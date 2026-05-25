@@ -1,0 +1,56 @@
+.footer {
+  width: min(1220px, calc(100% - 40px));
+  margin: 92px auto 0;
+  padding: 28px 0 38px;
+  color: rgba(245, 240, 230, 0.62);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 22px;
+  align-items: center;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand {
+  color: #f7f2e5;
+  font-size: 18px;
+  font-weight: 860;
+  letter-spacing: -0.04em;
+}
+
+.contact {
+  display: grid;
+  gap: 3px;
+  font-style: normal;
+  text-align: right;
+}
+
+.contactName {
+  color: #f7f2e5;
+  font-weight: 760;
+}
+
+.contactRole,
+.legal {
+  font-size: 13px;
+}
+
+.mail {
+  color: #dfff7a;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .inner {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .contact {
+    text-align: left;
+  }
+}

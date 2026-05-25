@@ -1,0 +1,53 @@
+/* Import partners styles */
+
+/* Additional global styles for partners page */
+.section {
+  container-type: inline-size;
+}
+
+@container (max-width: 768px) {
+  .section {
+    margin: 60px auto;
+  }
+
+  .section h2 {
+    font-size: 28px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .partner-card {
+    transition: none;
+  }
+
+  .partner-card:hover {
+    transform: none;
+  }
+
+  .filter-btn {
+    transition: none;
+  }
+}
+
+/* Focus styles for better accessibility */
+.filter-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.partner-card:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .partner-card {
+    border-width: 2px;
+  }
+
+  .status-dot {
+    border: 1px solid currentColor;
+  }
+}

@@ -1,0 +1,1 @@
+export { CorePricingScreen } from './controllers';

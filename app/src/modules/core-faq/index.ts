@@ -1,0 +1,1 @@
+export { CoreFaqScreen } from './controllers';

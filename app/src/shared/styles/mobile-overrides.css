@@ -1,0 +1,168 @@
+/* ================================
+   MOBILE POLISH — drop at the END of globals.css
+   ================================ */
+
+/* Базовые мобильные переменные */
+@media (max-width: 980px){
+    :root{
+      --phone-w: clamp(240px, 52vw, 320px);
+    }
+  }
+  
+  /* Лёгкая оптимизация бэкграунда на мобилке (меньше «шума») */
+  @media (max-width: 980px){
+    .bg-noise{ opacity:.035 }
+    .bg-par{ display:none }  /* пареллокс и тяжёлые слои отключаем */
+  }
+  
+  /* Header / Topbar уплотняем, но оставляем «дорогость» */
+  @media (max-width: 980px){
+    .topbar{
+      gap:10px;
+      padding: 12px clamp(14px, 4vw, 20px);
+      padding-top: calc(12px + env(safe-area-inset-top));
+      backdrop-filter: saturate(140%) blur(8px);
+    }
+    .brand-title{ font-size: clamp(20px, 6.2vw, 26px); }
+    .topbar__nav{ display:none; }
+    /* Пилюля «waitlist» сжимается, прячет подпись (сам компонент уже умеет) */
+    .tb-wl{ gap:6px; padding:6px 8px; }
+    .tb-wl__label{ display:none; }
+  }
+  
+  /* Hero: вертикальный стек, крупная типографика, хороший «дых» */
+  @media (max-width: 980px){
+    .hero{
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 18px auto 14px;
+      padding: 0 clamp(14px, 4vw, 20px);
+    }
+    .hero .kicker{ font-size: 11px; letter-spacing:.14em; }
+    .hero__copy h1{
+      font-size: clamp(28px, 7.6vw, 42px);
+      line-height: 1.12;
+      margin: 4px 0 8px;
+      text-wrap: balance;
+    }
+    .hero .lead{
+      font-size: clamp(14px, 4.2vw, 17px);
+      color: var(--text-2);
+      margin: 4px 0 12px;
+    }
+    .hero__visual{ order: 2; }
+    .hero__frame{
+      height: clamp(220px, 40vh, 320px);
+      border-radius: 16px;
+    }
+    .cta-row{
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn{ height: 42px; padding: 0 16px; border-radius: 12px; }
+  }
+  
+  /* Sections: меньше поля и более плотная сетка */
+  @media (max-width: 980px){
+    .section{
+      margin: 56px auto;
+      padding: 0 clamp(14px, 4vw, 20px);
+    }
+    .section h2{
+      font-size: clamp(22px, 6.2vw, 30px);
+      line-height: 1.18;
+      margin-bottom: 6px;
+      text-wrap: balance;
+    }
+    .section .sub{
+      font-size: clamp(13px, 3.9vw, 16px);
+      margin-bottom: 18px;
+      color: var(--text-2);
+    }
+  }
+  
+  /* FeatureCards: превращаем в «список», без коробок */
+  @media (max-width: 680px){
+    .grid.features{ display:block }
+    .grid.features .card{
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      padding: 14px 0;
+      box-shadow: none;
+      transform: none;
+    }
+    .grid.features .card:last-child{ border-bottom: none; }
+    .grid.features .card h4{ margin: 0 0 4px; font-size: 16px; }
+    .grid.features .card p{ font-size: 14px; color: var(--text-2); }
+  }
+  
+  /* How it feels: на мобилке оставляем только список шагов (рамку телефона скрываем) */
+  @media (max-width: 980px){
+    .story__pin{ grid-template-columns: 1fr; }
+    .story__screen{ display: none; }  /* вы уже это делали, дублирую как хард-оверрайд */
+    .story__panel{ gap: 8px; }
+    .story__step{ padding: 10px 0; }
+    .story__step strong{ font-size: 15px; }
+    .story__step .sub{ font-size: 13px; color: var(--text-2); }
+  }
+  
+  /* Marquee: компактнее карточки и высота */
+  @media (max-width: 680px){
+    .marquee__item{ width: 150px; }
+    .marquee__item img{ height: 240px; }
+  }
+  
+  /* Trust strip: 2 колонки → 1 колонка */
+  @media (max-width: 980px){
+    .trust{ grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 680px){
+    .trust{ grid-template-columns: 1fr; }
+  }
+  
+  /* FAQ: ужимаем контролы */
+  @media (max-width: 740px){
+    .faq .toolbar{
+      gap: 8px;
+    }
+    .faq .search{
+      flex-basis: 100%;
+      height: 42px;
+    }
+    .faq .actions{ width: 100%; justify-content: flex-end; }
+  }
+  
+  /* Waitlist: в одну колонку и крупные хиты */
+  @media (max-width: 740px){
+    .waitform .wf-row{ grid-template-columns: 1fr; }
+    .waitform .btn{ height: 48px; min-width: 180px; border-radius: 999px; }
+  }
+  
+  /* Footer: центрируем, меньше отступов */
+  @media (max-width: 980px){
+    .footer{ margin: 56px 0 26px; }
+    .footer__inner{
+      padding: 0 clamp(14px, 4vw, 20px);
+      gap: 12px;
+    }
+  }
+  
+  /* Phone shell: чуть шире на узких экранах */
+  @media (max-width: 560px){
+    .phone{ width: clamp(240px, 64vw, 320px); }
+  }
+  
+  /* Кнопки в шапке/навигации — массивная «яблочная» тактильность */
+  @media (max-width: 560px){
+    .btn--nav{
+      height: 40px; padding: 0 14px; border-radius: 12px;
+      transform: translateZ(0);
+    }
+  }
+  
+  /* Reduce motion (мобилки часто экономят батарею) */
+  @media (prefers-reduced-motion: reduce){
+    .swap, .reveal, .btn, .hero__frame{ transition: none !important; animation: none !important; }
+  }

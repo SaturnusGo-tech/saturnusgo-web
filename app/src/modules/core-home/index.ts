@@ -1,0 +1,1 @@
+export { CoreHomeScreen } from "./controllers";

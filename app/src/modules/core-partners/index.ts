@@ -1,0 +1,15 @@
+export { default as CorePartnersScreen } from './routes/page';
+export { default as CorePartnersAboutScreen } from './routes/about/page';
+export { default as CorePartnersApplyScreen } from './routes/apply/page';
+export { default as CorePartnersBenefitsPlatformScreen } from './routes/benefits/platform/page';
+export { default as CorePartnersBenefitsReachScreen } from './routes/benefits/reach/page';
+export { default as CorePartnersBenefitsTrustedScreen } from './routes/benefits/trusted/page';
+export { default as CorePartnersCareersScreen } from './routes/careers/page';
+export { default as CorePartnersCareerDetailScreen } from './routes/careers/[id]/page';
+export { default as CorePartnersComplianceScreen } from './routes/compliance/page';
+export { default as CorePartnersContactsScreen } from './routes/contacts/page';
+export { default as CorePartnersCookiesScreen } from './routes/cookies/page';
+export { default as CorePartnersListingScreen } from './routes/listing/page';
+export { default as CorePartnersNewsScreen } from './routes/news/page';
+export { default as CorePartnersPrivacyScreen } from './routes/privacy/page';
+export { default as CorePartnersTermsScreen } from './routes/terms/page';

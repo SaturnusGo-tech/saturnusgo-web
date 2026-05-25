@@ -1,0 +1,1 @@
+export { CoreInvestorsMethodologyScreen } from './controllers';

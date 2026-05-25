@@ -1,0 +1,54 @@
+.root{
+  --bg:rgba(22,22,24,.55);--stroke:rgba(255,255,255,.14);--stroke-strong:rgba(255,255,255,.22);--fg:rgba(255,255,255,.92);--fg-dim:rgba(255,255,255,.72);--radius:22px;
+  display:block;width:100%;overflow-x:hidden;
+}
+.root :global(.section){--bg:rgba(22,22,24,.55);--stroke:rgba(255,255,255,.14);--stroke-strong:rgba(255,255,255,.22);--fg:rgba(255,255,255,.92);--fg-dim:rgba(255,255,255,.72);--radius:22px}
+.root :global(.card){border:1px solid var(--stroke);border-radius:var(--radius);background:var(--bg);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 10px 28px rgba(0,0,0,.24);padding:16px}
+.root :global(.card__title){margin:0 0 10px;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.root :global(.bullets){margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px;color:var(--fg-dim)}
+.root :global(.bullets--cols){list-style:disc}
+.root :global(.grid.model){display:flex;flex-wrap:wrap;gap:8px}
+.root :global(.pill){padding:8px 12px;border-radius:999px;border:1px solid var(--stroke);background:var(--bg);font-size:13px;backdrop-filter:saturate(135%) blur(8px)}
+.root :global(.cta-row){display:flex;gap:12px;flex-wrap:wrap}
+.root :global(.btn){all:unset;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--stroke);background:var(--bg);color:var(--fg);transition:transform .08s ease,filter .18s ease,box-shadow .18s ease}
+.root :global(.btn:hover){filter:brightness(1.03)}
+.root :global(.btn:active){transform:translateY(1px)}
+.root :global(.btn:focus-visible){outline:none;box-shadow:0 0 0 2px rgba(122,168,255,.18),0 10px 28px rgba(0,0,0,.28)}
+.root :global(.btn-primary){color:#0b0b0c;background:linear-gradient(180deg,#fff,#dcdfe7);border-color:rgba(255,255,255,.8);box-shadow:0 8px 20px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.8) inset}
+.root :global(.back-mobile){position:fixed;top:16px;left:16px;z-index:60;display:inline-flex;align-items:center;gap:8px;-webkit-tap-highlight-color:transparent}
+@media (prefers-reduced-motion:reduce){.root :global(.btn){transition:none}}
+@media (min-width:980px){.root :global(.back-mobile){display:none}}
+@supports (padding:max(0px)){.root :global(.back-mobile){top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left))}}
+@media (max-width:979.98px){
+  .root :global(.section){margin:56px auto;padding-left:clamp(14px,4vw,20px);padding-right:clamp(14px,4vw,20px)}
+  .root :global(.section__head .kicker){font-size:11px;letter-spacing:.14em}
+  .root :global(.section__head h2){font-size:clamp(22px,6.4vw,30px);line-height:1.14;margin:0 0 6px;text-wrap:balance}
+  .root :global(.section__head .sub){font-size:clamp(13px,3.9vw,16px);color:var(--text-2)}
+  .root :global(.news-grid),.root :global(.mlist){grid-template-columns:1fr!important}
+  .root :global(.news-rail){min-width:0!important}
+  .root :global(.mcopy){width:100%;max-width:100%}
+  .root :global(p),.root :global(li),.root :global(.md),.root :global(.bullets),.root :global(.ps-list li){overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
+  .root :global(.ps-title){font-size:clamp(16px,4.8vw,18px)}
+  .root :global(.ps-row){padding:10px 12px}
+  .root :global(.ps-list){padding-left:16px}
+  .root :global(.ps-list li){font-size:14px;line-height:1.5}
+  .root :global(.card){padding:12px;border-radius:16px}
+  .root :global(.card__title){font-size:15px}
+  .root :global(.cta-row){gap:10px}
+  .root :global(.btn),.root :global(.btn--cta-secondary){height:44px;padding:0 14px;border-radius:12px;max-width:100%;min-width:0;white-space:nowrap}
+  .root :global(.cta-row .btn),.root :global(.cta-row a.btn),.root :global(.cta-row .btn--cta-secondary){flex:1 1 auto}
+  .root :global(img),.root :global(video),.root :global(svg),.root :global(canvas){max-width:100%;height:auto}
+  .root :global(#gtm .section__head h2),.root :global(#model .section__head h2),.root :global(#roadmap .section__head h2){font-size:clamp(24px,7vw,32px)}
+  .root :global(#gtm .section__head .sub),.root :global(#model .section__head .sub),.root :global(#roadmap .section__head .sub){font-size:clamp(13px,3.8vw,16px)}
+  .root :global(.mlist>li:nth-child(n+3) .mcopy){border-top:1px solid color-mix(in oklab,var(--border),transparent 20%);padding-top:12px}
+}
+@media (max-width:680px){
+  .root :global(.section){margin:64px auto;padding-left:16px;padding-right:16px}
+  .root :global(.section__head .sub){font-size:15px}
+}
+@media (max-width:360px){
+  .root :global(.section){margin:44px auto}
+  .root :global(.btn){height:42px;padding:0 12px}
+  .root :global(.ps-row){padding:8px 10px}
+  .root :global(.card__title){font-size:14.5px}
+}
