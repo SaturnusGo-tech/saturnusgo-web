@@ -2,14 +2,16 @@
 
 import { useMemo, useState } from "react";
 
-import { CORE_HOME_SERVICE_MODULES } from "../../../../constants";
+import { useLanguage } from "../../../../../../shared/i18n";
 import styles from "../styles/styles.module.css";
 
 export default function FeatureCards() {
-  const [activeId, setActiveId] = useState(CORE_HOME_SERVICE_MODULES[0]?.id);
+  const { dictionary } = useLanguage();
+  const services = dictionary.home.serviceModules;
+  const [activeId, setActiveId] = useState(services[0]?.id);
   const activeService = useMemo(
-    () => CORE_HOME_SERVICE_MODULES.find((service) => service.id === activeId),
-    [activeId],
+    () => services.find((service) => service.id === activeId),
+    [activeId, services],
   );
 
   if (!activeService) {
@@ -27,7 +29,7 @@ export default function FeatureCards() {
       </div>
 
       <div className={styles.list}>
-        {CORE_HOME_SERVICE_MODULES.map((service) => {
+        {services.map((service) => {
           const isActive = service.id === activeId;
 
           return (

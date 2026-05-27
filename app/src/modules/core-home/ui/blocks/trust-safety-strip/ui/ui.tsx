@@ -1,12 +1,15 @@
 "use client";
 
-import { CORE_HOME_PRESENCE_CARDS } from "../../../../constants";
+import { useLanguage } from "../../../../../../shared/i18n";
 import styles from "../styles/styles.module.css";
 
 export default function TrustSafetyStrip() {
+  const { dictionary } = useLanguage();
+  const cards = dictionary.home.presenceCards;
+
   return (
     <div className={styles.grid}>
-      {CORE_HOME_PRESENCE_CARDS.map((item) => (
+      {cards.map((item) => (
         <article className={styles.item} key={`${item.city}-${item.entity}`}>
           <img className={styles.image} src={item.image} alt="" />
           <div className={styles.overlay} />

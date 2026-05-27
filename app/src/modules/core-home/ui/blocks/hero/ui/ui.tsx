@@ -8,6 +8,7 @@ import {
   CORE_HOME_INVESTORS_PATHNAME,
 } from "../../../../constants";
 import usePdfDemoDialog from "../../../../services/pdf-demo-dialog";
+import { useLanguage } from "../../../../../../shared/i18n";
 import styles from "../styles/styles.module.css";
 
 function useHeroLoadingProgress() {
@@ -51,6 +52,8 @@ function useHeroLoadingProgress() {
 
 export default function Hero() {
   const { progress, isReady } = useHeroLoadingProgress();
+  const { dictionary } = useLanguage();
+  const copy = dictionary.home.hero;
   const { Dialog, openDialog } = usePdfDemoDialog({
     url: "/SG-P.pdf",
     rememberKey: "skipDeckWarning",
@@ -76,28 +79,25 @@ export default function Hero() {
         <div className={styles.veil} aria-hidden />
 
         <div className={styles.content}>
-          <div className={styles.kicker}>SaturnusGo / urban mobility</div>
-          <h1 className={styles.title}>Ехать, отправлять, открывать город</h1>
-          <p className={styles.lead}>
-            Taxi-first главный экран для поездок, доставки, мест и городского
-            движения в одном спокойном premium-flow.
-          </p>
+          <div className={styles.kicker}>{copy.kicker}</div>
+          <h1 className={styles.title}>{copy.title}</h1>
+          <p className={styles.lead}>{copy.lead}</p>
 
           <div className={styles.actions}>
             <a className={styles.primaryAction} href="#trips">
-              Смотреть продукт
+              {copy.primaryAction}
             </a>
             <Link className={styles.secondaryAction} href={CORE_HOME_INVESTORS_PATHNAME}>
-              Investors
+              {copy.investorsAction}
             </Link>
             <button className={styles.secondaryAction} type="button" onClick={openDialog}>
-              Deck
+              {copy.deckAction}
             </button>
           </div>
         </div>
 
-        <a className={styles.scrollHint} href="#value" aria-label="Scroll to product intro">
-          <span>Scroll down</span>
+        <a className={styles.scrollHint} href="#value" aria-label={copy.scrollLabel}>
+          <span>{copy.scrollText}</span>
           <i aria-hidden />
         </a>
       </section>

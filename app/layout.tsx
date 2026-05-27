@@ -22,6 +22,7 @@ import CoreHomeFooter from "./src/modules/core-home/ui/blocks/footer";
 
 // === добавлено ===
 import ThemeProvider from "./src/shared/theme-provider/provider";
+import { LanguageProvider } from "./src/shared/i18n";
 // Шрифты Geist (variable), отдают CSS-переменные --font-geist-sans / --font-geist-mono
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
@@ -73,7 +74,7 @@ export default function RootLayout({
   return (
     // ⛔ УДАЛЯЕМ Inter.variable; ✅ ДОБАВЛЯЕМ GeistSans/GeistMono классы
     <html
-      lang="en"
+      lang="ru"
       className={`font-pjs ${pjs.variable} ${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
     >
@@ -89,6 +90,23 @@ export default function RootLayout({
               t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
             document.documentElement.classList.toggle('dark', t === 'dark');
+          } catch (_) {}
+        `}</Script>
+
+        <Script id="sg-locale-init" strategy="beforeInteractive">{`
+          try {
+            var key = 'saturnusgo.locale.v1';
+            var cookieKey = 'saturnusgo_locale';
+            var value = null;
+            try { value = localStorage.getItem(key); } catch (_) {}
+            if (!/^(ru|en|es)$/.test(value || '')) {
+              var match = document.cookie.match(new RegExp('(?:^|; )' + cookieKey + '=(ru|en|es)(?:;|$)'));
+              value = match && match[1];
+            }
+            if (!/^(ru|en|es)$/.test(value || '')) value = 'ru';
+            window.__SATURNUSGO_INITIAL_LOCALE__ = value;
+            document.documentElement.lang = value;
+            document.documentElement.dataset.locale = value;
           } catch (_) {}
         `}</Script>
 
@@ -118,64 +136,66 @@ export default function RootLayout({
       </head>
       <body>
         <PhoneOverlayProvider>
-          <CookieBanner />
           <ThemeProvider>
-            <Script
-              id="mobile-hard-gate"
-              strategy="beforeInteractive"
-            >{`(function(){ /* ... */ })();`}</Script>
-            <Script
-              id="route-flags"
-              strategy="beforeInteractive"
-            >{`(function(){ /* ... */ })();`}</Script>
+            <LanguageProvider>
+              <CookieBanner />
+              <Script
+                id="mobile-hard-gate"
+                strategy="beforeInteractive"
+              >{`(function(){ /* ... */ })();`}</Script>
+              <Script
+                id="route-flags"
+                strategy="beforeInteractive"
+              >{`(function(){ /* ... */ })();`}</Script>
 
-            <Suspense fallback={null}>
-              <RouteFlagsClient />
-            </Suspense>
+              <Suspense fallback={null}>
+                <RouteFlagsClient />
+              </Suspense>
 
-            {/* Background */}
-            <div className="bg-base" />
-            <div className="bg-grad bg-grad--1" />
-            <div className="bg-grad bg-grad--2" />
-            <div className="bg-cracks" />
-            <div className="bg-noise" />
+              {/* Background */}
+              <div className="bg-base" />
+              <div className="bg-grad bg-grad--1" />
+              <div className="bg-grad bg-grad--2" />
+              <div className="bg-cracks" />
+              <div className="bg-noise" />
 
-            <DeviceGate notMobile>
-              <Defer strategy="idle">
-                <ParallaxBG />
-              </Defer>
-            </DeviceGate>
+              <DeviceGate notMobile>
+                <Defer strategy="idle">
+                  <ParallaxBG />
+                </Defer>
+              </DeviceGate>
 
-            <AppHeader />
+              <AppHeader />
 
-            <main
-              id="app-main"
-              className="cv-auto"
-              style={{ paddingTop: "var(--app-header-h)" }}
-            >
-              <PageTransition>{children}</PageTransition>
-            </main>
+              <main
+                id="app-main"
+                className="cv-auto"
+                style={{ paddingTop: "var(--app-header-h)" }}
+              >
+                <PageTransition>{children}</PageTransition>
+              </main>
 
-            <CoreHomeFooter />
+              <CoreHomeFooter />
 
-            <Suspense fallback={null}>
-              <DeckDialogHost />
-            </Suspense>
+              <Suspense fallback={null}>
+                <DeckDialogHost />
+              </Suspense>
 
-            <DeviceGate notMobile>
-              <Defer strategy="idle">
-                <RouteProgress />
-              </Defer>
-            </DeviceGate>
+              <DeviceGate notMobile>
+                <Defer strategy="idle">
+                  <RouteProgress />
+                </Defer>
+              </DeviceGate>
 
-            <Script
-              id="prefer-reduced-motion"
-              strategy="afterInteractive"
-            >{`try{
+              <Script
+                id="prefer-reduced-motion"
+                strategy="afterInteractive"
+              >{`try{
             if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
               document.documentElement.setAttribute('data-prm','1');
             }
           }catch(e){}`}</Script>
+            </LanguageProvider>
           </ThemeProvider>
         </PhoneOverlayProvider>
       </body>

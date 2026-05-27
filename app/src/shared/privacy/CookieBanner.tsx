@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '../i18n';
 
 type Consent = 'granted' | 'denied';
 type Stored = { v: Consent; ts: number; ttl: number };
@@ -57,6 +58,8 @@ function useTone(): 'light'|'dark' {
 
 export default function CookieBanner() {
   const tone = useTone();
+  const { dictionary } = useLanguage();
+  const copy = dictionary.cookie;
   const [open, setOpen] = useState(false);
   const [mount, setMount] = useState(false);
   const wrapRef = useRef<HTMLDivElement|null>(null);
@@ -103,19 +106,19 @@ export default function CookieBanner() {
 
   return (
     <div ref={wrapRef} className={`cb__root ${open ? 'is-open' : ''}`} data-tone={tone} aria-live="polite">
-      <div className="cb__inner" role="region" aria-label="Cookie consent">
+      <div className="cb__inner" role="region" aria-label={copy.ariaLabel}>
         <div className="cb__text">
-          <div className="cb__kicker">Cookies & data</div>
-          <div className="cb__title">We respect your privacy</div>
+          <div className="cb__kicker">{copy.kicker}</div>
+          <div className="cb__title">{copy.title}</div>
           <p className="cb__p">
-            We use cookies to personalize, improve, and measure. Choose “Accept” for a better experience or “Decline” to keep only essential cookies.
-            <a className="cb__link" href="/partners/privacy" target="_self" rel="noopener"> Learn more</a>.
+            {copy.text}
+            <a className="cb__link" href="/partners/privacy" target="_self" rel="noopener"> {copy.learnMore}</a>.
           </p>
         </div>
 
-        <div className="cb__actions" role="group" aria-label="Cookie choices">
-          <button className="cb__btn cb__btn--ghost" onClick={() => onChoice('denied')}>Decline</button>
-          <button className="cb__btn cb__btn--primary" onClick={() => onChoice('granted')}>Accept</button>
+        <div className="cb__actions" role="group" aria-label={copy.choicesLabel}>
+          <button className="cb__btn cb__btn--ghost" onClick={() => onChoice('denied')}>{copy.decline}</button>
+          <button className="cb__btn cb__btn--primary" onClick={() => onChoice('granted')}>{copy.accept}</button>
         </div>
       </div>
 

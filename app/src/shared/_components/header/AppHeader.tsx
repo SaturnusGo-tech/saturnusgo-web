@@ -4,73 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { LOCALE_META, SUPPORTED_LOCALES, useLanguage } from "../../i18n";
 import styles from "./header.module.css";
-
-type NavigationItem = {
-  href: string;
-  label: string;
-};
-
-type NavigationGroup = {
-  title: string;
-  links: readonly NavigationItem[];
-};
-
-const PRIMARY_NAVIGATION_LINKS = [
-  { href: "/", label: "Главная" },
-  { href: "/features", label: "Возможности" },
-  { href: "/mobile", label: "Приложение" },
-  { href: "/pricing", label: "Тарифы" },
-  { href: "/investors", label: "Инвесторам" },
-  { href: "/partners", label: "Партнёрам" },
-] as const satisfies readonly NavigationItem[];
-
-const NAVIGATION_GROUPS = [
-  {
-    title: "Продукт",
-    links: [
-      { href: "/#trips", label: "Поездки" },
-      { href: "/#delivery", label: "Доставка" },
-      { href: "/#places", label: "Места" },
-      { href: "/topup-crypto", label: "Crypto top-up" },
-    ],
-  },
-  {
-    title: "Инвесторам",
-    links: [
-      { href: "/investors", label: "Обзор" },
-      { href: "/investors/methodology", label: "Методология" },
-      { href: "/press", label: "Пресса" },
-      { href: "/founder", label: "Founder" },
-    ],
-  },
-  {
-    title: "Партнёрам",
-    links: [
-      { href: "/partners/about", label: "О партнёрстве" },
-      { href: "/partners/apply", label: "Подать заявку" },
-      { href: "/partners/listing", label: "Листинг" },
-      { href: "/partners/benefits/platform", label: "Платформа" },
-      { href: "/partners/benefits/reach", label: "Охват" },
-      { href: "/partners/benefits/trusted", label: "Доверие" },
-      { href: "/partners/careers", label: "Вакансии" },
-      { href: "/partners/compliance", label: "Compliance" },
-      { href: "/partners/news", label: "Новости" },
-      { href: "/partners/contacts", label: "Контакты" },
-    ],
-  },
-  {
-    title: "Помощь",
-    links: [
-      { href: "/support", label: "Поддержка" },
-      { href: "/faq", label: "FAQ" },
-      { href: "/changelog", label: "Changelog" },
-      { href: "/partners/privacy", label: "Privacy" },
-      { href: "/partners/terms", label: "Terms" },
-      { href: "/partners/cookies", label: "Cookies" },
-    ],
-  },
-] as const satisfies readonly NavigationGroup[];
 
 function isNavigationItemActive(pathname: string, href: string) {
   const [routePath] = href.split("#");
@@ -84,17 +19,21 @@ function isNavigationItemActive(pathname: string, href: string) {
 
 export default function Header() {
   const pathname = usePathname();
+  const { locale, setLocale, dictionary } = useLanguage();
+  const { header } = dictionary;
   const [menuOpen, setMenuOpen] = useState(false);
   const overlayId = "saturnusgo-navigation-overlay";
 
-  const menuButtonLabel = menuOpen ? "Закрыть меню" : "Открыть меню";
+  const menuButtonLabel = menuOpen
+    ? header.closeMenuLabel
+    : header.openMenuLabel;
 
   const activePrimaryIndex = useMemo(
     () =>
-      PRIMARY_NAVIGATION_LINKS.findIndex((item) =>
+      header.primaryNavigation.findIndex((item) =>
         isNavigationItemActive(pathname, item.href),
       ),
-    [pathname],
+    [header.primaryNavigation, pathname],
   );
 
   useEffect(() => {
@@ -128,7 +67,7 @@ export default function Header() {
   return (
     <header className={styles.header} data-menu-open={menuOpen}>
       <div className={styles.container}>
-        <Link href="/" className={styles.logo} aria-label="SaturnusGo home">
+        <Link href="/" className={styles.logo} aria-label={header.brandHomeLabel}>
           SaturnusGo
         </Link>
 
@@ -141,7 +80,7 @@ export default function Header() {
           type="button"
         >
           <span className={styles.menuButtonText}>
-            {menuOpen ? "Close" : "Menu"}
+            {menuOpen ? header.close : header.menu}
           </span>
           <span className={styles.menuIcon} aria-hidden="true" />
         </button>
@@ -153,7 +92,7 @@ export default function Header() {
         aria-hidden={!menuOpen}
         role="dialog"
         aria-modal="true"
-        aria-label="Навигация SaturnusGo"
+        aria-label={header.overlayLabel}
       >
         <div className={styles.overlayShell}>
           <div className={styles.overlayHeader}>
@@ -169,7 +108,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               type="button"
             >
-              <span>Закрыть</span>
+              <span>{header.close}</span>
               <span className={styles.closeIcon} aria-hidden="true" />
             </button>
           </div>
@@ -177,11 +116,11 @@ export default function Header() {
           <div className={styles.overlayBody}>
             <nav
               className={styles.primaryNavigation}
-              aria-label="Главная навигация"
+              aria-label={header.primaryNavigationLabel}
             >
-              <p className={styles.eyebrow}>Navigation</p>
+              <p className={styles.eyebrow}>{header.eyebrow}</p>
               <ol className={styles.primaryList}>
-                {PRIMARY_NAVIGATION_LINKS.map((item, index) => {
+                {header.primaryNavigation.map((item, index) => {
                   const active = index === activePrimaryIndex;
 
                   return (
@@ -208,9 +147,9 @@ export default function Header() {
 
             <aside
               className={styles.secondaryNavigation}
-              aria-label="Все разделы сайта"
+              aria-label={header.allSectionsLabel}
             >
-              {NAVIGATION_GROUPS.map((group) => (
+              {header.navigationGroups.map((group) => (
                 <section key={group.title} className={styles.linkGroup}>
                   <h2>{group.title}</h2>
                   <ul>
@@ -237,10 +176,36 @@ export default function Header() {
           </div>
 
           <div className={styles.overlayFooter}>
-            <span>Urban mobility · Travel intelligence · City services</span>
-            <Link href="/#download-app" onClick={() => setMenuOpen(false)}>
-              Скачать приложение
-            </Link>
+            <div className={styles.footerMeta}>
+              <span>{header.footer.tagline}</span>
+              <Link href="/#download-app" onClick={() => setMenuOpen(false)}>
+                {header.footer.download}
+              </Link>
+            </div>
+
+            <div
+              className={styles.languageSwitcher}
+              aria-label={header.language.label}
+            >
+              <span className={styles.languageLabel}>
+                {header.language.label}
+              </span>
+              <div className={styles.languageOptions}>
+                {SUPPORTED_LOCALES.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    data-active={option === locale}
+                    aria-pressed={option === locale}
+                    aria-label={`${header.language.current}: ${header.language.options[option]}`}
+                    onClick={() => setLocale(option)}
+                  >
+                    <span>{LOCALE_META[option].shortName}</span>
+                    <small>{header.language.options[option]}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,228 @@
+.content {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 450px;
+  overflow: hidden;
+  color: #5d7399;
+  font-family: "Dosis", "Trebuchet MS", Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  background-color: #d2e1ec;
+  background-image: linear-gradient(to bottom, #bbcfe1 0%, #e8f2f6 80%);
+}
+
+.snow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.mainText {
+  padding: 20vh 20px 0;
+  text-align: center;
+  line-height: 2em;
+  font-size: 5vh;
+}
+
+.mainText h1 {
+  margin: 0;
+  font: inherit;
+  font-weight: 500;
+}
+
+.homeLink {
+  color: inherit;
+  border-bottom: 1px dashed rgba(93, 115, 153, 0.5);
+  font-size: 0.6em;
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+.homeLink:hover {
+  opacity: 1;
+}
+
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 160px;
+  background: #f6f9fa;
+  box-shadow: 0 0 10px 10px #f6f9fa;
+}
+
+.ground::before,
+.ground::after {
+  content: "";
+  position: absolute;
+  top: -62.5px;
+  z-index: -1;
+  display: block;
+  width: 250px;
+  height: 250px;
+  background: transparent;
+  transform: scaleX(0.2) rotate(45deg);
+}
+
+.ground::after {
+  left: 50%;
+  margin-left: -166.6666666667px;
+  box-shadow:
+    -260px 340px 15px #91a1bc,
+    -585px 615px 15px #8a9bb8,
+    -905px 895px 15px #8a9bb8,
+    -1230px 1170px 15px #91a1bc,
+    -1545px 1455px 15px #8798b6,
+    -1770px 1830px 15px #8193b2,
+    -2080px 2120px 15px #8a9bb8,
+    -2400px 2400px 15px #9dabc4,
+    -2740px 2660px 15px #a7b4c9,
+    -3045px 2955px 15px #9dabc4,
+    -3330px 3270px 15px #8496b4,
+    -3615px 3585px 15px #8798b6,
+    -3880px 3920px 15px #9dabc4,
+    -4205px 4195px 15px #bac4d5,
+    -4465px 4535px 15px #9dabc4,
+    -4770px 4830px 15px #8a9bb8;
+}
+
+.ground::before {
+  right: 50%;
+  margin-right: -166.6666666667px;
+  box-shadow:
+    330px -270px 15px #8193b2,
+    640px -560px 15px #a7b4c9,
+    875px -925px 15px #bac4d5,
+    1225px -1175px 15px #aab6cb,
+    1475px -1525px 15px #8193b2,
+    1775px -1825px 15px #adb9cd,
+    2115px -2085px 15px #a1aec6,
+    2410px -2390px 15px #8a9bb8,
+    2705px -2695px 15px #7e90b0,
+    3020px -2980px 15px #8496b4,
+    3310px -3290px 15px #8193b2,
+    3575px -3625px 15px #97a6c0,
+    3945px -3855px 15px #b0bccf,
+    4210px -4190px 15px #a1aec6,
+    4505px -4495px 15px #bac4d5,
+    4840px -4760px 15px #a4b1c8;
+}
+
+.mound {
+  margin-top: -80px;
+  color: #dd4040;
+  font-size: 180px;
+  font-weight: 800;
+  text-align: center;
+  pointer-events: none;
+}
+
+.mound::before {
+  content: "";
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: 600px;
+  height: 200px;
+  margin-left: -300px;
+  border-radius: 100%;
+  background-color: #e8f2f6;
+  background-image: linear-gradient(to bottom, #dee8f1, #f6f9fa 60px);
+}
+
+.mound::after {
+  content: "";
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 28px;
+  height: 6px;
+  margin-left: -150px;
+  border-radius: 100%;
+  background: #dd4040;
+  box-shadow:
+    -56px 12px 0 1px #dd4040,
+    -126px 6px 0 2px #dd4040,
+    -196px 24px 0 3px #dd4040;
+  transform: rotate(-15deg);
+}
+
+.moundText {
+  transform: rotate(6deg);
+}
+
+.moundSpade {
+  position: absolute;
+  top: 42%;
+  right: 50%;
+  z-index: 0;
+  display: block;
+  width: 35px;
+  height: 30px;
+  margin-right: -250px;
+  background: #dd4040;
+  transform: rotate(35deg);
+}
+
+.moundSpade::before,
+.moundSpade::after {
+  content: "";
+  position: absolute;
+  display: block;
+}
+
+.moundSpade::before {
+  bottom: 98%;
+  left: 50%;
+  width: 40%;
+  height: 30px;
+  margin-left: -20%;
+  background: #dd4040;
+}
+
+.moundSpade::after {
+  top: -55px;
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 30px;
+  border: 10px solid #dd4040;
+  border-radius: 4px 4px 20px 20px;
+}
+
+@media (max-width: 720px) {
+  .content {
+    font-size: 25px;
+  }
+
+  .mainText {
+    padding-top: 16vh;
+    font-size: 4.4vh;
+  }
+
+  .mound {
+    font-size: 132px;
+  }
+
+  .mound::before {
+    width: 430px;
+    height: 160px;
+    margin-left: -215px;
+  }
+
+  .moundSpade {
+    margin-right: -170px;
+  }
+}

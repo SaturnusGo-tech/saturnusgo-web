@@ -1,32 +1,12 @@
-const questions = [
-  {
-    index: "01",
-    title: "What is SaturnusGo?",
-    text: "A mobile product that connects rides, delivery, places, wallet, and partner services into one city flow.",
-  },
-  {
-    index: "02",
-    title: "Is it only a taxi app?",
-    text: "No. The ride layer is the entry point, but the product is built around movement, discovery, payments, and partners.",
-  },
-  {
-    index: "03",
-    title: "Where will it launch first?",
-    text: "The first commercial focus is South America, with Argentina as the most natural starting market.",
-  },
-  {
-    index: "04",
-    title: "Can partners join before launch?",
-    text: "Yes. Hotels, restaurants, cafés, venues, and local services can apply through the partner flow.",
-  },
-  {
-    index: "05",
-    title: "Why does the site alternate dark and light sections?",
-    text: "The home screen defines the rhythm: cinematic entry, light reading areas, and dark product emphasis where depth is needed.",
-  },
-];
+"use client";
+
+import { useLanguage } from "../../../../../shared/i18n";
+import { PUBLIC_PAGE_COPY } from "../../../../../shared/i18n/page-copy";
 
 export default function FaqPage() {
+  const { locale } = useLanguage();
+  const copy = PUBLIC_PAGE_COPY[locale].faq;
+
   return (
     <main className="sg-page">
       <section className="sg-hero" aria-labelledby="faq-title">
@@ -34,31 +14,23 @@ export default function FaqPage() {
           <img src="/mock/module-places.jpg" alt="" />
         </div>
         <div className="sg-hero-inner">
-          <span className="sg-kicker">SaturnusGo / FAQ</span>
-          <h1 id="faq-title">
-            Answers without turning the page into a black wall.
-          </h1>
-          <p>
-            FAQ is a reading screen. It keeps the cinematic entrance but moves
-            the actual answers into a calm light section.
-          </p>
+          <span className="sg-kicker">{copy.hero.kicker}</span>
+          <h1 id="faq-title">{copy.hero.title}</h1>
+          <p>{copy.hero.text}</p>
         </div>
       </section>
 
       <section className="sg-section sg-light" aria-labelledby="faq-list-title">
         <div className="sg-section-inner">
           <div className="sg-section-head">
-            <span className="sg-eyebrow">Questions</span>
+            <span className="sg-eyebrow">{copy.head.kicker}</span>
             <div className="sg-section-copy">
-              <h2 id="faq-list-title">The short version.</h2>
-              <p>
-                Clean rows are easier to scan than heavy cards, especially on
-                support and documentation-like pages.
-              </p>
+              <h2 id="faq-list-title">{copy.head.title}</h2>
+              <p>{copy.head.text}</p>
             </div>
           </div>
           <div className="sg-rows">
-            {questions.map((item) => (
+            {copy.questions.map((item) => (
               <article className="sg-row" key={item.title}>
                 <span className="sg-row-index">{item.index}</span>
                 <h3 className="sg-row-title">{item.title}</h3>
@@ -75,16 +47,10 @@ export default function FaqPage() {
       >
         <div className="sg-section-inner">
           <div className="sg-section-head">
-            <span className="sg-eyebrow">Still unclear</span>
+            <span className="sg-eyebrow">{copy.support.kicker}</span>
             <div className="sg-section-copy">
-              <h2 id="faq-support-title">
-                Support should continue the product flow.
-              </h2>
-              <p>
-                If the answer depends on a real ride, payment, partner, or
-                place, the correct UX is contextual support, not a generic FAQ
-                block.
-              </p>
+              <h2 id="faq-support-title">{copy.support.title}</h2>
+              <p>{copy.support.text}</p>
             </div>
           </div>
         </div>

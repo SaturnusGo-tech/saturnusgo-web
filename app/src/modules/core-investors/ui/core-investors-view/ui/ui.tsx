@@ -2,12 +2,8 @@
 
 import Link from "next/link";
 
-import {
-  CORE_INVESTORS_CONTENT_SECTIONS,
-  CORE_INVESTORS_MARQUEE_PHRASES,
-  CORE_INVESTORS_THESIS_ROWS,
-} from "../../../constants";
 import type { CoreInvestorsViewProps } from "../../../types";
+import { useLanguage } from "../../../../../shared/i18n";
 import ProjectionsSection from "../../sections/projections-section";
 import styles from "../styles/styles.module.css";
 
@@ -34,6 +30,9 @@ export function CoreInvestorsView({
   onIntroCtaClick,
   onOpenDeck,
 }: CoreInvestorsViewProps) {
+  const { dictionary } = useLanguage();
+  const copy = dictionary.investors;
+
   return (
     <div className={styles.root}>
       <section
@@ -56,26 +55,22 @@ export function CoreInvestorsView({
 
         <div className={styles.heroContent}>
           <div className={styles.heroTopline}>
-            <span>SaturnusGo / investors</span>
+            <span>{copy.hero.topLine}</span>
             <button type="button" onClick={onOpenDeck} aria-haspopup="dialog">
-              Open deck
+              {copy.hero.openDeck}
             </button>
           </div>
 
-          <p className={styles.kicker}>Urban mobility thesis</p>
-          <h1 id="investor-title">City movement, in one interface.</h1>
-          <p className={styles.lead}>
-            Trips, delivery, places, routes, and wallet logic connected around
-            repeated daily intent — built as one product surface, not a set of
-            disconnected utilities.
-          </p>
+          <p className={styles.kicker}>{copy.hero.kicker}</p>
+          <h1 id="investor-title">{copy.hero.title}</h1>
+          <p className={styles.lead}>{copy.hero.lead}</p>
 
           <div className={styles.heroActions}>
             <button type="button" onClick={onOpenDeck}>
-              Review deck
+              {copy.hero.reviewDeck}
             </button>
             <button type="button" onClick={onIntroCtaClick}>
-              Request walkthrough
+              {copy.hero.requestWalkthrough}
             </button>
           </div>
         </div>
@@ -83,22 +78,22 @@ export function CoreInvestorsView({
         <a
           className={styles.scrollHint}
           href="#thesis"
-          aria-label="Scroll to investor thesis"
+          aria-label={copy.hero.scrollLabel}
         >
-          <span>Scroll down</span>
+          <span>{copy.hero.scrollText}</span>
           <i aria-hidden />
         </a>
       </section>
 
       <section id="thesis" className={`${styles.thesisSection} reveal`}>
         <div className={styles.thesisHead}>
-          <span className={styles.kicker}>Investment case</span>
-          <h2>The investment case starts with the operating logic.</h2>
+          <span className={styles.kicker}>{copy.thesis.kicker}</span>
+          <h2>{copy.thesis.title}</h2>
         </div>
-        <TextRows rows={CORE_INVESTORS_THESIS_ROWS} />
+        <TextRows rows={copy.thesis.rows} />
       </section>
 
-      {CORE_INVESTORS_CONTENT_SECTIONS.slice(0, 1).map((section) => (
+      {copy.contentSections.slice(0, 1).map((section) => (
         <section
           key={section.id}
           id={section.id}
@@ -114,11 +109,11 @@ export function CoreInvestorsView({
         </section>
       ))}
 
-      <section className={styles.marquee} aria-label="Investor model surfaces">
+      <section className={styles.marquee} aria-label={copy.marqueeLabel}>
         <div className={styles.marqueeRail}>
           {[
-            ...CORE_INVESTORS_MARQUEE_PHRASES,
-            ...CORE_INVESTORS_MARQUEE_PHRASES,
+            ...copy.marqueePhrases,
+            ...copy.marqueePhrases,
           ].map((phrase, index) => (
             <span key={`${phrase}-${index}`}>{phrase}</span>
           ))}
@@ -127,18 +122,15 @@ export function CoreInvestorsView({
 
       <section
         className={`${styles.marketIntro} reveal`}
-        aria-label="Market model introduction"
+        aria-label={copy.marketIntro.label}
       >
-        <span className={styles.kicker}>Market model</span>
-        <p>
-          Switch the horizon, compare assumptions, and keep the 3, 5, and 10
-          year growth view visible before opening the deck.
-        </p>
+        <span className={styles.kicker}>{copy.marketIntro.label}</span>
+        <p>{copy.marketIntro.text}</p>
       </section>
 
       <ProjectionsSection />
 
-      {CORE_INVESTORS_CONTENT_SECTIONS.slice(1).map((section) => (
+      {copy.contentSections.slice(1).map((section) => (
         <section
           key={section.id}
           id={section.id}
@@ -159,15 +151,15 @@ export function CoreInvestorsView({
         className={`${styles.finalCta} reveal`}
         aria-labelledby="cta-title"
       >
-        <span className={styles.kicker}>Next step</span>
-        <h2 id="cta-title">If the thesis is interesting, open the deck.</h2>
-        <p>Full model, assumptions, rollout logic, and founder context.</p>
+        <span className={styles.kicker}>{copy.finalCta.kicker}</span>
+        <h2 id="cta-title">{copy.finalCta.title}</h2>
+        <p>{copy.finalCta.text}</p>
         <div className={styles.ctaActions}>
           <button type="button" onClick={onOpenDeck}>
-            Open deck
+            {copy.finalCta.openDeck}
           </button>
-          <Link href="/investors/methodology">Methodology</Link>
-          <Link href="/founder">Founder</Link>
+          <Link href="/investors/methodology">{copy.finalCta.methodology}</Link>
+          <Link href="/founder">{copy.finalCta.founder}</Link>
         </div>
       </section>
     </div>

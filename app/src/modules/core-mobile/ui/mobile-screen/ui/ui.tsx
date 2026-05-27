@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useLanguage } from "../../../../../shared/i18n";
+import { PUBLIC_PAGE_COPY } from "../../../../../shared/i18n/page-copy";
 
 const MobileLottie = dynamic(() => import("../../mobile-lottie"), {
   ssr: false,
@@ -11,6 +13,8 @@ const MobileLottie = dynamic(() => import("../../mobile-lottie"), {
 export default function MobileScreen() {
   const router = useRouter();
   const params = useSearchParams();
+  const { locale } = useLanguage();
+  const copy = PUBLIC_PAGE_COPY[locale].mobile;
   const from = params.get("from") || "/";
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -44,22 +48,16 @@ export default function MobileScreen() {
           <img src="/mock/device-preview.jpg" alt="" />
         </div>
         <div className="sg-hero-inner">
-          <span className="sg-kicker">SaturnusGo / Mobile preview</span>
-          <h1 id="mobile-title">
-            The current web build is tuned for desktop review.
-          </h1>
-          <p>
-            You can still continue on mobile, but the investor and product pages
-            are designed for wide screens while the app itself remains
-            mobile-first.
-          </p>
+          <span className="sg-kicker">{copy.hero.kicker}</span>
+          <h1 id="mobile-title">{copy.hero.title}</h1>
+          <p>{copy.hero.text}</p>
           <div className="sg-actions">
             <button
               className="sg-button"
               type="button"
               onClick={() => setConfirmOpen(true)}
             >
-              Continue anyway
+              {copy.hero.primary}
             </button>
           </div>
         </div>
@@ -68,17 +66,10 @@ export default function MobileScreen() {
       <section className="sg-section sg-light">
         <div className="sg-section-inner">
           <div className="sg-section-head">
-            <span className="sg-eyebrow">Desktop review</span>
+            <span className="sg-eyebrow">{copy.desktop.kicker}</span>
             <div className="sg-section-copy">
-              <h2>
-                The public site needs space for charts, product rhythm, and
-                partner content.
-              </h2>
-              <p>
-                This gate is intentionally simple: it explains the constraint
-                and lets the user continue without turning the page into a
-                broken mobile layout.
-              </p>
+              <h2>{copy.desktop.title}</h2>
+              <p>{copy.desktop.text}</p>
             </div>
           </div>
           <div
@@ -97,25 +88,22 @@ export default function MobileScreen() {
           aria-labelledby="confirm-title"
         >
           <div className="sg-mobile-dialog-panel">
-            <h2 id="confirm-title">Open the desktop layout?</h2>
-            <p>
-              The page can be viewed, but several sections may be compressed on
-              a phone.
-            </p>
+            <h2 id="confirm-title">{copy.dialog.title}</h2>
+            <p>{copy.dialog.text}</p>
             <div className="sg-actions">
               <button
                 className="sg-button"
                 type="button"
                 onClick={continueAnyway}
               >
-                Continue
+                {copy.dialog.continue}
               </button>
               <button
                 className="sg-button-ghost"
                 type="button"
                 onClick={() => setConfirmOpen(false)}
               >
-                Cancel
+                {copy.dialog.cancel}
               </button>
             </div>
           </div>

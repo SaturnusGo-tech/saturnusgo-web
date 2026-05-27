@@ -1,22 +1,12 @@
-const items = [
-  {
-    date: "2026",
-    title: "Unified identity pass",
-    text: "Public screens move to the Core Home rhythm: cinematic top, light reading body, dark product emphasis.",
-  },
-  {
-    date: "2025",
-    title: "Investor model and projections",
-    text: "Investor materials received a dedicated analytical surface with animated projections and methodology support.",
-  },
-  {
-    date: "2025",
-    title: "Partner layer",
-    text: "Partner onboarding, application flow, and business scenarios were separated from the consumer home story.",
-  },
-];
+"use client";
+
+import { useLanguage } from "../../../../../shared/i18n";
+import { PUBLIC_PAGE_COPY } from "../../../../../shared/i18n/page-copy";
 
 export default function Changelog() {
+  const { locale } = useLanguage();
+  const copy = PUBLIC_PAGE_COPY[locale].changelog;
+
   return (
     <main className="sg-page">
       <section className="sg-hero" aria-labelledby="changelog-title">
@@ -24,31 +14,23 @@ export default function Changelog() {
           <img src="/mock/device-preview.jpg" alt="" />
         </div>
         <div className="sg-hero-inner">
-          <span className="sg-kicker">SaturnusGo / Changelog</span>
-          <h1 id="changelog-title">
-            Product changes with the same visual rhythm.
-          </h1>
-          <p>
-            Changelog is a timeline, so it should be light, readable, and easy
-            to scan after the initial dark entry.
-          </p>
+          <span className="sg-kicker">{copy.hero.kicker}</span>
+          <h1 id="changelog-title">{copy.hero.title}</h1>
+          <p>{copy.hero.text}</p>
         </div>
       </section>
 
       <section className="sg-section sg-light" aria-labelledby="timeline-title">
         <div className="sg-section-inner">
           <div className="sg-section-head">
-            <span className="sg-eyebrow">Timeline</span>
+            <span className="sg-eyebrow">{copy.head.kicker}</span>
             <div className="sg-section-copy">
-              <h2 id="timeline-title">What changed.</h2>
-              <p>
-                A restrained timeline reads better than a grid of blocks and
-                keeps the content aligned with the new site identity.
-              </p>
+              <h2 id="timeline-title">{copy.head.title}</h2>
+              <p>{copy.head.text}</p>
             </div>
           </div>
           <div className="sg-rows">
-            {items.map((item, index) => (
+            {copy.items.map((item) => (
               <article className="sg-row" key={item.title}>
                 <span className="sg-row-index">{item.date}</span>
                 <h3 className="sg-row-title">{item.title}</h3>
@@ -59,22 +41,9 @@ export default function Changelog() {
         </div>
       </section>
 
-      <section className="sg-marquee" aria-label="SaturnusGo product evolution">
+      <section className="sg-marquee" aria-label={copy.marqueeLabel}>
         <div className="sg-marquee-rail">
-          {[
-            "Design",
-            "Product",
-            "Partners",
-            "Mobility",
-            "Payments",
-            "Launch",
-            "Design",
-            "Product",
-            "Partners",
-            "Mobility",
-            "Payments",
-            "Launch",
-          ].map((item, index) => (
+          {[...copy.marquee, ...copy.marquee].map((item, index) => (
             <span key={`${item}-${index}`}>{item}</span>
           ))}
         </div>
