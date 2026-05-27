@@ -17,10 +17,10 @@ import { resampleLinesForHorizon } from '../../../../services/som-engine';
 export default function ProjectionsWithController() {
   // Non-ride baseline lines (kept as-is for Y3)
   const baseLines = [
-    { id: 'subs',     label: 'Subscriptions',         valuesM: [6, 16, 25, 32] },
-    { id: 'bookings', label: 'Bookings (12%)',        valuesM: [0.4, 1.5, 2.5, 2.8] },
-    { id: 'events',   label: 'Events (15%)',          valuesM: [0.5, 1.3, 2.0, 2.8] },
-    { id: 'b2b2c',    label: 'B2B2C (fixed+uplift)',  valuesM: [1, 3, 4.5, 6] },
+    { id: 'subs',     label: 'Subscriptions',         valuesM: [6, 16, 25, 32], color: '#245cff' },
+    { id: 'bookings', label: 'Bookings (12%)',        valuesM: [0.4, 1.5, 2.5, 2.8], color: '#1b8cff' },
+    { id: 'events',   label: 'Events (15%)',          valuesM: [0.5, 1.3, 2.0, 2.8], color: '#27b7ff' },
+    { id: 'b2b2c',    label: 'B2B2C (fixed+uplift)',  valuesM: [1, 3, 4.5, 6], color: '#6b7cff' },
   ];
   const baseSomY3_M   = 32 + 2.8 + 2.8 + 6;   // 43.6 ($M)
   const baseSomY3_USD = baseSomY3_M * 1e6;    // $43.6M

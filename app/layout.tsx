@@ -18,6 +18,7 @@ import Defer from "./src/shared/_components/defer/Defer";
 import DeviceGate from "./src/shared/_components/DeviceGate";
 import { PhoneOverlayProvider } from "./src/modules/core-home/ui/blocks/phone-overlay";
 import AppHeader from "./src/shared/_components/header/AppHeader";
+import CoreHomeFooter from "./src/modules/core-home/ui/blocks/footer";
 
 // === добавлено ===
 import ThemeProvider from "./src/shared/theme-provider/provider";
@@ -29,14 +30,14 @@ import CookieBanner from "./src/shared/privacy/CookieBanner";
 
 const ParallaxBG = dynamic(
   () => import("./src/shared/components/shared/orcestarors/ParallaxBG"),
-  { ssr: false }
+  { ssr: false },
 );
 const RouteProgress = dynamic(
   () => import("./src/shared/components/shared/common/RouteProgress"),
-  { ssr: false }
+  { ssr: false },
 );
 const PageTransition = dynamic(
-  () => import("./src/shared/components/shared/transition/PageTransition")
+  () => import("./src/shared/components/shared/transition/PageTransition"),
 );
 
 export const metadata: Metadata = {
@@ -77,8 +78,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="preload" as="video" href="/videos/hero-vision.mp4" />
-        <link rel="preload" as="image" href="/images/hero-main.png" />
         {/* self-hosted через next/font — preconnect к gstatic больше не нужен */}
         {/* <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" /> */}
         <meta name="color-scheme" content="dark light" />
@@ -156,6 +155,8 @@ export default function RootLayout({
             >
               <PageTransition>{children}</PageTransition>
             </main>
+
+            <CoreHomeFooter />
 
             <Suspense fallback={null}>
               <DeckDialogHost />

@@ -1,286 +1,374 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useTheme } from 'next-themes';
-import { computeMethodology, fmMoney, Horizon } from '../../../services/methodology-calculator';
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTheme } from "next-themes";
+import useReveal from "../../../../../shared/lib/useReveal";
+import {
+  computeMethodology,
+  fmMoney,
+  type Horizon,
+} from "../../../services/methodology-calculator";
 
-/**
- * Ultra-modern investor view, 2025.
- * - Clean grid, glass surfaces, subtle depth.
- * - Smooth, deterministic animations that reset on horizon change.
- * - No hover; keyboard accessible.
- */
+type ValueRow = {
+  label: string;
+  text: string;
+  value: string;
+};
 
-export default function MethodologyClient({ initialH = '3' as Horizon }) {
+type FormulaRow = {
+  code: string;
+  label: string;
+  text: string;
+};
+
+const HORIZONS: Horizon[] = ["3", "5", "10"];
+const BASE_NONRIDE_Y3_M = 43.6;
+
+function ValueRows({ rows }: { rows: readonly ValueRow[] }) {
+  return (
+    <div className="md-value-rows">
+      {rows.map((row) => (
+        <article className="md-value-row reveal" key={row.label}>
+          <span>{row.label}</span>
+          <p>{row.text}</p>
+          <strong>{row.value}</strong>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function FormulaRows({ rows }: { rows: readonly FormulaRow[] }) {
+  return (
+    <div className="md-formula-rows">
+      {rows.map((row) => (
+        <article className="md-formula-row reveal" key={row.label}>
+          <span>{row.label}</span>
+          <code>{row.code}</code>
+          <p>{row.text}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+export default function MethodologyClient({ initialH = "3" as Horizon }) {
   const [h, setH] = useState<Horizon>(initialH);
   const sp = useSearchParams();
   const router = useRouter();
   const { resolvedTheme } = useTheme();
-  const tone: 'light' | 'dark' = resolvedTheme === 'light' ? 'light' : 'dark';
+  const tone: "light" | "dark" = resolvedTheme === "light" ? "light" : "dark";
 
-  // Sync ?h=
+  useReveal();
+
+  const data = useMemo(() => computeMethodology(h), [h]);
+  const streamMultiplier = data.nonRideM / BASE_NONRIDE_Y3_M;
+  const animKey = `methodology-${h}`;
+  const activeHorizonIndex = HORIZONS.indexOf(h);
+
   useEffect(() => {
-    const qs = new URLSearchParams(Array.from(sp.entries()));
-    qs.set('h', h);
-    router.replace(`?${qs.toString()}`, { scroll: false });
+    const query = new URLSearchParams(Array.from(sp.entries()));
+    if (query.get("h") === h) return;
+
+    query.set("h", h);
+    router.replace(`?${query.toString()}`, { scroll: false });
   }, [h, router, sp]);
 
-  // Compute all numbers (separate module)
-  const data = useMemo(() => computeMethodology(h), [h]);
-
-  // — Segmented control thumb metrics
-  const segRef = useRef<HTMLDivElement | null>(null);
-  const [thumb, setThumb] = useState({ w: 0, x: 0 });
-
-  useEffect(() => {
-    const root = segRef.current;
-    if (!root) return;
-    const btns = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
-    const idx = ['3','5','10'].indexOf(h);
-    const el = btns[idx];
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const pr = root.getBoundingClientRect();
-    setThumb({ w: r.width, x: r.left - pr.left });
-  }, [h]);
-
-  // Re-mount key to reset animations on horizon change (for bars & ring)
-  const animKey = `h-${h}`;
-
-  // Content blocks
-  const inputsBlock = [
-    { k: 'Users (active, Y3)', v: '2,500,000' },
-    { k: 'ARPU (annual, net, Y3)', v: '$74.8' },
-    { k: 'Users cap (max bound)', v: '20,000,000' },
+  const summaryRows: ValueRow[] = [
+    {
+      label: "Selected horizon",
+      text: "The active planning window used by the investor model.",
+      value: `${h} years`,
+    },
+    {
+      label: "Total revenue",
+      text: "Top-line revenue target for the selected horizon.",
+      value: fmMoney(data.totalUSD),
+    },
+    {
+      label: "Ride revenue",
+      text: "Taxi revenue after the non-ride layer is separated.",
+      value: fmMoney(data.rideUSD),
+    },
+    {
+      label: "Non-ride revenue",
+      text: "Subscriptions, bookings, events, and B2B2C revenue combined.",
+      value: fmMoney(data.nonRideUSD),
+    },
   ];
-  const baselineBlock = [
-    { k: 'TOTAL revenue (ARR, Y3)', v: '$187M' },
-    { k: 'Ride revenue (ARR, Y3)',  v: fmMoney(data.rideUSD) },        // equals $143.4M at 3y
-    { k: 'Non-ride revenue (ARR, Y3)', v: '$43.6M' },
+
+  const inputRows: ValueRow[] = [
+    {
+      label: "Y3 active users",
+      text: "Starting user base used for the three-year model.",
+      value: "2.5M",
+    },
+    {
+      label: "Y3 net ARPU",
+      text: "Annual net revenue per active user in the baseline scenario.",
+      value: "$74.8",
+    },
+    {
+      label: "Maximum user bound",
+      text: "Upper guardrail used to avoid unconstrained growth assumptions.",
+      value: "20M",
+    },
   ];
-  const targetsBlock = [
-    { k: 'TOTAL (h)', v: fmMoney(data.totalUSD) },
-    { k: 'Ride (h)',  v: fmMoney(data.rideUSD) },
-    { k: 'Non-ride (h)', v: fmMoney(data.nonRideUSD) },
-    { k: 'Non-ride share (h)', v: `${data.nonRidePct} of TOTAL` },
+
+  const sourceRows: ValueRow[] = [
+    {
+      label: "Baseline split",
+      text: "Y3 total revenue is fixed at $187M, with $43.6M assigned to non-ride revenue.",
+      value: "23.3% non-ride",
+    },
+    {
+      label: "Planning targets",
+      text: "Five-year and ten-year totals are planning targets, not generated by a hidden formula.",
+      value: "$400M / $1B",
+    },
+    {
+      label: "Non-ride share",
+      text: "Non-ride share increases as the product expands beyond the taxi layer.",
+      value: "35% / 40%",
+    },
+  ];
+
+  const formulaRows: FormulaRow[] = [
+    {
+      label: "Total revenue",
+      code: "Users(h) × ARPU_net(h) × TakeRate = Total(h)",
+      text: "ARPU is already net in this model, so TakeRate remains explicit but equals one.",
+    },
+    {
+      label: "Non-ride revenue",
+      code: "NonRide(h) = Share(h) × Total(h)",
+      text: "The share is 23.3% for Y3, 35% for Y5, and 40% for Y10.",
+    },
+    {
+      label: "Ride revenue",
+      code: "Ride(h) = Total(h) − NonRide(h)",
+      text: "Ride revenue is calculated as the remaining part of the selected total.",
+    },
+    {
+      label: "Stream allocation",
+      code: "Stream(h) = Stream(Y3) × NonRide(h) / NonRide(Y3)",
+      text: "Each non-ride stream keeps the same baseline proportion unless the model is changed.",
+    },
   ];
 
   return (
     <main className="md-root" data-tone={tone}>
-      <div className="md-shell">
-        {/* HERO */}
-        <section className="md-hero">
-          <div className="md-hero-top">
-            <h1 className="md-h1">Methodology</h1>
-            <div
-              className="md-toggle"
-              role="tablist"
-              aria-label="Horizon"
-              ref={segRef}
-              style={{ ['--thumb-w' as any]: `${thumb.w}px`, ['--thumb-x' as any]: `${thumb.x}px` }}
-            >
-              <div className="md-toggle-thumb" aria-hidden="true" />
-              {(['3','5','10'] as Horizon[]).map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  role="tab"
-                  aria-selected={opt === h}
-                  className="md-toggle-btn"
-                  onClick={() => setH(opt)}
-                >
-                  {opt}y
-                </button>
-              ))}
-            </div>
-          </div>
-          <p className="md-lead">
-            Явная математика без чёрных ящиков. <span className="mono">Users × ARPU<sub>net</sub> × TakeRate</span> → TOTAL → Non-ride share → Streams. Всё прозрачно и проверяемо.
+      <section className="md-page-head" aria-labelledby="methodology-title">
+        <div className="md-page-head-copy reveal">
+          <span className="md-kicker">Methodology</span>
+          <h1 id="methodology-title">How the investor model is calculated.</h1>
+          <p>
+            This page explains the assumptions, formulas, revenue split, and
+            stream allocation behind the investor numbers. No narrative effects,
+            no hidden steps — only the calculation path.
           </p>
-          <div className="md-divider" />
-        </section>
+        </div>
 
-        {/* QUICK STATS */}
-        <section className="md-section">
-          <div className="md-grid-3">
-            <div className="md-card">
-              <h3>Targets (by horizon)</h3>
-              <ul className="md-kv">
-                {targetsBlock.map(r => (
-                  <li key={r.k}><span className="k">{r.k}</span><span className="v">{r.v}</span></li>
-                ))}
-              </ul>
-            </div>
+        <div
+          className="md-toggle"
+          role="tablist"
+          aria-label="Projection horizon"
+          data-active-index={activeHorizonIndex}
+        >
+          <div className="md-toggle-thumb" aria-hidden="true" />
+          {HORIZONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="tab"
+              aria-selected={option === h}
+              className="md-toggle-btn"
+              onClick={() => setH(option)}
+            >
+              {option}y
+            </button>
+          ))}
+        </div>
+      </section>
 
-            <div className="md-card">
-              <h3>Baseline (Y3)</h3>
-              <ul className="md-kv">
-                {baselineBlock.map(r => (
-                  <li key={r.k}><span className="k">{r.k}</span><span className="v">{r.v}</span></li>
-                ))}
-              </ul>
-            </div>
+      <section
+        className="md-summary-section"
+        aria-label="Selected model output"
+      >
+        <ValueRows rows={summaryRows} />
+      </section>
 
-            <div className="md-card">
-              <h3>Inputs</h3>
-              <ul className="md-kv">
-                {inputsBlock.map(r => (
-                  <li key={r.k}><span className="k">{r.k}</span><span className="v">{r.v}</span></li>
-                ))}
-              </ul>
+      <section className="md-section md-split-section" id="composition">
+        <div className="md-section-copy reveal">
+          <span className="md-kicker">Revenue composition</span>
+          <h2>Selected horizon output.</h2>
+          <p>
+            The chart is only a visual aid. The values on the right are the
+            auditable output of the formula for the selected horizon.
+          </p>
+        </div>
+
+        <div className="md-data-panel" key={animKey}>
+          <div className="md-total-row">
+            <span>Total</span>
+            <strong>{fmMoney(data.totalUSD)}</strong>
+          </div>
+
+          <div
+            className="md-comp-bar"
+            aria-label="Ride and non-ride revenue composition"
+          >
+            <div
+              className="md-seg md-seg-ride"
+              style={{ width: data.ridePct }}
+            />
+            <div
+              className="md-seg md-seg-nonride"
+              style={{ width: data.nonRidePct }}
+            />
+          </div>
+
+          <div className="md-chart-row">
+            <svg
+              width="104"
+              height="104"
+              viewBox="0 0 104 104"
+              role="img"
+              aria-label={`Non-ride ${data.nonRidePct}`}
+            >
+              <defs>
+                <linearGradient
+                  id="methodology-ring"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor="var(--cream)" />
+                  <stop offset="100%" stopColor="var(--accent-soft)" />
+                </linearGradient>
+              </defs>
+              <g transform="translate(52,52)">
+                <circle
+                  r="40"
+                  fill="none"
+                  stroke="var(--line-strong)"
+                  strokeWidth="12"
+                />
+                <circle
+                  r="40"
+                  fill="none"
+                  stroke="url(#methodology-ring)"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeDasharray={`${data.nonRideShare * 2 * Math.PI * 40} ${2 * Math.PI * 40}`}
+                  strokeDashoffset="0"
+                  transform="rotate(-90)"
+                >
+                  <animate
+                    attributeName="stroke-dasharray"
+                    dur="620ms"
+                    fill="freeze"
+                    from={`0 ${2 * Math.PI * 40}`}
+                    to={`${data.nonRideShare * 2 * Math.PI * 40} ${2 * Math.PI * 40}`}
+                  />
+                </circle>
+              </g>
+            </svg>
+
+            <div className="md-split-values">
+              <article>
+                <span>Ride</span>
+                <strong>{data.ridePct}</strong>
+                <p>{fmMoney(data.rideUSD)}</p>
+              </article>
+              <article>
+                <span>Non-ride</span>
+                <strong>{data.nonRidePct}</strong>
+                <p>{fmMoney(data.nonRideUSD)}</p>
+              </article>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* COMPOSITION */}
-        <section className="md-section">
-          <div className="md-card">
-            <div className="md-comp" key={animKey}>
-              <div className="md-comp-bar" aria-label="Composition bar">
-                <div className="seg ride" style={{ width: data.ridePct }} />
-                <div className="seg nonride" style={{ width: data.nonRidePct }} />
-              </div>
+      <section className="md-section" id="formulas">
+        <div className="md-section-copy reveal">
+          <span className="md-kicker">Formulas</span>
+          <h2>The model is intentionally readable.</h2>
+          <p>
+            These are the formulas used by the page. They are short on purpose:
+            the goal is to let an investor challenge the assumptions without
+            reverse-engineering the UI.
+          </p>
+        </div>
+        <FormulaRows rows={formulaRows} />
+      </section>
 
-              <div className="md-ring" aria-label="Non-ride ring chart">
-                <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label={`Non-ride ${data.nonRidePct}`}>
-                  <defs>
-                    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="var(--acc-start)" />
-                      <stop offset="100%" stopColor="var(--acc-end)" />
-                    </linearGradient>
-                  </defs>
-                  <g transform="translate(42,42)">
-                    {/** ring */}
-                    <circle r="34" fill="none" stroke="var(--md-fill-2)" strokeWidth="12" />
-                    {/* ride track */}
-                    <circle
-                      r="34"
-                      fill="none"
-                      stroke="var(--ride)"
-                      strokeWidth="12"
-                      strokeDasharray={`${2 * Math.PI * 34}`}
-                      strokeDashoffset={0}
-                      opacity="0.35"
-                    />
-                    {/* non-ride arc */}
-                    <circle
-                      r="34"
-                      fill="none"
-                      stroke="url(#g1)"
-                      strokeWidth="12"
-                      strokeLinecap="round"
-                      strokeDasharray={`${(data.nonRideShare) * 2 * Math.PI * 34} ${2 * Math.PI * 34}`}
-                      strokeDashoffset="0"
-                      transform="rotate(-90)"
-                    >
-                      <animate
-                        attributeName="stroke-dasharray"
-                        dur="700ms"
-                        fill="freeze"
-                        from={`0 ${2 * Math.PI * 34}`}
-                        to={`${(data.nonRideShare) * 2 * Math.PI * 34} ${2 * Math.PI * 34}`}
-                      />
-                    </circle>
-                  </g>
-                </svg>
+      <section className="md-section md-split-section">
+        <div className="md-section-copy reveal">
+          <span className="md-kicker">Inputs and guardrails</span>
+          <h2>What the calculation depends on.</h2>
+          <p>
+            Inputs are separated from outputs so the model can be reviewed or
+            adjusted without mixing assumptions with results.
+          </p>
+        </div>
+        <div className="md-source-stack">
+          <ValueRows rows={inputRows} />
+          <ValueRows rows={sourceRows} />
+        </div>
+      </section>
 
-                <div className="meta">
-                  <div>Ride {data.ridePct} — <b>{fmMoney(data.rideUSD)}</b></div>
-                  <div>Non-ride {data.nonRidePct} — <b>{fmMoney(data.nonRideUSD)}</b></div>
-                  <div className="item total" style={{ marginTop: 4 }}>TOTAL — <b>{fmMoney(data.totalUSD)}</b></div>
+      <section className="md-section md-stream-section" id="streams">
+        <div className="md-section-copy reveal">
+          <span className="md-kicker">Non-ride streams</span>
+          <h2>Allocation of the non-ride layer.</h2>
+          <p>
+            Stream values are derived from the Y3 stream mix and scaled to match
+            the selected non-ride total. The audit row confirms that the stream
+            sum reconciles with the non-ride value.
+          </p>
+        </div>
+
+        <div className="md-stream-rows" key={animKey}>
+          {data.streamsM.map((stream) => {
+            const width = `${Math.min(100, (stream.vM / Math.max(1, data.nonRideM)) * 100)}%`;
+            return (
+              <article className="md-stream-row" key={stream.id}>
+                <div>
+                  <span>{stream.label}</span>
+                  <p>Multiplier {streamMultiplier.toFixed(2)}×</p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FORMULAS */}
-        <section className="md-section">
-          <div className="md-card">
-            <h3>Formulas</h3>
-            <div className="md-eq-grid">
-              <div className="md-eq">
-                <span className="k">E1 — TOTAL SOM(h)</span>
-                <code>Users(h) × ARPU_net(h) × TakeRate = TOTAL(h)</code>
-                <div className="note">ARPU указана как net ⇒ <b>TakeRate = 1</b>.</div>
-              </div>
-              <div className="md-eq">
-                <span className="k">E2 — Non-ride(h)</span>
-                <code>NonRide(h) = share(h) × TOTAL(h)</code>
-                <div className="note">share(3y)=23.3%, 5y=35%, 10y=40%.</div>
-              </div>
-              <div className="md-eq">
-                <span className="k">E3 — Ride(h)</span>
-                <code>Ride(h) = TOTAL(h) − NonRide(h)</code>
-              </div>
-              <div className="md-eq">
-                <span className="k">E4 — Streams scaling</span>
-                <code>k(h) = NonRide(h) / NonRide(3y)</code>
-                <div className="note">Каждый Y3-стрим умножаем на k(h).</div>
-              </div>
-              <div className="md-eq">
-                <span className="k">E5 — Baseline lock</span>
-                <code>h = 3y ⇒ TOTAL=$187M; NonRide=$43.6M</code>
-              </div>
-              <div className="md-eq">
-                <span className="k">E6 — Users cap</span>
-                <code>Users(h) ≤ UsersCap</code>
-                <div className="note">Сейф-ограничение (по умолчанию 20M) для реализма.</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* STREAMS */}
-        <section className="md-section">
-          <div className="md-card">
-            <div style={{ display: 'grid', gap: 6, marginBottom: 10 }}>
-              <h3>Non-ride streams (scaled for {h}y)</h3>
-              <p className="md-lead" style={{ fontSize: 13, margin: 0 }}>
-                Σ(streams) сверяется с Non-ride(h). Y3 — baseline; 5y/10y — масштаб по k(h).
-              </p>
-            </div>
-
-            <div className="md-grid-4" key={animKey}>
-              {data.streamsM.map(s => (
-                <div className="md-card md-stream" key={s.id}>
-                  <div className="hdr">
-                    <span className="t">{s.label}</span>
-                    <span className="mono">Y3 anchor × k(h)</span>
-                  </div>
-                  <div className="val">
-                    ${s.vM.toLocaleString('en-US', { maximumFractionDigits: 1 })}M
-                  </div>
-                  <div className="note">
-                    {h === '3' ? 'Y3 baseline' : `Scaled ×${(data.nonRideM / 43.6).toFixed(2)}`}
-                  </div>
+                <div className="md-stream-measure" aria-hidden>
+                  <i style={{ width }} />
                 </div>
-              ))}
-            </div>
+                <strong>
+                  $
+                  {stream.vM.toLocaleString("en-US", {
+                    maximumFractionDigits: 1,
+                  })}
+                  M
+                </strong>
+              </article>
+            );
+          })}
 
-            <div className="md-audit">
-              <div>Σ(streams) = <b>${data.sumStreamsM.toFixed(1)}M</b></div>
-              <div>Non-ride(h) = <b>${data.nonRideM.toFixed(1)}M</b></div>
-              <div>Δ = <b>{data.deltaStreamsM === 0 ? '0.0M' : `${data.deltaStreamsM.toFixed(1)}M`}</b></div>
-            </div>
+          <div className="md-audit-row">
+            <span>Streams total</span>
+            <strong>${data.sumStreamsM.toFixed(1)}M</strong>
+            <span>Non-ride total</span>
+            <strong>${data.nonRideM.toFixed(1)}M</strong>
+            <span>Difference</span>
+            <strong>
+              {data.deltaStreamsM === 0
+                ? "$0.0M"
+                : `$${data.deltaStreamsM.toFixed(1)}M`}
+            </strong>
           </div>
-        </section>
-
-        {/* SOURCES */}
-        <section className="md-section">
-          <div className="md-card">
-            <h3>Where numbers come from</h3>
-            <ul className="md-kv">
-              <li><span className="k">Targets (TOTAL)</span><span className="v">5y: $400M; 10y: $1B (фиксированные цели)</span></li>
-              <li><span className="k">Shares</span><span className="v">share(3y)=23.3% (из baseline), 5y=35%, 10y=40%</span></li>
-              <li><span className="k">Baseline Y3</span><span className="v">TOTAL $187M = Ride $143.4M + Non-ride $43.6M</span></li>
-              <li><span className="k">ARPU</span><span className="v">Annual, <b>net</b> ⇒ TakeRate = 1</span></li>
-              <li><span className="k">Users cap</span><span className="v">Предохранитель (по умолчанию 20M). Можно вывести из SAM/ARPU (подключу при необходимости).</span></li>
-            </ul>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }

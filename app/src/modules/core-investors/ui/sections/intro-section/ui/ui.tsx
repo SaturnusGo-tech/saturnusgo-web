@@ -41,8 +41,8 @@ export default function IntroSection(_: Props) {
     <Section
       id="intro"
       kicker="Investor overview"
-      title="Infrastructure for intelligent mobility in emerging markets"
-      subtitle="We unify rides, bookings, places, and loyalty — start where incumbents are weakest and compound with loyalty."
+      title="A city operating layer for trips, delivery, places, and transport"
+      subtitle="We start where mobility feels fragmented, then compound retention through a single product surface for everyday city movement."
     >
       <div className="intro-wrap">
         <div className="news-grid" role="region" aria-label="Founder's brief in newspaper layout">
@@ -51,18 +51,18 @@ export default function IntroSection(_: Props) {
               A modular super-app for mobility & travel. We start LATAM-first —
               launch in Argentina, expand across Brazil; next UAE; then EU.
               <span className="lead-next">
-                We unify fragmented ride and travel flows, and compound retention with loyalty and memberships.
+                We connect trips, delivery, local places, and transport routes so the user does not need to stitch a city together manually.
               </span>
             </NewsLead>
 
-            <NewsPullQuote text="One product spine across rides, bookings, places, and events — fewer hops, higher trust, better unit economics." />
+            <NewsPullQuote text="One product spine across trips, delivery, places, and transport - fewer hops, higher trust, better unit economics." />
 
             <NewsColumns
               sections={[
                 { title: 'Why now',      body: `Mobility in emerging markets remains fragmented; reliability and trust are uneven for many users.
-                  Super-app attempts bolt features; we ship a single spine that reduces cognitive load and unlocks adoption.` },
-                { title: 'What we build', body: `Core ride ordering with class upgrades, city guides & saved places, hotel/event rails, and wishlists with AI planning.
-                  The infra is modular: each vertical can run standalone or compound.` },
+                  Most products still separate movement, discovery, and fulfillment; we ship one spine that reduces cognitive load and unlocks adoption.` },
+                { title: 'What we build', body: `Core ride ordering, delivery, curated city places, transport routes, and saved destinations.
+                  The infrastructure is modular: each vertical can run standalone or compound into one flow.` },
                 { title: 'How it works',  body: `Thin client over a service-oriented backend with real-time via WebSocket and resilient state sync.
                   Cohort-based activation and loyalty to drive repeats.` },
                 { title: 'Go-to-market',  body: `Start with Argentina city pairs; expand to Brazil with partner pilots. Subsequent rollouts target UAE, then EU.

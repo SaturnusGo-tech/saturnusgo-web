@@ -343,8 +343,9 @@ export default function MarketChartStreams({
       >
         <defs>
           <linearGradient id="mcBarGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%"   stopColor="var(--mc-accent)" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="var(--mc-accent)" stopOpacity="0.22" />
+            <stop offset="0%" stopColor="var(--mc-accent-2, var(--mc-accent))" stopOpacity="0.9" />
+            <stop offset="58%" stopColor="var(--mc-accent)" stopOpacity="0.74" />
+            <stop offset="100%" stopColor="var(--mc-accent)" stopOpacity="0.18" />
           </linearGradient>
 
           {!isMobile && !reduceMotion && (

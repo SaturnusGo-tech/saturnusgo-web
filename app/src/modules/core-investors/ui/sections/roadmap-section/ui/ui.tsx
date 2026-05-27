@@ -9,10 +9,10 @@ import Section from "../../../items/section";
 type Item = { title: string; desc: string };
 
 const ITEMS: Item[] = [
-  { title: 'Q1', desc: 'LATAM closed beta; payments hardening; core flows polish.' },
-  { title: 'Q2', desc: 'Loyalty MVP; cohort expansion; subs groundwork.' },
-  { title: 'Q3', desc: 'Public cohorts in AR/BR; Pro & Flexible subscriptions.' },
-  { title: 'Q4', desc: 'UAE partners; expansion planning toward EU.' },
+  { title: 'Q1', desc: 'LATAM closed beta; trip flow, saved places, and delivery status polish.' },
+  { title: 'Q2', desc: 'Transport route layer, partner supply, and repeat-use mechanics.' },
+  { title: 'Q3', desc: 'Public cohorts in AR/BR with subscriptions and city partner bundles.' },
+  { title: 'Q4', desc: 'UAE partner conversations and expansion planning toward EU.' },
 ];
 
 export default function RoadmapSection() {
@@ -74,7 +74,7 @@ export default function RoadmapSection() {
       id="roadmap"
       kicker="Roadmap"
       title="12-month plan"
-      subtitle="From closed beta to public cohorts with wallet-led retention."
+      subtitle="From closed beta to public cohorts across trips, delivery, places, and transport."
     >
       <div ref={wrapRef} className="mono" role="region" aria-label="Roadmap">
         <ul className="mlist" role="list">

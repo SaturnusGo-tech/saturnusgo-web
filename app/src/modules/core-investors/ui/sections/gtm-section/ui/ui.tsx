@@ -9,9 +9,9 @@ import Section from "../../../items/section";
 type Item = { title: string; desc: string; sep?: boolean };
 
 const ITEMS: Item[] = [
-  { title: 'Direct launch in AR/BR', desc: 'Closed beta cohorts with tight feedback loops and city-by-city activation.' },
-  { title: 'Community-led growth',   desc: 'Referrals and ambassadors (nomads, CIS expats); coworking/campus nodes.' },
-  { title: 'B2B2C integrations',     desc: 'Local fleets and boutique hotels; supply + distribution partnerships.', sep: true },
+  { title: 'Direct launch in AR/BR', desc: 'Closed beta cohorts around repeat city movement, delivery, and saved places.' },
+  { title: 'Community-led growth',   desc: 'Referrals, ambassadors, expat communities, coworking nodes, and campus corridors.' },
+  { title: 'B2B2C integrations',     desc: 'Local fleets, couriers, venues, and transport partners for supply and distribution.', sep: true },
 ];
 
 export default function GtmSection() {
@@ -72,7 +72,7 @@ export default function GtmSection() {
       id="gtm"
       kicker="GTM"
       title="Beachheads + community + partnerships"
-      subtitle="Launch where global players are weak/blocked, leverage micro-communities, partner with local fleets/hotels."
+      subtitle="Launch where city movement is fragmented, build trust through micro-communities, and partner with local supply."
     >
       <div ref={wrapRef} className="mono" role="region" aria-label="Go-to-market highlights">
         <ul className="mlist" role="list">

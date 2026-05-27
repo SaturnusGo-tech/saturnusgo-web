@@ -1,246 +1,165 @@
-// app/mobile/MobileScreen.tsx
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter, useSearchParams } from 'next/navigation';
+import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// ВАЖНО: грузим MobileLottie только на клиенте
-const MobileLottie = dynamic(() => import('../../mobile-lottie'), { ssr: false });
+const MobileLottie = dynamic(() => import("../../mobile-lottie"), {
+  ssr: false,
+});
 
 export default function MobileScreen() {
   const router = useRouter();
   const params = useSearchParams();
-  const from = params.get('from') || '/';
-
+  const from = params.get("from") || "/";
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  function continueAnyway() {
-    try { localStorage.setItem('allowMobile', '1'); } catch {}
+  const continueAnyway = () => {
+    try {
+      localStorage.setItem("allowMobile", "1");
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Unable to persist mobile override", error);
+      }
+    }
     router.replace(from);
-  }
+  };
 
   useEffect(() => {
-    if (!confirmOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setConfirmOpen(false);
-      if (e.key === 'Enter') continueAnyway();
+    if (!confirmOpen) return undefined;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setConfirmOpen(false);
+      if (event.key === "Enter") continueAnyway();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [confirmOpen]);
 
   return (
-    <main className="mbl-wrap" aria-labelledby="mbl-title">
-      <div className="mbl-bg" aria-hidden />
+    <main className="sg-page" aria-labelledby="mobile-title">
+      <section className="sg-hero">
+        <div className="sg-hero-media" aria-hidden="true">
+          <img src="/mock/device-preview.jpg" alt="" />
+        </div>
+        <div className="sg-hero-inner">
+          <span className="sg-kicker">SaturnusGo / Mobile preview</span>
+          <h1 id="mobile-title">
+            The current web build is tuned for desktop review.
+          </h1>
+          <p>
+            You can still continue on mobile, but the investor and product pages
+            are designed for wide screens while the app itself remains
+            mobile-first.
+          </p>
+          <div className="sg-actions">
+            <button
+              className="sg-button"
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+            >
+              Continue anyway
+            </button>
+          </div>
+        </div>
+      </section>
 
-      {/* Lottie — теперь точно только на клиенте */}
-      <MobileLottie />
-
-      <p className="mbl-kicker">Optimized for desktop</p>
-      <h1 id="mbl-title" className="mbl-title">Best viewed on desktop</h1>
-      <p className="mbl-sub">This build is designed for wide screens.</p>
-
-      <div className="mbl-cta">
-        <button
-          className="mbl-btn"
-          onClick={() => setConfirmOpen(true)}
-          aria-haspopup="dialog"
-          aria-controls="confirm-mobile"
-        >
-          Continue anyway
-        </button>
-      </div>
-
-      <p className="mbl-tagline" aria-live="polite">
-        You can still explore, but some layouts may look broken on mobile.
-      </p>
+      <section className="sg-section sg-light">
+        <div className="sg-section-inner">
+          <div className="sg-section-head">
+            <span className="sg-eyebrow">Desktop review</span>
+            <div className="sg-section-copy">
+              <h2>
+                The public site needs space for charts, product rhythm, and
+                partner content.
+              </h2>
+              <p>
+                This gate is intentionally simple: it explains the constraint
+                and lets the user continue without turning the page into a
+                broken mobile layout.
+              </p>
+            </div>
+          </div>
+          <div
+            style={{ display: "grid", placeItems: "center", minHeight: 260 }}
+          >
+            <MobileLottie />
+          </div>
+        </div>
+      </section>
 
       {confirmOpen && (
         <div
-          id="confirm-mobile"
+          className="sg-mobile-dialog"
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-title"
-          className="confirm"
-          onClick={(e) => { if (e.target === e.currentTarget) setConfirmOpen(false); }}
         >
-          <div className="confirm__panel">
-            <h2 id="confirm-title" className="confirm__title">View on mobile?</h2>
-            <p className="confirm__sub">
-              The layout is optimized for desktop. You can continue, but some sections may render poorly.
+          <div className="sg-mobile-dialog-panel">
+            <h2 id="confirm-title">Open the desktop layout?</h2>
+            <p>
+              The page can be viewed, but several sections may be compressed on
+              a phone.
             </p>
-            <div className="confirm__actions">
-              <button className="confirm__yes" onClick={continueAnyway}>Continue anyway</button>
-              <button className="confirm__no" onClick={() => setConfirmOpen(false)}>No thanks</button>
+            <div className="sg-actions">
+              <button
+                className="sg-button"
+                type="button"
+                onClick={continueAnyway}
+              >
+                Continue
+              </button>
+              <button
+                className="sg-button-ghost"
+                type="button"
+                onClick={() => setConfirmOpen(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
 
-<style jsx>{`
-        .mbl-wrap{
-          min-height:100dvh;
-          display:grid;
-          grid-template-rows: auto auto auto auto auto 1fr;
-          justify-items:center;
-          align-content:start;
-          text-align:center;
-          padding: max(24px, env(safe-area-inset-top)) 20px 24px;
-          position:relative;
-          overflow:hidden;
-        }
-        .mbl-bg{
-          position:fixed; inset:0; pointer-events:none; z-index:-1;
-          background:
-            radial-gradient(1200px 600px at 40% 10%, #2E2E2E33 0%, transparent 60%),
-            radial-gradient(900px 420px at 10% 80%, #2E2E2E33 0%, transparent 65%),
-            radial-gradient(700px 360px at 90% 30%, rgba(74,123,217,.22) 0%, transparent 70%),
-            var(--bg, #111214);
-        }
-        .mbl-anim{
-          width: clamp(220px, 48vw, 340px);
-          height: clamp(220px, 48vw, 340px);
-          margin-top: clamp(8px, 3.5vh, 22px);
-          margin-bottom: 10px;
-          filter: drop-shadow(0 22px 46px rgba(0,0,0,.35));
-          position: relative;
-        }
-        .mbl-anim::after{
-          content:'';
-          position:absolute; inset:-10% -18% -26% -18%;
-          background:
-            radial-gradient(60% 40% at 50% 10%, rgba(255,255,255,.10), transparent 60%),
-            radial-gradient(55% 40% at 50% 70%, rgba(74,123,217,.18), transparent 70%);
-          filter: blur(18px) saturate(120%);
-          z-index:-1;
-          animation: mblGlow 6s ease-in-out infinite alternate;
-        }
-        @keyframes mblGlow{
-          from{ transform: translateY(0) scale(1) }
-          to{   transform: translateY(6px) scale(1.02) }
+      <style jsx global>{`
+        .sg-mobile-dialog {
+          position: fixed;
+          inset: 0;
+          z-index: 2000;
+          display: grid;
+          place-items: center;
+          padding: 24px;
+          background: rgba(5, 5, 5, 0.74);
+          backdrop-filter: blur(18px);
         }
 
-        .mbl-kicker{
-          text-transform:uppercase;
-          letter-spacing:.12em;
-          font-size:12px;
-          color:var(--text-3, #70707A);
-          margin: 6px 0;
-        }
-        .mbl-title{
-          margin: 6px 0 8px;
-          font-size: clamp(26px, 7.5vw, 44px);
-          line-height:1.12;
-          letter-spacing:-0.01em;
-          text-wrap: balance;
-          text-shadow: 0 1px 0 rgba(0,0,0,.25);
-        }
-        .mbl-sub{
-          color: var(--text-2, #A9A9B1);
-          font-size: clamp(14px, 4.2vw, 18px);
-          margin: 0 0 16px;
+        .sg-mobile-dialog-panel {
+          width: min(460px, 100%);
+          border-radius: 34px;
+          padding: 30px;
+          background: #f2eee4;
+          color: #080808;
+          box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
         }
 
-        .mbl-cta{ display:flex; gap:12px; align-items:center; justify-content:center; width:100%; }
-        .mbl-btn{
-          -webkit-tap-highlight-color: transparent;
-          appearance:none; border:none; cursor:pointer;
-          height: 46px; padding: 0 18px; border-radius: 999px;
-          font-weight: 800; letter-spacing: .02em; color:#fff;
-          background: linear-gradient(180deg, #5f8ef1, #3b6bdb);
-          box-shadow: 0 10px 24px rgba(74,123,217,.28), inset 0 1px 0 rgba(255,255,255,.12);
-          transition: transform .12s ease, filter .18s ease, box-shadow .18s ease;
-        }
-        .mbl-btn:active{ transform: translateY(1px) }
-        .mbl-btn:focus-visible{
-          outline:none;
-          box-shadow:
-            0 0 0 3px rgba(122,168,255,.30),
-            0 10px 24px rgba(74,123,217,.28),
-            inset 0 1px 0 rgba(255,255,255,.12);
-        }
-        @media (min-width: 980px){ .mbl-btn{ display:none; } }
-
-        .mbl-tagline{
-          margin: 10px 0 0;
-          font-size: 13px;
-          color: color-mix(in oklab, var(--text-2, #A9A9B1), white 6%);
-          max-width: 520px;
+        .sg-mobile-dialog-panel h2 {
+          margin: 0;
+          font-size: 34px;
+          line-height: 0.98;
+          letter-spacing: -0.06em;
         }
 
-        /* ===== Confirm dialog ===== */
-        .confirm{
-          position: fixed; inset: 0; display:grid; place-items:center; z-index: 50;
-          background: color-mix(in oklab, var(--bg, #111214), transparent 32%);
-          backdrop-filter: blur(8px) saturate(115%);
-          animation: fadeIn .18s ease-out both;
-        }
-        @keyframes fadeIn{ from{ opacity:0 } to{ opacity:1 } }
-
-        .confirm__panel{
-          width: min(94vw, 560px);
-          margin: 0 18px;
-          border-radius: 24px;
-          padding: 22px 18px;
-          background: var(--bg2, #1A1B1F);
-          border: 1px solid var(--border, #31323A);
-          box-shadow:
-            0 1px 0 rgba(255,255,255,0.06) inset,
-            0 20px 54px rgba(0,0,0,0.38);
-          animation: slideUp .2s cubic-bezier(.2,.8,.2,1) both;
-        }
-        @keyframes slideUp{ from{ transform: translateY(6px); opacity:0 } to{ transform:none; opacity:1 } }
-
-        .confirm__title{
-          margin: 2px 0 6px;
-          font-size: clamp(18px, 5.4vw, 22px);
-          font-weight: 800;
-          letter-spacing: -0.01em;
-        }
-        .confirm__sub{
-          margin: 0 0 14px;
-          font-size: 14.5px;
-          color: var(--text-2, #A9A9B1);
-          text-wrap: pretty;
-        }
-        .confirm__actions{
-          display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+        .sg-mobile-dialog-panel p {
+          margin: 16px 0 0;
+          color: rgba(8, 8, 8, 0.66);
+          line-height: 1.55;
         }
 
-        /* Primary (accent gradient) */
-        .confirm__yes{
-          all: unset; cursor: pointer;
-          height: 44px; padding: 0 18px; border-radius: 999px;
-          font-weight: 800; letter-spacing: .01em; color: #fff;
-          background: linear-gradient(180deg, #5f8ef1, #3b6bdb);
-          box-shadow: 0 10px 24px rgba(74,123,217,.28), inset 0 1px 0 rgba(255,255,255,.12);
-          transition: transform .12s ease, filter .18s ease, box-shadow .18s ease;
+        .sg-mobile-dialog-panel .sg-button-ghost {
+          color: #080808;
+          border-color: rgba(8, 8, 8, 0.16);
         }
-        .confirm__yes:active{ transform: translateY(1px); }
-        .confirm__yes:focus-visible{
-          outline:none;
-          box-shadow:
-            0 0 0 3px rgba(122,168,255,.30),
-            0 10px 24px rgba(74,123,217,.28),
-            inset 0 1px 0 rgba(255,255,255,.12);
-        }
-
-        /* Secondary (outlined) */
-        .confirm__no{
-          all: unset; cursor: pointer;
-          height: 44px; padding: 0 16px; border-radius: 999px;
-          font-weight: 700; color: var(--text, #ECECEC);
-          background: transparent;
-          border: 1px solid color-mix(in oklab, var(--border, #31323A), white 10%);
-          transition: transform .12s ease, background-color .18s ease, border-color .18s ease;
-        }
-        .confirm__no:hover{
-          background: color-mix(in oklab, var(--bg, #111214), white 4%);
-          border-color: color-mix(in oklab, var(--border, #31323A), white 18%);
-        }
-        .confirm__no:active{ transform: translateY(1px); }
-        .confirm__no:focus-visible{ outline: 2px solid rgba(122,168,255,.35); outline-offset: 2px; }
       `}</style>
     </main>
   );

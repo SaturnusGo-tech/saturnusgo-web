@@ -1,0 +1,94 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 782 >>
+stream
+q
+0.08 0.07 0.06 rg
+BT
+/F1 28 Tf
+56 770 Td
+(SaturnusGo) Tj
+ET
+BT
+/F1 15 Tf
+56 736 Td
+(City scenarios in one soft interface) Tj
+ET
+BT
+/F1 11 Tf
+56 704 Td
+(Focused modules: Trips, Delivery, Places, Transport.) Tj
+ET
+BT
+/F1 13 Tf
+56 648 Td
+(1. Trips) Tj
+ET
+BT
+/F1 10 Tf
+76 626 Td
+(Routes, stops, timing and next action clarity.) Tj
+ET
+BT
+/F1 13 Tf
+56 586 Td
+(2. Delivery) Tj
+ET
+BT
+/F1 10 Tf
+76 564 Td
+(Pickup, courier status and arrival context.) Tj
+ET
+BT
+/F1 13 Tf
+56 524 Td
+(3. Places) Tj
+ET
+BT
+/F1 10 Tf
+76 502 Td
+(Curated restaurants, stays, walks and city points.) Tj
+ET
+BT
+/F1 13 Tf
+56 462 Td
+(4. Transport) Tj
+ET
+BT
+/F1 10 Tf
+76 440 Td
+(Ride, transfer, public route and light mobility hierarchy.) Tj
+ET
+BT
+/F1 11 Tf
+56 370 Td
+(Investor context: saturnusgo.com/investors) Tj
+ET
+Q
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1144
+%%EOF

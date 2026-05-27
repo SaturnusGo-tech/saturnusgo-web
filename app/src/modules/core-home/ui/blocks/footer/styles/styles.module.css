@@ -1,56 +1,110 @@
 .footer {
-  width: min(1220px, calc(100% - 40px));
-  margin: 92px auto 0;
-  padding: 28px 0 38px;
-  color: rgba(245, 240, 230, 0.62);
+  width: 100%;
+  margin: 0;
+  padding: 54px max(20px, calc((100% - 1180px) / 2)) 58px;
+  box-sizing: border-box;
+  color: rgba(247, 244, 238, 0.62);
+  background: #050505;
 }
 
-.inner {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 22px;
+.top,
+.bottom {
+  display: flex;
   align-items: center;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.top {
+  padding-bottom: 42px;
 }
 
 .brand {
-  color: #f7f2e5;
-  font-size: 18px;
-  font-weight: 860;
-  letter-spacing: -0.04em;
+  color: #f7f4ee;
+  font-size: 34px;
+  font-weight: 720;
+  letter-spacing: -0.06em;
+}
+
+.socials {
+  display: flex;
+  gap: 12px;
+}
+
+.socials a {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 244, 238, 0.12);
+  border-radius: 50%;
+  color: #f7f4ee;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 42px;
+  padding: 42px 0;
+  border-top: 1px solid rgba(247, 244, 238, 0.1);
+  border-bottom: 1px solid rgba(247, 244, 238, 0.1);
+}
+
+.group {
+  display: grid;
+  gap: 14px;
+}
+
+.group h3 {
+  margin: 0 0 8px;
+  color: #f7f4ee;
+  font-size: 16px;
+}
+
+.group a,
+.contact a {
+  color: rgba(247, 244, 238, 0.56);
+  text-decoration: none;
+}
+
+.group a:hover,
+.contact a:hover {
+  color: #f7f4ee;
+}
+
+.bottom {
+  padding-top: 34px;
 }
 
 .contact {
   display: grid;
-  gap: 3px;
+  gap: 4px;
   font-style: normal;
-  text-align: right;
 }
 
-.contactName {
-  color: #f7f2e5;
+.contact span:first-child {
+  color: #f7f4ee;
   font-weight: 760;
 }
 
-.contactRole,
-.legal {
+.contact span,
+.contact a,
+.bottom small {
   font-size: 13px;
 }
 
-.mail {
-  color: #dfff7a;
-  text-decoration: none;
-  font-size: 13px;
-}
-
-@media (max-width: 720px) {
-  .inner {
-    grid-template-columns: 1fr;
-    align-items: start;
+@media (max-width: 760px) {
+  .top,
+  .bottom {
+    display: grid;
+    justify-items: start;
   }
 
-  .contact {
-    text-align: left;
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
   }
 }
