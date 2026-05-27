@@ -32,11 +32,6 @@ export type CoreHomeNavigationLink = {
   href: string;
 };
 
-export type CoreHomeHeroMetric = {
-  value: string;
-  label: string;
-};
-
 export type CoreHomeFeatureCard = {
   icon: string;
   title: string;
@@ -49,10 +44,37 @@ export type CoreHomeExperienceStep = {
   description: string;
 };
 
-export type CoreHomeTrustItem = {
-  label: string;
-  value: string;
+export type CoreHomeServiceModule = {
+  id: "trips" | "delivery" | "places" | "transport";
+  index: string;
+  eyebrow: string;
+  title: string;
+  summary: string;
   description: string;
+  action: string;
+  href: string;
+  image: string;
+};
+
+export type CoreHomeRideClass = {
+  id: string;
+  name: string;
+  eyebrow: string;
+  description: string;
+  image: string;
+};
+
+export type CoreHomePresenceCard = {
+  city: string;
+  country: string;
+  entity: string;
+  detail: string;
+  image: string;
+};
+
+export type CoreHomeFooterGroup = {
+  title: string;
+  links: CoreHomeNavigationLink[];
 };
 
 export type CoreHomeFaqItem = {

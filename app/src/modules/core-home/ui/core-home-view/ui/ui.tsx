@@ -1,89 +1,98 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import Link from "next/link";
-
-import Footer from "../../blocks/footer";
-import SocialLinks from "../../blocks/social-links";
-import FeatureCards from "../../blocks/feature-cards";
-import Hero from "../../blocks/hero";
-import Section from "../../blocks/section";
-import ScreensMarquee from "../../blocks/screens-marquee";
-import TrustSafetyStrip from "../../blocks/trust-safety-strip";
-import MiniFAQ from "../../blocks/mini-faq";
-import WaitlistCounter from "../../blocks/waitlist-counter";
-import WaitList, { API_BASE } from "../../blocks/wait-list";
-import {
-  CORE_HOME_COPY,
-  CORE_HOME_INVESTORS_LABEL,
-  CORE_HOME_INVESTORS_PATHNAME,
-} from "../../../constants";
 import type { CoreHomeViewProps } from "../../../types";
+import { useLanguage } from "../../../../../shared/i18n";
+import {
+  CoreHomeFeatureCards,
+  CoreHomeHero,
+  CoreHomeHowItFeels,
+  CoreHomeTrustSafetyStrip,
+} from "../../blocks";
 import styles from "../styles/styles.module.css";
 
-const HowItFeels = dynamic(() => import("../../blocks/how-it-feels"), { ssr: false });
-
 export function CoreHomeView({
-  pathname,
-  shouldMountExperience,
   experienceMountRef,
+  shouldMountExperience,
 }: CoreHomeViewProps) {
-  const shouldShowInvestorsLink = pathname !== CORE_HOME_INVESTORS_PATHNAME;
+  const { dictionary } = useLanguage();
+  const copy = dictionary.home;
 
   return (
     <div className={styles.root}>
-      <Hero />
+      <CoreHomeHero />
 
-      <Section {...CORE_HOME_COPY.value}>
-        <FeatureCards />
-      </Section>
-
-      <Section {...CORE_HOME_COPY.feel}>
-        <span id="experience" aria-hidden className={styles.anchorAlias} />
-        <div ref={experienceMountRef} className={styles.experienceMountHost}>
-          {shouldMountExperience ? <HowItFeels /> : null}
+      <section id="value" className={`${styles.intro} reveal`}>
+        <div className={styles.introCopy}>
+          <span className={styles.kicker}>{copy.value.kicker}</span>
+          <h2>{copy.value.title}</h2>
+          <p>{copy.value.subtitle}</p>
+          <a href="#trips">{copy.introLink}</a>
         </div>
-      </Section>
+        <div className={styles.introVisual} aria-hidden>
+          <img src="/mock/device-preview.jpg" alt="" />
+        </div>
+      </section>
 
-      <Section {...CORE_HOME_COPY.screens}>
-        <ScreensMarquee />
-      </Section>
+      <section id="experience" className={styles.workSection}>
+        <div
+          id="feel"
+          ref={experienceMountRef}
+          className={styles.mountAnchor}
+        />
+        <div className={`${styles.sectionHead} reveal`}>
+          <span className={styles.kicker}>{copy.feel.kicker}</span>
+          <h2>{copy.feel.title}</h2>
+          <p>{copy.feel.subtitle}</p>
+        </div>
+        {shouldMountExperience ? (
+          <CoreHomeFeatureCards />
+        ) : (
+          <div className={styles.serviceSkeleton} aria-hidden />
+        )}
+      </section>
 
-      <Section {...CORE_HOME_COPY.trust}>
-        <TrustSafetyStrip />
-      </Section>
+      <section id="screens" className={`${styles.flowsSection} reveal`}>
+        <div className={styles.sectionHead}>
+          <span className={styles.kicker}>{copy.screens.kicker}</span>
+          <h2>{copy.screens.title}</h2>
+          <p>{copy.screens.subtitle}</p>
+        </div>
+        <CoreHomeHowItFeels />
+      </section>
 
-      <Section {...CORE_HOME_COPY.faq}>
-        <MiniFAQ />
-      </Section>
-
-      <Section
-        {...CORE_HOME_COPY.waitlist}
-        titleAside={<WaitlistCounter apiBase={API_BASE} />}
+      <section
+        className={styles.marquee}
+        aria-label={copy.marqueeLabel}
       >
-        <WaitList />
-      </Section>
-
-      <Section {...CORE_HOME_COPY.follow}>
-        <div className={styles.followCard}>
-          <p className={styles.followText}>
-            Follow the product build, investor notes and launch progress without the noise.
-          </p>
-          <SocialLinks size="lg" scroll>
-            {shouldShowInvestorsLink ? (
-              <Link
-                href={CORE_HOME_INVESTORS_PATHNAME}
-                className={styles.investorsLink}
-                aria-label={CORE_HOME_INVESTORS_LABEL}
-              >
-                {CORE_HOME_INVESTORS_LABEL}
-              </Link>
-            ) : null}
-          </SocialLinks>
+        <div className={styles.marqueeRail}>
+          {[...copy.screenPhrases, ...copy.screenPhrases].map(
+            (phrase, index) => (
+              <span key={`${phrase}-${index}`}>{phrase}</span>
+            ),
+          )}
         </div>
-      </Section>
+      </section>
 
-      <Footer />
+      <section id="trust" className={`${styles.presenceSection} reveal`}>
+        <div className={styles.sectionHead}>
+          <span className={styles.kicker}>{copy.trust.kicker}</span>
+          <h2>{copy.trust.title}</h2>
+          <p>{copy.trust.subtitle}</p>
+        </div>
+        <CoreHomeTrustSafetyStrip />
+      </section>
+
+      <section id="download-app" className={`${styles.download} reveal`}>
+        <div className={styles.downloadCopy}>
+          <span className={styles.kicker}>{copy.download.kicker}</span>
+          <h2>{copy.download.title}</h2>
+          <p>{copy.download.text}</p>
+          <img src="/mock/app-qr.png" alt={copy.download.qrAlt} />
+        </div>
+        <div className={styles.phone} aria-hidden>
+          <img src="/mock/device-preview.jpg" alt="" />
+        </div>
+      </section>
     </div>
   );
 }

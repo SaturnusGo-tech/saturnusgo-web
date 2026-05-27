@@ -320,8 +320,14 @@ export default function MarketChart({
       >
         <defs>
           <linearGradient id="mcBarGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%"   stopColor="var(--mc-accent)" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="var(--mc-accent)" stopOpacity="0.22" />
+            <stop offset="0%" stopColor="var(--mc-accent-2, var(--mc-accent))" stopOpacity="0.9" />
+            <stop offset="58%" stopColor="var(--mc-accent)" stopOpacity="0.74" />
+            <stop offset="100%" stopColor="var(--mc-accent)" stopOpacity="0.18" />
+          </linearGradient>
+
+          <linearGradient id="mcLineGrad" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stopColor="var(--mc-accent)" />
+            <stop offset="100%" stopColor="var(--mc-accent-2, var(--mc-accent))" />
           </linearGradient>
 
           {!isMobile && !reduceMotion && (
@@ -670,7 +676,7 @@ export default function MarketChart({
         }
 
         /* Line & points */
-        .mc__line { fill: none; stroke: var(--mc-accent); stroke-width: 2; }
+        .mc__line { fill: none; stroke: url(#mcLineGrad); stroke-width: 2; }
         .mc__point { fill: var(--mc-accent); }
         .mc__tagText { fill: var(--mc-fg); font-size: 11px; font-weight: 600; }
 

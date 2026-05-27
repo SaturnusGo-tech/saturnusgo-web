@@ -1,6 +1,5 @@
-import type { ComponentProps } from 'react';
 import { CorePartnersAboutScreen } from '../../../src/modules/core-partners';
 
-export default function Page(props: ComponentProps<typeof CorePartnersAboutScreen>) {
-  return <CorePartnersAboutScreen {...props} />;
+export default function Page() {
+  return <CorePartnersAboutScreen />;
 }

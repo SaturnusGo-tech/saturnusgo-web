@@ -1,95 +1,63 @@
-// app/partners/listing/page.tsx
-"use client"
+"use client";
 
-import { useRef, useEffect, useState } from "react"
-import { useTheme } from "next-themes"
-import Link from "next/link"
-// 1) ДОБАВЬ к существующему импорту lucide-react:
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
-    ArrowRight, Search, Filter, MapPin, Building2,
-    BedDouble, UtensilsCrossed, Coffee, Sun, Ticket, Mountain, Briefcase
-  } from "lucide-react"
-  
+  ArrowRight,
+  BedDouble,
+  Building2,
+  Briefcase,
+  Check,
+  ChevronDown,
+  Coffee,
+  MapPin,
+  Mountain,
+  Search,
+  Sun,
+  Ticket,
+  UtensilsCrossed,
+} from "lucide-react";
 
-// 2) ДОБАВЬ компонент TypeIcon (выше export default или рядом с BackgroundEffects):
+type PartnerStatus = "new" | "in_review" | "approved" | "rejected";
 
-const TypeIcon = ({ type }: { type?: string }) => {
-    // Нормализуем вход
-    const t = (type || "").trim().toLowerCase()
-  
-    // Карта соответствий companyType → иконка
-    // Поддерживаем значения после sanitizeCompanyType на бэке:
-    // 'Hotel','Resort','Restaurant','Café','Event Venue','Experience Provider','Other Service'
-    if (t === "hotel")           return <BedDouble className="logo-icon-svg" aria-label="Hotel" />
-    if (t === "resort")          return <Sun className="logo-icon-svg" aria-label="Resort" />
-    if (t === "restaurant")      return <UtensilsCrossed className="logo-icon-svg" aria-label="Restaurant" />
-    if (t === "café" || t === "cafe") return <Coffee className="logo-icon-svg" aria-label="Café" />
-    if (t === "event venue")     return <Ticket className="logo-icon-svg" aria-label="Event Venue" />
-    if (t === "experience provider") return <Mountain className="logo-icon-svg" aria-label="Experience Provider" />
-    if (t === "other service")   return <Briefcase className="logo-icon-svg" aria-label="Other Service" />
-  
-    // Fallback — нейтральное здание
-    return <Building2 className="logo-icon-svg" aria-label="Partner" />
-  }
-
-  
 type Partner = {
-  id: string
-  name: string
-  type?: string
-  location?: string
-  description?: string
-  logo?: string
-  status?: "new" | "in_review" | "approved" | "rejected"
-}
+  id: string;
+  name: string;
+  type?: string;
+  location?: string;
+  status?: PartnerStatus;
+};
 
 type PartnerApplication = {
-  id: number
-  companyName: string
-  companyType: string
-  website?: string | null
-  contactName: string
-  email: string
-  phone?: string | null
-  country?: string | null
-  city?: string | null
-  interests: Array<"hotels" | "restaurants" | "cafes" | "events">
-  monthlyVolume?: number | null
-  notes?: string | null
-  agree: boolean
-  status: "new" | "in_review" | "approved" | "rejected"
-  createdAt: string
-  updatedAt: string
-}
+  id: number;
+  companyName: string;
+  companyType: string;
+  country?: string | null;
+  city?: string | null;
+  status: PartnerStatus;
+};
 
 type ListResponse = {
-  success: boolean
-  page: number
-  limit: number
-  total: number
-  data: PartnerApplication[]
-}
+  success: boolean;
+  page: number;
+  limit: number;
+  total: number;
+  data: PartnerApplication[];
+};
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://saturnusgo-backend-production.up.railway.app"
-const PARTNER_LIST_ENDPOINT = `${API_BASE}/api/partners/list`
+type TypeOption = {
+  value: string;
+  label: string;
+};
 
-const BackgroundEffects = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div
-      className="absolute inset-0 opacity-[0.015]"
-      style={{
-        backgroundImage: `
-          linear-gradient(var(--grid) 1px, transparent 1px),
-          linear-gradient(90deg, var(--grid) 1px, transparent 1px)
-        `,
-        backgroundSize: "40px 40px",
-      }}
-    />
-  </div>
-)
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
+  "https://saturnusgo-backend-production.up.railway.app";
 
-const typeOptions = [
-  { value: "all", label: "All types" },
+const PARTNER_LIST_ENDPOINT = `${API_BASE}/api/partners/list`;
+
+const TYPE_OPTIONS: TypeOption[] = [
+  { value: "all", label: "All partner types" },
   { value: "Hotel", label: "Hotels" },
   { value: "Resort", label: "Resorts" },
   { value: "Event Venue", label: "Event venues" },
@@ -97,801 +65,1129 @@ const typeOptions = [
   { value: "Café", label: "Cafés" },
   { value: "Experience Provider", label: "Experience providers" },
   { value: "Other Service", label: "Other services" },
-]
+];
 
-function authHeaders(): HeadersInit {
-  // опционально: если эндпоинт под AuthGuard — прикрепляем Bearer-токен, если он есть
-  try {
-    const token =
-      (typeof window !== "undefined" && (localStorage.getItem("saturnusgo_token") || localStorage.getItem("token") || localStorage.getItem("access_token"))) ||
-      ""
-    return token ? { Authorization: `Bearer ${token}` } : {}
-  } catch {
-    return {}
+const PARTNER_LISTING_PRINCIPLES = [
+  {
+    title: "Verified supply",
+    text: "Partners are shown as operational entries, not decorative logos. The list stays useful for real marketplace review.",
+  },
+  {
+    title: "City context",
+    text: "Every listing is readable by category, location and review state, so business teams can understand partner coverage fast.",
+  },
+  {
+    title: "Clean access",
+    text: "Search and category filtering stay close to the result set, without turning the page into a dashboard full of controls.",
+  },
+];
+
+const STATUS_LABELS: Record<PartnerStatus, string> = {
+  new: "New",
+  in_review: "In review",
+  approved: "Approved",
+  rejected: "Rejected",
+};
+
+function getAuthHeaders(): HeadersInit {
+  if (typeof window === "undefined") {
+    return {};
   }
+
+  const token =
+    localStorage.getItem("saturnusgo_token") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("access_token");
+
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-function mapPartner(a: PartnerApplication): Partner {
-  return {
-    id: String(a.id),
-    name: a.companyName,
-    type: a.companyType,
-    location: [a.city, a.country].filter(Boolean).join(", "),
-    description: a.notes ?? undefined,
-    logo: undefined, // бэкенд пока не отдаёт логотипы
-    status: a.status,
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
   }
+
+  return "Unknown error";
+}
+
+function mapPartner(application: PartnerApplication): Partner {
+  return {
+    id: String(application.id),
+    name: application.companyName,
+    type: application.companyType,
+    location: [application.city, application.country]
+      .filter(Boolean)
+      .join(", "),
+    status: application.status,
+  };
+}
+
+function TypeIcon({ type }: { type?: string }) {
+  const normalizedType = (type || "").trim().toLowerCase();
+
+  if (normalizedType === "hotel") {
+    return <BedDouble aria-hidden="true" />;
+  }
+
+  if (normalizedType === "resort") {
+    return <Sun aria-hidden="true" />;
+  }
+
+  if (normalizedType === "restaurant") {
+    return <UtensilsCrossed aria-hidden="true" />;
+  }
+
+  if (normalizedType === "café" || normalizedType === "cafe") {
+    return <Coffee aria-hidden="true" />;
+  }
+
+  if (normalizedType === "event venue") {
+    return <Ticket aria-hidden="true" />;
+  }
+
+  if (normalizedType === "experience provider") {
+    return <Mountain aria-hidden="true" />;
+  }
+
+  if (normalizedType === "other service") {
+    return <Briefcase aria-hidden="true" />;
+  }
+
+  return <Building2 aria-hidden="true" />;
+}
+
+function PartnersTypeSelect({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: TypeOption[];
+  onChange: (nextValue: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selectedOption =
+    options.find((option) => option.value === value) || options[0];
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  return (
+    <div ref={rootRef} className="partnerListingSelect">
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        className="partnerListingSelectTrigger"
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <Building2 aria-hidden="true" />
+        <span>{selectedOption.label}</span>
+        <ChevronDown aria-hidden="true" data-open={isOpen} />
+      </button>
+
+      {isOpen && (
+        <div className="partnerListingSelectMenu" role="listbox">
+          {options.map((option) => {
+            const isSelected = option.value === value;
+
+            return (
+              <button
+                key={option.value}
+                aria-selected={isSelected}
+                className="partnerListingSelectOption"
+                role="option"
+                type="button"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+              >
+                <span>{option.label}</span>
+                {isSelected && <Check aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function PartnerListingPage() {
-  const heroRef = useRef<HTMLElement>(null)
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
 
-  // tone (dark/light)
-  const { resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  const tone = mounted && resolvedTheme === "light" ? "light" : "dark"
-
-  // simple parallax for hero
   useEffect(() => {
-    const el = heroRef.current
-    if (!el) return
-    let ticking = false
-    const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const y = window.scrollY
-          const h = el.offsetHeight || 1
-          const p = Math.min(y / (h * 0.6), 1)
-          el.style.transform = `translateY(${p * 15}px)`
-          el.style.opacity = `${Math.max(1 - p * 0.2, 0.8)}`
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+    const abortController = new AbortController();
 
-  // DATA
-  const [partners, setPartners] = useState<Partner[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+    async function fetchPartners() {
+      setLoading(true);
+      setError(null);
 
-  // filters
-  const [searchTerm, setSearchTerm] = useState("")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [filteredPartners, setFilteredPartners] = useState<Partner[]>([])
-
-  // fetch ALL partners from all statuses (pagination-aware)
-  useEffect(() => {
-    const abort = new AbortController()
-    const headers: HeadersInit = {}
-
-    async function fetchAll() {
-      setLoading(true)
-      setError(null)
-      const limit = 200 // max allowed by DTO
-      let page = 1
-      let acc: Partner[] = []
+      const limit = 200;
+      let page = 1;
+      let nextPartners: Partner[] = [];
 
       try {
         for (;;) {
-          const url = `${PARTNER_LIST_ENDPOINT}?page=${page}&limit=${limit}`
-          const res = await fetch(url, {
-            method: "GET",
-            headers,
-            
-            cache: "no-store",
-            signal: abort.signal,
-          })
+          const response = await fetch(
+            `${PARTNER_LIST_ENDPOINT}?page=${page}&limit=${limit}`,
+            {
+              method: "GET",
+              headers: getAuthHeaders(),
+              cache: "no-store",
+              signal: abortController.signal,
+            },
+          );
 
-          if (!res.ok) {
-            // читаем текст ошибки для дебага
-            const msg = `${res.status} ${res.statusText}`
-            throw new Error(msg)
+          if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}`);
           }
 
-          const json: ListResponse = await res.json()
-          const batch = (json.data || []).map(mapPartner)
-          acc = acc.concat(batch)
+          const payload = (await response.json()) as ListResponse;
+          const batch = (payload.data || []).map(mapPartner);
+          nextPartners = nextPartners.concat(batch);
 
-          if (acc.length >= json.total || batch.length === 0) break
-          page += 1
+          if (nextPartners.length >= payload.total || batch.length === 0) {
+            break;
+          }
+
+          page += 1;
         }
 
-        setPartners(acc)
-      } catch (e: any) {
-        if (e?.name !== "AbortError") {
-            setError("Failed to load partners. " + (e?.message || "Unknown error"))
+        setPartners(nextPartners);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
         }
+
+        setError(`Failed to load partners. ${getErrorMessage(error)}`);
       } finally {
-        setLoading(false)
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
-    fetchAll()
-    return () => abort.abort()
-  }, [])
+    fetchPartners();
 
-  // apply filters
-  useEffect(() => {
-    let filtered = partners
+    return () => abortController.abort();
+  }, []);
 
-    if (searchTerm) {
-      const q = searchTerm.toLowerCase()
-      filtered = filtered.filter((p) =>
-        [p.name, p.location, p.type].some((v) => v?.toLowerCase().includes(q)),
-      )
-    }
+  const filteredPartners = useMemo(() => {
+    const normalizedQuery = searchTerm.trim().toLowerCase();
 
-    if (typeFilter !== "all") {
-      filtered = filtered.filter((p) => p.type === typeFilter)
-    }
+    return partners.filter((partner) => {
+      const matchesSearch = normalizedQuery
+        ? [partner.name, partner.location, partner.type].some((value) =>
+            value?.toLowerCase().includes(normalizedQuery),
+          )
+        : true;
 
-    setFilteredPartners(filtered)
-  }, [partners, searchTerm, typeFilter])
+      const matchesType = typeFilter === "all" || partner.type === typeFilter;
+
+      return matchesSearch && matchesType;
+    });
+  }, [partners, searchTerm, typeFilter]);
 
   return (
-    <div className="partner-listing" data-tone={tone}>
-      <BackgroundEffects />
+    <div className="partnerListingPage">
+      <section className="partnerListingHero" aria-labelledby="partners-title">
+        <div className="partnerListingHeroMedia" aria-hidden="true">
+          <img src="/mock/module-places.jpg" alt="" />
+        </div>
 
-      {/* Hero */}
-      <section ref={heroRef} className="hero-section">
-        <div className="hero-content">
-          <div className="hero-logo">
-            <img
-              src="https://wjfhdyynywkjudwlouxv.supabase.co/storage/v1/object/public/Video-host/logo.png"
-              alt="SaturnusGo logo"
-              className="hero-logo-img"
-            />
-          </div>
-
-          <h1 className="hero-title">
-            Our <span className="hero-company">Partners</span>
-          </h1>
-
-          <p className="hero-subtitle">
-            Browse the partner directory once integrations are live. This page shows real partners only
+        <div className="partnerListingHeroInner">
+          <span className="partnerListingEyebrow">Partner directory</span>
+          <h1 id="partners-title">Verified partners for the city layer.</h1>
+          <p>
+            A clean operational view of hotels, restaurants, venues and local
+            services connected to SaturnusGo partner flows.
           </p>
-        </div>
-      </section>
-
-      {/* Error/Loading */}
-      <section className="section-container" style={{ paddingTop: 8 }}>
-        {loading && (
-          <div className="loading-bar" role="status" aria-live="polite">
-            Loading partners…
-          </div>
-        )}
-        {error && (
-          <div className="error-box" role="alert">
-            {error}
-          </div>
-        )}
-      </section>
-
-      {/* Filters */}
-      <section className="filters-section">
-        <div className="section-container">
-          <div className="filters-header">
-            <h2 className="filters-title">Search & filters</h2>
-            <p className="filters-subtitle">Find partners by name, location, or business type.</p>
-          </div>
-
-          <div className="filters-grid">
-            <div className="search-box">
-              <Search className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search by name, city, or type..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </div>
-
-            <div className="filter-group">
-              <Building2 className="filter-icon" />
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="filter-select">
-                {typeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <Filter className="filter-icon" />
-              <select className="filter-select" disabled>
-                <option>More filters soon</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="results-count">
-            Found: <span className="count-number">{filteredPartners.length}</span>
+          <div className="partnerListingActions">
+            <Link href="/partners/apply" className="partnerListingPrimaryLink">
+              Apply as partner
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <Link href="/partners" className="partnerListingGhostLink">
+              Partnership overview
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Partners Grid */}
-      <section className="partners-section">
-        <div className="section-container">
-          <div className="partners-grid">
-            {filteredPartners.map((partner) => (
-              <div key={partner.id} className="partner-card">
-                <div className="partner-header">
-<div className="partner-logo">
-  {partner.logo
-    ? <img src={partner.logo} alt={`${partner.name} logo`} className="logo-img" />
-    : <TypeIcon type={partner.type} />
-  }
-</div>
+      <section className="partnerListingIntroSection">
+        <div className="partnerListingSectionInner">
+          <div className="partnerListingSectionHead">
+            <span className="partnerListingEyebrow">How the list works</span>
+            <div>
+              <h2>Directory first, dashboard only where it helps.</h2>
+              <p>
+                This screen should be readable as a marketplace directory. The
+                structure is light, searchable and grounded in real partner
+                records rather than decorative cards.
+              </p>
+            </div>
+          </div>
 
-                  {partner.status && (
-                    <span className={`status-pill status-${partner.status}`}>
-                      {partner.status === "new" && "New"}
-                      {partner.status === "in_review" && "In review"}
-                      {partner.status === "approved" && "Approved"}
-                      {partner.status === "rejected" && "Rejected"}
-                    </span>
-                  )}
-                </div>
-
-                <div className="partner-info">
-                  <h3 className="partner-name">{partner.name}</h3>
-                  {partner.type && <div className="partner-type">{partner.type}</div>}
-                  {partner.description && <p className="partner-description">{partner.description}</p>}
-                </div>
-
-                <div className="partner-details">
-                  {partner.location && (
-                    <div className="detail-item">
-                      <MapPin className="detail-icon" />
-                      <span>{partner.location}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="partner-actions">
-                  <Link className="btn-secondary" href="/partners">
-                    Learn more
-                    <ArrowRight className="btn-icon" />
-                  </Link>
-                </div>
+          <div className="partnerListingPrinciples">
+            {PARTNER_LISTING_PRINCIPLES.map((principle, index) => (
+              <div key={principle.title} className="partnerListingPrinciple">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{principle.title}</h3>
+                <p>{principle.text}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="partnerListingResultsSection">
+        <div className="partnerListingSectionInner">
+          <div className="partnerListingToolbar">
+            <div>
+              <span className="partnerListingEyebrow">Browse partners</span>
+              <h2>Find a partner by name, city or category.</h2>
+            </div>
+
+            <div className="partnerListingCount" aria-live="polite">
+              <span>{filteredPartners.length}</span>
+              <small>
+                {filteredPartners.length === 1 ? "result" : "results"}
+              </small>
+            </div>
+          </div>
+
+          <div className="partnerListingFilters" role="search">
+            <label className="partnerListingSearch">
+              <Search aria-hidden="true" />
+              <span className="sr-only">Search partners</span>
+              <input
+                type="search"
+                placeholder="Search by partner, city or type"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </label>
+
+            <PartnersTypeSelect
+              options={TYPE_OPTIONS}
+              value={typeFilter}
+              onChange={setTypeFilter}
+            />
+          </div>
+
+          {loading && (
+            <div
+              className="partnerListingState"
+              role="status"
+              aria-live="polite"
+            >
+              Loading partners…
+            </div>
+          )}
+
+          {error && (
+            <div
+              className="partnerListingState partnerListingStateError"
+              role="alert"
+            >
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && filteredPartners.length > 0 && (
+            <div className="partnerListingRows">
+              {filteredPartners.map((partner, index) => (
+                <article key={partner.id} className="partnerListingRow">
+                  <div className="partnerListingRowIndex">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+
+                  <div className="partnerListingIcon">
+                    <TypeIcon type={partner.type} />
+                  </div>
+
+                  <div className="partnerListingCompany">
+                    <h3>{partner.name}</h3>
+                    {partner.location && (
+                      <p>
+                        <MapPin aria-hidden="true" />
+                        {partner.location}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="partnerListingMeta">
+                    {partner.type && <span>{partner.type}</span>}
+                    {partner.status && (
+                      <small data-status={partner.status}>
+                        {STATUS_LABELS[partner.status]}
+                      </small>
+                    )}
+                  </div>
+
+                  <Link href="/partners" className="partnerListingRowLink">
+                    Learn more
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
 
           {!loading && !error && filteredPartners.length === 0 && (
-            <div className="no-results">
-              <div className="no-results-icon">
-                <Search />
-              </div>
-              <h3 className="no-results-title">No partners to display</h3>
-              <p className="no-results-text">
-                Once integrations are in place, verified partners will appear here.
+            <div className="partnerListingEmpty">
+              <Search aria-hidden="true" />
+              <h3>No partners to display</h3>
+              <p>
+                Change the search or category. Verified partners will appear
+                here when they are available in the directory.
               </p>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="cta-section">
-        <div className="section-container">
-          <div className="cta-content">
-            <h2 className="cta-title">Want to become a partner?</h2>
-            <p className="cta-subtitle">
-              Join SaturnusGo as we build a unified travel ecosystem. Submit your application to start the review
-              process.
-            </p>
-            <Link href="/partners/apply" className="btn-primary">
-              Apply now
-              <ArrowRight className="btn-icon" />
-            </Link>
-          </div>
+      <section className="partnerListingCtaSection">
+        <div className="partnerListingSectionInner">
+          <span className="partnerListingEyebrow">
+            Become visible in the flow
+          </span>
+          <h2>
+            Hotels, venues and city services can join the SaturnusGo partner
+            layer.
+          </h2>
+          <p>
+            Submit the application once. The team reviews fit, city coverage and
+            the operational scenario before adding a partner to the ecosystem.
+          </p>
+          <Link href="/partners/apply" className="partnerListingPrimaryLink">
+            Start application
+            <ArrowRight aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <img
-              src="https://wjfhdyynywkjudwlouxv.supabase.co/storage/v1/object/public/Video-host/logo.png"
-              alt="SaturnusGo logo"
-              className="footer-logo-img"
-            />
-          </div>
-
-          <div className="footer-links">
-
-          <div className="link-group footer-cta-group">
-    <h4 className="link-title">More</h4>
-    <Link href="/investors" className="footer-cta">For Investors</Link>
-    <Link href="/founder" className="footer-cta">About Founder</Link>
-    <Link href="/lending" className="footer-cta">Lending</Link>
-  </div>
-            <div className="link-group">
-              <h4 className="link-title">Company</h4>
-              <Link href="/partners/about" className="footer-link">About Us</Link>
-              <a href="/partners/careers" className="footer-link">Careers</a>
-              <a href="/partners/contacts" className="footer-link">Contact</a>
-              <a href="/partners/news" className="footer-link">News</a>
-            </div>
-
-            <div className="link-group">
-              <h4 className="link-title">Partners</h4>
-              <a href="#" className="footer-link">Partner Program</a>
-              <a href="#" className="footer-link">Partner Portal</a>
-              <a href="#" className="footer-link">Resources</a>
-              <a href="#" className="footer-link">Support</a>
-            </div>
-
-            <div className="link-group">
-              <h4 className="link-title">Legal</h4>
-              <Link href="/partners/privacy" className="footer-link">Privacy Policy</Link>
-              <Link href="/partners/terms" className="footer-link">Terms of Service</Link>
-              <Link href="/partners/cookies" className="footer-link">Cookie Policy</Link>
-              <Link href="/partners/compliance" className="footer-link">Compliance</Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>Copyright 2025 SaturnusGo. All rights reserved.</p>
-        </div>
-      </footer>
-      {/* Styles */}
       <style jsx global>{`
-        /* ============================
-           TOKENS — DARK (default)
-        =============================*/
-        .partner-listing {
-          --bg-0: #0a0b0d;
-          --bg-1: #0f1115;
-          --grid: rgba(255, 255, 255, 0.035);
-
-          --txt: #e7e9ee;
-          --txt-2: #c2c6cf;
-          --txt-3: #9aa0a6;
-
-          --white-02: rgba(255, 255, 255, 0.02);
-          --white-08: rgba(255, 255, 255, 0.08);
-          --white-12: rgba(255, 255, 255, 0.12);
-
-          --primary: #646cff;
-          --primary-hover: #5a63f0;
-
-          --radius-md: 14px;
-          --radius-lg: 20px;
-          --radius-xl: 28px;
-
-          --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.02) inset;
-          --shadow-2: 0 24px 60px -20px rgba(0, 0, 0, 0.5);
-
-          position: relative;
-          width: 100%;
+        .partnerListingPage {
+          --pl-night: #050505;
+          --pl-paper: #f2eee4;
+          --pl-paper-soft: #ebe5d8;
+          --pl-ink: #080808;
+          --pl-ink-soft: rgba(8, 8, 8, 0.66);
+          --pl-ink-muted: rgba(8, 8, 8, 0.44);
+          --pl-cream: #f7f4ee;
+          --pl-cream-soft: rgba(247, 244, 238, 0.68);
+          --pl-cream-muted: rgba(247, 244, 238, 0.45);
+          --pl-line-light: rgba(8, 8, 8, 0.13);
+          --pl-line-dark: rgba(247, 244, 238, 0.14);
           min-height: 100vh;
-          background:
-            radial-gradient(1100px 560px at 50% -10%, rgba(100,108,255,.08), transparent),
-            linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-0) 100%);
-          color: var(--txt);
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          margin-top: calc(var(--app-header-h, 96px) * -1);
+          overflow-x: clip;
+          background: var(--pl-paper);
+          color: var(--pl-ink);
+          font-family:
+            var(--font-geist-sans), var(--font-pjs), system-ui, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          text-rendering: geometricprecision;
         }
 
-        /* === Footer: spacing & logo centering — final overrides === */
-.partner-listing {
-  /* больше отступа от верхней линии футера до заголовков разделов */
-  --footer-pad-top: clamp(64px, 6vw, 96px);
-  /* немного больше отступ снизу футера */
-  --footer-pad-bottom: clamp(28px, 4vw, 48px);
-  /* опускаем нижний ограничитель (линия в .footer-bottom) */
-  --footer-line-gap: clamp(24px, 3vw, 36px);
-}
-
-/* применяем обновлённые переменные */
-.footer {
-  padding-top: var(--footer-pad-top) !important;
-  padding-bottom: var(--footer-pad-bottom) !important;
-}
-
-/* лёгкий зазор перед сеткой ссылок, чтобы заголовки не «липли» к верхней границе */
-.footer-links {
-  margin-top: clamp(8px, 1.6vw, 14px) !important;
-}
-
-/* нижний ограничитель: чуть позже по вертикали и больше внутренний отступ сверху */
-.footer-bottom {
-  margin-top: var(--footer-line-gap) !important;
-  padding-top: clamp(20px, 2.4vw, 28px) !important;
-}
-
-/* логотип — к визуальному центру своей колонки */
-.footer-logo {
-  align-self: center;                 /* центр по вертикали внутри grid-строки */
-  display: flex;
-  align-items: center;                /* центрируем сам img по оси контейнера */
-  min-height: 100%;                   /* тянем колонку для ровного центрирования */
-}
-
-/* чуть крупнее можно оставить текущий размер; при необходимости — подстройка */
-.footer-logo-img {
-  max-width: 100px;                   /* ваш исходный размер */
-  /* при желании — мягкая оптика: небольшое смещение вниз
-     раскомментировать при необходимости
-  transform: translateY(4px);
-  */
-}
-
-/* мобильные — сохраняем баланс отступов */
-@media (max-width: 768px) {
-  .partner-listing {
-    --footer-pad-top: clamp(40px, 7vw, 56px);
-    --footer-pad-bottom: clamp(16px, 5vw, 28px);
-    --footer-line-gap: clamp(18px, 5vw, 26px);
-  }
-  .footer-logo { align-self: center; }
-  .footer-bottom { text-align: center; justify-content: center; }
-}
-
-
-        /* ============================
-           TOKENS — LIGHT OVERRIDES
-        =============================*/
-        .partner-listing[data-tone='light'],
-        :global(html.light) .partner-listing {
-          --bg-0: #f6f8fb;
-          --bg-1: #ffffff;
-          --grid: rgba(2, 6, 23, 0.06);
-
-          --txt: #0f172a;   /* slate-900 */
-          --txt-2: #475569; /* slate-600 */
-          --txt-3: #64748b; /* slate-500 */
-
-          --white-02: rgba(2, 6, 23, 0.02);
-          --white-08: rgba(2, 6, 23, 0.06);
-          --white-12: rgba(2, 6, 23, 0.12);
-
-          background:
-            radial-gradient(1100px 560px at 50% -10%, rgba(100,108,255,.09), transparent),
-            linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-0) 100%);
-          color: var(--txt);
-        }
-
-        /* HERO */
-        .hero-section {
+        .partnerListingHero {
           position: relative;
-          min-height: 72vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 92px 24px 56px;
-          text-align: center;
+          min-height: min(760px, 100svh);
+          display: grid;
+          align-items: end;
+          padding: calc(var(--app-header-h, 96px) + clamp(80px, 9vw, 132px))
+            clamp(20px, 5vw, 72px) clamp(72px, 9vw, 128px);
+          overflow: hidden;
+          background: var(--pl-night);
+          color: var(--pl-cream);
         }
-        .hero-content { max-width: 900px; width: 100%; }
-        .hero-logo { margin-bottom: 36px; }
-        .hero-logo-img {
-          max-width: 120px;
-          height: auto;
-          margin: 0 auto 18px;
+
+        .partnerListingHero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          background:
+            linear-gradient(
+              90deg,
+              rgba(5, 5, 5, 0.94) 0%,
+              rgba(5, 5, 5, 0.74) 44%,
+              rgba(5, 5, 5, 0.44) 100%
+            ),
+            radial-gradient(
+              circle at 78% 18%,
+              rgba(145, 166, 188, 0.22),
+              transparent 34rem
+            );
+        }
+
+        .partnerListingHero::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          opacity: 0.18;
+          background-image:
+            linear-gradient(rgba(247, 244, 238, 0.04) 1px, transparent 1px),
+            linear-gradient(
+              90deg,
+              rgba(247, 244, 238, 0.03) 1px,
+              transparent 1px
+            );
+          background-size: 84px 84px;
+          mask-image: linear-gradient(90deg, black 0%, transparent 74%);
+        }
+
+        .partnerListingHeroMedia {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          transform: scale(1.035);
+        }
+
+        .partnerListingHeroMedia img {
+          width: 100%;
+          height: 100%;
           display: block;
-          filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
-        }
-        .partner-listing[data-tone='light'] .hero-logo-img,
-        :global(html.light) .partner-listing .hero-logo-img {
-          filter: drop-shadow(0 8px 16px rgba(2,6,23,.12));
-        }
-        .hero-title {
-          font-size: clamp(44px, 7vw, 84px);
-          font-weight: 850;
-          letter-spacing: -0.02em;
-          line-height: 1.06;
-          margin: 0 0 10px;
-          background: linear-gradient(to right, var(--txt), var(--txt-2));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .hero-company { display: inline; color: var(--primary); }
-        .hero-subtitle {
-          font-size: 20px;
-          line-height: 1.7;
-          color: var(--txt-2);
-          max-width: 760px;
-          margin: 0 auto 0;
+          object-fit: cover;
+          filter: saturate(0.88) contrast(1.08) brightness(0.62);
         }
 
-        /* Feedback */
-        .loading-bar {
-          width: 100%;
-          padding: 12px 16px;
-          background: var(--white-08);
-          border: 1px solid var(--white-12);
-          border-radius: var(--radius-lg);
-          color: var(--txt-2);
-          text-align: center;
-          margin-bottom: 16px;
-        }
-        .error-box {
-          width: 100%;
-          padding: 14px 16px;
-          background: rgba(255, 59, 48, 0.08);
-          border: 1px solid rgba(255, 59, 48, 0.22);
-          border-radius: var(--radius-lg);
-          color: #ff6b6b;
-          font-weight: 600;
-          margin-bottom: 16px;
+        .partnerListingHeroInner,
+        .partnerListingSectionInner {
+          width: min(1180px, 100%);
+          margin: 0 auto;
         }
 
-        /* Filters */
-        .filters-section { padding: 80px 0; background: var(--white-02); }
-        .section-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .filters-header { text-align: center; margin-bottom: 48px; }
-        .filters-title {
-          font-size: clamp(28px, 4vw, 36px);
-          font-weight: 800;
-          margin: 0 0 10px;
-          background: linear-gradient(to right, var(--txt), var(--txt-2));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .filters-subtitle { color: var(--txt-2); font-size: 16px; max-width: 600px; margin: 0 auto; }
-
-        .filters-grid {
-          display: grid;
-          grid-template-columns: 2fr 1fr 1fr;
-          gap: 24px;
-          margin-bottom: 24px;
-        }
-        @media (max-width: 768px) {
-          .filters-grid { grid-template-columns: 1fr; }
+        .partnerListingHeroInner {
+          position: relative;
+          z-index: 3;
         }
 
-        .search-box { position: relative; display: flex; align-items: center; }
-        .search-icon {
-          position: absolute; left: 16px; width: 20px; height: 20px; color: var(--txt-3); z-index: 1;
+        .partnerListingEyebrow {
+          display: inline-block;
+          margin: 0 0 20px;
+          color: var(--pl-ink-muted);
+          font-size: 12px;
+          font-weight: 820;
+          letter-spacing: 0.18em;
+          line-height: 1.25;
+          text-transform: uppercase;
         }
-        .search-input {
-          width: 100%;
-          padding: 16px 16px 16px 48px;
-          background: var(--white-08);
-          border: 1px solid var(--white-12);
-          border-radius: var(--radius-lg);
-          color: var(--txt);
-          font-size: 16px;
-          transition: all 0.2s ease;
-        }
-        .search-input::placeholder { color: var(--txt-3); }
-        .search-input:focus { outline: none; border-color: var(--primary); background: var(--white-12); }
 
-        .filter-group { position: relative; display: flex; align-items: center; }
-        .filter-icon {
-          position: absolute; left: 16px; width: 18px; height: 18px; color: var(--txt-3); z-index: 1;
+        .partnerListingHero .partnerListingEyebrow,
+        .partnerListingCtaSection .partnerListingEyebrow {
+          color: var(--pl-cream-muted);
         }
-        .filter-select {
-          width: 100%;
-          padding: 16px 16px 16px 48px;
-          background: var(--white-08);
-          border: 1px solid var(--white-12);
-          border-radius: var(--radius-lg);
-          color: var(--txt);
-          font-size: 16px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          appearance: none;
-        }
-        .filter-select:focus { outline: none; border-color: var(--primary); background: var(--white-12); }
 
-        .results-count { text-align: center; font-size: 16px; color: var(--txt-2); }
-        .count-number { font-weight: 700; color: var(--primary); }
+        .partnerListingHero h1,
+        .partnerListingIntroSection h2,
+        .partnerListingToolbar h2,
+        .partnerListingCtaSection h2 {
+          max-width: 980px;
+          margin: 0;
+          font-size: clamp(48px, 8vw, 124px);
+          font-weight: 660;
+          letter-spacing: -0.078em;
+          line-height: 0.92;
+        }
 
-        /* Partners Grid */
-        .partners-section { padding: 80px 0; }
-        .partners-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-          gap: 32px;
+        .partnerListingIntroSection h2,
+        .partnerListingToolbar h2,
+        .partnerListingCtaSection h2 {
+          font-size: clamp(42px, 6.4vw, 94px);
         }
-        @media (max-width: 768px) {
-          .partners-grid { grid-template-columns: 1fr; }
-        }
-        .logo-icon-svg {
-            width: 40px;
-            height: 40px;
-            stroke-width: 1.75;
-            color: var(--primary);
-            /* Чуть подсветим фон контейнера под иконку */
-            filter: drop-shadow(0 1px 0 rgba(0,0,0,.08));
-          }
-          .partner-listing[data-tone='light'] .logo-icon-svg {
-            color: var(--primary);
-            filter: drop-shadow(0 1px 0 rgba(2,6,23,.05));
-          }
-        .partner-card {
-          background: var(--white-08);
-          border: 1px solid var(--white-12);
-          border-radius: var(--radius-xl);
-          padding: 32px;
-          transition: all 0.3s ease;
-        }
-        .partner-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-2); background: var(--white-12); }
 
-        .partner-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .partner-logo {
-          width: 80px; height: 80px; background: var(--white-12); border-radius: var(--radius-lg);
-          display: flex; align-items: center; justify-content: center; overflow: hidden;
+        .partnerListingHero p,
+        .partnerListingIntroSection p,
+        .partnerListingCtaSection p {
+          max-width: 720px;
+          margin: 28px 0 0;
+          color: var(--pl-cream-soft);
+          font-size: clamp(17px, 1.55vw, 22px);
+          line-height: 1.58;
         }
-        .logo-img { max-width: 60px; max-height: 60px; object-fit: contain; }
 
-        .status-pill {
+        .partnerListingIntroSection p {
+          color: var(--pl-ink-soft);
+        }
+
+        .partnerListingActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 14px;
+          margin-top: 36px;
+        }
+
+        .partnerListingPrimaryLink,
+        .partnerListingGhostLink,
+        .partnerListingRowLink {
           display: inline-flex;
           align-items: center;
-          padding: 6px 10px;
-          font-size: 12px;
-          font-weight: 700;
+          justify-content: center;
+          gap: 9px;
+          min-height: 50px;
           border-radius: 999px;
-          border: 1px solid var(--white-12);
-          background: var(--white-08);
-          color: var(--txt-2);
+          padding: 0 22px;
+          font-size: 13px;
+          font-weight: 780;
+          letter-spacing: 0.08em;
+          text-decoration: none;
           text-transform: uppercase;
-          letter-spacing: .6px;
+          transition:
+            transform 180ms ease,
+            background 180ms ease,
+            color 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease;
         }
-        .status-approved { color: #00d17a; border-color: rgba(0,209,122,.25); background: rgba(0,209,122,.08); }
-        .status-in_review { color: #f2b700; border-color: rgba(242,183,0,.28); background: rgba(242,183,0,.08); }
-        .status-new { color: #5a63f0; border-color: rgba(90,99,240,.28); background: rgba(90,99,240,.08); }
-        .status-rejected { color: #ff6b6b; border-color: rgba(255,107,107,.28); background: rgba(255,107,107,.08); }
 
-        .partner-info { margin-bottom: 16px; }
-        .partner-name { font-size: 22px; font-weight: 800; color: var(--txt); margin: 0 0 6px; }
-        .partner-type {
-          font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: .9px; margin-bottom: 10px;
+        .partnerListingPrimaryLink {
+          background: var(--pl-cream);
+          color: var(--pl-ink);
         }
-        .partner-description { font-size: 16px; line-height: 1.6; color: var(--txt-2); }
 
-        .partner-details { margin-bottom: 18px; }
-        .detail-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; color: var(--txt-2); }
-        .detail-icon { width: 16px; height: 16px; color: var(--txt-3); flex: 0 0 auto; }
-
-        .partner-actions { display: flex; gap: 12px; }
-        .btn-primary, .btn-secondary {
-          display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px;
-          border-radius: var(--radius-lg); font-weight: 700; font-size: 14px; text-decoration: none;
-          transition: all 0.2s ease; cursor: pointer; border: none; justify-content: center;
+        .partnerListingGhostLink,
+        .partnerListingRowLink {
+          border: 1px solid currentColor;
+          color: inherit;
         }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--white-08); color: var(--txt); border: 1px solid var(--white-12); }
-        .btn-secondary:hover { background: var(--white-12); transform: translateY(-2px); }
-        .btn-icon { width: 16px; height: 16px; }
 
-        /* Empty state */
-        .no-results { text-align: center; padding: 80px 24px; }
-        .no-results-icon {
-          width: 80px; height: 80px; margin: 0 auto 20px; display: grid; place-items: center;
-          background: var(--white-08); border: 1px solid var(--white-12); border-radius: var(--radius-xl); color: var(--txt-3);
+        .partnerListingPrimaryLink:hover,
+        .partnerListingGhostLink:hover,
+        .partnerListingRowLink:hover {
+          transform: translateY(-2px);
         }
-        .no-results-icon svg { width: 40px; height: 40px; }
-        .no-results-title { font-size: 24px; font-weight: 800; color: var(--txt); margin: 0 0 8px; }
-        .no-results-text { font-size: 16px; color: var(--txt-2); margin: 0; }
 
-        /* CTA */
-        .cta-section { padding: 120px 0; background: var(--white-02); }
-        .cta-content { text-align: center; max-width: 640px; margin: 0 auto; }
-        .cta-title {
-          font-size: clamp(32px, 5vw, 48px);
-          font-weight: 800;
-          margin: 0 0 10px;
-          background: linear-gradient(to right, var(--txt), var(--txt-2));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
+        .partnerListingPrimaryLink svg,
+        .partnerListingGhostLink svg,
+        .partnerListingRowLink svg {
+          width: 16px;
+          height: 16px;
         }
-        .cta-subtitle { font-size: 18px; line-height: 1.6; color: var(--txt-2); margin: 0 0 22px; }
 
-        /* Footer */
-        .footer { padding: 80px 0 40px; background: var(--white-02); border-top: 1px solid var(--white-12); }
-        .footer-content {
-          max-width: 1200px; margin: 0 auto; padding: 0 24px;
-          display: grid; grid-template-columns: 1fr 2fr; gap: 64px; align-items: start;
+        .partnerListingIntroSection,
+        .partnerListingResultsSection {
+          padding: clamp(86px, 10vw, 142px) clamp(20px, 5vw, 72px);
+          background: var(--pl-paper);
+          color: var(--pl-ink);
         }
-        @media (max-width: 768px) {
-          .footer-content { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+
+        .partnerListingSectionHead {
+          display: grid;
+          grid-template-columns: minmax(160px, 0.42fr) minmax(0, 1fr);
+          gap: clamp(24px, 5vw, 76px);
+          align-items: end;
+          margin-bottom: clamp(42px, 6vw, 76px);
         }
-        .footer-logo-img { max-width: 100px; height: auto; }
-        .footer-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 40px; }
-        .link-group { display: flex; flex-direction: column; gap: 12px; }
-        .link-title { font-size: 16px; font-weight: 700; color: var(--txt); margin: 0 0 4px; }
-        .footer-link { color: var(--txt-2); text-decoration: none; font-size: 14px; transition: color .2s ease; }
-        .footer-link:hover { color: var(--primary); }
-        .footer-bottom { max-width: 1200px; margin: 0 auto; padding: 40px 24px 0; border-top: 1px solid var(--white-12); text-align: center; }
-        .footer-bottom p { color: var(--txt-3); font-size: 14px; margin: 0; }
 
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce){
-          .hero-section { transform:none !important; opacity:1 !important; }
+        .partnerListingPrinciples {
+          border-top: 1px solid var(--pl-line-light);
         }
-        .footer { padding: 80px 0 40px; background: var(--white-02); border-top: 1px solid var(--white-12); }
-        .footer-content {
-          max-width: 1200px; margin: 0 auto; padding: 0 24px; display: grid;
-          grid-template-columns: 1fr 2fr; gap: 64px; align-items: start;
+
+        .partnerListingPrinciple {
+          display: grid;
+          grid-template-columns: 74px minmax(180px, 0.42fr) minmax(0, 1fr);
+          gap: clamp(18px, 4vw, 62px);
+          align-items: baseline;
+          padding: clamp(24px, 3.6vw, 42px) 0;
+          border-bottom: 1px solid var(--pl-line-light);
         }
-        .footer-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 40px; }
-        .link-group { display: flex; flex-direction: column; gap: 12px; }
-        .link-title { font-size: 16px; font-weight: 700; color: var(--txt); margin-bottom: 8px; }
-        .footer-link { color: var(--txt-2); text-decoration: none; font-size: 14px; transition: color 0.2s ease; }
-        .footer-link:hover { color: var(--primary); }
-        .footer-logo-img { max-width: 100px; height: auto; }
 
-        .footer-bottom {
-          max-width: 1200px; margin: 0 auto; padding: 40px 24px 0; border-top: 1px solid var(--white-12); text-align: center;
+        .partnerListingPrinciple span {
+          color: var(--pl-ink-muted);
+          font-size: 12px;
+          font-weight: 820;
+          letter-spacing: 0.18em;
         }
-        .footer-bottom p { color: var(--txt-3); font-size: 14px; margin: 0; }
 
-        /* ===== Footer — layout fix ===== */
-.partner-program {
-  --footer-pad-top: clamp(36px, 5vw, 56px);
-  --footer-pad-bottom: clamp(14px, 2.2vw, 24px);
-  --footer-gap: clamp(28px, 3vw, 48px);
-  --footer-line-gap: clamp(18px, 2.2vw, 26px);
-}
+        .partnerListingPrinciple h3 {
+          margin: 0;
+          font-size: clamp(24px, 3vw, 42px);
+          font-weight: 650;
+          letter-spacing: -0.05em;
+          line-height: 1;
+        }
 
-/* компактнее поля секции футера */
-.footer {
-  padding: var(--footer-pad-top) 0 var(--footer-pad-bottom) !important;
-}
+        .partnerListingPrinciple p {
+          max-width: 660px;
+          margin: 0;
+          color: var(--pl-ink-soft);
+          font-size: clamp(15px, 1.1vw, 18px);
+          line-height: 1.62;
+        }
 
-/* меньше межколоночный и межблочный зазор */
-.footer-content {
-  gap: var(--footer-gap) !important;
-  align-items: start;
-}
+        .partnerListingResultsSection {
+          background: var(--pl-paper-soft);
+        }
 
-/* отодвигаем блок ссылок от разделительной линии снизу */
-.footer-links {
-  gap: clamp(28px, 3vw, 40px) !important;
-  margin-bottom: var(--footer-line-gap) !important;
-}
+        .partnerListingToolbar {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 32px;
+          align-items: end;
+          margin-bottom: 34px;
+        }
 
-/* разделительная линия + копирайт справа внизу */
-.footer-bottom {
-  max-width: 1200px;
-  margin: 0 auto;
-  border-top: 1px solid var(--white-12);
-  padding: 14px 24px calc(8px + env(safe-area-inset-bottom)) !important;
-  display: flex;
-  justify-content: flex-end;     /* вправо */
-  align-items: center;
-  text-align: right;
-}
+        .partnerListingCount {
+          display: grid;
+          justify-items: end;
+          gap: 4px;
+          color: var(--pl-ink-soft);
+        }
 
-/* сам текст копирайта */
-.footer-bottom p {
-  margin: 0;
-  color: var(--txt-3);
-  font-size: 14px;
-}
+        .partnerListingCount span {
+          color: var(--pl-ink);
+          font-size: clamp(52px, 6vw, 92px);
+          font-weight: 620;
+          letter-spacing: -0.078em;
+          line-height: 0.88;
+        }
 
-/* логотип в футере чуть компактнее, чтобы не раздувал высоту */
-.footer-logo-img { max-width: 88px; }
+        .partnerListingCount small {
+          font-size: 12px;
+          font-weight: 820;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
 
-/* Мобильная адаптация: копирайт по центру, мягче поля */
-@media (max-width: 768px) {
-  .footer {
-    padding: clamp(28px, 6vw, 40px) 0 clamp(10px, 4vw, 18px) !important;
-  }
-  .footer-bottom {
-    justify-content: center;
-    text-align: center;
-  }
-}
+        .partnerListingFilters {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+          gap: 14px;
+          margin-bottom: 28px;
+        }
 
+        .partnerListingSearch,
+        .partnerListingSelectTrigger {
+          min-height: 62px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border: 1px solid rgba(8, 8, 8, 0.12);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.5);
+          color: var(--pl-ink);
+          box-shadow: 0 18px 48px rgba(8, 8, 8, 0.08);
+          transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            transform 180ms ease,
+            background 180ms ease;
+        }
+
+        .partnerListingSearch {
+          padding: 0 20px;
+        }
+
+        .partnerListingSearch:focus-within,
+        .partnerListingSelectTrigger:hover,
+        .partnerListingSelectTrigger[aria-expanded="true"] {
+          border-color: rgba(8, 8, 8, 0.28);
+          background: rgba(255, 255, 255, 0.74);
+          box-shadow: 0 24px 70px rgba(8, 8, 8, 0.13);
+          transform: translateY(-1px);
+        }
+
+        .partnerListingSearch svg,
+        .partnerListingSelectTrigger svg {
+          width: 18px;
+          height: 18px;
+          flex: 0 0 auto;
+          color: var(--pl-ink-muted);
+        }
+
+        .partnerListingSearch input {
+          width: 100%;
+          min-width: 0;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: var(--pl-ink);
+          font: inherit;
+          font-size: 16px;
+        }
+
+        .partnerListingSearch input::placeholder {
+          color: rgba(8, 8, 8, 0.38);
+        }
+
+        .partnerListingSelect {
+          position: relative;
+          z-index: 10;
+        }
+
+        .partnerListingSelectTrigger {
+          width: 100%;
+          justify-content: flex-start;
+          padding: 0 18px;
+          cursor: pointer;
+          font: inherit;
+          font-weight: 680;
+        }
+
+        .partnerListingSelectTrigger span {
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-align: left;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .partnerListingSelectTrigger svg:last-child {
+          transition: transform 180ms ease;
+        }
+
+        .partnerListingSelectTrigger svg:last-child[data-open="true"] {
+          transform: rotate(180deg);
+        }
+
+        .partnerListingSelectMenu {
+          position: absolute;
+          inset: calc(100% + 10px) 0 auto 0;
+          z-index: 20;
+          display: grid;
+          gap: 4px;
+          padding: 8px;
+          border: 1px solid rgba(8, 8, 8, 0.12);
+          border-radius: 28px;
+          background: #f7f4ee;
+          box-shadow: 0 30px 90px rgba(8, 8, 8, 0.2);
+        }
+
+        .partnerListingSelectOption {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          border: 0;
+          border-radius: 20px;
+          padding: 0 14px;
+          background: transparent;
+          color: var(--pl-ink);
+          cursor: pointer;
+          font: inherit;
+          font-size: 14px;
+          font-weight: 660;
+          text-align: left;
+          transition:
+            background 160ms ease,
+            color 160ms ease;
+        }
+
+        .partnerListingSelectOption:hover,
+        .partnerListingSelectOption:focus-visible {
+          outline: 0;
+          background: rgba(8, 8, 8, 0.08);
+        }
+
+        .partnerListingSelectOption[aria-selected="true"] {
+          background: var(--pl-ink);
+          color: var(--pl-cream);
+        }
+
+        .partnerListingSelectOption svg {
+          width: 16px;
+          height: 16px;
+          flex: 0 0 auto;
+        }
+
+        .partnerListingRows {
+          border-top: 1px solid var(--pl-line-light);
+        }
+
+        .partnerListingRow {
+          display: grid;
+          grid-template-columns:
+            54px 74px minmax(0, 1fr) minmax(180px, 0.38fr)
+            auto;
+          gap: clamp(14px, 2.4vw, 32px);
+          align-items: center;
+          padding: clamp(22px, 3vw, 34px) 0;
+          border-bottom: 1px solid var(--pl-line-light);
+          color: var(--pl-ink);
+          transition:
+            transform 180ms ease,
+            background 180ms ease,
+            padding-inline 180ms ease;
+        }
+
+        .partnerListingRow:hover {
+          transform: translateY(-2px);
+          padding-inline: 18px;
+          background: rgba(255, 255, 255, 0.34);
+        }
+
+        .partnerListingRowIndex {
+          color: var(--pl-ink-muted);
+          font-size: 12px;
+          font-weight: 820;
+          letter-spacing: 0.18em;
+        }
+
+        .partnerListingIcon {
+          width: 58px;
+          height: 58px;
+          display: grid;
+          place-items: center;
+          border-radius: 999px;
+          background: rgba(8, 8, 8, 0.07);
+          color: var(--pl-ink);
+        }
+
+        .partnerListingIcon svg {
+          width: 24px;
+          height: 24px;
+          stroke-width: 1.65;
+        }
+
+        .partnerListingCompany h3 {
+          margin: 0;
+          color: var(--pl-ink);
+          font-size: clamp(24px, 2.8vw, 40px);
+          font-weight: 650;
+          letter-spacing: -0.052em;
+          line-height: 1;
+        }
+
+        .partnerListingCompany p {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          margin: 12px 0 0;
+          color: var(--pl-ink-soft);
+          font-size: 14px;
+          line-height: 1.4;
+        }
+
+        .partnerListingCompany p svg {
+          width: 15px;
+          height: 15px;
+          flex: 0 0 auto;
+        }
+
+        .partnerListingMeta {
+          display: grid;
+          justify-items: start;
+          gap: 9px;
+          color: var(--pl-ink-soft);
+        }
+
+        .partnerListingMeta span,
+        .partnerListingMeta small {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          min-height: 30px;
+          border-radius: 999px;
+          padding: 0 11px;
+          font-size: 11px;
+          font-weight: 820;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .partnerListingMeta span {
+          border: 1px solid rgba(8, 8, 8, 0.12);
+          color: var(--pl-ink-soft);
+        }
+
+        .partnerListingMeta small {
+          background: rgba(8, 8, 8, 0.07);
+          color: var(--pl-ink);
+        }
+
+        .partnerListingMeta small[data-status="approved"] {
+          background: rgba(0, 120, 75, 0.12);
+          color: #006b47;
+        }
+
+        .partnerListingMeta small[data-status="in_review"] {
+          background: rgba(132, 96, 0, 0.13);
+          color: #7a5600;
+        }
+
+        .partnerListingMeta small[data-status="rejected"] {
+          background: rgba(150, 24, 24, 0.11);
+          color: #8f1f1f;
+        }
+
+        .partnerListingRowLink {
+          min-height: 42px;
+          padding: 0 16px;
+          color: var(--pl-ink);
+          border-color: rgba(8, 8, 8, 0.16);
+          white-space: nowrap;
+        }
+
+        .partnerListingRowLink:hover {
+          background: var(--pl-ink);
+          color: var(--pl-cream);
+          border-color: var(--pl-ink);
+        }
+
+        .partnerListingState,
+        .partnerListingEmpty {
+          border-top: 1px solid var(--pl-line-light);
+          border-bottom: 1px solid var(--pl-line-light);
+          padding: 34px 0;
+          color: var(--pl-ink-soft);
+          font-size: 16px;
+        }
+
+        .partnerListingStateError {
+          color: #8f1f1f;
+        }
+
+        .partnerListingEmpty {
+          display: grid;
+          justify-items: start;
+          gap: 12px;
+          padding: clamp(44px, 6vw, 74px) 0;
+        }
+
+        .partnerListingEmpty svg {
+          width: 28px;
+          height: 28px;
+          color: var(--pl-ink-muted);
+        }
+
+        .partnerListingEmpty h3 {
+          margin: 0;
+          color: var(--pl-ink);
+          font-size: clamp(28px, 3.6vw, 48px);
+          font-weight: 650;
+          letter-spacing: -0.055em;
+        }
+
+        .partnerListingEmpty p {
+          max-width: 560px;
+          margin: 0;
+          color: var(--pl-ink-soft);
+          font-size: 16px;
+          line-height: 1.6;
+        }
+
+        .partnerListingCtaSection {
+          padding: clamp(90px, 11vw, 150px) clamp(20px, 5vw, 72px);
+          background: var(--pl-night);
+          color: var(--pl-cream);
+        }
+
+        .partnerListingCtaSection p {
+          margin-bottom: 34px;
+        }
+
+        .partnerListingCtaSection .partnerListingPrimaryLink {
+          background: var(--pl-cream);
+          color: var(--pl-ink);
+        }
+
+        @media (max-width: 980px) {
+          .partnerListingSectionHead,
+          .partnerListingPrinciple,
+          .partnerListingToolbar,
+          .partnerListingFilters,
+          .partnerListingRow {
+            grid-template-columns: 1fr;
+          }
+
+          .partnerListingToolbar {
+            align-items: start;
+          }
+
+          .partnerListingCount {
+            justify-items: start;
+          }
+
+          .partnerListingRow {
+            gap: 14px;
+          }
+
+          .partnerListingRow:hover {
+            padding-inline: 0;
+            background: transparent;
+          }
+
+          .partnerListingRowLink {
+            width: fit-content;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .partnerListingHero h1 {
+            font-size: clamp(46px, 15vw, 82px);
+          }
+
+          .partnerListingHero,
+          .partnerListingIntroSection,
+          .partnerListingResultsSection,
+          .partnerListingCtaSection {
+            padding-inline: 20px;
+          }
+
+          .partnerListingActions {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          .partnerListingPrimaryLink,
+          .partnerListingGhostLink {
+            width: 100%;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .partnerListingPrimaryLink,
+          .partnerListingGhostLink,
+          .partnerListingRowLink,
+          .partnerListingSearch,
+          .partnerListingSelectTrigger,
+          .partnerListingRow {
+            transition: none;
+          }
+
+          .partnerListingPrimaryLink:hover,
+          .partnerListingGhostLink:hover,
+          .partnerListingRowLink:hover,
+          .partnerListingRow:hover {
+            transform: none;
+          }
+        }
       `}</style>
     </div>
-  )
+  );
 }

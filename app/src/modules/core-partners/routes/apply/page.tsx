@@ -1,1210 +1,1023 @@
-// app/partners/apply/page.tsx
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 
-import { useRef, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import { ArrowRight, Building2, Globe2, Mail, Phone, User, MapPin, CheckCircle } from "lucide-react"
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
+  "https://saturnusgo-backend-production.up.railway.app";
+const PARTNER_APPLICATION_PATH = "/api/partners/list";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://saturnusgo-backend-production.up.railway.app"
+const interestOptions = [
+  { key: "hotels", label: "Hotels" },
+  { key: "restaurants", label: "Restaurants" },
+  { key: "cafes", label: "Cafés" },
+  { key: "events", label: "Events" },
+] as const;
 
-const BackgroundEffects = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div
-      className="absolute inset-0 opacity-[0.02]"
-      style={{
-        backgroundImage: `
-          linear-gradient(var(--grid) 1px, transparent 1px),
-          linear-gradient(90deg, var(--grid) 1px, transparent 1px)
-        `,
-        backgroundSize: "32px 32px",
-      }}
-    />
-    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-full blur-3xl animate-pulse" />
-    <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-indigo-500/5 to-cyan-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
-  </div>
-)
+const businessTypes = [
+  "Hotel",
+  "Resort",
+  "Restaurant",
+  "Café",
+  "Event Venue",
+  "Experience Provider",
+  "Other Service",
+];
 
-// ↑ рядом с импортами добавь типы
-type Interests = {
-  hotels: boolean
-  restaurants: boolean
-  cafes: boolean
-  events: boolean
-}
+type InterestKey = (typeof interestOptions)[number]["key"];
+
+type Interests = Record<InterestKey, boolean>;
+
 type FormState = {
-  companyName: string
-  companyType: string
-  website: string
-  contactName: string
-  email: string
-  phone: string
-  country: string // "Country, City" одним полем
-  city: string // отдельное поле в стейте (может быть пустым)
-  interests: Interests
-  monthlyVolume: string
-  notes: string
-  agree: boolean
+  companyName: string;
+  companyType: string;
+  website: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  country: string;
+  monthlyVolume: string;
+  interests: Interests;
+  agree: boolean;
+};
+
+type PartnerApplicationPayload = {
+  companyName: string;
+  companyType: string;
+  website?: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  monthlyVolume?: number;
+  interests: Interests;
+  agree: boolean;
+};
+
+type ApiErrorBody = {
+  success?: boolean;
+  message?: string | string[];
+};
+
+const initialForm: FormState = {
+  companyName: "",
+  companyType: "Hotel",
+  website: "",
+  contactName: "",
+  email: "",
+  phone: "",
+  country: "",
+  monthlyVolume: "",
+  interests: { hotels: true, restaurants: false, cafes: false, events: false },
+  agree: false,
+};
+
+function resolveApiUrl(path: string) {
+  const normalizedBase = `${API_BASE.replace(/\/+$/, "")}/`;
+  return new URL(path.replace(/^\/+/, ""), normalizedBase).toString();
 }
 
-type ListResponse = {
-  success: boolean
-  page: number
-  limit: number
-  total: number
-  data: any[]
+function splitLocation(value: string) {
+  const [country, city] = value
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  return { country, city };
 }
 
-const PARTNER_LIST_ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/partners/list`
+function buildPayload(form: FormState): PartnerApplicationPayload {
+  const location = splitLocation(form.country);
+  const monthlyVolume =
+    form.monthlyVolume.trim() === "" ? undefined : Number(form.monthlyVolume);
 
+  return {
+    companyName: form.companyName.trim(),
+    companyType: form.companyType.trim(),
+    website: form.website.trim() || undefined,
+    contactName: form.contactName.trim(),
+    email: form.email.trim(),
+    phone: form.phone.trim() || undefined,
+    country: location.country,
+    city: location.city,
+    monthlyVolume: Number.isFinite(monthlyVolume) ? monthlyVolume : undefined,
+    interests: form.interests,
+    agree: form.agree,
+  };
+}
+
+function parseApiMessage(body: ApiErrorBody | null, status: number) {
+  if (Array.isArray(body?.message) && body.message.length > 0) {
+    return body.message[0];
+  }
+
+  if (typeof body?.message === "string" && body.message.trim()) {
+    return body.message;
+  }
+
+  return `Request failed with status ${status}`;
+}
+
+async function submitPartnerApplication(payload: PartnerApplicationPayload) {
+  const response = await fetch(resolveApiUrl(PARTNER_APPLICATION_PATH), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(payload),
+    credentials: "omit",
+    cache: "no-store",
+  });
+
+  const contentType = response.headers.get("content-type") || "";
+  const body = contentType.includes("application/json")
+    ? ((await response.json()) as ApiErrorBody)
+    : null;
+
+  if (!response.ok || body?.success === false) {
+    throw new Error(parseApiMessage(body, response.status));
+  }
+
+  return body;
+}
+
+function isValidEmail(value: string) {
+  return /^\S+@\S+\.\S+$/.test(value);
+}
 
 export default function ApplyNowPage() {
-  const router = useRouter()
-  const heroRef = useRef<HTMLElement>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const router = useRouter();
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [businessTypeOpen, setBusinessTypeOpen] = useState(false);
 
-  const [partnersCount, setPartnersCount] = useState<number | null>(null)
-  const [statsLoading, setStatsLoading] = useState<boolean>(true)
+  const updateField =
+    (key: keyof FormState) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((current) => ({ ...current, [key]: event.target.value }));
+    };
 
-  
-  // tone (SSR-safe)
-  const { resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  const tone = mounted && resolvedTheme === "light" ? "light" : "dark"
-
-  function buildPayload(form: FormState) {
-    const [country, city] = (form.country || "").split(",").map((s) => s.trim())
-
-    return {
-      companyName: form.companyName.trim(),
-      companyType: form.companyType.trim(),
-      website: form.website.trim() || undefined,
-      contactName: form.contactName.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim() || undefined,
-      country: country || undefined,
-      city: city || undefined,
-      interests: form.interests,
-      monthlyVolume: form.monthlyVolume === "" ? undefined : Number(form.monthlyVolume),
-      notes: form.notes.trim() || undefined,
-      agree: !!form.agree, // строго boolean
-    }
-  }
-
-  // формируем body как x-www-form-urlencoded, чтобы избежать preflight
-  function toForm(payload: ReturnType<typeof buildPayload>) {
-    const s = new URLSearchParams()
-    s.set("companyName", payload.companyName)
-    s.set("companyType", payload.companyType)
-    if (payload.website) s.set("website", payload.website)
-    s.set("contactName", payload.contactName)
-    s.set("email", payload.email)
-    if (payload.phone) s.set("phone", payload.phone)
-    if (payload.country) s.set("country", payload.country)
-    if (payload.city) s.set("city", payload.city)
-    if (payload.monthlyVolume != null) s.set("monthlyVolume", String(payload.monthlyVolume))
-    if (payload.notes) s.set("notes", payload.notes)
-    s.set("agree", String(!!payload.agree))
-    // interests как объект-булевки — DTO сам приведёт к массиву
-    Object.entries(payload.interests || {}).forEach(([k, v]) => {
-      s.set(`interests[${k}]`, String(!!v))
-    })
-    return s
-  }
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://saturnusgo-backend-production.up.railway.app"
-
-  function apiUrl(path: string) {
-    const base = API_BASE.replace(/\/+$/, "") + "/"
-    return new URL(path.replace(/^\/+/, ""), base).toString()
-  }
-
-  async function submitApplication(payload: ReturnType<typeof buildPayload>) {
-    const res = await fetch(apiUrl("/api/partners/list"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(payload),
-      credentials: "omit",
-      cache: "no-store",
-    })
-
-    let data: any = null
-    try {
-      data = await res.json()
-    } catch {}
-
-    if (!res.ok || data?.success === false) {
-      const msg = (Array.isArray(data?.message) ? data.message[0] : data?.message) || `HTTP ${res.status}`
-      throw new Error(msg)
-    }
-    return data
-  }
-
-  // hero parallax
-  useEffect(() => {
-    const hero = heroRef.current
-    if (!hero) return
-    let ticking = false
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollY = window.scrollY
-          const heroHeight = hero.offsetHeight
-          const progress = Math.min(scrollY / (heroHeight * 0.6), 1)
-          hero.style.transform = `translateY(${progress * 15}px)`
-          hero.style.opacity = `${Math.max(1 - progress * 0.2, 0.8)}`
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  // load partners total quickly (page=1&limit=1 -> только метаданные total)
-useEffect(() => {
-  const abort = new AbortController()
-  async function fetchTotals() {
-    setStatsLoading(true)
-    try {
-      const url = `${PARTNER_LIST_ENDPOINT}?page=1&limit=1`
-      const res = await fetch(url, { method: "GET", cache: "no-store", signal: abort.signal })
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-      const json: ListResponse = await res.json()
-      setPartnersCount(Math.max(0, Number(json?.total ?? 0)))
-    } catch (e) {
-      // не роняем страницу, просто покажем "—"
-      setPartnersCount(null)
-    } finally {
-      setStatsLoading(false)
-    }
-  }
-  fetchTotals()
-  return () => abort.abort()
-}, [])
-
-
-  // Стейт пометь явно (не обязательно, но удобно)
-  const [form, setForm] = useState<FormState>({
-    companyName: "",
-    companyType: "Hotel",
-    website: "",
-    contactName: "",
-    email: "",
-    phone: "",
-    country: "",
-    city: "",
-    interests: { hotels: true, restaurants: false, cafes: false, events: false },
-    monthlyVolume: "",
-    notes: "",
-    agree: false,
-  })
-
-  const onChange =
-    (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setForm((s) => ({ ...s, [key]: e.target.value }))
-    }
-
-  // 🔄 вместо чекбоксов — toggle по кнопке
-  const toggleInterest = (key: keyof typeof form.interests) => {
-    setForm((s) => ({ ...s, interests: { ...s.interests, [key]: !s.interests[key] } }))
-  }
+  const toggleInterest = (key: InterestKey) => {
+    setForm((current) => ({
+      ...current,
+      interests: { ...current.interests, [key]: !current.interests[key] },
+    }));
+  };
 
   const validate = () => {
-    const next: Record<string, string> = {}
-    if (!form.companyName.trim()) next.companyName = "Company name is required"
-    if (!form.contactName.trim()) next.contactName = "Contact name is required"
-    if (!form.email.trim() || !/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Valid email is required"
-    if (!form.agree) next.agree = "You must accept the terms"
-    setErrors(next)
-    return Object.keys(next).length === 0
-  }
+    const nextErrors: Record<string, string> = {};
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validate()) return
-    setSubmitting(true)
-    setErrors({})
+    if (!form.companyName.trim())
+      nextErrors.companyName = "Company name is required";
+    if (!form.contactName.trim())
+      nextErrors.contactName = "Contact name is required";
+    if (!isValidEmail(form.email.trim()))
+      nextErrors.email = "Valid email is required";
+    if (!Object.values(form.interests).some(Boolean))
+      nextErrors.interests = "Select at least one partner scenario";
+    if (!form.agree)
+      nextErrors.agree =
+        "You must accept the terms before sending the application";
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!validate()) return;
+
+    setSubmitting(true);
+    setErrors({});
+
     try {
-      const payload = buildPayload(form)
-      await submitApplication(payload)
-      setSuccess(true)
-      setTimeout(() => router.push("/partners"), 1600)
-    } catch (err: any) {
-      // быстрый UX: подсветим общую ошибку у agree/почты, если это они
-      const msg = String(err?.message || "Something went wrong")
-      const next: Record<string, string> = {}
-      if (/email/i.test(msg)) next.email = msg
-      if (/accept|agree/i.test(msg)) next.agree = msg
-      setErrors(Object.keys(next).length ? next : { general: msg })
+      await submitPartnerApplication(buildPayload(form));
+      setSuccess(true);
+      window.setTimeout(() => router.push("/partners"), 1500);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to send the application";
+      setErrors({ general: message });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
-
-  const formatCompact = (n: number) =>
-  new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n)
-
+  };
 
   return (
-    <div className="apply-page" data-tone={tone}>
-      <BackgroundEffects />
+    <main className="partnerApplyPage">
+      <section
+        className="partnerApplyHero"
+        aria-labelledby="partner-apply-title"
+      >
+        <button
+          className="partnerBackButton"
+          type="button"
+          onClick={() => router.push("/partners")}
+        >
+          <ArrowLeft aria-hidden="true" />
+          Partners
+        </button>
 
-      {/* Hero */}
-      <section ref={heroRef} className="hero-section">
-        <div className="hero-content">
-          <div className="hero-logo">
-            <img
-              src="https://wjfhdyynywkjudwlouxv.supabase.co/storage/v1/object/public/Video-host/logo.png"
-              alt="SaturnusGo logo"
-              className="hero-logo-img"
-            />
-          </div>
-
-          <h1 className="hero-title">
-            <span className="hero-title-main">Partner with</span>
-            <span className="hero-company">SaturnusGo</span>
-          </h1>
-
-          <p className="hero-subtitle">
-            Join the all-in-one travel super-app. Connect your brand to hotels, restaurants, cafés, events — one
-            seamless experience.
+        <div className="partnerApplyHeroInner">
+          <p className="partnerApplyEyebrow">
+            SaturnusGo / Partner application
           </p>
-
-          <div className="hero-stats">
-  <div className="stat-item" aria-live="polite">
-    <span className="stat-number">
-      {statsLoading ? "—" : partnersCount == null ? "—" : formatCompact(partnersCount)}
-    </span>
-    <span className="stat-label">Partners</span>
-  </div>
-
-  <div className="stat-divider" />
-
-  <div className="stat-item">
-    <span className="stat-number">{formatCompact(0)}</span>
-    <span className="stat-label">Bookings</span>
-  </div>
-
-  <div className="stat-divider" />
-
-  <div className="stat-item">
-    <span className="stat-number">24h</span>
-    <span className="stat-label">Response</span>
-  </div>
-</div>
-
+          <h1 id="partner-apply-title">Apply to become a partner.</h1>
+          <p>
+            Send the business profile, location, contact person, and the first
+            partner scenario. The form stays focused: no unnecessary questions,
+            no legacy onboarding noise.
+          </p>
         </div>
       </section>
 
-      {/* Form */}
-      <section className="form-section">
-        <div className="section-container">
-          <div className="form-header">
-            <h2 className="form-title">Application Details</h2>
-            <p className="form-subtitle">Tell us about your business and we'll get back to you within 24 hours</p>
+      <section
+        className="partnerApplyContent"
+        aria-label="Partner application form"
+      >
+        {success ? (
+          <div className="partnerSuccessState" role="status">
+            <CheckCircle aria-hidden="true" />
+            <h2>Application sent.</h2>
+            <p>
+              We received the partner profile and will route it to the next
+              review step.
+            </p>
           </div>
-
-          <div className="form-card">
+        ) : (
+          <form
+            className="partnerApplicationForm"
+            onSubmit={handleSubmit}
+            noValidate
+          >
             {errors.general && (
-              <div className="error-box" role="alert">
-                {/^please try again/i.test(errors.general)
-                  ? "Too many submissions from this email in the last 10 minutes. Please try again later or use a different email."
-                  : errors.general}
-              </div>
+              <p className="partnerFormError" role="alert">
+                {errors.general}
+              </p>
             )}
 
-            {success ? (
-              <div className="success-state">
-                <CheckCircle className="success-icon" />
-                <h3 className="success-title">Application sent</h3>
-                <p className="success-subtitle">We'll get back to you shortly.</p>
+            <div className="partnerFormGroup">
+              <div className="partnerFormGroupHeader">
+                <span>01</span>
+                <h2>Business</h2>
               </div>
-            ) : (
-              <form onSubmit={onSubmit} className="grid-form">
-                <div className="form-section-group">
-                  <h3 className="section-title">Company Information</h3>
-                  <div className="grid-2">
-                    <div className="field">
-                      <label htmlFor="companyName">Company name</label>
-                      <div className="input">
-                        <Building2 />
-                        <input
-                          id="companyName"
-                          placeholder="e.g., Hotel Aurora"
-                          value={form.companyName}
-                          onChange={onChange("companyName")}
-                          aria-invalid={!!errors.companyName}
-                          aria-describedby={errors.companyName ? "err-companyName" : undefined}
-                        />
-                      </div>
-                      {errors.companyName && (
-                        <p id="err-companyName" className="err">
-                          {errors.companyName}
-                        </p>
-                      )}
-                    </div>
 
-                    <div className="field">
-                      <label htmlFor="companyType">Business type</label>
-                      <div className="select">
-                        <select id="companyType" value={form.companyType} onChange={onChange("companyType")}>
-                          <option>Hotel</option>
-                          <option>Resort</option>
-                          <option>Restaurant</option>
-                          <option>Café</option>
-                          <option>Event Venue</option>
-                          <option>Experience Provider</option>
-                          <option>Other Service</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
+              <div className="partnerFormGrid">
+                <label className="partnerField" htmlFor="companyName">
+                  <span>Company name</span>
+                  <input
+                    id="companyName"
+                    value={form.companyName}
+                    onChange={updateField("companyName")}
+                    placeholder="Hotel Aurora"
+                    aria-invalid={!!errors.companyName}
+                  />
+                  {errors.companyName && <small>{errors.companyName}</small>}
+                </label>
 
-                  <div className="grid-2">
-                    <div className="field">
-                      <label htmlFor="website">Website</label>
-                      <div className="input">
-                        <Globe2 />
-                        <input
-                          id="website"
-                          placeholder="https://..."
-                          value={form.website}
-                          onChange={onChange("website")}
-                        />
-                      </div>
-                    </div>
+                <div
+                  className="partnerField partnerSelectField"
+                  onBlur={(event) => {
+                    const nextTarget = event.relatedTarget;
 
-                    <div className="field">
-                      <label htmlFor="monthlyVolume">Monthly volume</label>
-                      <div className="input">
-                        <input
-                          id="monthlyVolume"
-                          placeholder="e.g., 450 rooms/bookings"
-                          value={form.monthlyVolume}
-                          onChange={onChange("monthlyVolume")}
-                          inputMode="numeric"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    if (
+                      !(nextTarget instanceof Node) ||
+                      !event.currentTarget.contains(nextTarget)
+                    ) {
+                      setBusinessTypeOpen(false);
+                    }
+                  }}
+                >
+                  <span id="companyTypeLabel">Business type</span>
+                  <button
+                    className="partnerSelectTrigger"
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded={businessTypeOpen}
+                    aria-labelledby="companyTypeLabel companyTypeValue"
+                    onClick={() => setBusinessTypeOpen((value) => !value)}
+                  >
+                    <span id="companyTypeValue">{form.companyType}</span>
+                    <ChevronDown aria-hidden="true" />
+                  </button>
 
-                <div className="form-section-group">
-                  <h3 className="section-title">Contact Details</h3>
-                  <div className="grid-2">
-                    <div className="field">
-                      <label htmlFor="contactName">Contact name</label>
-                      <div className="input">
-                        <User />
-                        <input
-                          id="contactName"
-                          placeholder="Full name"
-                          value={form.contactName}
-                          onChange={onChange("contactName")}
-                          aria-invalid={!!errors.contactName}
-                          aria-describedby={errors.contactName ? "err-contactName" : undefined}
-                        />
-                      </div>
-                      {errors.contactName && (
-                        <p id="err-contactName" className="err">
-                          {errors.contactName}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="field">
-                      <label htmlFor="email">Email</label>
-                      <div className="input">
-                        <Mail />
-                        <input
-                          id="email"
-                          type="email"
-                          placeholder="name@company.com"
-                          value={form.email}
-                          onChange={onChange("email")}
-                          aria-invalid={!!errors.email}
-                          aria-describedby={errors.email ? "err-email" : undefined}
-                        />
-                      </div>
-                      {errors.email && (
-                        <p id="err-email" className="err">
-                          {errors.email}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid-2">
-                    <div className="field">
-                      <label htmlFor="phone">Phone</label>
-                      <div className="input">
-                        <Phone />
-                        <input id="phone" placeholder="+54 11 ..." value={form.phone} onChange={onChange("phone")} />
-                      </div>
-                    </div>
-
-                    <div className="field">
-                      <label htmlFor="country">Country & city</label>
-                      <div className="input">
-                        <MapPin />
-                        <input
-                          id="country"
-                          placeholder="Country, City"
-                          value={form.country}
-                          onChange={onChange("country")}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-section-group">
-                  <h3 className="section-title">Partnership Interests</h3>
-                  <div className="field">
-                    <label>What would you like to integrate?</label>
-                    <div className="chips chips--enhanced" role="group" aria-label="Integration interests">
-                      <button
-                        type="button"
-                        className={`chip ${form.interests.hotels ? "chip-on" : ""}`}
-                        aria-pressed={form.interests.hotels}
-                        onClick={() => toggleInterest("hotels")}
-                      >
-                        🏨 Hotels
-                      </button>
-
-                      <button
-                        type="button"
-                        className={`chip ${form.interests.restaurants ? "chip-on" : ""}`}
-                        aria-pressed={form.interests.restaurants}
-                        onClick={() => toggleInterest("restaurants")}
-                      >
-                        🍽️ Restaurants
-                      </button>
-
-                      <button
-                        type="button"
-                        className={`chip ${form.interests.cafes ? "chip-on" : ""}`}
-                        aria-pressed={form.interests.cafes}
-                        onClick={() => toggleInterest("cafes")}
-                      >
-                        ☕ Cafés
-                      </button>
-
-                      <button
-                        type="button"
-                        className={`chip ${form.interests.events ? "chip-on" : ""}`}
-                        aria-pressed={form.interests.events}
-                        onClick={() => toggleInterest("events")}
-                      >
-                        🎉 Events
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <label htmlFor="notes">Additional information</label>
-                    <textarea
-                      id="notes"
-                      rows={4}
-                      placeholder="Tell us about your current systems, goals, timelines, or any specific requirements..."
-                      value={form.notes}
-                      onChange={onChange("notes")}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-footer">
-                  <div className="agree">
-                    <label className="agree-row">
-                      <input
-                        type="checkbox"
-                        checked={form.agree}
-                        onChange={(e) => setForm((s) => ({ ...s, agree: e.target.checked }))}
-                      />
-                      <span>I agree to be contacted about partnership opportunities and have read the terms.</span>
-                    </label>
-                    {errors.agree && <p className="err">{errors.agree}</p>}
-                  </div>
-
-                  <div className="actions">
-                    <button
-                      type="button"
-                      className="btn-secondary"
-                      onClick={() => router.push("/partners")}
-                      aria-label="Back to Partners"
+                  {businessTypeOpen && (
+                    <div
+                      className="partnerSelectMenu"
+                      role="listbox"
+                      aria-labelledby="companyTypeLabel"
                     >
-                      Back
-                    </button>
-                    <button className="btn-primary" type="submit" disabled={submitting}>
-                      {submitting ? (
-                        <>
-                          <div className="spinner" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          Submit application
-                          <ArrowRight className="btn-icon" />
-                        </>
-                      )}
-                    </button>
-                  </div>
+                      {businessTypes.map((type) => {
+                        const selected = type === form.companyType;
+
+                        return (
+                          <button
+                            key={type}
+                            className="partnerSelectOption"
+                            type="button"
+                            role="option"
+                            aria-selected={selected}
+                            data-selected={selected}
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() => {
+                              setForm((current) => ({
+                                ...current,
+                                companyType: type,
+                              }));
+                              setBusinessTypeOpen(false);
+                            }}
+                          >
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              </form>
-            )}
-          </div>
-        </div>
+
+                <label className="partnerField" htmlFor="website">
+                  <span>Website</span>
+                  <input
+                    id="website"
+                    value={form.website}
+                    onChange={updateField("website")}
+                    placeholder="https://"
+                  />
+                </label>
+
+                <label className="partnerField" htmlFor="monthlyVolume">
+                  <span>Monthly volume</span>
+                  <input
+                    id="monthlyVolume"
+                    value={form.monthlyVolume}
+                    onChange={updateField("monthlyVolume")}
+                    placeholder="450"
+                    inputMode="numeric"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="partnerFormGroup">
+              <div className="partnerFormGroupHeader">
+                <span>02</span>
+                <h2>Contact</h2>
+              </div>
+
+              <div className="partnerFormGrid">
+                <label className="partnerField" htmlFor="contactName">
+                  <span>Contact name</span>
+                  <input
+                    id="contactName"
+                    value={form.contactName}
+                    onChange={updateField("contactName")}
+                    placeholder="Full name"
+                    aria-invalid={!!errors.contactName}
+                  />
+                  {errors.contactName && <small>{errors.contactName}</small>}
+                </label>
+
+                <label className="partnerField" htmlFor="email">
+                  <span>Email</span>
+                  <input
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    onChange={updateField("email")}
+                    placeholder="name@company.com"
+                    aria-invalid={!!errors.email}
+                  />
+                  {errors.email && <small>{errors.email}</small>}
+                </label>
+
+                <label className="partnerField" htmlFor="phone">
+                  <span>Phone</span>
+                  <input
+                    id="phone"
+                    value={form.phone}
+                    onChange={updateField("phone")}
+                    placeholder="+54 11"
+                  />
+                </label>
+
+                <label className="partnerField" htmlFor="country">
+                  <span>Country & city</span>
+                  <input
+                    id="country"
+                    value={form.country}
+                    onChange={updateField("country")}
+                    placeholder="Argentina, Buenos Aires"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="partnerFormGroup">
+              <div className="partnerFormGroupHeader">
+                <span>03</span>
+                <h2>Scenario</h2>
+              </div>
+
+              <div
+                className="partnerScenarioOptions"
+                role="group"
+                aria-label="Partnership interests"
+              >
+                {interestOptions.map((option) => (
+                  <button
+                    key={option.key}
+                    className="partnerScenarioOption"
+                    type="button"
+                    data-selected={form.interests[option.key]}
+                    aria-pressed={form.interests[option.key]}
+                    onClick={() => toggleInterest(option.key)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              {errors.interests && (
+                <p className="partnerInlineError">{errors.interests}</p>
+              )}
+            </div>
+
+            <div className="partnerFormFooter">
+              <label className="partnerAgreement">
+                <input
+                  type="checkbox"
+                  checked={form.agree}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      agree: event.target.checked,
+                    }))
+                  }
+                />
+                <span>
+                  I agree to be contacted about partnership opportunities and
+                  have read the terms.
+                </span>
+              </label>
+              {errors.agree && (
+                <p className="partnerInlineError">{errors.agree}</p>
+              )}
+
+              <div className="partnerFormActions">
+                <button
+                  className="partnerSecondaryButton"
+                  type="button"
+                  onClick={() => router.push("/partners")}
+                >
+                  Back
+                </button>
+                <button
+                  className="partnerPrimaryButton"
+                  type="submit"
+                  disabled={submitting}
+                >
+                  {submitting ? "Sending" : "Submit application"}
+                  {!submitting && <ArrowRight aria-hidden="true" />}
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
       </section>
 
-      {/* STYLES */}
       <style jsx global>{`
-        /* ================================
-           TOKENS — DARK (default)
-        ==================================*/
-        .apply-page {
-          --bg-0: #0a0b0d;
-          --bg-1: #0f1115;
-          --bg-2: #1a1d23;
-          --grid: rgba(255, 255, 255, 0.025);
-
-          --txt: #f8fafc;
-          --txt-2: #cbd5e1;
-          --txt-3: #94a3b8;
-          --txt-4: #64748b;
-
-          --white-02: rgba(255, 255, 255, 0.02);
-          --white-04: rgba(255, 255, 255, 0.04);
-          --white-06: rgba(255, 255, 255, 0.06);
-          --white-08: rgba(255, 255, 255, 0.08);
-          --white-12: rgba(255, 255, 255, 0.12);
-          --white-16: rgba(255, 255, 255, 0.16);
-
-          --primary: #6366f1;
-          --primary-hover: #5b5cf6;
-          --primary-light: rgba(99, 102, 241, 0.1);
-
-          --success: #10b981;
-          --error: #ef4444;
-
-          --radius-sm: 8px;
-          --radius-md: 12px;
-          --radius-lg: 16px;
-          --radius-xl: 24px;
-          --radius-2xl: 32px;
-
-          --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-          --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-          --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
+        .partnerApplyPage {
+          --apply-bg: #080a0d;
+          --apply-bg-soft: #0e1116;
+          --apply-text: #f4f0e8;
+          --apply-muted: rgba(244, 240, 232, 0.66);
+          --apply-faint: rgba(244, 240, 232, 0.42);
+          --apply-line: rgba(244, 240, 232, 0.12);
+          --apply-line-soft: rgba(244, 240, 232, 0.07);
+          --apply-surface: rgba(244, 240, 232, 0.055);
+          --apply-surface-strong: rgba(244, 240, 232, 0.1);
+          --apply-danger: #ff7f73;
+          margin-top: calc(var(--app-header-h, 96px) * -1);
           min-height: 100vh;
-          background: radial-gradient(ellipse at top, var(--bg-1) 0%, var(--bg-0) 50%, var(--bg-1) 100%);
-          color: var(--txt);
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-          line-height: 1.6;
-        }
-        .hero-stats .stat-number { min-width: 3ch; display: inline-block; text-align: center; }
-
-        /* ================================
-           TOKENS — LIGHT OVERRIDES
-        ==================================*/
-        .apply-page[data-tone='light'],
-        :global(html.light) .apply-page {
-          --bg-0: #ffffff;
-          --bg-1: #f8fafc;
-          --bg-2: #f1f5f9;
-          --grid: rgba(15, 23, 42, 0.04);
-
-          --txt: #0f172a;
-          --txt-2: #334155;
-          --txt-3: #64748b;
-          --txt-4: #94a3b8;
-
-          --white-02: rgba(15, 23, 42, 0.02);
-          --white-04: rgba(15, 23, 42, 0.04);
-          --white-06: rgba(15, 23, 42, 0.06);
-          --white-08: rgba(15, 23, 42, 0.08);
-          --white-12: rgba(15, 23, 42, 0.12);
-          --white-16: rgba(15, 23, 42, 0.16);
-
-          --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
-          --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
-          --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.1);
-          --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
-
-          background: radial-gradient(ellipse at top, var(--bg-1) 0%, var(--bg-0) 50%, var(--bg-1) 100%);
+          background:
+            radial-gradient(
+              circle at 58% -20%,
+              rgba(244, 240, 232, 0.08),
+              transparent 34rem
+            ),
+            linear-gradient(
+              135deg,
+              var(--apply-bg),
+              var(--apply-bg-soft) 48%,
+              var(--apply-bg)
+            );
+          color: var(--apply-text);
+          font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
         }
 
-        /* ================================
-           HERO SECTION
-        ==================================*/
-        .hero-section {
+        .partnerApplyHero {
           position: relative;
-          min-height: 75vh;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 120px 24px 80px;
-          text-align: center;
-        }
-        
-        .hero-content { 
-          max-width: 900px; 
-          width: 100%; 
-        }
-        
-        .hero-logo-img {
-          max-width: 140px;
-          height: auto;
-          margin: 0 auto 32px;
-          display: block;
-          filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
-          transition: transform 0.3s ease;
-        }
-        .hero-logo-img:hover {
-          transform: scale(1.05);
-        }
-        
-        .apply-page[data-tone='light'] .hero-logo-img,
-        :global(html.light) .apply-page .hero-logo-img {
-          filter: drop-shadow(0 16px 32px rgba(15, 23, 42, 0.1));
-        }
-        
-        .hero-title {
-          font-size: clamp(48px, 8vw, 84px);
-          font-weight: 800;
-          line-height: 1.05;
-          margin-bottom: 24px;
-          letter-spacing: -0.02em;
-        }
-        
-        .hero-title-main {
-          display: block;
-          background: linear-gradient(135deg, var(--txt) 0%, var(--txt-2) 100%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        
-        .hero-company { 
-          display: block; 
-          background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          margin-top: 8px;
-        }
-        
-        .hero-subtitle {
-          font-size: 20px;
-          line-height: 1.6;
-          color: var(--txt-2);
-          margin: 0 auto 48px;
-          max-width: 720px;
-          font-weight: 400;
+          min-height: 70svh;
+          align-items: flex-end;
+          padding: clamp(104px, 14svh, 168px) clamp(22px, 6vw, 88px)
+            clamp(56px, 8vw, 98px);
+          border-bottom: 1px solid var(--apply-line-soft);
         }
 
-        .hero-stats {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 32px;
-          margin-top: 48px;
-          flex-wrap: wrap;
-        }
-        
-        .stat-item {
-          text-align: center;
-        }
-        
-        .stat-number {
-          display: block;
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--primary);
-          line-height: 1;
-        }
-        
-        .stat-label {
-          display: block;
-          font-size: 14px;
-          color: var(--txt-3);
-          margin-top: 4px;
-          font-weight: 500;
-        }
-        
-        .stat-divider {
-          width: 1px;
-          height: 32px;
-          background: var(--white-12);
-        }
-
-        /* ================================
-           FORM SECTION
-        ==================================*/
-        .form-section { 
-          padding: 40px 0 160px; 
-          position: relative;
-        }
-        
-        .section-container { 
-          max-width: 1200px; 
-          margin: 0 auto; 
-          padding: 0 24px; 
-        }
-
-        .form-header {
-          text-align: center;
-          margin-bottom: 48px;
-        }
-        
-        .form-title {
-          font-size: 36px;
-          font-weight: 700;
-          margin: 0 0 12px;
-          color: var(--txt);
-          letter-spacing: -0.01em;
-        }
-        
-        .form-subtitle {
-          font-size: 18px;
-          color: var(--txt-2);
-          margin: 0;
-          max-width: 600px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        
-        .form-card {
-          margin: 0 auto;
-          padding: 48px;
-          border: 1px solid var(--white-08);
-          border-radius: var(--radius-2xl);
-          background: var(--white-04);
-          backdrop-filter: blur(20px);
-          box-shadow: var(--shadow-xl);
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .form-card::before {
-          content: '';
+        .partnerApplyHero::before {
+          content: "";
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, var(--white-16), transparent);
-        }
-
-        .grid-form { 
-          display: grid; 
-          gap: 40px; 
-        }
-
-        .form-section-group {
-          padding: 32px 0;
-          border-bottom: 1px solid var(--white-06);
-        }
-        
-        .form-section-group:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-        
-        .section-title {
-          font-size: 20px;
-          font-weight: 600;
-          color: var(--txt);
-          margin: 0 0 24px;
-          letter-spacing: -0.01em;
-        }
-        
-        .grid-2 {
-          display: grid; 
-          gap: 24px;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          margin-bottom: 24px;
-        }
-        .grid-2:last-child {
-          margin-bottom: 0;
-        }
-        
-        @media (max-width: 860px) { 
-          .grid-2 { grid-template-columns: 1fr; }
-          .form-card { padding: 32px 24px; }
-          .hero-stats { gap: 24px; }
-          .stat-divider { display: none; }
-        }
-
-        /* ================================
-           FORM FIELDS
-        ==================================*/
-        .field { 
-          margin-bottom: 24px; 
-        }
-        .field:last-child {
-          margin-bottom: 0;
-        }
-        
-        .field label {
-          display: block;
-          font-size: 15px;
-          color: var(--txt-2);
-          margin-bottom: 8px;
-          font-weight: 600;
-          letter-spacing: -0.01em;
-        }
-        
-        .input, .select {
-          display: flex; 
-          align-items: center; 
-          gap: 12px;
-          background: var(--white-04);
-          border: 1.5px solid var(--white-08);
-          border-radius: var(--radius-lg);
-          padding: 16px 18px;
-          transition: all 0.2s ease;
-          position: relative;
-        }
-        
-        .input:focus-within, .select:focus-within {
-          border-color: var(--primary);
-          background: var(--white-06);
-          box-shadow: 0 0 0 3px var(--primary-light);
-        }
-        
-        .input svg { 
-          width: 20px; 
-          height: 20px; 
-          color: var(--txt-3); 
-          flex: 0 0 auto; 
-        }
-        
-        .input input, .select select {
-          background: transparent; 
-          border: 0; 
-          outline: 0;
-          color: var(--txt); 
-          width: 100%; 
-          font-size: 16px;
-          font-weight: 500;
-        }
-        
-        .input input::placeholder {
-          color: var(--txt-4);
-        }
-        
-        .select select {
-          appearance: none;
-          cursor: pointer;
-        }
-        
-        .select::after {
-          content: '';
-          width: 12px;
-          height: 12px;
-          border: 2px solid var(--txt-3);
-          border-top: none;
-          border-left: none;
-          transform: rotate(45deg);
-          margin-top: -2px;
+          inset: 0;
+          opacity: 0.14;
+          background-image:
+            linear-gradient(rgba(244, 240, 232, 0.035) 1px, transparent 1px),
+            linear-gradient(
+              90deg,
+              rgba(244, 240, 232, 0.035) 1px,
+              transparent 1px
+            );
+          background-size: 72px 72px;
           pointer-events: none;
         }
-        
-        textarea {
-          width: 100%;
-          background: var(--white-04);
-          border: 1.5px solid var(--white-08);
-          border-radius: var(--radius-lg);
-          color: var(--txt);
-          padding: 16px 18px;
-          font-size: 16px;
-          font-weight: 500;
-          resize: vertical;
-          min-height: 120px;
-          transition: all 0.2s ease;
-          font-family: inherit;
-        }
-        
-        textarea:focus {
-          outline: none;
-          border-color: var(--primary);
-          background: var(--white-06);
-          box-shadow: 0 0 0 3px var(--primary-light);
-        }
-        
-        textarea::placeholder {
-          color: var(--txt-4);
-        }
 
-        /* ================================
-           CHIPS
-        ==================================*/
-        .chips {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
-        
-        .chips--enhanced {
-          gap: 16px;
-        }
-        
-        .chip {
-          padding: 12px 20px;
-          border-radius: 999px;
-          border: 1.5px solid var(--white-12);
-          background: var(--white-04);
-          color: var(--txt-2);
-          font-weight: 600;
-          font-size: 15px;
-          cursor: pointer;
-          user-select: none;
-          white-space: nowrap;
-          transition: all 0.2s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .chip::before {
-          content: '';
+        .partnerBackButton {
           position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, var(--white-08), transparent);
-          transition: left 0.5s ease;
-        }
-        
-        .chip:hover::before {
-          left: 100%;
-        }
-        
-        .chip:hover {
-          border-color: var(--primary);
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-md);
-        }
-        
-        .chip:active { 
-          transform: translateY(0); 
-        }
-        
-        .chip[aria-pressed="true"],
-        .chip.chip-on {
-          background: var(--primary);
-          color: white;
-          border-color: var(--primary);
-          box-shadow: var(--shadow-md);
-        }
-        
-        .chip.chip-on::before {
-          display: none;
-        }
-
-        /* ================================
-           FORM FOOTER
-        ==================================*/
-        .form-footer {
-          padding-top: 32px;
-          border-top: 1px solid var(--white-06);
-        }
-        
-        .agree { 
-          margin-bottom: 32px; 
-        }
-        
-        .agree-row { 
-          display: flex; 
-          align-items: flex-start; 
-          gap: 12px; 
-          color: var(--txt-2); 
-          font-size: 15px; 
-          user-select: none;
-          line-height: 1.5;
-        }
-        
-        .agree-row input { 
-          width: 20px; 
-          height: 20px; 
-          accent-color: var(--primary);
-          margin-top: 2px;
-          flex-shrink: 0;
-        }
-
-        /* ================================
-           BUTTONS
-        ==================================*/
-        .actions { 
-          display: flex; 
-          gap: 16px; 
-          justify-content: flex-end; 
+          top: clamp(92px, 12svh, 122px);
+          left: clamp(22px, 6vw, 88px);
+          z-index: 1;
+          display: inline-flex;
           align-items: center;
-        }
-        
-        .btn-primary, .btn-secondary {
-          display: inline-flex; 
-          align-items: center; 
-          gap: 10px;
-          padding: 16px 28px; 
-          border-radius: var(--radius-lg);
-          font-weight: 600; 
-          font-size: 16px; 
-          cursor: pointer; 
-          border: none; 
-          transition: all 0.2s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .btn-primary { 
-          background: var(--primary); 
-          color: white;
-          box-shadow: var(--shadow-md);
-        }
-        
-        .btn-primary:hover:not(:disabled) { 
-          background: var(--primary-hover); 
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-lg);
-        }
-        
-        .btn-primary:active:not(:disabled) {
-          transform: translateY(0);
-        }
-        
-        .btn-primary:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-        
-        .btn-secondary { 
-          background: var(--white-04); 
-          color: var(--txt); 
-          border: 1.5px solid var(--white-12); 
-        }
-        
-        .btn-secondary:hover { 
-          background: var(--white-08); 
-          border-color: var(--white-16);
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-md);
-        }
-        
-        .btn-icon { 
-          width: 18px; 
-          height: 18px; 
+          gap: 9px;
+          border: 0;
+          background: transparent;
+          color: var(--apply-faint);
+          font-size: 12px;
+          font-weight: 850;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: color 180ms ease;
         }
 
-        .spinner {
+        .partnerBackButton:hover {
+          color: var(--apply-text);
+        }
+
+        .partnerBackButton svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .partnerApplyHeroInner {
+          position: relative;
+          z-index: 1;
+          max-width: 1050px;
+        }
+
+        .partnerApplyEyebrow {
+          margin: 0 0 24px;
+          color: var(--apply-faint);
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.34em;
+          line-height: 1.4;
+          text-transform: uppercase;
+        }
+
+        .partnerApplyHero h1 {
+          max-width: 980px;
+          margin: 0;
+          color: var(--apply-text);
+          font-size: clamp(64px, 11vw, 150px);
+          font-weight: 900;
+          letter-spacing: -0.085em;
+          line-height: 0.85;
+        }
+
+        .partnerApplyHero p:not(.partnerApplyEyebrow) {
+          max-width: 680px;
+          margin: clamp(28px, 4vw, 48px) 0 0;
+          color: var(--apply-muted);
+          font-size: clamp(18px, 1.7vw, 22px);
+          line-height: 1.6;
+        }
+
+        .partnerApplyContent {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: clamp(64px, 8vw, 112px) clamp(22px, 6vw, 88px)
+            clamp(96px, 11vw, 150px);
+        }
+
+        .partnerApplicationForm,
+        .partnerSuccessState {
+          border-top: 1px solid var(--apply-line);
+        }
+
+        .partnerFormGroup {
+          display: grid;
+          grid-template-columns: minmax(160px, 0.38fr) minmax(0, 1fr);
+          gap: clamp(26px, 5vw, 72px);
+          padding: clamp(34px, 5vw, 58px) 0;
+          border-bottom: 1px solid var(--apply-line);
+        }
+
+        .partnerFormGroupHeader span {
+          display: block;
+          margin-bottom: 14px;
+          color: var(--apply-faint);
+          font-size: 12px;
+          font-weight: 850;
+          letter-spacing: 0.18em;
+        }
+
+        .partnerFormGroupHeader h2 {
+          margin: 0;
+          color: var(--apply-text);
+          font-size: clamp(30px, 4vw, 54px);
+          font-weight: 900;
+          letter-spacing: -0.06em;
+          line-height: 0.95;
+        }
+
+        .partnerFormGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 22px;
+        }
+
+        .partnerField {
+          position: relative;
+          display: flex;
+          min-width: 0;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .partnerField > span {
+          color: var(--apply-faint);
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .partnerField input,
+        .partnerField textarea,
+        .partnerSelectTrigger {
+          width: 100%;
+          border: 1px solid rgba(244, 240, 232, 0.13);
+          border-radius: 22px;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(244, 240, 232, 0.09),
+              rgba(244, 240, 232, 0.045)
+            ),
+            rgba(8, 10, 13, 0.58);
+          color: var(--apply-text);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.045),
+            0 18px 42px rgba(0, 0, 0, 0.16);
+          font: inherit;
+          font-size: 16px;
+          outline: 0;
+          transition:
+            border-color 180ms ease,
+            background 180ms ease,
+            box-shadow 180ms ease,
+            transform 180ms ease;
+        }
+
+        .partnerField input,
+        .partnerSelectTrigger {
+          height: 62px;
+          padding: 0 18px;
+        }
+
+        .partnerField textarea {
+          min-height: 142px;
+          padding: 18px;
+          resize: vertical;
+        }
+
+        .partnerField input::placeholder,
+        .partnerField textarea::placeholder {
+          color: rgba(244, 240, 232, 0.34);
+        }
+
+        .partnerField input:hover,
+        .partnerField textarea:hover,
+        .partnerSelectTrigger:hover {
+          border-color: rgba(244, 240, 232, 0.24);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(244, 240, 232, 0.12),
+              rgba(244, 240, 232, 0.06)
+            ),
+            rgba(8, 10, 13, 0.68);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.06),
+            0 22px 52px rgba(0, 0, 0, 0.24);
+        }
+
+        .partnerField input:focus,
+        .partnerField textarea:focus,
+        .partnerSelectTrigger:focus-visible,
+        .partnerSelectTrigger[aria-expanded="true"] {
+          border-color: rgba(244, 240, 232, 0.42);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(244, 240, 232, 0.14),
+              rgba(244, 240, 232, 0.065)
+            ),
+            rgba(8, 10, 13, 0.76);
+          box-shadow:
+            0 0 0 4px rgba(244, 240, 232, 0.07),
+            inset 0 1px 0 rgba(255, 255, 255, 0.07),
+            0 24px 58px rgba(0, 0, 0, 0.28);
+        }
+
+        .partnerField input[aria-invalid="true"] {
+          border-color: rgba(255, 127, 115, 0.55);
+          box-shadow:
+            0 0 0 4px rgba(255, 127, 115, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .partnerSelectTrigger {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          cursor: pointer;
+          text-align: left;
+        }
+
+        .partnerSelectTrigger span {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .partnerSelectTrigger svg {
           width: 18px;
           height: 18px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top: 2px solid white;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
+          color: var(--apply-faint);
+          flex: 0 0 auto;
+          transition: transform 180ms ease;
         }
 
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        .partnerSelectTrigger[aria-expanded="true"] svg {
+          transform: rotate(180deg);
         }
 
-        /* ================================
-           VALIDATION & SUCCESS
-        ==================================*/
-        .err { 
-          color: var(--error); 
-          font-size: 13px; 
-          margin-top: 8px;
-          font-weight: 500;
+        .partnerSelectMenu {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: calc(100% + 10px);
+          z-index: 20;
+          display: grid;
+          gap: 4px;
+          padding: 8px;
+          border: 1px solid rgba(244, 240, 232, 0.14);
+          border-radius: 24px;
+          background: linear-gradient(
+            180deg,
+            rgba(23, 27, 32, 0.98),
+            rgba(10, 12, 15, 0.98)
+          );
+          box-shadow:
+            0 28px 70px rgba(0, 0, 0, 0.48),
+            inset 0 1px 0 rgba(255, 255, 255, 0.055);
+          backdrop-filter: blur(18px);
         }
 
-        .error-box {
-          padding: 16px 20px;
-          background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          border-radius: var(--radius-lg);
-          color: var(--error);
-          margin-bottom: 32px;
-          font-weight: 500;
+        .partnerSelectOption {
+          min-height: 44px;
+          padding: 0 14px;
+          border: 0;
+          border-radius: 16px;
+          background: transparent;
+          color: rgba(244, 240, 232, 0.72);
+          font: inherit;
+          font-size: 14px;
+          font-weight: 720;
+          text-align: left;
+          cursor: pointer;
+          transition:
+            background 160ms ease,
+            color 160ms ease,
+            transform 160ms ease;
         }
 
-        .success-state { 
-          text-align: center; 
-          padding: 60px 24px; 
+        .partnerSelectOption:hover,
+        .partnerSelectOption:focus-visible {
+          background: rgba(244, 240, 232, 0.09);
+          color: var(--apply-text);
+          outline: 0;
+          transform: translateX(2px);
         }
-        
-        .success-icon { 
-          width: 64px; 
-          height: 64px; 
-          color: var(--success); 
-          margin: 0 auto 16px; 
+
+        .partnerSelectOption[data-selected="true"] {
+          background: var(--apply-text);
+          color: #080a0d;
         }
-        
-        .success-title { 
-          font-size: 24px; 
-          font-weight: 700; 
-          margin: 0 0 8px;
-          color: var(--txt);
+
+        .partnerField small,
+        .partnerInlineError,
+        .partnerFormError {
+          color: var(--apply-danger);
+          font-size: 13px;
+          line-height: 1.45;
         }
-        
-        .success-subtitle { 
-          color: var(--txt-2); 
+
+        .partnerFormError {
           margin: 0;
-          font-size: 16px;
+          padding: 20px 0;
+          border-bottom: 1px solid rgba(255, 127, 115, 0.22);
         }
 
-        /* ================================
-           RESPONSIVE & ACCESSIBILITY
-        ==================================*/
-        @media (max-width: 640px) {
-          .actions {
-            flex-direction: column-reverse;
-            align-items: stretch;
-          }
-          
-          .btn-primary, .btn-secondary {
-            justify-content: center;
-          }
-          
-          .hero-title {
-            font-size: clamp(36px, 10vw, 48px);
-          }
-          
-          .form-title {
-            font-size: 28px;
-          }
+        .partnerScenarioOptions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-bottom: 28px;
         }
 
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          .hero-section { transform: none !important; opacity: 1 !important; }
-          .chip::before { display: none; }
-          * { animation-duration: 0.01ms !important; }
+        .partnerScenarioOption {
+          min-height: 48px;
+          padding: 0 18px;
+          border: 1px solid var(--apply-line);
+          border-radius: 999px;
+          background: transparent;
+          color: var(--apply-muted);
+          font-size: 13px;
+          font-weight: 820;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition:
+            background 180ms ease,
+            color 180ms ease,
+            border-color 180ms ease;
         }
 
-        /* Focus styles for accessibility */
-        .chip:focus-visible {
-          outline: 2px solid var(--primary);
-          outline-offset: 2px;
+        .partnerScenarioOption[data-selected="true"] {
+          border-color: var(--apply-text);
+          background: var(--apply-text);
+          color: #080a0d;
         }
-        
-        .btn-primary:focus-visible,
-        .btn-secondary:focus-visible {
-          outline: 2px solid var(--primary);
-          outline-offset: 2px;
+
+        .partnerFormFooter {
+          padding-top: clamp(34px, 5vw, 54px);
+        }
+
+        .partnerAgreement {
+          display: flex;
+          max-width: 720px;
+          align-items: flex-start;
+          gap: 12px;
+          color: var(--apply-muted);
+          font-size: 15px;
+          line-height: 1.55;
+        }
+
+        .partnerAgreement input {
+          width: 19px;
+          height: 19px;
+          margin-top: 3px;
+          accent-color: var(--apply-text);
+          flex: 0 0 auto;
+          cursor: pointer;
+        }
+
+        .partnerFormActions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 14px;
+          margin-top: 34px;
+        }
+
+        .partnerPrimaryButton,
+        .partnerSecondaryButton {
+          display: inline-flex;
+          min-height: 54px;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 0 23px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          font-size: 13px;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition:
+            transform 180ms ease,
+            background 180ms ease,
+            border-color 180ms ease,
+            opacity 180ms ease;
+        }
+
+        .partnerPrimaryButton {
+          background: var(--apply-text);
+          color: #080a0d;
+        }
+
+        .partnerPrimaryButton:disabled {
+          cursor: not-allowed;
+          opacity: 0.62;
+        }
+
+        .partnerSecondaryButton {
+          background: transparent;
+          color: var(--apply-text);
+          border-color: var(--apply-line);
+        }
+
+        .partnerPrimaryButton:not(:disabled):hover,
+        .partnerSecondaryButton:hover {
+          transform: translateY(-2px);
+        }
+
+        .partnerPrimaryButton svg,
+        .partnerSecondaryButton svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .partnerSuccessState {
+          padding: clamp(54px, 7vw, 82px) 0;
+        }
+
+        .partnerSuccessState svg {
+          width: 52px;
+          height: 52px;
+          margin-bottom: 24px;
+          color: var(--apply-text);
+        }
+
+        .partnerSuccessState h2 {
+          margin: 0;
+          color: var(--apply-text);
+          font-size: clamp(40px, 6vw, 82px);
+          font-weight: 900;
+          letter-spacing: -0.07em;
+          line-height: 0.95;
+        }
+
+        .partnerSuccessState p {
+          max-width: 560px;
+          margin: 22px 0 0;
+          color: var(--apply-muted);
+          font-size: 18px;
+          line-height: 1.65;
+        }
+
+        @media (max-width: 860px) {
+          .partnerApplyHero {
+            min-height: auto;
+            padding-top: 132px;
+          }
+
+          .partnerApplyHero h1 {
+            font-size: clamp(58px, 17vw, 104px);
+          }
+
+          .partnerFormGroup,
+          .partnerFormGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .partnerFormActions {
+            justify-content: stretch;
+          }
+
+          .partnerPrimaryButton,
+          .partnerSecondaryButton {
+            width: 100%;
+          }
         }
       `}</style>
-    </div>
-  )
+    </main>
+  );
 }

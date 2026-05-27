@@ -9,10 +9,10 @@ import Section from "../../../items/section";
 type Item = { title: string; desc: string };
 
 const ITEMS: Item[] = [
-  { title: 'Ride commission',              desc: 'Upfront price, transparent per-ride fee.' },
-  { title: 'Hotel & SPA margin',           desc: 'Direct/partner inventory; ride+stay bundles.' },
-  { title: 'Subscriptions (Pro/Flexible)', desc: 'Optional perks and priority; no paywalls.' },
-  { title: 'B2B promoted listings',        desc: 'Disclosed placements for fleets/hotels.' },
+  { title: 'Trip commission',              desc: 'Transparent per-trip economics across ride classes and repeat routes.' },
+  { title: 'Delivery service fee',         desc: 'Everyday orders, courier tasks, and partner fulfillment in one logistics surface.' },
+  { title: 'Places monetization',          desc: 'Promoted venues, saved-place activation, and discovery-to-visit conversion.' },
+  { title: 'Transport partnerships',       desc: 'Route integrations, city operators, and B2B distribution for mobility supply.' },
 ];
 
 export default function ModelSection() {
@@ -74,8 +74,8 @@ export default function ModelSection() {
     <Section
       id="model"
       kicker="Business model"
-      title="Monetization aligned with users"
-      subtitle="Four streams: ride commission, hotel & SPA margin, optional subscriptions, and B2B promoted listings."
+      title="Monetization follows the city journey"
+      subtitle="Four streams aligned with the current product: trips, delivery, places, and transport partnerships."
     >
       <div ref={wrapRef} className="mono" role="region" aria-label="Monetization highlights">
         <ul className="mlist" role="list">

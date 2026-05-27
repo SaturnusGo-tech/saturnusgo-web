@@ -16,75 +16,75 @@ type PSItem = {
 
 const ITEMS: PSItem[] = [
   {
-    tag: 'Payments',
-    title: 'Payments fail in many markets',
+    tag: 'Trips',
+    title: 'Ride ordering is still high-friction',
     problem: [
-      'Millions of users cannot pay for rides or bookings: cards are declined, providers unsupported.',
-      'A failed payment = a failed trip and broken trust.',
+      'Users jump between maps, taxi apps, chats, and saved addresses just to move across the city.',
+      'Every extra step reduces conversion and makes the service feel less reliable.',
     ],
     solution: [
-      'Local payment methods and saved cards (PCI) for reliable transactions.',
-      'In-app balance and fallback payment routes for resilience.',
+      'A direct trip flow with clear destination context, class options, ETA, and price logic.',
+      'Saved places and repeat routes reduce effort for daily movement.',
     ],
   },
   {
-    tag: 'Unification',
-    title: 'Mobility is fragmented',
+    tag: 'Delivery',
+    title: 'Delivery demand is split across categories',
     problem: [
-      'Users juggle 3–5 apps: rides, hotels, places, events, wallets.',
-      'Flows break between services → wasted time, money, conversion.',
+      'Food, packages, and errands are treated as separate experiences with inconsistent status and support.',
+      'Users do not see the same reliability layer across city logistics.',
     ],
     solution: [
-      'One platform: rides, bookings, places, events, wallet, and loyalty.',
-      'Unified UX reduces hops and lifts conversion.',
+      'One delivery module for everyday orders, courier tasks, and partner fulfillment.',
+      'Shared account, places, support, and status patterns lift trust.',
     ],
   },
   {
     tag: 'Places',
-    title: 'Places are scattered and offline',
+    title: 'Local intent is trapped outside the transaction',
     problem: [
       'Users save places in random maps, notes, or screenshots.',
-      'No integration with rides, bookings, or planning.',
+      'Discovery rarely connects naturally to the next ride, delivery order, or route.',
     ],
     solution: [
       'PlaceHub: one hub for saving, sharing, and reusing locations.',
-      'B2B2C: venues, events, and merchants plug directly into user flows.',
+      'Venues and merchants plug into movement, delivery, and repeat visits.',
     ],
   },
   {
-    tag: 'Planning',
-    title: 'Smart planning is missing',
+    tag: 'Transport',
+    title: 'Routes are informational, not actionable',
     problem: [
-      'Weekend trips and getaways are manual and error-prone.',
-      'Routes, timing, and bookings must be stitched together.',
+      'Transport schedules and route options often sit away from the actual trip decision.',
+      'Users still compare multiple tools before choosing how to move.',
     ],
     solution: [
-      'Built-in AI planning: routes, timing, availability — in real time.',
-      'Wishlists and weekend kits turn ideas into coordinated trips.',
+      'A transport layer that connects route awareness with trip and place context.',
+      'The product can recommend the cleanest way to move, not just show raw data.',
     ],
   },
   {
-    tag: 'Finance',
-    title: 'No financial visibility',
+    tag: 'Trust',
+    title: 'Trust breaks across service boundaries',
     problem: [
-      'No unified view of spend across rides, hotels, places, and events.',
-      'Hard to optimize payments or manage limits.',
+      'Support, status, and account context feel different in every city service.',
+      'That inconsistency slows repeat usage.',
     ],
     solution: [
-      'Single financial dashboard: categories, limits, controls.',
-      'Optimized payment routing and rewards to cut effective cost.',
+      'Shared account logic, consistent support, and clear status across modules.',
+      'The user learns one system instead of relearning each vertical.',
     ],
   },
   {
-    tag: 'Loyalty',
-    title: 'Loyalty is broken',
+    tag: 'Retention',
+    title: 'Single-purpose apps leak frequency',
     problem: [
       'Transactions are isolated; no cross-service value.',
       'No reason to stay within one ecosystem.',
     ],
     solution: [
-      'Unified loyalty across rides, hotels, places, and events.',
-      'Subscriptions and tiers that build retention and stickiness.',
+      'Trips, delivery, places, and transport reinforce one another.',
+      'Subscriptions, saved routines, and partner perks create repeat behavior.',
     ],
   },
 ];
@@ -157,8 +157,8 @@ export default function ProblemSolutionSection() {
     <Section
       id="problem"
       kicker="Problem → Solution"
-      title="5 apps for 1 trip → broken journeys."
-      subtitle="SaturnusGo: one platform for rides, hotels, places, and events — unified by AI planning and loyalty."
+      title="One city journey is still split across too many products."
+      subtitle="SaturnusGo turns trips, delivery, places, and transport into one repeatable experience instead of a set of disconnected tabs."
     >
       <div className="ps" data-tone={tone}>
         <div

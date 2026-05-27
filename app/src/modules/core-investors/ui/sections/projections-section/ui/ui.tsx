@@ -13,14 +13,18 @@ import { useSomController } from '../../../../services/som-controller';
 import { ControllerSegment } from '../../../../services/som-engine';
 import { scaleLinesToTarget } from '../../../../services/som-engine';
 import { resampleLinesForHorizon } from '../../../../services/som-engine';
+import { useLanguage } from '../../../../../../shared/i18n';
 
 export default function ProjectionsWithController() {
+  const { dictionary } = useLanguage();
+  const copy = dictionary.investors.projections;
+
   // Non-ride baseline lines (kept as-is for Y3)
   const baseLines = [
-    { id: 'subs',     label: 'Subscriptions',         valuesM: [6, 16, 25, 32] },
-    { id: 'bookings', label: 'Bookings (12%)',        valuesM: [0.4, 1.5, 2.5, 2.8] },
-    { id: 'events',   label: 'Events (15%)',          valuesM: [0.5, 1.3, 2.0, 2.8] },
-    { id: 'b2b2c',    label: 'B2B2C (fixed+uplift)',  valuesM: [1, 3, 4.5, 6] },
+    { id: 'subs',     label: copy.labels.subscriptions, valuesM: [6, 16, 25, 32], color: '#245cff' },
+    { id: 'bookings', label: copy.labels.bookings,       valuesM: [0.4, 1.5, 2.5, 2.8], color: '#1b8cff' },
+    { id: 'events',   label: copy.labels.events,         valuesM: [0.5, 1.3, 2.0, 2.8], color: '#27b7ff' },
+    { id: 'b2b2c',    label: copy.labels.b2b2c,          valuesM: [1, 3, 4.5, 6], color: '#6b7cff' },
   ];
   const baseSomY3_M   = 32 + 2.8 + 2.8 + 6;   // 43.6 ($M)
   const baseSomY3_USD = baseSomY3_M * 1e6;    // $43.6M
@@ -127,7 +131,7 @@ export default function ProjectionsWithController() {
   const prettyDelta = (delta?: number) => {
     if (typeof delta !== 'number') return '';
     const abs = Math.abs(Math.round(delta));
-    const sign = delta > 0 ? 'shortfall' : 'excess';
+    const sign = delta > 0 ? copy.shortfall : copy.excess;
     return `${sign} ${abs.toLocaleString('en-US')} USD`;
   };
   const pctOfTarget = (target: number, got: number) =>
@@ -144,25 +148,25 @@ export default function ProjectionsWithController() {
     <div id="projections" style={{ scrollMarginTop: '96px' }}>
       {/* Top: Total SOM — single CTA link (not pill) + controller */}
       <Section
-        kicker="Outlook"
-        title="Total SOM • 3 / 5 / 10 years"
-        subtitle="Bars show % of TAM (left axis). Line shows total ARR in $M (right axis)."
+        kicker={copy.outlook}
+        title={copy.totalTitle}
+        subtitle={copy.totalSubtitle}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
           <small style={{ opacity: 0.75, marginRight: 'auto' }}>
             {main.horizon === 3
-              ? 'Baseline (bit-to-bit)'
-              : `Target: ${main.horizon === 5 ? '400M' : '1B'} · ${prettyDelta(main.debug.deltaToTargetUSD)} (${pctOfTarget(main.horizon === 5 ? 400e6 : 1e9, main.som)})`}
+              ? copy.baseline
+              : `${copy.target}: ${main.horizon === 5 ? '400M' : '1B'} · ${prettyDelta(main.debug.deltaToTargetUSD)} (${pctOfTarget(main.horizon === 5 ? 400e6 : 1e9, main.som)})`}
           </small>
 
           {/* Single CTA — plain link style (not pill) */}
           <Link
             href={`/investors/methodology?h=${main.horizon}`}
             className="sg-link"
-            aria-label="How this is calculated"
+            aria-label={copy.howCalculatedLabel}
             prefetch
           >
-            How this is calculated
+            {copy.howCalculated}
           </Link>
 
           {/* Existing segment controller (unchanged) */}
@@ -171,16 +175,16 @@ export default function ProjectionsWithController() {
 
         <MarketChart
           key={marketKey}
-          title={`TAM / SAM / TOTAL SOM • ${main.horizon}y`}
+          title={`${copy.totalChartTitle} • ${main.horizon}y`}
           marketScope="custom"
           samMetric="GMV"
-          rightAxisLabel="Right: $M (ARR by stream)"
+          rightAxisLabel={copy.rightAxisStreams}
           marketUSD={marketUSD}
           callout={{ somUsersM: users ? Math.round(users / 1e6) : undefined, arpuUSD }}
           rationale={
             main.horizon === 3
-              ? 'Baseline preserved exactly; no transformations applied.'
-              : (main.debug.limitReason ? `Closest achievable within bounds. ${main.debug.limitReason}` : 'Target matched within rounding tolerance.')
+              ? copy.baselineRationale
+              : (main.debug.limitReason ? `Closest achievable within bounds. ${main.debug.limitReason}` : copy.matchedRationale)
           }
           somScale={1.2}
           showSomScaleNote
@@ -190,15 +194,15 @@ export default function ProjectionsWithController() {
       {/* Bottom: Non-ride (NO controller here, NO extra button) */}
       <Section
         id="nonrides"
-        kicker="Monetization"
-        title="Non-ride revenue streams (subset of total)"
-        subtitle="Bars show % of TAM (left axis). Lines show ARR by stream in $M (right axis)."
+        kicker={copy.monetization}
+        title={copy.nonRideTitle}
+        subtitle={copy.nonRideSubtitle}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
           <small style={{ opacity: 0.75 }}>
             {main.horizon === 3
-              ? 'Baseline (subset of total)'
-              : `Target: ${
+              ? copy.subsetBaseline
+              : `${copy.target}: ${
                   main.horizon === 5 ? `${Math.round(200)}M` : `${Math.round(500)}M`
                 } · ${prettyDelta(nonRideDisplayDelta)} (${pctOfTarget(
                   main.horizon === 5 ? 200e6 : 500e6,
@@ -209,10 +213,10 @@ export default function ProjectionsWithController() {
 
         <MarketChartStreams
           key={streamsKey}
-          title="Subscriptions • Bookings • Events • B2B2C"
+          title={copy.nonRideChartTitle}
           marketScope="custom"
           samMetric="OperatorRevenue"
-          rightAxisLabel="Right: $M (ARR)"
+          rightAxisLabel={copy.rightAxisArr}
           marketUSD={nonRideMarketUSD}
           lines={linesScaled}
           callout={{ arpuUSD: undefined }}

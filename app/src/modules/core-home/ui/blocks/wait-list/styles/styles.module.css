@@ -1,1 +1,145 @@
-.form{display:grid;gap:18px;max-width:920px;margin:0 auto;padding:28px;border:1px solid rgba(255,255,255,.12);background:#050606;color:#f4f4ef;box-shadow:0 22px 70px rgba(0,0,0,.24)}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.input{width:100%;height:56px;padding:0 18px;border:1px solid rgba(255,255,255,.14);border-radius:0;background:#101213;color:#f4f4ef;font-size:15px;outline:none}.input::placeholder{color:rgba(244,244,239,.38)}.input:focus{border-color:rgba(255,255,255,.42)}.group{display:grid;gap:10px}.label{color:rgba(244,244,239,.52);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{min-height:38px;padding:0 13px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:#111313;color:rgba(244,244,239,.72);font-size:12px;font-weight:780;cursor:pointer}.chipActive{background:#f6f6f0;color:#060707;border-color:#f6f6f0}.honeypot{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}.actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.submit{min-height:52px;padding:0 24px;border:0;border-radius:999px;background:#f6f6f0;color:#070707;font-size:14px;font-weight:850;cursor:pointer}.submit:disabled{opacity:.45;cursor:not-allowed}.note{min-height:20px;color:rgba(244,244,239,.58);font-size:13px}.noteOk{color:#b7ff91}.noteError{color:#ffb4a8}.micro{color:rgba(244,244,239,.42);font-size:12px}@media (max-width:720px){.form{padding:18px}.row{grid-template-columns:1fr}.actions{display:grid}.submit{width:100%}}
+.form {
+  display: grid;
+  gap: 18px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 28px;
+  background: #0f0f0f;
+  color: #f7f7f5;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.26);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.input {
+  width: 100%;
+  height: 56px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  background: #181818;
+  color: #f7f7f5;
+  font-size: 15px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(247, 247, 245, 0.38);
+}
+
+.input:focus {
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+.group {
+  display: grid;
+  gap: 10px;
+}
+
+.label {
+  color: rgba(247, 247, 245, 0.52);
+  font-size: 12px;
+  font-weight: 820;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: #181818;
+  color: rgba(247, 247, 245, 0.72);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chipActive {
+  background: #f7f7f5;
+  color: #080808;
+  border-color: #f7f7f5;
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.submit {
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #f7f7f5;
+  color: #080808;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.note {
+  min-height: 20px;
+  color: rgba(247, 247, 245, 0.58);
+  font-size: 13px;
+}
+
+.noteOk {
+  color: #f7f7f5;
+}
+
+.noteError {
+  color: #ffb4a8;
+}
+
+.micro {
+  color: rgba(247, 247, 245, 0.42);
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .form {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    display: grid;
+  }
+
+  .submit {
+    width: 100%;
+  }
+}
