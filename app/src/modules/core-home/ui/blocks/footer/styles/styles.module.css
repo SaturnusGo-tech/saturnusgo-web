@@ -7,6 +7,10 @@
   background: #050505;
 }
 
+:global(html[data-tms="1"]) .footer {
+  display: none;
+}
+
 .top,
 .bottom {
   display: flex;

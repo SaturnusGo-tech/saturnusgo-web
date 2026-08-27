@@ -3,6 +3,52 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* TMS is a viewport application with its own panel scrolling. */
+html[data-tms="1"] {
+  scroll-behavior: auto;
+  scroll-padding-top: 0;
+  overflow: hidden;
+}
+
+html[data-tms="1"] body {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html[data-tms="1"] #app-main {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+
+html[data-tms="1"] #app-main > .pt-wrap,
+html[data-tms="1"] #app-main > .pt-wrap > .pt-child {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+html[data-tms="1"] .cb__root,
+html[data-tms="1"] .bg-base,
+html[data-tms="1"] .bg-grad,
+html[data-tms="1"] .bg-cracks,
+html[data-tms="1"] .bg-noise,
+html[data-tms="1"] .bg-par {
+  display: none !important;
+}
+
 /* ================================
    GLOBALS
    ================================ */

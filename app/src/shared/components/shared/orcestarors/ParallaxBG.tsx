@@ -1,5 +1,6 @@
 // app/components/shared/orcestarors/ParallaxBG.tsx
 'use client';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 /**
@@ -12,10 +13,14 @@ import { useEffect, useRef } from 'react';
  * - безопасный teardown (AbortController)
  */
 export default function ParallaxBG() {
+  const pathname = usePathname();
+  const isTms = /^\/testcases(?:\/|$)/i.test(pathname || '');
   const farRef = useRef<HTMLDivElement>(null);
   const nearRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isTms) return;
+
     // уважение предпочтений пользователя
     const mReduced = matchMedia?.('(prefers-reduced-motion: reduce)');
     if (mReduced?.matches) return;
@@ -138,7 +143,9 @@ export default function ParallaxBG() {
       document.removeEventListener('visibilitychange', onVis);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [isTms]);
+
+  if (isTms) return null;
 
   return (
     <>

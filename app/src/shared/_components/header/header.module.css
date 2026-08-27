@@ -4,6 +4,10 @@
   overflow: hidden;
 }
 
+:global(html[data-tms="1"]) .header {
+  display: none;
+}
+
 .header {
   position: absolute;
   top: 0;

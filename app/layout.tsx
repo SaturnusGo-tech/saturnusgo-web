@@ -146,7 +146,17 @@ export default function RootLayout({
               <Script
                 id="route-flags"
                 strategy="beforeInteractive"
-              >{`(function(){ /* ... */ })();`}</Script>
+              >{`(function(){
+                try {
+                  var root = document.documentElement;
+                  var path = location.pathname || '';
+                  if (/^\\/testcases(?:\\/|$)/i.test(path)) {
+                    root.setAttribute('data-tms', '1');
+                  } else {
+                    root.removeAttribute('data-tms');
+                  }
+                } catch (_) {}
+              })();`}</Script>
 
               <Suspense fallback={null}>
                 <RouteFlagsClient />

@@ -10,8 +10,11 @@ export default function RouteFlagsClient() {
   useEffect(() => {
     const html = document.documentElement;
     const isInvestors = /^\/(investors|inversors)(\/|$)/.test(pathname || '');
+    const isTms = /^\/testcases(?:\/|$)/i.test(pathname || '');
     if (isInvestors) html.setAttribute('data-investors', '1');
     else html.removeAttribute('data-investors');
+    if (isTms) html.setAttribute('data-tms', '1');
+    else html.removeAttribute('data-tms');
   }, [pathname]);
 
   return null;
