@@ -1,21 +1,20 @@
-name: Deploy to GitHub Pages
+name: Validate static export
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: static-export-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,31 +24,54 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
-      - name: Install deps
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build (Next.js static export to out/)
-        run: npm run build
+      - name: Typecheck
+        run: npx tsc --noEmit --pretty false --incremental false
 
-      - name: Add CNAME
+      - name: Validate TMS production API boundary
         run: |
-          echo "saturnusgo.com" > out/CNAME
-          touch out/.nojekyll
+          boundary_dir=$(mktemp -d)
+          npx tsc \
+            app/src/core/tms/config/api-base.ts \
+            app/src/core/tms/config/api-base.test.ts \
+            --module commonjs \
+            --target es2021 \
+            --outDir "$boundary_dir" \
+            --esModuleInterop \
+            --skipLibCheck
+          node --test "$boundary_dir/api-base.test.js"
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
+      - name: Build static export
+        env:
+          BUILD_TARGET: export
+          NEXT_PUBLIC_TMS_API_BASE: https://tms-api.invalid/api/v1
+        run: |
+          set -euo pipefail
+          restore_api() {
+            if [ -d ../_app_api_for_export ]; then
+              mv ../_app_api_for_export app/api
+            fi
+          }
+          trap restore_api EXIT
+          if [ -d app/api ]; then
+            mv app/api ../_app_api_for_export
+          fi
+          npm run build
+          restore_api
+          trap - EXIT
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Verify canonical TMS artifact
+        run: |
+          test -f out/testcases/umbrella-home/work/index.html
+          if find out/testcases -type d | grep -Eq 'UmbrellaHome|/Work$'; then
+            echo 'Legacy mixed-case TMS route was emitted.' >&2
+            exit 1
+          fi
+          if rg -n 'http://localhost:4100|/testcases/UmbrellaHome/Work' out; then
+            echo 'Local API or legacy TMS route leaked into the export.' >&2
+            exit 1
+          fi
