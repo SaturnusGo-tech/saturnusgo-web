@@ -1,7 +1,12 @@
 import { Check, ChevronLeft, ChevronRight, FlaskConical, ListChecks, Play, RefreshCw, Search } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { Bootstrap, Project, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
+import {
+  resolvePendingOperation,
+  type PendingOperation,
+} from "../../../../../core/tms/idempotency/pending-operation";
 import { createRun } from "../../../application/runs/createRun";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -32,7 +37,8 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
   const [name, setName] = useState(`${project.name} ${presetCaseIds.length ? copy.integrationName : copy.smokeName} · ${copy.localBuild}`);
   const [build, setBuild] = useState("local-current");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<"start" | "create" | null>(null);
+  const [error, setError] = useState("");
+  const operation = useRef<PendingOperation | null>(null);
   const visibleCases = cases.filter((item) => `${item.key} ${item.folderPath} ${item.title} ${item.tags.join(" ")}`.toLowerCase().includes(query.toLowerCase()));
   const selectedCases = cases.filter((item) => caseIds.includes(item.id));
   const estimate = selectedCases.reduce((total, item) => total + (item.estimatedMinutes ?? 0), 0);
@@ -53,10 +59,23 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
     const environment = environments.find((item) => item.id === environmentId);
     if (!environment) return;
     setSubmitting(true);
-    setError(null);
-    const result = await createRun({ http, project, environment, suite, caseIds, name, type, build, offline });
+    setError("");
+    const signature = JSON.stringify({
+      projectId: project.id,
+      environmentId: environment.id,
+      suiteId: suite?.id ?? null,
+      caseIds: suite ? [] : caseIds,
+      name,
+      type,
+      build,
+    });
+    operation.current = resolvePendingOperation(operation.current, signature);
+    const result = await createRun({
+      http, project, environment, suite, caseIds, name, type, build, offline,
+      operationKey: operation.current.key,
+    });
     if (!result.ok) {
-      setError(result.reason);
+      setError(formatTmsMutationFailure(result.failure, copy.createError));
       setSubmitting(false);
       return;
     }
@@ -88,7 +107,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
             </div>
             <div className={styles.runReview}><div><strong>{copy.executionScope}</strong><span>{selectionLabel}{!suiteId && <> · {estimate || "—"} {copy.minuteShort} · {folderCount(new Set(selectedCases.map((item) => item.folderPath)).size)}</>}</span></div><div className={styles.runReviewCases}>{suiteId && selectedSuite ? <span><Check size={13} />{selectedSuite.key} · {selectedSuite.name}</span> : <>{selectedCases.slice(0, 6).map((item) => <span key={item.id}><Check size={13} />{item.key} · {item.title}</span>)}{selectedCases.length > 6 && <small>+ {copy.more} {caseCount(selectedCases.length - 6)}</small>}</>}</div></div>
             <div className={styles.snapshotNote}><RefreshCw size={18} /><span><strong>{copy.immutable}</strong><small>{copy.immutableHint}</small></span></div>
-            {error && <FormError message={error === "start" ? copy.draftError : copy.createError} />}
+            {error && <FormError message={error} />}
           </>}
         </div>}
       </div>

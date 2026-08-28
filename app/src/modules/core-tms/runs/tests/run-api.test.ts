@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
+import { createRunItemMutationQueue } from "../../state/run-actions/run-item-mutation-queue";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
 import { createRunLifecycleActions } from "../../state/run-lifecycle/run-lifecycle-actions";
 
@@ -88,4 +89,48 @@ test("attempt history preserves cursor pagination and loads immutable detail", a
   assert.equal(new URL(urls[0]!).searchParams.get("limit"), "25");
   assert.equal(page.items[0]?.attemptNo, 2);
   assert.equal(detail.stepResults.length, 0);
+});
+
+test("serializes rapid writes so each mutation receives the latest item ETag", async () => {
+  const queue = createRunItemMutationQueue<{ id: string; value: number }>();
+  queue.sync({ data: { id: "item-1", value: 0 }, etag: '"item-1:1"' });
+  const seenEtags: Array<string | null> = [];
+  let releaseFirst!: () => void;
+  const firstGate = new Promise<void>((resolve) => { releaseFirst = resolve; });
+
+  const first = queue.run("item-1", async (current) => {
+    seenEtags.push(current.etag);
+    await firstGate;
+    return { data: { id: "item-1", value: 1 }, etag: '"item-1:2"' };
+  });
+  const second = queue.run("item-1", async (current) => {
+    seenEtags.push(current.etag);
+    return { data: { id: "item-1", value: 2 }, etag: '"item-1:3"' };
+  });
+  queue.sync({ data: { id: "item-1", value: 0 }, etag: '"item-1:1"' });
+  releaseFirst();
+
+  const resources = await Promise.all([first, second]);
+  assert.deepEqual(seenEtags, ['"item-1:1"', '"item-1:2"']);
+  assert.equal(resources[1]?.data.value, 2);
+  assert.equal(resources[1]?.etag, '"item-1:3"');
+});
+
+test("continues queued work from a resource refreshed after a stale write", async () => {
+  const queue = createRunItemMutationQueue<{ id: string; value: number }>();
+  queue.sync({ data: { id: "item-1", value: 0 }, etag: '"item-1:1"' });
+  const stale = queue.run("item-1", async () => {
+    queue.replace({ data: { id: "item-1", value: 4 }, etag: '"item-1:5"' });
+    throw new Error("stale ETag");
+  });
+  const next = queue.run("item-1", async (current) => ({
+    data: { id: current.data.id, value: current.data.value + 1 },
+    etag: '"item-1:6"',
+  }));
+
+  await assert.rejects(stale, /stale ETag/);
+  assert.deepEqual(await next, {
+    data: { id: "item-1", value: 5 },
+    etag: '"item-1:6"',
+  });
 });

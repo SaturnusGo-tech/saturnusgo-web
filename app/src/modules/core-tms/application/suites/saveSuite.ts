@@ -17,6 +17,7 @@ export async function saveSuite(input: {
   caseIds: string[];
   tags: string[];
   offline: boolean;
+  operationKey: string;
 }): Promise<TmsResource<Suite>> {
   const shared = {
     name: input.name.trim(),
@@ -40,11 +41,12 @@ export async function saveSuite(input: {
     };
     return { data: suite, etag: null };
   }
-  const key = crypto.randomUUID();
   if (input.suite) {
     if (!input.suiteEtag) throw new Error("Suite ETag is required for update.");
-    return await updateSuite(input.http, input.suite.id, shared, input.suiteEtag, key);
+    return await updateSuite(
+      input.http, input.suite.id, shared, input.suiteEtag, input.operationKey,
+    );
   }
   const body = { projectId: input.projectId, ...shared } satisfies Api["SuiteCreateRequest"];
-  return await createSuite(input.http, body, key);
+  return await createSuite(input.http, body, input.operationKey);
 }

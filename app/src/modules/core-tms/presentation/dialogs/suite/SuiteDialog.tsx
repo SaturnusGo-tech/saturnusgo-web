@@ -1,7 +1,15 @@
 import { Plus, Save, Search } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { Suite, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import {
+  formatTmsMutationFailure,
+  toTmsMutationFailure,
+} from "../../../../../core/tms/errors/mutation-failure";
+import {
+  resolvePendingOperation,
+  type PendingOperation,
+} from "../../../../../core/tms/idempotency/pending-operation";
 import { saveSuite } from "../../../application/suites/saveSuite";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { matchesSuite } from "../../../helpers/suites/matchesSuite";
@@ -25,16 +33,29 @@ export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClo
   const [tags, setTags] = useState((suite?.filter.tags ?? ["smoke"]).join(", "));
   const [query, setQuery] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+  const operation = useRef<PendingOperation | null>(null);
   const visibleCases = activeCases.filter((item) => `${item.key} ${item.title} ${item.folderPath} ${item.tags.join(" ")}`.toLowerCase().includes(query.toLowerCase()));
   const effectiveIds = type === "dynamic" ? activeCases.filter((item) => tags.split(",").map((tagName) => tagName.trim()).filter(Boolean).every((tagName) => item.tags.includes(tagName))).map((item) => item.id) : caseIds;
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting || effectiveIds.length === 0) return;
     setSubmitting(true);
-    setError(false);
-    try { const saved = await saveSuite({ http, suite, suiteEtag, projectId, name, description, type, caseIds, tags: tags.split(",").map((item) => item.trim()).filter(Boolean), offline }); onSaved(saved.data, saved.etag); }
-    catch { setError(true); setSubmitting(false); }
+    setError("");
+    const normalizedTags = tags.split(",").map((item) => item.trim()).filter(Boolean);
+    const signature = JSON.stringify({
+      suiteId: suite?.id ?? null,
+      suiteEtag: suiteEtag ?? null,
+      projectId,
+      name: name.trim(),
+      description: description.trim(),
+      type,
+      caseIds: type === "static" ? Array.from(new Set(caseIds)) : [],
+      tags: type === "dynamic" ? Array.from(new Set(normalizedTags)) : [],
+    });
+    operation.current = resolvePendingOperation(operation.current, signature);
+    try { const saved = await saveSuite({ http, suite, suiteEtag, projectId, name, description, type, caseIds, tags: normalizedTags, offline, operationKey: operation.current.key }); onSaved(saved.data, saved.etag); }
+    catch (caught) { setError(formatTmsMutationFailure(toTmsMutationFailure(caught), copy.error)); setSubmitting(false); }
   }
   return <Modal title={suite ? copy.configureTitle : copy.createTitle} subtitle={copy.subtitle} onClose={onClose} wide>
     <form onSubmit={submit} className={styles.wizardForm}>
@@ -50,7 +71,7 @@ export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClo
         {visibleCases.map((item) => { const checked = effectiveIds.includes(item.id); return <label key={item.id} className={checked ? styles.casePickerSelected : ""}><input type="checkbox" checked={checked} disabled={type === "dynamic"} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} /><span><small>{item.key} · {item.folderPath}</small><strong>{item.title}</strong></span><em className={styles[`priority_${item.priority}`]}>{copy[item.priority]}</em></label>; })}
         {visibleCases.length === 0 && <div className={styles.miniEmpty}><Search size={19} /><span>{copy.noMatching}</span></div>}
       </div>
-      {error && <FormError message={copy.error} />}
+      {error && <FormError message={error} />}
       </div>
       <div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button><button className={styles.primaryButton} disabled={submitting || !name.trim() || effectiveIds.length === 0}><Save size={16} /> {submitting ? copy.saving : suite ? copy.save : copy.create}</button></div>
     </form>

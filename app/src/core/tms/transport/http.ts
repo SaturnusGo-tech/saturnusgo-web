@@ -1,4 +1,8 @@
 import { resolveTmsApiBase } from "../config/api-base";
+import type { components } from "../generated/tms-api";
+
+type ApiError = components["schemas"]["Error"];
+export type TmsApiErrorCode = ApiError["code"] | "HTTP_ERROR";
 
 export type MutationMethod = "POST" | "PATCH" | "DELETE";
 export type TmsAccessTokenProvider = (signal?: AbortSignal) => Promise<string>;
@@ -38,10 +42,43 @@ export class TmsApiError extends Error {
     message: string,
     readonly status: number,
     readonly requestId: string | null,
+    readonly code: TmsApiErrorCode = "HTTP_ERROR",
   ) {
     super(message);
     this.name = "TmsApiError";
   }
+}
+
+function boundedString(value: unknown, maximum: number): string | null {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized.length > 0 && normalized.length <= maximum ? normalized : null;
+}
+
+async function responseError(response: Response): Promise<TmsApiError> {
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+  const envelope = typeof body === "object" && body !== null
+    ? (body as { error?: unknown }).error
+    : null;
+  const error = typeof envelope === "object" && envelope !== null
+    ? envelope as Partial<ApiError>
+    : null;
+  const message = boundedString(error?.message, 1000) ?? `TMS API returned ${response.status}`;
+  const requestId = boundedString(error?.requestId, 128)
+    ?? boundedString(response.headers.get("x-request-id"), 128);
+  const code = boundedString(error?.code, 128) as ApiError["code"] | null;
+  return new TmsApiError(message, response.status, requestId, code ?? "HTTP_ERROR");
+}
+
+function concurrencyEtag(response: Response): string | null {
+  const value = response.headers.get("etag");
+  if (!value || value.length > 512) return null;
+  return value.startsWith('W/"') && value.endsWith('"') ? value.slice(2) : value;
 }
 
 async function bearer(provider: TmsAccessTokenProvider, signal?: AbortSignal): Promise<string> {
@@ -52,7 +89,9 @@ async function bearer(provider: TmsAccessTokenProvider, signal?: AbortSignal): P
   } catch (error) {
     signal?.throwIfAborted();
     if (error instanceof DOMException && error.name === "AbortError") throw error;
-    throw new TmsApiError("TMS authentication is required.", 401, null);
+    throw new TmsApiError(
+      "TMS authentication is required.", 401, null, "AUTHENTICATION_REQUIRED",
+    );
   }
 }
 
@@ -83,11 +122,7 @@ export function createTmsHttpClient(
       redirect: "error",
     });
     if (!response.ok) {
-      throw new TmsApiError(
-        `TMS API returned ${response.status}`,
-        response.status,
-        response.headers.get("x-request-id"),
-      );
+      throw await responseError(response);
     }
     return response;
   }
@@ -99,7 +134,7 @@ export function createTmsHttpClient(
     async getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>> {
       const response = await request(path, { method: "GET" }, signal);
       const body = await payload<{ data: T }>(response);
-      return { data: body.data, etag: response.headers.get("etag") };
+      return { data: body.data, etag: concurrencyEtag(response) };
     },
     async mutate<T>(
       path: string,
@@ -137,7 +172,7 @@ export function createTmsHttpClient(
         body: body === undefined ? undefined : JSON.stringify(body),
       }, options.signal);
       const envelope = await payload<{ data: T }>(response);
-      return { data: envelope?.data, etag: response.headers.get("etag") };
+      return { data: envelope?.data, etag: concurrencyEtag(response) };
     },
   });
 }

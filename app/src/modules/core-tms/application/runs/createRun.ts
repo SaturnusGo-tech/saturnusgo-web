@@ -4,12 +4,16 @@ import type {
   SuiteSummary,
   TestRunSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
+import {
+  toTmsMutationFailure,
+  type TmsMutationFailure,
+} from "../../../../core/tms/errors/mutation-failure";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createRun as createRunResource, getRun } from "../../runs/data/run-api";
 
 type Result =
   | { ok: true; run: TestRunSummary }
-  | { ok: false; reason: "create" };
+  | { ok: false; reason: "create"; failure: TmsMutationFailure };
 
 export async function createRun(input: {
   http: TmsHttpClient;
@@ -21,8 +25,15 @@ export async function createRun(input: {
   type: TestRunSummary["type"];
   build: string;
   offline: boolean;
+  operationKey: string;
 }): Promise<Result> {
-  if (input.offline) return { ok: false, reason: "create" };
+  if (input.offline) {
+    return {
+      ok: false,
+      reason: "create",
+      failure: { message: null, code: null, requestId: null },
+    };
+  }
   try {
     const scope = input.suite
       ? { suiteId: input.suite.id }
@@ -37,9 +48,9 @@ export async function createRun(input: {
       configuration: {},
       startImmediately: true,
       ...scope,
-    }, crypto.randomUUID());
+    }, input.operationKey);
     return { ok: true, run: (await getRun(input.http, created.data.id)).data };
-  } catch {
-    return { ok: false, reason: "create" };
+  } catch (error) {
+    return { ok: false, reason: "create", failure: toTmsMutationFailure(error) };
   }
 }

@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0012.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0013.
          */
         get: operations["getHealth"];
         put?: never;

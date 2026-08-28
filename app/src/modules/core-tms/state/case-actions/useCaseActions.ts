@@ -1,5 +1,14 @@
+import { useRef } from "react";
 import type { FormEvent } from "react";
 import type { TestCase, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
+import {
+  formatTmsMutationFailure,
+  toTmsMutationFailure,
+} from "../../../../core/tms/errors/mutation-failure";
+import {
+  resolvePendingOperation,
+  type PendingOperation,
+} from "../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
 import { uploadEvidence } from "../../application/evidence/uploadEvidence";
@@ -25,6 +34,7 @@ export function useCaseActions(
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
+  const caseOperation = useRef<PendingOperation | null>(null);
 
   function commit(testCase: TestCase, etag: string | null, append = false) {
     const summary = summaryOf(testCase);
@@ -41,6 +51,7 @@ export function useCaseActions(
   }
 
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
+    caseOperation.current = null;
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);
@@ -49,6 +60,7 @@ export function useCaseActions(
 
   function openEditCase() {
     if (!derived.selectedRevision) return;
+    caseOperation.current = null;
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
     state.setEditing(true);
@@ -75,7 +87,13 @@ export function useCaseActions(
         commit(testCase, null, !previous);
         caseCommitted = true;
       } else {
-        const key = crypto.randomUUID();
+        const signature = JSON.stringify({
+          caseId: state.editing ? derived.selectedCase?.id ?? null : null,
+          etag: state.editing ? state.selectedCaseEtag : null,
+          input,
+        });
+        caseOperation.current = resolvePendingOperation(caseOperation.current, signature);
+        const key = caseOperation.current.key;
         const result = state.editing && derived.selectedCase
           ? state.selectedCaseEtag
             ? await reviseTestCase(http, derived.selectedCase.id, input, state.selectedCaseEtag, key)
@@ -101,15 +119,21 @@ export function useCaseActions(
           commit(refreshed.data, refreshed.etag);
         }
       }
-    } catch {
+    } catch (caught) {
       if (caseCommitted) {
         state.setDialog(null);
-        notify(t("runs.evidenceUploadError"));
+        notify(formatTmsMutationFailure(
+          toTmsMutationFailure(caught), t("runs.evidenceUploadError"),
+        ));
         return;
       }
-      notify(state.editing ? t("actions.caseRevisionSaveError") : t("actions.caseCreateError"));
+      const fallback = state.editing
+        ? t("actions.caseRevisionSaveError")
+        : t("actions.caseCreateError");
+      notify(formatTmsMutationFailure(toTmsMutationFailure(caught), fallback));
       return;
     }
+    caseOperation.current = null;
     state.setDialog(null);
     notify(state.editing ? t("actions.caseRevisionSaved") : t("actions.caseCreated"));
   }

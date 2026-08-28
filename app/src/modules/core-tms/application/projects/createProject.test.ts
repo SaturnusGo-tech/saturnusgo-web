@@ -30,7 +30,15 @@ test("default-environment failure never performs an unsafe project rollback", as
     locale: "en", operationKey: "workspace-project-operation",
   });
 
-  assert.deepEqual(result, { ok: false, reason: "environment" });
+  assert.deepEqual(result, {
+    ok: false,
+    reason: "environment",
+    failure: {
+      message: "Environment exists",
+      code: "CONFLICT",
+      requestId: "request-1",
+    },
+  });
   assert.equal(calls.length, 2);
   assert.equal(calls.some(({ init }) => init.method === "DELETE"), false);
   assert.equal(new Headers(calls[0].init.headers).get("idempotency-key"), "workspace-project-operation:project");

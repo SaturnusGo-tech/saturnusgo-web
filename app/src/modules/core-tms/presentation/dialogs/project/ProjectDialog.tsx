@@ -1,7 +1,15 @@
 import { FolderKanban, Plus } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { Environment, Project } from "../../../../../core/tms/contracts/legacy-contract";
+import {
+  formatTmsMutationFailure,
+  toTmsMutationFailure,
+} from "../../../../../core/tms/errors/mutation-failure";
+import {
+  resolvePendingOperation,
+  type PendingOperation,
+} from "../../../../../core/tms/idempotency/pending-operation";
 import { createProject, updateProject } from "../../../application/projects/createProject";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -20,8 +28,8 @@ export function ProjectDialog({ workspaceId, project, projectEtag, offline, onCl
   const [environmentName, setEnvironmentName] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<"project" | "environment" | null>(null);
-  const [operationKey] = useState(() => crypto.randomUUID());
+  const [error, setError] = useState("");
+  const operation = useRef<PendingOperation | null>(null);
   function updateName(next: string) {
     setName(next);
     if (!key || key === name.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase()) setKey(next.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase());
@@ -30,20 +38,33 @@ export function ProjectDialog({ workspaceId, project, projectEtag, offline, onCl
     event.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setError(null);
+    setError("");
+    const signature = JSON.stringify({
+      projectId: project?.id ?? null,
+      projectEtag: projectEtag ?? null,
+      workspaceId,
+      name: name.trim(),
+      key: key.trim(),
+      description: description.trim(),
+      environmentName: environmentName.trim(),
+      baseUrl: baseUrl.trim(),
+    });
+    operation.current = resolvePendingOperation(operation.current, signature);
+    const operationKey = operation.current.key;
     if (project) {
       try {
         const result = await updateProject({ http, project, etag: projectEtag ?? null, name, key, description, offline, operationKey });
         onUpdated(result.data, result.etag);
-      } catch {
-        setError("project");
+      } catch (caught) {
+        setError(formatTmsMutationFailure(toTmsMutationFailure(caught), copy.projectError));
         setSubmitting(false);
       }
       return;
     }
     const result = await createProject({ http, workspaceId, name, key, description, environmentName, baseUrl, offline, locale, operationKey });
     if (!result.ok) {
-      setError(result.reason);
+      const fallback = result.reason === "project" ? copy.projectError : copy.environmentError;
+      setError(formatTmsMutationFailure(result.failure, fallback));
       setSubmitting(false);
       return;
     }
@@ -59,7 +80,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, offline, onCl
         {!project && <Field label={copy.baseUrl} wide><input required type="url" value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></Field>}
       </div>
       {!project && <div className={styles.snapshotNote}><FolderKanban size={18} /><span><strong>{copy.ready}</strong><small>{copy.readyHint}</small></span></div>}
-      {error && <FormError message={error === "project" ? copy.projectError : copy.environmentError} />}
+      {error && <FormError message={error} />}
       <div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button><button className={styles.primaryButton} disabled={submitting || !name.trim() || key.trim().length < 2}><Plus size={16} /> {submitting ? copy.creating : project ? copy.save : copy.create}</button></div>
     </form>
   </Modal>;

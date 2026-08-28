@@ -3,6 +3,10 @@ import type {
   Project,
 } from "../../../../core/tms/contracts/legacy-contract";
 import type { components } from "../../../../core/tms/generated/tms-api";
+import {
+  toTmsMutationFailure,
+  type TmsMutationFailure,
+} from "../../../../core/tms/errors/mutation-failure";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createEnvironmentResource } from "../../environments/data/environment-api";
 import { createUid } from "../../helpers/id/createUid";
@@ -11,7 +15,11 @@ import { createProjectResource, updateProjectResource } from "../../projects/dat
 
 type Result =
   | { ok: true; project: Project; environment: Environment }
-  | { ok: false; reason: "project" | "environment" };
+  | {
+    ok: false;
+    reason: "project" | "environment";
+    failure: TmsMutationFailure;
+  };
 
 export async function createProject(input: {
   http: TmsHttpClient;
@@ -65,8 +73,8 @@ export async function createProject(input: {
       projectPayload,
       `${input.operationKey}:project`,
     )).data;
-  } catch {
-    return { ok: false, reason: "project" };
+  } catch (error) {
+    return { ok: false, reason: "project", failure: toTmsMutationFailure(error) };
   }
   const environmentPayload = {
     projectId: project.id,
@@ -86,8 +94,8 @@ export async function createProject(input: {
       environmentPayload,
       `${input.operationKey}:environment`,
     )).data;
-  } catch {
-    return { ok: false, reason: "environment" };
+  } catch (error) {
+    return { ok: false, reason: "environment", failure: toTmsMutationFailure(error) };
   }
   return { ok: true, project, environment };
 }
