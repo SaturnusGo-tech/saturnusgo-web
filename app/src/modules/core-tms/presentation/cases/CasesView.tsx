@@ -1,34 +1,34 @@
 import { Archive, ChevronDown, ChevronRight, Copy, ExternalLink, FilePlus2, Filter, Folder, FolderKanban, FolderPlus, ListChecks, MoreHorizontal, Paperclip, Play, Plus, RotateCcw, Save, Search, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Activity, TestCase, TestCaseRevision, TestRun } from "../../../../core/tms/contracts/legacy-contract";
-import { executableSteps, latestRevision } from "../../helpers/cases/caseRevision";
+import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
+import { executableSteps } from "../../helpers/cases/caseRevision";
 import { activityLabel } from "../../localization/activity/label";
 import { formatCount } from "../../localization/format/count";
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters } from "../../state/types/workspace";
-import { statusIcon } from "../status/executionStatus";
+import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { EmptyState } from "../common/empty/EmptyState";
 import styles from "../../tms.module.css";
 type CasesViewProps = {
   query: string;
   onQuery: (value: string) => void;
-  groups: Array<[string, TestCase[]]>;
+  groups: Array<[string, TestCaseSummary[]]>;
   collapsed: string[];
   onToggleFolder: (folder: string) => void;
   selectedFolder: string;
   onSelectFolder: (folder: string) => void;
   selectedCaseId: string;
   onSelectCase: (id: string) => void;
-  testCase?: TestCase;
+  testCase?: TestCaseSummary;
   revision: TestCaseRevision | null;
+  linkIds: string[];
   onNew: (folderPath?: string) => void;
   onEdit: () => void;
   onClone: () => void;
   onArchive: () => void;
   onRunCase: () => void;
   activity: Activity[];
-  runs: TestRun[];
   filters: CaseFilters;
   onFilters: (filters: CaseFilters) => void;
   onNewFolder: () => void;
@@ -39,7 +39,7 @@ type CasesViewProps = {
 
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
-  const { query, onQuery, groups, collapsed, onToggleFolder, selectedFolder, onSelectFolder, selectedCaseId, onSelectCase, testCase, revision, onNew, onEdit, onClone, onArchive, onRunCase, activity, runs, filters, onFilters, onNewFolder, onNewProject, onCollapseAll, onExpandAll } = props;
+  const { query, onQuery, groups, collapsed, onToggleFolder, selectedFolder, onSelectFolder, selectedCaseId, onSelectCase, testCase, revision, linkIds, onNew, onEdit, onClone, onArchive, onRunCase, activity, filters, onFilters, onNewFolder, onNewProject, onCollapseAll, onExpandAll } = props;
   const [filterOpen, setFilterOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [contextTab, setContextTab] = useState<"activity" | "runs" | "files">("runs");
@@ -50,7 +50,6 @@ export function CasesView(props: CasesViewProps) {
     window.addEventListener("keydown", closeMenus);
     return () => window.removeEventListener("keydown", closeMenus);
   }, []);
-  const caseRuns = testCase ? runs.filter((run) => run.items.some((item) => item.caseId === testCase.id)) : [];
   const displayedSteps = revision ? executableSteps(revision, locale) : [];
   const activeFilterCount = Number(filters.priority !== "all") + Number(filters.lifecycle !== "all") + Number(Boolean(filters.tag.trim())) + Number(filters.includeArchived);
   return (
@@ -65,7 +64,7 @@ export function CasesView(props: CasesViewProps) {
           {filterOpen && <div className={styles.toolbarPopover} data-testid="case-filters">
             <div className={styles.popoverHeader}><strong>{t("cases.filterAria")}</strong><button className={styles.textButton} onClick={() => onFilters({ priority: "all", lifecycle: "all", tag: "", includeArchived: false })}>{t("cases.resetFilters")}</button></div>
             <label><span>{t("cases.priority")}</span><select value={filters.priority} onChange={(event) => onFilters({ ...filters, priority: event.target.value as CaseFilters["priority"] })}><option value="all">{t("cases.allPriorities")}</option><option value="critical">{t("priority.critical")}</option><option value="high">{t("priority.high")}</option><option value="medium">{t("priority.medium")}</option><option value="low">{t("priority.low")}</option></select></label>
-            <label><span>{t("cases.lifecycle")}</span><select value={filters.lifecycle} onChange={(event) => onFilters({ ...filters, lifecycle: event.target.value as CaseFilters["lifecycle"] })}><option value="all">{t("cases.allStates")}</option><option value="draft">{t("status.draft")}</option><option value="ready">{t("status.ready")}</option><option value="deprecated">{t("status.deprecated")}</option><option value="archived">{t("status.archived")}</option></select></label>
+            <label><span>{t("cases.lifecycle")}</span><select value={filters.lifecycle} onChange={(event) => onFilters({ ...filters, lifecycle: event.target.value as CaseFilters["lifecycle"] })}><option value="all">{t("cases.allStates")}</option><option value="draft">{t("status.draft")}</option><option value="ready">{t("status.ready")}</option><option value="deprecated">{t("status.deprecated")}</option></select></label>
             <label><span>{t("cases.tagContains")}</span><input value={filters.tag} onChange={(event) => onFilters({ ...filters, tag: event.target.value })} placeholder="smoke" /></label>
             <label className={styles.checkboxLine}><input type="checkbox" checked={filters.includeArchived} onChange={(event) => onFilters({ ...filters, includeArchived: event.target.checked })} /><span>{t("cases.includeArchived")}</span></label>
           </div>}
@@ -87,10 +86,9 @@ export function CasesView(props: CasesViewProps) {
               <button className={styles.folderAdd} onClick={() => onNew(folderName)} title={t("cases.createInFolder", { folder: folderName })}><Plus size={14} /></button>
             </div>
             {!collapsed.includes(folderName) && cases.map((item) => {
-              const value = latestRevision(item);
               return <button key={item.id} className={`${styles.caseRow} ${selectedCaseId === item.id ? styles.caseRowActive : ""}`} onClick={() => onSelectCase(item.id)}>
-                <span className={`${styles.lifecycleDot} ${item.archivedAt ? styles.dotArchived : styles[`dot_${value.lifecycle}`]}`} />
-                <span><small>{item.key}</small><strong>{value.title}</strong></span>
+                <span className={`${styles.lifecycleDot} ${item.archivedAt ? styles.dotArchived : styles[`dot_${item.lifecycle}`]}`} />
+                <span><small>{item.key}</small><strong>{item.title}</strong></span>
                 {item.archivedAt && <Archive size={13} />}
               </button>;
             })}
@@ -118,7 +116,7 @@ export function CasesView(props: CasesViewProps) {
             <div className={styles.tagRow}>{revision.tags.map((tagName) => <span key={tagName}><Tag size={12} />{tagName}</span>)}<span className={styles[`priority_${revision.priority}`]}>{localizedLabel(locale, revision.priority)}</span><span>{localizedLabel(locale, revision.lifecycle)}</span></div>
             <p className={styles.description}>{revision.description || t("cases.noDescription")}</p>
             <div className={styles.metaGrid}>
-              <div><span>{t("common.owner")}</span><strong>{revision.owner}</strong></div><div><span>{t("cases.component")}</span><strong>{revision.component}</strong></div>
+              <div><span>{t("common.owner")}</span><strong>{revision.ownerIdentityId ?? t("common.unassigned")}</strong></div><div><span>{t("cases.component")}</span><strong>{revision.component}</strong></div>
               <div><span>{t("cases.estimate")}</span><strong>{revision.estimatedMinutes ?? "—"} {locale === "ru" ? "мин" : "min"}</strong></div><div><span>{t("cases.type")}</span><strong>{localizedLabel(locale, revision.type)}</strong></div>
             </div>
             <section className={styles.contentSection}><h2>{t("cases.preconditions")}</h2><p>{revision.preconditions || t("cases.noPreconditions")}</p></section>
@@ -130,7 +128,7 @@ export function CasesView(props: CasesViewProps) {
                 {displayedSteps.map((step) => <div className={styles.stepRow} key={step.id}><b>{step.order}</b><p>{step.action}</p><p>{step.expectedResult}</p></div>)}
               </div>
             </section>
-            {(revision.attachmentIds.length > 0 || revision.linkIds.length > 0) && <section className={styles.contentSection}><h2>{t("cases.evidenceLinks")}</h2><div className={styles.attachmentGrid}>{revision.attachmentIds.map((name) => <span key={name}><Paperclip size={14} />{name}</span>)}{revision.linkIds.map((link) => <a key={link} href={link} target="_blank" rel="noreferrer"><ExternalLink size={14} />{link}</a>)}</div></section>}
+            {(revision.attachmentIds.length > 0 || linkIds.length > 0) && <section className={styles.contentSection}><h2>{t("cases.evidenceLinks")}</h2><div className={styles.attachmentGrid}>{revision.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}{linkIds.map((id) => <span key={id}><ExternalLink size={14} />{id}</span>)}</div></section>}
           </div>
         </>}
       </section>
@@ -138,13 +136,9 @@ export function CasesView(props: CasesViewProps) {
       <aside className={`${styles.pane} ${styles.contextPane}`}>
         <div className={styles.contextTabs}><button className={contextTab === "activity" ? styles.contextTabSelected : ""} onClick={() => setContextTab("activity")}>{t("cases.activity")}</button><button className={contextTab === "runs" ? styles.contextTabSelected : ""} onClick={() => setContextTab("runs")}>{t("cases.runs")}</button><button className={contextTab === "files" ? styles.contextTabSelected : ""} onClick={() => setContextTab("files")}>{t("cases.files")}</button></div>
         <div className={styles.contextBody}>
-          {contextTab === "runs" && <><h3>{t("cases.latestRuns")}</h3>
-          {caseRuns.length === 0 ? <div className={styles.miniEmpty}><Play size={20} /><span>{t("cases.notExecuted")}</span></div> : caseRuns.slice(0, 6).map((run) => {
-            const item = run.items.find((entry) => entry.caseId === testCase?.id);
-            return <div className={styles.contextRecord} key={run.id}><span className={`${styles.statusIcon} ${styles[`status_${item?.status ?? "not_run"}`]}`}>{statusIcon[item?.status ?? "not_run"]}</span><div><strong>{run.name}</strong><small>{localizedLabel(locale, item?.status ?? "not_run")} · {run.environment.name}</small></div></div>;
-          })}</>}
+          {contextTab === "runs" && <><h3>{t("cases.latestRuns")}</h3><div className={styles.miniEmpty}><Play size={20} /><span>{t("cases.notExecuted")}</span></div></>}
           {contextTab === "activity" && <><h3>{t("cases.revisionHistory")}</h3>{activity.slice(0, 7).map((entry) => <div className={styles.activityLine} key={entry.id}><span>{entry.actor.slice(0, 1).toUpperCase()}</span><div><strong>{activityLabel(locale, entry.action)}</strong><small>{new Date(entry.createdAt).toLocaleDateString(languageTag)}</small></div></div>)}</>}
-          {contextTab === "files" && <><h3>{t("cases.evidenceAndLinks")}</h3>{!revision || (revision.attachmentIds.length === 0 && revision.linkIds.length === 0) ? <div className={styles.miniEmpty}><Paperclip size={20} /><span>{t("cases.noFiles")}</span></div> : <div className={styles.contextFiles}>{revision.attachmentIds.map((name) => <span key={name}><Paperclip size={14} />{name}</span>)}{revision.linkIds.map((link) => <a key={link} href={link} target="_blank" rel="noreferrer"><ExternalLink size={14} />{link}</a>)}</div>}</>}
+          {contextTab === "files" && <><h3>{t("cases.evidenceAndLinks")}</h3>{!revision || (revision.attachmentIds.length === 0 && linkIds.length === 0) ? <div className={styles.miniEmpty}><Paperclip size={20} /><span>{t("cases.noFiles")}</span></div> : <div className={styles.contextFiles}>{revision.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}{linkIds.map((id) => <span key={id}><ExternalLink size={14} />{id}</span>)}</div>}</>}
         </div>
       </aside>
     </div>

@@ -57,6 +57,9 @@ jobs:
       - name: Test TMS Auth0 boundary
         run: npm run test:tms-auth
 
+      - name: Test TMS contract adapters
+        run: npm run test:tms-adapters
+
       - name: Build static export
         env:
           BUILD_TARGET: export
@@ -86,7 +89,7 @@ jobs:
             echo 'Legacy mixed-case TMS route was emitted.' >&2
             exit 1
           fi
-          if rg -n 'http://localhost:4100|/testcases/UmbrellaHome/Work' out; then
+          if rg -n 'http://(?:localhost|127\.0\.0\.1)|/testcases/UmbrellaHome/Work' out; then
             echo 'Local API or legacy TMS route leaked into the export.' >&2
             exit 1
           fi

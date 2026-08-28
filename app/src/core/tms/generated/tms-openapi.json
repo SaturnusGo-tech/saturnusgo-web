@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.1",
+    "version": "1.0.0-checkpoint.4",
     "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -28,6 +28,8 @@
     { "name": "Results" },
     { "name": "Defects" },
     { "name": "Attachments" },
+    { "name": "External links" },
+    { "name": "Dashboards" },
     { "name": "Activity" }
   ],
   "paths": {
@@ -40,6 +42,28 @@
         "security": [],
         "responses": {
           "200": { "$ref": "#/components/responses/HealthResponse" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/bootstrap": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Workspaces"],
+        "summary": "Discover and read a bounded workspace shell",
+        "description": "Selects the only active workspace membership when workspaceId is omitted. Principals with zero or multiple active memberships must provide workspaceId. This never returns unbounded case, suite, run, defect, dashboard, attachment, or activity collections; clients hydrate them through paginated endpoints.",
+        "operationId": "getWorkspaceBootstrap",
+        "parameters": [
+          { "name": "workspaceId", "in": "query", "required": false, "schema": { "$ref": "#/components/schemas/Identifier" } },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "name": "recentLimit", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 20, "default": 20 } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/WorkspaceBootstrapResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
@@ -132,6 +156,7 @@
       "patch": {
         "tags": ["Projects"],
         "summary": "Update a project",
+        "description": "Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH.",
         "operationId": "updateProject",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -157,6 +182,33 @@
         "summary": "Archive a project",
         "description": "Archives the project; it never hard-deletes project history.",
         "operationId": "archiveProject",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ProjectResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/projects/{projectId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/ProjectIdPath" }
+      ],
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Restore an archived project",
+        "operationId": "restoreProject",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
         "parameters": [
@@ -233,6 +285,7 @@
       "patch": {
         "tags": ["Environments"],
         "summary": "Update an environment",
+        "description": "Updates mutable fields on an active environment. Archive and restore are explicit lifecycle operations; archived environments reject PATCH.",
         "operationId": "updateEnvironment",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -275,6 +328,33 @@
         }
       }
     },
+    "/environments/{environmentId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/EnvironmentIdPath" }
+      ],
+      "post": {
+        "tags": ["Environments"],
+        "summary": "Restore an archived environment",
+        "operationId": "restoreEnvironment",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/EnvironmentResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/test-cases": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -287,12 +367,6 @@
           { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
           { "$ref": "#/components/parameters/Cursor" },
           { "$ref": "#/components/parameters/Limit" },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": { "$ref": "#/components/schemas/AttachmentUploadStatus" }
-          },
           {
             "name": "includeArchived",
             "in": "query",
@@ -321,7 +395,7 @@
             "name": "tag",
             "in": "query",
             "required": false,
-            "schema": { "type": "array", "items": { "type": "string", "maxLength": 80 }, "maxItems": 20 },
+            "schema": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" }, "maxItems": 20, "uniqueItems": true },
             "style": "form",
             "explode": true
           }
@@ -553,7 +627,7 @@
       "get": {
         "tags": ["Suites"],
         "summary": "Get a suite definition",
-        "description": "Dynamic suites are resolved at run creation. resolvedCaseCount is informational; the run stores the exact revision snapshots selected at that time.",
+        "description": "resolvedCaseCount previews the currently resolvable, non-archived cases. For a static suite it can be lower than caseCount after a member is archived. Immutable suite resolutions snapshot current revision numbers; a future run references a resolutionId.",
         "operationId": "getSuite",
         "responses": {
           "200": { "$ref": "#/components/responses/SuiteResponse" },
@@ -608,6 +682,33 @@
         }
       }
     },
+    "/suites/{suiteId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/SuiteIdPath" }
+      ],
+      "post": {
+        "tags": ["Suites"],
+        "summary": "Restore an archived suite",
+        "operationId": "restoreSuite",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SuiteResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/runs": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -643,7 +744,7 @@
       "post": {
         "tags": ["Runs"],
         "summary": "Create a run with immutable case and environment snapshots",
-        "description": "caseIds, when non-empty, are the exact deduplicated scope and suiteId remains provenance. Otherwise suiteId is resolved once. Archived or cross-project cases are rejected.",
+        "description": "Exactly one of suiteId or caseIds selects the scope. A suite is resolved once into an immutable resolution; explicit caseIds store no suite provenance. Archived, stale, or cross-project resources are rejected.",
         "operationId": "createRun",
         "x-tms-idempotency": "required",
         "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
@@ -770,6 +871,7 @@
           { "$ref": "#/components/parameters/IdempotencyKey" },
           { "$ref": "#/components/parameters/IfMatch" }
         ],
+        "requestBody": { "$ref": "#/components/requestBodies/RunAbort" },
         "responses": {
           "200": { "$ref": "#/components/responses/RunResponse" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -911,6 +1013,26 @@
         "responses": {
           "200": { "$ref": "#/components/responses/RunAttemptListResponse" },
           "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}/attempts/{attemptNo}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" },
+        { "$ref": "#/components/parameters/AttemptNoPath" }
+      ],
+      "get": {
+        "tags": ["Results"],
+        "summary": "Get one preserved attempt with bounded step results",
+        "operationId": "getRunItemAttempt",
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunAttemptResponse" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "404": { "$ref": "#/components/responses/NotFound" },
@@ -1065,6 +1187,139 @@
         }
       }
     },
+    "/links": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["External links"],
+        "summary": "List bounded external-link metadata",
+        "description": "Returns active links by default. Owner filters are exact and tenant-scoped; quarantined legacy links are audit provenance and are never exposed as active resources.",
+        "operationId": "listExternalLinks",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/ExternalLinkStatusQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "ownerKind",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/ExternalLinkOwnerKind" }
+          },
+          {
+            "name": "ownerId",
+            "in": "query",
+            "required": false,
+            "description": "Required together with ownerKind; interpreted as caseId, runId, or defectId.",
+            "schema": { "$ref": "#/components/schemas/Identifier" }
+          },
+          {
+            "name": "runItemId",
+            "in": "query",
+            "required": false,
+            "description": "Optional only when ownerKind is run.",
+            "schema": { "$ref": "#/components/schemas/Identifier" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ExternalLinkListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["External links"],
+        "summary": "Create a scoped external link",
+        "operationId": "createExternalLink",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/ExternalLinkCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ExternalLinkResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/links/{linkId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/ExternalLinkIdPath" }
+      ],
+      "get": {
+        "tags": ["External links"],
+        "summary": "Get scoped external-link metadata",
+        "operationId": "getExternalLink",
+        "responses": {
+          "200": { "$ref": "#/components/responses/ExternalLinkResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/links/{linkId}/archive": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/ExternalLinkIdPath" }
+      ],
+      "post": {
+        "tags": ["External links"],
+        "summary": "Archive an external link without deleting history",
+        "operationId": "archiveExternalLink",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ExternalLinkResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/links/{linkId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/ExternalLinkIdPath" }
+      ],
+      "post": {
+        "tags": ["External links"],
+        "summary": "Restore an archived external link",
+        "operationId": "restoreExternalLink",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ExternalLinkResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/attachments": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -1129,7 +1384,7 @@
       "post": {
         "tags": ["Attachments"],
         "summary": "Finalize and verify an uploaded object",
-        "description": "Before the persisted upload deadline, HEAD-verifies the private object, byte size, storage ETag, media policy, and SHA-256. A pending attachment transitions exactly once to ready, failed, or quarantined; completed results replay for the same principal, key, and canonical request without repeating storage inspection. Client claims are never trusted without storage verification.",
+        "description": "Before the persisted upload deadline, HEAD-verifies the private object, byte size, exact declared Content-Type, storage ETag, and SHA-256, then conditionally reads at most the first 65536 bytes to validate the active content-signature/text profile. A media mismatch is quarantined with ATTACHMENT_MEDIA_MISMATCH; incomplete provider evidence never becomes ready. Completed results replay for the same principal, key, and canonical request without repeating storage inspection.",
         "operationId": "finalizeAttachmentUpload",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -1168,6 +1423,28 @@
           "404": { "$ref": "#/components/responses/NotFound" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
+      },
+      "delete": {
+        "tags": ["Attachments"],
+        "summary": "Request deletion of a private attachment",
+        "description": "Moves ready, failed, or quarantined evidence to deleting. A bounded cleanup worker removes the exact private R2 object and retains a deleted metadata tombstone for audit history.",
+        "operationId": "deleteAttachment",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AttachmentResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
       }
     },
     "/attachments/{attachmentId}/access": {
@@ -1189,6 +1466,143 @@
           "403": { "$ref": "#/components/responses/Forbidden" },
           "404": { "$ref": "#/components/responses/NotFound" },
           "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboards": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Dashboards"],
+        "summary": "List bounded dashboard summaries newest first",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project. Widget definitions are hydrated only through the singleton resource.",
+        "operationId": "listDashboards",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/EntityStatusQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Dashboards"],
+        "summary": "Create a bounded dashboard",
+        "operationId": "createDashboard",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/DashboardCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/DashboardResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboards/{dashboardId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DashboardIdPath" }
+      ],
+      "get": {
+        "tags": ["Dashboards"],
+        "summary": "Get one dashboard with at most 100 widgets",
+        "operationId": "getDashboard",
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Dashboards"],
+        "summary": "Replace mutable dashboard fields or its bounded widget layout",
+        "description": "Archived dashboards reject PATCH. Widget replacement is transactional with the dashboard version and never returns an unbounded collection.",
+        "operationId": "updateDashboard",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/DashboardPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboards/{dashboardId}/archive": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DashboardIdPath" }
+      ],
+      "post": {
+        "tags": ["Dashboards"],
+        "summary": "Archive a dashboard without deleting history",
+        "operationId": "archiveDashboard",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboards/{dashboardId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DashboardIdPath" }
+      ],
+      "post": {
+        "tags": ["Dashboards"],
+        "summary": "Restore an archived dashboard as non-default",
+        "operationId": "restoreDashboard",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
@@ -1341,6 +1755,12 @@
         "required": true,
         "schema": { "$ref": "#/components/schemas/Identifier" }
       },
+      "AttemptNoPath": {
+        "name": "attemptNo",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer", "minimum": 1 }
+      },
       "StepIdPath": {
         "name": "stepId",
         "in": "path",
@@ -1361,6 +1781,24 @@
       },
       "AttachmentIdPath": {
         "name": "attachmentId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "ExternalLinkIdPath": {
+        "name": "linkId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "ExternalLinkStatusQuery": {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "schema": { "$ref": "#/components/schemas/ExternalLinkStatus", "default": "active" }
+      },
+      "DashboardIdPath": {
+        "name": "dashboardId",
         "in": "path",
         "required": true,
         "schema": { "$ref": "#/components/schemas/Identifier" }
@@ -1449,6 +1887,10 @@
         "required": true,
         "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/RunPatchRequest" } } }
       },
+      "RunAbort": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunAbortRequest" } } }
+      },
       "RunItemStatusUpdate": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunItemStatusUpdateRequest" } } }
@@ -1480,6 +1922,18 @@
       "AttachmentAccessCreate": {
         "required": false,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentAccessCreateRequest" } } }
+      },
+      "ExternalLinkCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExternalLinkCreateRequest" } } }
+      },
+      "DashboardCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardCreateRequest" } } }
+      },
+      "DashboardPatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/DashboardPatchRequest" } } }
       }
     },
     "responses": {
@@ -1495,6 +1949,14 @@
           "ETag": { "$ref": "#/components/headers/ETag" }
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorkspaceSummaryEnvelope" } } }
+      },
+      "WorkspaceBootstrapResponse": {
+        "description": "Bounded authenticated workspace-discovery composition.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorkspaceBootstrapEnvelope" } } }
       },
       "ProjectListResponse": {
         "description": "A page of projects ordered by key then ID.",
@@ -1531,7 +1993,7 @@
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnvironmentEnvelope" } } }
       },
       "TestCaseListResponse": {
-        "description": "A page of test cases ordered by updatedAt descending then ID.",
+        "description": "A page of bounded test-case summaries ordered by updatedAt descending then ID.",
         "headers": {
           "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
           "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
@@ -1548,7 +2010,7 @@
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseEnvelope" } } }
       },
       "TestCaseRevisionListResponse": {
-        "description": "A page of immutable revisions.",
+        "description": "A page of bounded immutable revision summaries.",
         "headers": {
           "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
           "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
@@ -1622,6 +2084,11 @@
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunAttemptListEnvelope" } } }
       },
+      "RunAttemptResponse": {
+        "description": "One immutable attempt with at most 500 step results.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunAttemptEnvelope" } } }
+      },
       "StepResultResponse": {
         "description": "Updated step result and its aggregate identifiers.",
         "headers": {
@@ -1682,6 +2149,23 @@
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentAccessEnvelope" } } }
       },
+      "ExternalLinkListResponse": {
+        "description": "A page of scoped external-link metadata ordered newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExternalLinkListEnvelope" } } }
+      },
+      "ExternalLinkResponse": {
+        "description": "One scoped external link.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExternalLinkEnvelope" } } }
+      },
       "ActivityListResponse": {
         "description": "A page of safe append-only audit events ordered newest first.",
         "headers": {
@@ -1689,6 +2173,23 @@
           "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ActivityListEnvelope" } } }
+      },
+      "DashboardListResponse": {
+        "description": "A page of bounded dashboard summaries ordered newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardListEnvelope" } } }
+      },
+      "DashboardResponse": {
+        "description": "One dashboard with no more than 100 safe widget definitions.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardEnvelope" } } }
       },
       "BadRequest": {
         "description": "The request is malformed or fails safe field validation.",
@@ -1753,7 +2254,7 @@
       "Identifier": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 160,
+        "maxLength": 128,
         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "description": "Opaque identifier; clients must not parse prefixes or embed business meaning."
       },
@@ -1768,7 +2269,7 @@
       },
       "EntityStatus": { "type": "string", "enum": ["active", "archived"] },
       "Priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
-      "TestCaseLifecycle": { "type": "string", "enum": ["draft", "ready", "deprecated", "archived"] },
+      "TestCaseLifecycle": { "type": "string", "enum": ["draft", "ready", "deprecated"] },
       "RunType": { "type": "string", "enum": ["smoke", "regression", "acceptance", "ad_hoc"] },
       "RunStatus": { "type": "string", "enum": ["draft", "active", "completed", "aborted"] },
       "ExecutionStatus": {
@@ -1871,7 +2372,7 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "minLength": 2, "maxLength": 40 },
-          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 1, "maxLength": 120 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
@@ -1885,7 +2386,7 @@
           "id": { "$ref": "#/components/schemas/Identifier" },
           "workspaceId": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*$", "minLength": 2, "maxLength": 12 },
-          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 1, "maxLength": 120 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "status": { "$ref": "#/components/schemas/EntityStatus" },
@@ -1901,7 +2402,7 @@
           "workspaceId": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*$", "minLength": 2, "maxLength": 12 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 1, "maxLength": 120 },
           "description": { "$ref": "#/components/schemas/LongText" }
         }
       },
@@ -1911,9 +2412,8 @@
         "minProperties": 1,
         "properties": {
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "description": { "$ref": "#/components/schemas/LongText" },
-          "status": { "$ref": "#/components/schemas/EntityStatus" }
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 1, "maxLength": 120 },
+          "description": { "$ref": "#/components/schemas/LongText" }
         }
       },
       "ProjectEnvelope": {
@@ -1938,9 +2438,9 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
-          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9_-]{1,31}$", "minLength": 2, "maxLength": 32 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "baseUrl": { "type": "string", "maxLength": 2000, "description": "Public HTTP(S) base URL without embedded username or password credentials." },
           "description": { "$ref": "#/components/schemas/LongText" },
           "variableKeys": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 120 } },
           "isDefault": { "type": "boolean" },
@@ -1955,11 +2455,15 @@
         "required": ["projectId", "key", "name"],
         "properties": {
           "projectId": { "$ref": "#/components/schemas/Identifier" },
-          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9_-]{1,31}$", "minLength": 2, "maxLength": 32 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "baseUrl": { "type": "string", "maxLength": 2000, "description": "Public HTTP(S) base URL without embedded username or password credentials." },
           "description": { "$ref": "#/components/schemas/LongText" },
-          "variables": { "allOf": [{ "$ref": "#/components/schemas/StringMap" }], "writeOnly": true },
+          "variables": {
+            "allOf": [{ "$ref": "#/components/schemas/StringMap" }],
+            "writeOnly": true,
+            "description": "Public values only. Variable names containing password, secret, token, private key, or API key markers are rejected with VALIDATION_ERROR."
+          },
           "isDefault": { "type": "boolean", "default": false }
         }
       },
@@ -1968,13 +2472,16 @@
         "additionalProperties": false,
         "minProperties": 1,
         "properties": {
-          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9_-]{1,31}$", "minLength": 2, "maxLength": 32 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "baseUrl": { "type": "string", "maxLength": 2000, "description": "Public HTTP(S) base URL without embedded username or password credentials." },
           "description": { "$ref": "#/components/schemas/LongText" },
-          "variables": { "allOf": [{ "$ref": "#/components/schemas/StringMap" }], "writeOnly": true },
-          "isDefault": { "type": "boolean" },
-          "status": { "$ref": "#/components/schemas/EntityStatus" }
+          "variables": {
+            "allOf": [{ "$ref": "#/components/schemas/StringMap" }],
+            "writeOnly": true,
+            "description": "Public values only. Variable names containing password, secret, token, private key, or API key markers are rejected with VALIDATION_ERROR."
+          },
+          "isDefault": { "type": "boolean" }
         }
       },
       "EnvironmentEnvelope": {
@@ -1999,11 +2506,10 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1 },
-          "action": { "$ref": "#/components/schemas/LongText" },
-          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "action": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
+          "expectedResult": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "testData": { "$ref": "#/components/schemas/LongText" },
-          "required": { "type": "boolean", "default": true },
-          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "required": { "type": "boolean", "default": true }
         }
       },
       "TestStep": {
@@ -2013,8 +2519,8 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1 },
-          "action": { "$ref": "#/components/schemas/LongText" },
-          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "action": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
+          "expectedResult": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "testData": { "$ref": "#/components/schemas/LongText" },
           "required": { "type": "boolean" },
           "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
@@ -2027,7 +2533,7 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1 },
-          "text": { "$ref": "#/components/schemas/LongText" },
+          "text": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "required": { "type": "boolean", "default": true }
         }
       },
@@ -2038,14 +2544,14 @@
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1 },
-          "text": { "$ref": "#/components/schemas/LongText" },
+          "text": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "required": { "type": "boolean" }
         }
       },
       "TestCaseRevision": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["revision", "title", "description", "preconditions", "type", "lifecycle", "priority", "component", "owner", "tags", "estimatedMinutes", "testData", "steps", "checklist", "attachmentIds", "linkIds", "changeNote", "createdBy", "createdAt"],
+        "required": ["revision", "title", "description", "preconditions", "type", "lifecycle", "priority", "component", "ownerIdentityId", "tags", "estimatedMinutes", "testData", "steps", "checklist", "attachmentIds", "changeNote", "createdBy", "createdAt"],
         "properties": {
           "revision": { "type": "integer", "minimum": 1 },
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
@@ -2055,16 +2561,15 @@
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "owner": { "$ref": "#/components/schemas/ShortText" },
-          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
-          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "ownerIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
           "testData": { "$ref": "#/components/schemas/LongText" },
           "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStep" } },
           "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItem" } },
           "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "changeNote": { "$ref": "#/components/schemas/ShortText" },
-          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "createdBy": { "$ref": "#/components/schemas/Identifier" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" }
         },
         "allOf": [
@@ -2081,15 +2586,16 @@
       "TestCase": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "current", "revisionCount", "archivedAt", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "current", "revisionCount", "linkIds", "archivedAt", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "minLength": 1, "maxLength": 40 },
-          "folderPath": { "type": "string", "maxLength": 500 },
+          "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" },
           "currentRevision": { "type": "integer", "minimum": 1 },
           "current": { "$ref": "#/components/schemas/TestCaseRevision" },
           "revisionCount": { "type": "integer", "minimum": 1 },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "archivedAt": { "type": ["string", "null"], "format": "date-time" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
@@ -2101,7 +2607,7 @@
         "required": ["projectId", "title"],
         "properties": {
           "projectId": { "$ref": "#/components/schemas/Identifier" },
-          "folderPath": { "type": "string", "maxLength": 500, "default": "/" },
+          "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$", "default": "/" },
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "preconditions": { "$ref": "#/components/schemas/LongText" },
@@ -2109,14 +2615,12 @@
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "owner": { "$ref": "#/components/schemas/ShortText" },
-          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
-          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "ownerIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
           "testData": { "$ref": "#/components/schemas/LongText" },
           "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStepInput" } },
           "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItemInput" } },
-          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "changeNote": { "$ref": "#/components/schemas/ShortText" }
         },
         "allOf": [
@@ -2135,7 +2639,7 @@
         "additionalProperties": false,
         "minProperties": 1,
         "properties": {
-          "folderPath": { "type": "string", "maxLength": 500 },
+          "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "preconditions": { "$ref": "#/components/schemas/LongText" },
@@ -2143,14 +2647,12 @@
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "owner": { "$ref": "#/components/schemas/ShortText" },
-          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
-          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "ownerIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
           "testData": { "$ref": "#/components/schemas/LongText" },
           "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStepInput" } },
           "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItemInput" } },
-          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "changeNote": { "$ref": "#/components/schemas/ShortText" }
         }
       },
@@ -2159,7 +2661,49 @@
         "additionalProperties": false,
         "properties": {
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
-          "folderPath": { "type": "string", "maxLength": 500 }
+          "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" }
+        }
+      },
+      "TestCaseSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "title", "type", "lifecycle", "priority", "component", "ownerIdentityId", "tags", "estimatedMinutes", "revisionCount", "archivedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" },
+          "currentRevision": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "ownerIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
+          "revisionCount": { "type": "integer", "minimum": 1 },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "TestCaseRevisionSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["revision", "title", "type", "lifecycle", "priority", "component", "ownerIdentityId", "estimatedMinutes", "changeNote", "createdBy", "createdAt"],
+        "properties": {
+          "revision": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "ownerIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" },
+          "createdBy": { "$ref": "#/components/schemas/Identifier" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
         }
       },
       "TestCaseEnvelope": {
@@ -2173,7 +2717,7 @@
         "additionalProperties": false,
         "required": ["data", "meta"],
         "properties": {
-          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCase" } },
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCaseSummary" } },
           "meta": { "$ref": "#/components/schemas/PageMeta" }
         }
       },
@@ -2188,7 +2732,7 @@
         "additionalProperties": false,
         "required": ["data", "meta"],
         "properties": {
-          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCaseRevision" } },
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCaseRevisionSummary" } },
           "meta": { "$ref": "#/components/schemas/PageMeta" }
         }
       },
@@ -2196,10 +2740,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
           "priority": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Priority" } },
-          "lifecycle": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "$ref": "#/components/schemas/TestCaseLifecycle" } },
-          "folderPathPrefix": { "type": "string", "maxLength": 500 },
+          "lifecycle": { "type": "array", "maxItems": 3, "uniqueItems": true, "items": { "$ref": "#/components/schemas/TestCaseLifecycle" } },
+          "folderPathPrefix": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*/?)?$" },
           "text": { "type": "string", "maxLength": 300 }
         }
       },
@@ -2214,7 +2758,7 @@
           "name": { "type": "string", "minLength": 1, "maxLength": 200 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "type": { "type": "string", "enum": ["static", "dynamic"] },
-          "caseCount": { "type": "integer", "minimum": 0 },
+          "caseCount": { "type": "integer", "minimum": 0, "description": "Stored explicit membership count for static suites; always zero for dynamic suites." },
           "status": { "$ref": "#/components/schemas/EntityStatus" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
@@ -2229,7 +2773,7 @@
             "properties": {
               "caseIds": { "type": "array", "maxItems": 10000, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
               "filter": { "$ref": "#/components/schemas/SuiteFilter" },
-              "resolvedCaseCount": { "type": "integer", "minimum": 0 }
+              "resolvedCaseCount": { "type": "integer", "minimum": 0, "description": "Current server-owned preview excluding archived case aggregates; it does not create a resolution snapshot." }
             }
           }
         ],
@@ -2244,13 +2788,17 @@
           "name": { "type": "string", "minLength": 1, "maxLength": 200 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "type": { "type": "string", "enum": ["static", "dynamic"] },
-          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "caseIds": { "type": "array", "maxItems": 10000, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "filter": { "$ref": "#/components/schemas/SuiteFilter" }
         },
         "allOf": [
           {
             "if": { "properties": { "type": { "const": "dynamic" } }, "required": ["type"] },
             "then": { "properties": { "caseIds": { "maxItems": 0 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "static" } }, "required": ["type"] },
+            "then": { "properties": { "filter": { "maxProperties": 0 } } }
           }
         ]
       },
@@ -2262,10 +2810,19 @@
           "name": { "type": "string", "minLength": 1, "maxLength": 200 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "type": { "type": "string", "enum": ["static", "dynamic"] },
-          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "filter": { "$ref": "#/components/schemas/SuiteFilter" },
-          "status": { "$ref": "#/components/schemas/EntityStatus" }
-        }
+          "caseIds": { "type": "array", "maxItems": 10000, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "filter": { "$ref": "#/components/schemas/SuiteFilter" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "dynamic" } }, "required": ["type"] },
+            "then": { "properties": { "caseIds": { "maxItems": 0 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "static" } }, "required": ["type"] },
+            "then": { "properties": { "filter": { "maxProperties": 0 } } }
+          }
+        ]
       },
       "SuiteEnvelope": {
         "type": "object",
@@ -2321,7 +2878,7 @@
       "Run": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "name", "description", "type", "status", "environment", "suiteId", "build", "configuration", "itemCount", "progress", "createdBy", "startedAt", "completedAt", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "name", "description", "type", "status", "environment", "suiteId", "suiteResolutionId", "build", "configuration", "itemCount", "progress", "attachmentIds", "createdBy", "startedAt", "completedAt", "abortedAt", "abortReason", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
@@ -2332,13 +2889,17 @@
           "status": { "$ref": "#/components/schemas/RunStatus" },
           "environment": { "$ref": "#/components/schemas/EnvironmentSnapshot" },
           "suiteId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "suiteResolutionId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }], "description": "Immutable suite resolution used for reproducibility; null for explicit caseIds." },
           "build": { "$ref": "#/components/schemas/ShortText" },
           "configuration": { "$ref": "#/components/schemas/StringMap" },
           "itemCount": { "type": "integer", "minimum": 1 },
           "progress": { "$ref": "#/components/schemas/RunProgress" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" }, "description": "Ready private attachments owned by this run." },
           "createdBy": { "$ref": "#/components/schemas/ActorRef" },
           "startedAt": { "type": ["string", "null"], "format": "date-time" },
           "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "abortedAt": { "type": ["string", "null"], "format": "date-time" },
+          "abortReason": { "oneOf": [{ "$ref": "#/components/schemas/LongText" }, { "type": "null" }] },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
@@ -2350,19 +2911,19 @@
         "properties": {
           "projectId": { "$ref": "#/components/schemas/Identifier" },
           "environmentId": { "$ref": "#/components/schemas/Identifier" },
-          "suiteId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
-          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" }, "description": "Duplicates are collapsed in request order." },
+          "suiteId": { "$ref": "#/components/schemas/Identifier" },
+          "caseIds": { "type": "array", "minItems": 1, "maxItems": 10000, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" }, "description": "Exact explicit scope in request order." },
           "name": { "type": "string", "minLength": 1, "maxLength": 240 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "type": { "$ref": "#/components/schemas/RunType" },
           "build": { "$ref": "#/components/schemas/ShortText" },
-          "configuration": { "$ref": "#/components/schemas/StringMap" },
-          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "configuration": { "allOf": [{ "$ref": "#/components/schemas/StringMap" }], "description": "Public strings only. Secret-like property names are rejected." },
+          "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }], "description": "An active identity with active workspace membership, or null." },
           "startImmediately": { "type": "boolean", "default": false }
         },
-        "anyOf": [
-          { "required": ["suiteId"], "properties": { "suiteId": { "$ref": "#/components/schemas/Identifier" } } },
-          { "required": ["caseIds"], "properties": { "caseIds": { "minItems": 1 } } }
+        "oneOf": [
+          { "required": ["suiteId"], "not": { "required": ["caseIds"] } },
+          { "required": ["caseIds"], "not": { "required": ["suiteId"] } }
         ]
       },
       "RunPatchRequest": {
@@ -2375,6 +2936,12 @@
           "build": { "$ref": "#/components/schemas/ShortText" },
           "configuration": { "$ref": "#/components/schemas/StringMap" }
         }
+      },
+      "RunAbortRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason"],
+        "properties": { "reason": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 } }
       },
       "RunEnvelope": {
         "type": "object",
@@ -2404,36 +2971,45 @@
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
       },
-      "RunAttempt": {
+      "RunAttemptSummary": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "number", "status", "actualResult", "comment", "stepResults", "startedAt", "completedAt", "createdAt", "updatedAt"],
+        "required": ["attemptNo", "status", "actualResult", "comment", "blockedReason", "attachmentIds", "startedAt", "completedAt", "createdAt", "updatedAt"],
         "properties": {
-          "id": { "$ref": "#/components/schemas/Identifier" },
-          "number": { "type": "integer", "minimum": 1 },
+          "attemptNo": { "type": "integer", "minimum": 1 },
           "status": { "$ref": "#/components/schemas/ExecutionStatus" },
           "actualResult": { "$ref": "#/components/schemas/LongText" },
           "comment": { "$ref": "#/components/schemas/LongText" },
-          "stepResults": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/StepResult" } },
+          "blockedReason": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "startedAt": { "type": ["string", "null"], "format": "date-time" },
           "completedAt": { "type": ["string", "null"], "format": "date-time" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
       },
+      "RunAttempt": {
+        "allOf": [
+          { "$ref": "#/components/schemas/RunAttemptSummary" },
+          { "type": "object", "required": ["stepResults"], "properties": {
+            "stepResults": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/StepResult" } }
+          } }
+        ],
+        "unevaluatedProperties": false
+      },
       "RunItemSummary": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "caseId", "caseKey", "revision", "assignee", "status", "attemptCount", "activeAttemptId", "createdAt", "updatedAt"],
+        "required": ["id", "caseId", "caseKey", "revision", "assigneeIdentityId", "status", "attemptCount", "activeAttemptNo", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "caseId": { "$ref": "#/components/schemas/Identifier" },
           "caseKey": { "type": "string", "minLength": 1, "maxLength": 40 },
           "revision": { "type": "integer", "minimum": 1 },
-          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "status": { "$ref": "#/components/schemas/ExecutionStatus" },
           "attemptCount": { "type": "integer", "minimum": 1 },
-          "activeAttemptId": { "$ref": "#/components/schemas/Identifier" },
+          "activeAttemptNo": { "type": "integer", "minimum": 1 },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
@@ -2460,7 +3036,7 @@
           "status": { "$ref": "#/components/schemas/ExecutionStatus" },
           "actualResult": { "$ref": "#/components/schemas/LongText" },
           "comment": { "$ref": "#/components/schemas/LongText" },
-          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "blockedReason": { "$ref": "#/components/schemas/LongText" }
         },
         "allOf": [
           {
@@ -2474,7 +3050,7 @@
           },
           {
             "if": { "properties": { "status": { "const": "blocked" } }, "required": ["status"] },
-            "then": { "required": ["comment"], "properties": { "comment": { "minLength": 1 } } }
+            "then": { "required": ["blockedReason"], "properties": { "blockedReason": { "minLength": 1 } } }
           }
         ]
       },
@@ -2485,8 +3061,7 @@
         "properties": {
           "status": { "$ref": "#/components/schemas/ExecutionStatus" },
           "actualResult": { "$ref": "#/components/schemas/LongText" },
-          "comment": { "$ref": "#/components/schemas/LongText" },
-          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "comment": { "$ref": "#/components/schemas/LongText" }
         }
       },
       "RunItemEnvelope": {
@@ -2509,18 +3084,24 @@
         "additionalProperties": false,
         "required": ["data", "meta"],
         "properties": {
-          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/RunAttempt" } },
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/RunAttemptSummary" } },
           "meta": { "$ref": "#/components/schemas/PageMeta" }
         }
+      },
+      "RunAttemptEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/RunAttempt" } }
       },
       "StepResultMutation": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["runId", "runItemId", "attemptId", "result"],
+        "required": ["runId", "runItemId", "attemptNo", "result"],
         "properties": {
           "runId": { "$ref": "#/components/schemas/Identifier" },
           "runItemId": { "$ref": "#/components/schemas/Identifier" },
-          "attemptId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
           "result": { "$ref": "#/components/schemas/StepResult" }
         }
       },
@@ -2531,32 +3112,42 @@
         "properties": { "data": { "$ref": "#/components/schemas/StepResultMutation" } }
       },
       "ActorRef": { "type": "string", "minLength": 1, "maxLength": 200 },
+      "DefectOccurrence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "runId", "runItemId", "attemptNo", "stepId", "createdAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
       "Defect": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "title", "description", "severity", "priority", "status", "reproducibility", "assignee", "component", "labels", "runId", "runItemId", "attemptId", "stepId", "expectedResult", "actualResult", "attachmentIds", "linkIds", "createdBy", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "title", "description", "severity", "priority", "status", "reproducibility", "assigneeIdentityId", "component", "labels", "occurrence", "expectedResult", "actualResult", "attachmentIds", "linkIds", "createdByIdentityId", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "minLength": 1, "maxLength": 40 },
-          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "severity": { "$ref": "#/components/schemas/Priority" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "status": { "$ref": "#/components/schemas/DefectStatus" },
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
-          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
-          "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
-          "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
-          "attemptId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
-          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "occurrence": { "oneOf": [{ "$ref": "#/components/schemas/DefectOccurrence" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
           "actualResult": { "$ref": "#/components/schemas/LongText" },
           "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "createdByIdentityId": { "$ref": "#/components/schemas/Identifier" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
@@ -2567,22 +3158,19 @@
         "required": ["projectId", "title"],
         "properties": {
           "projectId": { "$ref": "#/components/schemas/Identifier" },
-          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "severity": { "$ref": "#/components/schemas/Priority" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
-          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
           "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
-          "attemptId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
-          "actualResult": { "$ref": "#/components/schemas/LongText" },
-          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "actualResult": { "$ref": "#/components/schemas/LongText" }
         }
       },
       "DefectPatchRequest": {
@@ -2590,18 +3178,16 @@
         "additionalProperties": false,
         "minProperties": 1,
         "properties": {
-          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "severity": { "$ref": "#/components/schemas/Priority" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
-          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
-          "actualResult": { "$ref": "#/components/schemas/LongText" },
-          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
-          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "actualResult": { "$ref": "#/components/schemas/LongText" }
         }
       },
       "DefectStatusTransitionRequest": {
@@ -2633,13 +3219,27 @@
         "type": "string",
         "enum": ["pending", "ready", "failed", "quarantined", "deleting", "deleted"]
       },
+      "AttachmentFailureCode": {
+        "type": "string",
+        "enum": [
+          "ATTACHMENT_OBJECT_MISSING", "ATTACHMENT_SIZE_MISMATCH",
+          "ATTACHMENT_ETAG_MISMATCH", "ATTACHMENT_DIGEST_MISMATCH",
+          "ATTACHMENT_MEDIA_MISMATCH", "ATTACHMENT_UPLOAD_EXPIRED"
+        ],
+        "description": "Safe lifecycle reason persisted with failed or quarantined private metadata."
+      },
       "AttachmentMimeType": {
         "type": "string",
         "enum": [
           "image/png", "image/jpeg", "image/webp", "image/gif", "video/mp4", "video/webm",
           "video/quicktime", "text/plain", "application/pdf", "application/json",
           "application/zip", "application/gzip", "application/octet-stream"
-        ]
+        ],
+        "description": "Closed server policy. Finalize requires the exact stored Content-Type and bounded content validation; application/octet-stream is intentionally opaque.",
+        "x-tms-content-inspection": {
+          "maximumRangeBytes": 65536,
+          "mismatchOutcome": "quarantined:ATTACHMENT_MEDIA_MISMATCH"
+        }
       },
       "TrustedAttachmentExtension": {
         "type": "string",
@@ -2755,7 +3355,7 @@
           "status": { "$ref": "#/components/schemas/AttachmentUploadStatus" },
           "createdBy": { "$ref": "#/components/schemas/ActorRef" },
           "storedAt": { "type": ["string", "null"], "format": "date-time" },
-          "failureCode": { "type": ["string", "null"], "minLength": 1, "maxLength": 160 },
+          "failureCode": { "oneOf": [{ "$ref": "#/components/schemas/AttachmentFailureCode" }, { "type": "null" }] },
           "deletingAt": { "type": ["string", "null"], "format": "date-time" },
           "deletedAt": { "type": ["string", "null"], "format": "date-time" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
@@ -2774,7 +3374,7 @@
           },
           {
             "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
-            "then": { "properties": { "failureCode": { "type": "string", "minLength": 1, "maxLength": 160 } } }
+            "then": { "properties": { "failureCode": { "$ref": "#/components/schemas/AttachmentFailureCode" } } }
           },
           {
             "if": { "properties": { "status": { "enum": ["deleting", "deleted"] } }, "required": ["status"] },
@@ -2886,6 +3486,258 @@
         "required": ["data"],
         "properties": { "data": { "$ref": "#/components/schemas/AttachmentAccess" } }
       },
+      "ExternalLinkOwnerKind": {
+        "type": "string",
+        "enum": ["test_case", "run", "defect"]
+      },
+      "ExternalLinkKind": {
+        "type": "string",
+        "enum": ["url", "deep_link", "external_issue"]
+      },
+      "ExternalLinkStatus": {
+        "type": "string",
+        "enum": ["active", "archived"]
+      },
+      "ExternalLinkOwner": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "caseId"],
+            "properties": {
+              "kind": { "type": "string", "const": "test_case" },
+              "caseId": { "$ref": "#/components/schemas/Identifier" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "runId"],
+            "properties": {
+              "kind": { "type": "string", "const": "run" },
+              "runId": { "$ref": "#/components/schemas/Identifier" },
+              "runItemId": {
+                "oneOf": [
+                  { "$ref": "#/components/schemas/Identifier" },
+                  { "type": "null" }
+                ],
+                "default": null
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "defectId"],
+            "properties": {
+              "kind": { "type": "string", "const": "defect" },
+              "defectId": { "$ref": "#/components/schemas/Identifier" }
+            }
+          }
+        ]
+      },
+      "ExternalLinkCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "owner", "label", "targetUri", "kind"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "owner": { "$ref": "#/components/schemas/ExternalLinkOwner" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "targetUri": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "description": "URL and external_issue targets must be HTTPS without credentials. Deep links use an explicit lowercase scheme followed by ://."
+          },
+          "kind": { "$ref": "#/components/schemas/ExternalLinkKind" },
+          "externalSystem": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "externalKey": { "type": "string", "minLength": 1, "maxLength": 200 }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "kind": { "const": "external_issue" } }, "required": ["kind"] },
+            "then": { "required": ["externalSystem", "externalKey"] },
+            "else": {
+              "not": {
+                "anyOf": [
+                  { "required": ["externalSystem"] },
+                  { "required": ["externalKey"] }
+                ]
+              }
+            }
+          },
+          {
+            "if": { "properties": { "kind": { "const": "deep_link" } }, "required": ["kind"] },
+            "then": { "properties": { "targetUri": { "pattern": "^[a-z][a-z0-9+.-]*://" } } },
+            "else": { "properties": { "targetUri": { "pattern": "^[Hh][Tt][Tt][Pp][Ss]://" } } }
+          }
+        ]
+      },
+      "ExternalLink": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "owner", "label", "targetUri", "kind", "externalSystem", "externalKey", "status", "archivedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "owner": { "$ref": "#/components/schemas/ExternalLinkOwner" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "targetUri": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "kind": { "$ref": "#/components/schemas/ExternalLinkKind" },
+          "externalSystem": { "type": ["string", "null"], "minLength": 1, "maxLength": 200 },
+          "externalKey": { "type": ["string", "null"], "minLength": 1, "maxLength": 200 },
+          "status": { "$ref": "#/components/schemas/ExternalLinkStatus" },
+          "archivedAt": { "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }] },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "archived" } }, "required": ["status"] },
+            "then": { "properties": { "archivedAt": { "$ref": "#/components/schemas/Timestamp" } } },
+            "else": { "properties": { "archivedAt": { "type": "null" } } }
+          }
+        ]
+      },
+      "ExternalLinkEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/ExternalLink" } }
+      },
+      "ExternalLinkListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/ExternalLink" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "DashboardWidgetType": {
+        "type": "string",
+        "enum": ["summary", "run_progress", "recent_activity", "defects", "assigned_to_me"]
+      },
+      "DashboardWidgetPosition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["x", "y", "width", "height"],
+        "properties": {
+          "x": { "type": "integer", "minimum": 0, "maximum": 1000 },
+          "y": { "type": "integer", "minimum": 0, "maximum": 100000 },
+          "width": { "type": "integer", "minimum": 1, "maximum": 24 },
+          "height": { "type": "integer", "minimum": 1, "maximum": 100 }
+        }
+      },
+      "DashboardWidgetSettings": {
+        "type": "object",
+        "maxProperties": 30,
+        "propertyNames": {
+          "not": { "pattern": "authorization|cookie|credential|password|secret|token|private.?key|api[_-]?key" }
+        },
+        "additionalProperties": true,
+        "description": "At most 8192 encoded bytes and four nested levels. Secret-like keys and non-JSON values are rejected."
+      },
+      "DashboardWidgetInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "title", "position"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "type": { "$ref": "#/components/schemas/DashboardWidgetType" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "position": { "$ref": "#/components/schemas/DashboardWidgetPosition" },
+          "settings": { "$ref": "#/components/schemas/DashboardWidgetSettings" }
+        }
+      },
+      "DashboardWidget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "title", "position", "settings"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "type": { "$ref": "#/components/schemas/DashboardWidgetType" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "position": { "$ref": "#/components/schemas/DashboardWidgetPosition" },
+          "settings": { "$ref": "#/components/schemas/DashboardWidgetSettings" }
+        }
+      },
+      "DashboardCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workspaceId", "name"],
+        "properties": {
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 20000 },
+          "isDefault": { "type": "boolean", "default": false },
+          "widgets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardWidgetInput" } }
+        }
+      },
+      "DashboardPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 20000 },
+          "isDefault": { "type": "boolean" },
+          "widgets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardWidgetInput" } }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workspaceId", "projectId", "name", "description", "isDefault", "status", "createdByIdentityId", "widgets", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 20000 },
+          "isDefault": { "type": "boolean" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "createdByIdentityId": { "$ref": "#/components/schemas/Identifier" },
+          "widgets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardWidget" } },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workspaceId", "projectId", "name", "description", "isDefault", "status", "createdByIdentityId", "widgetCount", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 20000 },
+          "isDefault": { "type": "boolean" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "createdByIdentityId": { "$ref": "#/components/schemas/Identifier" },
+          "widgetCount": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Dashboard" } }
+      },
+      "DashboardListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardSummary" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
       "ActivityEvent": {
         "type": "object",
         "additionalProperties": false,
@@ -2895,15 +3747,18 @@
           "workspaceId": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "actor": { "$ref": "#/components/schemas/ActorRef" },
-          "action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$", "maxLength": 120 },
+          "action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$", "maxLength": 120 },
           "entityType": { "type": "string", "minLength": 1, "maxLength": 80 },
           "entityId": { "$ref": "#/components/schemas/Identifier" },
           "entityKey": { "type": ["string", "null"], "maxLength": 80 },
           "details": {
             "type": "object",
             "maxProperties": 30,
+            "propertyNames": {
+              "not": { "pattern": "authorization|cookie|credential|password|secret|token|api.?key|url|uri|path|storage|header|body|variable" }
+            },
             "additionalProperties": true,
-            "description": "Safe redacted metadata only; secrets, environment values, request bodies, storage keys, and signed URLs are forbidden."
+            "description": "Safe redacted metadata only, capped at 8192 encoded bytes and four nested levels. Secrets, environment values, request bodies, storage keys, credential-bearing URLs, and signed URLs are forbidden."
           },
           "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" }
@@ -2926,7 +3781,7 @@
           "id": { "$ref": "#/components/schemas/Identifier" },
           "workspaceId": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "minLength": 2, "maxLength": 12 },
-          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 1, "maxLength": 120 },
           "name": { "type": "string", "minLength": 1, "maxLength": 120 },
           "status": { "$ref": "#/components/schemas/EntityStatus" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
@@ -3004,6 +3859,23 @@
         "additionalProperties": false,
         "required": ["data"],
         "properties": { "data": { "$ref": "#/components/schemas/WorkspaceSummary" } }
+      },
+      "WorkspaceBootstrapEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "$ref": "#/components/schemas/WorkspaceSummary" },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["compositionVersion", "payloadBudgetBytes"],
+            "properties": {
+              "compositionVersion": { "type": "string", "const": "workspace-bootstrap.v1" },
+              "payloadBudgetBytes": { "type": "integer", "const": 262144 }
+            }
+          }
+        }
       }
     }
   }

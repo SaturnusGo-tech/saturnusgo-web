@@ -1,11 +1,21 @@
 import type { FormEvent } from "react";
-import type { TestCase } from "../../../../core/tms/contracts/legacy-contract";
+import type { TestCase, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
+import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
+import { uploadEvidence } from "../../application/evidence/uploadEvidence";
 import { createEmptyRevision } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import {
+  cloneTestCase, createTestCase, getTestCase, reviseTestCase, transitionTestCase,
+} from "../../test-cases/data/test-case-api";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
+
+function summaryOf(testCase: TestCase): TestCaseSummary {
+  const { current: _current, linkIds: _linkIds, ...summary } = testCase;
+  return summary;
+}
 
 export function useCaseActions(
   state: ReturnType<typeof useWorkspaceState>,
@@ -13,7 +23,23 @@ export function useCaseActions(
   notify: (message: string) => void,
 ) {
   const http = useTmsHttpClient();
+  const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
+
+  function commit(testCase: TestCase, etag: string | null, append = false) {
+    const summary = summaryOf(testCase);
+    state.setData((current) => ({
+      ...current,
+      testCases: append
+        ? [...current.testCases, summary]
+        : current.testCases.map((item) => item.id === summary.id ? summary : item),
+    }));
+    state.setSelectedCaseId(testCase.id);
+    state.setSelectedFolder(testCase.folderPath);
+    state.setSelectedCaseDetail(testCase);
+    state.setSelectedCaseEtag(etag);
+  }
+
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
@@ -24,176 +50,99 @@ export function useCaseActions(
   function openEditCase() {
     if (!derived.selectedRevision) return;
     state.setCaseDraft(structuredClone(derived.selectedRevision));
-    state.setCaseFolderPath(
-      derived.selectedCase?.folderPath ?? "/Unsorted",
-    );
+    state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
     state.setEditing(true);
     state.setDialog("case");
   }
 
-  async function saveCase(event: FormEvent) {
+  async function saveCase(event: FormEvent, files: File[] = []) {
     event.preventDefault();
     if (!derived.project || !state.caseDraft.title.trim()) return;
-    const stamp = new Date().toISOString();
-    const payload = {
+    const input = {
       projectId: derived.project.id,
       folderPath: state.caseFolderPath || "/Unsorted",
-      ...state.caseDraft,
-      tags: state.caseDraft.tags.filter(Boolean),
+      revision: { ...state.caseDraft, tags: state.caseDraft.tags.filter(Boolean) },
     };
+    let caseCommitted = false;
     try {
-      if (state.connection === "demo") throw new Error("development demo");
-      const remote =
-        state.editing && derived.selectedCase
-          ? await http.mutate<TestCase>(
-              `/test-cases/${derived.selectedCase.id}`,
-              "PATCH",
-              payload,
-            )
-          : await http.mutate<TestCase>("/test-cases", "POST", payload);
-      state.setData((current) => ({
-        ...current,
-        testCases: state.editing
-          ? current.testCases.map((item) =>
-              item.id === remote.id ? remote : item,
-            )
-          : [...current.testCases, remote],
-      }));
-      state.setSelectedCaseId(remote.id);
-      state.setSelectedFolder(remote.folderPath);
+      if (state.connection === "demo") {
+        const now = new Date().toISOString();
+        const previous = state.selectedCaseDetail;
+        const revision = { ...input.revision, revision: previous ? previous.currentRevision + 1 : 1, createdAt: now };
+        const testCase: TestCase = previous
+          ? { ...previous, folderPath: input.folderPath, currentRevision: revision.revision, revisionCount: previous.revisionCount + 1, current: revision, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, updatedAt: now }
+          : { id: createUid("case"), projectId: derived.project.id, key: `${derived.project.key}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`, folderPath: input.folderPath, currentRevision: 1, revisionCount: 1, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, current: revision, linkIds: [], archivedAt: null, createdAt: now, updatedAt: now };
+        commit(testCase, null, !previous);
+        caseCommitted = true;
+      } else {
+        const key = crypto.randomUUID();
+        const result = state.editing && derived.selectedCase
+          ? state.selectedCaseEtag
+            ? await reviseTestCase(http, derived.selectedCase.id, input, state.selectedCaseEtag, key)
+            : null
+          : await createTestCase(http, input, key);
+        if (!result) throw new Error("missing case precondition");
+        let refreshed = await getTestCase(http, result.data.id);
+        commit(refreshed.data, refreshed.etag, !state.editing);
+        caseCommitted = true;
+        if (files.length > 0) {
+          await uploadEvidence({
+            client: attachments,
+            projectId: refreshed.data.projectId,
+            owner: {
+              kind: "test_case_revision",
+              caseId: refreshed.data.id,
+              revisionNo: refreshed.data.currentRevision,
+            },
+            files,
+            operationKeyPrefix: `${key}:evidence`,
+          });
+          refreshed = await getTestCase(http, refreshed.data.id);
+          commit(refreshed.data, refreshed.etag);
+        }
+      }
     } catch {
-      if (state.connection !== "demo") {
-        notify(
-          state.editing
-            ? t("actions.caseRevisionSaveError")
-            : t("actions.caseCreateError"),
-        );
+      if (caseCommitted) {
+        state.setDialog(null);
+        notify(t("runs.evidenceUploadError"));
         return;
       }
-      if (state.editing && derived.selectedCase) {
-        const nextRevision = {
-          ...state.caseDraft,
-          revision: derived.selectedCase.currentRevision + 1,
-          createdAt: stamp,
-        };
-        state.setData((current) => ({
-          ...current,
-          testCases: current.testCases.map((item) =>
-            item.id === derived.selectedCase!.id
-              ? {
-                  ...item,
-                  currentRevision: nextRevision.revision,
-                  revisions: [...item.revisions, nextRevision],
-                  updatedAt: stamp,
-                }
-              : item,
-          ),
-        }));
-      } else {
-        const next: TestCase = {
-          id: createUid("case"),
-          projectId: derived.project.id,
-          key: `${derived.project.key}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`,
-          folderPath: state.caseFolderPath || "/Unsorted",
-          currentRevision: 1,
-          revisions: [{ ...state.caseDraft, revision: 1, createdAt: stamp }],
-          archivedAt: null,
-          createdAt: stamp,
-          updatedAt: stamp,
-        };
-        state.setData((current) => ({
-          ...current,
-          testCases: [...current.testCases, next],
-        }));
-        state.setSelectedCaseId(next.id);
-        state.setSelectedFolder(next.folderPath);
-      }
+      notify(state.editing ? t("actions.caseRevisionSaveError") : t("actions.caseCreateError"));
+      return;
     }
     state.setDialog(null);
-    notify(
-      state.editing
-        ? t("actions.caseRevisionSaved")
-        : t("actions.caseCreated"),
-    );
+    notify(state.editing ? t("actions.caseRevisionSaved") : t("actions.caseCreated"));
   }
 
   async function cloneCase() {
     if (!derived.selectedCase) return;
     try {
-      if (state.connection === "demo") throw new Error("development demo");
-      const remote = await http.mutate<TestCase>(
-        `/test-cases/${derived.selectedCase.id}/clone`,
-        "POST",
-      );
-      state.setData((current) => ({
-        ...current,
-        testCases: [...current.testCases, remote],
-      }));
-      state.setSelectedCaseId(remote.id);
+      if (state.connection === "demo") throw new Error("demo clone unavailable");
+      const result = await cloneTestCase(http, derived.selectedCase.id, crypto.randomUUID());
+      const refreshed = await getTestCase(http, result.data.id);
+      commit(refreshed.data, refreshed.etag, true);
     } catch {
-      if (state.connection !== "demo") {
-        notify(t("actions.caseCloneError"));
-        return;
-      }
-      const clone = structuredClone(derived.selectedCase);
-      clone.id = createUid("case");
-      clone.key = `${derived.project?.key ?? "TMS"}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`;
-      clone.revisions = clone.revisions.map((item) => ({
-        ...item,
-        title: `${item.title} — ${t("actions.caseCopySuffix")}`,
-      }));
-      state.setData((current) => ({
-        ...current,
-        testCases: [...current.testCases, clone],
-      }));
-      state.setSelectedCaseId(clone.id);
+      notify(t("actions.caseCloneError"));
+      return;
     }
     notify(t("actions.caseCloned"));
   }
 
   async function toggleArchiveCase() {
-    if (!derived.selectedCase) return;
+    if (!derived.selectedCase || !state.selectedCaseEtag) return;
     const restoring = Boolean(derived.selectedCase.archivedAt);
     try {
-      if (state.connection === "demo") throw new Error("development demo");
-      const remote = await http.mutate<TestCase>(
-        restoring
-          ? `/test-cases/${derived.selectedCase.id}/restore`
-          : `/test-cases/${derived.selectedCase.id}`,
-        restoring ? "POST" : "DELETE",
+      const result = await transitionTestCase(
+        http, derived.selectedCase.id, restoring ? "restore" : "archive",
+        state.selectedCaseEtag, crypto.randomUUID(),
       );
-      state.setData((current) => ({
-        ...current,
-        testCases: current.testCases.map((item) =>
-          item.id === remote.id ? remote : item,
-        ),
-      }));
+      const refreshed = await getTestCase(http, result.data.id);
+      commit(refreshed.data, refreshed.etag);
     } catch {
-      if (state.connection !== "demo") {
-        notify(
-          restoring
-            ? t("actions.caseRestoreError")
-            : t("actions.caseArchiveError"),
-        );
-        return;
-      }
-      state.setData((current) => ({
-        ...current,
-        testCases: current.testCases.map((item) =>
-          item.id === derived.selectedCase!.id
-            ? {
-                ...item,
-                archivedAt: restoring ? null : new Date().toISOString(),
-              }
-            : item,
-        ),
-      }));
+      notify(restoring ? t("actions.caseRestoreError") : t("actions.caseArchiveError"));
+      return;
     }
-    notify(
-      restoring
-        ? t("actions.caseRestored")
-        : t("actions.caseArchived"),
-    );
+    notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
   }
 
   return { openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };

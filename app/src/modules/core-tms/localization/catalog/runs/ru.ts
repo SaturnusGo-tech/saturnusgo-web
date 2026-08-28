@@ -29,6 +29,7 @@ export const ruRunMessages = {
   "runs.pass": "Пройти",
   "runs.passRequiredFirst": "Сначала пройдите все обязательные шаги",
   "runs.addEvidence": "Добавить материалы",
+  "runs.evidence": "Приложенные материалы",
   "runs.createBug": "Создать баг",
   "runs.reportBug": "Завести баг",
   "runs.completed": "Ран завершён",

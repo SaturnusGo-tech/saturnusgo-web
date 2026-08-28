@@ -9,6 +9,8 @@ const digest = "a".repeat(64);
 test("upload orchestrates intent, private PUT, and finalize with stable operation keys", async () => {
   const calls: string[] = [];
   const transport: AttachmentTransportPort = {
+    async getMetadata() { throw new Error("not used"); },
+    async remove() { throw new Error("not used"); },
     async createUploadIntent(input) {
       calls.push(`intent:${input.idempotencyKey}:${input.sha256}`);
       return {
@@ -60,6 +62,8 @@ test("upload orchestrates intent, private PUT, and finalize with stable operatio
 test("an expired upload intent stops before the private PUT", async () => {
   let putCalled = false;
   const transport = {
+    async getMetadata() { throw new Error("not used"); },
+    async remove() { throw new Error("not used"); },
     async createUploadIntent() {
       return { intent: {
         intentId: "att-1", attachmentId: "att-1", method: "PUT" as const,

@@ -24,6 +24,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bootstrap": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover and read a bounded workspace shell
+         * @description Selects the only active workspace membership when workspaceId is omitted. Principals with zero or multiple active memberships must provide workspaceId. This never returns unbounded case, suite, run, defect, dashboard, attachment, or activity collections; clients hydrate them through paginated endpoints.
+         */
+        get: operations["getWorkspaceBootstrap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/summary": {
         parameters: {
             query?: never;
@@ -93,8 +116,33 @@ export interface paths {
         delete: operations["archiveProject"];
         options?: never;
         head?: never;
-        /** Update a project */
+        /**
+         * Update a project
+         * @description Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH.
+         */
         patch: operations["updateProject"];
+        trace?: never;
+    };
+    "/projects/{projectId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived project */
+        post: operations["restoreProject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/environments": {
@@ -138,8 +186,33 @@ export interface paths {
         delete: operations["archiveEnvironment"];
         options?: never;
         head?: never;
-        /** Update an environment */
+        /**
+         * Update an environment
+         * @description Updates mutable fields on an active environment. Archive and restore are explicit lifecycle operations; archived environments reject PATCH.
+         */
         patch: operations["updateEnvironment"];
+        trace?: never;
+    };
+    "/environments/{environmentId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                environmentId: components["parameters"]["EnvironmentIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived environment */
+        post: operations["restoreEnvironment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/test-cases": {
@@ -317,7 +390,7 @@ export interface paths {
         };
         /**
          * Get a suite definition
-         * @description Dynamic suites are resolved at run creation. resolvedCaseCount is informational; the run stores the exact revision snapshots selected at that time.
+         * @description resolvedCaseCount previews the currently resolvable, non-archived cases. For a static suite it can be lower than caseCount after a member is archived. Immutable suite resolutions snapshot current revision numbers; a future run references a resolutionId.
          */
         get: operations["getSuite"];
         put?: never;
@@ -328,6 +401,28 @@ export interface paths {
         head?: never;
         /** Update a suite definition */
         patch: operations["updateSuite"];
+        trace?: never;
+    };
+    "/suites/{suiteId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                suiteId: components["parameters"]["SuiteIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived suite */
+        post: operations["restoreSuite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/runs": {
@@ -345,7 +440,7 @@ export interface paths {
         put?: never;
         /**
          * Create a run with immutable case and environment snapshots
-         * @description caseIds, when non-empty, are the exact deduplicated scope and suiteId remains provenance. Otherwise suiteId is resolved once. Archived or cross-project cases are rejected.
+         * @description Exactly one of suiteId or caseIds selects the scope. A suite is resolved once into an immutable resolution; explicit caseIds store no suite provenance. Archived, stale, or cross-project resources are rejected.
          */
         post: operations["createRun"];
         delete?: never;
@@ -567,6 +662,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/runs/{runId}/items/{itemId}/attempts/{attemptNo}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+                itemId: components["parameters"]["RunItemIdPath"];
+                attemptNo: components["parameters"]["AttemptNoPath"];
+            };
+            cookie?: never;
+        };
+        /** Get one preserved attempt with bounded step results */
+        get: operations["getRunItemAttempt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/runs/{runId}/items/{itemId}/retest": {
         parameters: {
             query?: never;
@@ -656,6 +775,96 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/links": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List bounded external-link metadata
+         * @description Returns active links by default. Owner filters are exact and tenant-scoped; quarantined legacy links are audit provenance and are never exposed as active resources.
+         */
+        get: operations["listExternalLinks"];
+        put?: never;
+        /** Create a scoped external link */
+        post: operations["createExternalLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/links/{linkId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        /** Get scoped external-link metadata */
+        get: operations["getExternalLink"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/links/{linkId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive an external link without deleting history */
+        post: operations["archiveExternalLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/links/{linkId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived external link */
+        post: operations["restoreExternalLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/attachments": {
         parameters: {
             query?: never;
@@ -718,7 +927,7 @@ export interface paths {
         put?: never;
         /**
          * Finalize and verify an uploaded object
-         * @description Before the persisted upload deadline, HEAD-verifies the private object, byte size, storage ETag, media policy, and SHA-256. A pending attachment transitions exactly once to ready, failed, or quarantined; completed results replay for the same principal, key, and canonical request without repeating storage inspection. Client claims are never trusted without storage verification.
+         * @description Before the persisted upload deadline, HEAD-verifies the private object, byte size, exact declared Content-Type, storage ETag, and SHA-256, then conditionally reads at most the first 65536 bytes to validate the active content-signature/text profile. A media mismatch is quarantined with ATTACHMENT_MEDIA_MISMATCH; incomplete provider evidence never becomes ready. Completed results replay for the same principal, key, and canonical request without repeating storage inspection.
          */
         post: operations["finalizeAttachmentUpload"];
         delete?: never;
@@ -743,7 +952,11 @@ export interface paths {
         get: operations["getAttachment"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Request deletion of a private attachment
+         * @description Moves ready, failed, or quarantined evidence to deleting. A bounded cleanup worker removes the exact private R2 object and retains a deleted metadata tombstone for audit history.
+         */
+        delete: operations["deleteAttachment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -768,6 +981,100 @@ export interface paths {
          * @description Available only while status is ready. The private URL is never persisted in DTOs or activity, expires in at most five minutes, and must not be cached. Pending, failed, quarantined, deleting, and deleted objects never receive signed read access.
          */
         post: operations["createAttachmentAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboards": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List bounded dashboard summaries newest first
+         * @description When projectId is supplied, returns workspace-level dashboards and dashboards for that project. Widget definitions are hydrated only through the singleton resource.
+         */
+        get: operations["listDashboards"];
+        put?: never;
+        /** Create a bounded dashboard */
+        post: operations["createDashboard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboards/{dashboardId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        /** Get one dashboard with at most 100 widgets */
+        get: operations["getDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Replace mutable dashboard fields or its bounded widget layout
+         * @description Archived dashboards reject PATCH. Widget replacement is transactional with the dashboard version and never returns an unbounded collection.
+         */
+        patch: operations["updateDashboard"];
+        trace?: never;
+    };
+    "/dashboards/{dashboardId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a dashboard without deleting history */
+        post: operations["archiveDashboard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboards/{dashboardId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived dashboard as non-default */
+        post: operations["restoreDashboard"];
         delete?: never;
         options?: never;
         head?: never;
@@ -812,7 +1119,7 @@ export interface components {
         /** @enum {string} */
         Priority: "low" | "medium" | "high" | "critical";
         /** @enum {string} */
-        TestCaseLifecycle: "draft" | "ready" | "deprecated" | "archived";
+        TestCaseLifecycle: "draft" | "ready" | "deprecated";
         /** @enum {string} */
         RunType: "smoke" | "regression" | "acceptance" | "ad_hoc";
         /** @enum {string} */
@@ -886,7 +1193,6 @@ export interface components {
             name?: string;
             slug?: string;
             description?: components["schemas"]["LongText"];
-            status?: components["schemas"]["EntityStatus"];
         };
         ProjectEnvelope: {
             data: components["schemas"]["Project"];
@@ -900,6 +1206,7 @@ export interface components {
             projectId: components["schemas"]["Identifier"];
             key: string;
             name: string;
+            /** @description Public HTTP(S) base URL without embedded username or password credentials. */
             baseUrl: string;
             description: components["schemas"]["LongText"];
             variableKeys: string[];
@@ -912,8 +1219,10 @@ export interface components {
             projectId: components["schemas"]["Identifier"];
             key: string;
             name: string;
+            /** @description Public HTTP(S) base URL without embedded username or password credentials. */
             baseUrl?: string;
             description?: components["schemas"]["LongText"];
+            /** @description Public values only. Variable names containing password, secret, token, private key, or API key markers are rejected with VALIDATION_ERROR. */
             variables?: components["schemas"]["StringMap"];
             /** @default false */
             isDefault: boolean;
@@ -921,11 +1230,12 @@ export interface components {
         EnvironmentPatchRequest: {
             key?: string;
             name?: string;
+            /** @description Public HTTP(S) base URL without embedded username or password credentials. */
             baseUrl?: string;
             description?: components["schemas"]["LongText"];
+            /** @description Public values only. Variable names containing password, secret, token, private key, or API key markers are rejected with VALIDATION_ERROR. */
             variables?: components["schemas"]["StringMap"];
             isDefault?: boolean;
-            status?: components["schemas"]["EntityStatus"];
         };
         EnvironmentEnvelope: {
             data: components["schemas"]["Environment"];
@@ -942,7 +1252,6 @@ export interface components {
             testData?: components["schemas"]["LongText"];
             /** @default true */
             required: boolean;
-            attachmentIds?: components["schemas"]["Identifier"][];
         };
         TestStep: {
             id: components["schemas"]["Identifier"];
@@ -976,16 +1285,15 @@ export interface components {
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
             component: components["schemas"]["ShortText"];
-            owner: components["schemas"]["ShortText"];
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
             tags: string[];
             estimatedMinutes: number | null;
             testData: components["schemas"]["LongText"];
             steps: components["schemas"]["TestStep"][];
             checklist: components["schemas"]["ChecklistItem"][];
             attachmentIds: components["schemas"]["Identifier"][];
-            linkIds: components["schemas"]["Identifier"][];
             changeNote: components["schemas"]["ShortText"];
-            createdBy: components["schemas"]["ActorRef"];
+            createdBy: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
         } & (unknown & unknown);
         TestCase: {
@@ -996,6 +1304,7 @@ export interface components {
             currentRevision: number;
             current: components["schemas"]["TestCaseRevision"];
             revisionCount: number;
+            linkIds: components["schemas"]["Identifier"][];
             /** Format: date-time */
             archivedAt: string | null;
             createdAt: components["schemas"]["Timestamp"];
@@ -1016,14 +1325,12 @@ export interface components {
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
             priority?: components["schemas"]["Priority"];
             component?: components["schemas"]["ShortText"];
-            owner?: components["schemas"]["ShortText"];
+            ownerIdentityId?: components["schemas"]["Identifier"] | null;
             tags?: string[];
             estimatedMinutes?: number | null;
             testData?: components["schemas"]["LongText"];
             steps?: components["schemas"]["TestStepInput"][];
             checklist?: components["schemas"]["ChecklistItemInput"][];
-            attachmentIds?: components["schemas"]["Identifier"][];
-            linkIds?: components["schemas"]["Identifier"][];
             changeNote?: components["schemas"]["ShortText"];
         } & (unknown & unknown);
         TestCasePatchRequest: {
@@ -1036,32 +1343,65 @@ export interface components {
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
             priority?: components["schemas"]["Priority"];
             component?: components["schemas"]["ShortText"];
-            owner?: components["schemas"]["ShortText"];
+            ownerIdentityId?: components["schemas"]["Identifier"] | null;
             tags?: string[];
             estimatedMinutes?: number | null;
             testData?: components["schemas"]["LongText"];
             steps?: components["schemas"]["TestStepInput"][];
             checklist?: components["schemas"]["ChecklistItemInput"][];
-            attachmentIds?: components["schemas"]["Identifier"][];
-            linkIds?: components["schemas"]["Identifier"][];
             changeNote?: components["schemas"]["ShortText"];
         };
         TestCaseCloneRequest: {
             title?: string;
             folderPath?: string;
         };
+        TestCaseSummary: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            folderPath: string;
+            currentRevision: number;
+            title: string;
+            /** @enum {string} */
+            type: "manual" | "checklist";
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            component: components["schemas"]["ShortText"];
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
+            tags: string[];
+            estimatedMinutes: number | null;
+            revisionCount: number;
+            /** Format: date-time */
+            archivedAt: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+        };
+        TestCaseRevisionSummary: {
+            revision: number;
+            title: string;
+            /** @enum {string} */
+            type: "manual" | "checklist";
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            component: components["schemas"]["ShortText"];
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
+            estimatedMinutes: number | null;
+            changeNote: components["schemas"]["ShortText"];
+            createdBy: components["schemas"]["Identifier"];
+            createdAt: components["schemas"]["Timestamp"];
+        };
         TestCaseEnvelope: {
             data: components["schemas"]["TestCase"];
         };
         TestCaseListEnvelope: {
-            data: components["schemas"]["TestCase"][];
+            data: components["schemas"]["TestCaseSummary"][];
             meta: components["schemas"]["PageMeta"];
         };
         TestCaseRevisionEnvelope: {
             data: components["schemas"]["TestCaseRevision"];
         };
         TestCaseRevisionListEnvelope: {
-            data: components["schemas"]["TestCaseRevision"][];
+            data: components["schemas"]["TestCaseRevisionSummary"][];
             meta: components["schemas"]["PageMeta"];
         };
         SuiteFilter: {
@@ -1079,6 +1419,7 @@ export interface components {
             description: components["schemas"]["LongText"];
             /** @enum {string} */
             type: "static" | "dynamic";
+            /** @description Stored explicit membership count for static suites; always zero for dynamic suites. */
             caseCount: number;
             status: components["schemas"]["EntityStatus"];
             createdAt: components["schemas"]["Timestamp"];
@@ -1087,6 +1428,7 @@ export interface components {
         Suite: components["schemas"]["SuiteSummary"] & {
             caseIds: components["schemas"]["Identifier"][];
             filter: components["schemas"]["SuiteFilter"];
+            /** @description Current server-owned preview excluding archived case aggregates; it does not create a resolution snapshot. */
             resolvedCaseCount: number;
         };
         SuiteCreateRequest: {
@@ -1097,7 +1439,7 @@ export interface components {
             type: "static" | "dynamic";
             caseIds?: components["schemas"]["Identifier"][];
             filter?: components["schemas"]["SuiteFilter"];
-        } & unknown;
+        } & (unknown & unknown);
         SuitePatchRequest: {
             name?: string;
             description?: components["schemas"]["LongText"];
@@ -1105,8 +1447,7 @@ export interface components {
             type?: "static" | "dynamic";
             caseIds?: components["schemas"]["Identifier"][];
             filter?: components["schemas"]["SuiteFilter"];
-            status?: components["schemas"]["EntityStatus"];
-        };
+        } & (unknown & unknown);
         SuiteEnvelope: {
             data: components["schemas"]["Suite"];
         };
@@ -1145,42 +1486,50 @@ export interface components {
             status: components["schemas"]["RunStatus"];
             environment: components["schemas"]["EnvironmentSnapshot"];
             suiteId: components["schemas"]["Identifier"] | null;
+            /** @description Immutable suite resolution used for reproducibility; null for explicit caseIds. */
+            suiteResolutionId: components["schemas"]["Identifier"] | null;
             build: components["schemas"]["ShortText"];
             configuration: components["schemas"]["StringMap"];
             itemCount: number;
             progress: components["schemas"]["RunProgress"];
+            /** @description Ready private attachments owned by this run. */
+            attachmentIds: components["schemas"]["Identifier"][];
             createdBy: components["schemas"]["ActorRef"];
             /** Format: date-time */
             startedAt: string | null;
             /** Format: date-time */
             completedAt: string | null;
+            /** Format: date-time */
+            abortedAt: string | null;
+            abortReason: components["schemas"]["LongText"] | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
         RunCreateRequest: {
             projectId: components["schemas"]["Identifier"];
             environmentId: components["schemas"]["Identifier"];
-            suiteId?: components["schemas"]["Identifier"] | null;
-            /** @description Duplicates are collapsed in request order. */
+            suiteId?: components["schemas"]["Identifier"];
+            /** @description Exact explicit scope in request order. */
             caseIds?: components["schemas"]["Identifier"][];
             name: string;
             description?: components["schemas"]["LongText"];
             type: components["schemas"]["RunType"];
             build?: components["schemas"]["ShortText"];
+            /** @description Public strings only. Secret-like property names are rejected. */
             configuration?: components["schemas"]["StringMap"];
-            assignee?: components["schemas"]["ShortText"];
+            /** @description An active identity with active workspace membership, or null. */
+            assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             /** @default false */
             startImmediately: boolean;
-        } | {
-            suiteId: components["schemas"]["Identifier"];
-        } | {
-            caseIds: unknown;
-        };
+        } & (unknown | unknown);
         RunPatchRequest: {
             name?: string;
             description?: components["schemas"]["LongText"];
             build?: components["schemas"]["ShortText"];
             configuration?: components["schemas"]["StringMap"];
+        };
+        RunAbortRequest: {
+            reason: components["schemas"]["LongText"];
         };
         RunEnvelope: {
             data: components["schemas"]["Run"];
@@ -1197,13 +1546,13 @@ export interface components {
             attachmentIds: components["schemas"]["Identifier"][];
             updatedAt: components["schemas"]["Timestamp"];
         };
-        RunAttempt: {
-            id: components["schemas"]["Identifier"];
-            number: number;
+        RunAttemptSummary: {
+            attemptNo: number;
             status: components["schemas"]["ExecutionStatus"];
             actualResult: components["schemas"]["LongText"];
             comment: components["schemas"]["LongText"];
-            stepResults: components["schemas"]["StepResult"][];
+            blockedReason: components["schemas"]["LongText"];
+            attachmentIds: components["schemas"]["Identifier"][];
             /** Format: date-time */
             startedAt: string | null;
             /** Format: date-time */
@@ -1211,15 +1560,18 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
+        RunAttempt: components["schemas"]["RunAttemptSummary"] & {
+            stepResults: components["schemas"]["StepResult"][];
+        };
         RunItemSummary: {
             id: components["schemas"]["Identifier"];
             caseId: components["schemas"]["Identifier"];
             caseKey: string;
             revision: number;
-            assignee: components["schemas"]["ShortText"];
+            assigneeIdentityId: components["schemas"]["Identifier"] | null;
             status: components["schemas"]["ExecutionStatus"];
             attemptCount: number;
-            activeAttemptId: components["schemas"]["Identifier"];
+            activeAttemptNo: number;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
@@ -1231,13 +1583,12 @@ export interface components {
             status: components["schemas"]["ExecutionStatus"];
             actualResult?: components["schemas"]["LongText"];
             comment?: components["schemas"]["LongText"];
-            attachmentIds?: components["schemas"]["Identifier"][];
+            blockedReason?: components["schemas"]["LongText"];
         } & (unknown & unknown);
         StepResultUpdateRequest: {
             status: components["schemas"]["ExecutionStatus"];
             actualResult?: components["schemas"]["LongText"];
             comment?: components["schemas"]["LongText"];
-            attachmentIds?: components["schemas"]["Identifier"][];
         };
         RunItemEnvelope: {
             data: components["schemas"]["RunItem"];
@@ -1247,19 +1598,30 @@ export interface components {
             meta: components["schemas"]["PageMeta"];
         };
         RunAttemptListEnvelope: {
-            data: components["schemas"]["RunAttempt"][];
+            data: components["schemas"]["RunAttemptSummary"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        RunAttemptEnvelope: {
+            data: components["schemas"]["RunAttempt"];
         };
         StepResultMutation: {
             runId: components["schemas"]["Identifier"];
             runItemId: components["schemas"]["Identifier"];
-            attemptId: components["schemas"]["Identifier"];
+            attemptNo: number;
             result: components["schemas"]["StepResult"];
         };
         StepResultEnvelope: {
             data: components["schemas"]["StepResultMutation"];
         };
         ActorRef: string;
+        DefectOccurrence: {
+            id: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId: components["schemas"]["Identifier"] | null;
+            createdAt: components["schemas"]["Timestamp"];
+        };
         Defect: {
             id: components["schemas"]["Identifier"];
             projectId: components["schemas"]["Identifier"];
@@ -1270,18 +1632,15 @@ export interface components {
             priority: components["schemas"]["Priority"];
             status: components["schemas"]["DefectStatus"];
             reproducibility: components["schemas"]["ShortText"];
-            assignee: components["schemas"]["ShortText"];
+            assigneeIdentityId: components["schemas"]["Identifier"] | null;
             component: components["schemas"]["ShortText"];
             labels: string[];
-            runId: components["schemas"]["Identifier"] | null;
-            runItemId: components["schemas"]["Identifier"] | null;
-            attemptId: components["schemas"]["Identifier"] | null;
-            stepId: components["schemas"]["Identifier"] | null;
+            occurrence: components["schemas"]["DefectOccurrence"] | null;
             expectedResult: components["schemas"]["LongText"];
             actualResult: components["schemas"]["LongText"];
             attachmentIds: components["schemas"]["Identifier"][];
             linkIds: components["schemas"]["Identifier"][];
-            createdBy: components["schemas"]["ActorRef"];
+            createdByIdentityId: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
@@ -1292,17 +1651,14 @@ export interface components {
             severity?: components["schemas"]["Priority"];
             priority?: components["schemas"]["Priority"];
             reproducibility?: components["schemas"]["ShortText"];
-            assignee?: components["schemas"]["ShortText"];
+            assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
             labels?: string[];
             runId?: components["schemas"]["Identifier"] | null;
             runItemId?: components["schemas"]["Identifier"] | null;
-            attemptId?: components["schemas"]["Identifier"] | null;
             stepId?: components["schemas"]["Identifier"] | null;
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
-            attachmentIds?: components["schemas"]["Identifier"][];
-            linkIds?: components["schemas"]["Identifier"][];
         };
         DefectPatchRequest: {
             title?: string;
@@ -1310,13 +1666,11 @@ export interface components {
             severity?: components["schemas"]["Priority"];
             priority?: components["schemas"]["Priority"];
             reproducibility?: components["schemas"]["ShortText"];
-            assignee?: components["schemas"]["ShortText"];
+            assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
             labels?: string[];
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
-            attachmentIds?: components["schemas"]["Identifier"][];
-            linkIds?: components["schemas"]["Identifier"][];
         };
         DefectStatusTransitionRequest: {
             status: components["schemas"]["DefectStatus"];
@@ -1333,7 +1687,15 @@ export interface components {
         AttachmentKind: "file" | "screenshot" | "video" | "log";
         /** @enum {string} */
         AttachmentUploadStatus: "pending" | "ready" | "failed" | "quarantined" | "deleting" | "deleted";
-        /** @enum {string} */
+        /**
+         * @description Safe lifecycle reason persisted with failed or quarantined private metadata.
+         * @enum {string}
+         */
+        AttachmentFailureCode: "ATTACHMENT_OBJECT_MISSING" | "ATTACHMENT_SIZE_MISMATCH" | "ATTACHMENT_ETAG_MISMATCH" | "ATTACHMENT_DIGEST_MISMATCH" | "ATTACHMENT_MEDIA_MISMATCH" | "ATTACHMENT_UPLOAD_EXPIRED";
+        /**
+         * @description Closed server policy. Finalize requires the exact stored Content-Type and bounded content validation; application/octet-stream is intentionally opaque.
+         * @enum {string}
+         */
         AttachmentMimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif" | "video/mp4" | "video/webm" | "video/quicktime" | "text/plain" | "application/pdf" | "application/json" | "application/zip" | "application/gzip" | "application/octet-stream";
         /**
          * @description Selected by the server from the active MIME policy; never accepted from the client.
@@ -1551,7 +1913,7 @@ export interface components {
             createdBy: components["schemas"]["ActorRef"];
             /** Format: date-time */
             storedAt: string | null;
-            failureCode: string | null;
+            failureCode: components["schemas"]["AttachmentFailureCode"] | null;
             /** Format: date-time */
             deletingAt: string | null;
             /** Format: date-time */
@@ -1620,6 +1982,132 @@ export interface components {
         AttachmentAccessEnvelope: {
             data: components["schemas"]["AttachmentAccess"];
         };
+        /** @enum {string} */
+        ExternalLinkOwnerKind: "test_case" | "run" | "defect";
+        /** @enum {string} */
+        ExternalLinkKind: "url" | "deep_link" | "external_issue";
+        /** @enum {string} */
+        ExternalLinkStatus: "active" | "archived";
+        ExternalLinkOwner: {
+            /** @constant */
+            kind: "test_case";
+            caseId: components["schemas"]["Identifier"];
+        } | {
+            /** @constant */
+            kind: "run";
+            runId: components["schemas"]["Identifier"];
+            /** @default null */
+            runItemId: components["schemas"]["Identifier"] | null;
+        } | {
+            /** @constant */
+            kind: "defect";
+            defectId: components["schemas"]["Identifier"];
+        };
+        ExternalLinkCreateRequest: {
+            projectId: components["schemas"]["Identifier"];
+            owner: components["schemas"]["ExternalLinkOwner"];
+            label: string;
+            /** @description URL and external_issue targets must be HTTPS without credentials. Deep links use an explicit lowercase scheme followed by ://. */
+            targetUri: string;
+            kind: components["schemas"]["ExternalLinkKind"];
+            externalSystem?: string;
+            externalKey?: string;
+        } & (unknown & unknown);
+        ExternalLink: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            owner: components["schemas"]["ExternalLinkOwner"];
+            label: string;
+            targetUri: string;
+            kind: components["schemas"]["ExternalLinkKind"];
+            externalSystem: string | null;
+            externalKey: string | null;
+            status: components["schemas"]["ExternalLinkStatus"];
+            archivedAt: components["schemas"]["Timestamp"] | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+        } & unknown;
+        ExternalLinkEnvelope: {
+            data: components["schemas"]["ExternalLink"];
+        };
+        ExternalLinkListEnvelope: {
+            data: components["schemas"]["ExternalLink"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        /** @enum {string} */
+        DashboardWidgetType: "summary" | "run_progress" | "recent_activity" | "defects" | "assigned_to_me";
+        DashboardWidgetPosition: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+        };
+        /** @description At most 8192 encoded bytes and four nested levels. Secret-like keys and non-JSON values are rejected. */
+        DashboardWidgetSettings: {
+            [key: string]: unknown;
+        };
+        DashboardWidgetInput: {
+            id?: components["schemas"]["Identifier"];
+            type: components["schemas"]["DashboardWidgetType"];
+            title: string;
+            position: components["schemas"]["DashboardWidgetPosition"];
+            settings?: components["schemas"]["DashboardWidgetSettings"];
+        };
+        DashboardWidget: {
+            id: components["schemas"]["Identifier"];
+            type: components["schemas"]["DashboardWidgetType"];
+            title: string;
+            position: components["schemas"]["DashboardWidgetPosition"];
+            settings: components["schemas"]["DashboardWidgetSettings"];
+        };
+        DashboardCreateRequest: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId?: components["schemas"]["Identifier"] | null;
+            name: string;
+            description?: string;
+            /** @default false */
+            isDefault: boolean;
+            widgets?: components["schemas"]["DashboardWidgetInput"][];
+        };
+        DashboardPatchRequest: {
+            name?: string;
+            description?: string;
+            isDefault?: boolean;
+            widgets?: components["schemas"]["DashboardWidgetInput"][];
+        };
+        Dashboard: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            name: string;
+            description: string;
+            isDefault: boolean;
+            status: components["schemas"]["EntityStatus"];
+            createdByIdentityId: components["schemas"]["Identifier"];
+            widgets: components["schemas"]["DashboardWidget"][];
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+        };
+        DashboardSummary: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            name: string;
+            description: string;
+            isDefault: boolean;
+            status: components["schemas"]["EntityStatus"];
+            createdByIdentityId: components["schemas"]["Identifier"];
+            widgetCount: number;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+        };
+        DashboardEnvelope: {
+            data: components["schemas"]["Dashboard"];
+        };
+        DashboardListEnvelope: {
+            data: components["schemas"]["DashboardSummary"][];
+            meta: components["schemas"]["PageMeta"];
+        };
         ActivityEvent: {
             id: components["schemas"]["Identifier"];
             workspaceId: components["schemas"]["Identifier"];
@@ -1629,7 +2117,7 @@ export interface components {
             entityType: string;
             entityId: components["schemas"]["Identifier"];
             entityKey: string | null;
-            /** @description Safe redacted metadata only; secrets, environment values, request bodies, storage keys, and signed URLs are forbidden. */
+            /** @description Safe redacted metadata only, capped at 8192 encoded bytes and four nested levels. Secrets, environment values, request bodies, storage keys, credential-bearing URLs, and signed URLs are forbidden. */
             details: {
                 [key: string]: unknown;
             };
@@ -1696,6 +2184,15 @@ export interface components {
         WorkspaceSummaryEnvelope: {
             data: components["schemas"]["WorkspaceSummary"];
         };
+        WorkspaceBootstrapEnvelope: {
+            data: components["schemas"]["WorkspaceSummary"];
+            meta: {
+                /** @constant */
+                compositionVersion: "workspace-bootstrap.v1";
+                /** @constant */
+                payloadBudgetBytes: 262144;
+            };
+        };
     };
     responses: {
         /** @description Service is ready to accept requests. */
@@ -1717,6 +2214,17 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["WorkspaceSummaryEnvelope"];
+            };
+        };
+        /** @description Bounded authenticated workspace-discovery composition. */
+        WorkspaceBootstrapResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["WorkspaceBootstrapEnvelope"];
             };
         };
         /** @description A page of projects ordered by key then ID. */
@@ -1765,7 +2273,7 @@ export interface components {
                 "application/json": components["schemas"]["EnvironmentEnvelope"];
             };
         };
-        /** @description A page of test cases ordered by updatedAt descending then ID. */
+        /** @description A page of bounded test-case summaries ordered by updatedAt descending then ID. */
         TestCaseListResponse: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
@@ -1788,7 +2296,7 @@ export interface components {
                 "application/json": components["schemas"]["TestCaseEnvelope"];
             };
         };
-        /** @description A page of immutable revisions. */
+        /** @description A page of bounded immutable revision summaries. */
         TestCaseRevisionListResponse: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
@@ -1890,6 +2398,16 @@ export interface components {
                 "application/json": components["schemas"]["RunAttemptListEnvelope"];
             };
         };
+        /** @description One immutable attempt with at most 500 step results. */
+        RunAttemptResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["RunAttemptEnvelope"];
+            };
+        };
         /** @description Updated step result and its aggregate identifiers. */
         StepResultResponse: {
             headers: {
@@ -1971,6 +2489,29 @@ export interface components {
                 "application/json": components["schemas"]["AttachmentAccessEnvelope"];
             };
         };
+        /** @description A page of scoped external-link metadata ordered newest first. */
+        ExternalLinkListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ExternalLinkListEnvelope"];
+            };
+        };
+        /** @description One scoped external link. */
+        ExternalLinkResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ExternalLinkEnvelope"];
+            };
+        };
         /** @description A page of safe append-only audit events ordered newest first. */
         ActivityListResponse: {
             headers: {
@@ -1980,6 +2521,29 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ActivityListEnvelope"];
+            };
+        };
+        /** @description A page of bounded dashboard summaries ordered newest first. */
+        DashboardListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardListEnvelope"];
+            };
+        };
+        /** @description One dashboard with no more than 100 safe widget definitions. */
+        DashboardResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardEnvelope"];
             };
         };
         /** @description The request is malformed or fails safe field validation. */
@@ -2118,10 +2682,14 @@ export interface components {
         SuiteIdPath: components["schemas"]["Identifier"];
         RunIdPath: components["schemas"]["Identifier"];
         RunItemIdPath: components["schemas"]["Identifier"];
+        AttemptNoPath: number;
         StepIdPath: components["schemas"]["Identifier"];
         DefectIdPath: components["schemas"]["Identifier"];
         UploadIntentIdPath: components["schemas"]["Identifier"];
         AttachmentIdPath: components["schemas"]["Identifier"];
+        ExternalLinkIdPath: components["schemas"]["Identifier"];
+        ExternalLinkStatusQuery: components["schemas"]["ExternalLinkStatus"];
+        DashboardIdPath: components["schemas"]["Identifier"];
         EntityStatusQuery: components["schemas"]["EntityStatus"];
     };
     requestBodies: {
@@ -2180,6 +2748,11 @@ export interface components {
                 "application/merge-patch+json": components["schemas"]["RunPatchRequest"];
             };
         };
+        RunAbort: {
+            content: {
+                "application/json": components["schemas"]["RunAbortRequest"];
+            };
+        };
         RunItemStatusUpdate: {
             content: {
                 "application/json": components["schemas"]["RunItemStatusUpdateRequest"];
@@ -2220,6 +2793,21 @@ export interface components {
                 "application/json": components["schemas"]["AttachmentAccessCreateRequest"];
             };
         };
+        ExternalLinkCreate: {
+            content: {
+                "application/json": components["schemas"]["ExternalLinkCreateRequest"];
+            };
+        };
+        DashboardCreate: {
+            content: {
+                "application/json": components["schemas"]["DashboardCreateRequest"];
+            };
+        };
+        DashboardPatch: {
+            content: {
+                "application/merge-patch+json": components["schemas"]["DashboardPatchRequest"];
+            };
+        };
     };
     headers: {
         /** @description Effective request correlation ID; identical to error.requestId on failures. */
@@ -2249,6 +2837,30 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["HealthResponse"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getWorkspaceBootstrap: {
+        parameters: {
+            query?: {
+                workspaceId?: components["schemas"]["Identifier"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                recentLimit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["WorkspaceBootstrapResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -2405,6 +3017,34 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    restoreProject: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ProjectResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     listEnvironments: {
         parameters: {
             query: {
@@ -2532,6 +3172,34 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    restoreEnvironment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                environmentId: components["parameters"]["EnvironmentIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["EnvironmentResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     listTestCases: {
         parameters: {
             query: {
@@ -2541,7 +3209,6 @@ export interface operations {
                 cursor?: components["parameters"]["Cursor"];
                 /** @description Requested page size. */
                 limit?: components["parameters"]["Limit"];
-                status?: components["schemas"]["AttachmentUploadStatus"];
                 includeArchived?: boolean;
                 search?: string;
                 lifecycle?: components["schemas"]["TestCaseLifecycle"];
@@ -2893,6 +3560,34 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    restoreSuite: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                suiteId: components["parameters"]["SuiteIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["SuiteResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     listRuns: {
         parameters: {
             query: {
@@ -3065,7 +3760,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: components["requestBodies"]["RunAbort"];
         responses: {
             200: components["responses"]["RunResponse"];
             401: components["responses"]["Unauthorized"];
@@ -3210,6 +3905,29 @@ export interface operations {
         responses: {
             200: components["responses"]["RunAttemptListResponse"];
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRunItemAttempt: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+                itemId: components["parameters"]["RunItemIdPath"];
+                attemptNo: components["parameters"]["AttemptNoPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["RunAttemptResponse"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
@@ -3374,6 +4092,139 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    listExternalLinks: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                status?: components["parameters"]["ExternalLinkStatusQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                ownerKind?: components["schemas"]["ExternalLinkOwnerKind"];
+                /** @description Required together with ownerKind; interpreted as caseId, runId, or defectId. */
+                ownerId?: components["schemas"]["Identifier"];
+                /** @description Optional only when ownerKind is run. */
+                runItemId?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ExternalLinkListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createExternalLink: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["ExternalLinkCreate"];
+        responses: {
+            201: components["responses"]["ExternalLinkResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getExternalLink: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ExternalLinkResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveExternalLink: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ExternalLinkResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreExternalLink: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                linkId: components["parameters"]["ExternalLinkIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ExternalLinkResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     listAttachments: {
         parameters: {
             query: {
@@ -3480,6 +4331,34 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    deleteAttachment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                attachmentId: components["parameters"]["AttachmentIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["AttachmentResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     createAttachmentAccess: {
         parameters: {
             query?: never;
@@ -3500,6 +4379,163 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listDashboards: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                status?: components["parameters"]["EntityStatusQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createDashboard: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["DashboardCreate"];
+        responses: {
+            201: components["responses"]["DashboardResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDashboard: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateDashboard: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["DashboardPatch"];
+        responses: {
+            200: components["responses"]["DashboardResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveDashboard: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreDashboard: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                dashboardId: components["parameters"]["DashboardIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
         };
     };

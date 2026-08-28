@@ -4,6 +4,7 @@ out/
 dist/
 build/
 .vercel/
+.reference/
 *.tsbuildinfo
 
 .DS_Store

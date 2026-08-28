@@ -4,8 +4,6 @@ import {
   Menu,
   Plus,
   Search,
-  Wifi,
-  WifiOff,
 } from "lucide-react";
 import { TmsSessionControl } from "../../auth/presentation/session/TmsSessionControl";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -13,7 +11,15 @@ import type { TmsLocale } from "../../localization/model/locale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import styles from "../../tms.module.css";
 
-export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
+export function WorkspaceHeader({
+  model,
+  sidebarCollapsed,
+  onToggleSidebar,
+}: {
+  model: WorkspaceModel;
+  sidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+}) {
   const { languageTag, locale, setLocale, t } = useTmsLocale();
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
@@ -35,12 +41,6 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
     minute: "2-digit",
   });
   const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
-  const connectionLabel =
-    model.connection === "connected"
-      ? t("header.apiConnected")
-      : model.connection === "demo"
-        ? t("header.developmentDemo")
-        : t("header.apiUnavailable");
   const languages: Array<{ id: TmsLocale; short: string }> = [
     { id: "en", short: "EN" },
     { id: "ru", short: "RU" },
@@ -49,9 +49,11 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
     <header className={styles.tabsBar}>
       <button
         className={styles.homeButton}
-        onClick={() => model.setView("dashboard")}
-        aria-label={t("header.openDashboard")}
-        title={t("header.dashboard")}
+        onClick={onToggleSidebar}
+        aria-label={t("header.toggleNavigation")}
+        title={t("header.toggleNavigation")}
+        aria-controls="tms-navigation"
+        aria-expanded={!sidebarCollapsed}
       >
         <Menu size={21} />
       </button>
@@ -68,6 +70,7 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
           <label className={styles.headerProjectSelect}>
             <select
               value={model.project.id}
+              title={model.project.name}
               onChange={(event) => model.chooseProject(event.target.value)}
               aria-label={t("header.currentProject")}
             >
@@ -83,7 +86,7 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
           <button
             className={styles.headerProjectEmpty}
             disabled={!workspaceReady}
-            onClick={() => model.setDialog("project")}
+            onClick={model.openNewProject}
           >
             <Plus size={15} /> {t("header.createFirstProject")}
           </button>
@@ -91,7 +94,7 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
         {model.project && workspaceReady && (
           <button
             className={styles.headerProjectAdd}
-            onClick={() => model.setDialog("project")}
+            onClick={model.openNewProject}
             aria-label={t("header.createProject")}
             title={t("header.createProject")}
           >
@@ -160,18 +163,6 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
               </button>
             );
           })}
-        </div>
-        <div
-          className={styles.connection}
-          role="status"
-          aria-label={connectionLabel}
-          title={connectionLabel}
-        >
-          {model.connection === "connected" ? (
-            <Wifi size={15} />
-          ) : (
-            <WifiOff size={15} />
-          )}
         </div>
         <TmsSessionControl />
       </div>

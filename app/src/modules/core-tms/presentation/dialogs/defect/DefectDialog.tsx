@@ -4,10 +4,11 @@ import type { FormEvent } from "react";
 import type {
   Defect,
   RunItem,
-  TestRun,
+  TestRunSummary,
 } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
+import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
@@ -18,7 +19,7 @@ import styles from "../../../tms.module.css";
 
 type DefectDialogProps = {
   projectId: string;
-  run: TestRun | null;
+  run: TestRunSummary | null;
   item: RunItem | null;
   offline: boolean;
   onClose: () => void;
@@ -34,10 +35,11 @@ export function DefectDialog({
   onCreated,
 }: DefectDialogProps) {
   const http = useTmsHttpClient();
+  const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
   const attempt =
-    item?.attempts.find((entry) => entry.id === item.activeAttemptId) ??
+    item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ??
     item?.attempts[0];
   const failedStep = item
     ? executableSteps(item.snapshot, locale).find(
@@ -61,13 +63,14 @@ export function DefectDialog({
   const [link, setLink] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [operationKey] = useState(() => crypto.randomUUID());
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
     setSubmitting(true);
     setError(false);
-    const payload: Omit<Defect, "id" | "key" | "createdAt"> = {
+    const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds"> = {
       projectId,
       title,
       description,
@@ -75,7 +78,7 @@ export function DefectDialog({
       priority: severity,
       status: "open",
       reproducibility,
-      assignee: "QA Team",
+      assigneeIdentityId: null,
       component:
         item?.snapshot.component ??
         (locale === "ru" ? "Основной продукт" : "Core product"),
@@ -88,7 +91,7 @@ export function DefectDialog({
     };
     try {
       onCreated(
-        await createDefect({ http, projectId, payload, files, link, offline, locale }),
+        await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale }),
       );
     } catch {
       setError(true);

@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { TmsAuthBoundary } from "../../auth/presentation/boundary/TmsAuthBoundary";
 import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -14,14 +15,30 @@ import { WorkspaceHeader } from "./WorkspaceHeader";
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   const { t } = useTmsLocale();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  useEffect(() => {
+    setSidebarCollapsed(window.localStorage.getItem("tms.sidebar.collapsed.v1") === "true");
+  }, []);
+  function toggleSidebar() {
+    setSidebarCollapsed((current) => {
+      const next = !current;
+      window.localStorage.setItem("tms.sidebar.collapsed.v1", String(next));
+      return next;
+    });
+  }
   return (
     <div className={styles.app} data-testid="tms-workspace">
-      <WorkspaceHeader model={model} />
-      <div className={styles.frame}>
+      <WorkspaceHeader
+        model={model}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={toggleSidebar}
+      />
+      <div className={`${styles.frame} ${sidebarCollapsed ? styles.frameCollapsed : ""}`}>
         <Navigation
           view={model.view}
           onChange={model.setView}
           disabled={!model.project}
+          collapsed={sidebarCollapsed}
         />
         <main className={styles.stage}>
           {model.connection === "demo" && (

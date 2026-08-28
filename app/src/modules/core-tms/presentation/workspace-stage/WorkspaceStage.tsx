@@ -27,7 +27,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     return (
       <ProjectOnboarding
         loading={false}
-        onCreate={() => model.setDialog("project")}
+        onCreate={model.openNewProject}
       />
     );
   }
@@ -64,6 +64,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         }}
         testCase={model.selectedCase}
         revision={model.selectedRevision}
+        linkIds={model.selectedCaseDetail?.linkIds ?? []}
         onNew={model.openNewCase}
         onEdit={model.openEditCase}
         onClone={model.cloneCase}
@@ -73,11 +74,10 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
           model.openRunDialog({ caseIds: [model.selectedCase.id] })
         }
         activity={model.data.activity}
-        runs={model.projectRuns}
         filters={model.caseFilters}
         onFilters={model.setCaseFilters}
         onNewFolder={() => model.setDialog("folder")}
-        onNewProject={() => model.setDialog("project")}
+        onNewProject={model.openNewProject}
         onCollapseAll={() =>
           model.setCollapsedFolders(
             model.folderGroups.map(([folderName]) => folderName),
@@ -107,6 +107,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         suites={model.projectSuites}
         cases={model.projectCases}
         selected={model.selectedSuiteId}
+        selectedDetail={model.selectedSuite}
         onSelect={model.setSelectedSuiteId}
         onCreate={() => {
           model.setEditingSuiteId(null);
@@ -126,7 +127,11 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       <ConfigView
         environments={model.projectEnvironments}
         project={model.project}
-        onCreate={() => model.setDialog("environment")}
+        onCreate={model.openNewEnvironment}
+        onEditEnvironment={model.openEditEnvironment}
+        onToggleEnvironment={model.toggleEnvironment}
+        onEditProject={model.openEditProject}
+        onToggleProject={model.toggleProject}
       />
     );
   }
@@ -136,6 +141,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         offline={model.connection === "demo"}
         runs={model.projectRuns}
         selectedRun={model.selectedRun}
+        items={model.runItems}
         selectedItem={model.selectedRunItem}
         progress={model.executionProgress}
         onSelectRun={(id) => {

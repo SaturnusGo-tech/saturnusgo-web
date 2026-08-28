@@ -5,6 +5,7 @@ const copies = {
     defaultDescription: "Local test target",
     error: "The environment was not saved. Check the key, URL, and TMS API response.",
     title: "New environment",
+    editTitle: "Edit environment",
     subtitle: "Store a reusable target for manual runs.",
     name: "Name",
     key: "Key",
@@ -13,11 +14,13 @@ const copies = {
     cancel: "Cancel",
     creating: "Creating…",
     create: "Create environment",
+    save: "Save changes",
   },
   ru: {
     defaultDescription: "Локальное тестовое окружение",
     error: "Не удалось сохранить окружение. Проверьте ключ, URL и ответ TMS API.",
     title: "Новое окружение",
+    editTitle: "Изменить окружение",
     subtitle: "Сохраните переиспользуемую цель для ручных ранов.",
     name: "Название",
     key: "Ключ",
@@ -26,6 +29,7 @@ const copies = {
     cancel: "Отмена",
     creating: "Создание…",
     create: "Создать окружение",
+    save: "Сохранить изменения",
   },
 } as const;
 

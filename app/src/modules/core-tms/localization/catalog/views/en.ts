@@ -24,6 +24,7 @@ export const enViewMessages = {
   "config.description": "Reusable runtime targets captured with every test result.",
   "config.newEnvironment": "New environment",
   "config.copyBaseUrl": "Copy base URL",
+  "config.projectSettings": "Project settings",
   "config.executionDefaults": "Execution defaults",
   "config.executionDefaultsHint": "Browser, platform, build, and assignee are snapshotted into every run.",
   "integrations.eyebrow": "Cross-system quality",

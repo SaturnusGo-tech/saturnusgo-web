@@ -1,68 +1,86 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─────────────────────────────────────────────────────────────
-# Запускать ИЗ репозитория Pages: saturnusgo-web.github.io
-# Скрипт:
-#  1) собирает экспорт в ../saturnusgo-landing.work (BUILD_TARGET=export)
-#  2) копирует в ../_deploy
-#  3) синхронизирует в текущий репозиторий Pages и пушит в main
-# ─────────────────────────────────────────────────────────────
-
-LANDING_REPO="../saturnusgo-landing.work"
-STAGE="../_deploy"
-PAGES_REPO="$(pwd)"                  # текущий каталог — корень Pages
-OUT_DIR="$LANDING_REPO/out"
-
-echo "› Проверка путей…"
-[ -d "$LANDING_REPO" ] || { echo "❌ Не найден $LANDING_REPO"; exit 1; }
-[ -d "$PAGES_REPO/.git" ] || { echo "❌ Текущая папка не похожа на git-репозиторий Pages"; exit 1; }
-
-echo "› Сборка статики (Next, output: export)…"
-cd "$LANDING_REPO"
-
-# Важно: если используешь переключатель в next.config.js,
-# этот env заставит build идти в режиме export (и Next сам положит файлы в /out).
-BUILD_TARGET=export npm run build
-
-# Явная метка версии (чтобы Git видел новый файл)
-date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT_DIR/version.txt"
-
-# Быстрый sanity check
-[ -d "$OUT_DIR" ] || { echo "❌ После сборки нет $OUT_DIR"; exit 1; }
-[ -f "$OUT_DIR/index.html" ] || { echo "❌ В $OUT_DIR нет index.html — export не сгенерировался"; exit 1; }
-
-echo "› Подготовка staging каталога…"
-rm -rf "$STAGE" && mkdir -p "$STAGE"
-rsync -a "$OUT_DIR"/ "$STAGE"/
-
-echo "› Копируем служебные файлы Pages…"
-cd "$PAGES_REPO"
-[ -f CNAME ]    && cp CNAME    "$STAGE/"
-[ -f 404.html ] && cp 404.html "$STAGE/"
-touch "$STAGE/.nojekyll"
-
-echo "› Синхронизация с origin/main…"
-git fetch origin
-git reset --hard origin/main
-
-echo "› Публикуем артефакты в корень репозитория Pages…"
-# Полное замещение (кроме .git)
-find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-rsync -a --delete "$STAGE"/ . --exclude ".git" --exclude "_deploy"
-
-echo "› Проверяем diff…"
-git status --porcelain
-
-echo "› Коммит и пуш…"
-git add -A
-# Если .gitignore вдруг отрезает html/js/css — форсанём на всякий случай
-git add -f .
-
-# Если изменений реально нет — git commit упадёт. Поймаем и сообщим.
-if git commit -m "deploy: $(date -u '+%Y-%m-%d %H:%M:%SZ')"; then
-  git push origin main
-  echo "✅ Pages обновлены."
-else
-  echo "ℹ️ Нет изменений для коммита — вероятно, контент идентичен предыдущему."
+mode="${1:---prepare}"
+if [[ "$mode" != "--prepare" && "$mode" != "--publish" ]]; then
+  echo "Usage: TMS_SOURCE_SHA=<sha> $0 [--prepare|--publish]" >&2
+  exit 2
 fi
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source_repo=$(cd "$script_dir/.." && pwd)
+pages_repo=${TMS_PAGES_REPO:-"$(dirname "$source_repo")/saturnusgo-web.github.io"}
+expected_sha=${TMS_SOURCE_SHA:-}
+route_path="testcases/umbrella-home/work"
+
+if [[ -z "$expected_sha" ]]; then
+  echo "TMS_SOURCE_SHA is required; deployment must be bound to a reviewed source commit." >&2
+  exit 3
+fi
+[[ -d "$pages_repo/.git" ]] || { echo "Pages repository not found: $pages_repo" >&2; exit 4; }
+
+actual_sha=$(git -C "$source_repo" rev-parse HEAD)
+[[ "$actual_sha" == "$expected_sha" ]] || {
+  echo "Source SHA mismatch: expected $expected_sha, found $actual_sha" >&2
+  exit 5
+}
+[[ -z "$(git -C "$source_repo" status --porcelain)" ]] || {
+  echo "Source checkout must be clean before release." >&2
+  exit 6
+}
+[[ -z "$(git -C "$pages_repo" status --porcelain)" ]] || {
+  echo "Pages checkout must be clean before release." >&2
+  exit 7
+}
+
+api_hold_dir=$(mktemp -d)
+restore_api() {
+  if [[ -d "$api_hold_dir/api" ]]; then mv "$api_hold_dir/api" "$source_repo/app/api"; fi
+  rmdir "$api_hold_dir" 2>/dev/null || true
+}
+trap restore_api EXIT
+if [[ -d "$source_repo/app/api" ]]; then mv "$source_repo/app/api" "$api_hold_dir/api"; fi
+
+(
+  cd "$source_repo"
+  BUILD_TARGET=export \
+  NEXT_PUBLIC_AUTH0_DOMAIN=dev-4v1srvqwzp1m7cdl.us.auth0.com \
+  NEXT_PUBLIC_AUTH0_CLIENT_ID=CQjoUKhO0f73Cb80jmWNiGXuyZt1TviC \
+  NEXT_PUBLIC_AUTH0_AUDIENCE=https://api.tms.saturnusgo.com \
+  NEXT_PUBLIC_TMS_API_BASE=https://umbrella-home-tms-backend-production.up.railway.app/api/v1 \
+  npm run build
+)
+restore_api
+trap - EXIT
+
+out_dir="$source_repo/out"
+test -f "$out_dir/$route_path/index.html"
+if find "$out_dir/testcases" -type d | grep -Eq 'UmbrellaHome|/Work$'; then
+  echo "Mixed-case TMS route was emitted." >&2
+  exit 8
+fi
+if rg -n 'http://(?:localhost|127\.0\.0\.1)|/testcases/UmbrellaHome/Work' "$out_dir"; then
+  echo "Local API or mixed-case route leaked into the export." >&2
+  exit 9
+fi
+
+echo "Scoped Pages changes:"
+rsync -ani "$out_dir/_next/" "$pages_repo/_next/"
+rsync -ani --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
+
+if [[ "$mode" == "--prepare" ]]; then
+  echo "Prepared only; Pages checkout was not modified."
+  exit 0
+fi
+[[ "${TMS_RELEASE_APPROVED:-}" == "YES" ]] || {
+  echo "Publishing requires TMS_RELEASE_APPROVED=YES after backend/Auth0 readiness confirmation." >&2
+  exit 10
+}
+
+mkdir -p "$pages_repo/_next" "$pages_repo/$route_path"
+rsync -a "$out_dir/_next/" "$pages_repo/_next/"
+rsync -a --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
+touch "$pages_repo/.nojekyll"
+git -C "$pages_repo" add _next "$route_path" .nojekyll
+git -C "$pages_repo" commit -m "deploy: TMS ${actual_sha:0:8}"
+git -C "$pages_repo" push origin main

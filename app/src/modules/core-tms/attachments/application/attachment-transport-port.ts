@@ -1,10 +1,12 @@
 import type {
   AttachmentKind,
   AttachmentMetadata,
+  AttachmentMetadataResource,
   AttachmentMimeType,
   AttachmentOwner,
   AttachmentReadAccess,
   CreateAttachmentAccessInput,
+  RemovePrivateAttachmentInput,
 } from "../domain/attachment";
 
 export interface PendingAttachmentUpload {
@@ -43,6 +45,7 @@ export interface FinalizeUploadInput {
 }
 
 export interface AttachmentTransportPort {
+  getMetadata(attachmentId: string, signal?: AbortSignal): Promise<AttachmentMetadataResource>;
   createUploadIntent(input: CreateUploadIntentInput): Promise<{
     readonly intent: PendingAttachmentUpload;
     readonly etag: string;
@@ -54,4 +57,5 @@ export interface AttachmentTransportPort {
   ): Promise<string>;
   finalizeUpload(input: FinalizeUploadInput): Promise<AttachmentMetadata>;
   createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess>;
+  remove(input: RemovePrivateAttachmentInput): Promise<AttachmentMetadataResource>;
 }

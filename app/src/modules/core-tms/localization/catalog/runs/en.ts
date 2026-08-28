@@ -27,6 +27,7 @@ export const enRunMessages = {
   "runs.pass": "Pass",
   "runs.passRequiredFirst": "Pass every required step first",
   "runs.addEvidence": "Add evidence",
+  "runs.evidence": "Attached evidence",
   "runs.createBug": "Create bug",
   "runs.reportBug": "Report bug",
   "runs.completed": "Run completed",

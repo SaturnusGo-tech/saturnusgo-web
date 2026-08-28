@@ -1,12 +1,29 @@
-import type { Bootstrap } from "../contracts/legacy-contract";
 import { resolveTmsApiBase } from "../config/api-base";
 
 export type MutationMethod = "POST" | "PATCH" | "DELETE";
 export type TmsAccessTokenProvider = (signal?: AbortSignal) => Promise<string>;
 
+export type TmsResource<T> = {
+  readonly data: T;
+  readonly etag: string | null;
+};
+
+export type TmsMutationOptions = {
+  readonly signal?: AbortSignal;
+  readonly ifMatch?: string;
+  readonly idempotencyKey?: string;
+};
+
 export interface TmsHttpClient {
-  fetchBootstrap(signal?: AbortSignal): Promise<Bootstrap>;
+  get<T>(path: string, signal?: AbortSignal): Promise<T>;
+  getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>>;
   mutate<T>(path: string, method: MutationMethod, body?: unknown, signal?: AbortSignal): Promise<T>;
+  mutateResource<T>(
+    path: string,
+    method: MutationMethod,
+    body?: unknown,
+    options?: TmsMutationOptions,
+  ): Promise<TmsResource<T>>;
 }
 
 export interface TmsHttpClientConfiguration {
@@ -48,6 +65,11 @@ export function createTmsHttpClient(
   );
   const fetcher = configuration.fetch ?? fetch;
 
+  async function payload<T>(response: Response): Promise<T> {
+    if (response.status === 204) return undefined as T;
+    return await response.json() as T;
+  }
+
   async function request(path: string, init: RequestInit, signal?: AbortSignal): Promise<Response> {
     const token = await bearer(configuration.accessToken, signal);
     const headers = new Headers(init.headers);
@@ -71,8 +93,13 @@ export function createTmsHttpClient(
   }
 
   return Object.freeze({
-    async fetchBootstrap(signal?: AbortSignal): Promise<Bootstrap> {
-      return await (await request("/bootstrap", { method: "GET" }, signal)).json() as Bootstrap;
+    async get<T>(path: string, signal?: AbortSignal): Promise<T> {
+      return await payload<T>(await request(path, { method: "GET" }, signal));
+    },
+    async getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>> {
+      const response = await request(path, { method: "GET" }, signal);
+      const body = await payload<{ data: T }>(response);
+      return { data: body.data, etag: response.headers.get("etag") };
     },
     async mutate<T>(
       path: string,
@@ -90,6 +117,27 @@ export function createTmsHttpClient(
       return typeof payload === "object" && payload !== null && "data" in payload
         ? (payload as { data: T }).data
         : payload as T;
+    },
+    async mutateResource<T>(
+      path: string,
+      method: MutationMethod,
+      body?: unknown,
+      options: TmsMutationOptions = {},
+    ): Promise<TmsResource<T>> {
+      const headers = new Headers(body === undefined
+        ? undefined
+        : { "Content-Type": "application/json" });
+      if (options.ifMatch) headers.set("If-Match", options.ifMatch);
+      if (options.idempotencyKey) {
+        headers.set("Idempotency-Key", options.idempotencyKey);
+      }
+      const response = await request(path, {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      }, options.signal);
+      const envelope = await payload<{ data: T }>(response);
+      return { data: envelope?.data, etag: response.headers.get("etag") };
     },
   });
 }

@@ -1,18 +1,20 @@
 import { Bug, ExternalLink, Image as ImageIcon, Paperclip, RefreshCw, Video } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import type { Defect, RunItem, TestRun, TestStep } from "../../../../core/tms/contracts/legacy-contract";
+import type { Defect, RunItem, TestRunSummary, TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../application/defects/createDefect";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
+import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { FormError } from "../common/error/FormError";
 import { Field } from "../common/field/Field";
 import styles from "../../tms.module.css";
-export function InlineDefectComposer({ projectId, run, item, step, offline, onCreated }: { projectId: string; run: TestRun; item: RunItem; step: TestStep; offline: boolean; onCreated: (defect: Defect) => void }) {
+export function InlineDefectComposer({ projectId, run, item, step, offline, onCreated }: { projectId: string; run: TestRunSummary; item: RunItem; step: TestStep; offline: boolean; onCreated: (defect: Defect) => void }) {
   const http = useTmsHttpClient();
+  const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
-  const attempt = item.attempts.find((entry) => entry.id === item.activeAttemptId) ?? item.attempts[0];
+  const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;
   const failedResult = attempt.stepResults.find((entry) => entry.stepId === step.id);
   const observed = failedResult?.actualResult || attempt.actualResult || t("inlineDefect.observedDefault");
@@ -22,20 +24,23 @@ export function InlineDefectComposer({ projectId, run, item, step, offline, onCr
   const [category, setCategory] = useState(t("inlineDefect.categoryDefault"));
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
   const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}\n\n${t("inlineDefect.actualPrefix")}: ${observed}`);
-  const [link, setLink] = useState(run.environment.baseUrl);
+  const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl)
+    ? run.environment.baseUrl
+    : "");
   const [files, setFiles] = useState<File[]>([]);
   const [created, setCreated] = useState<Defect | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [operationKey] = useState(() => crypto.randomUUID());
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting || created) return;
     setSubmitting(true);
     setError("");
-    const payload: Omit<Defect, "id" | "key" | "createdAt"> = { projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`, severity, priority, status: "open", reproducibility: "Always", assignee: "QA Team", component: category, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id, stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed };
+    const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds"> = { projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`, severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null, component: category, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id, stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed };
     try {
-      const next = await createDefect({ http, projectId, payload, files, link, offline, locale });
+      const next = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
       setCreated(next);
       onCreated(next);
     } catch {

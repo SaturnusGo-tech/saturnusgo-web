@@ -6,6 +6,7 @@ import {
 } from "../../../../core/tms/fallback/bootstrap";
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
+import { loadProjectCollections, loadWorkspace } from "../../workspace/data/workspace-api";
 
 export type WorkspaceConnection =
   | "loading"
@@ -49,7 +50,8 @@ export function useWorkspaceBootstrap() {
     activeController.current = controller;
     setConnection("loading");
     setFailure(null);
-    http.fetchBootstrap(controller.signal)
+    const preferredProjectId = window.localStorage.getItem("tms.project.v1") ?? undefined;
+    loadWorkspace(http, preferredProjectId, controller.signal)
       .then((payload) => {
         if (controller.signal.aborted || requestId !== activeRequest.current) return;
         setData(payload);
@@ -74,6 +76,50 @@ export function useWorkspaceBootstrap() {
     setRequestVersion((current) => current + 1);
   }, []);
 
+  const loadProject = useCallback(async (projectId: string) => {
+    const requestId = ++activeRequest.current;
+    const controller = new AbortController();
+    activeController.current?.abort();
+    activeController.current = controller;
+    try {
+      const collections = await loadProjectCollections(http, projectId, controller.signal);
+      if (controller.signal.aborted || requestId !== activeRequest.current) return null;
+      setData((current) => ({
+        ...current,
+        testCases: [
+          ...current.testCases.filter((item) => item.projectId !== projectId),
+          ...collections.testCases,
+        ],
+        runs: [
+          ...current.runs.filter((item) => item.projectId !== projectId),
+          ...collections.runs,
+        ],
+        environments: [
+          ...current.environments.filter((item) => item.projectId !== projectId),
+          ...collections.environments,
+        ],
+        suites: [
+          ...current.suites.filter((item) => item.projectId !== projectId),
+          ...collections.suites,
+        ],
+        defects: [
+          ...current.defects.filter((item) => item.projectId !== projectId),
+          ...collections.defects,
+        ],
+        externalLinks: [
+          ...current.externalLinks.filter((item) => item.projectId !== projectId),
+          ...collections.externalLinks,
+        ],
+      }));
+      return collections;
+    } catch (error) {
+      if (controller.signal.aborted || requestId !== activeRequest.current) return null;
+      const apiError = error instanceof TmsApiError ? error : null;
+      setFailure({ detail: apiError ? `status ${apiError.status}` : "unreachable", requestId: apiError?.requestId ?? null });
+      return null;
+    }
+  }, [http]);
+
   const useDevelopmentDemo = useCallback(() => {
     if (!DEMO_AVAILABLE) return;
     activeController.current?.abort();
@@ -90,6 +136,7 @@ export function useWorkspaceBootstrap() {
     connection,
     failure,
     generation,
+    loadProject,
     retryBootstrap,
     useDevelopmentDemo,
     demoAvailable: DEMO_AVAILABLE,

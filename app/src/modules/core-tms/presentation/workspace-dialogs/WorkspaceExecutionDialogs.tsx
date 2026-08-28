@@ -12,11 +12,16 @@ export function WorkspaceExecutionDialogs({
   model: WorkspaceModel;
 }) {
   const { locale, t } = useTmsLocale();
-  const close = () => model.setDialog(null);
+  const close = () => {
+    model.closeResourceEditors();
+    model.setDialog(null);
+  };
   if (model.dialog === "environment") {
     return (
       <EnvironmentDialog
         projectId={model.project?.id ?? ""}
+        environment={model.environmentEditor?.data}
+        environmentEtag={model.environmentEditor?.etag}
         offline={model.connection === "demo"}
         onClose={close}
         onCreated={(environment) => {
@@ -26,6 +31,10 @@ export function WorkspaceExecutionDialogs({
           }));
           close();
           model.notify(t("actions.environmentCreated"));
+        }}
+        onUpdated={(environment, etag) => {
+          model.acceptEnvironmentUpdate(environment, etag);
+          close();
         }}
       />
     );
@@ -49,13 +58,13 @@ export function WorkspaceExecutionDialogs({
             runs: [...current.runs, run],
           }));
           model.setSelectedRunId(run.id);
-          model.setSelectedRunItemId(run.items[0]?.id ?? null);
+          model.setSelectedRunItemId(null);
           model.setRunPresetCaseIds([]);
           model.setRunPresetSuiteId("");
           model.setView("runs");
           close();
           model.notify(t("actions.runStarted", {
-            type: localizedLabel(locale, run.type), count: run.items.length,
+            type: localizedLabel(locale, run.type), count: run.itemCount,
           }));
         }}
       />

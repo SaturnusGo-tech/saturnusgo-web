@@ -26,6 +26,7 @@ export const ruViewMessages = {
   "config.description": "Повторно используемые цели, которые фиксируются с каждым результатом теста.",
   "config.newEnvironment": "Новое окружение",
   "config.copyBaseUrl": "Скопировать базовый URL",
+  "config.projectSettings": "Настройки проекта",
   "config.executionDefaults": "Настройки выполнения",
   "config.executionDefaultsHint": "Браузер, платформа, сборка и исполнитель фиксируются в каждом ране.",
   "integrations.eyebrow": "Качество взаимодействия систем",

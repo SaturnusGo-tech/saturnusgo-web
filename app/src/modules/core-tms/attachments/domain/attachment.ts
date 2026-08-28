@@ -42,6 +42,11 @@ export interface AttachmentMetadata {
   readonly updatedAt: string;
 }
 
+export interface AttachmentMetadataResource {
+  readonly metadata: AttachmentMetadata;
+  readonly etag: string;
+}
+
 export interface AttachmentReadAccess {
   readonly attachmentId: string;
   readonly method: "GET";
@@ -65,6 +70,14 @@ export interface CreateAttachmentAccessInput {
   readonly attachmentId: string;
   readonly disposition?: "inline" | "attachment";
   readonly fileName?: string;
+  readonly requestId?: string;
+  readonly signal?: AbortSignal;
+}
+
+export interface RemovePrivateAttachmentInput {
+  readonly attachmentId: string;
+  readonly etag: string;
+  readonly operationKey: string;
   readonly requestId?: string;
   readonly signal?: AbortSignal;
 }

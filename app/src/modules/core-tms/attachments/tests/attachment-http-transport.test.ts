@@ -41,6 +41,25 @@ test("authenticated API calls never leak bearer credentials to the private objec
         createdAt: "2026-08-28T00:00:00.000Z", updatedAt: "2026-08-28T00:00:00.000Z",
       });
     }
+    if (url.endsWith("/attachments/att-1") && init.method === "GET") {
+      return json({
+        id: "att-1", projectId: "project-1", owner: { kind: "run", runId: "run-1" },
+        kind: "log", originalFilename: "hello.txt", mimeType: "text/plain",
+        trustedExtension: "txt", byteSize: 5, sha256, status: "ready", createdBy: "identity-1",
+        storedAt: "2026-08-28T00:00:00.000Z", failureCode: null, deletingAt: null, deletedAt: null,
+        createdAt: "2026-08-28T00:00:00.000Z", updatedAt: "2026-08-28T00:00:00.000Z",
+      }, 200, { etag: '"attachment:att-1:2"' });
+    }
+    if (url.endsWith("/attachments/att-1") && init.method === "DELETE") {
+      return json({
+        id: "att-1", projectId: "project-1", owner: { kind: "run", runId: "run-1" },
+        kind: "log", originalFilename: "hello.txt", mimeType: "text/plain",
+        trustedExtension: "txt", byteSize: 5, sha256, status: "deleting", createdBy: "identity-1",
+        storedAt: "2026-08-28T00:00:00.000Z", failureCode: null,
+        deletingAt: "2026-08-28T00:00:01.000Z", deletedAt: null,
+        createdAt: "2026-08-28T00:00:00.000Z", updatedAt: "2026-08-28T00:00:01.000Z",
+      }, 200, { etag: '"attachment:att-1:3"' });
+    }
     if (url.endsWith("/attachments/att-1/access")) {
       return json({
         attachmentId: "att-1", trustedExtension: "txt", method: "GET",
@@ -61,16 +80,26 @@ test("authenticated API calls never leak bearer credentials to the private objec
     mimeType: "text/plain", file: new File(["hello"], "hello.txt", { type: "text/plain" }),
     operationKey: "stable-operation-key",
   });
+  const metadata = await client.getMetadata(uploaded.id);
+  const removed = await client.remove({
+    attachmentId: uploaded.id, etag: metadata.etag, operationKey: "remove-operation-key",
+  });
   const access = await client.createAccess({ attachmentId: uploaded.id, disposition: "inline" });
 
   assert.equal(access.method, "GET");
-  assert.equal(tokenRequests, 3);
-  const [intent, put, finalize, read] = calls;
+  assert.equal(metadata.metadata.originalFilename, "hello.txt");
+  assert.equal(removed.metadata.status, "deleting");
+  assert.equal(tokenRequests, 5);
+  const [intent, put, finalize, metadataRead, remove, read] = calls;
   assert.equal(new Headers(intent.init.headers).get("authorization"), "Bearer header.payload.signature");
   assert.equal(new Headers(put.init.headers).get("authorization"), null);
   assert.equal(new Headers(put.init.headers).get("x-amz-checksum-sha256"), checksum);
   assert.equal(put.init.credentials, "omit");
   assert.equal(new Headers(finalize.init.headers).get("if-match"), '"attachment:att-1:1"');
+  assert.equal(new Headers(metadataRead.init.headers).get("authorization"), "Bearer header.payload.signature");
+  assert.equal(new Headers(remove.init.headers).get("authorization"), "Bearer header.payload.signature");
+  assert.equal(new Headers(remove.init.headers).get("if-match"), '"attachment:att-1:2"');
+  assert.equal(new Headers(remove.init.headers).get("idempotency-key"), "remove-operation-key");
   assert.equal(new Headers(read.init.headers).get("authorization"), "Bearer header.payload.signature");
 });
 

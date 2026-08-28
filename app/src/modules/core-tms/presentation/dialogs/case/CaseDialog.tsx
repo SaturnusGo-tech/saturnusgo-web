@@ -9,11 +9,13 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
 import { getCaseDialogCopy } from "./copy";
+import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import styles from "../../../tms.module.css";
-export function CaseDialog({ value, onChange, folderPath, onFolderPath, folders, editing, onClose, onSubmit }: { value: TestCaseRevision; onChange: (value: TestCaseRevision) => void; folderPath: string; onFolderPath: (value: string) => void; folders: string[]; editing: boolean; onClose: () => void; onSubmit: (event: FormEvent) => void }) {
+export function CaseDialog({ value, onChange, folderPath, onFolderPath, folders, editing, onClose, onSubmit }: { value: TestCaseRevision; onChange: (value: TestCaseRevision) => void; folderPath: string; onFolderPath: (value: string) => void; folders: string[]; editing: boolean; onClose: () => void; onSubmit: (event: FormEvent, files: File[]) => void }) {
   const { locale } = useTmsLocale();
   const copy = getCaseDialogCopy(locale);
   const [stage, setStage] = useState<"basics" | "procedure" | "review">("basics");
+  const [files, setFiles] = useState<File[]>([]);
   useEffect(() => {
     if (editing) return;
     const defaults = createEmptyRevision(locale);
@@ -38,7 +40,7 @@ export function CaseDialog({ value, onChange, folderPath, onFolderPath, folders,
     : formatCount(locale, reviewEntries.length, ["step", "steps"], ["шаг", "шага", "шагов"]);
   const stageIndex = stage === "basics" ? 0 : stage === "procedure" ? 1 : 2;
   return <Modal title={editing ? copy.editTitle : copy.createTitle} subtitle={editing ? copy.editSubtitle : copy.createSubtitle} onClose={onClose} wide>
-    <form onSubmit={onSubmit} className={styles.wizardForm}>
+    <form onSubmit={(event) => onSubmit(event, files)} className={styles.wizardForm}>
       <div className={styles.wizardSteps}>
         {[{ id: "basics", label: copy.basics }, { id: "procedure", label: copy.procedure }, { id: "review", label: copy.review }].map((item, index) => <button key={item.id} type="button" className={`${stage === item.id ? styles.wizardStepActive : ""} ${index < stageIndex ? styles.wizardStepDone : ""}`} onClick={() => { if (index === 0 || value.title.trim()) setStage(item.id as typeof stage); }}><span>{index < stageIndex ? <Check size={14} /> : index + 1}</span>{item.label}</button>)}
       </div>
@@ -55,7 +57,7 @@ export function CaseDialog({ value, onChange, folderPath, onFolderPath, folders,
             <Field label={copy.description} wide><textarea value={value.description} onChange={(event) => patch("description", event.target.value)} placeholder={copy.descriptionPlaceholder} /></Field>
             <Field label={copy.priority}><select value={value.priority} onChange={(event) => patch("priority", event.target.value as TestCaseRevision["priority"])}><option value="low">{copy.low}</option><option value="medium">{copy.medium}</option><option value="high">{copy.high}</option><option value="critical">{copy.critical}</option></select></Field>
             <Field label={copy.lifecycle}><select value={value.lifecycle} onChange={(event) => patch("lifecycle", event.target.value as TestCaseRevision["lifecycle"])}><option value="draft">{copy.draft}</option><option value="ready">{copy.ready}</option><option value="deprecated">{copy.deprecated}</option></select></Field>
-            <Field label={copy.owner}><input value={value.owner} onChange={(event) => patch("owner", event.target.value)} /></Field>
+            <Field label={copy.owner}><input value={value.ownerIdentityId ?? ""} disabled /></Field>
             <Field label={copy.component}><input value={value.component} onChange={(event) => patch("component", event.target.value)} /></Field>
             <Field label={copy.estimate}><input type="number" min={1} value={value.estimatedMinutes ?? ""} onChange={(event) => patch("estimatedMinutes", event.target.value ? Number(event.target.value) : null)} /></Field>
             <Field label={copy.tags}><input value={value.tags.join(", ")} onChange={(event) => patch("tags", event.target.value.split(",").map((item) => item.trim()).filter(Boolean))} placeholder={copy.tagsPlaceholder} /></Field>
@@ -70,9 +72,9 @@ export function CaseDialog({ value, onChange, folderPath, onFolderPath, folders,
         </div>}
         {stage === "review" && <div className={styles.wizardPane}>
           <div className={styles.reviewHeader}><span className={styles.caseTypeIcon}><ListChecks size={22} /></span><div><small>{folderPath} · {copy[value.lifecycle]}</small><h3>{value.title}</h3><p>{value.description || copy.noDescription}</p></div></div>
-          <div className={styles.reviewStats}><span>{reviewCount}</span><span><strong>{copy[value.priority]}</strong> {copy.priority.toLowerCase()}</span><span><strong>{value.estimatedMinutes ?? "—"}</strong> {copy.minuteShort}</span><span><strong>{value.owner}</strong> {copy.owner.toLowerCase()}</span></div>
+          <div className={styles.reviewStats}><span>{reviewCount}</span><span><strong>{copy[value.priority]}</strong> {copy.priority.toLowerCase()}</span><span><strong>{value.estimatedMinutes ?? "—"}</strong> {copy.minuteShort}</span><span><strong>{value.ownerIdentityId ?? "—"}</strong> {copy.owner.toLowerCase()}</span></div>
           <div className={styles.reviewSteps}>{reviewEntries.map((step) => <div key={step.id}><b>{step.order}</b><span><strong>{step.action}</strong><small>{step.expectedResult}</small></span></div>)}</div>
-          <div className={styles.evidenceFields}><label tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") event.currentTarget.querySelector("input")?.click(); }}><Paperclip size={17} /><span>{copy.attachments}</span><input type="file" multiple onChange={(event) => patch("attachmentIds", [...value.attachmentIds, ...Array.from(event.target.files ?? []).map((file) => file.name)])} /></label><div>{value.attachmentIds.map((name) => <span key={name}>{name}<button type="button" aria-label={`${copy.removeAttachment} ${name}`} title={copy.removeAttachment} onClick={() => patch("attachmentIds", value.attachmentIds.filter((item) => item !== name))}><X size={12} /></button></span>)}</div></div>
+          <div className={styles.evidenceFields}><label tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") event.currentTarget.querySelector("input")?.click(); }}><Paperclip size={17} /><span>{copy.attachments}</span><input type="file" multiple onChange={(event) => setFiles(Array.from(event.target.files ?? []))} /></label><div>{value.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}{files.map((file) => <span key={`${file.name}-${file.lastModified}`}>{file.name}<button type="button" aria-label={`${copy.removeAttachment} ${file.name}`} title={copy.removeAttachment} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>)}</div></div>
           {editing && <Field label={copy.revisionNote} wide><input value={value.changeNote} onChange={(event) => patch("changeNote", event.target.value)} placeholder={copy.revisionNotePlaceholder} /></Field>}
         </div>}
       </div>

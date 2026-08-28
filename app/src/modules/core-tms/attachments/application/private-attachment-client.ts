@@ -1,15 +1,19 @@
 import type {
   AttachmentMetadata,
+  AttachmentMetadataResource,
   AttachmentReadAccess,
   CreateAttachmentAccessInput,
+  RemovePrivateAttachmentInput,
   UploadPrivateAttachmentInput,
 } from "../domain/attachment";
 import { AttachmentClientError } from "../domain/attachment-client-error";
 import type { AttachmentTransportPort } from "./attachment-transport-port";
 
 export interface PrivateAttachmentClient {
+  getMetadata(attachmentId: string, signal?: AbortSignal): Promise<AttachmentMetadataResource>;
   upload(input: UploadPrivateAttachmentInput): Promise<AttachmentMetadata>;
   createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess>;
+  remove(input: RemovePrivateAttachmentInput): Promise<AttachmentMetadataResource>;
 }
 
 export interface PrivateAttachmentClientDependencies {
@@ -35,6 +39,9 @@ export function createPrivateAttachmentClient(
 ): PrivateAttachmentClient {
   const now = dependencies.now ?? Date.now;
   return Object.freeze({
+    getMetadata(attachmentId: string, signal?: AbortSignal): Promise<AttachmentMetadataResource> {
+      return dependencies.transport.getMetadata(attachmentId, signal);
+    },
     async upload(input: UploadPrivateAttachmentInput): Promise<AttachmentMetadata> {
       validFile(input);
       const operationKey = input.operationKey;
@@ -82,8 +89,27 @@ export function createPrivateAttachmentClient(
         signal: input.signal,
       });
     },
-    createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess> {
-      return dependencies.transport.createAccess(input);
+    async createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess> {
+      const access = await dependencies.transport.createAccess(input);
+      let target: URL;
+      try { target = new URL(access.url); } catch {
+        throw new AttachmentClientError("INVALID_API_RESPONSE", "Attachment access URL is invalid.");
+      }
+      const expiresAt = Date.parse(access.expiresAt);
+      if (target.protocol !== "https:" || target.username || target.password ||
+          !Number.isFinite(expiresAt) || expiresAt <= now() || Object.keys(access.headers).length > 0) {
+        throw new AttachmentClientError("INVALID_API_RESPONSE", "Attachment access is unsafe or expired.");
+      }
+      return access;
+    },
+    remove(input: RemovePrivateAttachmentInput): Promise<AttachmentMetadataResource> {
+      if (!operationKeyPattern.test(input.operationKey)) {
+        throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment operation key is invalid.");
+      }
+      if (!/^"[^"]+"$/.test(input.etag)) {
+        throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment ETag is invalid.");
+      }
+      return dependencies.transport.remove(input);
     },
   });
 }

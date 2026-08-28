@@ -10,9 +10,10 @@ export function DashboardView({ data, projectId, onCreate, onOpenRuns }: { data:
   const cases = data.testCases.filter((item) => item.projectId === projectId && !item.archivedAt);
   const runs = data.runs.filter((item) => item.projectId === projectId);
   const defects = data.defects.filter((item) => item.projectId === projectId && !["verified", "closed"].includes(item.status));
-  const finishedItems = runs.flatMap((run) => run.items).filter((item) => item.status !== "not_run");
-  const passRate = finishedItems.length
-    ? Math.round((finishedItems.filter((item) => item.status === "passed").length / finishedItems.length) * 100)
+  const executed = runs.reduce((total, run) => total + run.progress.executed, 0);
+  const passed = runs.reduce((total, run) => total + run.progress.counts.passed, 0);
+  const passRate = executed
+    ? Math.round((passed / executed) * 100)
     : 0;
 
   return (
@@ -46,8 +47,7 @@ export function DashboardView({ data, projectId, onCreate, onOpenRuns }: { data:
           ) : (
             <div className={styles.simpleList}>
               {runs.slice(0, 5).map((run) => {
-                const completed = run.items.filter((item) => ["passed", "failed", "blocked", "skipped"].includes(item.status)).length;
-                const progress = Math.round((completed / Math.max(run.items.length, 1)) * 100);
+                const progress = run.progress.percent;
                 return <button key={run.id} onClick={onOpenRuns} className={styles.runRow}>
                   <span className={`${styles.statusDot} ${styles[`status_${run.status === "active" ? "in_progress" : "passed"}`]}`} />
                   <span><strong>{run.name}</strong><small>{run.key} · {run.environment.name}</small></span>

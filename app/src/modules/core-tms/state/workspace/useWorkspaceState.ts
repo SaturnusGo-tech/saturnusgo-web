@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
+import type {
+  RunItem, RunItemSummary, TestCase, TestCaseRevision,
+} from "../../../../core/tms/contracts/legacy-contract";
+import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { createEmptyRevision } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters, Dialog, View } from "../types/workspace";
 import { useWorkspaceBootstrap } from "./useWorkspaceBootstrap";
+import { getRun, getRunItem, listRunItems } from "../../runs/data/run-api";
+import { getTestCase } from "../../test-cases/data/test-case-api";
+import { useSelectedSuiteResource } from "../workspace-resources/useSelectedSuiteResource";
 
 const defaultFilters: CaseFilters = {
   priority: "all",
@@ -13,6 +19,7 @@ const defaultFilters: CaseFilters = {
 };
 
 export function useWorkspaceState() {
+  const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
   const bootstrap = useWorkspaceBootstrap();
   const { data, setData, connection } = bootstrap;
@@ -39,6 +46,13 @@ export function useWorkspaceState() {
   const [runPresetSuiteId, setRunPresetSuiteId] = useState("");
   const [notice, setNotice] = useState("");
   const [collapsedFolders, setCollapsedFolders] = useState<string[]>([]);
+  const [selectedCaseDetail, setSelectedCaseDetail] = useState<TestCase | null>(null);
+  const [selectedCaseEtag, setSelectedCaseEtag] = useState<string | null>(null);
+  const selectedSuite = useSelectedSuiteResource(http, connection === "connected", selectedSuiteId);
+  const [runItems, setRunItems] = useState<RunItemSummary[]>([]);
+  const [selectedRunEtag, setSelectedRunEtag] = useState<string | null>(null);
+  const [selectedRunItemDetail, setSelectedRunItemDetail] = useState<RunItem | null>(null);
+  const [selectedRunItemEtag, setSelectedRunItemEtag] = useState<string | null>(null);
 
   useEffect(() => {
     if (connection !== "connected" && connection !== "demo") return;
@@ -61,6 +75,57 @@ export function useWorkspaceState() {
     );
     setNotice(connection === "connected" ? t("actions.workspaceConnected") : "");
   }, [bootstrap.generation]);
+
+  useEffect(() => {
+    setSelectedCaseDetail(null);
+    setSelectedCaseEtag(null);
+    if (connection !== "connected" || !selectedCaseId) return;
+    const controller = new AbortController();
+    getTestCase(http, selectedCaseId, controller.signal).then((resource) => {
+      if (controller.signal.aborted) return;
+      setSelectedCaseDetail(resource.data);
+      setSelectedCaseEtag(resource.etag);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [connection, http, selectedCaseId]);
+
+  useEffect(() => {
+    setRunItems([]);
+    setSelectedRunEtag(null);
+    setSelectedRunItemDetail(null);
+    setSelectedRunItemEtag(null);
+    if (connection !== "connected" || !selectedRunId) return;
+    const controller = new AbortController();
+    Promise.all([
+      getRun(http, selectedRunId, controller.signal),
+      listRunItems(http, selectedRunId, controller.signal),
+    ]).then(([run, items]) => {
+      if (controller.signal.aborted) return;
+      setData((current) => ({
+        ...current,
+        runs: current.runs.map((item) => item.id === run.data.id ? run.data : item),
+      }));
+      setSelectedRunEtag(run.etag);
+      setRunItems(items.items);
+      setSelectedRunItemId((current) => current && items.items.some((item) => item.id === current)
+        ? current
+        : (items.items[0]?.id ?? null));
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [connection, http, selectedRunId]);
+
+  useEffect(() => {
+    setSelectedRunItemDetail(null);
+    setSelectedRunItemEtag(null);
+    if (connection !== "connected" || !selectedRunId || !selectedRunItemId) return;
+    const controller = new AbortController();
+    getRunItem(http, selectedRunId, selectedRunItemId, controller.signal).then((resource) => {
+      if (controller.signal.aborted) return;
+      setSelectedRunItemDetail(resource.data);
+      setSelectedRunItemEtag(resource.etag);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [connection, http, selectedRunId, selectedRunItemId]);
 
   useEffect(() => {
     if (connection !== "demo") return;
@@ -122,5 +187,11 @@ export function useWorkspaceState() {
     setCaseFilters, editingSuiteId, setEditingSuiteId, runPresetCaseIds,
     setRunPresetCaseIds, runPresetSuiteId, setRunPresetSuiteId, notice,
     setNotice, collapsedFolders, setCollapsedFolders,
+    selectedCaseDetail, setSelectedCaseDetail, selectedCaseEtag,
+    setSelectedCaseEtag, selectedSuiteDetail: selectedSuite.detail,
+    setSelectedSuiteDetail: selectedSuite.setDetail, selectedSuiteEtag: selectedSuite.etag,
+    setSelectedSuiteEtag: selectedSuite.setEtag, runItems, setRunItems, selectedRunEtag,
+    setSelectedRunEtag, selectedRunItemDetail, setSelectedRunItemDetail,
+    selectedRunItemEtag, setSelectedRunItemEtag,
   };
 }

@@ -1,10 +1,9 @@
 import { Plus, Save, Search } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import type { Suite, TestCase } from "../../../../../core/tms/contracts/legacy-contract";
+import type { Suite, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { saveSuite } from "../../../application/suites/saveSuite";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
-import { latestRevision } from "../../../helpers/cases/caseRevision";
 import { matchesSuite } from "../../../helpers/suites/matchesSuite";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { formatCount } from "../../../localization/format/count";
@@ -13,7 +12,7 @@ import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
 import { getSuiteDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
-export function SuiteDialog({ projectId, cases, suite, offline, onClose, onSaved }: { projectId: string; cases: TestCase[]; suite?: Suite; offline: boolean; onClose: () => void; onSaved: (suite: Suite) => void }) {
+export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClose, onSaved }: { projectId: string; cases: TestCaseSummary[]; suite?: Suite; suiteEtag?: string | null; offline: boolean; onClose: () => void; onSaved: (suite: Suite, etag: string | null) => void }) {
   const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getSuiteDialogCopy(locale);
@@ -22,19 +21,19 @@ export function SuiteDialog({ projectId, cases, suite, offline, onClose, onSaved
   const [name, setName] = useState<string>(suite?.name ?? copy.defaultName);
   const [description, setDescription] = useState<string>(suite?.description ?? copy.defaultDescription);
   const [type, setType] = useState<Suite["type"]>(suite?.type ?? "static");
-  const [caseIds, setCaseIds] = useState<string[]>(suite ? activeCases.filter((item) => matchesSuite(item, suite)).map((item) => item.id) : activeCases.filter((item) => latestRevision(item).tags.includes("smoke")).map((item) => item.id));
+  const [caseIds, setCaseIds] = useState<string[]>(suite ? activeCases.filter((item) => matchesSuite(item, suite)).map((item) => item.id) : activeCases.filter((item) => item.tags.includes("smoke")).map((item) => item.id));
   const [tags, setTags] = useState((suite?.filter.tags ?? ["smoke"]).join(", "));
   const [query, setQuery] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
-  const visibleCases = activeCases.filter((item) => `${item.key} ${latestRevision(item).title} ${item.folderPath} ${latestRevision(item).tags.join(" ")}`.toLowerCase().includes(query.toLowerCase()));
-  const effectiveIds = type === "dynamic" ? activeCases.filter((item) => tags.split(",").map((tagName) => tagName.trim()).filter(Boolean).every((tagName) => latestRevision(item).tags.includes(tagName))).map((item) => item.id) : caseIds;
+  const visibleCases = activeCases.filter((item) => `${item.key} ${item.title} ${item.folderPath} ${item.tags.join(" ")}`.toLowerCase().includes(query.toLowerCase()));
+  const effectiveIds = type === "dynamic" ? activeCases.filter((item) => tags.split(",").map((tagName) => tagName.trim()).filter(Boolean).every((tagName) => item.tags.includes(tagName))).map((item) => item.id) : caseIds;
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting || effectiveIds.length === 0) return;
     setSubmitting(true);
     setError(false);
-    try { onSaved(await saveSuite({ http, suite, projectId, name, description, type, caseIds, tags: tags.split(",").map((item) => item.trim()).filter(Boolean), offline })); }
+    try { const saved = await saveSuite({ http, suite, suiteEtag, projectId, name, description, type, caseIds, tags: tags.split(",").map((item) => item.trim()).filter(Boolean), offline }); onSaved(saved.data, saved.etag); }
     catch { setError(true); setSubmitting(false); }
   }
   return <Modal title={suite ? copy.configureTitle : copy.createTitle} subtitle={copy.subtitle} onClose={onClose} wide>
@@ -48,7 +47,7 @@ export function SuiteDialog({ projectId, cases, suite, offline, onClose, onSaved
       <div className={styles.scopeHeader}><div><strong>{caseCount(effectiveIds.length)} {copy.scope}</strong><small>{type === "dynamic" ? copy.dynamicHint : copy.staticHint}</small></div>{type === "static" && <div><button type="button" className={styles.textButton} onClick={() => setCaseIds(Array.from(new Set([...caseIds, ...visibleCases.map((item) => item.id)])))}>{copy.selectVisible}</button><button type="button" className={styles.textButton} onClick={() => setCaseIds((current) => current.filter((id) => !visibleCases.some((item) => item.id === id)))}>{copy.clearVisible}</button></div>}</div>
       <label className={styles.searchField}><Search size={16} /><input aria-label={copy.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} /></label>
       <div className={styles.casePicker}>
-        {visibleCases.map((item) => { const value = latestRevision(item); const checked = effectiveIds.includes(item.id); return <label key={item.id} className={checked ? styles.casePickerSelected : ""}><input type="checkbox" checked={checked} disabled={type === "dynamic"} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} /><span><small>{item.key} · {item.folderPath}</small><strong>{value.title}</strong></span><em className={styles[`priority_${value.priority}`]}>{copy[value.priority]}</em></label>; })}
+        {visibleCases.map((item) => { const checked = effectiveIds.includes(item.id); return <label key={item.id} className={checked ? styles.casePickerSelected : ""}><input type="checkbox" checked={checked} disabled={type === "dynamic"} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} /><span><small>{item.key} · {item.folderPath}</small><strong>{item.title}</strong></span><em className={styles[`priority_${item.priority}`]}>{copy[item.priority]}</em></label>; })}
         {visibleCases.length === 0 && <div className={styles.miniEmpty}><Search size={19} /><span>{copy.noMatching}</span></div>}
       </div>
       {error && <FormError message={copy.error} />}

@@ -7,23 +7,32 @@ export function useWorkspaceActions(
 ) {
   const notify = (message: string) => state.setNotice(message);
 
-  function chooseProject(nextProjectId: string) {
+  async function chooseProject(nextProjectId: string) {
+    const remote = state.connection === "demo"
+      ? null
+      : await state.loadProject(nextProjectId);
+    if (state.connection !== "demo" && !remote) return;
     window.localStorage.setItem("tms.project.v1", nextProjectId);
     state.setProjectId(nextProjectId);
-    const nextCase = state.data.testCases.find(
+    const testCases = remote?.testCases ?? state.data.testCases;
+    const runs = remote?.runs ?? state.data.runs;
+    const suites = remote?.suites ?? state.data.suites;
+    const nextCase = testCases.find(
       (item) => item.projectId === nextProjectId,
     );
     state.setSelectedCaseId(nextCase?.id ?? "");
     state.setSelectedFolder(nextCase?.folderPath ?? "/Unsorted");
     state.setSelectedSuiteId(
-      state.data.suites.find((item) => item.projectId === nextProjectId)?.id ??
+      suites.find((item) => item.projectId === nextProjectId)?.id ??
         "",
     );
     state.setSelectedRunId(
-      state.data.runs.find((item) => item.projectId === nextProjectId)?.id ??
+      runs.find((item) => item.projectId === nextProjectId)?.id ??
         null,
     );
     state.setSelectedRunItemId(null);
+    state.setSelectedCaseDetail(null);
+    state.setRunItems([]);
     state.setQuery("");
     state.setCaseFilters({
       priority: "all",

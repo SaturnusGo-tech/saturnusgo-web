@@ -1,18 +1,6 @@
-import type {
-  TestCase,
-  TestCaseRevision,
-  TestStep,
-} from "../../../../core/tms/contracts/legacy-contract";
+import type { TestCaseRevision, TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../localization/model/locale";
 import { createUid } from "../id/createUid";
-
-export function latestRevision(testCase: TestCase): TestCaseRevision {
-  return (
-    testCase.revisions.find(
-      (item) => item.revision === testCase.currentRevision,
-    ) ?? testCase.revisions[testCase.revisions.length - 1]!
-  );
-}
 
 export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision {
   return {
@@ -24,7 +12,7 @@ export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision 
     lifecycle: "draft",
     priority: "medium",
     component: locale === "ru" ? "Основной продукт" : "Core product",
-    owner: "QA Team",
+    ownerIdentityId: null,
     tags: [],
     estimatedMinutes: 5,
     testData: "",
@@ -39,7 +27,6 @@ export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision 
     ],
     checklist: [],
     attachmentIds: [],
-    linkIds: [],
     changeNote: locale === "ru" ? "Создано в TMS" : "Created in TMS",
     createdAt: new Date().toISOString(),
   };

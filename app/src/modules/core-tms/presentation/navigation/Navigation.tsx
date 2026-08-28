@@ -37,14 +37,20 @@ export function Navigation({
   view,
   onChange,
   disabled,
+  collapsed,
 }: {
   view: View;
   onChange: (view: View) => void;
   disabled: boolean;
+  collapsed: boolean;
 }) {
   const { t } = useTmsLocale();
   return (
-    <nav className={styles.navigation} aria-label={t("nav.ariaLabel")}>
+    <nav
+      id="tms-navigation"
+      className={`${styles.navigation} ${collapsed ? styles.navigationCollapsed : ""}`}
+      aria-label={t("nav.ariaLabel")}
+    >
       {navigationItems.map((item) => {
         const label = t(item.labelKey);
         return (

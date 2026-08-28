@@ -1,18 +1,14 @@
-// Temporary handwritten mirror of the prototype /api/v1 wire format.
-// Delete this module when the generated OpenAPI client becomes authoritative.
-export type ExecutionStatus =
-  | "not_run"
-  | "in_progress"
-  | "passed"
-  | "failed"
-  | "blocked"
-  | "skipped";
+import type { TestCaseRevision, TestRunSummary } from "./execution-contract";
+export type {
+  ExecutionStatus, RunAttempt, RunAttemptSummary, RunItem, RunItemSummary, RunProgress,
+  StepResult, TestCaseRevision, TestRun, TestRunSummary, TestStep,
+} from "./execution-contract";
 
 export type Project = {
   id: string;
   key: string;
   name: string;
-  description: string;
+  description?: string;
   status?: "active" | "archived";
 };
 
@@ -27,103 +23,48 @@ export type Environment = {
   status?: "active" | "archived";
 };
 
-export type TestStep = {
-  id: string;
-  order: number;
-  action: string;
-  expectedResult: string;
-  testData?: string;
-  required: boolean;
-};
-
-export type TestCaseRevision = {
-  revision: number;
-  title: string;
-  description: string;
-  preconditions: string;
-  type: "manual" | "checklist";
-  lifecycle: "draft" | "ready" | "deprecated" | "archived";
-  priority: "low" | "medium" | "high" | "critical";
-  component: string;
-  owner: string;
-  tags: string[];
-  estimatedMinutes: number | null;
-  testData: string;
-  steps: TestStep[];
-  checklist: Array<{ id: string; order: number; text: string; required: boolean }>;
-  attachmentIds: string[];
-  linkIds: string[];
-  changeNote: string;
-  createdAt: string;
-};
-
-export type TestCase = {
+export type TestCaseSummary = {
   id: string;
   projectId: string;
   key: string;
   folderPath: string;
   currentRevision: number;
-  revisions: TestCaseRevision[];
+  title: string;
+  type: TestCaseRevision["type"];
+  lifecycle: TestCaseRevision["lifecycle"];
+  priority: TestCaseRevision["priority"];
+  component: string;
+  ownerIdentityId: string | null;
+  tags: string[];
+  estimatedMinutes: number | null;
+  revisionCount: number;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
-export type Suite = {
+export type TestCase = TestCaseSummary & {
+  current: TestCaseRevision;
+  linkIds: string[];
+};
+
+export type SuiteSummary = {
   id: string;
   projectId: string;
   key: string;
   name: string;
   description: string;
   type: "static" | "dynamic";
-  caseIds: string[];
-  filter: { tags?: string[] };
+  caseCount: number;
   status: "active" | "archived";
-};
-
-export type StepResult = {
-  stepId: string;
-  status: ExecutionStatus;
-  actualResult: string;
-  comment: string;
+  createdAt: string;
   updatedAt: string;
 };
 
-export type RunItem = {
-  id: string;
-  caseId: string;
-  caseKey: string;
-  revision: number;
-  snapshot: TestCaseRevision;
-  assignee: string;
-  status: ExecutionStatus;
-  attempts: Array<{
-    id: string;
-    number: number;
-    status: ExecutionStatus;
-    actualResult: string;
-    comment: string;
-    stepResults: StepResult[];
-  }>;
-  activeAttemptId: string;
-};
-
-export type TestRun = {
-  id: string;
-  projectId: string;
-  key: string;
-  name: string;
-  description: string;
-  type: "smoke" | "regression" | "acceptance" | "ad_hoc";
-  status: "draft" | "active" | "completed" | "aborted";
-  environment: { id: string; key: string; name: string; baseUrl: string };
-  suiteId: string | null;
-  build: string;
-  configuration: Record<string, string>;
-  items: RunItem[];
-  createdAt: string;
-  startedAt: string | null;
-  completedAt: string | null;
+export type Suite = SuiteSummary & {
+  caseIds: string[];
+  filter: { tags?: string[] };
+  resolvedCaseCount: number;
 };
 
 export type Defect = {
@@ -143,7 +84,7 @@ export type Defect = {
     | "closed"
     | "reopened";
   reproducibility: string;
-  assignee: string;
+  assigneeIdentityId: string | null;
   component: string;
   labels: string[];
   runId: string | null;
@@ -151,7 +92,22 @@ export type Defect = {
   stepId: string | null;
   expectedResult: string;
   actualResult: string;
+  attachmentIds: string[];
+  linkIds: string[];
   createdAt: string;
+};
+
+export type ExternalLink = {
+  id: string;
+  projectId: string;
+  owner:
+    | { kind: "test_case"; caseId: string }
+    | { kind: "run"; runId: string; runItemId: string | null }
+    | { kind: "defect"; defectId: string };
+  label: string;
+  targetUri: string;
+  kind: "url" | "deep_link" | "external_issue";
+  status: "active" | "archived";
 };
 
 export type Dashboard = {
@@ -174,10 +130,11 @@ export type Bootstrap = {
   workspace: { id: string; key: string; slug: string; name: string };
   projects: Project[];
   environments: Environment[];
-  testCases: TestCase[];
-  suites: Suite[];
-  runs: TestRun[];
+  testCases: TestCaseSummary[];
+  suites: SuiteSummary[];
+  runs: TestRunSummary[];
   defects: Defect[];
+  externalLinks: ExternalLink[];
   dashboards: Dashboard[];
   activity: Activity[];
   meta: { generatedAt: string; apiVersion: string };

@@ -1,63 +1,44 @@
 import type {
-  Bootstrap,
   Environment,
   Project,
-  Suite,
-  TestRun,
+  SuiteSummary,
+  TestRunSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
-import { createLocalRun } from "../../helpers/runs/createLocalRun";
-import type { TmsLocale } from "../../localization/model/locale";
+import { createRun as createRunResource, getRun } from "../../runs/data/run-api";
 
 type Result =
-  | { ok: true; run: TestRun }
-  | { ok: false; reason: "create" | "start" };
+  | { ok: true; run: TestRunSummary }
+  | { ok: false; reason: "create" };
 
 export async function createRun(input: {
   http: TmsHttpClient;
-  data: Bootstrap;
   project: Project;
   environment: Environment;
-  suite?: Suite;
+  suite?: SuiteSummary;
   caseIds: string[];
   name: string;
-  type: TestRun["type"];
+  type: TestRunSummary["type"];
   build: string;
   offline: boolean;
-  locale: TmsLocale;
 }): Promise<Result> {
-  const local = createLocalRun(
-    input.data,
-    input.project.id,
-    input.environment,
-    input.suite,
-    input.caseIds,
-    input.name,
-    input.type,
-    input.locale,
-  );
-  local.build = input.build;
-  if (input.offline) return { ok: true, run: local };
+  if (input.offline) return { ok: false, reason: "create" };
   try {
-    const remote = await input.http.mutate<TestRun>("/runs", "POST", {
+    const scope = input.suite
+      ? { suiteId: input.suite.id }
+      : { caseIds: input.caseIds };
+    const created = await createRunResource(input.http, {
       projectId: input.project.id,
-      suiteId: input.suite?.id ?? null,
-      caseIds: input.caseIds,
       environmentId: input.environment.id,
       name: input.name,
-      description: local.description,
+      description: `${input.type.replace("_", " ")} execution`,
       type: input.type,
       build: input.build,
-      configuration: local.configuration,
-    });
-    try {
-      return {
-        ok: true,
-        run: await input.http.mutate<TestRun>(`/runs/${remote.id}/start`, "POST"),
-      };
-    } catch {
-      return { ok: false, reason: "start" };
-    }
+      configuration: {},
+      startImmediately: true,
+      ...scope,
+    }, crypto.randomUUID());
+    return { ok: true, run: (await getRun(input.http, created.data.id)).data };
   } catch {
     return { ok: false, reason: "create" };
   }

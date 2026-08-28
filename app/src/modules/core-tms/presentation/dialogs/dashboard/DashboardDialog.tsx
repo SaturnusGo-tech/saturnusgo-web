@@ -33,6 +33,7 @@ export function DashboardDialog({
   const [description, setDescription] = useState<string>(copy.defaultDescription);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [operationKey] = useState(() => crypto.randomUUID());
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -49,6 +50,7 @@ export function DashboardDialog({
           description,
           offline,
           locale,
+          operationKey,
         }),
       );
     } catch {

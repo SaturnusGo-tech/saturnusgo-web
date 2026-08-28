@@ -14,6 +14,7 @@ function workspaceShell(apiVersion: string): Bootstrap {
     suites: [],
     runs: [],
     defects: [],
+    externalLinks: [],
     dashboards: [
       {
         id: "dashboard_umbrella_work",
