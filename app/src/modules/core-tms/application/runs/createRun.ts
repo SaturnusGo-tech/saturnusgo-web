@@ -7,6 +7,7 @@ import type {
 } from "../../../../core/tms/contracts/legacy-contract";
 import { mutate } from "../../../../core/tms/transport/http";
 import { createLocalRun } from "../../helpers/runs/createLocalRun";
+import type { TmsLocale } from "../../localization/model/locale";
 
 type Result =
   | { ok: true; run: TestRun }
@@ -22,6 +23,7 @@ export async function createRun(input: {
   type: TestRun["type"];
   build: string;
   offline: boolean;
+  locale: TmsLocale;
 }): Promise<Result> {
   const local = createLocalRun(
     input.data,
@@ -31,6 +33,7 @@ export async function createRun(input: {
     input.caseIds,
     input.name,
     input.type,
+    input.locale,
   );
   local.build = input.build;
   if (input.offline) return { ok: true, run: local };
@@ -41,6 +44,7 @@ export async function createRun(input: {
       caseIds: input.caseIds,
       environmentId: input.environment.id,
       name: input.name,
+      description: local.description,
       type: input.type,
       build: input.build,
       configuration: local.configuration,

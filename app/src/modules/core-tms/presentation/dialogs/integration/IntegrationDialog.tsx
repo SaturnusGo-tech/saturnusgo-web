@@ -3,11 +3,15 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Project, TestCase } from "../../../../../core/tms/contracts/legacy-contract";
 import { createIntegrationCase } from "../../../application/integrations/createIntegrationCase";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
+import { getIntegrationDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 export function IntegrationDialog({ project, casesCount, offline, onClose, onCreated }: { project: Project; casesCount: number; offline: boolean; onClose: () => void; onCreated: (testCase: TestCase) => void }) {
+  const { locale } = useTmsLocale();
+  const copy = getIntegrationDialogCopy(locale);
   const [name, setName] = useState("");
   const [source, setSource] = useState("");
   const [target, setTarget] = useState("");
@@ -15,31 +19,31 @@ export function IntegrationDialog({ project, casesCount, offline, onClose, onCre
   const [endpoint, setEndpoint] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setError("");
-    try { onCreated(await createIntegrationCase({ project, casesCount, name, source, target, contract, endpoint, description, offline })); }
-    catch { setError("The integration case was not saved. Check the system names and API response."); setSubmitting(false); }
+    setError(false);
+    try { onCreated(await createIntegrationCase({ project, casesCount, name, source, target, contract, endpoint, description, offline, locale })); }
+    catch { setError(true); setSubmitting(false); }
   }
-  return <Modal title="Create integration test" subtitle="Capture the systems, contract, happy path, and failure handling in one executable case." onClose={onClose} wide>
+  return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose} wide>
     <form onSubmit={submit}>
       <div className={styles.integrationFlowFields}>
-        <Field label="Source system"><input required autoFocus value={source} onChange={(event) => setSource(event.target.value)} placeholder="Web client" /></Field>
+        <Field label={copy.source}><input required autoFocus value={source} onChange={(event) => setSource(event.target.value)} placeholder={copy.sourcePlaceholder} /></Field>
         <span><ArrowRightLeft size={20} /></span>
-        <Field label="Target system"><input required value={target} onChange={(event) => setTarget(event.target.value)} placeholder="Account API" /></Field>
+        <Field label={copy.target}><input required value={target} onChange={(event) => setTarget(event.target.value)} placeholder={copy.targetPlaceholder} /></Field>
       </div>
       <div className={styles.formGrid}>
-        <Field label="Test name" wide><input required value={name} onChange={(event) => setName(event.target.value)} placeholder="Ride request is synchronized to operations" data-testid="integration-name" /></Field>
-        <Field label="Contract"><select value={contract} onChange={(event) => setContract(event.target.value)}><option>REST API</option><option>GraphQL</option><option>Webhook</option><option>Event stream</option><option>Deep link</option><option>Database sync</option></select></Field>
-        <Field label="Endpoint / topic"><input value={endpoint} onChange={(event) => setEndpoint(event.target.value)} placeholder="/v1/rides or rides.created" /></Field>
-        <Field label="Purpose and risk" wide><textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="What must stay consistent across both systems?" /></Field>
+        <Field label={copy.name} wide><input required value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="integration-name" /></Field>
+        <Field label={copy.contract}><select value={contract} onChange={(event) => setContract(event.target.value)}><option value="REST API">REST API</option><option value="GraphQL">GraphQL</option><option value="Webhook">Webhook</option><option value="Event stream">{copy.eventStream}</option><option value="Deep link">{copy.deepLink}</option><option value="Database sync">{copy.databaseSync}</option></select></Field>
+        <Field label={copy.endpoint}><input value={endpoint} onChange={(event) => setEndpoint(event.target.value)} placeholder="/v1/rides or rides.created" /></Field>
+        <Field label={copy.purpose} wide><textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder={copy.purposePlaceholder} /></Field>
       </div>
-      <div className={styles.snapshotNote}><Network size={18} /><span><strong>Four executable steps are generated</strong><small>Valid payload, delivery, target state, and controlled failure handling.</small></span></div>
-      {error && <FormError message={error} />}
-      <div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>Cancel</button><button className={styles.primaryButton} disabled={submitting || !name.trim() || !source.trim() || !target.trim()}><Plus size={16} /> {submitting ? "Creating…" : "Create integration test"}</button></div>
+      <div className={styles.snapshotNote}><Network size={18} /><span><strong>{copy.generated}</strong><small>{copy.generatedHint}</small></span></div>
+      {error && <FormError message={copy.error} />}
+      <div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button><button className={styles.primaryButton} disabled={submitting || !name.trim() || !source.trim() || !target.trim()}><Plus size={16} /> {submitting ? copy.creating : copy.create}</button></div>
     </form>
   </Modal>;
 }

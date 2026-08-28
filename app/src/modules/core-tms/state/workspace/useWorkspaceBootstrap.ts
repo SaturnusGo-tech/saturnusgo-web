@@ -62,8 +62,8 @@ export function useWorkspaceBootstrap() {
         const apiError = error instanceof TmsApiError ? error : null;
         setFailure({
           detail: apiError
-            ? `The TMS API returned status ${apiError.status}.`
-            : "The TMS API could not be reached.",
+            ? `status ${apiError.status}`
+            : "unreachable",
           requestId: apiError?.requestId ?? null,
         });
         setConnection("error");

@@ -7,10 +7,13 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import type { TmsLocale } from "../../localization/model/locale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import styles from "../../tms.module.css";
 
 export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
+  const { languageTag, locale, setLocale, t } = useTmsLocale();
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
   const activeEnvironment =
@@ -21,38 +24,51 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
   const activeBuild =
     model.selectedRun?.build ?? (model.project ? "local-current" : "—");
   const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  const localTime = now.toLocaleTimeString("en-GB", {
+  const today = now.toLocaleDateString(languageTag, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const localTime = now.toLocaleTimeString(languageTag, {
     hour: "2-digit",
     minute: "2-digit",
   });
-  const weekday = now.toLocaleDateString("en-US", { weekday: "short" });
+  const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
+  const connectionLabel =
+    model.connection === "connected"
+      ? t("header.apiConnected")
+      : model.connection === "demo"
+        ? t("header.developmentDemo")
+        : t("header.apiUnavailable");
+  const languages: Array<{ id: TmsLocale; short: string }> = [
+    { id: "en", short: "EN" },
+    { id: "ru", short: "RU" },
+  ];
   return (
     <header className={styles.tabsBar}>
       <button
         className={styles.homeButton}
         onClick={() => model.setView("dashboard")}
-        aria-label="Open dashboard"
-        title="Dashboard"
+        aria-label={t("header.openDashboard")}
+        title={t("header.dashboard")}
       >
         <Menu size={21} />
       </button>
       <button
         className={styles.brandButton}
         onClick={() => model.setView("dashboard")}
-        aria-label="TMS dashboard"
+        aria-label={t("header.dashboardAria")}
       >
-        <span className={styles.brandGlyph}>T</span>
         <strong>TMS</strong>
       </button>
       <div className={styles.headerProject}>
-        <span>Project</span>
+        <span>{t("header.project")}</span>
         {model.project ? (
           <label className={styles.headerProjectSelect}>
             <select
               value={model.project.id}
               onChange={(event) => model.chooseProject(event.target.value)}
-              aria-label="Current project"
+              aria-label={t("header.currentProject")}
             >
               {model.projects.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -68,15 +84,15 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
             disabled={!workspaceReady}
             onClick={() => model.setDialog("project")}
           >
-            <Plus size={15} /> Create first project
+            <Plus size={15} /> {t("header.createFirstProject")}
           </button>
         )}
         {model.project && workspaceReady && (
           <button
             className={styles.headerProjectAdd}
             onClick={() => model.setDialog("project")}
-            aria-label="Create project"
-            title="Create project"
+            aria-label={t("header.createProject")}
+            title={t("header.createProject")}
           >
             <Plus size={16} />
           </button>
@@ -86,7 +102,7 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
         <Search size={17} />
         <input
           id="tms-command-search"
-          aria-label="Search test cases"
+          aria-label={t("header.searchCases")}
           disabled={!model.project}
           value={model.query}
           onChange={(event) => model.setQuery(event.target.value)}
@@ -94,18 +110,20 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
             if (event.key === "Enter") model.setView("cases");
           }}
           placeholder={
-            model.project ? "Search test cases…" : "Create a project to begin"
+            model.project
+              ? t("header.searchPlaceholder")
+              : t("header.createProjectToBegin")
           }
         />
         <kbd>⌘ K</kbd>
       </label>
       <div className={styles.headerMeta}>
         <div className={styles.headerMetaItem}>
-          <span>Environment</span>
+          <span>{t("header.environment")}</span>
           <strong>{activeEnvironment}</strong>
         </div>
         <div className={styles.headerMetaItem}>
-          <span>Build</span>
+          <span>{t("header.build")}</span>
           <strong>{activeBuild}</strong>
         </div>
         <div className={styles.headerClock}>
@@ -118,22 +136,35 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
           </span>
         </div>
         <div
+          className={styles.languageSwitcher}
+          role="group"
+          aria-label={t("language.label")}
+        >
+          {languages.map((language) => {
+            const name = t(
+              language.id === "en" ? "language.english" : "language.russian",
+            );
+            const label = t("language.switchTo", { language: name });
+            return (
+              <button
+                key={language.id}
+                type="button"
+                className={styles.languageOption}
+                aria-label={label}
+                aria-pressed={locale === language.id}
+                title={label}
+                onClick={() => setLocale(language.id)}
+              >
+                {language.short}
+              </button>
+            );
+          })}
+        </div>
+        <div
           className={styles.connection}
           role="status"
-          aria-label={
-            model.connection === "connected"
-              ? "TMS API connected"
-              : model.connection === "demo"
-                ? "Development demo"
-                : "TMS API unavailable"
-          }
-          title={
-            model.connection === "connected"
-              ? "TMS API connected"
-              : model.connection === "demo"
-                ? "Development demo"
-                : "TMS API unavailable"
-          }
+          aria-label={connectionLabel}
+          title={connectionLabel}
         >
           {model.connection === "connected" ? (
             <Wifi size={15} />

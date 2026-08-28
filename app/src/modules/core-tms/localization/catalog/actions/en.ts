@@ -1,0 +1,28 @@
+export const enActionMessages = {
+  "form.couldNotSave": "Could not save",
+  "api.unreachable": "The TMS API could not be reached.",
+  "api.statusError": "The TMS API returned status {status}.",
+  "actions.workspaceConnected": "Workspace connected",
+  "actions.caseRevisionSaveError": "Could not save the new revision",
+  "actions.caseCreateError": "Could not create the test case",
+  "actions.caseRevisionSaved": "New test case revision saved",
+  "actions.caseCreated": "Test case created",
+  "actions.caseCloneError": "Could not clone the test case",
+  "actions.caseCloned": "Test case cloned",
+  "actions.caseCopySuffix": "copy",
+  "actions.caseRestoreError": "Could not restore the test case",
+  "actions.caseArchiveError": "Could not archive the test case",
+  "actions.caseRestored": "Test case restored",
+  "actions.caseArchived": "Test case archived — history preserved",
+  "actions.projectCreated": "Project {name} created",
+  "actions.folderCreated": "Folder {path} created",
+  "actions.integrationCreated": "Integration case {key} created",
+  "actions.suiteCreated": "Test suite created",
+  "actions.suiteUpdated": "Test suite updated",
+  "actions.environmentCreated": "Environment created",
+  "actions.runStarted": "{type} run started · test cases: {count}",
+  "actions.defectCreated": "{key} created and linked",
+  "actions.dashboardCreated": "Dashboard created",
+} as const;
+
+export type ActionMessages = typeof enActionMessages;

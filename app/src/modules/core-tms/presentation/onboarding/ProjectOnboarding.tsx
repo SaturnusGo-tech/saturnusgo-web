@@ -1,4 +1,5 @@
 import { FolderKanban, ListChecks, PlayCircle, Plus } from "lucide-react";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import styles from "../../tms.module.css";
 
 export function ProjectOnboarding({
@@ -8,15 +9,18 @@ export function ProjectOnboarding({
   loading: boolean;
   onCreate: () => void;
 }) {
+  const { t } = useTmsLocale();
   return (
     <section className={styles.onboarding} data-testid="project-onboarding">
       <div className={styles.onboardingPanel}>
-        <span className={styles.onboardingEyebrow}>TMS workspace</span>
-        <h1>{loading ? "Loading workspace…" : "Create your first project"}</h1>
+        <span className={styles.onboardingEyebrow}>{t("workspace.title")}</span>
+        <h1>
+          {loading ? t("workspace.loading") : t("workspace.createFirstProject")}
+        </h1>
         <p>
           {loading
-            ? "Loading the latest workspace state."
-            : "Projects keep test cases, environments, suites, runs, and defects isolated. Start with a real project—no sample records will be added."}
+            ? t("workspace.loadingLatest")
+            : t("workspace.projectDescription")}
         </p>
         {!loading && (
           <button
@@ -24,27 +28,27 @@ export function ProjectOnboarding({
             onClick={onCreate}
             data-testid="create-first-project"
           >
-            <Plus size={17} /> Create project
+            <Plus size={17} /> {t("header.createProject")}
           </button>
         )}
         <div className={styles.onboardingSteps}>
           <div>
             <span>01</span>
             <FolderKanban size={20} />
-            <strong>Build the repository</strong>
-            <small>Create folders, manual cases, and checklists.</small>
+            <strong>{t("workspace.buildRepository")}</strong>
+            <small>{t("workspace.buildRepositoryDescription")}</small>
           </div>
           <div>
             <span>02</span>
             <ListChecks size={20} />
-            <strong>Define coverage</strong>
-            <small>Group exact cases into smoke or regression suites.</small>
+            <strong>{t("workspace.defineCoverage")}</strong>
+            <small>{t("workspace.defineCoverageDescription")}</small>
           </div>
           <div>
             <span>03</span>
             <PlayCircle size={20} />
-            <strong>Run and report</strong>
-            <small>Execute every step and capture defects with evidence.</small>
+            <strong>{t("workspace.runAndReport")}</strong>
+            <small>{t("workspace.runAndReportDescription")}</small>
           </div>
         </div>
       </div>

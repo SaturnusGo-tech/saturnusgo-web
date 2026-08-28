@@ -4,6 +4,7 @@ import {
   uploadAttachment,
 } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
+import type { TmsLocale } from "../../localization/model/locale";
 
 type DefectPayload = Omit<Defect, "id" | "key" | "createdAt">;
 
@@ -13,6 +14,7 @@ export async function createDefect(input: {
   files: File[];
   link?: string;
   offline: boolean;
+  locale: TmsLocale;
 }): Promise<Defect> {
   if (input.offline) {
     return {
@@ -44,7 +46,7 @@ export async function createDefect(input: {
       projectId: input.projectId,
       entityType: "defect",
       entityId: defect.id,
-      label: "Defect link",
+      label: input.locale === "ru" ? "Ссылка на дефект" : "Defect link",
       url,
       kind: url.startsWith("http") ? "url" : "deep_link",
     });

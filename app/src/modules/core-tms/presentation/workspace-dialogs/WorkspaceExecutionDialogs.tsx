@@ -1,3 +1,5 @@
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { localizedLabel } from "../../localization/format/labels";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { DashboardDialog } from "../dialogs/dashboard/DashboardDialog";
 import { DefectDialog } from "../dialogs/defect/DefectDialog";
@@ -9,6 +11,7 @@ export function WorkspaceExecutionDialogs({
 }: {
   model: WorkspaceModel;
 }) {
+  const { locale, t } = useTmsLocale();
   const close = () => model.setDialog(null);
   if (model.dialog === "environment") {
     return (
@@ -22,7 +25,7 @@ export function WorkspaceExecutionDialogs({
             environments: [...current.environments, environment],
           }));
           close();
-          model.notify("Environment created");
+          model.notify(t("actions.environmentCreated"));
         }}
       />
     );
@@ -51,9 +54,9 @@ export function WorkspaceExecutionDialogs({
           model.setRunPresetSuiteId("");
           model.setView("runs");
           close();
-          model.notify(
-            `${run.type} run started with ${run.items.length} ${run.items.length === 1 ? "case" : "cases"}`,
-          );
+          model.notify(t("actions.runStarted", {
+            type: localizedLabel(locale, run.type), count: run.items.length,
+          }));
         }}
       />
     );
@@ -72,7 +75,7 @@ export function WorkspaceExecutionDialogs({
             defects: [...current.defects, defect],
           }));
           close();
-          model.notify(`${defect.key} created and linked`);
+          model.notify(t("actions.defectCreated", { key: defect.key }));
         }}
       />
     );
@@ -90,7 +93,7 @@ export function WorkspaceExecutionDialogs({
             dashboards: [...current.dashboards, dashboard],
           }));
           close();
-          model.notify("Dashboard created");
+          model.notify(t("actions.dashboardCreated"));
         }}
       />
     );

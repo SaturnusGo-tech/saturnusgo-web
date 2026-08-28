@@ -48,7 +48,7 @@ jobs:
       - name: Build static export
         env:
           BUILD_TARGET: export
-          NEXT_PUBLIC_TMS_API_BASE: https://tms-api.invalid/api/v1
+          NEXT_PUBLIC_TMS_API_BASE: https://umbrella-home-tms-backend-production.up.railway.app/api/v1
         run: |
           set -euo pipefail
           restore_api() {

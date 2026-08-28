@@ -1,3 +1,4 @@
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { CasesView } from "../cases/CasesView";
 import { ConfigView } from "../config/ConfigView";
@@ -11,6 +12,7 @@ import { SuitesView } from "../suites/SuitesView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
+  const { t } = useTmsLocale();
   if (model.connection === "loading" || model.connection === "error") {
     return (
       <WorkspaceLoadState
@@ -151,7 +153,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
             ...current,
             defects: [...current.defects, defect],
           }));
-          model.notify(`${defect.key} created and linked`);
+          model.notify(t("actions.defectCreated", { key: defect.key }));
         }}
       />
     );

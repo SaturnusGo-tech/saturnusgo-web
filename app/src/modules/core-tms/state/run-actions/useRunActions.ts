@@ -2,6 +2,7 @@ import type { ExecutionStatus, TestRun } from "../../../../core/tms/contracts/le
 import { mutate } from "../../../../core/tms/transport/http";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { statusLabel } from "../../helpers/status/statusLabel";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 
@@ -10,6 +11,10 @@ export function useRunActions(
   derived: ReturnType<typeof useWorkspaceDerived>,
   notify: (message: string) => void,
 ) {
+  const { locale, t } = useTmsLocale();
+  const statusVariables = (key: string, status: ExecutionStatus) => ({
+    key, status: statusLabel(locale, status),
+  });
   function openRunDialog(options?: { suiteId?: string; caseIds?: string[] }) {
     if (options?.suiteId) state.setSelectedSuiteId(options.suiteId);
     state.setRunPresetSuiteId(options?.suiteId ?? "");
@@ -20,9 +25,7 @@ export function useRunActions(
   function updateRun(nextRun: TestRun) {
     state.setData((current) => ({
       ...current,
-      runs: current.runs.map((item) =>
-        item.id === nextRun.id ? nextRun : item,
-      ),
+      runs: current.runs.map((item) => item.id === nextRun.id ? nextRun : item),
     }));
   }
 
@@ -32,7 +35,8 @@ export function useRunActions(
     const item = nextRun.items.find(
       (entry) => entry.id === derived.selectedRunItem!.id)!;
     const attempt = item.attempts.find(
-      (entry) => entry.id === item.activeAttemptId) ?? item.attempts[0];
+      (entry) => entry.id === item.activeAttemptId,
+    ) ?? item.attempts[0];
     const result = attempt.stepResults.find(
       (entry) => entry.stepId === stepId,
     );
@@ -63,9 +67,9 @@ export function useRunActions(
           {
             status,
             actualResult:
-              status === "failed" ? "One or more execution steps failed." : "",
+              status === "failed" ? t("actions.stepFailure") : "",
             comment:
-              status === "blocked" ? "Execution is blocked at this step." : "",
+              status === "blocked" ? t("actions.stepBlocked") : "",
           },
         );
         updateRun(remote);
@@ -73,7 +77,7 @@ export function useRunActions(
         updateRun(nextRun);
       }
     } catch {
-      notify("Could not save the step result to the TMS API");
+      notify(t("actions.stepSaveError"));
     }
   }
 
@@ -83,7 +87,8 @@ export function useRunActions(
     const item = nextRun.items.find(
       (entry) => entry.id === derived.selectedRunItem!.id)!;
     const attempt = item.attempts.find(
-      (entry) => entry.id === item.activeAttemptId) ?? item.attempts[0];
+      (entry) => entry.id === item.activeAttemptId,
+    ) ?? item.attempts[0];
     const result = attempt.stepResults.find(
       (entry) => entry.stepId === stepId,
     );
@@ -99,7 +104,7 @@ export function useRunActions(
       { status: result.status, actualResult: value, comment: result.comment },
     ).catch(() => {
       updateRun(previousRun);
-      notify("Could not save the actual result to the TMS API");
+      notify(t("actions.actualSaveError"));
     });
   }
 
@@ -109,7 +114,8 @@ export function useRunActions(
     const item = nextRun.items.find(
       (entry) => entry.id === derived.selectedRunItem!.id)!;
     const attempt = item.attempts.find(
-      (entry) => entry.id === item.activeAttemptId) ?? item.attempts[0];
+      (entry) => entry.id === item.activeAttemptId,
+    ) ?? item.attempts[0];
     if (status === "passed") {
       const requiredStepIds = executableSteps(item.snapshot)
         .filter((step) => step.required)
@@ -120,22 +126,21 @@ export function useRunActions(
             ?.status === "passed",
       );
       if (!requiredStepsPassed) {
-        notify("Pass every required step before completing the test case");
+        notify(t("actions.passRequiredFirst"));
         return;
       }
     }
     if (status === "failed" && !attempt.actualResult.trim()) {
-      attempt.actualResult =
-        "Observed result differs from the expected behavior.";
+      attempt.actualResult = t("inlineDefect.observedDefault");
     }
     if (status === "blocked" && !attempt.comment.trim()) {
-      attempt.comment = "Execution is blocked by an environment or dependency.";
+      attempt.comment = t("actions.executionBlockedDefault");
     }
     item.status = status;
     attempt.status = status;
     if (state.connection === "demo") {
       updateRun(nextRun);
-      notify(`${item.caseKey} marked ${statusLabel[status].toLowerCase()}`);
+      notify(t("actions.itemMarked", statusVariables(item.caseKey, status)));
       if (status !== "failed") {
         const index = nextRun.items.findIndex((entry) => entry.id === item.id);
         state.setSelectedRunItemId(nextRun.items[index + 1]?.id ?? item.id);
@@ -154,12 +159,10 @@ export function useRunActions(
       );
       updateRun(remote);
     } catch {
-      notify(
-        `Could not mark ${item.caseKey} ${statusLabel[status].toLowerCase()}`,
-      );
+      notify(t("actions.itemMarkError", statusVariables(item.caseKey, status)));
       return;
     }
-    notify(`${item.caseKey} marked ${statusLabel[status].toLowerCase()}`);
+    notify(t("actions.itemMarked", statusVariables(item.caseKey, status)));
     if (status !== "failed") {
       const index = nextRun.items.findIndex((entry) => entry.id === item.id);
       state.setSelectedRunItemId(nextRun.items[index + 1]?.id ?? item.id);
@@ -174,7 +177,7 @@ export function useRunActions(
         status: "completed",
         completedAt: new Date().toISOString(),
       });
-      notify(`${derived.selectedRun.key} completed`);
+      notify(t("actions.runCompleted", { key: derived.selectedRun.key }));
       return;
     }
     try {
@@ -184,17 +187,13 @@ export function useRunActions(
       );
       updateRun(remote);
     } catch {
-      notify("The run cannot be completed yet");
+      notify(t("actions.runCannotComplete"));
       return;
     }
-    notify(`${derived.selectedRun.key} completed`);
+    notify(t("actions.runCompleted", { key: derived.selectedRun.key }));
   }
 
   return {
-    openRunDialog,
-    setStepStatus,
-    updateStepActualResult,
-    setItemStatus,
-    completeRun,
+    openRunDialog, setStepStatus, updateStepActualResult, setItemStatus, completeRun,
   };
 }

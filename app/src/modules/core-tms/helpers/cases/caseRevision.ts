@@ -3,6 +3,7 @@ import type {
   TestCaseRevision,
   TestStep,
 } from "../../../../core/tms/contracts/legacy-contract";
+import type { TmsLocale } from "../../localization/model/locale";
 import { createUid } from "../id/createUid";
 
 export function latestRevision(testCase: TestCase): TestCaseRevision {
@@ -13,7 +14,7 @@ export function latestRevision(testCase: TestCase): TestCaseRevision {
   );
 }
 
-export function createEmptyRevision(): TestCaseRevision {
+export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision {
   return {
     revision: 1,
     title: "",
@@ -22,7 +23,7 @@ export function createEmptyRevision(): TestCaseRevision {
     type: "manual",
     lifecycle: "draft",
     priority: "medium",
-    component: "Core product",
+    component: locale === "ru" ? "Основной продукт" : "Core product",
     owner: "QA Team",
     tags: [],
     estimatedMinutes: 5,
@@ -39,18 +40,22 @@ export function createEmptyRevision(): TestCaseRevision {
     checklist: [],
     attachmentIds: [],
     linkIds: [],
-    changeNote: "Created in TMS",
+    changeNote: locale === "ru" ? "Создано в TMS" : "Created in TMS",
     createdAt: new Date().toISOString(),
   };
 }
 
-export function executableSteps(revision: TestCaseRevision): TestStep[] {
+export function executableSteps(
+  revision: TestCaseRevision,
+  locale: TmsLocale = "en",
+): TestStep[] {
   if (revision.type === "checklist") {
     return revision.checklist.map((item) => ({
       id: item.id,
       order: item.order,
       action: item.text,
-      expectedResult: "The check is confirmed",
+      expectedResult:
+        locale === "ru" ? "Проверка подтверждена" : "The check is confirmed",
       required: item.required,
     }));
   }

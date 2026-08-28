@@ -3,9 +3,11 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Dashboard } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDashboard } from "../../../application/dashboards/createDashboard";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
+import { getDashboardDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 
 type DashboardDialogProps = {
@@ -23,18 +25,18 @@ export function DashboardDialog({
   onClose,
   onCreated,
 }: DashboardDialogProps) {
-  const [name, setName] = useState("Release quality");
-  const [description, setDescription] = useState(
-    "Release readiness and manual test results",
-  );
+  const { locale } = useTmsLocale();
+  const copy = getDashboardDialogCopy(locale);
+  const [name, setName] = useState<string>(copy.defaultName);
+  const [description, setDescription] = useState<string>(copy.defaultDescription);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setError("");
+    setError(false);
     try {
       onCreated(
         await createDashboard({
@@ -43,30 +45,31 @@ export function DashboardDialog({
           name,
           description,
           offline,
+          locale,
         }),
       );
     } catch {
-      setError("The dashboard was not created. Check the TMS API and retry.");
+      setError(true);
       setSubmitting(false);
     }
   }
 
   return (
     <Modal
-      title="Create dashboard"
-      subtitle="Start with a useful quality overview."
+      title={copy.title}
+      subtitle={copy.subtitle}
       onClose={onClose}
     >
       <form onSubmit={submit}>
         <div className={styles.formGrid}>
-          <Field label="Name" wide>
+          <Field label={copy.name} wide>
             <input
               required
               value={name}
               onChange={(event) => setName(event.target.value)}
             />
           </Field>
-          <Field label="Description" wide>
+          <Field label={copy.description} wide>
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
@@ -76,17 +79,17 @@ export function DashboardDialog({
         <div className={styles.widgetPreview}>
           <LayoutDashboard size={22} />
           <div>
-            <strong>Starter widgets included</strong>
-            <p>Run progress, pass rate, open defects, and recent activity.</p>
+            <strong>{copy.widgets}</strong>
+            <p>{copy.widgetsHint}</p>
           </div>
         </div>
-        {error && <FormError message={error} />}
+        {error && <FormError message={copy.error} />}
         <div className={styles.modalFooter}>
           <button type="button" className={styles.textButton} onClick={onClose}>
-            Cancel
+            {copy.cancel}
           </button>
           <button className={styles.primaryButton} disabled={submitting}>
-            <Plus size={16} /> {submitting ? "Creating…" : "Create dashboard"}
+            <Plus size={16} /> {submitting ? copy.creating : copy.create}
           </button>
         </div>
       </form>

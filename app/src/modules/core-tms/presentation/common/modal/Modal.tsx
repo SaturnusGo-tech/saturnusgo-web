@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "../../../tms.module.css";
 
 export function Modal({
@@ -16,6 +17,7 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
 }) {
+  const { t } = useTmsLocale();
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -46,7 +48,8 @@ export function Modal({
             type="button"
             className={styles.iconButton}
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("common.close")}
+            title={t("common.close")}
           >
             <X size={18} />
           </button>

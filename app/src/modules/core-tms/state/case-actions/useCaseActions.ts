@@ -3,6 +3,7 @@ import type { TestCase } from "../../../../core/tms/contracts/legacy-contract";
 import { mutate } from "../../../../core/tms/transport/http";
 import { createEmptyRevision } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 
@@ -11,10 +12,9 @@ export function useCaseActions(
   derived: ReturnType<typeof useWorkspaceDerived>,
   notify: (message: string) => void,
 ) {
-  function openNewCase(
-    folderPath = state.selectedFolder || "/Unsorted",
-  ) {
-    state.setCaseDraft(createEmptyRevision());
+  const { locale, t } = useTmsLocale();
+  function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
+    state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);
     state.setDialog("case");
@@ -64,8 +64,8 @@ export function useCaseActions(
       if (state.connection !== "demo") {
         notify(
           state.editing
-            ? "Could not save the new revision"
-            : "Could not create the test case",
+            ? t("actions.caseRevisionSaveError")
+            : t("actions.caseCreateError"),
         );
         return;
       }
@@ -111,8 +111,8 @@ export function useCaseActions(
     state.setDialog(null);
     notify(
       state.editing
-        ? "New test case revision saved"
-        : "Test case created",
+        ? t("actions.caseRevisionSaved")
+        : t("actions.caseCreated"),
     );
   }
 
@@ -131,7 +131,7 @@ export function useCaseActions(
       state.setSelectedCaseId(remote.id);
     } catch {
       if (state.connection !== "demo") {
-        notify("Could not clone the test case");
+        notify(t("actions.caseCloneError"));
         return;
       }
       const clone = structuredClone(derived.selectedCase);
@@ -139,7 +139,7 @@ export function useCaseActions(
       clone.key = `${derived.project?.key ?? "TMS"}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`;
       clone.revisions = clone.revisions.map((item) => ({
         ...item,
-        title: `${item.title} — copy`,
+        title: `${item.title} — ${t("actions.caseCopySuffix")}`,
       }));
       state.setData((current) => ({
         ...current,
@@ -147,7 +147,7 @@ export function useCaseActions(
       }));
       state.setSelectedCaseId(clone.id);
     }
-    notify("Test case cloned");
+    notify(t("actions.caseCloned"));
   }
 
   async function toggleArchiveCase() {
@@ -171,8 +171,8 @@ export function useCaseActions(
       if (state.connection !== "demo") {
         notify(
           restoring
-            ? "Could not restore the test case"
-            : "Could not archive the test case",
+            ? t("actions.caseRestoreError")
+            : t("actions.caseArchiveError"),
         );
         return;
       }
@@ -190,8 +190,8 @@ export function useCaseActions(
     }
     notify(
       restoring
-        ? "Test case restored"
-        : "Test case archived — history preserved",
+        ? t("actions.caseRestored")
+        : t("actions.caseArchived"),
     );
   }
 

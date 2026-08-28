@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
 import { createEmptyRevision } from "../../helpers/cases/caseRevision";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters, Dialog, View } from "../types/workspace";
 import { useWorkspaceBootstrap } from "./useWorkspaceBootstrap";
 
@@ -12,6 +13,7 @@ const defaultFilters: CaseFilters = {
 };
 
 export function useWorkspaceState() {
+  const { locale, t } = useTmsLocale();
   const bootstrap = useWorkspaceBootstrap();
   const { data, setData, connection } = bootstrap;
   const [view, setView] = useState<View>("cases");
@@ -24,7 +26,7 @@ export function useWorkspaceState() {
   const [dialog, setDialog] = useState<Dialog>(null);
   const [editing, setEditing] = useState(false);
   const [caseDraft, setCaseDraft] = useState<TestCaseRevision>(() =>
-    createEmptyRevision(),
+    createEmptyRevision(locale),
   );
   const [caseFolderPath, setCaseFolderPath] = useState("/Unsorted");
   const [selectedFolder, setSelectedFolder] = useState("/Unsorted");
@@ -57,7 +59,7 @@ export function useWorkspaceState() {
     setSelectedRunId(
       data.runs.find((item) => item.projectId === initialProjectId)?.id ?? null,
     );
-    setNotice(connection === "connected" ? "Workspace connected" : "");
+    setNotice(connection === "connected" ? t("actions.workspaceConnected") : "");
   }, [bootstrap.generation]);
 
   useEffect(() => {

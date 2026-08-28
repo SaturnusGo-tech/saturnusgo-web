@@ -1,0 +1,46 @@
+import type { TmsLocale } from "../../../localization/model/locale";
+
+const copies = {
+  en: {
+    projectError: "Check the project key and the TMS API response, then try again.",
+    rollbackError: "The default environment and automatic project rollback both failed. Reload before retrying.",
+    environmentError: "The default environment could not be created. The partial project was rolled back.",
+    title: "Create project",
+    subtitle: "A project keeps its own repository, suites, environments, runs, and reports.",
+    name: "Project name",
+    namePlaceholder: "Mobile App",
+    key: "Project key",
+    keyPlaceholder: "MOBILE",
+    environment: "Default environment",
+    description: "Description",
+    descriptionPlaceholder: "What product or service does this project cover?",
+    baseUrl: "Base URL",
+    ready: "Ready to test immediately",
+    readyHint: "An empty repository and a default local environment are created together.",
+    cancel: "Cancel",
+    creating: "Creating…",
+    create: "Create project",
+  },
+  ru: {
+    projectError: "Проверьте ключ проекта и ответ TMS API, затем повторите попытку.",
+    rollbackError: "Не удалось создать окружение и откатить проект. Перезагрузите страницу перед повторной попыткой.",
+    environmentError: "Не удалось создать окружение по умолчанию. Частично созданный проект был удалён.",
+    title: "Создать проект",
+    subtitle: "У каждого проекта свой репозиторий, сьюты, окружения, раны и отчёты.",
+    name: "Название проекта",
+    namePlaceholder: "Мобильное приложение",
+    key: "Ключ проекта",
+    keyPlaceholder: "MOBILE",
+    environment: "Окружение по умолчанию",
+    description: "Описание",
+    descriptionPlaceholder: "Какой продукт или сервис покрывает этот проект?",
+    baseUrl: "Базовый URL",
+    ready: "Можно тестировать сразу",
+    readyHint: "Пустой репозиторий и локальное окружение создаются вместе.",
+    cancel: "Отмена",
+    creating: "Создание…",
+    create: "Создать проект",
+  },
+} as const;
+
+export const getProjectDialogCopy = (locale: TmsLocale) => copies[locale];

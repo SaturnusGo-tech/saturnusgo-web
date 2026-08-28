@@ -1,0 +1,28 @@
+import type { ActionMessages } from "./en";
+
+export const ruActionMessages = {
+  "form.couldNotSave": "Не удалось сохранить",
+  "api.unreachable": "Не удалось подключиться к TMS API.",
+  "api.statusError": "TMS API вернул статус {status}.",
+  "actions.workspaceConnected": "Рабочее пространство подключено",
+  "actions.caseRevisionSaveError": "Не удалось сохранить новую ревизию",
+  "actions.caseCreateError": "Не удалось создать тест-кейс",
+  "actions.caseRevisionSaved": "Новая ревизия тест-кейса сохранена",
+  "actions.caseCreated": "Тест-кейс создан",
+  "actions.caseCloneError": "Не удалось клонировать тест-кейс",
+  "actions.caseCloned": "Тест-кейс клонирован",
+  "actions.caseCopySuffix": "копия",
+  "actions.caseRestoreError": "Не удалось восстановить тест-кейс",
+  "actions.caseArchiveError": "Не удалось отправить тест-кейс в архив",
+  "actions.caseRestored": "Тест-кейс восстановлен",
+  "actions.caseArchived": "Тест-кейс в архиве — история сохранена",
+  "actions.projectCreated": "Проект «{name}» создан",
+  "actions.folderCreated": "Папка {path} создана",
+  "actions.integrationCreated": "Интеграционный кейс {key} создан",
+  "actions.suiteCreated": "Тест-сьют создан",
+  "actions.suiteUpdated": "Тест-сьют обновлён",
+  "actions.environmentCreated": "Окружение создано",
+  "actions.runStarted": "Запущен ран «{type}» · тест-кейсов: {count}",
+  "actions.defectCreated": "{key} создан и связан",
+  "actions.dashboardCreated": "Дашборд создан",
+} satisfies Record<keyof ActionMessages, string>;

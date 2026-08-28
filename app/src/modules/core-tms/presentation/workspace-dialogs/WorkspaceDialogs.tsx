@@ -1,3 +1,4 @@
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { CaseDialog } from "../dialogs/case/CaseDialog";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
@@ -7,6 +8,7 @@ import { SuiteDialog } from "../dialogs/suite/SuiteDialog";
 import { WorkspaceExecutionDialogs } from "./WorkspaceExecutionDialogs";
 
 export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
+  const { t } = useTmsLocale();
   const close = () => model.setDialog(null);
   if (model.dialog === "project") {
     return (
@@ -26,7 +28,7 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           model.setSelectedFolder("/Unsorted");
           model.setView("cases");
           close();
-          model.notify(`${createdProject.name} project created`);
+          model.notify(t("actions.projectCreated", { name: createdProject.name }));
         }}
       />
     );
@@ -50,7 +52,7 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
             current.filter((item) => item !== folderPath),
           );
           close();
-          model.notify(`${folderPath} created`);
+          model.notify(t("actions.folderCreated", { path: folderPath }));
         }}
       />
     );
@@ -84,7 +86,7 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           model.setSelectedCaseId(testCase.id);
           model.setSelectedFolder(testCase.folderPath);
           close();
-          model.notify(`${testCase.key} integration case created`);
+          model.notify(t("actions.integrationCreated", { key: testCase.key }));
         }}
       />
     );
@@ -112,7 +114,7 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           model.setSelectedSuiteId(suite.id);
           model.setEditingSuiteId(null);
           close();
-          model.notify(`Test suite ${existing ? "updated" : "created"}`);
+          model.notify(t(existing ? "actions.suiteUpdated" : "actions.suiteCreated"));
         }}
       />
     );

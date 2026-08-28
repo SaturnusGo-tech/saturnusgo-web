@@ -4,6 +4,7 @@ import type {
 } from "../../../../core/tms/contracts/legacy-contract";
 import { mutate } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
+import type { TmsLocale } from "../../localization/model/locale";
 
 type Result =
   | { ok: true; project: Project; environment: Environment }
@@ -17,6 +18,7 @@ export async function createProject(input: {
   environmentName: string;
   baseUrl: string;
   offline: boolean;
+  locale: TmsLocale;
 }): Promise<Result> {
   const normalizedKey = input.key.trim().toUpperCase();
   const projectPayload = {
@@ -46,7 +48,10 @@ export async function createProject(input: {
         key: "local",
         name: input.environmentName.trim(),
         baseUrl: input.baseUrl.trim(),
-        description: "Development demo target",
+        description:
+          input.locale === "ru"
+            ? "Цель демо-режима разработки"
+            : "Development demo target",
         isDefault: true,
       },
     };
@@ -64,7 +69,10 @@ export async function createProject(input: {
     key: "local",
     name: input.environmentName.trim(),
     baseUrl: input.baseUrl.trim(),
-    description: "Default local test target",
+    description:
+      input.locale === "ru"
+        ? "Локальная цель тестирования по умолчанию"
+        : "Default local test target",
     isDefault: true,
   };
   let environment: Environment;
