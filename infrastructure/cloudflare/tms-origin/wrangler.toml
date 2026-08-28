@@ -1,0 +1,9 @@
+name = "umbrella-home-tms-origin"
+account_id = "4b485e3b82c9e0b429aa9aa753c250a7"
+main = "worker.mjs"
+compatibility_date = "2026-08-28"
+workers_dev = false
+
+routes = [
+  { pattern = "tms.saturnusgo.com", custom_domain = true }
+]
