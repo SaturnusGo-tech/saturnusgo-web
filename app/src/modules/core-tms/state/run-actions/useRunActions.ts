@@ -1,5 +1,5 @@
 import type { ExecutionStatus, TestRun } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { statusLabel } from "../../helpers/status/statusLabel";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -11,6 +11,7 @@ export function useRunActions(
   derived: ReturnType<typeof useWorkspaceDerived>,
   notify: (message: string) => void,
 ) {
+  const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
   const statusVariables = (key: string, status: ExecutionStatus) => ({
     key, status: statusLabel(locale, status),
@@ -55,13 +56,13 @@ export function useRunActions(
       return;
     }
     try {
-      await mutate(
+      await http.mutate(
         `/runs/${derived.selectedRun.id}/items/${item.id}/steps/${stepId}`,
         "PATCH",
         { status },
       );
       if (status === "failed" || status === "blocked") {
-        const remote = await mutate<TestRun>(
+        const remote = await http.mutate<TestRun>(
           `/runs/${derived.selectedRun.id}/items/${item.id}/status`,
           "PATCH",
           {
@@ -98,7 +99,7 @@ export function useRunActions(
     updateRun(nextRun);
     if (state.connection === "demo") return;
     const previousRun = derived.selectedRun;
-    mutate(
+    http.mutate(
       `/runs/${derived.selectedRun.id}/items/${item.id}/steps/${stepId}`,
       "PATCH",
       { status: result.status, actualResult: value, comment: result.comment },
@@ -148,7 +149,7 @@ export function useRunActions(
       return;
     }
     try {
-      const remote = await mutate<TestRun>(
+      const remote = await http.mutate<TestRun>(
         `/runs/${derived.selectedRun.id}/items/${item.id}/status`,
         "PATCH",
         {
@@ -181,7 +182,7 @@ export function useRunActions(
       return;
     }
     try {
-      const remote = await mutate<TestRun>(
+      const remote = await http.mutate<TestRun>(
         `/runs/${derived.selectedRun.id}/complete`,
         "POST",
       );

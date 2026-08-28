@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Suite, TestCase } from "../../../../../core/tms/contracts/legacy-contract";
 import { saveSuite } from "../../../application/suites/saveSuite";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { latestRevision } from "../../../helpers/cases/caseRevision";
 import { matchesSuite } from "../../../helpers/suites/matchesSuite";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -13,6 +14,7 @@ import { Modal } from "../../common/modal/Modal";
 import { getSuiteDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 export function SuiteDialog({ projectId, cases, suite, offline, onClose, onSaved }: { projectId: string; cases: TestCase[]; suite?: Suite; offline: boolean; onClose: () => void; onSaved: (suite: Suite) => void }) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getSuiteDialogCopy(locale);
   const caseCount = (count: number) => formatCount(locale, count, ["case", "cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
@@ -32,7 +34,7 @@ export function SuiteDialog({ projectId, cases, suite, offline, onClose, onSaved
     if (submitting || effectiveIds.length === 0) return;
     setSubmitting(true);
     setError(false);
-    try { onSaved(await saveSuite({ suite, projectId, name, description, type, caseIds, tags: tags.split(",").map((item) => item.trim()).filter(Boolean), offline })); }
+    try { onSaved(await saveSuite({ http, suite, projectId, name, description, type, caseIds, tags: tags.split(",").map((item) => item.trim()).filter(Boolean), offline })); }
     catch { setError(true); setSubmitting(false); }
   }
   return <Modal title={suite ? copy.configureTitle : copy.createTitle} subtitle={copy.subtitle} onClose={onClose} wide>

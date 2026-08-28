@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Environment, Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { createProject } from "../../../application/projects/createProject";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { FormError } from "../../common/error/FormError";
@@ -10,6 +11,7 @@ import { Modal } from "../../common/modal/Modal";
 import { getProjectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 export function ProjectDialog({ workspaceId, offline, onClose, onCreated }: { workspaceId: string; offline: boolean; onClose: () => void; onCreated: (project: Project, environment: Environment) => void }) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getProjectDialogCopy(locale);
   const [name, setName] = useState("");
@@ -28,7 +30,7 @@ export function ProjectDialog({ workspaceId, offline, onClose, onCreated }: { wo
     if (submitting) return;
     setSubmitting(true);
     setError(null);
-    const result = await createProject({ workspaceId, name, key, description, environmentName, baseUrl, offline, locale });
+    const result = await createProject({ http, workspaceId, name, key, description, environmentName, baseUrl, offline, locale });
     if (!result.ok) {
       setError(result.reason);
       setSubmitting(false);

@@ -2,7 +2,7 @@ import type {
   Environment,
   Project,
 } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
@@ -11,6 +11,7 @@ type Result =
   | { ok: false; reason: "project" | "environment" | "rollback" };
 
 export async function createProject(input: {
+  http: TmsHttpClient;
   workspaceId: string;
   name: string;
   key: string;
@@ -59,7 +60,7 @@ export async function createProject(input: {
   let project: Project;
   let projectPersisted = false;
   try {
-    project = await mutate<Project>("/projects", "POST", projectPayload);
+    project = await input.http.mutate<Project>("/projects", "POST", projectPayload);
     projectPersisted = true;
   } catch {
     return { ok: false, reason: "project" };
@@ -77,7 +78,7 @@ export async function createProject(input: {
   };
   let environment: Environment;
   try {
-    environment = await mutate<Environment>(
+    environment = await input.http.mutate<Environment>(
       "/environments",
       "POST",
       environmentPayload,
@@ -85,7 +86,7 @@ export async function createProject(input: {
   } catch {
     if (projectPersisted) {
       try {
-        await mutate(`/projects/${project.id}`, "DELETE");
+        await input.http.mutate(`/projects/${project.id}`, "DELETE");
       } catch {
         return { ok: false, reason: "rollback" };
       }

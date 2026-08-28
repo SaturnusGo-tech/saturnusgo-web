@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
+import { TmsAuthBoundary } from "../../auth/presentation/boundary/TmsAuthBoundary";
 import { TmsLocaleProvider } from "../../localization/context/TmsLocaleProvider";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useWorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -49,7 +50,9 @@ function LocalizedWorkspace() {
 export default function TmsWorkspace() {
   return (
     <TmsLocaleProvider>
-      <LocalizedWorkspace />
+      <TmsAuthBoundary>
+        <LocalizedWorkspace />
+      </TmsAuthBoundary>
     </TmsLocaleProvider>
   );
 }

@@ -1,8 +1,9 @@
 import type { Suite } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 
 export async function saveSuite(input: {
+  http: TmsHttpClient;
   suite?: Suite;
   projectId: string;
   name: string;
@@ -35,7 +36,7 @@ export async function saveSuite(input: {
     };
   }
   try {
-    return await mutate<Suite>(
+    return await input.http.mutate<Suite>(
       input.suite ? `/suites/${input.suite.id}` : "/suites",
       input.suite ? "PATCH" : "POST",
       payload,

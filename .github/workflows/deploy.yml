@@ -32,6 +32,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit --pretty false --incremental false
 
+      - name: Check TMS architecture
+        run: npm run architecture:tms
+
       - name: Validate TMS production API boundary
         run: |
           boundary_dir=$(mktemp -d)
@@ -45,9 +48,21 @@ jobs:
             --skipLibCheck
           node --test "$boundary_dir/api-base.test.js"
 
+      - name: Validate generated TMS contract
+        run: npm run check:tms-contract
+
+      - name: Test private TMS attachments
+        run: npm run test:tms-attachments
+
+      - name: Test TMS Auth0 boundary
+        run: npm run test:tms-auth
+
       - name: Build static export
         env:
           BUILD_TARGET: export
+          NEXT_PUBLIC_AUTH0_DOMAIN: dev-4v1srvqwzp1m7cdl.us.auth0.com
+          NEXT_PUBLIC_AUTH0_CLIENT_ID: CQjoUKhO0f73Cb80jmWNiGXuyZt1TviC
+          NEXT_PUBLIC_AUTH0_AUDIENCE: https://api.tms.saturnusgo.com
           NEXT_PUBLIC_TMS_API_BASE: https://umbrella-home-tms-backend-production.up.railway.app/api/v1
         run: |
           set -euo pipefail

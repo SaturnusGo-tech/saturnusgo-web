@@ -1,14 +1,12 @@
 import type { Defect } from "../../../../core/tms/contracts/legacy-contract";
-import {
-  mutate,
-  uploadAttachment,
-} from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
 type DefectPayload = Omit<Defect, "id" | "key" | "createdAt">;
 
 export async function createDefect(input: {
+  http: TmsHttpClient;
   projectId: string;
   payload: DefectPayload;
   files: File[];
@@ -24,25 +22,18 @@ export async function createDefect(input: {
       ...input.payload,
     };
   }
+  if (input.files.length > 0) {
+    throw new Error("Legacy multipart attachment upload is disabled.");
+  }
   let defect: Defect;
   try {
-    defect = await mutate<Defect>("/defects", "POST", input.payload);
+    defect = await input.http.mutate<Defect>("/defects", "POST", input.payload);
   } catch (error) {
     throw error;
   }
-  await Promise.all(
-    input.files.map((file) =>
-      uploadAttachment({
-        projectId: input.projectId,
-        entityType: "defect",
-        entityId: defect.id,
-        file,
-      }),
-    ),
-  );
   if (input.link?.trim()) {
     const url = input.link.trim();
-    await mutate("/links", "POST", {
+    await input.http.mutate("/links", "POST", {
       projectId: input.projectId,
       entityType: "defect",
       entityId: defect.id,

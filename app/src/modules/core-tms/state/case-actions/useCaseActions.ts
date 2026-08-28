@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import type { TestCase } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { createEmptyRevision } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -12,6 +12,7 @@ export function useCaseActions(
   derived: ReturnType<typeof useWorkspaceDerived>,
   notify: (message: string) => void,
 ) {
+  const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
     state.setCaseDraft(createEmptyRevision(locale));
@@ -44,12 +45,12 @@ export function useCaseActions(
       if (state.connection === "demo") throw new Error("development demo");
       const remote =
         state.editing && derived.selectedCase
-          ? await mutate<TestCase>(
+          ? await http.mutate<TestCase>(
               `/test-cases/${derived.selectedCase.id}`,
               "PATCH",
               payload,
             )
-          : await mutate<TestCase>("/test-cases", "POST", payload);
+          : await http.mutate<TestCase>("/test-cases", "POST", payload);
       state.setData((current) => ({
         ...current,
         testCases: state.editing
@@ -120,7 +121,7 @@ export function useCaseActions(
     if (!derived.selectedCase) return;
     try {
       if (state.connection === "demo") throw new Error("development demo");
-      const remote = await mutate<TestCase>(
+      const remote = await http.mutate<TestCase>(
         `/test-cases/${derived.selectedCase.id}/clone`,
         "POST",
       );
@@ -155,7 +156,7 @@ export function useCaseActions(
     const restoring = Boolean(derived.selectedCase.archivedAt);
     try {
       if (state.connection === "demo") throw new Error("development demo");
-      const remote = await mutate<TestCase>(
+      const remote = await http.mutate<TestCase>(
         restoring
           ? `/test-cases/${derived.selectedCase.id}/restore`
           : `/test-cases/${derived.selectedCase.id}`,

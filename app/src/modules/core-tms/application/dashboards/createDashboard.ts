@@ -1,9 +1,10 @@
 import type { Dashboard } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
 export async function createDashboard(input: {
+  http: TmsHttpClient;
   workspaceId: string;
   projectId: string | null;
   name: string;
@@ -37,7 +38,7 @@ export async function createDashboard(input: {
     };
   }
   try {
-    return await mutate<Dashboard>("/dashboards", "POST", {
+    return await input.http.mutate<Dashboard>("/dashboards", "POST", {
       workspaceId: input.workspaceId,
       projectId: input.projectId,
       name: input.name,

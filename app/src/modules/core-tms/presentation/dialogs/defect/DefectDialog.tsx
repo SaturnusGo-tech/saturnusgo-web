@@ -7,6 +7,7 @@ import type {
   TestRun,
 } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
@@ -32,6 +33,7 @@ export function DefectDialog({
   onClose,
   onCreated,
 }: DefectDialogProps) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
   const attempt =
@@ -86,7 +88,7 @@ export function DefectDialog({
     };
     try {
       onCreated(
-        await createDefect({ projectId, payload, files, link, offline, locale }),
+        await createDefect({ http, projectId, payload, files, link, offline, locale }),
       );
     } catch {
       setError(true);

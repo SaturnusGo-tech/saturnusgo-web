@@ -3,12 +3,14 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Defect, RunItem, TestRun, TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../application/defects/createDefect";
+import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { FormError } from "../common/error/FormError";
 import { Field } from "../common/field/Field";
 import styles from "../../tms.module.css";
 export function InlineDefectComposer({ projectId, run, item, step, offline, onCreated }: { projectId: string; run: TestRun; item: RunItem; step: TestStep; offline: boolean; onCreated: (defect: Defect) => void }) {
+  const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
   const attempt = item.attempts.find((entry) => entry.id === item.activeAttemptId) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;
@@ -33,7 +35,7 @@ export function InlineDefectComposer({ projectId, run, item, step, offline, onCr
     setError("");
     const payload: Omit<Defect, "id" | "key" | "createdAt"> = { projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`, severity, priority, status: "open", reproducibility: "Always", assignee: "QA Team", component: category, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id, stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed };
     try {
-      const next = await createDefect({ projectId, payload, files, link, offline, locale });
+      const next = await createDefect({ http, projectId, payload, files, link, offline, locale });
       setCreated(next);
       onCreated(next);
     } catch {

@@ -1,0 +1,3010 @@
+{
+  "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "TMS API",
+    "version": "1.0.0-checkpoint.1",
+    "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Version 1 API root"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "Health" },
+    { "name": "Workspaces" },
+    { "name": "Projects" },
+    { "name": "Environments" },
+    { "name": "Test cases" },
+    { "name": "Suites" },
+    { "name": "Runs" },
+    { "name": "Results" },
+    { "name": "Defects" },
+    { "name": "Attachments" },
+    { "name": "Activity" }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Report API readiness",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0012.",
+        "operationId": "getHealth",
+        "security": [],
+        "responses": {
+          "200": { "$ref": "#/components/responses/HealthResponse" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/summary": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/WorkspaceIdPath" }
+      ],
+      "get": {
+        "tags": ["Workspaces"],
+        "summary": "Read the bounded initial workspace projection",
+        "description": "Replaces the unbounded prototype bootstrap dump. The response is versioned as workspace-summary.v1, is capped at 262144 encoded bytes, and contains only summary records. Clients use paginated collection endpoints for complete data.",
+        "operationId": "getWorkspaceSummary",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          {
+            "name": "recentLimit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 20, "default": 10 },
+            "description": "Maximum records in each recent-items section."
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/WorkspaceSummaryResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/projects": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Projects"],
+        "summary": "List projects in a workspace",
+        "operationId": "listProjects",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/EntityStatusQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ProjectListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Create a project",
+        "operationId": "createProject",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/ProjectCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ProjectResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/projects/{projectId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/ProjectIdPath" }
+      ],
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Get a project",
+        "operationId": "getProject",
+        "responses": {
+          "200": { "$ref": "#/components/responses/ProjectResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Projects"],
+        "summary": "Update a project",
+        "operationId": "updateProject",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ProjectPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ProjectResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Projects"],
+        "summary": "Archive a project",
+        "description": "Archives the project; it never hard-deletes project history.",
+        "operationId": "archiveProject",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ProjectResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/environments": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Environments"],
+        "summary": "List project environments",
+        "operationId": "listEnvironments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/EntityStatusQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/EnvironmentListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Environments"],
+        "summary": "Create an environment",
+        "operationId": "createEnvironment",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/EnvironmentCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/EnvironmentResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/environments/{environmentId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/EnvironmentIdPath" }
+      ],
+      "get": {
+        "tags": ["Environments"],
+        "summary": "Get an environment",
+        "operationId": "getEnvironment",
+        "responses": {
+          "200": { "$ref": "#/components/responses/EnvironmentResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Environments"],
+        "summary": "Update an environment",
+        "operationId": "updateEnvironment",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/EnvironmentPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/EnvironmentResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Environments"],
+        "summary": "Archive an environment",
+        "operationId": "archiveEnvironment",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/EnvironmentResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Test cases"],
+        "summary": "List test cases",
+        "description": "Returns bounded case summaries with their current revision only. Revision history is paginated separately.",
+        "operationId": "listTestCases",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/AttachmentUploadStatus" }
+          },
+          {
+            "name": "includeArchived",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean", "default": false }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "maxLength": 300 }
+          },
+          {
+            "name": "lifecycle",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/TestCaseLifecycle" }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/Priority" }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string", "maxLength": 80 }, "maxItems": 20 },
+            "style": "form",
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Test cases"],
+        "summary": "Create a test case and revision 1",
+        "operationId": "createTestCase",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/TestCaseCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/TestCaseResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "get": {
+        "tags": ["Test cases"],
+        "summary": "Get a test case at its current revision",
+        "operationId": "getTestCase",
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Test cases"],
+        "summary": "Create the next immutable test-case revision",
+        "description": "Never overwrites historical revisions. If-Match is the ETag returned for the current case representation.",
+        "operationId": "reviseTestCase",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/TestCasePatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Test cases"],
+        "summary": "Archive a test case",
+        "operationId": "archiveTestCase",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/revisions": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "get": {
+        "tags": ["Test cases"],
+        "summary": "List immutable revisions newest first",
+        "operationId": "listTestCaseRevisions",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseRevisionListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/revisions/{revision}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" },
+        { "$ref": "#/components/parameters/RevisionPath" }
+      ],
+      "get": {
+        "tags": ["Test cases"],
+        "summary": "Get one immutable revision",
+        "operationId": "getTestCaseRevision",
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseRevisionResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "post": {
+        "tags": ["Test cases"],
+        "summary": "Restore an archived test case",
+        "operationId": "restoreTestCase",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/clone": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "post": {
+        "tags": ["Test cases"],
+        "summary": "Clone the current revision into a new test case",
+        "operationId": "cloneTestCase",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/TestCaseClone" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/TestCaseResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/suites": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Suites"],
+        "summary": "List test-suite summaries",
+        "operationId": "listSuites",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/EntityStatusQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SuiteListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Suites"],
+        "summary": "Create a static or dynamic suite",
+        "operationId": "createSuite",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/SuiteCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/SuiteResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/suites/{suiteId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/SuiteIdPath" }
+      ],
+      "get": {
+        "tags": ["Suites"],
+        "summary": "Get a suite definition",
+        "description": "Dynamic suites are resolved at run creation. resolvedCaseCount is informational; the run stores the exact revision snapshots selected at that time.",
+        "operationId": "getSuite",
+        "responses": {
+          "200": { "$ref": "#/components/responses/SuiteResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Suites"],
+        "summary": "Update a suite definition",
+        "operationId": "updateSuite",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/SuitePatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/SuiteResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Suites"],
+        "summary": "Archive a suite",
+        "operationId": "archiveSuite",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SuiteResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Runs"],
+        "summary": "List test-run summaries",
+        "operationId": "listRuns",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/RunStatus" }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/RunType" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Runs"],
+        "summary": "Create a run with immutable case and environment snapshots",
+        "description": "caseIds, when non-empty, are the exact deduplicated scope and suiteId remains provenance. Otherwise suiteId is resolved once. Archived or cross-project cases are rejected.",
+        "operationId": "createRun",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/RunCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/RunResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "get": {
+        "tags": ["Runs"],
+        "summary": "Get a run summary",
+        "description": "Run items and attempt history are paginated through their owned endpoints.",
+        "operationId": "getRun",
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Runs"],
+        "summary": "Edit a draft run",
+        "operationId": "updateRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/RunPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/start": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "post": {
+        "tags": ["Runs"],
+        "summary": "Start a draft run",
+        "operationId": "startRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/complete": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "post": {
+        "tags": ["Runs"],
+        "summary": "Complete an active run",
+        "description": "Fails with CONFLICT and safe unfinishedItems details until every item is passed, failed, blocked, or skipped.",
+        "operationId": "completeRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/abort": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "post": {
+        "tags": ["Runs"],
+        "summary": "Abort an active run",
+        "operationId": "abortRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "get": {
+        "tags": ["Runs", "Results"],
+        "summary": "List immutable run-item snapshots",
+        "operationId": "listRunItems",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/ExecutionStatus" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunItemListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" }
+      ],
+      "get": {
+        "tags": ["Runs", "Results"],
+        "summary": "Get a run item and its active attempt",
+        "operationId": "getRunItem",
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunItemResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}/status": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" }
+      ],
+      "patch": {
+        "tags": ["Results"],
+        "summary": "Submit the active attempt result",
+        "description": "passed requires every required step to be passed; failed requires actualResult or comment; blocked requires a reason. Invalid transitions return stable domain codes.",
+        "operationId": "updateRunItemStatus",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/RunItemStatusUpdate" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunItemResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}/steps/{stepId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" },
+        { "$ref": "#/components/parameters/StepIdPath" }
+      ],
+      "patch": {
+        "tags": ["Results"],
+        "summary": "Submit a step or checklist result",
+        "operationId": "updateStepResult",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/StepResultUpdate" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/StepResultResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}/attempts": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" }
+      ],
+      "get": {
+        "tags": ["Results"],
+        "summary": "List preserved attempts newest first",
+        "operationId": "listRunItemAttempts",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunAttemptListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/items/{itemId}/retest": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" },
+        { "$ref": "#/components/parameters/RunItemIdPath" }
+      ],
+      "post": {
+        "tags": ["Results"],
+        "summary": "Create the next attempt without overwriting history",
+        "operationId": "retestRunItem",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "responses": {
+          "201": { "$ref": "#/components/responses/RunItemResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/defects": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Defects"],
+        "summary": "List project defects",
+        "operationId": "listDefects",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/DefectStatus" }
+          },
+          {
+            "name": "runId",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/Identifier" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DefectListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Defects"],
+        "summary": "Create a traceable defect",
+        "operationId": "createDefect",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/DefectCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/DefectResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/defects/{defectId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DefectIdPath" }
+      ],
+      "get": {
+        "tags": ["Defects"],
+        "summary": "Get a defect",
+        "operationId": "getDefect",
+        "responses": {
+          "200": { "$ref": "#/components/responses/DefectResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Defects"],
+        "summary": "Update defect fields without bypassing lifecycle rules",
+        "operationId": "updateDefect",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/DefectPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/DefectResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/defects/{defectId}/status": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DefectIdPath" }
+      ],
+      "post": {
+        "tags": ["Defects"],
+        "summary": "Apply an explicit defect status transition",
+        "operationId": "transitionDefectStatus",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/DefectStatusTransition" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/DefectResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/attachments": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Attachments"],
+        "summary": "List private attachment metadata",
+        "description": "Returns bounded metadata for every lifecycle state, including deleted tombstones retained for history. Object keys and provider details are never exposed.",
+        "operationId": "listAttachments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "description": "Optional exact owner selector. Required IDs are enforced by its discriminated owner schema.",
+            "style": "deepObject",
+            "explode": true,
+            "schema": { "$ref": "#/components/schemas/AttachmentOwner" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AttachmentListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/attachments/upload-intents": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Attachments"],
+        "summary": "Create a private direct-upload intent",
+        "description": "Authorizes the typed immutable owner, selects the trusted extension from the active media policy, persists the upload deadline with pending private metadata, and returns an expiring URL for exactly one object. Idempotent replays never extend the persisted deadline. No read access is available until finalize verifies the object.",
+        "operationId": "createAttachmentUploadIntent",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/AttachmentUploadIntentCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/AttachmentUploadIntentResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "410": { "$ref": "#/components/responses/Gone" },
+          "413": { "$ref": "#/components/responses/PayloadTooLarge" },
+          "415": { "$ref": "#/components/responses/UnsupportedMediaType" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/attachments/upload-intents/{intentId}/finalize": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/UploadIntentIdPath" }
+      ],
+      "post": {
+        "tags": ["Attachments"],
+        "summary": "Finalize and verify an uploaded object",
+        "description": "Before the persisted upload deadline, HEAD-verifies the private object, byte size, storage ETag, media policy, and SHA-256. A pending attachment transitions exactly once to ready, failed, or quarantined; completed results replay for the same principal, key, and canonical request without repeating storage inspection. Client claims are never trusted without storage verification.",
+        "operationId": "finalizeAttachmentUpload",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/AttachmentUploadFinalize" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/AttachmentResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "410": { "$ref": "#/components/responses/Gone" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/attachments/{attachmentId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/AttachmentIdPath" }
+      ],
+      "get": {
+        "tags": ["Attachments"],
+        "summary": "Get private attachment metadata",
+        "operationId": "getAttachment",
+        "responses": {
+          "200": { "$ref": "#/components/responses/AttachmentResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/attachments/{attachmentId}/access": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/AttachmentIdPath" }
+      ],
+      "post": {
+        "tags": ["Attachments"],
+        "summary": "Authorize and mint short-lived signed read access",
+        "description": "Available only while status is ready. The private URL is never persisted in DTOs or activity, expires in at most five minutes, and must not be cached. Pending, failed, quarantined, deleting, and deleted objects never receive signed read access.",
+        "operationId": "createAttachmentAccess",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": { "$ref": "#/components/requestBodies/AttachmentAccessCreate" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/AttachmentAccessResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/activity": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Activity"],
+        "summary": "List append-only workspace activity newest first",
+        "operationId": "listActivity",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "entityType",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "minLength": 1, "maxLength": 80 }
+          },
+          {
+            "name": "entityId",
+            "in": "query",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/Identifier" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ActivityListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Production access token. The prototype x-actor header is not authentication and is not part of this contract."
+      }
+    },
+    "parameters": {
+      "XRequestId": {
+        "name": "X-Request-Id",
+        "in": "header",
+        "required": false,
+        "description": "Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID.",
+        "schema": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" }
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours.",
+        "schema": { "type": "string", "minLength": 16, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" }
+      },
+      "IfMatch": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "description": "Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted.",
+        "schema": { "type": "string", "minLength": 3, "maxLength": 160, "pattern": "^\"[^\"]+\"$" }
+      },
+      "Cursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering.",
+        "schema": { "type": "string", "minLength": 1, "maxLength": 1024 }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Requested page size.",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 }
+      },
+      "WorkspaceIdPath": {
+        "name": "workspaceId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "WorkspaceIdQueryRequired": {
+        "name": "workspaceId",
+        "in": "query",
+        "required": true,
+        "description": "Required tenant boundary for the query.",
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "ProjectIdPath": {
+        "name": "projectId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "ProjectIdQuery": {
+        "name": "projectId",
+        "in": "query",
+        "required": false,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "ProjectIdQueryRequired": {
+        "name": "projectId",
+        "in": "query",
+        "required": true,
+        "description": "Required project scope; cross-project reads are never performed and filtered afterward.",
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "EnvironmentIdPath": {
+        "name": "environmentId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "CaseIdPath": {
+        "name": "caseId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "RevisionPath": {
+        "name": "revision",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer", "minimum": 1 }
+      },
+      "SuiteIdPath": {
+        "name": "suiteId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "RunIdPath": {
+        "name": "runId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "RunItemIdPath": {
+        "name": "itemId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "StepIdPath": {
+        "name": "stepId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "DefectIdPath": {
+        "name": "defectId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "UploadIntentIdPath": {
+        "name": "intentId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "AttachmentIdPath": {
+        "name": "attachmentId",
+        "in": "path",
+        "required": true,
+        "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "EntityStatusQuery": {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "schema": { "$ref": "#/components/schemas/EntityStatus" }
+      }
+    },
+    "headers": {
+      "XRequestId": {
+        "required": true,
+        "description": "Effective request correlation ID; identical to error.requestId on failures.",
+        "schema": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "ETag": {
+        "required": true,
+        "description": "Strong opaque representation version for a singleton resource or its aggregate concurrency boundary.",
+        "schema": { "type": "string", "pattern": "^\"[^\"]+\"$" }
+      },
+      "XNextCursor": {
+        "required": false,
+        "description": "Opaque next cursor. Omitted on the final page and equal to meta.nextCursor when present.",
+        "schema": { "type": "string", "minLength": 1, "maxLength": 1024 }
+      },
+      "IdempotencyReplayed": {
+        "required": false,
+        "description": "true only when this response was replayed from a completed idempotent command.",
+        "schema": { "type": "boolean" }
+      },
+      "RetryAfter": {
+        "required": false,
+        "description": "Seconds until the client may retry.",
+        "schema": { "type": "integer", "minimum": 1 }
+      },
+      "CacheControlNoStore": {
+        "required": true,
+        "description": "Signed access responses are private and must not be cached.",
+        "schema": { "type": "string", "const": "no-store" }
+      }
+    },
+    "requestBodies": {
+      "ProjectCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectCreateRequest" } } }
+      },
+      "ProjectPatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/ProjectPatchRequest" } } }
+      },
+      "EnvironmentCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnvironmentCreateRequest" } } }
+      },
+      "EnvironmentPatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/EnvironmentPatchRequest" } } }
+      },
+      "TestCaseCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCreateRequest" } } }
+      },
+      "TestCasePatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/TestCasePatchRequest" } } }
+      },
+      "TestCaseClone": {
+        "required": false,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCloneRequest" } } }
+      },
+      "SuiteCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteCreateRequest" } } }
+      },
+      "SuitePatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/SuitePatchRequest" } } }
+      },
+      "RunCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunCreateRequest" } } }
+      },
+      "RunPatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/RunPatchRequest" } } }
+      },
+      "RunItemStatusUpdate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunItemStatusUpdateRequest" } } }
+      },
+      "StepResultUpdate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StepResultUpdateRequest" } } }
+      },
+      "DefectCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectCreateRequest" } } }
+      },
+      "DefectPatch": {
+        "required": true,
+        "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/DefectPatchRequest" } } }
+      },
+      "DefectStatusTransition": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectStatusTransitionRequest" } } }
+      },
+      "AttachmentUploadIntentCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentUploadIntentCreateRequest" } } }
+      },
+      "AttachmentUploadFinalize": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentUploadFinalizeRequest" } } }
+      },
+      "AttachmentAccessCreate": {
+        "required": false,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentAccessCreateRequest" } } }
+      }
+    },
+    "responses": {
+      "HealthResponse": {
+        "description": "Service is ready to accept requests.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } }
+      },
+      "WorkspaceSummaryResponse": {
+        "description": "Bounded workspace summary projection.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorkspaceSummaryEnvelope" } } }
+      },
+      "ProjectListResponse": {
+        "description": "A page of projects ordered by key then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectListEnvelope" } } }
+      },
+      "ProjectResponse": {
+        "description": "Project representation.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProjectEnvelope" } } }
+      },
+      "EnvironmentListResponse": {
+        "description": "A page of environments ordered by key then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnvironmentListEnvelope" } } }
+      },
+      "EnvironmentResponse": {
+        "description": "Environment representation. Secret values are never serialized.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnvironmentEnvelope" } } }
+      },
+      "TestCaseListResponse": {
+        "description": "A page of test cases ordered by updatedAt descending then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseListEnvelope" } } }
+      },
+      "TestCaseResponse": {
+        "description": "Test case with current revision only.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseEnvelope" } } }
+      },
+      "TestCaseRevisionListResponse": {
+        "description": "A page of immutable revisions.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseRevisionListEnvelope" } } }
+      },
+      "TestCaseRevisionResponse": {
+        "description": "One immutable revision.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseRevisionEnvelope" } } }
+      },
+      "SuiteListResponse": {
+        "description": "A page of bounded suite summaries ordered by key then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteListEnvelope" } } }
+      },
+      "SuiteResponse": {
+        "description": "Suite definition.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteEnvelope" } } }
+      },
+      "RunListResponse": {
+        "description": "A page of run summaries ordered by createdAt descending then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunListEnvelope" } } }
+      },
+      "RunResponse": {
+        "description": "Run summary; items are paginated separately.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunEnvelope" } } }
+      },
+      "RunItemListResponse": {
+        "description": "A page of immutable run-item snapshots.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunItemListEnvelope" } } }
+      },
+      "RunItemResponse": {
+        "description": "Run item and active attempt.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunItemEnvelope" } } }
+      },
+      "RunAttemptListResponse": {
+        "description": "A page of preserved attempts ordered newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunAttemptListEnvelope" } } }
+      },
+      "StepResultResponse": {
+        "description": "Updated step result and its aggregate identifiers.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StepResultEnvelope" } } }
+      },
+      "DefectListResponse": {
+        "description": "A page of defects ordered by createdAt descending then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectListEnvelope" } } }
+      },
+      "DefectResponse": {
+        "description": "Defect representation.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectEnvelope" } } }
+      },
+      "AttachmentListResponse": {
+        "description": "A page of private attachment metadata ordered by createdAt descending then ID.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentListEnvelope" } } }
+      },
+      "AttachmentResponse": {
+        "description": "Private attachment metadata without a storage key or public URL.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentEnvelope" } } }
+      },
+      "AttachmentUploadIntentResponse": {
+        "description": "Expiring upload instructions for one object.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentUploadIntentEnvelope" } } }
+      },
+      "AttachmentAccessResponse": {
+        "description": "Expiring signed read instructions.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Cache-Control": { "$ref": "#/components/headers/CacheControlNoStore" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentAccessEnvelope" } } }
+      },
+      "ActivityListResponse": {
+        "description": "A page of safe append-only audit events ordered newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ActivityListEnvelope" } } }
+      },
+      "BadRequest": {
+        "description": "The request is malformed or fails safe field validation.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "Unauthorized": {
+        "description": "A valid bearer principal is required.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "Forbidden": {
+        "description": "The principal is authenticated but lacks workspace permission.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "NotFound": {
+        "description": "The scoped resource does not exist or is intentionally concealed.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "Conflict": {
+        "description": "A stable domain transition, uniqueness, or idempotency conflict.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "Gone": {
+        "description": "The upload intent expired and cannot be finalized.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "PreconditionFailed": {
+        "description": "If-Match does not equal the current representation ETag.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "PayloadTooLarge": {
+        "description": "The declared attachment exceeds the configured policy.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "UnsupportedMediaType": {
+        "description": "The attachment media type is not permitted.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "PreconditionRequired": {
+        "description": "A required If-Match header is missing.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "InternalError": {
+        "description": "Unexpected server error; internal details are never exposed.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      }
+    },
+    "schemas": {
+      "Identifier": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "description": "Opaque identifier; clients must not parse prefixes or embed business meaning."
+      },
+      "Timestamp": { "type": "string", "format": "date-time" },
+      "ShortText": { "type": "string", "maxLength": 500 },
+      "LongText": { "type": "string", "maxLength": 20000 },
+      "StringMap": {
+        "type": "object",
+        "maxProperties": 100,
+        "propertyNames": { "minLength": 1, "maxLength": 120 },
+        "additionalProperties": { "type": "string", "maxLength": 4000 }
+      },
+      "EntityStatus": { "type": "string", "enum": ["active", "archived"] },
+      "Priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+      "TestCaseLifecycle": { "type": "string", "enum": ["draft", "ready", "deprecated", "archived"] },
+      "RunType": { "type": "string", "enum": ["smoke", "regression", "acceptance", "ad_hoc"] },
+      "RunStatus": { "type": "string", "enum": ["draft", "active", "completed", "aborted"] },
+      "ExecutionStatus": {
+        "type": "string",
+        "enum": ["not_run", "in_progress", "passed", "failed", "blocked", "skipped"]
+      },
+      "DefectStatus": {
+        "type": "string",
+        "enum": ["open", "triaged", "in_progress", "ready_for_retest", "verified", "closed", "reopened"]
+      },
+      "AttachmentOwnerKind": {
+        "type": "string",
+        "enum": ["test_case_revision", "run", "run_attempt", "defect"]
+      },
+      "PageMeta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["limit", "hasMore", "nextCursor"],
+        "properties": {
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "hasMore": { "type": "boolean" },
+          "nextCursor": { "type": ["string", "null"], "minLength": 1, "maxLength": 1024 }
+        }
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "AUTHENTICATION_REQUIRED",
+          "FORBIDDEN",
+          "VALIDATION_ERROR",
+          "BAD_REQUEST",
+          "NOT_FOUND",
+          "CONFLICT",
+          "INVALID_TRANSITION",
+          "PRECONDITION_REQUIRED",
+          "PRECONDITION_FAILED",
+          "IDEMPOTENCY_KEY_REUSED",
+          "UPLOAD_INTENT_EXPIRED",
+          "ATTACHMENT_DIGEST_MISMATCH",
+          "PAYLOAD_TOO_LARGE",
+          "UNSUPPORTED_MEDIA_TYPE",
+          "INTERNAL_ERROR"
+        ]
+      },
+      "ValidationIssue": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "code", "message"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "code": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "message": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      },
+      "ErrorDetails": {
+        "oneOf": [
+          { "type": "null" },
+          { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/ValidationIssue" } },
+          {
+            "type": "object",
+            "maxProperties": 30,
+            "additionalProperties": {
+              "type": ["string", "number", "integer", "boolean", "array", "object", "null"]
+            }
+          }
+        ],
+        "description": "Safe structured context only. Never contains stack traces, SQL, storage keys, secrets, or signed URLs."
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "requestId"],
+        "properties": {
+          "code": { "$ref": "#/components/schemas/ErrorCode" },
+          "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "details": { "$ref": "#/components/schemas/ErrorDetails" },
+          "requestId": { "type": "string", "minLength": 1, "maxLength": 128 }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["error"],
+        "properties": { "error": { "$ref": "#/components/schemas/Error" } }
+      },
+      "Health": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "service", "apiVersion"],
+        "properties": {
+          "status": { "type": "string", "const": "ok" },
+          "service": { "type": "string", "const": "tms-backend" },
+          "apiVersion": { "type": "string", "const": "v1" }
+        }
+      },
+      "Workspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "key", "slug", "name", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 2, "maxLength": 40 },
+          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workspaceId", "key", "slug", "name", "description", "status", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*$", "minLength": 2, "maxLength": 12 },
+          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "ProjectCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workspaceId", "key", "name"],
+        "properties": {
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*$", "minLength": 2, "maxLength": 12 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "description": { "$ref": "#/components/schemas/LongText" }
+        }
+      },
+      "ProjectPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" }
+        }
+      },
+      "ProjectEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Project" } }
+      },
+      "ProjectListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Project" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "Environment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "name", "baseUrl", "description", "variableKeys", "isDefault", "status", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "variableKeys": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 120 } },
+          "isDefault": { "type": "boolean" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "EnvironmentCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "key", "name"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "variables": { "allOf": [{ "$ref": "#/components/schemas/StringMap" }], "writeOnly": true },
+          "isDefault": { "type": "boolean", "default": false }
+        }
+      },
+      "EnvironmentPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "variables": { "allOf": [{ "$ref": "#/components/schemas/StringMap" }], "writeOnly": true },
+          "isDefault": { "type": "boolean" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" }
+        }
+      },
+      "EnvironmentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Environment" } }
+      },
+      "EnvironmentListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Environment" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "TestStepInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "expectedResult"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "order": { "type": "integer", "minimum": 1 },
+          "action": { "$ref": "#/components/schemas/LongText" },
+          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "required": { "type": "boolean", "default": true },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        }
+      },
+      "TestStep": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "order", "action", "expectedResult", "required", "attachmentIds"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "order": { "type": "integer", "minimum": 1 },
+          "action": { "$ref": "#/components/schemas/LongText" },
+          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "required": { "type": "boolean" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        }
+      },
+      "ChecklistItemInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "order": { "type": "integer", "minimum": 1 },
+          "text": { "$ref": "#/components/schemas/LongText" },
+          "required": { "type": "boolean", "default": true }
+        }
+      },
+      "ChecklistItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "order", "text", "required"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "order": { "type": "integer", "minimum": 1 },
+          "text": { "$ref": "#/components/schemas/LongText" },
+          "required": { "type": "boolean" }
+        }
+      },
+      "TestCaseRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["revision", "title", "description", "preconditions", "type", "lifecycle", "priority", "component", "owner", "tags", "estimatedMinutes", "testData", "steps", "checklist", "attachmentIds", "linkIds", "changeNote", "createdBy", "createdAt"],
+        "properties": {
+          "revision": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "preconditions": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "owner": { "$ref": "#/components/schemas/ShortText" },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStep" } },
+          "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItem" } },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" },
+          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "manual" } }, "required": ["type"] },
+            "then": { "properties": { "checklist": { "maxItems": 0 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "checklist" } }, "required": ["type"] },
+            "then": { "properties": { "steps": { "maxItems": 0 } } }
+          }
+        ]
+      },
+      "TestCase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "current", "revisionCount", "archivedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "folderPath": { "type": "string", "maxLength": 500 },
+          "currentRevision": { "type": "integer", "minimum": 1 },
+          "current": { "$ref": "#/components/schemas/TestCaseRevision" },
+          "revisionCount": { "type": "integer", "minimum": 1 },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "TestCaseCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "title"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "folderPath": { "type": "string", "maxLength": 500, "default": "/" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "preconditions": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["manual", "checklist"], "default": "manual" },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "owner": { "$ref": "#/components/schemas/ShortText" },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStepInput" } },
+          "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItemInput" } },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "manual" } } },
+            "then": { "properties": { "checklist": { "maxItems": 0 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "checklist" } }, "required": ["type"] },
+            "then": { "properties": { "steps": { "maxItems": 0 } } }
+          }
+        ]
+      },
+      "TestCasePatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "folderPath": { "type": "string", "maxLength": 500 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "preconditions": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "owner": { "$ref": "#/components/schemas/ShortText" },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0 },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "steps": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/TestStepInput" } },
+          "checklist": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/ChecklistItemInput" } },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" }
+        }
+      },
+      "TestCaseCloneRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "folderPath": { "type": "string", "maxLength": 500 }
+        }
+      },
+      "TestCaseEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/TestCase" } }
+      },
+      "TestCaseListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCase" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "TestCaseRevisionEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/TestCaseRevision" } }
+      },
+      "TestCaseRevisionListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCaseRevision" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "SuiteFilter": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "priority": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Priority" } },
+          "lifecycle": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "$ref": "#/components/schemas/TestCaseLifecycle" } },
+          "folderPathPrefix": { "type": "string", "maxLength": 500 },
+          "text": { "type": "string", "maxLength": 300 }
+        }
+      },
+      "SuiteSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "name", "description", "type", "caseCount", "status", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["static", "dynamic"] },
+          "caseCount": { "type": "integer", "minimum": 0 },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "Suite": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SuiteSummary" },
+          {
+            "type": "object",
+            "required": ["caseIds", "filter", "resolvedCaseCount"],
+            "properties": {
+              "caseIds": { "type": "array", "maxItems": 10000, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+              "filter": { "$ref": "#/components/schemas/SuiteFilter" },
+              "resolvedCaseCount": { "type": "integer", "minimum": 0 }
+            }
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "SuiteCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "name", "type"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["static", "dynamic"] },
+          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "filter": { "$ref": "#/components/schemas/SuiteFilter" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "dynamic" } }, "required": ["type"] },
+            "then": { "properties": { "caseIds": { "maxItems": 0 } } }
+          }
+        ]
+      },
+      "SuitePatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "type": { "type": "string", "enum": ["static", "dynamic"] },
+          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "filter": { "$ref": "#/components/schemas/SuiteFilter" },
+          "status": { "$ref": "#/components/schemas/EntityStatus" }
+        }
+      },
+      "SuiteEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Suite" } }
+      },
+      "SuiteListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/SuiteSummary" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "EnvironmentSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "key", "name", "baseUrl", "variableKeys"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "baseUrl": { "type": "string", "maxLength": 2000 },
+          "variableKeys": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 120 } }
+        }
+      },
+      "ExecutionCounts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["not_run", "in_progress", "passed", "failed", "blocked", "skipped"],
+        "properties": {
+          "not_run": { "type": "integer", "minimum": 0 },
+          "in_progress": { "type": "integer", "minimum": 0 },
+          "passed": { "type": "integer", "minimum": 0 },
+          "failed": { "type": "integer", "minimum": 0 },
+          "blocked": { "type": "integer", "minimum": 0 },
+          "skipped": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "RunProgress": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["total", "executed", "percent", "counts"],
+        "properties": {
+          "total": { "type": "integer", "minimum": 0 },
+          "executed": { "type": "integer", "minimum": 0 },
+          "percent": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "counts": { "$ref": "#/components/schemas/ExecutionCounts" }
+        }
+      },
+      "Run": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "name", "description", "type", "status", "environment", "suiteId", "build", "configuration", "itemCount", "progress", "createdBy", "startedAt", "completedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "type": { "$ref": "#/components/schemas/RunType" },
+          "status": { "$ref": "#/components/schemas/RunStatus" },
+          "environment": { "$ref": "#/components/schemas/EnvironmentSnapshot" },
+          "suiteId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "build": { "$ref": "#/components/schemas/ShortText" },
+          "configuration": { "$ref": "#/components/schemas/StringMap" },
+          "itemCount": { "type": "integer", "minimum": 1 },
+          "progress": { "$ref": "#/components/schemas/RunProgress" },
+          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "startedAt": { "type": ["string", "null"], "format": "date-time" },
+          "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RunCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "environmentId", "name", "type"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "environmentId": { "$ref": "#/components/schemas/Identifier" },
+          "suiteId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "caseIds": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/components/schemas/Identifier" }, "description": "Duplicates are collapsed in request order." },
+          "name": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "type": { "$ref": "#/components/schemas/RunType" },
+          "build": { "$ref": "#/components/schemas/ShortText" },
+          "configuration": { "$ref": "#/components/schemas/StringMap" },
+          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "startImmediately": { "type": "boolean", "default": false }
+        },
+        "anyOf": [
+          { "required": ["suiteId"], "properties": { "suiteId": { "$ref": "#/components/schemas/Identifier" } } },
+          { "required": ["caseIds"], "properties": { "caseIds": { "minItems": 1 } } }
+        ]
+      },
+      "RunPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "build": { "$ref": "#/components/schemas/ShortText" },
+          "configuration": { "$ref": "#/components/schemas/StringMap" }
+        }
+      },
+      "RunEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Run" } }
+      },
+      "RunListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Run" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "StepResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stepId", "status", "actualResult", "comment", "attachmentIds", "updatedAt"],
+        "properties": {
+          "stepId": { "$ref": "#/components/schemas/Identifier" },
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "comment": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RunAttempt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "number", "status", "actualResult", "comment", "stepResults", "startedAt", "completedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "number": { "type": "integer", "minimum": 1 },
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "comment": { "$ref": "#/components/schemas/LongText" },
+          "stepResults": { "type": "array", "maxItems": 500, "items": { "$ref": "#/components/schemas/StepResult" } },
+          "startedAt": { "type": ["string", "null"], "format": "date-time" },
+          "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RunItemSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "caseId", "caseKey", "revision", "assignee", "status", "attemptCount", "activeAttemptId", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "caseId": { "$ref": "#/components/schemas/Identifier" },
+          "caseKey": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "revision": { "type": "integer", "minimum": 1 },
+          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "attemptCount": { "type": "integer", "minimum": 1 },
+          "activeAttemptId": { "$ref": "#/components/schemas/Identifier" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RunItem": {
+        "allOf": [
+          { "$ref": "#/components/schemas/RunItemSummary" },
+          {
+            "type": "object",
+            "required": ["snapshot", "activeAttempt"],
+            "properties": {
+              "snapshot": { "$ref": "#/components/schemas/TestCaseRevision" },
+              "activeAttempt": { "$ref": "#/components/schemas/RunAttempt" }
+            }
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "RunItemStatusUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "comment": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+            "then": {
+              "anyOf": [
+                { "required": ["actualResult"], "properties": { "actualResult": { "minLength": 1 } } },
+                { "required": ["comment"], "properties": { "comment": { "minLength": 1 } } }
+              ]
+            }
+          },
+          {
+            "if": { "properties": { "status": { "const": "blocked" } }, "required": ["status"] },
+            "then": { "required": ["comment"], "properties": { "comment": { "minLength": 1 } } }
+          }
+        ]
+      },
+      "StepResultUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "comment": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        }
+      },
+      "RunItemEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/RunItem" } }
+      },
+      "RunItemListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/RunItemSummary" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "RunAttemptListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/RunAttempt" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "StepResultMutation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["runId", "runItemId", "attemptId", "result"],
+        "properties": {
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptId": { "$ref": "#/components/schemas/Identifier" },
+          "result": { "$ref": "#/components/schemas/StepResult" }
+        }
+      },
+      "StepResultEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/StepResultMutation" } }
+      },
+      "ActorRef": { "type": "string", "minLength": 1, "maxLength": 200 },
+      "Defect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "title", "description", "severity", "priority", "status", "reproducibility", "assignee", "component", "labels", "runId", "runItemId", "attemptId", "stepId", "expectedResult", "actualResult", "attachmentIds", "linkIds", "createdBy", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "severity": { "$ref": "#/components/schemas/Priority" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "status": { "$ref": "#/components/schemas/DefectStatus" },
+          "reproducibility": { "$ref": "#/components/schemas/ShortText" },
+          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "attemptId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DefectCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "title"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "severity": { "$ref": "#/components/schemas/Priority" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "reproducibility": { "$ref": "#/components/schemas/ShortText" },
+          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "attemptId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        }
+      },
+      "DefectPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "description": { "$ref": "#/components/schemas/LongText" },
+          "severity": { "$ref": "#/components/schemas/Priority" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "reproducibility": { "$ref": "#/components/schemas/ShortText" },
+          "assignee": { "$ref": "#/components/schemas/ShortText" },
+          "component": { "$ref": "#/components/schemas/ShortText" },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "expectedResult": { "$ref": "#/components/schemas/LongText" },
+          "actualResult": { "$ref": "#/components/schemas/LongText" },
+          "attachmentIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "linkIds": { "type": "array", "maxItems": 500, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+        }
+      },
+      "DefectStatusTransitionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": { "$ref": "#/components/schemas/DefectStatus" },
+          "reason": { "type": "string", "maxLength": 2000 }
+        }
+      },
+      "DefectEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Defect" } }
+      },
+      "DefectListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Defect" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "AttachmentKind": { "type": "string", "enum": ["file", "screenshot", "video", "log"] },
+      "AttachmentUploadStatus": {
+        "type": "string",
+        "enum": ["pending", "ready", "failed", "quarantined", "deleting", "deleted"]
+      },
+      "AttachmentMimeType": {
+        "type": "string",
+        "enum": [
+          "image/png", "image/jpeg", "image/webp", "image/gif", "video/mp4", "video/webm",
+          "video/quicktime", "text/plain", "application/pdf", "application/json",
+          "application/zip", "application/gzip", "application/octet-stream"
+        ]
+      },
+      "TrustedAttachmentExtension": {
+        "type": "string",
+        "enum": ["png", "jpg", "webp", "gif", "mp4", "webm", "mov", "txt", "pdf", "json", "zip", "gz", "bin"],
+        "description": "Selected by the server from the active MIME policy; never accepted from the client."
+      },
+      "AttachmentMediaIdentity": {
+        "oneOf": [
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "image/png" }, "trustedExtension": { "const": "png" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "image/jpeg" }, "trustedExtension": { "const": "jpg" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "image/webp" }, "trustedExtension": { "const": "webp" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "image/gif" }, "trustedExtension": { "const": "gif" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "video/mp4" }, "trustedExtension": { "const": "mp4" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "video/webm" }, "trustedExtension": { "const": "webm" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "video/quicktime" }, "trustedExtension": { "const": "mov" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "text/plain" }, "trustedExtension": { "const": "txt" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "application/pdf" }, "trustedExtension": { "const": "pdf" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "application/json" }, "trustedExtension": { "const": "json" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "application/zip" }, "trustedExtension": { "const": "zip" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "application/gzip" }, "trustedExtension": { "const": "gz" } } },
+          { "required": ["mimeType", "trustedExtension"], "properties": { "mimeType": { "const": "application/octet-stream" }, "trustedExtension": { "const": "bin" } } }
+        ]
+      },
+      "AttachmentMediaPolicy": {
+        "oneOf": [
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "image/png" }, "trustedExtension": { "const": "png" }, "maxBytes": { "const": 26214400 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "image/jpeg" }, "trustedExtension": { "const": "jpg" }, "maxBytes": { "const": 26214400 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "image/webp" }, "trustedExtension": { "const": "webp" }, "maxBytes": { "const": 26214400 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "image/gif" }, "trustedExtension": { "const": "gif" }, "maxBytes": { "const": 26214400 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "video/mp4" }, "trustedExtension": { "const": "mp4" }, "maxBytes": { "const": 1073741824 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "video/webm" }, "trustedExtension": { "const": "webm" }, "maxBytes": { "const": 1073741824 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "video/quicktime" }, "trustedExtension": { "const": "mov" }, "maxBytes": { "const": 1073741824 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "text/plain" }, "trustedExtension": { "const": "txt" }, "maxBytes": { "const": 104857600 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "application/pdf" }, "trustedExtension": { "const": "pdf" }, "maxBytes": { "const": 104857600 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "application/json" }, "trustedExtension": { "const": "json" }, "maxBytes": { "const": 104857600 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "application/zip" }, "trustedExtension": { "const": "zip" }, "maxBytes": { "const": 524288000 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "application/gzip" }, "trustedExtension": { "const": "gz" }, "maxBytes": { "const": 524288000 } } },
+          { "required": ["mimeType", "trustedExtension", "maxBytes"], "properties": { "mimeType": { "const": "application/octet-stream" }, "trustedExtension": { "const": "bin" }, "maxBytes": { "const": 524288000 } } }
+        ]
+      },
+      "TestCaseRevisionAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "caseId", "revisionNo"],
+        "properties": {
+          "kind": { "type": "string", "const": "test_case_revision" },
+          "caseId": { "$ref": "#/components/schemas/Identifier" },
+          "revisionNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "$ref": "#/components/schemas/Identifier" }
+        }
+      },
+      "RunAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "runId"],
+        "properties": {
+          "kind": { "type": "string", "const": "run" },
+          "runId": { "$ref": "#/components/schemas/Identifier" }
+        }
+      },
+      "RunAttemptAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "runId", "runItemId", "attemptNo"],
+        "properties": {
+          "kind": { "type": "string", "const": "run_attempt" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "$ref": "#/components/schemas/Identifier" }
+        }
+      },
+      "DefectAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "defectId"],
+        "properties": {
+          "kind": { "type": "string", "const": "defect" },
+          "defectId": { "$ref": "#/components/schemas/Identifier" }
+        }
+      },
+      "AttachmentOwner": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/TestCaseRevisionAttachmentOwner" },
+          { "$ref": "#/components/schemas/RunAttachmentOwner" },
+          { "$ref": "#/components/schemas/RunAttemptAttachmentOwner" },
+          { "$ref": "#/components/schemas/DefectAttachmentOwner" }
+        ],
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "test_case_revision": "#/components/schemas/TestCaseRevisionAttachmentOwner",
+            "run": "#/components/schemas/RunAttachmentOwner",
+            "run_attempt": "#/components/schemas/RunAttemptAttachmentOwner",
+            "defect": "#/components/schemas/DefectAttachmentOwner"
+          }
+        }
+      },
+      "Attachment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "owner", "kind", "originalFilename", "mimeType", "trustedExtension", "byteSize", "sha256", "status", "createdBy", "storedAt", "failureCode", "deletingAt", "deletedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "owner": { "$ref": "#/components/schemas/AttachmentOwner" },
+          "kind": { "$ref": "#/components/schemas/AttachmentKind" },
+          "originalFilename": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "mimeType": { "$ref": "#/components/schemas/AttachmentMimeType" },
+          "trustedExtension": { "$ref": "#/components/schemas/TrustedAttachmentExtension" },
+          "byteSize": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+          "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "status": { "$ref": "#/components/schemas/AttachmentUploadStatus" },
+          "createdBy": { "$ref": "#/components/schemas/ActorRef" },
+          "storedAt": { "type": ["string", "null"], "format": "date-time" },
+          "failureCode": { "type": ["string", "null"], "minLength": 1, "maxLength": 160 },
+          "deletingAt": { "type": ["string", "null"], "format": "date-time" },
+          "deletedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        },
+        "allOf": [
+          { "$ref": "#/components/schemas/AttachmentMediaIdentity" },
+          {
+            "if": { "properties": { "status": { "enum": ["ready", "quarantined"] } }, "required": ["status"] },
+            "then": {
+              "properties": {
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "storedAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+            "then": { "properties": { "failureCode": { "type": "string", "minLength": 1, "maxLength": 160 } } }
+          },
+          {
+            "if": { "properties": { "status": { "enum": ["deleting", "deleted"] } }, "required": ["status"] },
+            "then": { "properties": { "deletingAt": { "type": "string", "format": "date-time" } } },
+            "else": { "properties": { "deletingAt": { "type": "null" } } }
+          },
+          {
+            "if": { "properties": { "status": { "const": "deleted" } }, "required": ["status"] },
+            "then": { "properties": { "deletedAt": { "type": "string", "format": "date-time" } } },
+            "else": { "properties": { "deletedAt": { "type": "null" } } }
+          },
+          {
+            "if": { "properties": { "status": { "const": "pending" } }, "required": ["status"] },
+            "then": { "properties": { "storedAt": { "type": "null" } } }
+          }
+        ],
+        "description": "Private object metadata. Bucket, object key, provider details, and reusable public URLs are never exposed."
+      },
+      "AttachmentUploadIntentCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "owner", "kind", "originalFilename", "mimeType", "byteSize", "sha256"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "owner": { "$ref": "#/components/schemas/AttachmentOwner" },
+          "kind": { "$ref": "#/components/schemas/AttachmentKind" },
+          "originalFilename": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "mimeType": { "$ref": "#/components/schemas/AttachmentMimeType" },
+          "byteSize": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      },
+      "AttachmentUploadIntent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["intentId", "attachmentId", "status", "method", "uploadUrl", "headers", "expiresAt", "mimeType", "trustedExtension", "maxBytes"],
+        "properties": {
+          "intentId": { "$ref": "#/components/schemas/Identifier" },
+          "attachmentId": { "$ref": "#/components/schemas/Identifier" },
+          "status": { "type": "string", "const": "pending" },
+          "method": { "type": "string", "const": "PUT" },
+          "uploadUrl": { "type": "string", "format": "uri", "maxLength": 8000 },
+          "headers": { "$ref": "#/components/schemas/StringMap" },
+          "expiresAt": {
+            "allOf": [{ "$ref": "#/components/schemas/Timestamp" }],
+            "description": "Expiry of the returned signed upload URL. The server persists the first intent deadline; replayed credentials may expire earlier and never extend that deadline. Finalization at or after the persisted deadline returns UPLOAD_INTENT_EXPIRED."
+          },
+          "mimeType": { "$ref": "#/components/schemas/AttachmentMimeType" },
+          "trustedExtension": { "$ref": "#/components/schemas/TrustedAttachmentExtension" },
+          "maxBytes": { "type": "integer", "minimum": 1, "maximum": 1073741824 }
+        },
+        "allOf": [{ "$ref": "#/components/schemas/AttachmentMediaPolicy" }]
+      },
+      "AttachmentUploadFinalizeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["byteSize", "sha256", "storageETag"],
+        "properties": {
+          "byteSize": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "storageETag": { "type": "string", "minLength": 1, "maxLength": 512 }
+        }
+      },
+      "AttachmentAccessCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "disposition": { "type": "string", "enum": ["inline", "attachment"], "default": "inline" },
+          "fileName": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      },
+      "AttachmentAccess": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attachmentId", "trustedExtension", "method", "url", "headers", "expiresAt"],
+        "properties": {
+          "attachmentId": { "$ref": "#/components/schemas/Identifier" },
+          "trustedExtension": { "$ref": "#/components/schemas/TrustedAttachmentExtension" },
+          "method": { "type": "string", "const": "GET" },
+          "url": { "type": "string", "format": "uri", "maxLength": 8000 },
+          "headers": { "$ref": "#/components/schemas/StringMap" },
+          "expiresAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "AttachmentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/Attachment" } }
+      },
+      "AttachmentListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Attachment" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "AttachmentUploadIntentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/AttachmentUploadIntent" } }
+      },
+      "AttachmentAccessEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/AttachmentAccess" } }
+      },
+      "ActivityEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workspaceId", "projectId", "actor", "action", "entityType", "entityId", "entityKey", "details", "requestId", "createdAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "actor": { "$ref": "#/components/schemas/ActorRef" },
+          "action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$", "maxLength": 120 },
+          "entityType": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "entityId": { "$ref": "#/components/schemas/Identifier" },
+          "entityKey": { "type": ["string", "null"], "maxLength": 80 },
+          "details": {
+            "type": "object",
+            "maxProperties": 30,
+            "additionalProperties": true,
+            "description": "Safe redacted metadata only; secrets, environment values, request bodies, storage keys, and signed URLs are forbidden."
+          },
+          "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "ActivityListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/ActivityEvent" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "ProjectSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workspaceId", "key", "slug", "name", "status", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 2, "maxLength": 12 },
+          "slug": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "status": { "$ref": "#/components/schemas/EntityStatus" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RecentRun": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "name", "type", "status", "progress", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "type": { "$ref": "#/components/schemas/RunType" },
+          "status": { "$ref": "#/components/schemas/RunStatus" },
+          "progress": { "$ref": "#/components/schemas/RunProgress" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "RecentDefect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "title", "severity", "priority", "status", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "severity": { "$ref": "#/components/schemas/Priority" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "status": { "$ref": "#/components/schemas/DefectStatus" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "WorkspaceSummaryCounts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projects", "environments", "testCases", "suites", "runs", "openDefects"],
+        "properties": {
+          "projects": { "type": "integer", "minimum": 0 },
+          "environments": { "type": "integer", "minimum": 0 },
+          "testCases": { "type": "integer", "minimum": 0 },
+          "suites": { "type": "integer", "minimum": 0 },
+          "runs": { "type": "integer", "minimum": 0 },
+          "openDefects": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "WorkspaceSummaryMeta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectionVersion", "generatedAt", "payloadBudgetBytes"],
+        "properties": {
+          "projectionVersion": { "type": "string", "const": "workspace-summary.v1" },
+          "generatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "payloadBudgetBytes": { "type": "integer", "const": 262144 }
+        }
+      },
+      "WorkspaceSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workspace", "projects", "counts", "recentRuns", "recentDefects", "recentActivity", "meta"],
+        "properties": {
+          "workspace": { "$ref": "#/components/schemas/Workspace" },
+          "projects": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/ProjectSummary" } },
+          "counts": { "$ref": "#/components/schemas/WorkspaceSummaryCounts" },
+          "recentRuns": { "type": "array", "maxItems": 20, "items": { "$ref": "#/components/schemas/RecentRun" } },
+          "recentDefects": { "type": "array", "maxItems": 20, "items": { "$ref": "#/components/schemas/RecentDefect" } },
+          "recentActivity": { "type": "array", "maxItems": 20, "items": { "$ref": "#/components/schemas/ActivityEvent" } },
+          "meta": { "$ref": "#/components/schemas/WorkspaceSummaryMeta" }
+        }
+      },
+      "WorkspaceSummaryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/WorkspaceSummary" } }
+      }
+    }
+  }
+}

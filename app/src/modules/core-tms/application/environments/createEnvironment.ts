@@ -1,8 +1,9 @@
 import type { Environment } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 
 export async function createEnvironment(input: {
+  http: TmsHttpClient;
   projectId: string;
   name: string;
   key: string;
@@ -20,6 +21,6 @@ export async function createEnvironment(input: {
   };
   if (input.offline) return { id: createUid("env"), ...payload };
   try {
-    return await mutate<Environment>("/environments", "POST", payload);
+    return await input.http.mutate<Environment>("/environments", "POST", payload);
   } catch (error) { throw error; }
 }

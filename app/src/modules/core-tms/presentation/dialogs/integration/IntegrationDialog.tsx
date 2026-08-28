@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Project, TestCase } from "../../../../../core/tms/contracts/legacy-contract";
 import { createIntegrationCase } from "../../../application/integrations/createIntegrationCase";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { FormError } from "../../common/error/FormError";
@@ -10,6 +11,7 @@ import { Modal } from "../../common/modal/Modal";
 import { getIntegrationDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 export function IntegrationDialog({ project, casesCount, offline, onClose, onCreated }: { project: Project; casesCount: number; offline: boolean; onClose: () => void; onCreated: (testCase: TestCase) => void }) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getIntegrationDialogCopy(locale);
   const [name, setName] = useState("");
@@ -25,7 +27,7 @@ export function IntegrationDialog({ project, casesCount, offline, onClose, onCre
     if (submitting) return;
     setSubmitting(true);
     setError(false);
-    try { onCreated(await createIntegrationCase({ project, casesCount, name, source, target, contract, endpoint, description, offline, locale })); }
+    try { onCreated(await createIntegrationCase({ http, project, casesCount, name, source, target, contract, endpoint, description, offline, locale })); }
     catch { setError(true); setSubmitting(false); }
   }
   return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose} wide>

@@ -5,7 +5,7 @@ import type {
   Suite,
   TestRun,
 } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createLocalRun } from "../../helpers/runs/createLocalRun";
 import type { TmsLocale } from "../../localization/model/locale";
 
@@ -14,6 +14,7 @@ type Result =
   | { ok: false; reason: "create" | "start" };
 
 export async function createRun(input: {
+  http: TmsHttpClient;
   data: Bootstrap;
   project: Project;
   environment: Environment;
@@ -38,7 +39,7 @@ export async function createRun(input: {
   local.build = input.build;
   if (input.offline) return { ok: true, run: local };
   try {
-    const remote = await mutate<TestRun>("/runs", "POST", {
+    const remote = await input.http.mutate<TestRun>("/runs", "POST", {
       projectId: input.project.id,
       suiteId: input.suite?.id ?? null,
       caseIds: input.caseIds,
@@ -52,7 +53,7 @@ export async function createRun(input: {
     try {
       return {
         ok: true,
-        run: await mutate<TestRun>(`/runs/${remote.id}/start`, "POST"),
+        run: await input.http.mutate<TestRun>(`/runs/${remote.id}/start`, "POST"),
       };
     } catch {
       return { ok: false, reason: "start" };

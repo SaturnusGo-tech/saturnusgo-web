@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Bootstrap, Project, TestRun } from "../../../../../core/tms/contracts/legacy-contract";
 import { createRun } from "../../../application/runs/createRun";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { latestRevision } from "../../../helpers/cases/caseRevision";
 import { matchesSuite } from "../../../helpers/suites/matchesSuite";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -13,6 +14,7 @@ import { Modal } from "../../common/modal/Modal";
 import { getRunDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offline, onClose, onCreated }: { data: Bootstrap; project: Project; selectedSuiteId: string; presetCaseIds: string[]; offline: boolean; onClose: () => void; onCreated: (run: TestRun) => void }) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getRunDialogCopy(locale);
   const caseCount = (count: number) => formatCount(locale, count, ["case", "cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
@@ -49,7 +51,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
     if (!environment) return;
     setSubmitting(true);
     setError(null);
-    const result = await createRun({ data, project, environment, suite, caseIds, name, type, build, offline, locale });
+    const result = await createRun({ http, data, project, environment, suite, caseIds, name, type, build, offline, locale });
     if (!result.ok) {
       setError(result.reason);
       setSubmitting(false);

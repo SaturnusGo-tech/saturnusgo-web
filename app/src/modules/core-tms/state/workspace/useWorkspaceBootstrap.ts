@@ -4,10 +4,8 @@ import {
   createWorkspaceShell,
   fallbackBootstrap,
 } from "../../../../core/tms/fallback/bootstrap";
-import {
-  fetchBootstrap,
-  TmsApiError,
-} from "../../../../core/tms/transport/http";
+import { TmsApiError } from "../../../../core/tms/transport/http";
+import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 
 export type WorkspaceConnection =
   | "loading"
@@ -35,6 +33,7 @@ function readDemoCache(): Bootstrap {
 }
 
 export function useWorkspaceBootstrap() {
+  const http = useTmsHttpClient();
   const [data, setData] = useState<Bootstrap>(() => createWorkspaceShell());
   const [connection, setConnection] = useState<WorkspaceConnection>("loading");
   const [failure, setFailure] = useState<WorkspaceFailure | null>(null);
@@ -50,7 +49,7 @@ export function useWorkspaceBootstrap() {
     activeController.current = controller;
     setConnection("loading");
     setFailure(null);
-    fetchBootstrap(controller.signal)
+    http.fetchBootstrap(controller.signal)
       .then((payload) => {
         if (controller.signal.aborted || requestId !== activeRequest.current) return;
         setData(payload);
@@ -69,7 +68,7 @@ export function useWorkspaceBootstrap() {
         setConnection("error");
       });
     return () => controller.abort();
-  }, [requestVersion]);
+  }, [http, requestVersion]);
 
   const retryBootstrap = useCallback(() => {
     setRequestVersion((current) => current + 1);

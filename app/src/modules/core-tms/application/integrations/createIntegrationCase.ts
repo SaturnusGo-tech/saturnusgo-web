@@ -2,11 +2,12 @@ import type {
   Project,
   TestCase,
 } from "../../../../core/tms/contracts/legacy-contract";
-import { mutate } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
 export async function createIntegrationCase(input: {
+  http: TmsHttpClient;
   project: Project;
   casesCount: number;
   name: string;
@@ -121,6 +122,6 @@ export async function createIntegrationCase(input: {
     };
   }
   try {
-    return await mutate<TestCase>("/test-cases", "POST", payload);
+    return await input.http.mutate<TestCase>("/test-cases", "POST", payload);
   } catch (error) { throw error; }
 }

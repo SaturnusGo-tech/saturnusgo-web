@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Dashboard } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDashboard } from "../../../application/dashboards/createDashboard";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
@@ -25,6 +26,7 @@ export function DashboardDialog({
   onClose,
   onCreated,
 }: DashboardDialogProps) {
+  const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getDashboardDialogCopy(locale);
   const [name, setName] = useState<string>(copy.defaultName);
@@ -40,6 +42,7 @@ export function DashboardDialog({
     try {
       onCreated(
         await createDashboard({
+          http,
           workspaceId,
           projectId,
           name,

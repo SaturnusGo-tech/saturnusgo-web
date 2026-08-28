@@ -7,6 +7,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { TmsSessionControl } from "../../auth/presentation/session/TmsSessionControl";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { TmsLocale } from "../../localization/model/locale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -172,7 +173,7 @@ export function WorkspaceHeader({ model }: { model: WorkspaceModel }) {
             <WifiOff size={15} />
           )}
         </div>
-        <span className={styles.avatar}>QA</span>
+        <TmsSessionControl />
       </div>
     </header>
   );
