@@ -47,7 +47,7 @@ if [[ -d "$source_repo/app/api" ]]; then mv "$source_repo/app/api" "$api_hold_di
   NEXT_PUBLIC_AUTH0_DOMAIN=dev-4v1srvqwzp1m7cdl.us.auth0.com \
   NEXT_PUBLIC_AUTH0_CLIENT_ID=CQjoUKhO0f73Cb80jmWNiGXuyZt1TviC \
   NEXT_PUBLIC_AUTH0_AUDIENCE=https://api.tms.saturnusgo.com \
-  NEXT_PUBLIC_TMS_API_BASE=https://umbrella-home-tms-backend-production.up.railway.app/api/v1 \
+  NEXT_PUBLIC_TMS_API_BASE=https://api.tms.saturnusgo.com/api/v1 \
   npm run build
 )
 restore_api
