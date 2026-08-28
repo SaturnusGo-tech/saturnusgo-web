@@ -3,6 +3,7 @@ import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
 import { createRunItemMutationQueue } from "../../state/run-actions/run-item-mutation-queue";
+import { stepMutationEvidence } from "../../state/run-actions/useRunActions";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
 import { createRunLifecycleActions } from "../../state/run-lifecycle/run-lifecycle-actions";
 
@@ -132,5 +133,20 @@ test("continues queued work from a resource refreshed after a stale write", asyn
   assert.deepEqual(await next, {
     data: { id: "item-1", value: 5 },
     etag: '"item-1:6"',
+  });
+});
+
+test("supplies the evidence required by failed and blocked step transitions", () => {
+  const defaults = { failure: "Observed result differs", blocked: "Dependency unavailable" };
+  assert.deepEqual(stepMutationEvidence("failed", undefined, defaults), {
+    actualResult: defaults.failure, comment: "",
+  });
+  assert.deepEqual(stepMutationEvidence("blocked", undefined, defaults), {
+    actualResult: "", comment: defaults.blocked,
+  });
+  assert.deepEqual(stepMutationEvidence("failed", {
+    actualResult: "Checkout returned 502", comment: "Captured at 12:00",
+  }, defaults), {
+    actualResult: "Checkout returned 502", comment: "Captured at 12:00",
   });
 });

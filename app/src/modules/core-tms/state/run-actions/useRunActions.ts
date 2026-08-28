@@ -15,6 +15,19 @@ import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDeriv
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { createRunItemMutationQueue } from "./run-item-mutation-queue";
 
+export function stepMutationEvidence(
+  status: ExecutionStatus,
+  current: { actualResult: string; comment: string } | undefined,
+  defaults: { failure: string; blocked: string },
+) {
+  return {
+    actualResult: status === "failed"
+      ? current?.actualResult || defaults.failure : current?.actualResult ?? "",
+    comment: status === "blocked"
+      ? current?.comment || defaults.blocked : current?.comment ?? "",
+  };
+}
+
 export function useRunActions(
   state: ReturnType<typeof useWorkspaceState>,
   derived: ReturnType<typeof useWorkspaceDerived>,
@@ -77,8 +90,11 @@ export function useRunActions(
         ) ?? current.data.attempts[0];
         const result = attempt.stepResults.find((entry) => entry.stepId === stepId);
         try {
+          const evidence = stepMutationEvidence(status, result, {
+            failure: t("inlineDefect.observedDefault"), blocked: t("actions.stepBlocked"),
+          });
           const refreshed = await updateRunStep(http, run.id, item.id, stepId, {
-            status, actualResult: result?.actualResult ?? "", comment: result?.comment ?? "",
+            status, ...evidence,
           }, current.etag, key);
           commitItem(refreshed.data, refreshed.etag);
           await refreshRun(run.id);

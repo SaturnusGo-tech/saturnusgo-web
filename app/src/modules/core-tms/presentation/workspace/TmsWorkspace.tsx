@@ -50,7 +50,9 @@ function LocalizedWorkspace() {
               {t("workspace.demoNotice")}
             </div>
           )}
-          <WorkspaceStage model={model} />
+          <div className={styles.stageContent}>
+            <WorkspaceStage model={model} />
+          </div>
         </main>
       </div>
       {model.notice && (

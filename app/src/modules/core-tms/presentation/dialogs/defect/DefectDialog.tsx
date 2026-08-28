@@ -109,9 +109,11 @@ export function DefectDialog({
       }
       onClose={onClose}
       wide
+      drawer
     >
-      <form onSubmit={submit}>
-        <div className={styles.formGrid}>
+      <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm}`}>
+        <div className={styles.drawerBody}>
+          <section className={styles.drawerSection}><div className={styles.formGrid}>
           <Field label={copy.summary} wide>
             <input required autoFocus value={title} onChange={(event) => setTitle(event.target.value)} data-testid="defect-title" />
           </Field>
@@ -126,34 +128,34 @@ export function DefectDialog({
             </select>
           </Field>
           <Field label={copy.description} wide>
-            <textarea value={description} onChange={(event) => setDescription(event.target.value)} />
+            <textarea className={styles.drawerTextarea} value={description} onChange={(event) => setDescription(event.target.value)} />
           </Field>
           <Field label={copy.expected} wide>
-            <textarea value={failedStep?.expectedResult ?? ""} readOnly />
+            <textarea className={styles.drawerTextarea} value={failedStep?.expectedResult ?? ""} readOnly />
           </Field>
           <Field label={copy.actual} wide>
-            <textarea required value={actual} onChange={(event) => setActual(event.target.value)} />
+            <textarea className={styles.drawerTextarea} required value={actual} onChange={(event) => setActual(event.target.value)} />
           </Field>
           <Field label={copy.deepLink} wide>
             <input value={link} onChange={(event) => setLink(event.target.value)} placeholder={copy.linkPlaceholder} />
           </Field>
-        </div>
-        <div className={styles.reportEvidence}>
+        </div></section>
+        <section className={styles.drawerSection}><div className={styles.drawerSectionHeading}><strong>{copy.addEvidence}</strong><span>{copy.evidenceFormats}</span></div><div className={styles.compactUpload}>
           <label tabIndex={0} onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === " ") event.currentTarget.querySelector("input")?.click();
           }}>
             <ImageIcon size={18} />
-            <span><strong>{copy.addEvidence}</strong><small>{copy.evidenceFormats}</small></span>
+            <span>{copy.addEvidence}</span>
             <input type="file" multiple accept="image/*,video/*,.log,.txt,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} />
           </label>
-          {files.map((file) => (
+        </div><div className={styles.compactFileList}>{files.map((file) => (
             <span key={`${file.name}-${file.lastModified}`}><Paperclip size={13} />{file.name}</span>
-          ))}
+          ))}</div></section>
+          {error && <FormError message={copy.error} />}
         </div>
-        {error && <FormError message={copy.error} />}
         <div className={styles.modalFooter}>
           <button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button>
-          <button className={styles.dangerButton} data-testid="create-defect" disabled={submitting}>
+          <button className={styles.primaryButton} data-testid="create-defect" disabled={submitting}>
             <Bug size={16} /> {submitting ? copy.creating : copy.create}
           </button>
         </div>

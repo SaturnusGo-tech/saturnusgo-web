@@ -26,7 +26,21 @@ function readDemoCache(): Bootstrap {
   const cached = window.localStorage.getItem(DEMO_CACHE_KEY);
   if (!cached) return fallbackBootstrap();
   try {
-    return JSON.parse(cached) as Bootstrap;
+    const fallback = fallbackBootstrap();
+    const parsed = JSON.parse(cached) as Partial<Bootstrap>;
+    return {
+      ...fallback,
+      ...parsed,
+      projects: Array.isArray(parsed.projects) ? parsed.projects : [],
+      environments: Array.isArray(parsed.environments) ? parsed.environments : [],
+      testCases: Array.isArray(parsed.testCases) ? parsed.testCases : [],
+      suites: Array.isArray(parsed.suites) ? parsed.suites : [],
+      runs: Array.isArray(parsed.runs) ? parsed.runs : [],
+      defects: Array.isArray(parsed.defects) ? parsed.defects : [],
+      externalLinks: Array.isArray(parsed.externalLinks) ? parsed.externalLinks : [],
+      dashboards: Array.isArray(parsed.dashboards) ? parsed.dashboards : fallback.dashboards,
+      activity: Array.isArray(parsed.activity) ? parsed.activity : [],
+    };
   } catch {
     window.localStorage.removeItem(DEMO_CACHE_KEY);
     return fallbackBootstrap();
