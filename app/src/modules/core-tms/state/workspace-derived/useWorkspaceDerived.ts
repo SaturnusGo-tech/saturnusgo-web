@@ -29,7 +29,8 @@ export function useWorkspaceDerived(
   const selectedCase =
     state.data.testCases.find((item) => item.id === state.selectedCaseId) ??
     visibleCases[0];
-  const selectedRevision = state.selectedCaseDetail?.id === selectedCase?.id
+  const selectedRevision = state.selectedCaseDetail && selectedCase &&
+    state.selectedCaseDetail.id === selectedCase.id
     ? state.selectedCaseDetail.current
     : null;
   const projectSuites = state.data.suites.filter(
