@@ -15,9 +15,10 @@ import { WorkspaceHeader } from "./WorkspaceHeader";
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   const { t } = useTmsLocale();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   useEffect(() => {
-    setSidebarCollapsed(window.localStorage.getItem("tms.sidebar.collapsed.v1") === "true");
+    const saved = window.localStorage.getItem("tms.sidebar.collapsed.v1");
+    setSidebarCollapsed(saved === null || saved === "true");
   }, []);
   function toggleSidebar() {
     setSidebarCollapsed((current) => {

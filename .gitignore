@@ -5,6 +5,7 @@ dist/
 build/
 .vercel/
 .reference/
+.design-qa/
 *.tsbuildinfo
 
 .DS_Store

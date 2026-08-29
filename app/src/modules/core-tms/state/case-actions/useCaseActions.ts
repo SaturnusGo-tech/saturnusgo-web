@@ -37,7 +37,7 @@ export function useCaseActions(
   const caseOperation = useRef<PendingOperation | null>(null);
 
   function commit(testCase: TestCase, etag: string | null, append = false) {
-    const summary = summaryOf(testCase);
+    const summary: TestCaseSummary = state.connection === "demo" ? testCase : summaryOf(testCase);
     state.setData((current) => ({
       ...current,
       testCases: append

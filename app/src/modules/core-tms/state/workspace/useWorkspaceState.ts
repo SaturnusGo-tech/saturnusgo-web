@@ -77,6 +77,7 @@ export function useWorkspaceState() {
   }, [bootstrap.generation]);
 
   useEffect(() => {
+    if (connection === "demo") { const detail = data.testCases.find((item) => item.id === selectedCaseId); setSelectedCaseDetail(detail && "current" in detail ? detail as TestCase : null); return; }
     setSelectedCaseDetail(null);
     setSelectedCaseEtag(null);
     if (connection !== "connected" || !selectedCaseId) return;
@@ -87,7 +88,7 @@ export function useWorkspaceState() {
       setSelectedCaseEtag(resource.etag);
     }).catch(() => {});
     return () => controller.abort();
-  }, [connection, http, selectedCaseId]);
+  }, [connection, data.testCases, http, selectedCaseId]);
 
   useEffect(() => {
     setRunItems([]);

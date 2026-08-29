@@ -85,13 +85,25 @@ Date: 2026-08-29
 - Image quality and asset fidelity: these workbench screens contain no photographic or branded raster assets; existing Lucide icons remain sharp and consistent.
 - Copy and content: production Russian content and real imported records were used; no synthetic counts or placeholder records were added.
 
+## Selected test-case hybrid — final pass
+
+- Direction: the typography, document composition, and quiet repository hierarchy from option 1 are combined with the persistent property inspector from option 2.
+- Sources: selected option 1 (`exec-4275286b-e6a8-43d6-9ef0-1f711d751896.png`) and option 2 (`exec-de8c5b57-e866-4ff8-8459-84ede8fd71f5.png`).
+- Browser state: Russian locale, collapsed global navigation, populated selected case `UHQ-TC-006`, nested repository visible, inspector open. Focused in-app viewport was 979×378 CSS px at DPR 2.22; desktop track geometry is 344px repository / flexible document / 248px inspector and the inspector becomes a 288px dismissible overlay below 1380px.
+- Same-size comparison input: `design-qa-evidence/test-case-hybrid-final.jpg`; local final browser states additionally remain under ignored `.design-qa/` evidence.
+- P0 resolved: selecting demo cases now hydrates the matching full detail instead of leaving an empty document; the default collapsed rail preserves the intended desktop reading width; mobile no longer requires an impossible repository-plus-document minimum width.
+- P1 resolved: the selected branch truly collapses, repository controls use ordinary keyboard-operable navigation semantics, and the inspector open/close transfers and restores focus. Below 1380px it defaults closed; when opened it becomes a labelled modal rail with scrim, inert background, focus containment, and Escape dismissal. Focus indicators use a solid high-contrast blue ring, with a lighter high-contrast ring on dark navigation.
+- P1 visual resolved: restored the option-1 metadata strip and narrative rhythm, removed the redundant inspector heading, preserved tag casing, and kept the inspector as a flat information rail rather than a stack of cards.
+- P2 resolved: command row, document padding, narrative gap, and compact tag typography were aligned to the measured target; the final browser comparison contains no new gradients, floating cards, or decorative asset substitutions.
+- Interaction verification: repository collapse/expand, case selection after reload, inspector collapse/reopen, focus restoration, and Escape dismissal were exercised in the in-app browser.
+
 ## Verification
 
 - `npm run typecheck`
-- `npm run architecture:tms` — 157 files
+- `npm run architecture:tms` — 168 files
 - `npm run test:tms-auth` — 17/17
 - `npm run test:tms-attachments` — 4/4
-- `npm run test:tms-adapters` — 21/21
+- `npm run test:tms-adapters` — 28/28
 - dashboard snapshot test — 1/1
 - `npm run build:standalone` — 61/61 pages generated
 - production browser console — 0 warnings/errors after the v3 release

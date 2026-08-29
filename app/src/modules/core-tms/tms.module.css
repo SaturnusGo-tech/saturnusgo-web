@@ -1623,8 +1623,15 @@
 }
 
 .app :is(button, input, select, textarea):focus-visible {
-  outline: 3px solid rgb(55 116 150 / 28%);
+  outline: 3px solid #0c66e4;
   outline-offset: 2px;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.tabsBar :is(button, input, select, textarea):focus-visible,
+.navigation :is(button, input, select, textarea):focus-visible {
+  outline-color: #85b8ff;
+  box-shadow: 0 0 0 1px #101b24;
 }
 
 .tabsBar {
@@ -3416,4 +3423,365 @@
   .caseNarrativeGrid { grid-template-columns: 1fr; gap: 24px; }
   .caseExchange { grid-template-columns: 1fr; }
   .caseExchangeActions { justify-content: flex-start; }
+}
+
+/* Test case workbench: focused reader + persistent information inspector. */
+.app { font-weight: 400; }
+
+.caseWorkbench {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 344px minmax(0, 1fr) 248px;
+  grid-template-rows: 64px minmax(0, 1fr);
+  overflow: hidden;
+  background: #fff;
+  transition: grid-template-columns 180ms cubic-bezier(.2, .72, .3, 1);
+}
+
+.caseWorkbenchInspectorClosed { grid-template-columns: 344px minmax(0, 1fr) 0; }
+
+.caseRepositoryPane {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fcfcfd;
+  border-right: 1px solid #dadfe7;
+}
+
+.caseRepositoryHeading {
+  min-height: 64px;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px 0 18px;
+  border-bottom: 1px solid #dadfe7;
+}
+
+.caseRepositoryHeading > strong { color: #102039; font-size: 16px; line-height: 22px; }
+
+.repositoryNewButton {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  color: #0c56c9;
+  background: #fff;
+  border: 1px solid #85b8ff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.repositoryNewButton:hover { background: #eef4ff; }
+
+.caseRepositoryControls {
+  position: relative;
+  min-height: 54px;
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: minmax(0, 1fr) 36px 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 8px 14px;
+  border-bottom: 1px solid #e6e9ee;
+}
+
+.caseRepositoryControls .searchField { height: 36px; margin: 0; background: #fff; border-color: #c8d0da; border-radius: 4px; }
+.caseRepositoryControls .iconButton { width: 36px; min-width: 36px; min-height: 36px; border-radius: 4px; }
+.caseRepositoryControls .toolbarPopover { top: calc(100% - 4px); right: 10px; }
+
+.caseRepositoryPane .repositoryTree {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 7px 0 24px;
+  scrollbar-gutter: stable;
+}
+
+.repositoryFolderBranch { min-width: 0; }
+
+.repositoryFolderRow {
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 28px;
+  align-items: center;
+  padding-left: calc(8px + var(--repository-depth));
+  border-left: 3px solid transparent;
+}
+
+.repositoryFolderRow:hover { background: #f4f6f9; }
+.repositoryFolderRowActive { background: #eef4ff; border-left-color: #1e5fd1; }
+
+.repositoryFolderToggle,
+.repositoryFolderAdd {
+  width: 24px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: #68758a;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.repositoryFolderToggle:hover,
+.repositoryFolderAdd:hover { color: #0c56c9; background: #e5edfa; }
+
+.repositoryFolderButton {
+  min-width: 0;
+  height: 40px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 0 6px 0 2px;
+  color: #102039;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.repositoryFolderIcon { display: grid; place-items: center; color: #5b6b80; }
+.repositoryFolderLabel { min-width: 0; overflow: hidden; font-size: 13px; font-weight: 650; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
+.repositoryFolderCount { color: #68758a; font-size: 10px; font-weight: 600; }
+
+.repositoryCaseRow {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 8px 70px minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px calc(14px + var(--repository-depth));
+  color: #102039;
+  background: transparent;
+  border: 0;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.repositoryCaseRow:hover { background: #f4f6f9; }
+.repositoryCaseRowActive { background: #eef4ff; border-left-color: #1e5fd1; }
+.repositoryFolderToggle:focus-visible,
+.repositoryFolderButton:focus-visible,
+.repositoryFolderAdd:focus-visible,
+.repositoryCaseRow:focus-visible { outline-offset: -3px; }
+.repositoryCaseState { width: 7px; height: 7px; border-radius: 50%; background: #8792a2; }
+.repositoryCaseKey { overflow: hidden; color: #68758a; font-size: 10px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.repositoryCaseTitle { min-width: 0; overflow: hidden; font-size: 12px; font-weight: 600; line-height: 17px; text-overflow: ellipsis; white-space: nowrap; }
+.repositoryCaseArchive { color: #7d8794; }
+.repositoryEmptyFolder { margin: 5px 12px 8px calc(14px + var(--repository-depth)); color: #0c56c9; background: transparent; border: 0; cursor: pointer; font-size: 11px; }
+
+.caseCommandBar {
+  position: relative;
+  z-index: 5;
+  grid-column: 2 / 4;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 14px 0 22px;
+  background: rgb(255 255 255 / 98%);
+  border-bottom: 1px solid #dadfe7;
+}
+
+.caseBreadcrumb { min-width: 0; display: flex; align-items: center; gap: 8px; overflow: hidden; color: #68758a; font-size: 11px; line-height: 18px; white-space: nowrap; }
+.caseBreadcrumb span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.caseBreadcrumb span::after { margin-left: 8px; color: #b4bdc9; content: "/"; }
+.caseBreadcrumb strong { color: #102039; font-weight: 700; }
+
+.caseCommandActions { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; }
+.caseCommandActions button { min-height: 36px; border-radius: 4px; }
+.caseCommandActions .primaryButton { background: #185b86; border-color: #185b86; }
+.caseCommandActions .primaryButton:hover { background: #12496c; border-color: #12496c; }
+.caseOverflow { position: relative; }
+.caseActionMenu { top: calc(100% + 6px); right: 0; }
+
+.caseWorkbenchMain {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: #fff;
+}
+
+.caseWorkbenchMainEmpty { grid-column: 2 / 4; grid-row: 1 / 3; }
+.caseDocumentScroll { min-width: 0; min-height: 0; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+
+.caseDocument {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 30px 24px 72px;
+  color: #102039;
+}
+
+.caseDocumentHeader { padding-bottom: 22px; border-bottom: 1px solid #dadfe7; }
+.caseDocumentHeader h1 { max-width: 760px; margin: 6px 0 0; color: #102039; font-size: 28px; font-weight: 700; line-height: 34px; letter-spacing: -.02em; }
+.caseDocumentHeader > p { max-width: 740px; margin: 10px 0 0; color: #5b6474; font-size: 14px; font-weight: 400; line-height: 21px; }
+.caseDocument .keyLine { color: #68758a; font-size: 11px; font-weight: 650; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; }
+
+.caseTagLine { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 17px; color: #68758a; }
+.caseTagLine > span { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 550; line-height: 18px; text-transform: capitalize; }
+.caseTagLine .lifecycleDot { width: 7px; height: 7px; flex: 0 0 auto; }
+
+.casePropertyStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 15px 0;
+  border-bottom: 1px solid #dadfe7;
+}
+.casePropertyStrip > div { min-width: 0; padding: 0 18px; border-right: 1px solid #e6e9ee; }
+.casePropertyStrip > div:first-child { padding-left: 0; }
+.casePropertyStrip > div:last-child { padding-right: 0; border-right: 0; }
+.casePropertyStrip dt { color: #68758a; font-size: 10px; font-weight: 600; line-height: 15px; }
+.casePropertyStrip dd { margin: 4px 0 0; overflow: hidden; color: #102039; font-size: 13px; font-weight: 650; line-height: 19px; text-overflow: ellipsis; white-space: nowrap; }
+
+.caseNarrativeLayout { display: grid; grid-template-columns: minmax(0, 2.25fr) minmax(190px, 1fr); gap: 40px; margin-top: 30px; }
+.caseSection { min-width: 0; margin-top: 34px; }
+.caseNarrativeLayout .caseSection { margin-top: 0; }
+.caseSection > h2,
+.caseTestData > h2,
+.caseSection .sectionTitle h2 { margin: 0; color: #5b6474; font-size: 11px; font-weight: 700; line-height: 16px; letter-spacing: .05em; text-transform: uppercase; }
+.caseSection > p,
+.caseTestData > p { margin: 10px 0 0; color: #102039; font-size: 13px; line-height: 20px; }
+
+.casePreconditions { margin: 9px 0 0; padding: 0; list-style: none; }
+.casePreconditions li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-bottom: 1px solid #edf0f4; }
+.casePreconditions li:last-child { border-bottom: 0; }
+.casePreconditions li > span { color: #68758a; font-size: 11px; font-weight: 650; line-height: 19px; }
+.casePreconditions p { margin: 0; color: #102039; font-size: 13px; line-height: 19px; }
+
+.caseTestData { min-width: 0; align-self: start; padding-left: 20px; border-left: 1px solid #e2e6ec; }
+.caseSection .sectionTitle { margin-bottom: 0; padding-bottom: 9px; border-bottom: 1px solid #dadfe7; }
+.caseSection .sectionTitle span { color: #68758a; font-size: 11px; }
+
+.caseSteps { width: 100%; border: 0; border-collapse: collapse; table-layout: fixed; }
+.caseSteps th,
+.caseSteps td { padding: 11px 12px; border-bottom: 1px solid #e2e6ec; text-align: left; vertical-align: top; }
+.caseSteps thead th { position: sticky; z-index: 1; top: 0; color: #5b6474; background: #f7f8fa; font-size: 10px; font-weight: 700; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; }
+.caseSteps th:first-child { width: 44px; }
+.caseSteps th:nth-child(2) { width: 52%; }
+.caseSteps tbody th { color: #68758a; font-size: 11px; font-weight: 650; }
+.caseSteps tbody td { color: #102039; font-size: 13px; font-weight: 400; line-height: 19px; }
+
+.caseInspector {
+  position: relative;
+  grid-column: 3;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  background: #fcfcfd;
+  border-left: 1px solid #dadfe7;
+  animation: case-inspector-enter 180ms cubic-bezier(.2, .72, .3, 1);
+}
+
+.caseInspectorScrim {
+  position: absolute;
+  z-index: 9;
+  inset: 0 288px 0 0;
+  background: rgb(9 30 66 / 18%);
+  animation: case-inspector-scrim-enter 160ms ease-out;
+}
+
+.caseInspectorCollapse { position: absolute; z-index: 2; top: 16px; left: -17px; width: 34px; height: 34px; display: grid; place-items: center; padding: 0; color: #5b6474; background: #fff; border: 1px solid #c8d0da; border-radius: 4px; cursor: pointer; }
+.caseInspectorCollapse:hover { color: #0c56c9; background: #eef4ff; }
+.caseInspectorBody { min-height: 0; flex: 1 1 auto; overflow: auto; padding: 30px 20px 44px; scrollbar-gutter: stable; }
+.caseInspectorMeta { display: flex; flex-direction: column; gap: 22px; margin: 0; }
+.caseInspectorMeta > div { min-width: 0; }
+.caseInspectorMeta dt { margin: 0 0 4px; color: #68758a; font-size: 10px; font-weight: 700; line-height: 14px; letter-spacing: .05em; text-transform: uppercase; }
+.caseInspectorMeta dd { margin: 0; overflow-wrap: anywhere; color: #102039; font-size: 13px; font-weight: 500; line-height: 20px; }
+.caseInspectorStatus { display: flex; align-items: center; gap: 8px; }
+.caseInspectorTags dd { color: #5b6474; font-size: 11px; line-height: 18px; }
+.caseInspectorGroup { margin-top: 26px; padding-top: 22px; border-top: 1px solid #dadfe7; }
+.caseInspectorGroup h3 { margin: 0; color: #5b6474; font-size: 10px; font-weight: 700; line-height: 14px; letter-spacing: .05em; text-transform: uppercase; }
+.caseInspectorGroupTitle { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.caseInspectorGroupTitle > span { color: #68758a; font-size: 11px; }
+.caseInspectorActivity > div { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; margin-top: 12px; color: #68758a; }
+.caseInspectorActivity > div > span { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.caseInspectorActivity strong { overflow: hidden; color: #102039; font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.caseInspectorActivity small { color: #68758a; font-size: 10px; line-height: 15px; }
+.caseInspectorEmpty { display: flex; align-items: center; gap: 7px; margin: 12px 0 0; color: #68758a; font-size: 11px; }
+.caseInspectorEvidence { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.caseInspectorEvidence > * { min-width: 0; display: flex; align-items: center; gap: 7px; padding: 7px 0; overflow-wrap: anywhere; color: #42526e; border-bottom: 1px solid #edf0f4; font-size: 11px; }
+
+@keyframes case-inspector-enter {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes case-inspector-scrim-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 1380px) {
+  .caseWorkbench,
+  .caseWorkbenchInspectorClosed { grid-template-columns: 300px minmax(0, 1fr) 0; }
+  .caseInspector { position: absolute; z-index: 10; top: 64px; right: 0; bottom: 0; width: 288px; display: flex; box-shadow: -12px 0 28px rgb(9 30 66 / 12%); }
+  .caseCommandBar { grid-column: 2 / 4; }
+  .caseWorkbenchMain { grid-column: 2 / 4; }
+  .caseWorkbenchMainEmpty { grid-column: 2 / 4; }
+}
+
+@media (max-width: 820px) {
+  .caseWorkbench,
+  .caseWorkbenchInspectorClosed { grid-template-columns: 250px minmax(360px, 1fr) 0; }
+  .caseRepositoryHeading { padding-inline: 12px 10px; }
+  .repositoryNewButton { width: 34px; justify-content: center; padding: 0; font-size: 0; }
+  .caseCommandBar { padding-left: 14px; }
+  .caseCommandActions .secondaryButton { width: 36px; min-width: 36px; padding: 0; font-size: 0; }
+  .caseDocument { padding-inline: 22px; }
+  .casePropertyStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .casePropertyStrip > div { border-right: 0; }
+  .casePropertyStrip > div:nth-child(odd) { padding-left: 0; }
+  .caseNarrativeLayout { grid-template-columns: 1fr; gap: 24px; }
+  .caseTestData { padding: 18px 0 0; border-top: 1px solid #e2e6ec; border-left: 0; }
+}
+
+@media (max-width: 680px) {
+  .caseWorkbench,
+  .caseWorkbenchInspectorClosed {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(170px, 2fr) 52px minmax(240px, 3fr);
+  }
+  .caseRepositoryPane { grid-column: 1; grid-row: 1; }
+  .caseCommandBar { grid-column: 1; grid-row: 2; min-height: 52px; padding-inline: 10px; }
+  .caseWorkbenchMain,
+  .caseWorkbenchMainEmpty { grid-column: 1; grid-row: 3; }
+  .caseInspector { top: 0; width: 100%; }
+  .caseInspectorScrim { display: none; }
+  .caseInspectorCollapse { top: 10px; left: 12px; width: 38px; height: 38px; }
+  .caseInspectorBody { padding: 64px 20px 40px; }
+  .caseBreadcrumb { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caseWorkbench { transition: none; }
+  .caseInspector { animation: none; }
+  .caseInspectorScrim { animation: none; }
 }
