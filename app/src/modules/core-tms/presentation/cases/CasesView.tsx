@@ -1,4 +1,4 @@
-import { Archive, ChevronDown, ChevronRight, Copy, ExternalLink, FilePlus2, Filter, Folder, FolderKanban, FolderPlus, MoreHorizontal, Paperclip, Play, Plus, RotateCcw, Save, Search, Tag } from "lucide-react";
+import { Archive, ChevronDown, ChevronRight, Copy, ExternalLink, Filter, Folder, FolderKanban, FolderPlus, MoreHorizontal, Paperclip, Play, Plus, RotateCcw, Save, Search, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { executableSteps } from "../../helpers/cases/caseRevision";
@@ -57,7 +57,7 @@ export function CasesView(props: CasesViewProps) {
       <aside className={`${styles.pane} ${styles.repositoryPane}`}>
         <div className={styles.repositoryToolbar}>
           <strong className={styles.repositoryLabel}>{t("cases.title")}</strong>
-          <button className={styles.toolbarPrimary} onClick={() => onNew(selectedFolder)} aria-label={t("cases.create")} data-testid="new-case"><FilePlus2 size={16} /><span>{t("cases.new")}</span></button>
+          <button className={`${styles.iconButton} ${styles.repositoryCreateButton}`} onClick={() => onNew(selectedFolder)} aria-label={t("cases.create")} title={t("cases.new")} data-testid="new-case"><Plus size={17} /></button>
           <button className={styles.iconButton} onClick={onNewFolder} aria-label={t("cases.createFolder")} title={t("cases.createFolder")}><FolderPlus size={17} /></button>
           <button className={`${styles.iconButton} ${activeFilterCount ? styles.iconButtonActive : ""}`} onClick={() => { setFilterOpen((value) => !value); setMoreOpen(false); }} aria-label={t("cases.filter")} title={t("cases.filter")}><Filter size={17} />{activeFilterCount > 0 && <b>{activeFilterCount}</b>}</button>
           <button className={styles.iconButton} onClick={() => { setMoreOpen((value) => !value); setFilterOpen(false); }} aria-label={t("common.more")} title={t("cases.repositoryActions")}><MoreHorizontal size={17} /></button>
@@ -100,7 +100,7 @@ export function CasesView(props: CasesViewProps) {
       <section className={`${styles.pane} ${styles.caseDetails}`}>
         {!testCase || !revision ? <EmptyState icon={<FolderKanban size={34} />} title={selectedFolder ? selectedFolder.replace(/^\//, "") : t("cases.select")} text={selectedFolder ? t("cases.emptyFolder") : t("cases.selectHint")} action={<button className={styles.primaryButton} onClick={() => onNew(selectedFolder)}><Plus size={16} /> {t("cases.create")}</button>} /> : <>
           <div className={styles.detailsToolbar}>
-            <div className={styles.breadcrumb}><FolderKanban size={15} /><strong>{testCase.key}</strong></div>
+            <div className={styles.breadcrumb}><span>{testCase.folderPath}</span><strong>{testCase.key}</strong></div>
             <div className={styles.inlineActions}>
               <button className={styles.primaryButton} onClick={onRunCase}><Play size={15} /> {t("cases.run")}</button>
               <button className={styles.secondaryButton} onClick={onEdit}><Save size={15} /> {t("common.edit")}</button>
@@ -116,8 +116,10 @@ export function CasesView(props: CasesViewProps) {
               <div><span>{t("common.owner")}</span><strong>{revision.ownerIdentityId ?? t("common.unassigned")}</strong></div><div><span>{t("cases.component")}</span><strong>{revision.component}</strong></div>
               <div><span>{t("cases.estimate")}</span><strong>{revision.estimatedMinutes ?? "—"} {locale === "ru" ? "мин" : "min"}</strong></div><div><span>{t("cases.type")}</span><strong>{localizedLabel(locale, revision.type)}</strong></div>
             </div>
-            <section className={styles.contentSection}><h2>{t("cases.preconditions")}</h2><p>{revision.preconditions || t("cases.noPreconditions")}</p></section>
-            {revision.testData && <section className={styles.contentSection}><h2>{t("cases.testData")}</h2><p>{revision.testData}</p></section>}
+            <div className={styles.caseNarrativeGrid}>
+              <section className={styles.contentSection}><h2>{t("cases.preconditions")}</h2><p>{revision.preconditions || t("cases.noPreconditions")}</p></section>
+              {revision.testData && <section className={styles.contentSection}><h2>{t("cases.testData")}</h2><p>{revision.testData}</p></section>}
+            </div>
             <section className={styles.contentSection}>
               <div className={styles.sectionTitle}><h2>{revision.type === "checklist" ? t("cases.checklist") : t("cases.testSteps")}</h2><span>{revision.type === "checklist" ? formatCount(locale, displayedSteps.length, ["item", "items"], ["пункт", "пункта", "пунктов"]) : formatCount(locale, displayedSteps.length, ["step", "steps"], ["шаг", "шага", "шагов"])}</span></div>
               <div className={styles.stepsTable}>
