@@ -1,4 +1,4 @@
-import { Archive, ChevronDown, ChevronRight, Copy, ExternalLink, FilePlus2, Filter, Folder, FolderKanban, FolderPlus, ListChecks, MoreHorizontal, Paperclip, Play, Plus, RotateCcw, Save, Search, Tag } from "lucide-react";
+import { Archive, ChevronDown, ChevronRight, Copy, ExternalLink, FilePlus2, Filter, Folder, FolderKanban, FolderPlus, MoreHorizontal, Paperclip, Play, Plus, RotateCcw, Save, Search, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { executableSteps } from "../../helpers/cases/caseRevision";
@@ -109,10 +109,7 @@ export function CasesView(props: CasesViewProps) {
             </div>
           </div>
           <div className={styles.caseContent}>
-            <div className={styles.caseTitleLine}>
-              <span className={styles.caseTypeIcon}><ListChecks size={22} /></span>
-              <div><div className={styles.keyLine}>{testCase.key} · {t("cases.revision", { revision: revision.revision })}</div><h1>{revision.title}</h1></div>
-            </div>
+            <div className={styles.caseTitleLine}><div><div className={styles.keyLine}>{testCase.key} · {t("cases.revision", { revision: revision.revision })}</div><h1>{revision.title}</h1></div></div>
             <div className={styles.tagRow}>{revision.tags.map((tagName) => <span key={tagName}><Tag size={12} />{tagName}</span>)}<span className={styles[`priority_${revision.priority}`]}>{localizedLabel(locale, revision.priority)}</span><span>{localizedLabel(locale, revision.lifecycle)}</span></div>
             <p className={styles.description}>{revision.description || t("cases.noDescription")}</p>
             <div className={styles.metaGrid}>

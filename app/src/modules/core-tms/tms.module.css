@@ -3156,3 +3156,181 @@
   .dashboardMetric:first-child,
   .dashboardMetric:last-child { padding-inline: 16px; }
 }
+
+/* Production workbench pass: fewer containers, quieter hierarchy, faster scanning. */
+.suiteListHeader {
+  align-items: flex-start;
+  padding: 16px 16px 12px;
+}
+
+.suiteListHeader > div { min-width: 0; }
+.suiteListHeader h2 { font-size: 14px; }
+.suiteListHeader p {
+  max-width: 190px;
+  margin: 3px 0 0;
+  color: #6b778c;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.suiteListHeader .iconButton {
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  height: 34px;
+}
+
+.suiteScopeLine {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 38px;
+  margin: 8px 0 0;
+  padding: 0 2px 10px;
+  color: #5e6c84;
+  border-bottom: 1px solid #dfe1e6;
+  font-size: 12px;
+}
+
+.suiteScopeLine strong { margin-left: auto; color: #172b4d; }
+.suiteScopeLine + .dataTable {
+  border: 0;
+  border-bottom: 1px solid #dfe1e6;
+  border-radius: 0;
+}
+.suiteScopeLine + .dataTable .dataTableHead { background: transparent; }
+.suiteScopeLine + .dataTable .dataTableHead > *,
+.suiteScopeLine + .dataTable .dataTableRow > * { border-right: 0; }
+
+.integrationWorkspace {
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.integrationWorkspace .panelHeader {
+  min-height: 48px;
+  padding: 0 0 14px;
+  border-bottom-color: #dfe1e6;
+}
+
+.integrationWorkspace .panelHeader h2 { font-size: 14px; }
+.integrationWorkspace .panelHeader p { color: #6b778c; }
+.integrationWorkspace .tableSearch {
+  height: 38px;
+  border-color: #b6c2cf;
+  border-radius: 6px;
+}
+.integrationWorkspace > .centeredPane,
+.integrationWorkspace > [class*="emptyState"] {
+  min-height: 300px;
+  background: transparent;
+  border: 0;
+}
+
+.caseContent {
+  max-width: 900px;
+  padding-top: 26px;
+}
+
+.caseTitleLine { gap: 0; }
+.caseTitleLine h1 { max-width: 760px; }
+.tagRow { margin: 14px 0 20px; }
+
+.metaGrid {
+  gap: 24px;
+  margin: 20px 0 30px;
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid #dfe1e6;
+  border-bottom: 1px solid #dfe1e6;
+}
+
+.metaGrid > div {
+  min-height: 0;
+  padding: 0;
+  border-right: 0;
+}
+
+.contentSection { margin-top: 26px; }
+.contentSection > h2,
+.sectionTitle h2 { font-size: 14px; }
+
+.stepsTable {
+  border: 0;
+  border-top: 1px solid #dfe1e6;
+  border-bottom: 1px solid #dfe1e6;
+  border-radius: 0;
+}
+.stepsHead { background: transparent; }
+.stepsHead > *,
+.stepRow > * { border-right: 0; }
+.stepRow { min-height: 54px; }
+
+.executionShell { grid-template-columns: 276px minmax(0, 1fr); }
+.runPicker { min-height: 58px; padding: 9px 12px; }
+.runPicker select { height: 38px; }
+.runCreateButton { min-width: 84px; height: 38px; }
+.runSummary { min-height: 124px; padding: 15px 16px; }
+.runSummary h2 { margin-top: 7px; font-size: 15px; }
+.runItems { height: auto; }
+.runItem { min-height: 62px; padding: 9px 13px; }
+
+.executionHeader {
+  min-height: 112px;
+  padding: 20px 24px 16px;
+}
+.executionHeader h1 {
+  margin: 4px 0 5px;
+  font-size: clamp(21px, 1.8vw, 27px);
+}
+.executionHeader p { font-size: 13px; line-height: 1.45; }
+
+.executionMeta {
+  min-width: 0;
+  gap: 26px;
+  padding: 12px 24px 13px;
+  border-bottom-color: #dfe1e6;
+}
+.executionMeta > span {
+  min-height: 0;
+  padding: 0;
+  border-right: 0;
+  font-size: 13px;
+}
+
+.executionSteps {
+  min-width: 720px;
+  border-bottom: 0;
+}
+.executionStepHead,
+.executionStep {
+  grid-template-columns: 42px minmax(150px, 1fr) minmax(170px, 1.1fr) minmax(160px, 1fr) 144px;
+}
+.executionStepHead {
+  min-height: 38px;
+  background: #f7f8f9;
+}
+.executionStepHead > span { padding-inline: 11px; border-right: 0; }
+.executionStep { min-height: 72px; }
+.executionStep > div { padding: 12px 11px; border-right: 0; }
+.stepActions button { width: 32px; height: 30px; }
+.step_failed { box-shadow: inset 2px 0 0 #bd716b; }
+
+.executionFooter {
+  min-height: 58px;
+  padding: 8px 14px;
+  background: #fff;
+  border-top-color: #dfe1e6;
+  box-shadow: 0 -6px 18px rgb(9 30 66 / 4%);
+}
+.executionFooter button,
+.executionFooter label { min-height: 36px; }
+.executionActions { gap: 6px; }
+
+@media (max-width: 900px) {
+  .metaGrid { grid-template-columns: 1fr 1fr; row-gap: 16px; }
+  .integrationWorkspace .panelHeader { align-items: stretch; }
+  .integrationWorkspace .tableSearch { width: 100%; }
+}

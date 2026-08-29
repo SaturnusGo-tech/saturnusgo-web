@@ -1,4 +1,4 @@
-import { Filter, ListChecks, Play, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { ListChecks, Play, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { matchesSuite } from "../../helpers/suites/matchesSuite";
@@ -18,14 +18,14 @@ export function SuitesView({ suites, cases, selected, selectedDetail, onSelect, 
   return (
     <div className={styles.twoPane}>
       <aside className={`${styles.pane} ${styles.listPane}`}>
-        <div className={styles.listPaneHeader}><div><h2>{t("suite.title")}</h2><p>{t("suite.subtitle")}</p></div><button className={styles.secondaryButton} onClick={onCreate} data-testid="new-suite"><Plus size={16} /> {t("suite.new")}</button></div>
+        <div className={`${styles.listPaneHeader} ${styles.suiteListHeader}`}><div><h2>{t("suite.title")}</h2><p>{t("suite.subtitle")}</p></div><button className={styles.iconButton} onClick={onCreate} data-testid="new-suite" aria-label={t("suite.new")} title={t("suite.new")}><Plus size={16} /></button></div>
         <label className={styles.searchField}><Search size={16} /><input aria-label={t("suite.searchAria")} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("suite.searchPlaceholder")} /></label>
         <div className={styles.cardList}>{visibleSuites.map((suite) => <button className={`${styles.suiteCard} ${suite.id === selectedSuite?.id ? styles.suiteCardActive : ""}`} key={suite.id} onClick={() => onSelect(suite.id)}><span><ListChecks size={18} /></span><div><small>{suite.key} · {localizedLabel(locale, suite.type)}</small><strong>{suite.name}</strong><p>{suite.type === "dynamic" ? localizedLabel(locale, "dynamic") : formatCount(locale, suite.caseCount, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"])}</p></div></button>)}{visibleSuites.length === 0 && <div className={styles.miniEmpty}><Search size={19} /><span>{t("suite.notFound")}</span></div>}</div>
       </aside>
       <section className={`${styles.pane} ${styles.largePane}`}>
         {!selectedSuite ? <EmptyState icon={<ListChecks size={32} />} title={t("suite.empty")} text={t("suite.emptyHint")} action={<button className={styles.primaryButton} onClick={onCreate}><Plus size={16} /> {t("suite.create")}</button>} /> : <>
           <SectionHeading eyebrow={selectedSuite.key} title={selectedSuite.name} description={selectedSuite.description} action={<><button className={styles.secondaryButton} disabled={!detail} onClick={() => onConfigure(selectedSuite.id)}><SlidersHorizontal size={15} /> {t("common.configure")}</button><button className={styles.primaryButton} onClick={() => onRun(selectedSuite.id)} data-testid="run-suite"><Play size={15} /> {t("suite.run")}</button></>} />
-          <div className={styles.filterSummary}><Filter size={16} /><span>{!detail ? t("common.loading") : detail.type === "dynamic" ? `${localizedLabel(locale, "dynamic")}: ${(detail.filter.tags ?? []).join(", ")}` : t("suite.staticSelection")}</span><strong>{formatCount(locale, detail?.resolvedCaseCount ?? selectedSuite.caseCount, ["case", "cases"], ["кейс", "кейса", "кейсов"])}</strong></div>
+          <div className={styles.suiteScopeLine}><span>{!detail ? t("common.loading") : detail.type === "dynamic" ? `${localizedLabel(locale, "dynamic")}: ${(detail.filter.tags ?? []).join(", ")}` : t("suite.staticSelection")}</span><strong>{formatCount(locale, detail?.resolvedCaseCount ?? selectedSuite.caseCount, ["case", "cases"], ["кейс", "кейса", "кейсов"])}</strong></div>
           <div className={styles.dataTable}><div className={styles.dataTableHead}>{[t("suite.key"), t("suite.testCase"), t("suite.priority"), t("suite.owner")].map((header) => <span key={header}>{header}</span>)}</div>{suiteCases.map((item) => <div className={styles.dataTableRow} key={item.id}><span>{item.key}</span><strong>{item.title}</strong><span className={styles[`priority_${item.priority}`]}>{localizedLabel(locale, item.priority)}</span><span>{item.ownerIdentityId ?? t("common.unassigned")}</span></div>)}</div>
         </>}
       </section>

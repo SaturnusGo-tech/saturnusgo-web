@@ -1,7 +1,6 @@
-import { ArrowRightLeft, CheckCircle2, Network, Play, Plus, Search } from "lucide-react";
+import { Network, Play, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import type { TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
-import { formatCount } from "../../localization/format/count";
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { EmptyState } from "../common/empty/EmptyState";
@@ -20,12 +19,7 @@ export function IntegrationsView({ cases, onCreate, onOpenCase, onRun }: { cases
       description={t("integrations.description")}
       action={<button className={styles.primaryButton} onClick={onCreate} data-testid="new-integration"><Plus size={16} /> {t("integrations.new")}</button>}
     />
-    <div className={styles.integrationOverview}>
-      <div><ArrowRightLeft size={22} /><span><strong>{formatCount(locale, integrationCases.length, ["integration check", "integration checks"], ["интеграционная проверка", "интеграционные проверки", "интеграционных проверок"])}</strong><small>{t("integrations.coverageTypes")}</small></span></div>
-      <div><Network size={22} /><span><strong>{formatCount(locale, new Set(integrationCases.flatMap((item) => [tagValue(item, "source"), tagValue(item, "target")])).size, ["system", "systems"], ["система", "системы", "систем"])}</strong><small>{t("integrations.coverageHint")}</small></span></div>
-      <div><CheckCircle2 size={22} /><span><strong>{t("integrations.readyCount", { count: integrationCases.filter((item) => item.lifecycle === "ready").length })}</strong><small>{t("integrations.readyHint")}</small></span></div>
-    </div>
-    <section className={styles.panel}>
+    <section className={`${styles.panel} ${styles.integrationWorkspace}`}>
       <div className={styles.panelHeader}><div><h2>{t("integrations.contracts")}</h2><p>{t("integrations.contractsHint")}</p></div><label className={styles.tableSearch}><Search size={15} /><input aria-label={t("integrations.searchAria")} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("integrations.searchPlaceholder")} /></label></div>
       {visible.length === 0 ? <EmptyState icon={<Network size={32} />} title={t("integrations.empty")} text={t("integrations.emptyHint")} action={<button className={styles.primaryButton} onClick={onCreate}><Plus size={16} /> {t("integrations.create")}</button>} /> : <div className={styles.integrationTable}>
         <div className={styles.integrationTableHead}>{[t("integrations.testCase"), t("integrations.source"), t("integrations.target"), t("integrations.contract"), t("integrations.status"), t("common.actions")].map((header) => <span key={header}>{header}</span>)}</div>
