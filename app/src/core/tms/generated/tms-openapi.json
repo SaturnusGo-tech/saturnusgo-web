@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.4",
+    "version": "1.0.0-checkpoint.5",
     "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -37,7 +37,7 @@
       "get": {
         "tags": ["Health"],
         "summary": "Report API readiness",
-        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0013.",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0014.",
         "operationId": "getHealth",
         "security": [],
         "responses": {
@@ -731,6 +731,13 @@
             "in": "query",
             "required": false,
             "schema": { "$ref": "#/components/schemas/RunType" }
+          },
+          {
+            "name": "includeArchived",
+            "in": "query",
+            "required": false,
+            "description": "False by default. True includes archived runs without hiding historical evidence.",
+            "schema": { "type": "boolean", "default": false }
           }
         ],
         "responses": {
@@ -771,6 +778,7 @@
         "operationId": "getRun",
         "responses": {
           "200": { "$ref": "#/components/responses/RunResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "404": { "$ref": "#/components/responses/NotFound" },
@@ -788,6 +796,58 @@
           { "$ref": "#/components/parameters/IfMatch" }
         ],
         "requestBody": { "$ref": "#/components/requestBodies/RunPatch" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Runs"],
+        "summary": "Archive a run without deleting execution evidence",
+        "description": "Removes the run from default active lists while preserving items, attempts, defects, attachments, and audit history. Restore is explicit.",
+        "operationId": "archiveRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/RunArchive" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/RunResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/runs/{runId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/RunIdPath" }
+      ],
+      "post": {
+        "tags": ["Runs"],
+        "summary": "Restore an archived run",
+        "operationId": "restoreRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
         "responses": {
           "200": { "$ref": "#/components/responses/RunResponse" },
           "400": { "$ref": "#/components/responses/BadRequest" },
@@ -1887,6 +1947,10 @@
         "required": true,
         "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/RunPatchRequest" } } }
       },
+      "RunArchive": {
+        "required": false,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunArchiveRequest" } } }
+      },
       "RunAbort": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunAbortRequest" } } }
@@ -2043,7 +2107,7 @@
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteEnvelope" } } }
       },
       "RunListResponse": {
-        "description": "A page of run summaries ordered by createdAt descending then ID.",
+        "description": "A page of run summaries ordered by run key then ID; archived runs are excluded unless requested.",
         "headers": {
           "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
           "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
@@ -2878,7 +2942,7 @@
       "Run": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "name", "description", "type", "status", "environment", "suiteId", "suiteResolutionId", "build", "configuration", "itemCount", "progress", "attachmentIds", "createdBy", "startedAt", "completedAt", "abortedAt", "abortReason", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "name", "description", "type", "status", "environment", "suiteId", "suiteResolutionId", "build", "configuration", "itemCount", "progress", "attachmentIds", "createdBy", "startedAt", "completedAt", "abortedAt", "abortReason", "archivedAt", "archivedBy", "archiveReason", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
@@ -2900,6 +2964,9 @@
           "completedAt": { "type": ["string", "null"], "format": "date-time" },
           "abortedAt": { "type": ["string", "null"], "format": "date-time" },
           "abortReason": { "oneOf": [{ "$ref": "#/components/schemas/LongText" }, { "type": "null" }] },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "archivedBy": { "oneOf": [{ "$ref": "#/components/schemas/ActorRef" }, { "type": "null" }] },
+          "archiveReason": { "type": ["string", "null"], "maxLength": 2000 },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }
@@ -2942,6 +3009,11 @@
         "additionalProperties": false,
         "required": ["reason"],
         "properties": { "reason": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 } }
+      },
+      "RunArchiveRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": { "reason": { "type": "string", "maxLength": 2000 } }
       },
       "RunEnvelope": {
         "type": "object",
@@ -3869,10 +3941,36 @@
           "meta": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["compositionVersion", "payloadBudgetBytes"],
+            "required": ["compositionVersion", "payloadBudgetBytes", "authorization"],
             "properties": {
-              "compositionVersion": { "type": "string", "const": "workspace-bootstrap.v1" },
-              "payloadBudgetBytes": { "type": "integer", "const": 262144 }
+              "compositionVersion": { "type": "string", "const": "workspace-bootstrap.v2" },
+              "payloadBudgetBytes": { "type": "integer", "const": 262144 },
+              "authorization": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["role", "capabilities"],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": ["workspace_admin", "qa_manager", "tester", "reporter", "viewer"]
+                  },
+                  "capabilities": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "maxItems": 21,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "workspace:read", "workspace:manage", "project:read", "project:manage",
+                        "environment:read", "environment:manage", "test_case:read", "test_case:manage",
+                        "suite:read", "suite:manage", "run:read", "run:manage", "run:archive",
+                        "run:execute", "defect:read", "defect:manage", "report:read", "report:manage",
+                        "attachment:read", "attachment:manage", "audit:read"
+                      ]
+                    }
+                  }
+                }
+              }
             }
           }
         }

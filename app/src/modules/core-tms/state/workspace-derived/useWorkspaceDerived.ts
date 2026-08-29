@@ -47,7 +47,7 @@ export function useWorkspaceDerived(
   );
   const selectedRun =
     state.data.runs.find((item) => item.id === state.selectedRunId) ??
-    projectRuns[0] ??
+    projectRuns.find((item) => !item.archivedAt) ??
     null;
   const selectedRunItem = state.selectedRunItemDetail?.id === state.selectedRunItemId
     ? state.selectedRunItemDetail

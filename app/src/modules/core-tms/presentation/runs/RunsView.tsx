@@ -1,6 +1,6 @@
-import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Copy, Paperclip, Play, PlayCircle, Plus, X, XCircle } from "lucide-react";
+import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Copy, Paperclip, Play, PlayCircle, X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
+import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { uploadEvidence } from "../../application/evidence/uploadEvidence";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../helpers/cases/caseRevision";
@@ -11,10 +11,12 @@ import { FormError } from "../common/error/FormError";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
+import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
 import styles from "../../tms.module.css";
 type RunsViewProps = {
   offline: boolean;
   runs: TestRunSummary[];
+  cases: TestCaseSummary[];
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
   selectedItem: RunItem | null;
@@ -26,12 +28,17 @@ type RunsViewProps = {
   onStepActual: (stepId: string, value: string) => void;
   onItemStatus: (status: ExecutionStatus) => void;
   onComplete: () => void;
+  canArchive: boolean;
+  archivePending: boolean;
+  onArchive: (run: TestRunSummary) => void;
+  onRestore: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
 
-export function RunsView({ offline, runs, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onItemStatus, onComplete, onDefectCreated }: RunsViewProps) {
+export function RunsView({ offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onItemStatus, onComplete, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const attachments = useAttachmentClient();
+  const [listMode, setListMode] = useState<RunListMode>("active");
   const [evidence, setEvidence] = useState<string[]>([]);
   const [evidenceError, setEvidenceError] = useState("");
   const [reporting, setReporting] = useState(false);
@@ -42,6 +49,10 @@ export function RunsView({ offline, runs, selectedRun, items, selectedItem, prog
     setEvidenceError("");
     evidenceOperation.current = null;
   }, [selectedItem?.id, selectedRun?.id]);
+  useEffect(() => {
+    if (selectedRun) setListMode(selectedRun.archivedAt ? "archived" : "active");
+  }, [selectedRun?.archivedAt, selectedRun?.id]);
+  const runWritable = Boolean(selectedRun && !selectedRun.archivedAt && selectedRun.status === "active");
   useEffect(() => {
     if (!selectedRun || !selectedItem) return;
     function handleShortcut(event: KeyboardEvent) {
@@ -54,15 +65,15 @@ export function RunsView({ offline, runs, selectedRun, items, selectedItem, prog
       const key = event.key.toLowerCase();
       if ((event.metaKey || event.ctrlKey) && event.key === "[") { event.preventDefault(); const previous = items[index - 1]; if (previous) onSelectItem(previous.id); }
       else if ((event.metaKey || event.ctrlKey) && event.key === "]") { event.preventDefault(); const next = items[index + 1]; if (next) onSelectItem(next.id); }
-      else if (key === "b" && selectedRun!.status === "active") { event.preventDefault(); onItemStatus("blocked"); }
-      else if (key === "f" && selectedRun!.status === "active") { event.preventDefault(); onItemStatus("failed"); }
-      else if (key === "p" && selectedRun!.status === "active" && requiredPassed) { event.preventDefault(); onItemStatus("passed"); }
-      else if (key === "e") { event.preventDefault(); document.getElementById(`run-evidence-${selectedItem!.id}`)?.click(); }
-      else if (key === "r" && hasFailure) { event.preventDefault(); setReporting(true); }
+      else if (key === "b" && runWritable) { event.preventDefault(); onItemStatus("blocked"); }
+      else if (key === "f" && runWritable) { event.preventDefault(); onItemStatus("failed"); }
+      else if (key === "p" && runWritable && requiredPassed) { event.preventDefault(); onItemStatus("passed"); }
+      else if (key === "e" && runWritable) { event.preventDefault(); document.getElementById(`run-evidence-${selectedItem!.id}`)?.click(); }
+      else if (key === "r" && runWritable && hasFailure) { event.preventDefault(); setReporting(true); }
     }
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [items, onItemStatus, onSelectItem, selectedItem, selectedRun]);
+  }, [items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun]);
   async function addEvidence(files: File[]) {
     if (!selectedRun || !selectedItem || files.length === 0) return;
     setEvidenceError("");
@@ -92,7 +103,21 @@ export function RunsView({ offline, runs, selectedRun, items, selectedItem, prog
       setEvidenceError(t("runs.evidenceUploadError"));
     }
   }
-  if (!selectedRun || !selectedItem) return <div className={`${styles.pane} ${styles.centeredPane}`}><EmptyState icon={<PlayCircle size={36} />} title={t("runs.noActive")} text={t("runs.noActiveHint")} action={<button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button>} /></div>;
+  const selectedIsVisible = Boolean(selectedRun && (listMode === "archived" ? selectedRun.archivedAt : !selectedRun.archivedAt));
+  function changeListMode(mode: RunListMode) {
+    setListMode(mode);
+    const next = runs.find((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
+    if (next && next.id !== selectedRun?.id) onSelectRun(next.id);
+  }
+  const runNavigator = <RunNavigator
+    runs={runs} cases={cases} selectedRun={selectedIsVisible ? selectedRun : null}
+    items={selectedIsVisible ? items : []} selectedItemId={selectedIsVisible ? selectedItem?.id ?? null : null}
+    progress={selectedIsVisible ? progress : 0} mode={listMode} onModeChange={changeListMode}
+    onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
+    archivePending={archivePending} onArchive={canArchive ? onArchive : undefined}
+    onRestore={canArchive ? onRestore : undefined}
+  />;
+  if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={styles.executionShell} data-testid="runs-view">{runNavigator}<div className={`${styles.pane} ${styles.centeredPane}`}><EmptyState icon={<PlayCircle size={36} />} title={listMode === "archived" ? t("runs.noArchived") : t("runs.noActive")} text={listMode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")} action={listMode === "active" ? <button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button> : undefined} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");
@@ -103,14 +128,10 @@ export function RunsView({ offline, runs, selectedRun, items, selectedItem, prog
     ...attempt.stepResults.flatMap((result) => result.attachmentIds),
     ...evidence,
   ]));
-  const canComplete = selectedRun.status === "active" && items.every((item) => ["passed", "failed", "blocked", "skipped"].includes(item.status));
+  const canComplete = runWritable && items.every((item) => ["passed", "failed", "blocked", "skipped"].includes(item.status));
   const currentIndex = items.findIndex((item) => item.id === selectedItem.id);
   return <div className={styles.executionShell} data-testid="runs-view">
-    <aside className={`${styles.pane} ${styles.runQueue}`}>
-      <div className={styles.runPicker}><select aria-label={t("runs.current")} value={selectedRun.id} onChange={(event) => onSelectRun(event.target.value)}>{runs.map((run) => <option value={run.id} key={run.id}>{run.name}</option>)}</select><button className={styles.runCreateButton} aria-label={t("runs.new")} title={t("runs.new")} onClick={onCreate} data-testid="new-run"><Plus size={15} /><span>{t("runs.newShort")}</span></button></div>
-      <div className={styles.runSummary}><div><span>{selectedRun.key}</span><b>{localizedLabel(locale, selectedRun.type)}</b></div><h2>{selectedRun.name}</h2><small>{selectedRun.environment.name} · {selectedRun.build}</small><div className={styles.progressBar}><i style={{ width: `${progress}%` }} /></div><strong>{t("runs.percentComplete", { percent: progress })} <em>{selectedRun.progress.executed} / {selectedRun.itemCount}</em></strong></div>
-      <div className={styles.runItems}>{items.map((item, index) => <button className={`${styles.runItem} ${item.id === selectedItem.id ? styles.runItemActive : ""}`} key={item.id} onClick={() => onSelectItem(item.id)}><span className={`${styles.statusIcon} ${styles[`status_${item.status}`]}`}>{statusIcon[item.status]}</span><div><small>{index + 1} · {item.caseKey}</small><strong>{t("cases.revision", { revision: item.revision })}</strong></div><ChevronRight size={14} /></button>)}</div>
-    </aside>
+    {runNavigator}
     <section className={`${styles.pane} ${styles.executionPane}`}>
       <div className={styles.executionHeader}><div><span>{selectedItem.caseKey}</span><h1>{selectedItem.snapshot.title}</h1><p>{selectedItem.snapshot.description}</p></div><span className={`${styles.statusPill} ${styles[`status_${selectedItem.status}`]}`}>{statusIcon[selectedItem.status]} {localizedLabel(locale, selectedItem.status)}</span><button className={styles.iconButton} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(selectedItem.caseKey)}><Copy size={17} /></button></div>
       <div className={styles.executionMeta}><span><strong>{t("runs.environment")}</strong>{selectedRun.environment.name}</span><span><strong>{t("runs.build")}</strong>{selectedRun.build}</span><span><strong>{t("runs.estimate")}</strong>{selectedItem.snapshot.estimatedMinutes ?? "—"} {locale === "ru" ? "мин" : "min"}</span></div>
@@ -124,18 +145,18 @@ export function RunsView({ offline, runs, selectedRun, items, selectedItem, prog
             <div className={styles.stepNumber}>{step.order}</div>
             <div className={styles.stepAction}><small className={styles.stepCellLabel}>{t("runs.action")}</small><span>{step.action}</span></div>
             <div className={styles.stepExpected}><small className={styles.stepCellLabel}>{t("runs.expected")}</small><span>{step.expectedResult}</span></div>
-            <div className={styles.stepActual}><small className={styles.stepCellLabel}>{t("runs.actual")}</small>{status === "failed" ? <textarea aria-label={`${t("runs.actual")}: ${step.order}`} value={result?.actualResult ?? ""} onChange={(event) => onStepActual(step.id, event.target.value)} placeholder={t("runs.actualPlaceholder")} /> : <span>{status === "passed" ? result?.actualResult || step.expectedResult : result?.actualResult || "—"}</span>}</div>
+            <div className={styles.stepActual}><small className={styles.stepCellLabel}>{t("runs.actual")}</small>{status === "failed" && runWritable ? <textarea aria-label={`${t("runs.actual")}: ${step.order}`} value={result?.actualResult ?? ""} onChange={(event) => onStepActual(step.id, event.target.value)} placeholder={t("runs.actualPlaceholder")} /> : <span>{status === "passed" ? result?.actualResult || step.expectedResult : result?.actualResult || "—"}</span>}</div>
             <div className={styles.stepStatus}>
               <span className={`${styles.statusPill} ${styles[`status_${status}`]}`}>{statusIcon[status]} {localizedLabel(locale, status)}</span>
-              {selectedRun.status === "active" && <div className={styles.stepActions}><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} className={status === "passed" ? styles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} className={status === "failed" ? styles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} className={status === "blocked" ? styles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
+              {runWritable && <div className={styles.stepActions}><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} className={status === "passed" ? styles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} className={status === "failed" ? styles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} className={status === "blocked" ? styles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
             </div>
           </article>;
         })}
       </div>
       {attachmentIds.length > 0 && <section className={styles.runEvidence}><strong>{t("runs.evidence")}</strong><div className={styles.attachmentGrid}>{attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</div></section>}
-      {reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} offline={offline} onCreated={onDefectCreated} />}
+      {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onCreated={onDefectCreated} />}
     </section>
-    {selectedRun.status === "active" && <footer className={styles.executionFooter}>
+    {runWritable && <footer className={styles.executionFooter}>
       <div className={styles.executionPager}><button className={styles.textButton} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /> {t("runs.previous")}</button><button className={styles.textButton} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}>{t("runs.next")} <ChevronRight size={16} /></button></div>
       <div className={styles.executionActions}>{selectedRun.status === "active" && <><button className={styles.secondaryButton} onClick={() => onItemStatus("blocked")}><Ban size={16} /> {t("runs.block")}</button><button className={styles.dangerButton} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /> {t("runs.fail")}</button><button className={styles.successButton} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={!canPass} title={!canPass ? t("runs.passRequiredFirst") : undefined}><CheckCircle2 size={16} /> {t("runs.pass")}</button><label className={styles.secondaryButton}><Paperclip size={16} /> {t("runs.addEvidence")} {evidence.length > 0 && <span>{evidence.length}</span>}<input id={`run-evidence-${selectedItem.id}`} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => void addEvidence(Array.from(event.target.files ?? []))} /></label>{failed && <button className={styles.reportButton} type={reporting ? "submit" : "button"} form={reporting ? `defect-form-${selectedItem.id}` : undefined} onClick={() => { if (!reporting) setReporting(true); }} data-testid="report-defect"><Bug size={16} /> {reporting ? t("runs.createBug") : t("runs.reportBug")}</button>}</>}</div>
       {evidenceError && <FormError message={evidenceError} />}

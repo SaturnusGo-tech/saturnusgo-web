@@ -1,4 +1,5 @@
-import { Bug, Image as ImageIcon, Paperclip } from "lucide-react";
+import { Bug, Image as ImageIcon, Paperclip, X } from "lucide-react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type {
@@ -16,11 +17,13 @@ import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
 import { getDefectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
+import surface from "../drawer-surfaces.module.css";
 
 type DefectDialogProps = {
   projectId: string;
   run: TestRunSummary | null;
   item: RunItem | null;
+  components: string[];
   offline: boolean;
   onClose: () => void;
   onCreated: (defect: Defect) => void;
@@ -30,6 +33,7 @@ export function DefectDialog({
   projectId,
   run,
   item,
+  components,
   offline,
   onClose,
   onCreated,
@@ -48,6 +52,12 @@ export function DefectDialog({
             ?.status === "failed",
       )
     : undefined;
+  const fallbackComponent = locale === "ru" ? "Основной продукт" : "Core product";
+  const projectComponents = Array.from(new Set([
+    item?.snapshot.component,
+    ...components,
+  ].map((value) => value?.trim()).filter((value): value is string => Boolean(value))));
+  const componentOptions = projectComponents.length > 0 ? projectComponents : [fallbackComponent];
   const [title, setTitle] = useState(
     item
       ? `${item.snapshot.title} ${copy.failsOn} ${run?.environment.name ?? copy.testEnvironment}`
@@ -59,6 +69,8 @@ export function DefectDialog({
   );
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
+  const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
+  const [filesRef] = useAutoAnimate<HTMLDivElement>({ duration: 160 });
   const [files, setFiles] = useState<File[]>([]);
   const [link, setLink] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -79,9 +91,7 @@ export function DefectDialog({
       status: "open",
       reproducibility,
       assigneeIdentityId: null,
-      component:
-        item?.snapshot.component ??
-        (locale === "ru" ? "Основной продукт" : "Core product"),
+      component,
       labels: ["manual-run", run?.type ?? "reported"],
       runId: run?.id ?? null,
       runItemId: item?.id ?? null,
@@ -111,11 +121,16 @@ export function DefectDialog({
       wide
       drawer
     >
-      <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm}`}>
-        <div className={styles.drawerBody}>
-          <section className={styles.drawerSection}><div className={styles.formGrid}>
+      <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm} ${surface.form}`}>
+        <div className={`${styles.drawerBody} ${surface.body}`}>
+          <section className={`${styles.drawerSection} ${surface.section}`}><div className={`${styles.formGrid} ${surface.grid}`}>
           <Field label={copy.summary} wide>
             <input required autoFocus value={title} onChange={(event) => setTitle(event.target.value)} data-testid="defect-title" />
+          </Field>
+          <Field label={copy.component} wide>
+            <select value={component} onChange={(event) => setComponent(event.target.value)}>
+              {componentOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
           </Field>
           <Field label={copy.severity}>
             <select value={severity} onChange={(event) => setSeverity(event.target.value as Defect["severity"])}>
@@ -128,28 +143,28 @@ export function DefectDialog({
             </select>
           </Field>
           <Field label={copy.description} wide>
-            <textarea className={styles.drawerTextarea} value={description} onChange={(event) => setDescription(event.target.value)} />
+            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} />
           </Field>
           <Field label={copy.expected} wide>
-            <textarea className={styles.drawerTextarea} value={failedStep?.expectedResult ?? ""} readOnly />
+            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={failedStep?.expectedResult ?? ""} readOnly />
           </Field>
           <Field label={copy.actual} wide>
-            <textarea className={styles.drawerTextarea} required value={actual} onChange={(event) => setActual(event.target.value)} />
+            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} required value={actual} onChange={(event) => setActual(event.target.value)} />
           </Field>
           <Field label={copy.deepLink} wide>
             <input value={link} onChange={(event) => setLink(event.target.value)} placeholder={copy.linkPlaceholder} />
           </Field>
         </div></section>
-        <section className={styles.drawerSection}><div className={styles.drawerSectionHeading}><strong>{copy.addEvidence}</strong><span>{copy.evidenceFormats}</span></div><div className={styles.compactUpload}>
-          <label tabIndex={0} onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") event.currentTarget.querySelector("input")?.click();
+        <section className={`${styles.drawerSection} ${surface.section}`}><div className={styles.drawerSectionHeading}><strong>{copy.addEvidence}</strong><span>{copy.evidenceFormats}</span></div><div className={styles.compactUpload}>
+          <label role="button" tabIndex={0} onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); }
           }}>
             <ImageIcon size={18} />
             <span>{copy.addEvidence}</span>
-            <input type="file" multiple accept="image/*,video/*,.log,.txt,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} />
+            <input tabIndex={-1} type="file" multiple accept="image/*,video/*,.log,.txt,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} />
           </label>
-        </div><div className={styles.compactFileList}>{files.map((file) => (
-            <span key={`${file.name}-${file.lastModified}`}><Paperclip size={13} />{file.name}</span>
+        </div><div ref={filesRef} className={styles.compactFileList}>{files.map((file) => (
+            <span key={`${file.name}-${file.lastModified}`}><Paperclip size={13} />{file.name}<button type="button" aria-label={`${copy.removeFile} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>
           ))}</div></section>
           {error && <FormError message={copy.error} />}
         </div>

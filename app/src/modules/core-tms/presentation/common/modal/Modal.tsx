@@ -20,6 +20,7 @@ export function Modal({
   children,
   wide = false,
   drawer = false,
+  panelClassName = "",
 }: {
   title: string;
   subtitle?: string;
@@ -27,6 +28,7 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
   drawer?: boolean;
+  panelClassName?: string;
 }) {
   const { t } = useTmsLocale();
   const panelRef = useRef<HTMLElement>(null);
@@ -97,7 +99,7 @@ export function Modal({
     >
       <section
         ref={panelRef}
-        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""}`}
+        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""} ${panelClassName}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

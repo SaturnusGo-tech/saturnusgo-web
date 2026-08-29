@@ -11,6 +11,7 @@ import {
 } from "../../test-cases/exchange/model/test-case-exchange";
 import { parseTestCaseExchange } from "../../test-cases/exchange/validation/parse-test-case-exchange";
 import styles from "../../tms.module.css";
+import surface from "./config.module.css";
 
 type ProjectCaseExchangeProps = Readonly<{
   enabled: boolean;
@@ -72,33 +73,37 @@ export function ProjectCaseExchange({ enabled, project, onImported }: ProjectCas
   async function importCases() {
     if (!document) return;
     setState({ kind: "importing", message: t("config.exchangeImporting"), completed: 0, total: document.testCases.length });
-    const result = await importProjectCases(http, project.id, document, ({ completed, total }) => {
-      setState({ kind: "importing", message: t("config.exchangeProgress", { completed, total }), completed, total });
-    });
-    await onImported();
-    if (result.failed.length) {
-      const first = result.failed[0];
-      const summary = t("config.exchangePartial", { failed: result.failed.length, key: first.sourceKey });
-      setState({ kind: "error", message: `${summary} ${first.message}`, completed: result.completed, total: document.testCases.length });
-      return;
+    try {
+      const result = await importProjectCases(http, project.id, document, ({ completed, total }) => {
+        setState({ kind: "importing", message: t("config.exchangeProgress", { completed, total }), completed, total });
+      });
+      await onImported();
+      if (result.failed.length) {
+        const first = result.failed[0];
+        const summary = t("config.exchangePartial", { failed: result.failed.length, key: first.sourceKey });
+        setState({ kind: "error", message: `${summary} ${first.message}`, completed: result.completed, total: document.testCases.length });
+        return;
+      }
+      setDocument(null);
+      if (input.current) input.current.value = "";
+      setState({ kind: "success", message: t("config.exchangeImported", { count: result.completed }), completed: result.completed, total: result.completed });
+    } catch (error) {
+      setState({ kind: "error", message: error instanceof Error ? error.message : t("config.exchangeFailed"), completed: 0, total: document.testCases.length });
     }
-    setDocument(null);
-    if (input.current) input.current.value = "";
-    setState({ kind: "success", message: t("config.exchangeImported", { count: result.completed }), completed: result.completed, total: result.completed });
   }
 
-  return <section className={styles.caseExchange} aria-labelledby="case-exchange-title">
-    <div className={styles.caseExchangeHeading}>
+  return <div className={surface.exchange} aria-labelledby="case-exchange-title">
+    <div className={surface.exchangeHeading}>
       <FileJson size={20} />
       <span><strong id="case-exchange-title">{t("config.exchangeTitle")}</strong><small>{t("config.exchangeHint")}</small></span>
     </div>
-    <div className={styles.caseExchangeActions}>
+    <div className={surface.exchangeActions}>
       <button className={styles.secondaryButton} disabled={!enabled || busy} onClick={() => void exportCases()}>{state.kind === "exporting" ? <LoaderCircle className={styles.spin} size={16} /> : <Download size={16} />} {t("config.exchangeExport")}</button>
-      <input ref={input} className={styles.visuallyHidden} type="file" accept="application/json,.json" onChange={(event) => void selectFile(event.target.files?.[0])} />
+      <input ref={input} className={surface.visuallyHidden} type="file" accept="application/json,.json" onChange={(event) => void selectFile(event.target.files?.[0])} />
       <button className={styles.secondaryButton} disabled={!enabled || busy} onClick={() => input.current?.click()}><Upload size={16} /> {t("config.exchangeChoose")}</button>
       <button className={styles.primaryButton} disabled={!enabled || busy || !document} onClick={() => void importCases()}>{state.kind === "importing" ? <LoaderCircle className={styles.spin} size={16} /> : <Upload size={16} />} {document ? t("config.exchangeImportCount", { count: document.testCases.length }) : t("config.exchangeImport")}</button>
     </div>
-    {state.total > 0 && <progress className={styles.caseExchangeProgress} max={state.total} value={state.completed} aria-label={state.message} />}
-    <p className={`${styles.caseExchangeStatus} ${state.kind === "error" ? styles.caseExchangeError : ""}`} aria-live="polite">{state.message || (!enabled ? t("config.exchangeConnectedOnly") : t("config.exchangeFormat"))}</p>
-  </section>;
+    {state.total > 0 && <progress className={surface.exchangeProgress} max={state.total} value={state.completed} aria-label={state.message} />}
+    <p className={`${surface.exchangeStatus} ${state.kind === "error" ? surface.exchangeError : ""}`} aria-live="polite">{state.message || (!enabled ? t("config.exchangeConnectedOnly") : t("config.exchangeFormat"))}</p>
+  </div>;
 }

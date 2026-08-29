@@ -9,6 +9,9 @@ import {
 } from "./test-case-mapper";
 
 type Api = components["schemas"];
+const LIST_PAGE_SIZE = 100;
+const LIST_CASE_LIMIT = 10_000;
+const LIST_PAGE_LIMIT = 100;
 export type CaseWriteInput = {
   projectId: string;
   folderPath: string;
@@ -44,9 +47,24 @@ function revisionWrite(revision: TestCaseRevision) {
 }
 
 export async function listTestCases(http: TmsHttpClient, projectId: string, signal?: AbortSignal) {
-  const query = new URLSearchParams({ projectId, limit: "100" });
-  const envelope = await http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${query}`, signal);
-  return { items: envelope.data.map(mapTestCaseSummary), meta: envelope.meta };
+  const items: Api["TestCaseSummary"][] = [];
+  const seenCursors = new Set<string>();
+  let cursor: string | null = null;
+  let meta: Api["PageMeta"] = { limit: LIST_PAGE_SIZE, hasMore: false, nextCursor: null };
+  for (let page = 0; page < LIST_PAGE_LIMIT; page += 1) {
+    signal?.throwIfAborted();
+    const query = new URLSearchParams({ projectId, limit: String(LIST_PAGE_SIZE) });
+    if (cursor) query.set("cursor", cursor);
+    const envelope = await http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${query}`, signal);
+    items.push(...envelope.data);
+    meta = envelope.meta;
+    if (items.length > LIST_CASE_LIMIT || (items.length >= LIST_CASE_LIMIT && meta.hasMore)) throw new Error("Test-case collection exceeds the supported 10,000-case workspace limit.");
+    if (!meta.hasMore || !meta.nextCursor) return { items: items.map(mapTestCaseSummary), meta };
+    if (seenCursors.has(meta.nextCursor)) throw new Error("Test-case pagination returned a repeated cursor.");
+    seenCursors.add(meta.nextCursor);
+    cursor = meta.nextCursor;
+  }
+  throw new Error("Test-case collection exceeds the supported 100-page workspace limit.");
 }
 
 export async function getTestCase(http: TmsHttpClient, caseId: string, signal?: AbortSignal) {

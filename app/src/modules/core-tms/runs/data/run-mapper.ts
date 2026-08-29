@@ -38,6 +38,9 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
     createdAt: dto.createdAt,
     startedAt: dto.startedAt,
     completedAt: dto.completedAt,
+    archivedAt: dto.archivedAt,
+    archivedBy: dto.archivedBy,
+    archiveReason: dto.archiveReason,
   };
 }
 

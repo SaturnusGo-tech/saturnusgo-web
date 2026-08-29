@@ -1,16 +1,14 @@
 import { useRef } from "react";
-import type { ExecutionStatus, RunItem } from "../../../../core/tms/contracts/legacy-contract";
-import {
-  formatTmsMutationFailure, toTmsMutationFailure,
-} from "../../../../core/tms/errors/mutation-failure";
+import type { ExecutionStatus, RunItem, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
+import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../core/tms/errors/mutation-failure";
+import { resolvePendingOperation, type PendingOperation } from "../../../../core/tms/idempotency/pending-operation";
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { statusLabel } from "../../helpers/status/statusLabel";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import {
-  getRun, getRunItem, transitionRun, updateRunItem, updateRunStep,
-} from "../../runs/data/run-api";
+import { getRun, getRunItem, mutateRunWithEtagRecovery, transitionRun,
+  updateRunItem, updateRunStep } from "../../runs/data/run-api";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { createRunItemMutationQueue } from "./run-item-mutation-queue";
@@ -28,14 +26,20 @@ export function stepMutationEvidence(
   };
 }
 
+export async function refreshRunAfterSuccessfulMutation(
+  refresh: () => Promise<void>, invalidateEtag: () => void,
+) {
+  try { await refresh(); } catch { invalidateEtag(); }
+}
+
 export function useRunActions(
-  state: ReturnType<typeof useWorkspaceState>,
-  derived: ReturnType<typeof useWorkspaceDerived>,
+  state: ReturnType<typeof useWorkspaceState>, derived: ReturnType<typeof useWorkspaceDerived>,
   notify: (message: string) => void,
 ) {
   const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
   const queueRef = useRef<ReturnType<typeof createRunItemMutationQueue<RunItem>> | null>(null);
+  const completeOperation = useRef<PendingOperation | null>(null);
   if (!queueRef.current) queueRef.current = createRunItemMutationQueue<RunItem>();
   const itemMutations = queueRef.current;
   if (derived.selectedRunItem && state.selectedRunItemEtag) {
@@ -60,21 +64,21 @@ export function useRunActions(
     state.setRunItems((current) => current.map((entry) => entry.id === item.id ? summary : entry));
   }
 
+  function commitRun(run: TestRunSummary, etag: string | null) {
+    state.setData((current) => ({ ...current,
+      runs: current.runs.map((item) => item.id === run.id ? run : item) }));
+    state.setSelectedRunEtag(etag);
+  }
+
   async function refreshRun(runId: string) {
     const run = await getRun(http, runId);
-    state.setData((current) => ({
-      ...current,
-      runs: current.runs.map((item) => item.id === runId ? run.data : item),
-    }));
-    state.setSelectedRunEtag(run.etag);
+    commitRun(run.data, run.etag);
   }
 
   async function recoverStaleItem(runId: string, itemId: string, error: unknown) {
     if (!(error instanceof TmsApiError) || error.status !== 412) return;
-    try {
-      const current = await getRunItem(http, runId, itemId);
-      commitItem(current.data, current.etag);
-    } catch {}
+    try { const current = await getRunItem(http, runId, itemId);
+      commitItem(current.data, current.etag); } catch {}
   }
 
   async function setStepStatus(stepId: string, status: ExecutionStatus) {
@@ -85,9 +89,8 @@ export function useRunActions(
     try {
       await itemMutations.run(item.id, async (current) => {
         if (!current.etag) throw new Error("Run item ETag is required.");
-        const attempt = current.data.attempts.find(
-          (entry) => entry.attemptNo === current.data.activeAttemptNo,
-        ) ?? current.data.attempts[0];
+        const attempt = current.data.attempts.find((entry) =>
+          entry.attemptNo === current.data.activeAttemptNo) ?? current.data.attempts[0];
         const result = attempt.stepResults.find((entry) => entry.stepId === stepId);
         try {
           const evidence = stepMutationEvidence(status, result, {
@@ -95,9 +98,10 @@ export function useRunActions(
           });
           const refreshed = await updateRunStep(http, run.id, item.id, stepId, {
             status, ...evidence,
-          }, current.etag, key);
+          }, current.data, current.etag, key);
           commitItem(refreshed.data, refreshed.etag);
-          await refreshRun(run.id);
+          await refreshRunAfterSuccessfulMutation(() => refreshRun(run.id),
+            () => state.setSelectedRunEtag(null));
           return refreshed;
         } catch (error) {
           await recoverStaleItem(run.id, item.id, error);
@@ -133,25 +137,25 @@ export function useRunActions(
       await itemMutations.run(item.id, async (current) => {
         if (!current.etag) throw new Error("Run item ETag is required.");
         const currentItem = current.data;
-        const attempt = currentItem.attempts.find(
-          (entry) => entry.attemptNo === currentItem.activeAttemptNo,
-        ) ?? currentItem.attempts[0];
+        const attempt = currentItem.attempts.find((entry) =>
+          entry.attemptNo === currentItem.activeAttemptNo) ?? currentItem.attempts[0];
         const required = executableSteps(currentItem.snapshot).filter((step) => step.required);
-        if (status === "passed" && !required.every((step) =>
-          attempt.stepResults.find((entry) => entry.stepId === step.id)?.status === "passed")) {
+        if (status === "passed" && !required.every((step) => attempt.stepResults.find(
+          (entry) => entry.stepId === step.id)?.status === "passed")) {
           policyBlocked = true;
           return current;
         }
-        const actualResult = status === "failed"
-          ? attempt.actualResult || t("inlineDefect.observedDefault") : attempt.actualResult;
-        const blockedReason = status === "blocked"
-          ? attempt.blockedReason || t("actions.executionBlockedDefault") : undefined;
+        const actualResult = status === "failed" ? attempt.actualResult ||
+          t("inlineDefect.observedDefault") : attempt.actualResult;
+        const blockedReason = status === "blocked" ? attempt.blockedReason ||
+          t("actions.executionBlockedDefault") : undefined;
         try {
           const refreshed = await updateRunItem(http, run.id, item.id, {
             status, actualResult, comment: attempt.comment, blockedReason,
           }, current.etag, key);
           commitItem(refreshed.data, refreshed.etag);
-          await refreshRun(run.id);
+          await refreshRunAfterSuccessfulMutation(() => refreshRun(run.id),
+            () => state.setSelectedRunEtag(null));
           return refreshed;
         } catch (error) {
           await recoverStaleItem(run.id, item.id, error);
@@ -173,18 +177,24 @@ export function useRunActions(
 
   async function completeRun() {
     const run = derived.selectedRun;
-    if (!run || !state.selectedRunEtag || state.connection !== "connected") return;
+    if (!run || state.connection !== "connected") return;
     try {
-      await transitionRun(http, run.id, "complete", state.selectedRunEtag, crypto.randomUUID());
-      await refreshRun(run.id);
-    } catch {
-      notify(t("actions.runCannotComplete"));
+      const completed = await mutateRunWithEtagRecovery(http, run.id,
+        state.selectedRunEtag, (etag) => {
+          completeOperation.current = resolvePendingOperation(
+            completeOperation.current,
+            JSON.stringify({ runId: run.id, transition: "complete", etag }));
+          return transitionRun(http, run.id, "complete", etag, completeOperation.current.key);
+        });
+      completeOperation.current = null;
+      commitRun(completed.data, completed.etag);
+    } catch (error) {
+      notify(formatTmsMutationFailure(toTmsMutationFailure(error),
+        t("actions.runCannotComplete")));
       return;
     }
     notify(t("actions.runCompleted", { key: run.key }));
   }
 
-  return {
-    openRunDialog, setStepStatus, updateStepActualResult, setItemStatus, completeRun,
-  };
+  return { openRunDialog, setStepStatus, updateStepActualResult, setItemStatus, completeRun };
 }

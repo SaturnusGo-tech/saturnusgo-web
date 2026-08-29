@@ -25,7 +25,14 @@ function workspaceShell(apiVersion: string): Bootstrap {
       },
     ],
     activity: [],
-    meta: { generatedAt: new Date().toISOString(), apiVersion },
+    meta: {
+      generatedAt: new Date().toISOString(),
+      apiVersion,
+      authorization: {
+        role: "workspace_admin",
+        capabilities: ["run:archive"],
+      },
+    },
   };
 }
 

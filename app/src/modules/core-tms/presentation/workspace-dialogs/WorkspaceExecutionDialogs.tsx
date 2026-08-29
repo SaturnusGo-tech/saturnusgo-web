@@ -76,6 +76,7 @@ export function WorkspaceExecutionDialogs({
         projectId={model.project.id}
         run={model.selectedRun}
         item={model.selectedRunItem}
+        components={model.projectCases.map((testCase) => testCase.component)}
         offline={model.connection === "demo"}
         onClose={close}
         onCreated={(defect) => {

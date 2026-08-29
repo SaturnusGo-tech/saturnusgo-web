@@ -137,5 +137,9 @@ export type Bootstrap = {
   externalLinks: ExternalLink[];
   dashboards: Dashboard[];
   activity: Activity[];
-  meta: { generatedAt: string; apiVersion: string };
+  meta: {
+    generatedAt: string;
+    apiVersion: string;
+    authorization: { role: string; capabilities: string[] };
+  };
 };

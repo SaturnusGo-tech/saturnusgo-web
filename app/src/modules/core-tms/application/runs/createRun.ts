@@ -9,7 +9,7 @@ import {
   type TmsMutationFailure,
 } from "../../../../core/tms/errors/mutation-failure";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
-import { createRun as createRunResource, getRun } from "../../runs/data/run-api";
+import { createRun as createRunResource } from "../../runs/data/run-api";
 
 type Result =
   | { ok: true; run: TestRunSummary }
@@ -49,7 +49,7 @@ export async function createRun(input: {
       startImmediately: true,
       ...scope,
     }, input.operationKey);
-    return { ok: true, run: (await getRun(input.http, created.data.id)).data };
+    return { ok: true, run: created.data };
   } catch (error) {
     return { ok: false, reason: "create", failure: toTmsMutationFailure(error) };
   }

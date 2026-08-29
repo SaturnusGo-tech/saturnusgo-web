@@ -27,7 +27,7 @@ export function useWorkspaceActions(
         "",
     );
     state.setSelectedRunId(
-      runs.find((item) => item.projectId === nextProjectId)?.id ??
+      runs.find((item) => item.projectId === nextProjectId && !item.archivedAt)?.id ??
         null,
     );
     state.setSelectedRunItemId(null);

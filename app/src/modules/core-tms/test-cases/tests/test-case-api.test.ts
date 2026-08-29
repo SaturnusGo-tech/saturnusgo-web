@@ -3,6 +3,7 @@ import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
+import { listTestCases } from "../data/test-case-api";
 
 type Api = components["schemas"];
 const time = "2026-08-28T00:00:00.000Z";
@@ -17,6 +18,55 @@ const summary: Api["TestCaseRevisionSummary"] = {
   component: "Auth", ownerIdentityId: null, estimatedMinutes: 3, changeNote: "Clarified",
   createdBy: "identity-1", createdAt: time,
 };
+const caseSummary = (id: number): Api["TestCaseSummary"] => ({
+  id: `case-${id}`, projectId: "project-1", key: `HOST-TC-${id}`,
+  folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "manual",
+  lifecycle: "ready", priority: "medium", component: "Host", ownerIdentityId: null,
+  tags: ["Host", "Ui"], estimatedMinutes: 2, revisionCount: 1, archivedAt: null,
+  createdAt: time, updatedAt: time,
+});
+
+test("test-case collection follows every cursor page", async () => {
+  const urls: string[] = [];
+  const pages = [
+    { data: [caseSummary(240), caseSummary(239)], meta: { limit: 2, hasMore: true, nextCursor: "page-2" } },
+    { data: [caseSummary(238)], meta: { limit: 2, hasMore: false, nextCursor: null } },
+  ];
+  const http = createTmsHttpClient({
+    apiBase: "https://api.example.test/api/v1", accessToken: async () => "token",
+    fetch: (async (url) => {
+      urls.push(String(url));
+      return new Response(JSON.stringify(pages[urls.length - 1]), { status: 200 });
+    }) as typeof fetch,
+  });
+
+  const result = await listTestCases(http, "project-1");
+
+  assert.deepEqual(result.items.map((item) => item.key), ["HOST-TC-240", "HOST-TC-239", "HOST-TC-238"]);
+  assert.equal(new URL(urls[0]!).searchParams.get("cursor"), null);
+  assert.equal(new URL(urls[1]!).searchParams.get("cursor"), "page-2");
+  assert.equal(result.meta.hasMore, false);
+  assert.equal(result.meta.limit, 2);
+});
+
+test("test-case pagination stops before another request when cancelled", async () => {
+  const controller = new AbortController();
+  let calls = 0;
+  const http = createTmsHttpClient({
+    apiBase: "https://api.example.test/api/v1", accessToken: async () => "token",
+    fetch: (async () => {
+      calls += 1;
+      controller.abort(new DOMException("Project changed", "AbortError"));
+      return new Response(JSON.stringify({
+        data: [caseSummary(240)],
+        meta: { limit: 100, hasMore: true, nextCursor: "page-2" },
+      }), { status: 200 });
+    }) as typeof fetch,
+  });
+
+  await assert.rejects(() => listTestCases(http, "project-1", controller.signal), /Project changed/);
+  assert.equal(calls, 1);
+});
 
 test("revision history preserves cursor pagination and immutable detail", async () => {
   const urls: string[] = [];

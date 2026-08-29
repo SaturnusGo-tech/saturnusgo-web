@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
+import { createTmsHttpClient } from "../../../../core/tms/transport/http";
+import { listRuns } from "../data/run-api";
 import { mapRun, mapRunAttemptSummary, mapRunItem } from "../data/run-mapper";
 
 type Api = components["schemas"];
@@ -17,12 +19,48 @@ test("maps server-owned run progress without embedded items", () => {
     environment: { id: "env-1", key: "LOCAL", name: "Local", baseUrl: "https://example.test", variableKeys: [] },
     suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 1,
     progress, attachmentIds: [], createdBy: "identity-1", startedAt: time,
-    completedAt: null, abortedAt: null, abortReason: "", createdAt: time, updatedAt: time,
+    completedAt: null, abortedAt: null, abortReason: "", archivedAt: time,
+    archivedBy: "identity-2", archiveReason: "Cleanup", createdAt: time, updatedAt: time,
   };
   const run = mapRun(dto);
   assert.notEqual(run.progress, dto.progress);
   assert.equal(run.progress.counts.not_run, 1);
+  assert.equal(run.archivedBy, "identity-2");
+  assert.equal(run.archiveReason, "Cleanup");
   assert.equal("items" in run, false);
+});
+
+test("workspace run history aggregates every cursor page including archived runs", async () => {
+  const urls: string[] = [];
+  const active: Api["Run"] = {
+    id: "run-1", projectId: "project-1", key: "UH-TR-1", name: "Smoke",
+    description: "", type: "smoke", status: "active",
+    environment: { id: "env-1", key: "LOCAL", name: "Local", baseUrl: "https://example.test", variableKeys: [] },
+    suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 1,
+    progress, attachmentIds: [], createdBy: "identity-1", startedAt: time,
+    completedAt: null, abortedAt: null, abortReason: null, archivedAt: null,
+    archivedBy: null, archiveReason: null, createdAt: time, updatedAt: time,
+  };
+  const pages: Api["RunListEnvelope"][] = [
+    { data: [active], meta: { limit: 1, hasMore: true, nextCursor: "page-2" } },
+    { data: [{ ...active, id: "run-2", key: "UH-TR-2", archivedAt: time,
+      archivedBy: "identity-2", archiveReason: "Cleanup" }],
+      meta: { limit: 1, hasMore: false, nextCursor: null } },
+  ];
+  const http = createTmsHttpClient({
+    apiBase: "https://api.example.test/api/v1", accessToken: async () => "token",
+    fetch: (async (url) => {
+      urls.push(String(url));
+      return new Response(JSON.stringify(pages[urls.length - 1]), { status: 200 });
+    }) as typeof fetch,
+  });
+
+  const result = await listRuns(http, "project-1");
+
+  assert.deepEqual(result.items.map((run) => run.id), ["run-1", "run-2"]);
+  assert.equal(new URL(urls[0]!).searchParams.get("includeArchived"), "true");
+  assert.equal(new URL(urls[1]!).searchParams.get("cursor"), "page-2");
+  assert.equal(result.items[1]?.archiveReason, "Cleanup");
 });
 
 test("maps one selected item detail and keeps attempt history summary bounded", () => {

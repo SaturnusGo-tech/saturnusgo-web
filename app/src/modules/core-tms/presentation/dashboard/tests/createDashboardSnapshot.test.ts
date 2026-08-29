@@ -11,7 +11,9 @@ const progress = (passed: number, failed: number, blocked = 0, skipped = 0) => (
 });
 
 const run = (input: Partial<TestRunSummary> & Pick<TestRunSummary, "id" | "createdAt">): TestRunSummary => {
-  const { id, createdAt, ...overrides } = input;
+  const {
+    id, createdAt, archivedAt = null, archivedBy = null, archiveReason = null, ...overrides
+  } = input;
   return {
     id,
     createdAt,
@@ -29,6 +31,9 @@ const run = (input: Partial<TestRunSummary> & Pick<TestRunSummary, "id" | "creat
     progress: progress(0, 0),
     startedAt: null,
     completedAt: null,
+    archivedAt,
+    archivedBy,
+    archiveReason,
     ...overrides,
   };
 };
@@ -61,6 +66,7 @@ const data: Bootstrap = {
     run({
       id: "run-2", createdAt: "2026-07-01T09:00:00.000Z", startedAt: "2026-07-02T09:00:00.000Z",
       completedAt: "2026-08-02T09:00:00.000Z", progress: progress(2, 2),
+      archivedAt: "2026-08-20T09:00:00.000Z", archivedBy: "identity-1", archiveReason: "History",
     }),
   ],
   defects: [
@@ -76,7 +82,11 @@ const data: Bootstrap = {
   activity: [
     { id: "event-1", actor: "qa", action: "run.completed", entityKey: "RUN-1", createdAt: "2026-08-17T09:00:00.000Z" },
   ],
-  meta: { generatedAt: "2026-08-29T09:00:00.000Z", apiVersion: "v1" },
+  meta: {
+    generatedAt: "2026-08-29T09:00:00.000Z",
+    apiVersion: "v1",
+    authorization: { role: "workspace_admin", capabilities: ["run:archive"] },
+  },
 };
 
 test("dashboard snapshot uses only authoritative project records in its 30-day window", () => {

@@ -1,5 +1,6 @@
 import { useCaseActions } from "../case-actions/useCaseActions";
 import { useRunActions } from "../run-actions/useRunActions";
+import { useRunArchive } from "../run-archive/useRunArchive";
 import { useWorkspaceActions } from "../workspace-actions/useWorkspaceActions";
 import { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import { useWorkspaceResourceActions } from "../workspace-resources/useWorkspaceResourceActions";
@@ -16,6 +17,7 @@ export function useWorkspaceModel() {
   );
   const cases = useCaseActions(state, derived, workspace.notify);
   const runs = useRunActions(state, derived, workspace.notify);
+  const runArchive = useRunArchive(state, derived, workspace.notify);
   return {
     ...state,
     ...derived,
@@ -23,6 +25,7 @@ export function useWorkspaceModel() {
     ...resources,
     ...cases,
     ...runs,
+    ...runArchive,
   };
 }
 

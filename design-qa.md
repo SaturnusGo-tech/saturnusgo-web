@@ -100,13 +100,22 @@ Date: 2026-08-29
 ## Verification
 
 - `npm run typecheck`
-- `npm run architecture:tms` — 168 files
+- `npm run architecture:tms` — 177 files
 - `npm run test:tms-auth` — 17/17
 - `npm run test:tms-attachments` — 4/4
-- `npm run test:tms-adapters` — 28/28
+- `npm run test:tms-adapters` — 42/42
 - dashboard snapshot test — 1/1
-- `npm run build:standalone` — 61/61 pages generated
+- `npm run build` — 61/61 pages generated
 - production browser console — 0 warnings/errors after the v3 release
 - production document width — 812px client / 812px scroll width
+
+## Run-planning and history release candidate
+
+- Browser state: Russian locale, collapsed navigation, right-side run planner open at 979×731 CSS px.
+- Scope evidence: the planner presents one flat result list with loaded, matched, and selected totals, project-wide search, scenario/platform/component/folder/priority/lifecycle filters, stable selection, and a sticky count-bearing action.
+- Data evidence: cursor collection tests cover every test-case and run-item page; production data separately verifies all 240 Umbrella-Host cases exist, including 162 positive, 45 negative, and 33 corner cases.
+- History evidence: active and archived run tabs remain in the client model, archived evidence is read-only, and restore/archive controls are capability-gated.
+- Mutation evidence: sequential step transitions consume the strong ETag returned by each mutation, while stale archive/run ETags receive one bounded refresh-and-retry.
+- Accessibility evidence: dialog focus containment/return, Escape dismissal, labelled filter groups, selected-count status, keyboard-operable uploads, removable evidence rows, and reduced-motion fallbacks are implemented and covered by static/browser review.
 
 final result: passed

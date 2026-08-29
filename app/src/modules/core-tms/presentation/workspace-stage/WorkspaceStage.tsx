@@ -142,6 +142,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       <RunsView
         offline={model.connection === "demo"}
         runs={model.projectRuns}
+        cases={model.projectCases}
         selectedRun={model.selectedRun}
         items={model.runItems}
         selectedItem={model.selectedRunItem}
@@ -156,6 +157,10 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         onStepActual={model.updateStepActualResult}
         onItemStatus={model.setItemStatus}
         onComplete={model.completeRun}
+        canArchive={model.canArchiveRun}
+        archivePending={model.archivePending}
+        onArchive={model.archiveSelectedRun}
+        onRestore={model.restoreSelectedRun}
         onDefectCreated={(defect) => {
           model.setData((current) => ({
             ...current,

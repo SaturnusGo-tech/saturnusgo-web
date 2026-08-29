@@ -97,6 +97,9 @@ export type TestRunSummary = {
   createdAt: string;
   startedAt: string | null;
   completedAt: string | null;
+  archivedAt: string | null;
+  archivedBy: string | null;
+  archiveReason: string | null;
 };
 
 export type TestRun = TestRunSummary & { items: RunItem[] };

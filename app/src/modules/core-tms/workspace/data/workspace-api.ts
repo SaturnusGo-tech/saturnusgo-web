@@ -77,6 +77,10 @@ export async function loadWorkspace(
     meta: {
       generatedAt: summary.meta.generatedAt,
       apiVersion: envelope.meta.compositionVersion,
+      authorization: {
+        role: envelope.meta.authorization.role,
+        capabilities: [...envelope.meta.authorization.capabilities],
+      },
     },
   };
 }

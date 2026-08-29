@@ -765,8 +765,11 @@
 .inlineUpload em { margin-top: 5px; color: var(--muted); font-size: 10px; font-style: normal; }
 .inlineUpload input,
 .executionActions label input { display: none; }
+.inlineUpload:focus-visible,
+.compactUpload > label:focus-visible { outline: 2px solid #0c66e4; outline-offset: 2px; }
 .inlineFiles { display: flex; flex-wrap: wrap; gap: 5px; }
 .inlineFiles span { display: inline-flex; align-items: center; gap: 5px; padding: 3px 6px; color: #4e5b64; background: #f4f6f7; border: 1px solid var(--line); font-size: 11px; }
+.inlineFiles button { display: grid; place-items: center; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; }
 .linkInput { display: grid; grid-template-columns: minmax(0, 1fr) 30px; align-items: center; border: 1px solid var(--line-strong); }
 .linkInput input { height: 32px !important; border: 0 !important; }
 .linkInput svg { justify-self: center; color: var(--muted); }

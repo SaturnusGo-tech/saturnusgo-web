@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0013.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0014.
          */
         get: operations["getHealth"];
         put?: never;
@@ -468,11 +468,37 @@ export interface paths {
         get: operations["getRun"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Archive a run without deleting execution evidence
+         * @description Removes the run from default active lists while preserving items, attempts, defects, attachments, and audit history. Restore is explicit.
+         */
+        delete: operations["archiveRun"];
         options?: never;
         head?: never;
         /** Edit a draft run */
         patch: operations["updateRun"];
+        trace?: never;
+    };
+    "/runs/{runId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived run */
+        post: operations["restoreRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/runs/{runId}/start": {
@@ -1502,6 +1528,10 @@ export interface components {
             /** Format: date-time */
             abortedAt: string | null;
             abortReason: components["schemas"]["LongText"] | null;
+            /** Format: date-time */
+            archivedAt: string | null;
+            archivedBy: components["schemas"]["ActorRef"] | null;
+            archiveReason: string | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
@@ -1530,6 +1560,9 @@ export interface components {
         };
         RunAbortRequest: {
             reason: components["schemas"]["LongText"];
+        };
+        RunArchiveRequest: {
+            reason?: string;
         };
         RunEnvelope: {
             data: components["schemas"]["Run"];
@@ -2188,9 +2221,14 @@ export interface components {
             data: components["schemas"]["WorkspaceSummary"];
             meta: {
                 /** @constant */
-                compositionVersion: "workspace-bootstrap.v1";
+                compositionVersion: "workspace-bootstrap.v2";
                 /** @constant */
                 payloadBudgetBytes: 262144;
+                authorization: {
+                    /** @enum {string} */
+                    role: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer";
+                    capabilities: ("workspace:read" | "workspace:manage" | "project:read" | "project:manage" | "environment:read" | "environment:manage" | "test_case:read" | "test_case:manage" | "suite:read" | "suite:manage" | "run:read" | "run:manage" | "run:archive" | "run:execute" | "defect:read" | "defect:manage" | "report:read" | "report:manage" | "attachment:read" | "attachment:manage" | "audit:read")[];
+                };
             };
         };
     };
@@ -2341,7 +2379,7 @@ export interface components {
                 "application/json": components["schemas"]["SuiteEnvelope"];
             };
         };
-        /** @description A page of run summaries ordered by createdAt descending then ID. */
+        /** @description A page of run summaries ordered by run key then ID; archived runs are excluded unless requested. */
         RunListResponse: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
@@ -2746,6 +2784,11 @@ export interface components {
         RunPatch: {
             content: {
                 "application/merge-patch+json": components["schemas"]["RunPatchRequest"];
+            };
+        };
+        RunArchive: {
+            content: {
+                "application/json": components["schemas"]["RunArchiveRequest"];
             };
         };
         RunAbort: {
@@ -3599,6 +3642,8 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 status?: components["schemas"]["RunStatus"];
                 type?: components["schemas"]["RunType"];
+                /** @description False by default. True includes archived runs without hiding historical evidence. */
+                includeArchived?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -3653,9 +3698,39 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["RunResponse"];
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: components["requestBodies"]["RunArchive"];
+        responses: {
+            200: components["responses"]["RunResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -3676,6 +3751,35 @@ export interface operations {
             cookie?: never;
         };
         requestBody: components["requestBodies"]["RunPatch"];
+        responses: {
+            200: components["responses"]["RunResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: components["responses"]["RunResponse"];
             400: components["responses"]["BadRequest"];
