@@ -12,7 +12,6 @@ source_repo=$(cd "$script_dir/.." && pwd)
 pages_repo=${TMS_PAGES_REPO:-"$(dirname "$source_repo")/saturnusgo-web.github.io"}
 expected_sha=${TMS_SOURCE_SHA:-}
 route_path="testcases/umbrella-home/work"
-brand_assets_path="assets/tms"
 
 if [[ -z "$expected_sha" ]]; then
   echo "TMS_SOURCE_SHA is required; deployment must be bound to a reviewed source commit." >&2
@@ -57,7 +56,6 @@ trap - EXIT
 
 out_dir="$source_repo/out"
 test -f "$out_dir/$route_path/index.html"
-test -f "$out_dir/$brand_assets_path/saturn-mark.png"
 if find "$out_dir/testcases" -type d | grep -Eq 'UmbrellaHome|/Work$'; then
   echo "Mixed-case TMS route was emitted." >&2
   exit 8
@@ -70,7 +68,6 @@ fi
 echo "Scoped Pages changes:"
 rsync -ani "$out_dir/_next/" "$pages_repo/_next/"
 rsync -ani --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
-rsync -ani --delete "$out_dir/$brand_assets_path/" "$pages_repo/$brand_assets_path/"
 
 if [[ "$mode" == "--prepare" ]]; then
   echo "Prepared only; Pages checkout was not modified."
@@ -81,11 +78,10 @@ fi
   exit 10
 }
 
-mkdir -p "$pages_repo/_next" "$pages_repo/$route_path" "$pages_repo/$brand_assets_path"
+mkdir -p "$pages_repo/_next" "$pages_repo/$route_path"
 rsync -a "$out_dir/_next/" "$pages_repo/_next/"
 rsync -a --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
-rsync -a --delete "$out_dir/$brand_assets_path/" "$pages_repo/$brand_assets_path/"
 touch "$pages_repo/.nojekyll"
-git -C "$pages_repo" add _next "$route_path" "$brand_assets_path" .nojekyll
+git -C "$pages_repo" add _next "$route_path" .nojekyll
 git -C "$pages_repo" commit -m "deploy: TMS ${actual_sha:0:8}"
 git -C "$pages_repo" push origin main

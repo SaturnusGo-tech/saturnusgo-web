@@ -123,7 +123,7 @@ final result: passed
 ## Saturn identity and dark theme — final pass
 
 - Source: ImageGen-produced minimal ringed Saturn on a transparent background, with no lettering; the first selected concept was reused as the single brand mark.
-- Implementation: `public/assets/tms/saturn-mark.png` is rendered as a `currentColor` CSS mask, so the same uncropped geometry is white in the fixed dark header and adapts safely without a second raster asset.
+- Implementation: `app/src/modules/core-tms/assets/saturn-mark.png` is bundled into `_next/static/media` and rendered as a `currentColor` CSS mask, so the same uncropped geometry is white in the fixed dark header and adapts safely without a second raster asset.
 - Viewport: in-app browser at 1153×648 CSS px, authenticated demo workspace, collapsed navigation; light dashboard and dark configuration states were captured at the same viewport.
 - Comparison: the generated source asset and `.design-qa/theme-light-dashboard.png` were inspected together at original detail. The full planet and both ring tips remain visible inside a 44×40 brand slot; the `TMS` wordmark is absent.
 - Light mode: the pre-existing production palette was restored exactly—`#101b24` header/navigation, `#edf1f4` workspace canvas, original control, border, action, status, and chart colors. No monochrome redesign remains in the light theme.

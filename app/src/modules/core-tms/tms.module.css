@@ -163,8 +163,8 @@
   display: block;
   color: currentColor;
   background: currentColor;
-  -webkit-mask: url("/assets/tms/saturn-mark.png") center / contain no-repeat;
-  mask: url("/assets/tms/saturn-mark.png") center / contain no-repeat;
+  -webkit-mask: url("./assets/saturn-mark.png") center / contain no-repeat;
+  mask: url("./assets/saturn-mark.png") center / contain no-repeat;
 }
 
 .commandSearch {
