@@ -24,6 +24,7 @@
 .trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trigger > svg { color: #626f86; transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
 .trigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.compactTrigger { min-height: 36px; padding-block: 6px; font-size: 12px; }
 
 .menu {
   position: absolute;
@@ -77,6 +78,7 @@
 .menu > button[data-selected="true"] { background: #eef4ff; box-shadow: inset 2px 0 #0c66e4; font-weight: 650; }
 .menu > button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .menu > button > svg { color: #0c66e4; }
+.multiMenu { width: max(100%, 220px); }
 
 :global(.dark) .trigger { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
 :global(.dark) .trigger:hover,

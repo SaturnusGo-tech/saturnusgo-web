@@ -23,11 +23,19 @@ test("run filters combine facets and search without losing the full collection",
     query: "amount HOST",
     scenario: "corner",
     platform: "ios",
-    component: "Payments",
+    components: ["Payments"],
     folder: "/Host/Payments",
   });
   assert.deepEqual(result.map((item) => item.id), ["3"]);
   assert.equal(cases.length, 3);
+});
+
+test("component filter matches any selected component", () => {
+  const result = filterRunCases(cases, {
+    ...initialRunScopeFilters,
+    components: ["Core", "Payments"],
+  });
+  assert.deepEqual(result.map((item) => item.id).sort(), ["1", "2", "3"]);
 });
 
 test("key sorting is numeric and predictable", () => {

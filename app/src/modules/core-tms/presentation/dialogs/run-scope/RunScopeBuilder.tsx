@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
+import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
 import type { RunDialogCopy } from "../run/copy";
 import {
   activeRunFilterCount,
@@ -49,7 +50,14 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
     {filtersOpen && <div className={styles.filterGrid}>
       <FilterSelect label={copy.scenario} value={filters.scenario} onChange={(value) => update("scenario", value as RunScopeFilters["scenario"])} options={[["all", copy.allScenarios], ["positive", copy.positive], ["negative", copy.negative], ["corner", copy.corner]]} />
       <FilterSelect label={copy.platform} value={filters.platform} onChange={(value) => update("platform", value as RunScopeFilters["platform"])} options={[["all", copy.allPlatforms], ["ios", copy.ios], ["android", copy.android]]} />
-      <FilterSelect label={copy.component} value={filters.component} onChange={(value) => update("component", value)} options={[["all", copy.allComponents], ...components.map((value) => [value, localizedComponentLabel(locale, value)] as [string, string])]} />
+      <div className={styles.filterField}><span>{copy.component}</span><AnimatedMultiSelect
+        label={copy.component}
+        values={filters.components}
+        options={components.map((value) => ({ value, label: localizedComponentLabel(locale, value) }))}
+        allLabel={copy.allComponents}
+        selectedLabel={copy.selected}
+        onChange={(values) => update("components", values)}
+      /></div>
       <FilterSelect label={copy.folder} value={filters.folder} onChange={(value) => update("folder", value)} options={[["all", copy.allFolders], ...folders.map((value) => [value, value] as [string, string])]} />
       <FilterSelect label={copy.priority} value={filters.priority} onChange={(value) => update("priority", value as RunScopeFilters["priority"])} options={[["all", copy.allPriorities], ["critical", copy.critical], ["high", copy.high], ["medium", copy.medium], ["low", copy.low]]} />
       <FilterSelect label={copy.lifecycle} value={filters.lifecycle} onChange={(value) => update("lifecycle", value as RunScopeFilters["lifecycle"])} options={[["all", copy.allStates], ["ready", copy.ready], ["draft", copy.draft], ["deprecated", copy.deprecated]]} />
