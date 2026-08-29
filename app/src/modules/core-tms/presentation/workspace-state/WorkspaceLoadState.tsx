@@ -17,11 +17,22 @@ export function WorkspaceLoadState({
   const { t } = useTmsLocale();
   if (!failure) {
     return (
-      <section className={styles.onboarding} aria-busy="true">
-        <div className={styles.onboardingPanel}>
-          <span className={styles.onboardingEyebrow}>{t("workspace.title")}</span>
-          <h1>{t("workspace.loading")}</h1>
-          <p>{t("workspace.loadingDescription")}</p>
+      <section
+        className={styles.workspaceLoader}
+        aria-busy="true"
+        role="status"
+        data-testid="workspace-loading"
+      >
+        <span className={styles.srOnly}>{t("workspace.loading")}</span>
+        <div className={styles.workspaceLoaderOrbit} aria-hidden="true">
+          <span className={styles.workspaceLoaderTrack}>
+            <span className={styles.workspaceLoaderSatellite} />
+          </span>
+          <span className={`${styles.workspaceLoaderTrack} ${styles.workspaceLoaderTrackInner}`}>
+            <span className={styles.workspaceLoaderSatellite} />
+          </span>
+          <span className={styles.workspaceLoaderEcho} />
+          <span className={styles.workspaceLoaderPlanet} />
         </div>
       </section>
     );

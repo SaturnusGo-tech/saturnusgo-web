@@ -132,3 +132,15 @@ final result: passed
 - Differences found and fixed: an early light-theme recolor made the navigation white and changed legacy surface colors; that entire recolor was removed after review. The final light state is the legacy visual system plus only the new Saturn identity and settings controls.
 - Production runtime: the authenticated dashboard smoke exposed a second frozen-intrinsics incompatibility in `decimal.js`. Its constructor shadowing now uses an own property definition, and the child-process regression freezes both `Function.prototype` and `Object.prototype` before exercising Decimal and Recharts together.
 - Final result: passed.
+
+## Workspace orbital loader — final pass
+
+- Reference: CodePen `Neon Flux Node — Pure CSS 3D Orbital Loader` (`https://codepen.io/respectforcreators/full/yygbgge`), selected for its compact layered orbit and absence of a surrounding card.
+- Implementation: the reference motion language was adapted to the existing production Saturn raster mask; no CodePen code, neon palette, foreign branding, text, custom SVG, or decorative CSS drawing was copied.
+- Visual state: centered transparent motion layer over the native workspace canvas. The former eyebrow, heading, description, white panel, border, radius, and shadow are absent.
+- Light mode: original light TMS canvas with the dark Saturn asset. Dark mode: original blue-graphite canvas with the same asset inverted through `currentColor`.
+- Motion: two different-duration perspective orbits, a restrained breathing core, and one fading asset echo. Computed transforms changed across a 420ms browser sample.
+- Accessibility: the status remains announced with screen-reader-only localized copy; there is no visible loading text. All animation stops under `prefers-reduced-motion` while the Saturn mark remains visible.
+- Same-viewport comparison: the CodePen reference, light TMS implementation, and dark TMS implementation were opened together in the in-app browser at 1153×648 CSS px. The final implementations keep the compact focal point while matching TMS identity and theme surfaces.
+- Console: no new browser error was recorded during the final light/dark loader pass.
+- Final result: passed.
