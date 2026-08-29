@@ -1,4 +1,4 @@
-import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Copy, Paperclip, Play, PlayCircle, X, XCircle } from "lucide-react";
+import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, Play, PlayCircle, X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { uploadEvidence } from "../../application/evidence/uploadEvidence";
@@ -13,6 +13,7 @@ import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
+import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import styles from "../../tms.module.css";
 type RunsViewProps = {
   offline: boolean;
@@ -115,8 +116,7 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
     items={selectedIsVisible ? items : []} selectedItemId={selectedIsVisible ? selectedItem?.id ?? null : null}
     progress={selectedIsVisible ? progress : 0} mode={listMode} onModeChange={changeListMode}
     onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
-    archivePending={archivePending} onArchive={canArchive ? onArchive : undefined}
-    onRestore={canArchive ? onRestore : undefined}
+    archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
   />;
   if (selectedRun && selectedIsVisible && !selectedItem) return <div className={styles.executionShell} data-testid="runs-view">{runNavigator}<div className={`${styles.pane} ${styles.centeredPane}`}><SaturnLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={styles.executionShell} data-testid="runs-view">{runNavigator}<div className={`${styles.pane} ${styles.centeredPane}`}><EmptyState icon={<PlayCircle size={36} />} title={listMode === "archived" ? t("runs.noArchived") : t("runs.noActive")} text={listMode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")} action={listMode === "active" ? <button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button> : undefined} /></div></div>;
@@ -134,8 +134,8 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
   const currentIndex = items.findIndex((item) => item.id === selectedItem.id);
   return <div className={styles.executionShell} data-testid="runs-view">
     {runNavigator}
-    <section className={`${styles.pane} ${styles.executionPane}`}>
-      <div className={styles.executionHeader}><div><span>{selectedItem.caseKey}</span><h1>{selectedItem.snapshot.title}</h1><p>{selectedItem.snapshot.description}</p></div><span className={`${styles.statusPill} ${styles[`status_${selectedItem.status}`]}`}>{statusIcon[selectedItem.status]} {localizedLabel(locale, selectedItem.status)}</span><button className={styles.iconButton} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(selectedItem.caseKey)}><Copy size={17} /></button></div>
+    <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${styles.pane} ${styles.executionPane} ${styles.executionPaneTransition} ${archivePending ? styles.executionPaneArchiving : ""}`}>
+      <RunExecutionHeader run={selectedRun} item={selectedItem} canArchive={canArchive} archivePending={archivePending} onArchive={onArchive} />
       <div className={styles.executionMeta}><span><strong>{t("runs.environment")}</strong>{selectedRun.environment.name}</span><span><strong>{t("runs.build")}</strong>{selectedRun.build}</span><span><strong>{t("runs.estimate")}</strong>{selectedItem.snapshot.estimatedMinutes ?? "—"} {locale === "ru" ? "мин" : "min"}</span></div>
       <div className={styles.precondition}><strong>{t("runs.preconditions")}</strong><p>{selectedItem.snapshot.preconditions}</p></div>
       <div className={styles.executionSteps}>

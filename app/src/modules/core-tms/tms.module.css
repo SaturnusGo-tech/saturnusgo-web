@@ -752,11 +752,65 @@
 .statusIcon { width: 18px; height: 18px; display: grid; place-items: center; }
 
 .executionPane { grid-column: 2; grid-row: 1; overflow: auto; padding-bottom: 18px; }
-.executionHeader { min-height: 150px; display: grid; grid-template-columns: minmax(0, 1fr) auto 34px; align-items: start; gap: 12px; padding: 24px 24px 20px; border-bottom: 1px solid var(--line); }
+.executionHeader { min-height: 150px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 24px 24px 20px; border-bottom: 1px solid var(--line); }
 .executionHeader > div { min-width: 0; }
 .executionHeader > div > span { color: var(--muted); font-size: 11px; letter-spacing: .04em; }
 .executionHeader h1 { margin: 5px 0 6px; font-size: 24px; line-height: 1.2; letter-spacing: -.02em; }
 .executionHeader p { max-width: 720px; margin: 0; color: var(--muted); }
+.executionHeaderActions { position: relative; display: flex; align-items: center; gap: 7px; }
+.runArchiveButton { color: var(--muted); }
+.runArchiveButton:hover { color: #8e3f39; background: var(--red-soft); border-color: #d8a6a0; }
+
+.runArchivePopover {
+  position: absolute;
+  z-index: 42;
+  top: calc(100% + 9px);
+  right: 0;
+  width: min(320px, calc(100vw - 36px));
+  padding: 16px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: 0 16px 38px rgb(23 38 51 / 20%);
+  animation: tms-reveal-popover 160ms cubic-bezier(.2, .72, .3, 1);
+}
+
+.runArchivePopover > strong { display: block; padding-right: 26px; font-size: 14px; line-height: 1.35; }
+.runArchivePopover > p { margin: 6px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.runArchivePopover > div { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.runArchivePopover > div > button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 11px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+}
+.runArchivePopover > div > button:hover { background: var(--control-hover); }
+.runArchivePopover > div > button:disabled { cursor: wait; opacity: .55; }
+.runArchiveClose {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-control);
+}
+.runArchiveClose:hover { color: var(--ink); background: var(--control-hover); }
+.runArchiveConfirmButton { font-weight: 700; }
+.executionPaneTransition { animation: tms-reveal-panel 180ms cubic-bezier(.2, .72, .3, 1); }
+.executionPaneArchiving { opacity: .62; pointer-events: none; transform: translateX(-5px); transition: opacity 160ms ease, transform 160ms ease; }
 
 .executionMeta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0 24px; border-bottom: 1px solid var(--line); }
 .executionMeta > span { display: flex; flex-direction: column; gap: 3px; min-height: 64px; padding: 12px 14px; border-right: 1px solid var(--line); }
@@ -2060,7 +2114,7 @@
 .runItem { min-height: 72px; gap: 10px; padding: 10px 15px; }
 .runItemActive { background: #edf3f6; box-shadow: inset 3px 0 0 #2f6d8d; }
 .executionPane { overflow: auto; padding-bottom: 24px; }
-.executionHeader { min-height: 136px; grid-template-columns: minmax(0, 1fr) auto 40px; gap: 14px; padding: 24px 28px 20px; }
+.executionHeader { min-height: 136px; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 24px 28px 20px; }
 .executionHeader h1 { margin-block: 6px 7px; font-size: clamp(23px, 2vw, 29px); overflow-wrap: anywhere; }
 .executionHeader p { color: #536574; }
 .executionMeta { min-width: 720px; padding: 0 28px; }
@@ -4510,5 +4564,8 @@
 @media (prefers-reduced-motion: reduce) {
   .frame,
   .navigationItem span,
-  .caseRepositoryResizer::before { transition: none; }
+  .caseRepositoryResizer::before,
+  .executionPaneArchiving { transition: none; }
+  .runArchivePopover,
+  .executionPaneTransition { animation: none; }
 }

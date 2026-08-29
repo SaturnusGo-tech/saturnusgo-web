@@ -1,5 +1,5 @@
-import { Archive, ChevronRight, Plus, RotateCcw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Archive, Check, ChevronDown, ChevronRight, Plus, RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   RunItemSummary,
   TestCaseSummary,
@@ -25,17 +25,17 @@ type RunNavigatorProps = {
   onSelectRun: (id: string) => void;
   onSelectItem: (id: string) => void;
   onCreate: () => void;
-  onArchive?: (run: TestRunSummary) => void;
   onRestore?: (run: TestRunSummary) => void;
 };
 
 export function RunNavigator({
   runs, cases, selectedRun, items, selectedItemId, progress, mode,
   archivePending = false, onModeChange, onSelectRun, onSelectItem,
-  onCreate, onArchive, onRestore,
+  onCreate, onRestore,
 }: RunNavigatorProps) {
   const { locale, t } = useTmsLocale();
-  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
   const titles = useMemo(
     () => new Map(cases.map((item) => [item.id, item.title])),
     [cases],
@@ -45,7 +45,22 @@ export function RunNavigator({
   const visibleRuns = runs.filter((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
   const emptyLabel = mode === "archived" ? t("runs.noArchived") : t("runs.noActive");
 
-  useEffect(() => setConfirmArchive(false), [mode, selectedRun?.id]);
+  useEffect(() => setPickerOpen(false), [mode, selectedRun?.id]);
+  useEffect(() => {
+    if (!pickerOpen) return;
+    function closeOnPointer(event: PointerEvent) {
+      if (!pickerRef.current?.contains(event.target as Node)) setPickerOpen(false);
+    }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setPickerOpen(false);
+    }
+    document.addEventListener("pointerdown", closeOnPointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnPointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [pickerOpen]);
 
   return (
     <aside className={styles.navigator} aria-label={t("runs.current")}>
@@ -65,19 +80,49 @@ export function RunNavigator({
         ))}
       </div>
 
-      <div className={styles.picker}>
-        <select
-          aria-label={t("runs.current")}
-          value={selectedRun?.id ?? ""}
+      <div className={styles.picker} ref={pickerRef}>
+        <button
+          className={styles.pickerTrigger}
+          type="button"
           disabled={visibleRuns.length === 0}
-          onChange={(event) => onSelectRun(event.target.value)}
+          aria-haspopup="listbox"
+          aria-expanded={pickerOpen}
+          aria-controls="run-picker-list"
+          aria-label={t("runs.openRunList")}
+          onClick={() => setPickerOpen((current) => !current)}
         >
-          {visibleRuns.length === 0 && <option value="">{emptyLabel}</option>}
-          {visibleRuns.map((run) => <option value={run.id} key={run.id}>{run.name}</option>)}
-        </select>
-        <button type="button" onClick={onCreate} aria-label={t("runs.new")} title={t("runs.new")}>
+          <span>
+            <small>{t("runs.current")}</small>
+            <strong>{selectedRun ? `${selectedRun.key} · ${selectedRun.name}` : emptyLabel}</strong>
+            {selectedRun && <em>{selectedRun.environment.name} · {selectedRun.build}</em>}
+          </span>
+          <ChevronDown size={17} aria-hidden="true" />
+        </button>
+        <button className={styles.pickerCreate} type="button" onClick={onCreate} aria-label={t("runs.new")} title={t("runs.new")}>
           <Plus size={16} />
         </button>
+        {pickerOpen && (
+          <div className={styles.pickerMenu} id="run-picker-list" role="listbox" aria-label={t("runs.current")}>
+            {visibleRuns.map((run) => {
+              const percent = Math.round((run.progress.executed / Math.max(1, run.itemCount)) * 100);
+              const selected = run.id === selectedRun?.id;
+              return (
+                <button
+                  className={selected ? styles.pickerOptionActive : styles.pickerOption}
+                  key={run.id}
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  onClick={() => { onSelectRun(run.id); setPickerOpen(false); }}
+                >
+                  <span><strong>{run.name}</strong><small>{run.key} · {run.environment.name} · {run.build}</small></span>
+                  <em>{percent}%</em>
+                  {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {!selectedRun ? (
@@ -112,25 +157,8 @@ export function RunNavigator({
                   <RotateCcw size={14} /> {t("runs.restoreAction")}
                 </button>}
               </div>
-            ) : onArchive && !confirmArchive && (
-              <button className={styles.archiveTrigger} type="button" onClick={() => setConfirmArchive(true)}>
-                <Archive size={14} /> {t("runs.removeFromList")}
-              </button>
-            )}
+            ) : null}
           </header>
-
-          {confirmArchive && onArchive && (
-            <section className={styles.archiveConfirm} aria-live="polite">
-              <strong>{t("runs.removeConfirm", { key: selectedRun.key })}</strong>
-              <p>{t("runs.removeKeepsHistory")}</p>
-              <div>
-                <button type="button" onClick={() => setConfirmArchive(false)}>{t("common.cancel")}</button>
-                <button type="button" disabled={archivePending} onClick={() => onArchive(selectedRun)}>
-                  {t("runs.removeAction")}
-                </button>
-              </div>
-            </section>
-          )}
 
           <div className={styles.items}>
             {items.map((item, index) => (
