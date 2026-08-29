@@ -1,4 +1,6 @@
 import {
+  ChevronLeft,
+  ChevronRight,
   FileBarChart,
   FolderKanban,
   LayoutDashboard,
@@ -38,11 +40,13 @@ export function Navigation({
   onChange,
   disabled,
   collapsed,
+  onToggleCollapsed,
 }: {
   view: View;
   onChange: (view: View) => void;
   disabled: boolean;
   collapsed: boolean;
+  onToggleCollapsed: () => void;
 }) {
   const { t } = useTmsLocale();
   return (
@@ -71,6 +75,16 @@ export function Navigation({
           </button>
         );
       })}
+      <button
+        type="button"
+        className={styles.navigationToggle}
+        onClick={onToggleCollapsed}
+        aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+        aria-expanded={!collapsed}
+        title={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+      >
+        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+      </button>
     </nav>
   );
 }

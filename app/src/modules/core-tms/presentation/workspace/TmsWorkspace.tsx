@@ -40,6 +40,7 @@ function LocalizedWorkspace() {
           onChange={model.setView}
           disabled={!model.project}
           collapsed={sidebarCollapsed}
+          onToggleCollapsed={toggleSidebar}
         />
         <main className={styles.stage}>
           {model.connection === "demo" && (
