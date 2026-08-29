@@ -47,3 +47,24 @@
   .ledger > div { width: 100%; justify-content: space-between; padding: 7px 0; border-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .page { animation: none; } }
+
+:global(.dark) .page { color: var(--ink); background: var(--paper); }
+:global(.dark) .header,
+:global(.dark) .ledger,
+:global(.dark) .ledger > div,
+:global(.dark) .tableViewport { border-color: var(--line); }
+:global(.dark) .header p,
+:global(.dark) .ledger dt,
+:global(.dark) .summary small,
+:global(.dark) .empty,
+:global(.dark) .empty small { color: var(--muted); }
+:global(.dark) .ledger dd,
+:global(.dark) .table td,
+:global(.dark) .table td:first-child,
+:global(.dark) .summary b,
+:global(.dark) .empty strong { color: var(--ink); }
+:global(.dark) .table th { color: var(--muted); background: var(--control); }
+:global(.dark) .table td { border-color: var(--line); }
+:global(.dark) .table tbody tr:hover { background: var(--control-hover); }
+:global(.dark) .evidence > span { background: var(--control); border-color: var(--line); }
+:global(.dark) .evidence button { color: var(--ink); }

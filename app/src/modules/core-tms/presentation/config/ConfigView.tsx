@@ -1,6 +1,7 @@
 import { Archive, ArchiveRestore, Copy, Pencil, Plus } from "lucide-react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { AppearanceSettings } from "./settings/AppearanceSettings";
 import { ProjectCaseExchange } from "./ProjectCaseExchange";
 import styles from "../../tms.module.css";
 import surface from "./config.module.css";
@@ -30,6 +31,7 @@ export function ConfigView({ environments, project, onCreate, onEditEnvironment,
       </div>
       <ProjectCaseExchange enabled={exchangeEnabled} project={project} onImported={onCasesImported} />
     </section>}
+    <AppearanceSettings />
     <section className={surface.environmentSection} aria-labelledby="environment-list-title">
       <div className={surface.sectionLabel}><h2 id="environment-list-title">{t("config.environmentsCount", { count: environments.length })}</h2></div>
       {environments.length === 0 ? <div className={surface.empty}><strong>{t("config.emptyEnvironments")}</strong><span>{t("config.emptyEnvironmentsHint")}</span></div> : <div className={surface.tableViewport}><table className={surface.table}>

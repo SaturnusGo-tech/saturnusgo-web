@@ -5,9 +5,7 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import { TmsSessionControl } from "../../auth/presentation/session/TmsSessionControl";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import type { TmsLocale } from "../../localization/model/locale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import styles from "../../tms.module.css";
 
@@ -20,7 +18,8 @@ export function WorkspaceHeader({
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 }) {
-  const { languageTag, locale, setLocale, t } = useTmsLocale();
+  const { languageTag, t } = useTmsLocale();
+  const isDashboard = model.view === "dashboard";
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
   const activeEnvironment =
@@ -41,12 +40,10 @@ export function WorkspaceHeader({
     minute: "2-digit",
   });
   const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
-  const languages: Array<{ id: TmsLocale; short: string }> = [
-    { id: "en", short: "EN" },
-    { id: "ru", short: "RU" },
-  ];
   return (
-    <header className={styles.tabsBar}>
+    <header
+      className={`${styles.tabsBar} ${isDashboard ? styles.tabsBarDashboard : ""}`}
+    >
       <button
         className={styles.homeButton}
         onClick={onToggleSidebar}
@@ -62,7 +59,7 @@ export function WorkspaceHeader({
         onClick={() => model.setView("dashboard")}
         aria-label={t("header.dashboardAria")}
       >
-        <strong>TMS</strong>
+        <span className={styles.saturnLogo} aria-hidden="true" />
       </button>
       <div className={styles.headerProject}>
         <span>{t("header.project")}</span>
@@ -102,25 +99,27 @@ export function WorkspaceHeader({
           </button>
         )}
       </div>
-      <label className={styles.commandSearch}>
-        <Search size={17} />
-        <input
-          id="tms-command-search"
-          aria-label={t("header.searchCases")}
-          disabled={!model.project}
-          value={model.query}
-          onChange={(event) => model.setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") model.setView("cases");
-          }}
-          placeholder={
-            model.project
-              ? t("header.searchPlaceholder")
-              : t("header.createProjectToBegin")
-          }
-        />
-        <kbd>⌘ K</kbd>
-      </label>
+      {!isDashboard && (
+        <label className={styles.commandSearch}>
+          <Search size={17} />
+          <input
+            id="tms-command-search"
+            aria-label={t("header.searchCases")}
+            disabled={!model.project}
+            value={model.query}
+            onChange={(event) => model.setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") model.setView("cases");
+            }}
+            placeholder={
+              model.project
+                ? t("header.searchPlaceholder")
+                : t("header.createProjectToBegin")
+            }
+          />
+          <kbd>⌘ K</kbd>
+        </label>
+      )}
       <div className={styles.headerMeta}>
         <div className={styles.headerMetaItem}>
           <span>{t("header.environment")}</span>
@@ -139,32 +138,6 @@ export function WorkspaceHeader({
             </small>
           </span>
         </div>
-        <div
-          className={styles.languageSwitcher}
-          role="group"
-          aria-label={t("language.label")}
-        >
-          {languages.map((language) => {
-            const name = t(
-              language.id === "en" ? "language.english" : "language.russian",
-            );
-            const label = t("language.switchTo", { language: name });
-            return (
-              <button
-                key={language.id}
-                type="button"
-                className={styles.languageOption}
-                aria-label={label}
-                aria-pressed={locale === language.id}
-                title={label}
-                onClick={() => setLocale(language.id)}
-              >
-                {language.short}
-              </button>
-            );
-          })}
-        </div>
-        <TmsSessionControl />
       </div>
     </header>
   );

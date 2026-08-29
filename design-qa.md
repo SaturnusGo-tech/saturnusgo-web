@@ -119,3 +119,15 @@ Date: 2026-08-29
 - Accessibility evidence: dialog focus containment/return, Escape dismissal, labelled filter groups, selected-count status, keyboard-operable uploads, removable evidence rows, and reduced-motion fallbacks are implemented and covered by static/browser review.
 
 final result: passed
+
+## Saturn identity and dark theme — final pass
+
+- Source: ImageGen-produced minimal ringed Saturn on a transparent background, with no lettering; the first selected concept was reused as the single brand mark.
+- Implementation: `public/assets/tms/saturn-mark.png` is rendered as a `currentColor` CSS mask, so the same uncropped geometry is white in the fixed dark header and adapts safely without a second raster asset.
+- Viewport: in-app browser at 1153×648 CSS px, authenticated demo workspace, collapsed navigation; light dashboard and dark configuration states were captured at the same viewport.
+- Comparison: the generated source asset and `.design-qa/theme-light-dashboard.png` were inspected together at original detail. The full planet and both ring tips remain visible inside a 44×40 brand slot; the `TMS` wordmark is absent.
+- Light mode: the pre-existing production palette was restored exactly—`#101b24` header/navigation, `#edf1f4` workspace canvas, original control, border, action, status, and chart colors. No monochrome redesign remains in the light theme.
+- Dark mode: the content surface uses the same blue-graphite family as the original header (`#101b24`, `#16242e`, `#1b2a36`) rather than black; text and primary actions invert to restrained white values without introducing blue or yellow panels.
+- UX: language, appearance, and sign-out controls now live under Configuration; the dashboard no longer renders the global test-case search field. Sidebar width, labels, and content animate with a 240ms easing curve and honor `prefers-reduced-motion`.
+- Differences found and fixed: an early light-theme recolor made the navigation white and changed legacy surface colors; that entire recolor was removed after review. The final light state is the legacy visual system plus only the new Saturn identity and settings controls.
+- Final result: passed.

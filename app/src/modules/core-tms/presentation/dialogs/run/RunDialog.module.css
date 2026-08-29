@@ -320,3 +320,25 @@
 @media (prefers-reduced-motion: reduce) {
   .filterGrid { animation: none; }
 }
+
+:global(.dark) .form { color: var(--ink); }
+:global(.dark) .section,
+:global(.dark) .filterGrid,
+:global(.dark) .scopeSummary,
+:global(.dark) .caseList,
+:global(.dark) .footer { border-color: var(--line); }
+:global(.dark) :is(.sectionHeading h3, .scopeSummary strong, .scopeStatus strong, .caseRow b, .caseSelected b) { color: var(--ink); }
+:global(.dark) :is(.sectionHeading p, .targetGrid label, .sourceField, .sortField, .filterField, .scopeSummary small, .scopeSummary em, .scopeStatus, .caseRow small, .caseSelected small, .caseRow em, .caseSelected em, .emptyCases, .selectedPreview, .footer) { color: var(--muted); }
+:global(.dark) :is(.targetGrid input, .targetGrid select, .sourceField select, .sortField select, .filterField select, .scopeSearch, .filterButton, .filterActive) { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) :is(.targetGrid input, .targetGrid select, .sourceField select, .sortField select, .filterField select, .scopeSearch):focus { border-color: var(--teal); box-shadow: 0 0 0 2px rgb(122 208 190 / 16%); }
+:global(.dark) .filterActive { color: var(--teal); background: var(--control-hover); border-color: var(--teal); }
+:global(.dark) .filterActive b { color: #101b24; background: var(--teal); }
+:global(.dark) :is(.sectionHeading > button, .scopeStatus button, .resetFilters, .caseRow strong, .caseSelected strong) { color: var(--teal); }
+:global(.dark) :is(.caseRow, .caseSelected, .footer) { color: var(--ink); background: var(--paper); border-color: var(--line); }
+:global(.dark) .caseRow:hover,
+:global(.dark) .caseSelected { background: var(--control-hover); }
+:global(.dark) .caseSelected { border-left-color: var(--teal); }
+:global(.dark) .cancelButton { color: var(--ink); }
+:global(.dark) .cancelButton:hover { background: var(--control-hover); }
+:global(.dark) .startButton { color: var(--action-foreground); background: var(--action); border-color: var(--action); }
+:global(.dark) .startButton:hover:not(:disabled) { background: #dbe3e7; }

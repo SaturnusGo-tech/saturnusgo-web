@@ -5,7 +5,7 @@
 .header p { max-width: 720px; margin: 8px 0 0; color: #5b6474; font-size: 13px; line-height: 1.5; }
 .header button { min-height: 38px; flex: 0 0 auto; border-radius: 4px; }
 
-.projectSection, .environmentSection { margin-top: 22px; }
+.projectSection, .preferenceSection, .environmentSection { margin-top: 22px; }
 .sectionLabel { min-height: 34px; display: flex; align-items: center; }
 .sectionLabel h2 { margin: 0; color: #5b6474; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .projectRow { min-height: 72px; display: grid; grid-template-columns: minmax(220px, 1fr) auto auto; align-items: center; gap: 28px; padding: 12px 0; border-block: 1px solid #dfe3e8; }
@@ -40,6 +40,17 @@
 .exchangeProgress { width: 100%; height: 4px; accent-color: #1e5fd1; }
 .exchangeStatus { grid-column: 1 / -1; margin: 0; }
 .exchangeError { color: #ae2e24; }
+
+.preferenceSection { border-bottom: 1px solid #dfe3e8; }
+.preferenceRow { min-height: 68px; display: grid; grid-template-columns: minmax(220px, 1fr) auto; align-items: center; gap: 24px; padding: 12px 0; border-top: 1px solid #dfe3e8; }
+.preferenceCopy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.preferenceCopy strong { color: #102039; font-size: 13px; }
+.preferenceCopy span { color: #68758a; font-size: 11px; }
+.choiceGroup { display: flex; align-items: center; gap: 4px; }
+.choiceGroup button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 11px; color: #42526e; background: #fff; border: 1px solid #c4ccd2; border-radius: 4px; cursor: pointer; }
+.choiceGroup button:hover { color: #102039; background: #f4f6f7; }
+.choiceGroup button[data-active="true"] { color: #fff; background: #245f7d; border-color: #245f7d; }
+.choiceGroup button span { font-size: 10px; }
 
 .tableViewport { overflow-x: auto; border-block: 1px solid #dfe3e8; }
 .table { width: 100%; min-width: 940px; border-collapse: collapse; table-layout: fixed; }
@@ -76,5 +87,39 @@
   .projectRow { grid-template-columns: 1fr; }
   .projectMeta { grid-column: 1; grid-row: auto; }
   .rowActions { justify-content: flex-start; }
+  .preferenceRow { grid-template-columns: 1fr; gap: 10px; }
+  .choiceGroup { align-items: stretch; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { .page { animation: none; } }
+
+:global(.dark) .page { color: var(--ink); background: var(--paper); }
+:global(.dark) .header,
+:global(.dark) .projectRow,
+:global(.dark) .exchange,
+:global(.dark) .preferenceSection,
+:global(.dark) .preferenceRow,
+:global(.dark) .tableViewport,
+:global(.dark) .empty { border-color: var(--line); }
+:global(.dark) .header p,
+:global(.dark) .sectionLabel h2,
+:global(.dark) .projectIdentity span,
+:global(.dark) .projectMeta dt,
+:global(.dark) .exchangeHeading,
+:global(.dark) .exchangeHeading small,
+:global(.dark) .exchangeStatus,
+:global(.dark) .preferenceCopy span,
+:global(.dark) .table th,
+:global(.dark) .environmentName small,
+:global(.dark) .state[data-archived="true"],
+:global(.dark) .empty span { color: var(--muted); }
+:global(.dark) .exchangeHeading strong,
+:global(.dark) .preferenceCopy strong,
+:global(.dark) .table td,
+:global(.dark) .table code,
+:global(.dark) .environmentName strong { color: var(--ink); }
+:global(.dark) .table th { background: var(--control); }
+:global(.dark) .table td { border-color: var(--line); }
+:global(.dark) .table tbody tr:hover { background: var(--control-hover); }
+:global(.dark) .choiceGroup button { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .choiceGroup button:hover { color: var(--ink); background: var(--control-hover); }
+:global(.dark) .choiceGroup button[data-active="true"] { color: var(--action-foreground); background: var(--action); border-color: var(--action); }

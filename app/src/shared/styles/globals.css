@@ -3823,3 +3823,23 @@ html.light .footer__contactMail:hover {
   background: #f2eee4 !important;
   color: #080808 !important;
 }
+
+/* Theme changes reveal from the control that initiated them. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.theme-switching::view-transition-new(root) {
+  animation: sg-theme-reveal 360ms cubic-bezier(.2, .72, .3, 1) both;
+}
+
+@keyframes sg-theme-reveal {
+  from { clip-path: circle(0 at var(--vt-x) var(--vt-y)); }
+  to { clip-path: circle(150vmax at var(--vt-x) var(--vt-y)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-switching::view-transition-new(root) { animation: none; }
+}

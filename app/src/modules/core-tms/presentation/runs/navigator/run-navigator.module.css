@@ -193,3 +193,25 @@
 @media (prefers-reduced-motion: reduce) {
   .progress i { transition: none; }
 }
+
+:global(.dark) .navigator { color: var(--ink); background: var(--paper); border-color: var(--line); }
+:global(.dark) .viewSwitch,
+:global(.dark) .picker,
+:global(.dark) .summary,
+:global(.dark) .archivedActions { border-color: var(--line); }
+:global(.dark) :is(.viewTab, .summaryMeta, .progressLabel, .summary p, .archivedActions > span, .emptyHistory, .itemStatus, .itemText small) { color: var(--muted); }
+:global(.dark) :is(.viewActive, .summary h2, .progressLabel strong, .emptyHistory strong, .item, .itemActive) { color: var(--ink); }
+:global(.dark) :is(.viewTab span, .viewActive span) { color: var(--muted); background: var(--control); }
+:global(.dark) .viewActive { color: var(--teal); border-bottom-color: var(--teal); }
+:global(.dark) :is(.picker select, .picker button) { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .progress { background: var(--control-hover); }
+:global(.dark) .progress i { background: var(--teal); }
+:global(.dark) .archivedActions button { color: var(--teal); }
+:global(.dark) .archiveConfirm { background: var(--red-soft); border-color: var(--line); }
+:global(.dark) .archiveConfirm strong,
+:global(.dark) .archiveConfirm p,
+:global(.dark) .archiveConfirm button { color: var(--ink); }
+:global(.dark) :is(.item, .itemActive) { background: var(--paper); border-color: var(--line); }
+:global(.dark) .item:hover,
+:global(.dark) .itemActive { background: var(--control-hover); }
+:global(.dark) .itemActive { box-shadow: inset 3px 0 var(--teal); }

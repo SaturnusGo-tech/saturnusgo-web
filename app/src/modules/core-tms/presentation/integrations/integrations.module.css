@@ -82,3 +82,23 @@
 @media (prefers-reduced-motion: reduce) {
   .page { animation: none; }
 }
+
+:global(.dark) .page { color: var(--ink); background: var(--paper); }
+:global(.dark) .header,
+:global(.dark) .tableViewport { border-color: var(--line); }
+:global(.dark) .header p,
+:global(.dark) .toolbar span,
+:global(.dark) .caseLink small,
+:global(.dark) .status,
+:global(.dark) .empty span { color: var(--muted); }
+:global(.dark) .search { color: var(--muted); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .search input,
+:global(.dark) .caseLink,
+:global(.dark) .table td,
+:global(.dark) .table code { color: var(--ink); }
+:global(.dark) .table th { color: var(--muted); background: var(--control); }
+:global(.dark) .table td { border-color: var(--line); }
+:global(.dark) .table tbody tr:hover,
+:global(.dark) .empty { background: var(--control-hover); }
+:global(.dark) .caseLink:hover strong { color: var(--teal); }
+:global(.dark) .status[data-ready="true"] { color: var(--green); }

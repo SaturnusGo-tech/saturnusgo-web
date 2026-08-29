@@ -50,3 +50,28 @@
   .section, .picker { animation: none; }
   .scopeToggle svg { transition: none; }
 }
+
+:global(.dark) .form { color: var(--ink); }
+:global(.dark) .section { border-color: var(--line) !important; }
+:global(.dark) .form :is(input, select, textarea) { color: var(--ink) !important; background: var(--control) !important; border-color: var(--line-strong) !important; }
+:global(.dark) .form :is(input, select, textarea):hover { border-color: #60717c !important; }
+:global(.dark) .form :is(input, select, textarea):focus { border-color: var(--teal) !important; box-shadow: 0 0 0 2px rgb(122 208 190 / 16%) !important; }
+:global(.dark) .modeField,
+:global(.dark) .modeButton,
+:global(.dark) .modeButton strong,
+:global(.dark) .scopeSummary strong { color: var(--ink); }
+:global(.dark) .modeGroup,
+:global(.dark) .modeButton,
+:global(.dark) .search,
+:global(.dark) .caseList { border-color: var(--line-strong) !important; }
+:global(.dark) .modeButton,
+:global(.dark) .search { background: var(--control) !important; }
+:global(.dark) .modeButton span,
+:global(.dark) .scopeSummary small { color: var(--muted); }
+:global(.dark) .modeButton:hover,
+:global(.dark) .modeButton[data-selected="true"],
+:global(.dark) .scopeToggle:hover { background: var(--control-hover); }
+:global(.dark) .modeButton[data-selected="true"] { box-shadow: inset 0 -2px 0 var(--teal); }
+:global(.dark) .modeButton[data-selected="true"] strong,
+:global(.dark) .scopeToggle,
+:global(.dark) .pickerActions button { color: var(--teal); }

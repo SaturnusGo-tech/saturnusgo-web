@@ -17,6 +17,15 @@
   --red-soft: #fff1f0;
   --amber: #946200;
   --amber-soft: #fff7df;
+  --control: #ffffff;
+  --control-hover: #f4f6f7;
+  --action: var(--teal);
+  --action-foreground: #ffffff;
+  --chart-1: #1769d2;
+  --chart-2: #d8342f;
+  --chart-3: #2b8a4b;
+  --chart-4: #667786;
+  --chart-grid: #e6ebef;
   width: 100%;
   height: 100dvh;
   min-width: 0;
@@ -28,6 +37,8 @@
   font-family: var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
   line-height: 1.45;
+  color-scheme: light;
+  transition: color 180ms ease, background-color 180ms ease;
 }
 
 .app *,
@@ -107,6 +118,10 @@
   border-bottom: 1px solid #2b3841;
 }
 
+.tabsBarDashboard {
+  grid-template-columns: 46px 64px minmax(320px, 440px) minmax(0, 1fr);
+}
+
 .homeButton,
 .brandButton,
 .navigationItem,
@@ -142,7 +157,15 @@
   text-align: left;
 }
 
-.brandButton strong { font-size: 17px; letter-spacing: .01em; }
+.saturnLogo {
+  width: 44px;
+  height: 40px;
+  display: block;
+  color: currentColor;
+  background: currentColor;
+  -webkit-mask: url("/assets/tms/saturn-mark.png") center / contain no-repeat;
+  mask: url("/assets/tms/saturn-mark.png") center / contain no-repeat;
+}
 
 .commandSearch {
   height: 42px;
@@ -274,6 +297,7 @@
   display: grid;
   grid-template-columns: 234px minmax(0, 1fr);
   overflow: hidden;
+  transition: grid-template-columns 240ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .navigation {
@@ -284,6 +308,7 @@
   color: var(--nav-text);
   background: var(--nav);
   border-right: 1px solid #283740;
+  transition: padding 220ms cubic-bezier(.2, .72, .3, 1), background-color 180ms ease, border-color 180ms ease;
 }
 
 .projectContext {
@@ -310,6 +335,16 @@
   color: #d7dfe4;
   background: transparent;
   text-align: left;
+  transition: color 160ms ease, background-color 160ms ease, padding 220ms cubic-bezier(.2, .72, .3, 1), width 220ms cubic-bezier(.2, .72, .3, 1);
+}
+
+.navigationItem span {
+  max-width: 180px;
+  display: block;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateX(0);
+  transition: max-width 220ms cubic-bezier(.2, .72, .3, 1), opacity 140ms ease, transform 220ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .navigationItem:hover { color: #fff; background: #172630; }
@@ -3787,4 +3822,220 @@
   .caseWorkbench { transition: none; }
   .caseInspector { animation: none; }
   .caseInspectorScrim { animation: none; }
+}
+
+/* Dark mode keeps the original TMS blue-graphite identity instead of turning black. */
+@media (min-width: 681px) {
+  .navigationCollapsed .navigationItem span {
+    display: block;
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-7px);
+  }
+}
+
+:global(.dark) .app {
+  --ink: #edf3f6;
+  --muted: #9eabb4;
+  --line: #30414c;
+  --line-strong: #4b5c68;
+  --canvas: #101b24;
+  --paper: #16242e;
+  --nav: #101b24;
+  --nav-raised: #1b2a36;
+  --nav-text: #e0e7eb;
+  --teal: #7ad0be;
+  --teal-dark: #a4dfd4;
+  --teal-soft: #203a39;
+  --green: #77c49a;
+  --green-soft: #183328;
+  --red: #ee9189;
+  --red-soft: #3a2324;
+  --amber: #dfbe70;
+  --amber-soft: #3a3220;
+  --control: #1b2a36;
+  --control-hover: #253744;
+  --action: #f5f7f8;
+  --action-foreground: #101b24;
+  --chart-1: #78aef0;
+  --chart-2: #ee9189;
+  --chart-3: #77c49a;
+  --chart-4: #aebac2;
+  --chart-grid: #344650;
+  color-scheme: dark;
+}
+
+:global(.dark) .app :is(
+  .stage,
+  .pane,
+  .pageScroll,
+  .largePane,
+  .repositoryPane,
+  .listPane,
+  .runQueue,
+  .executionPane,
+  .contextPane,
+  .caseWorkbench,
+  .caseRepositoryPane,
+  .caseCommandBar,
+  .caseWorkbenchMain,
+  .caseDocumentScroll,
+  .caseInspector,
+  .integrationWorkspace,
+  .dashboardChartPanel,
+  .dashboardOperationsPanel,
+  .modal,
+  .modalDrawer,
+  .drawerBody,
+  .modalDrawer > header,
+  .drawerForm > .modalFooter,
+  .productionDrawerForm > .modalFooter,
+  .inlineDefect,
+  .executionFooter,
+  .executionStep,
+  .caseSteps thead th,
+  .dashboardRunTable th
+) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+:global(.dark) .app :is(
+  .repositoryToolbar,
+  .listPaneHeader,
+  .panelHeader,
+  .workbenchPageHeader,
+  .integrationTableHead,
+  .executionStepHead,
+  .precondition,
+  .compactUpload,
+  .drawerSummaryLine,
+  .dashboardStatus,
+  .dashboardRunTable th,
+  .filterSummary,
+  .snapshotNote
+) { color: var(--ink); background: var(--control); border-color: var(--line); }
+
+:global(.dark) .app :is(input, textarea, select) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+:global(.dark) .app :is(input, textarea)::placeholder { color: #83929c; }
+
+:global(.dark) .app :is(
+  .caseDocument,
+  .caseDocumentHeader h1,
+  .casePropertyStrip dd,
+  .caseSection > p,
+  .caseTestData > p,
+  .casePreconditions p,
+  .caseSteps tbody td,
+  .caseInspectorMeta dd,
+  .caseInspectorActivity strong,
+  .drawerSectionHeading,
+  .drawerDisclosure > summary,
+  .modalDrawer > header h2,
+  .dashboardTitleRow h1,
+  .dashboardMetric > strong,
+  .dashboardPanelHeading h2,
+  .dashboardRunTable td,
+  .dashboardPanelEmpty strong
+) { color: var(--ink); }
+
+:global(.dark) .app :is(
+  .caseDocumentHeader > p,
+  .caseTagLine,
+  .casePropertyStrip dt,
+  .caseSection > h2,
+  .caseTestData > h2,
+  .caseInspectorMeta dt,
+  .caseInspectorGroup h3,
+  .dashboardTitleRow p,
+  .dashboardRangeRow,
+  .dashboardMetric > div,
+  .dashboardMetric > p,
+  .dashboardPanelHeading p,
+  .dashboardLegend,
+  .dashboardRunTable small,
+  .dashboardActivityList small,
+  .dashboardActivityList time,
+  .modalDrawer > header p,
+  .drawerSectionHeading > span,
+  .drawerDisclosure > summary small
+) { color: var(--muted); }
+
+:global(.dark) .app :is(
+  .caseRepositoryHeading,
+  .caseRepositoryControls,
+  .caseDocumentHeader,
+  .casePropertyStrip,
+  .casePropertyStrip > div,
+  .casePreconditions li,
+  .caseSection .sectionTitle,
+  .caseSteps th,
+  .caseSteps td,
+  .caseInspectorGroup,
+  .caseInspectorEvidence > *,
+  .dashboardPanelHeading,
+  .dashboardRunTable th,
+  .dashboardRunTable td,
+  .dashboardActivityList li,
+  .drawerSection,
+  .drawerDisclosure,
+  .modalDrawer > header
+) { border-color: var(--line); }
+
+:global(.dark) .app :is(.primaryButton, .reportButton, .toolbarPrimary, .successButton, .dangerButton) {
+  color: var(--action-foreground) !important;
+  background: var(--action);
+  border-color: var(--action);
+}
+:global(.dark) .app :is(.secondaryButton, .textButton, .iconButton) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+:global(.dark) .app :is(.primaryButton, .reportButton, .toolbarPrimary, .successButton, .dangerButton):hover {
+  color: var(--action-foreground) !important;
+  background: #dbe3e7;
+  border-color: #dbe3e7;
+}
+:global(.dark) .app :is(.secondaryButton, .textButton, .iconButton):hover {
+  color: var(--ink);
+  background: var(--control-hover);
+  border-color: #60717c;
+}
+
+:global(.dark) .app .stepActions button { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .app :is(.step_passed, .step_failed, .step_blocked) { color: var(--ink); background: var(--paper); outline-color: var(--line-strong); }
+:global(.dark) .app .modalBackdropDrawer { background: rgb(8 17 24 / 72%); }
+:global(.dark) .app .dashboardRate > i { background: var(--teal); }
+:global(.dark) .app .dashboardActivityList li > span { color: #101b24; background: #d8e0e5; }
+
+.authSessionButton { color: var(--ink); background: var(--paper); border-color: var(--line-strong); }
+.authSessionButton:hover { color: var(--ink); background: var(--control-hover); border-color: var(--line-strong); }
+
+@media (max-width: 1180px) {
+  .tabsBar { padding-right: 10px; }
+  .tabsBarDashboard { grid-template-columns: 44px 74px minmax(210px, 1fr); }
+  .headerMeta { display: none; }
+}
+@media (max-width: 900px) {
+  .tabsBar { padding-right: 10px; }
+  .tabsBarDashboard { grid-template-columns: 42px 54px minmax(190px, 1fr); }
+}
+@media (max-width: 680px) {
+  .tabsBar { padding-right: 8px; }
+  .tabsBarDashboard { grid-template-columns: 40px 48px minmax(0, 1fr); }
+  .saturnLogo { width: 38px; height: 36px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app,
+  .frame,
+  .navigation,
+  .navigationItem,
+  .navigationItem span { transition: none; }
 }
