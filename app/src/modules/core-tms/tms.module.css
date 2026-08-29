@@ -3384,7 +3384,7 @@
 .executionActions { gap: 6px; }
 
 @media (max-width: 1500px) {
-  .threePane { grid-template-columns: 268px minmax(0, 1fr); }
+  .threePane { grid-template-columns: 268px minmax(0, 1fr) 0; }
 }
 
 @media (max-width: 900px) {
