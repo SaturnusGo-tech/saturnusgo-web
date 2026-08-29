@@ -23,6 +23,11 @@ Date: 2026-08-29
 - Final production test-case detail: `design-qa-evidence/workbench-final-cases.png`
 - Final production run execution: `design-qa-evidence/workbench-final-runs.png`
 - Combined before/after evidence: `design-qa-evidence/comparisons/{integrations,suites,cases,runs}-before-after.png`
+- Final production v3 test-case workbench: `design-qa-evidence/workbench-v3-cases.png`
+- Final production v3 integrations workbench: `design-qa-evidence/workbench-v3-integrations.png`
+- Final production v3 suites workbench: `design-qa-evidence/workbench-v3-suites.png`
+- Final production v3 run workbench: `design-qa-evidence/workbench-v3-runs.png`
+- Final same-route before/after comparisons: `design-qa-evidence/workbench-v3-comparisons/{cases,integrations,suites,runs}-before-after.png`
 
 ## Viewports and states
 
@@ -52,6 +57,7 @@ Date: 2026-08-29
 15. P1 suite composition: the suite screen used a boxed scope banner, a full-size duplicate create button, and a fully bordered table. Replaced them with a compact list action, an open ruled scope line, and a row-led table without an enclosing card or vertical cell grid.
 16. P1 test-case detail: the decorative type tile, boxed four-column metadata surface, and rounded steps container competed with the case content. Removed the tile and container chrome; metadata is now a quiet fact ledger and steps use horizontal rules.
 17. P1 run execution: the completed run retained a dense bottom action bar full of disabled controls, while every step was presented as a wide spreadsheet row. Completed runs now show only their terminal status; execution metadata and step evidence use compact open sections with fewer borders.
+18. P1 responsive layout found in the first v3 production capture: at the 812px QA viewport, the hidden context pane still created an implicit 252px grid track. The case detail collapsed to 220px even though the pane itself was `display:none`. The compact grid now explicitly defines `268px minmax(0,1fr) 0`; post-fix browser evidence is `268px 472px 0px`, with the detail ending exactly at the 812px viewport edge.
 
 ## Final visual review
 
@@ -64,12 +70,15 @@ Date: 2026-08-29
 - Accessibility: semantic dialog labeling, keyboard focus containment, 44px compact targets, chart aria labels, and reduced-motion chart behavior are present.
 - Console: after the final server restart and cache normalization, no new browser error was recorded during the final dashboard, case-drawer, and run-drawer checks; visible historical entries predate the fix.
 - Production workbench pass: integrations, suites, cases, and runs were opened after the Pages release while authenticated. Browser console warnings/errors were empty. At the narrow QA viewport the suites table intentionally owns horizontal overflow (`overflow-x:auto`, 401px client / 650px content) rather than clipping or widening the page.
+- Final v3 production pass: all four rebuilt workbenches were recaptured from `https://tms.saturnusgo.com/testcases/umbrella-home/work/` after the final Pages deployment. The document remains exactly 812px wide at the 812px viewport. The integrations table is the only horizontal overflow owner (`672px` client / `820px` content, `overflow-x:auto`), so its columns remain reachable without widening the application shell.
 
 ## Final workbench comparison history
 
 - Earlier evidence: the supplied captures showed repeated metric cards above integrations, nested bordered containers in suites, decorative case chrome, and a completed run with an inert action footer.
 - Fix applied: removed the integrations counter strip, de-cardified suite/case/run content, reduced header and control height, made labels and thin rules carry hierarchy, and removed inactive completed-run actions.
 - Post-fix evidence: the four production captures and four combined comparisons listed above. The intentionally different viewport was normalized without distortion and responsive overflow was tested separately.
+- V3 comparison method: each supplied desktop screenshot was aspect-preserved, scaled down to fit an 812×814 canvas, and vertically centered without stretching; the production capture remained native 812×814 at DPR 2. The combined files place source on the left and implementation on the right. Because source and production viewports differ, the comparison is limited to hierarchy, density, container treatment, and responsive behavior rather than pixel matching.
+- V3 post-fix evidence: the initial narrow case capture exposed the implicit third grid track; commits `5f6b9102` and `9fe598c0` removed it. The final v3 case screenshot and computed `268px 472px 0px` grid are the post-fix comparison evidence.
 - Fonts and typography: existing product sans stack retained; hierarchy reduced to one page title, compact labels, and normal-weight body copy. No new display font or decorative type was introduced.
 - Spacing and layout rhythm: desktop-scale padding was reduced in work surfaces, large empty chrome was removed, and narrow layout retains scroll ownership.
 - Colors and visual tokens: the existing dark shell and restrained blue action color remain; no gradients or new decorative color system were introduced.
@@ -85,5 +94,7 @@ Date: 2026-08-29
 - `npm run test:tms-adapters` — 21/21
 - dashboard snapshot test — 1/1
 - `npm run build:standalone` — 61/61 pages generated
+- production browser console — 0 warnings/errors after the v3 release
+- production document width — 812px client / 812px scroll width
 
 final result: passed
