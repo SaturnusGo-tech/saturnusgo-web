@@ -78,7 +78,8 @@ export function ProjectCaseExchange({ enabled, project, onImported }: ProjectCas
     await onImported();
     if (result.failed.length) {
       const first = result.failed[0];
-      setState({ kind: "error", message: t("config.exchangePartial", { failed: result.failed.length, key: first.sourceKey }), completed: result.completed, total: document.testCases.length });
+      const summary = t("config.exchangePartial", { failed: result.failed.length, key: first.sourceKey });
+      setState({ kind: "error", message: `${summary} ${first.message}`, completed: result.completed, total: document.testCases.length });
       return;
     }
     setDocument(null);

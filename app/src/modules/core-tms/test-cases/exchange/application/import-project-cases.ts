@@ -57,21 +57,18 @@ export async function importProjectCases(
 ): Promise<TestCaseImportResult> {
   const failed: { sourceKey: string; message: string }[] = [];
   let completed = 0;
-  for (let offset = 0; offset < document.testCases.length; offset += 4) {
-    const batch = document.testCases.slice(offset, offset + 4);
-    await Promise.all(batch.map(async (item, index) => {
-      try {
-        await importOne(http, projectId, item);
-      } catch (error) {
-        failed.push({
-          sourceKey: item.sourceKey ?? `item-${offset + index + 1}`,
-          message: error instanceof Error ? error.message : "Import failed.",
-        });
-      } finally {
-        completed += 1;
-        progress?.({ completed, total: document.testCases.length });
-      }
-    }));
+  for (const [index, item] of document.testCases.entries()) {
+    try {
+      await importOne(http, projectId, item);
+    } catch (error) {
+      failed.push({
+        sourceKey: item.sourceKey ?? `item-${index + 1}`,
+        message: error instanceof Error ? error.message : "Import failed.",
+      });
+    } finally {
+      completed += 1;
+      progress?.({ completed, total: document.testCases.length });
+    }
   }
   return { completed, failed };
 }
