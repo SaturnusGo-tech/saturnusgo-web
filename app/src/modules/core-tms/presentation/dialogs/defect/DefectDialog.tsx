@@ -15,7 +15,8 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
-import { getDefectDialogCopy } from "./copy";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
+import { getDefectDialogCopy, localizedComponentLabel } from "./copy";
 import styles from "../../../tms.module.css";
 import surface from "../drawer-surfaces.module.css";
 
@@ -58,6 +59,10 @@ export function DefectDialog({
     ...components,
   ].map((value) => value?.trim()).filter((value): value is string => Boolean(value))));
   const componentOptions = projectComponents.length > 0 ? projectComponents : [fallbackComponent];
+  const localizedComponentOptions = componentOptions.map((value) => ({
+    value,
+    label: localizedComponentLabel(locale, value),
+  }));
   const [title, setTitle] = useState(
     item
       ? `${item.snapshot.title} ${copy.failsOn} ${run?.environment.name ?? copy.testEnvironment}`
@@ -127,21 +132,21 @@ export function DefectDialog({
           <Field label={copy.summary} wide>
             <input required autoFocus value={title} onChange={(event) => setTitle(event.target.value)} data-testid="defect-title" />
           </Field>
-          <Field label={copy.component} wide>
-            <select value={component} onChange={(event) => setComponent(event.target.value)}>
-              {componentOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-            </select>
-          </Field>
-          <Field label={copy.severity}>
-            <select value={severity} onChange={(event) => setSeverity(event.target.value as Defect["severity"])}>
-              <option value="low">{copy.low}</option><option value="medium">{copy.medium}</option><option value="high">{copy.high}</option><option value="critical">{copy.critical}</option>
-            </select>
-          </Field>
-          <Field label={copy.reproducibility}>
-            <select value={reproducibility} onChange={(event) => setReproducibility(event.target.value)}>
-              <option value="Always">{copy.always}</option><option value="Sometimes">{copy.sometimes}</option><option value="Once">{copy.once}</option>
-            </select>
-          </Field>
+          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.component}</span>
+            <AnimatedSelect label={copy.component} value={component} onChange={setComponent} options={localizedComponentOptions} />
+          </div>
+          <div className={styles.formField}><span>{copy.severity}</span>
+            <AnimatedSelect label={copy.severity} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[
+              { value: "low", label: copy.low }, { value: "medium", label: copy.medium },
+              { value: "high", label: copy.high }, { value: "critical", label: copy.critical },
+            ]} />
+          </div>
+          <div className={styles.formField}><span>{copy.reproducibility}</span>
+            <AnimatedSelect label={copy.reproducibility} value={reproducibility} onChange={setReproducibility} options={[
+              { value: "Always", label: copy.always }, { value: "Sometimes", label: copy.sometimes },
+              { value: "Once", label: copy.once },
+            ]} />
+          </div>
           <Field label={copy.description} wide>
             <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} />
           </Field>
