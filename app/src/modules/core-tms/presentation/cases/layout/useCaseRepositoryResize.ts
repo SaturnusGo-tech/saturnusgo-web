@@ -17,6 +17,7 @@ export function clampCaseRepositoryWidth(value: number, containerWidth: number) 
 export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(CASE_REPOSITORY_DEFAULT);
   const [resizing, setResizing] = useState(false);
+  const [ready, setReady] = useState(false);
   const widthRef = useRef(width);
   const dragRef = useRef<{ pointerId: number; startX: number; startWidth: number } | null>(null);
 
@@ -36,6 +37,8 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
   useEffect(() => {
     const saved = Number(window.localStorage.getItem(STORAGE_KEY));
     if (Number.isFinite(saved) && saved > 0) update(saved);
+    const frame = window.requestAnimationFrame(() => setReady(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -73,6 +76,7 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
   return {
     width,
     resizing,
+    ready,
     style: { "--case-repository-width": `${width}px` } as CSSProperties,
     handleProps: {
       onDoubleClick: reset,

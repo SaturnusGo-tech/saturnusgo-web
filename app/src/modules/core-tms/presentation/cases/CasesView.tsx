@@ -90,7 +90,7 @@ export function CasesView(props: CasesViewProps) {
   const repositoryResize = useCaseRepositoryResize(workbenchRef);
 
   return (
-    <div ref={workbenchRef} style={repositoryResize.style} className={`${styles.caseWorkbench} ${!inspectorOpen ? styles.caseWorkbenchInspectorClosed : ""} ${repositoryResize.resizing ? styles.caseWorkbenchResizing : ""}`} data-testid="cases-view">
+    <div ref={workbenchRef} style={repositoryResize.style} className={`${styles.caseWorkbench} ${!inspectorOpen ? styles.caseWorkbenchInspectorClosed : ""} ${repositoryResize.resizing ? styles.caseWorkbenchResizing : ""} ${!repositoryResize.ready ? styles.caseWorkbenchRestoring : ""}`} data-testid="cases-view">
       <aside ref={repositoryRef} className={`${styles.pane} ${styles.caseRepositoryPane}`}>
         <div className={styles.caseRepositoryHeading}>
           <strong>{t("cases.title")}</strong>
