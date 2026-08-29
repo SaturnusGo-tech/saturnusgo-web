@@ -1,0 +1,40 @@
+diff --git a/node_modules/recharts/es6/util/scale/RechartsScale.js b/node_modules/recharts/es6/util/scale/RechartsScale.js
+index adc9ae0..9978e01 100644
+--- a/node_modules/recharts/es6/util/scale/RechartsScale.js
++++ b/node_modules/recharts/es6/util/scale/RechartsScale.js
+@@ -27,9 +27,12 @@ export function rechartsScaleFactory(d3Scale) {
+       function range() {
+         return _range.apply(this, arguments);
+       }
+-      range.toString = function () {
+-        return _range.toString();
+-      };
++      Object.defineProperty(range, 'toString', {
++        configurable: true,
++        value: function () {
++          return _range.toString();
++        }
++      });
+       return range;
+     }(() => range),
+     rangeMin: () => range[0],
+diff --git a/node_modules/recharts/lib/util/scale/RechartsScale.js b/node_modules/recharts/lib/util/scale/RechartsScale.js
+index 6c6da0b..29579a7 100644
+--- a/node_modules/recharts/lib/util/scale/RechartsScale.js
++++ b/node_modules/recharts/lib/util/scale/RechartsScale.js
+@@ -33,9 +33,12 @@ function rechartsScaleFactory(d3Scale) {
+       function range() {
+         return _range.apply(this, arguments);
+       }
+-      range.toString = function () {
+-        return _range.toString();
+-      };
++      Object.defineProperty(range, 'toString', {
++        configurable: true,
++        value: function () {
++          return _range.toString();
++        }
++      });
+       return range;
+     }(() => range),
+     rangeMin: () => range[0],
