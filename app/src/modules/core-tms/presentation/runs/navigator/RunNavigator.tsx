@@ -5,7 +5,6 @@ import type {
   TestCaseSummary,
   TestRunSummary,
 } from "../../../../../core/tms/contracts/legacy-contract";
-import { localizedLabel } from "../../../localization/format/labels";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
@@ -18,7 +17,6 @@ type RunNavigatorProps = {
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
   selectedItemId: string | null;
-  progress: number;
   mode: RunListMode;
   archivePending?: boolean;
   onModeChange: (mode: RunListMode) => void;
@@ -29,7 +27,7 @@ type RunNavigatorProps = {
 };
 
 export function RunNavigator({
-  runs, cases, selectedRun, items, selectedItemId, progress, mode,
+  runs, cases, selectedRun, items, selectedItemId, mode,
   archivePending = false, onModeChange, onSelectRun, onSelectItem,
   onCreate, onRestore,
 }: RunNavigatorProps) {
@@ -91,11 +89,7 @@ export function RunNavigator({
           aria-label={t("runs.openRunList")}
           onClick={() => setPickerOpen((current) => !current)}
         >
-          <span>
-            <small>{t("runs.current")}</small>
-            <strong>{selectedRun ? `${selectedRun.key} · ${selectedRun.name}` : emptyLabel}</strong>
-            {selectedRun && <em>{selectedRun.environment.name} · {selectedRun.build}</em>}
-          </span>
+          <strong>{selectedRun?.name ?? emptyLabel}</strong>
           <ChevronDown size={17} aria-hidden="true" />
         </button>
         <button className={styles.pickerCreate} type="button" onClick={onCreate} aria-label={t("runs.new")} title={t("runs.new")}>
@@ -104,7 +98,6 @@ export function RunNavigator({
         {pickerOpen && (
           <div className={styles.pickerMenu} id="run-picker-list" role="listbox" aria-label={t("runs.current")}>
             {visibleRuns.map((run) => {
-              const percent = Math.round((run.progress.executed / Math.max(1, run.itemCount)) * 100);
               const selected = run.id === selectedRun?.id;
               return (
                 <button
@@ -115,8 +108,7 @@ export function RunNavigator({
                   aria-selected={selected}
                   onClick={() => { onSelectRun(run.id); setPickerOpen(false); }}
                 >
-                  <span><strong>{run.name}</strong><small>{run.key} · {run.environment.name} · {run.build}</small></span>
-                  <em>{percent}%</em>
+                  <span><strong>{run.name}</strong><small>{run.key}</small></span>
                   {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
                 </button>
               );
@@ -135,17 +127,9 @@ export function RunNavigator({
           <header className={styles.summary}>
             <div className={styles.summaryMeta}>
               <span>{selectedRun.key}</span>
-              <span>{localizedLabel(locale, selectedRun.type)}</span>
-            </div>
-            <h2>{selectedRun.name}</h2>
-            <p>{selectedRun.environment.name} · {selectedRun.build}</p>
-            <div className={styles.progress} aria-label={t("runs.percentComplete", { percent: progress })}>
-              <i style={{ width: `${progress}%` }} />
-            </div>
-            <div className={styles.progressLabel}>
-              <strong>{t("runs.percentComplete", { percent: progress })}</strong>
               <span>{selectedRun.progress.executed} / {selectedRun.itemCount}</span>
             </div>
+            <p>{selectedRun.environment.name} · {selectedRun.build}</p>
             {selectedRun.archivedAt ? (
               <div className={styles.archivedActions}>
                 <span><Archive size={14} /> {t("runs.archivedOn", {

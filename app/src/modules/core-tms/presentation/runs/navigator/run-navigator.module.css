@@ -60,7 +60,7 @@
   border: 1px solid #bdc9d1;
   border-radius: 6px;
   color: #172633;
-  min-height: 42px;
+  min-height: 38px;
 }
 
 .pickerTrigger {
@@ -69,17 +69,11 @@
   gap: 8px;
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
-  padding: 7px 9px 7px 11px;
+  padding: 0 9px 0 11px;
   text-align: left;
 }
 
-.pickerTrigger > span { min-width: 0; }
-.pickerTrigger small,
-.pickerTrigger strong,
-.pickerTrigger em { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pickerTrigger small { color: #70808c; font-size: 9px; font-style: normal; letter-spacing: .05em; text-transform: uppercase; }
-.pickerTrigger strong { color: #172633; font-size: 12px; line-height: 1.35; margin-top: 1px; }
-.pickerTrigger em { color: #617281; font-size: 10px; font-style: normal; margin-top: 1px; }
+.pickerTrigger strong { display: block; overflow: hidden; color: #172633; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .pickerTrigger > svg { color: #617281; transition: transform 160ms ease; }
 .pickerTrigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
 .pickerTrigger:disabled { color: #7a8994; cursor: not-allowed; }
@@ -116,9 +110,9 @@
   color: #172633;
   display: grid;
   gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto 16px;
-  min-height: 52px;
-  padding: 7px 9px;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  min-height: 44px;
+  padding: 6px 9px;
   text-align: left;
   width: 100%;
 }
@@ -135,18 +129,15 @@
 .pickerOptionActive strong { font-size: 12px; line-height: 1.35; }
 .pickerOption small,
 .pickerOptionActive small { color: #617281; font-size: 10px; margin-top: 2px; }
-.pickerOption > em,
-.pickerOptionActive > em { color: #52636f; font-size: 10px; font-style: normal; font-weight: 700; }
 .pickerOptionActive > svg { color: #236d8b; }
 .optionMarker { background: #bac5cc; border-radius: 50%; height: 5px; justify-self: center; width: 5px; }
 
 .summary {
   border-bottom: 1px solid #d9e1e6;
-  padding: 16px 16px 13px;
+  padding: 11px 14px 12px;
 }
 
-.summaryMeta,
-.progressLabel {
+.summaryMeta {
   align-items: center;
   color: #617281;
   display: flex;
@@ -156,18 +147,7 @@
   text-transform: uppercase;
 }
 
-.summary h2 { color: #172633; font-size: 15px; line-height: 1.35; margin: 9px 0 4px; }
-.summary p { color: #617281; font-size: 12px; margin: 0; }
-
-.progress {
-  background: #e7ecef;
-  height: 3px;
-  margin: 15px 0 8px;
-  overflow: hidden;
-}
-
-.progress i { background: #236d8b; display: block; height: 100%; transition: width 180ms ease; }
-.progressLabel strong { color: #293b49; font-size: 11px; }
+.summary p { overflow: hidden; color: #617281; font-size: 11px; margin: 4px 0 0; text-overflow: ellipsis; white-space: nowrap; }
 
 .archivedActions {
   align-items: flex-start;
@@ -241,7 +221,6 @@
 .itemText strong { display: block; font-size: 12px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
-  .progress i,
   .pickerTrigger > svg { transition: none; }
   .pickerMenu { animation: none; }
 }
@@ -256,25 +235,20 @@
 :global(.dark) .picker,
 :global(.dark) .summary,
 :global(.dark) .archivedActions { border-color: var(--line); }
-:global(.dark) :is(.viewTab, .summaryMeta, .progressLabel, .summary p, .archivedActions > span, .emptyHistory, .itemStatus, .itemText small) { color: var(--muted); }
-:global(.dark) :is(.viewActive, .summary h2, .progressLabel strong, .emptyHistory strong, .item, .itemActive) { color: var(--ink); }
+:global(.dark) :is(.viewTab, .summaryMeta, .summary p, .archivedActions > span, .emptyHistory, .itemStatus, .itemText small) { color: var(--muted); }
+:global(.dark) :is(.viewActive, .emptyHistory strong, .item, .itemActive) { color: var(--ink); }
 :global(.dark) :is(.viewTab span, .viewActive span) { color: var(--muted); background: var(--control); }
 :global(.dark) .viewActive { color: var(--teal); border-bottom-color: var(--teal); }
 :global(.dark) :is(.pickerTrigger, .pickerCreate) { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
 :global(.dark) .pickerTrigger:hover:not(:disabled),
 :global(.dark) .pickerCreate:hover { background: var(--control-hover); }
-:global(.dark) .pickerTrigger small,
-:global(.dark) .pickerTrigger em,
-:global(.dark) :is(.pickerOption, .pickerOptionActive) small,
-:global(.dark) :is(.pickerOption, .pickerOptionActive) > em { color: var(--muted); }
+:global(.dark) :is(.pickerOption, .pickerOptionActive) small { color: var(--muted); }
 :global(.dark) .pickerTrigger strong { color: var(--ink); }
 :global(.dark) .pickerMenu { background: var(--nav-raised); border-color: var(--line-strong); box-shadow: 0 14px 32px rgb(0 0 0 / 30%); }
 :global(.dark) :is(.pickerOption, .pickerOptionActive) { color: var(--ink); }
 :global(.dark) .pickerOption:hover,
 :global(.dark) .pickerOptionActive { background: var(--control-hover); }
 :global(.dark) .pickerOptionActive { box-shadow: inset 3px 0 var(--teal); }
-:global(.dark) .progress { background: var(--control-hover); }
-:global(.dark) .progress i { background: var(--teal); }
 :global(.dark) .archivedActions button { color: var(--teal); }
 :global(.dark) :is(.item, .itemActive) { background: var(--paper); border-color: var(--line); }
 :global(.dark) .item:hover,

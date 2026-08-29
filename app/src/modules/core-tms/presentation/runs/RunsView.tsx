@@ -114,7 +114,7 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
   const runNavigator = <RunNavigator
     runs={runs} cases={cases} selectedRun={selectedIsVisible ? selectedRun : null}
     items={selectedIsVisible ? items : []} selectedItemId={selectedIsVisible ? selectedItem?.id ?? null : null}
-    progress={selectedIsVisible ? progress : 0} mode={listMode} onModeChange={changeListMode}
+    mode={listMode} onModeChange={changeListMode}
     onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
     archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
   />;
