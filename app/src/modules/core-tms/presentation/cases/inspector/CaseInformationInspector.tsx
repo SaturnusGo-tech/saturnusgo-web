@@ -4,7 +4,7 @@ import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../..
 import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import { activityLabel } from "../../../localization/activity/label";
 import type { TmsLocaleContextValue } from "../../../localization/context/TmsLocaleProvider";
-import { localizedLabel } from "../../../localization/format/labels";
+import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import styles from "../../../tms.module.css";
 
 export type CaseInformationInspectorProps = Pick<
@@ -127,7 +127,7 @@ export function CaseInformationInspector({
           </div>
           <div>
             <dt>{t("cases.component")}</dt>
-            <dd>{revision.component || "\u2014"}</dd>
+            <dd>{revision.component ? localizedComponentLabel(locale, revision.component) : "\u2014"}</dd>
           </div>
           <div>
             <dt>{t("cases.estimate")}</dt>

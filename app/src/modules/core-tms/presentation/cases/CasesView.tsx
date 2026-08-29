@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { formatCount } from "../../localization/format/count";
-import { localizedLabel } from "../../localization/format/labels";
+import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters } from "../../state/types/workspace";
 import { EmptyState } from "../common/empty/EmptyState";
@@ -153,7 +153,7 @@ export function CasesView(props: CasesViewProps) {
                 <div className={styles.caseTagLine}>
                   {revision.tags.map((tagName) => <span key={tagName}><Tag size={12} />{tagName}</span>)}
                   <span><Flag size={12} />{localizedLabel(locale, revision.priority)}</span>
-                  <span><Box size={12} />{revision.component || "—"}</span>
+                  <span><Box size={12} />{revision.component ? localizedComponentLabel(locale, revision.component) : "—"}</span>
                   <span><Clock3 size={12} />{revision.estimatedMinutes === null ? "—" : `${revision.estimatedMinutes} ${locale === "ru" ? "мин" : "min"}`}</span>
                   <span><Wrench size={12} />{localizedLabel(locale, revision.type)}</span>
                   <span><i className={`${styles.lifecycleDot} ${styles[`dot_${revision.lifecycle}`]}`} aria-hidden="true" />{localizedLabel(locale, revision.lifecycle)}</span>
@@ -161,7 +161,7 @@ export function CasesView(props: CasesViewProps) {
               </header>
               <dl className={styles.casePropertyStrip}>
                 <div><dt>{t("common.owner")}</dt><dd>{revision.ownerIdentityId ?? t("common.unassigned")}</dd></div>
-                <div><dt>{t("cases.component")}</dt><dd>{revision.component || "—"}</dd></div>
+                <div><dt>{t("cases.component")}</dt><dd>{revision.component ? localizedComponentLabel(locale, revision.component) : "—"}</dd></div>
                 <div><dt>{t("cases.estimate")}</dt><dd>{revision.estimatedMinutes === null ? "—" : `${revision.estimatedMinutes} ${locale === "ru" ? "мин" : "min"}`}</dd></div>
                 <div><dt>{t("cases.type")}</dt><dd>{localizedLabel(locale, revision.type)}</dd></div>
               </dl>

@@ -12,11 +12,12 @@ import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { localizedComponentLabel } from "../../../localization/format/labels";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
-import { getDefectDialogCopy, localizedComponentLabel } from "./copy";
+import { getDefectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 import surface from "../drawer-surfaces.module.css";
 

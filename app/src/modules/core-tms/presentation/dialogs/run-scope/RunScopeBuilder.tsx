@@ -2,6 +2,8 @@ import { Filter, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { RunDialogCopy } from "../run/copy";
 import {
   activeRunFilterCount,
@@ -19,6 +21,7 @@ type Props = {
 };
 
 export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
+  const { locale } = useTmsLocale();
   const [filters, setFilters] = useState<RunScopeFilters>(initialRunScopeFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const visibleCases = useMemo(() => filterRunCases(cases, filters), [cases, filters]);
@@ -46,7 +49,7 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
     {filtersOpen && <div className={styles.filterGrid}>
       <FilterSelect label={copy.scenario} value={filters.scenario} onChange={(value) => update("scenario", value as RunScopeFilters["scenario"])} options={[["all", copy.allScenarios], ["positive", copy.positive], ["negative", copy.negative], ["corner", copy.corner]]} />
       <FilterSelect label={copy.platform} value={filters.platform} onChange={(value) => update("platform", value as RunScopeFilters["platform"])} options={[["all", copy.allPlatforms], ["ios", copy.ios], ["android", copy.android]]} />
-      <FilterSelect label={copy.component} value={filters.component} onChange={(value) => update("component", value)} options={[["all", copy.allComponents], ...components.map((value) => [value, value] as [string, string])]} />
+      <FilterSelect label={copy.component} value={filters.component} onChange={(value) => update("component", value)} options={[["all", copy.allComponents], ...components.map((value) => [value, localizedComponentLabel(locale, value)] as [string, string])]} />
       <FilterSelect label={copy.folder} value={filters.folder} onChange={(value) => update("folder", value)} options={[["all", copy.allFolders], ...folders.map((value) => [value, value] as [string, string])]} />
       <FilterSelect label={copy.priority} value={filters.priority} onChange={(value) => update("priority", value as RunScopeFilters["priority"])} options={[["all", copy.allPriorities], ["critical", copy.critical], ["high", copy.high], ["medium", copy.medium], ["low", copy.low]]} />
       <FilterSelect label={copy.lifecycle} value={filters.lifecycle} onChange={(value) => update("lifecycle", value as RunScopeFilters["lifecycle"])} options={[["all", copy.allStates], ["ready", copy.ready], ["draft", copy.draft], ["deprecated", copy.deprecated]]} />
@@ -61,7 +64,7 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
     <div className={styles.caseList} role="group" aria-label={copy.searchAria}>
       {visibleCases.map((item) => <label key={item.id} className={selected.has(item.id) ? styles.caseSelected : styles.caseRow}>
         <input type="checkbox" checked={selected.has(item.id)} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} />
-        <span><strong>{item.key}</strong><b>{item.title}</b><small>{item.folderPath} · {item.component || "—"}</small></span>
+        <span><strong>{item.key}</strong><b>{item.title}</b><small>{item.folderPath} · {item.component ? localizedComponentLabel(locale, item.component) : "—"}</small></span>
         <em>{copy[item.priority]}</em>
       </label>)}
       {visibleCases.length === 0 && <div className={styles.emptyCases}>{copy.noMatching}</div>}

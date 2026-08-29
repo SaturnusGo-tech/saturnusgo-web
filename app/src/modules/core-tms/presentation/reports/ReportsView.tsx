@@ -1,6 +1,6 @@
 import { Bug } from "lucide-react";
 import type { Defect, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
-import { localizedLabel } from "../../localization/format/labels";
+import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import styles from "../../tms.module.css";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
@@ -28,7 +28,7 @@ export function ReportsView({ defects, runs, onNew }: {
         <tbody>{defects.length === 0 ? <tr><td colSpan={6}><div className={surface.empty}><Bug size={20} /><span><strong>{t("reports.empty")}</strong><small>{t("reports.emptyHint")}</small></span></div></td></tr> : defects.map((defect) => <tr key={defect.id}>
           <td><strong>{defect.key}</strong></td>
           <td><span className={surface.summary}><b>{defect.title}</b><small>{defect.labels.join(", ")}</small>{defect.attachmentIds.length > 0 && <span className={surface.evidence}>{defect.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</span>}</span></td>
-          <td>{defect.component}</td>
+          <td>{localizedComponentLabel(locale, defect.component)}</td>
           <td><span className={surface.severity} data-level={defect.severity}>{localizedLabel(locale, defect.severity)}</span></td>
           <td><span className={surface.status}>{localizedLabel(locale, defect.status)}</span></td>
           <td>{defect.assigneeIdentityId || t("common.unassigned")}</td>
