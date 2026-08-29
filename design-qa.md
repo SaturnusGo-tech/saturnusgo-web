@@ -18,6 +18,11 @@ Date: 2026-08-29
 - Tablet dashboard: `design-qa-evidence/dashboard-tablet.png`
 - Mobile dashboard: `design-qa-evidence/dashboard-mobile-390.png`
 - Mobile test-case drawer: `design-qa-evidence/case-drawer-mobile-390.png`
+- Final production integrations: `design-qa-evidence/workbench-final-integrations.png`
+- Final production suites: `design-qa-evidence/workbench-final-suites.png`
+- Final production test-case detail: `design-qa-evidence/workbench-final-cases.png`
+- Final production run execution: `design-qa-evidence/workbench-final-runs.png`
+- Combined before/after evidence: `design-qa-evidence/comparisons/{integrations,suites,cases,runs}-before-after.png`
 
 ## Viewports and states
 
@@ -26,6 +31,7 @@ Date: 2026-08-29
 - Mobile override: requested 390×844; effective in-app viewport 351×760, bottom icon navigation, full-width dashboard and drawer.
 - English and Russian catalogs compile with matching typed keys; visual QA used Russian to exercise longer labels.
 - Dashboard empty state uses the real empty demo project. No synthetic history or KPI values were injected.
+- Final production verification used the signed-in `Umbrella-mobile` workspace at an effective in-app browser viewport of 812×814 CSS px and device pixel ratio 2. The supplied desktop captures are wider, so they were aspect-preserved and centered on an 812×814 comparison canvas rather than stretched; the comparison is intentionally limited to hierarchy, surface density, and responsive behavior.
 
 ## Comparison findings and fixes
 
@@ -42,6 +48,10 @@ Date: 2026-08-29
 11. P1 motion: conditional bug-report, popover, feedback, evidence, and dialog surfaces mounted abruptly. They now share restrained 160–220ms entrance motion and disable it under `prefers-reduced-motion`.
 12. P1 dashboard framing: the five headline metrics were still enclosed by one rounded white panel, unlike the selected open ledger reference. Removed the enclosing surface entirely; metrics now sit on the page with only thin vertical separators.
 13. P1 drawer density: the intermediate drawer still exposed too many equal-weight controls and read as a long form wall. Reworked it around Jira-like progressive disclosure: one clear title, compact section headings, a single scroll owner, restrained 6px controls, and collapsed secondary fields/evidence until requested.
+14. P1 integration hierarchy: the overview counter strip repeated information before the actual contracts workspace and created the exact extra upper block called out in the supplied screenshot. Removed the entire strip; heading, search, empty state, and primary action now form one open workspace.
+15. P1 suite composition: the suite screen used a boxed scope banner, a full-size duplicate create button, and a fully bordered table. Replaced them with a compact list action, an open ruled scope line, and a row-led table without an enclosing card or vertical cell grid.
+16. P1 test-case detail: the decorative type tile, boxed four-column metadata surface, and rounded steps container competed with the case content. Removed the tile and container chrome; metadata is now a quiet fact ledger and steps use horizontal rules.
+17. P1 run execution: the completed run retained a dense bottom action bar full of disabled controls, while every step was presented as a wide spreadsheet row. Completed runs now show only their terminal status; execution metadata and step evidence use compact open sections with fewer borders.
 
 ## Final visual review
 
@@ -53,6 +63,18 @@ Date: 2026-08-29
 - Interactions: burger collapse, drawer Escape close, focus return, bidirectional focus wrapping, body-scroll lock, drawer internal scroll, case step editing, case/suite/run selection, and dashboard page scroll were exercised in the in-app browser.
 - Accessibility: semantic dialog labeling, keyboard focus containment, 44px compact targets, chart aria labels, and reduced-motion chart behavior are present.
 - Console: after the final server restart and cache normalization, no new browser error was recorded during the final dashboard, case-drawer, and run-drawer checks; visible historical entries predate the fix.
+- Production workbench pass: integrations, suites, cases, and runs were opened after the Pages release while authenticated. Browser console warnings/errors were empty. At the narrow QA viewport the suites table intentionally owns horizontal overflow (`overflow-x:auto`, 401px client / 650px content) rather than clipping or widening the page.
+
+## Final workbench comparison history
+
+- Earlier evidence: the supplied captures showed repeated metric cards above integrations, nested bordered containers in suites, decorative case chrome, and a completed run with an inert action footer.
+- Fix applied: removed the integrations counter strip, de-cardified suite/case/run content, reduced header and control height, made labels and thin rules carry hierarchy, and removed inactive completed-run actions.
+- Post-fix evidence: the four production captures and four combined comparisons listed above. The intentionally different viewport was normalized without distortion and responsive overflow was tested separately.
+- Fonts and typography: existing product sans stack retained; hierarchy reduced to one page title, compact labels, and normal-weight body copy. No new display font or decorative type was introduced.
+- Spacing and layout rhythm: desktop-scale padding was reduced in work surfaces, large empty chrome was removed, and narrow layout retains scroll ownership.
+- Colors and visual tokens: the existing dark shell and restrained blue action color remain; no gradients or new decorative color system were introduced.
+- Image quality and asset fidelity: these workbench screens contain no photographic or branded raster assets; existing Lucide icons remain sharp and consistent.
+- Copy and content: production Russian content and real imported records were used; no synthetic counts or placeholder records were added.
 
 ## Verification
 
