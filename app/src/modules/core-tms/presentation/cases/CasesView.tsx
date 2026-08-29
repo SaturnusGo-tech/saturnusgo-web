@@ -7,6 +7,7 @@ import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters } from "../../state/types/workspace";
 import { EmptyState } from "../common/empty/EmptyState";
+import { SaturnLoader } from "../common/loading/SaturnLoader";
 import { CaseInformationInspector } from "./inspector/CaseInformationInspector";
 import { TestCaseRepositoryTree } from "./repository/TestCaseRepositoryTree";
 import styles from "../../tms.module.css";
@@ -127,7 +128,7 @@ export function CasesView(props: CasesViewProps) {
       </div>}
 
       <section ref={documentRef} className={`${styles.pane} ${styles.caseWorkbenchMain} ${!testCase || !revision ? styles.caseWorkbenchMainEmpty : ""}`}>
-        {!testCase || !revision ? <EmptyState icon={<FolderKanban size={34} />} title={selectedFolder ? selectedFolder.replace(/^\//, "") : t("cases.select")} text={selectedFolder ? t("cases.emptyFolder") : t("cases.selectHint")} action={<button className={styles.primaryButton} onClick={() => onNew(selectedFolder)}><Plus size={16} /> {t("cases.create")}</button>} /> : <>
+        {!testCase ? <EmptyState icon={<FolderKanban size={34} />} title={selectedFolder ? selectedFolder.replace(/^\//, "") : t("cases.select")} text={selectedFolder ? t("cases.emptyFolder") : t("cases.selectHint")} action={<button className={styles.primaryButton} onClick={() => onNew(selectedFolder)}><Plus size={16} /> {t("cases.create")}</button>} /> : !revision ? <SaturnLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <>
           <div className={styles.caseDocumentScroll}>
             <article className={styles.caseDocument}>
               <header className={styles.caseDocumentHeader}>

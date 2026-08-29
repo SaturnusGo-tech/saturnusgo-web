@@ -8,6 +8,7 @@ import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { EmptyState } from "../common/empty/EmptyState";
 import { FormError } from "../common/error/FormError";
+import { SaturnLoader } from "../common/loading/SaturnLoader";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
@@ -117,6 +118,7 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
     archivePending={archivePending} onArchive={canArchive ? onArchive : undefined}
     onRestore={canArchive ? onRestore : undefined}
   />;
+  if (selectedRun && selectedIsVisible && !selectedItem) return <div className={styles.executionShell} data-testid="runs-view">{runNavigator}<div className={`${styles.pane} ${styles.centeredPane}`}><SaturnLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={styles.executionShell} data-testid="runs-view">{runNavigator}<div className={`${styles.pane} ${styles.centeredPane}`}><EmptyState icon={<PlayCircle size={36} />} title={listMode === "archived" ? t("runs.noArchived") : t("runs.noActive")} text={listMode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")} action={listMode === "active" ? <button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button> : undefined} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);

@@ -1,6 +1,7 @@
 import { AlertTriangle, FlaskConical, RefreshCw } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceFailure } from "../../state/workspace/useWorkspaceBootstrap";
+import { SaturnLoader } from "../common/loading/SaturnLoader";
 import styles from "../../tms.module.css";
 
 export function WorkspaceLoadState({
@@ -16,26 +17,7 @@ export function WorkspaceLoadState({
 }) {
   const { t } = useTmsLocale();
   if (!failure) {
-    return (
-      <section
-        className={styles.workspaceLoader}
-        aria-busy="true"
-        role="status"
-        data-testid="workspace-loading"
-      >
-        <span className={styles.srOnly}>{t("workspace.loading")}</span>
-        <div className={styles.workspaceLoaderOrbit} aria-hidden="true">
-          <span className={styles.workspaceLoaderTrack}>
-            <span className={styles.workspaceLoaderSatellite} />
-          </span>
-          <span className={`${styles.workspaceLoaderTrack} ${styles.workspaceLoaderTrackInner}`}>
-            <span className={styles.workspaceLoaderSatellite} />
-          </span>
-          <span className={styles.workspaceLoaderEcho} />
-          <span className={styles.workspaceLoaderPlanet} />
-        </div>
-      </section>
-    );
+    return <SaturnLoader label={t("workspace.loading")} testId="workspace-loading" />;
   }
 
   const status = failure.detail.match(/status\s+(\d+)/i)?.[1];
