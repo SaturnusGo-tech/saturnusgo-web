@@ -132,6 +132,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         onToggleEnvironment={model.toggleEnvironment}
         onEditProject={model.openEditProject}
         onToggleProject={model.toggleProject}
+        exchangeEnabled={model.connection === "connected"}
+        onCasesImported={async () => { await model.loadProject(model.project!.id); }}
       />
     );
   }
