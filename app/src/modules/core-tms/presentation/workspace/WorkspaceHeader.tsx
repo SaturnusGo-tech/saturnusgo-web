@@ -1,13 +1,11 @@
 import {
   CalendarDays,
-  ChevronDown,
   Menu,
-  Plus,
-  Search,
 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import styles from "../../tms.module.css";
+import { ProjectSelector } from "./project-selector/ProjectSelector";
 
 export function WorkspaceHeader({
   model,
@@ -19,7 +17,6 @@ export function WorkspaceHeader({
   onToggleSidebar: () => void;
 }) {
   const { languageTag, t } = useTmsLocale();
-  const isDashboard = model.view === "dashboard";
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
   const activeEnvironment =
@@ -41,9 +38,7 @@ export function WorkspaceHeader({
   });
   const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
   return (
-    <header
-      className={`${styles.tabsBar} ${isDashboard ? styles.tabsBarDashboard : ""}`}
-    >
+    <header className={styles.tabsBar}>
       <button
         className={styles.homeButton}
         onClick={onToggleSidebar}
@@ -61,65 +56,15 @@ export function WorkspaceHeader({
       >
         <span className={styles.saturnLogo} aria-hidden="true" />
       </button>
-      <div className={styles.headerProject}>
-        <span>{t("header.project")}</span>
-        {model.project ? (
-          <label className={styles.headerProjectSelect}>
-            <select
-              value={model.project.id}
-              title={model.project.name}
-              onChange={(event) => model.chooseProject(event.target.value)}
-              aria-label={t("header.currentProject")}
-            >
-              {model.projects.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={15} aria-hidden="true" />
-          </label>
-        ) : (
-          <button
-            className={styles.headerProjectEmpty}
-            disabled={!workspaceReady}
-            onClick={model.openNewProject}
-          >
-            <Plus size={15} /> {t("header.createFirstProject")}
-          </button>
-        )}
-        {model.project && workspaceReady && (
-          <button
-            className={styles.headerProjectAdd}
-            onClick={model.openNewProject}
-            aria-label={t("header.createProject")}
-            title={t("header.createProject")}
-          >
-            <Plus size={16} />
-          </button>
-        )}
-      </div>
-      {!isDashboard && (
-        <label className={styles.commandSearch}>
-          <Search size={17} />
-          <input
-            id="tms-command-search"
-            aria-label={t("header.searchCases")}
-            disabled={!model.project}
-            value={model.query}
-            onChange={(event) => model.setQuery(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") model.setView("cases");
-            }}
-            placeholder={
-              model.project
-                ? t("header.searchPlaceholder")
-                : t("header.createProjectToBegin")
-            }
-          />
-          <kbd>⌘ K</kbd>
-        </label>
-      )}
+      <ProjectSelector
+        activeProjectId={model.project?.id ?? null}
+        projects={model.projects}
+        disabled={!workspaceReady}
+        currentProjectLabel={t("header.currentProject")}
+        createProjectLabel={model.project ? t("header.createProject") : t("header.createFirstProject")}
+        onSelect={model.chooseProject}
+        onCreate={model.openNewProject}
+      />
       <div className={styles.headerMeta}>
         <div className={styles.headerMetaItem}>
           <span>{t("header.environment")}</span>

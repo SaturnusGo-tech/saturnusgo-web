@@ -4118,3 +4118,249 @@
   .navigationItem,
   .navigationItem span { transition: none; }
 }
+
+/* Header: one compact project menu, no duplicate repository search. */
+.tabsBar,
+.tabsBarDashboard {
+  grid-template-columns: 46px 58px minmax(170px, 1fr) auto;
+}
+
+.projectSelector {
+  position: relative;
+  min-width: 0;
+  justify-self: start;
+}
+
+.projectSelectorTrigger {
+  max-width: 360px;
+  min-width: 0;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  color: #f7f9fa;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  text-align: left;
+}
+
+.projectSelectorTrigger:hover,
+.projectSelectorTrigger[aria-expanded="true"] { background: #1a2933; }
+.projectSelectorTrigger:disabled { cursor: not-allowed; opacity: .55; }
+.projectSelectorTrigger strong { min-width: 0; overflow: hidden; font-size: 14px; font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+.projectSelectorTrigger svg { flex: 0 0 auto; color: #aebac2; transition: transform 160ms ease; }
+.projectSelectorTrigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.projectSelectorMenu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(304px, calc(100vw - 24px));
+  overflow: hidden;
+  color: #eef3f5;
+  background: #172631;
+  border: 1px solid #4b5c68;
+  border-radius: 8px;
+  box-shadow: 0 16px 38px rgb(3 10 15 / 32%);
+  animation: project-menu-enter 140ms cubic-bezier(.2, .72, .3, 1);
+}
+
+.projectSelectorList { max-height: min(360px, 60vh); overflow: auto; padding: 6px; }
+.projectSelectorList > button,
+.projectSelectorCreate {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  color: #e8eef1;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.projectSelectorList > button:hover,
+.projectSelectorList > button:focus-visible,
+.projectSelectorCreate:hover,
+.projectSelectorCreate:focus-visible { background: #253744; }
+.projectSelectorList > button > span { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projectSelectorList > button > svg { color: #7ad0be; }
+.projectSelectorCreate { color: #fff; border-top: 1px solid #3b4c57; border-radius: 0; font-weight: 650; }
+
+@keyframes project-menu-enter {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark workbench surfaces use the same graphite tokens instead of light literals. */
+:global(.dark) .app :is(
+  .caseWorkbench,
+  .caseRepositoryPane,
+  .caseCommandBar,
+  .caseWorkbenchMain,
+  .caseInspector,
+  .executionShell,
+  .runQueue,
+  .listPane,
+  .largePane,
+  .suiteCard,
+  .dataTable,
+  .dataTableRow,
+  .executionStep,
+  .precondition
+) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+:global(.dark) .app :is(
+  .caseRepositoryHeading,
+  .caseRepositoryControls,
+  .caseCommandBar,
+  .caseDocumentHeader,
+  .casePropertyStrip,
+  .casePropertyStrip > div,
+  .caseNarrativeLayout,
+  .caseSection,
+  .caseTestData,
+  .caseSteps th,
+  .caseSteps td,
+  .caseInspector,
+  .caseInspectorGroup,
+  .suiteDetailHeader,
+  .suiteScopeLine,
+  .suiteScopeLine + .dataTable,
+  .dataTableHead,
+  .dataTableRow,
+  .executionHeader,
+  .executionMeta,
+  .executionSteps,
+  .executionStepHead,
+  .executionStep,
+  .executionFooter
+) { border-color: var(--line); }
+
+:global(.dark) .app :is(
+  .caseRepositoryHeading > strong,
+  .repositoryFolderButton,
+  .repositoryCaseRow,
+  .caseBreadcrumb strong,
+  .caseDocument,
+  .caseDocumentHeader h1,
+  .casePropertyStrip dd,
+  .caseSection > p,
+  .caseTestData > p,
+  .casePreconditions p,
+  .caseSteps tbody td,
+  .suiteListHeader h2,
+  .suiteCard,
+  .suiteDetailHeader h1,
+  .suiteScopeLine strong,
+  .dataTableRow,
+  .tableEmpty,
+  .runSummary h2,
+  .runItem,
+  .executionHeader h1,
+  .executionMeta > span,
+  .executionStep,
+  .stepAction,
+  .stepExpected,
+  .stepActual,
+  .stepStatus
+) { color: var(--ink); }
+
+:global(.dark) .app :is(
+  .repositoryFolderIcon,
+  .repositoryFolderCount,
+  .repositoryCaseKey,
+  .caseBreadcrumb,
+  .caseDocumentHeader > p,
+  .caseDocument .keyLine,
+  .caseTagLine,
+  .casePropertyStrip dt,
+  .caseSection > h2,
+  .caseTestData > h2,
+  .sectionTitle h2,
+  .sectionTitle span,
+  .suiteListHeader p,
+  .suiteCard small,
+  .suiteCard > span,
+  .suiteDetailHeader p,
+  .suiteScopeLine,
+  .runSummary small,
+  .runSummary em,
+  .runItem small,
+  .executionHeader > div > span,
+  .executionHeader p,
+  .executionMeta strong,
+  .precondition,
+  .precondition strong,
+  .executionStepHead,
+  .stepNumber
+) { color: var(--muted); }
+
+:global(.dark) .app :is(
+  .caseRepositoryControls .searchField,
+  .caseRepositoryPane .searchField,
+  .listPane .searchField,
+  .repositoryNewButton,
+  .caseInspectorCollapse
+) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+
+:global(.dark) .app :is(
+  .repositoryFolderRow:hover,
+  .repositoryCaseRow:hover,
+  .suiteCard:hover,
+  .runItem:hover
+) { background: var(--control-hover); }
+
+:global(.dark) .app :is(
+  .repositoryFolderRowActive,
+  .repositoryCaseRowActive,
+  .suiteCardActive,
+  .runItemActive
+) {
+  color: var(--ink);
+  background: #243541;
+  border-left-color: var(--teal);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+
+:global(.dark) .app :is(
+  .caseSteps thead th,
+  .dataTableHead,
+  .suiteScopeLine + .dataTable .dataTableHead,
+  .executionStepHead,
+  .executionMeta
+) {
+  color: var(--muted);
+  background: var(--control);
+}
+
+@media (max-width: 1180px) {
+  .tabsBar,
+  .tabsBarDashboard { grid-template-columns: 44px 56px minmax(170px, 1fr); }
+}
+
+@media (max-width: 680px) {
+  .tabsBar,
+  .tabsBarDashboard { grid-template-columns: 40px 48px minmax(0, 1fr); }
+  .projectSelectorTrigger { width: 100%; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projectSelectorMenu { animation: none; }
+  .projectSelectorTrigger svg { transition: none; }
+}
