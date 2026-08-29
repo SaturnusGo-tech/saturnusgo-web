@@ -144,3 +144,17 @@ final result: passed
 - Same-viewport comparison: the CodePen reference, light TMS implementation, and dark TMS implementation were opened together in the in-app browser at 1153×648 CSS px. The final implementations keep the compact focal point while matching TMS identity and theme surfaces.
 - Console: no new browser error was recorded during the final light/dark loader pass.
 - Final result: passed.
+
+## Compact project header and dark workbenches — final pass
+
+- Source evidence: four user-supplied 29 August captures covering the header, dark Test Cases, dark Run execution, and dark Suites at the same desktop scale.
+- Header: removed the duplicated global test-case input and its obsolete `⌘/Ctrl K` listener. Environment and Build now occupy the final right-aligned grid column instead of inheriting the removed search track.
+- Project control: removed the `PROJECT/ПРОЕКТ` label, native operating-system select, and detached plus button. The active project name and chevron form one unboxed trigger; its custom keyboard-dismissible menu contains the project list, selected-state check, and Create project action.
+- Dark Test Cases: repository folders/cases, selected rows, command bar, case document, property strip, step table, and inspector now use the shared graphite surface, text, border, control, hover, and selected tokens. Light-only white and pale-blue literals no longer leak into the dark state.
+- Dark Runs: navigator, summary, selected item, title, metadata strip, preconditions, step header/rows, evidence state, and footer now use the same dark tokens; text no longer renders dark-on-dark and metadata no longer becomes a white strip.
+- Dark Suites: list, selected suite, detail header, scope line, table head/body, empty state, priority, and owner cells now remain readable on the graphite canvas instead of mixing white table surfaces with near-white text.
+- Motion and accessibility: the custom project menu enters in 140ms, the chevron rotates in 160ms, Escape closes and restores trigger focus, outside pointer dismisses, and reduced-motion disables both effects. The native select has been removed without losing an accessible menu label or selected state.
+- Build evidence: TypeScript, 181-file architecture check, 17/17 auth tests, 4/4 attachment tests, 45/45 adapter tests, static export 60/60, and production build 61/61 passed. The only build warning remains the unrelated legacy investor stylesheet `flex-end` warning.
+- Production artifact evidence: source commit `27547929` and Pages commit `b283021e` are on their respective `main` branches. The live TMS bundle contains the custom `menuitemradio` selector and dark-theme stylesheet, and contains zero `tms-command-search` elements.
+- Visual verification limit: the post-release in-app browser session reached the production Auth0 boundary without an authenticated TMS session, so the final signed-in pixels could not be recaptured in that browser. The implementation comparison is grounded in the accepted user-supplied screenshots plus the shipped production CSS/DOM artifact; no authenticated visual state was fabricated.
+- Final result: passed, with the named authenticated-browser capture limitation.
