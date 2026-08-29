@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 
-test("Recharts scales render when Function.prototype is frozen", () => {
+test("Recharts scales render with frozen runtime intrinsics", () => {
   const script = String.raw`
     const assert = require("node:assert/strict");
     const {
       rechartsScaleFactory,
     } = require("./node_modules/recharts/lib/util/scale/RechartsScale.js");
+    const Decimal = require("./node_modules/decimal.js/decimal.js");
 
     function scale(value) {
       return value * 10;
@@ -17,6 +18,10 @@ test("Recharts scales render when Function.prototype is frozen", () => {
     scale.ticks = () => [0, 5, 10];
 
     Object.freeze(Function.prototype);
+    Object.freeze(Object.prototype);
+
+    const decimal = new Decimal("0.1").plus("0.2");
+    assert.equal(decimal.toString(), "0.3");
 
     const adapted = rechartsScaleFactory(scale);
     assert.deepEqual(adapted.domain(), [0, 10]);

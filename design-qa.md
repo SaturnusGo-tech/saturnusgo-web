@@ -130,4 +130,5 @@ final result: passed
 - Dark mode: the content surface uses the same blue-graphite family as the original header (`#101b24`, `#16242e`, `#1b2a36`) rather than black; text and primary actions invert to restrained white values without introducing blue or yellow panels.
 - UX: language, appearance, and sign-out controls now live under Configuration; the dashboard no longer renders the global test-case search field. Sidebar width, labels, and content animate with a 240ms easing curve and honor `prefers-reduced-motion`.
 - Differences found and fixed: an early light-theme recolor made the navigation white and changed legacy surface colors; that entire recolor was removed after review. The final light state is the legacy visual system plus only the new Saturn identity and settings controls.
+- Production runtime: the authenticated dashboard smoke exposed a second frozen-intrinsics incompatibility in `decimal.js`. Its constructor shadowing now uses an own property definition, and the child-process regression freezes both `Function.prototype` and `Object.prototype` before exercising Decimal and Recharts together.
 - Final result: passed.
