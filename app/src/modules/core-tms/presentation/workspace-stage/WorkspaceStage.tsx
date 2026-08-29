@@ -176,7 +176,13 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     <ReportsView
       defects={model.projectDefects}
       runs={model.projectRuns}
+      links={model.projectLinks}
       onNew={() => model.setDialog("defect")}
+      onOpenRun={(runId, runItemId) => {
+        model.setSelectedRunId(runId);
+        model.setSelectedRunItemId(runItemId);
+        model.setView("runs");
+      }}
     />
   );
 }
