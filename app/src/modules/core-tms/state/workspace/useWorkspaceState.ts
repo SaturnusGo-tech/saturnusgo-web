@@ -161,23 +161,6 @@ export function useWorkspaceState() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  useEffect(() => {
-    function handleCommandSearch(event: KeyboardEvent) {
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === "k"
-      ) {
-        event.preventDefault();
-        setView("cases");
-        window.requestAnimationFrame(() =>
-          document.getElementById("tms-command-search")?.focus(),
-        );
-      }
-    }
-    window.addEventListener("keydown", handleCommandSearch);
-    return () => window.removeEventListener("keydown", handleCommandSearch);
-  }, []);
-
   return {
     ...bootstrap, data, setData, connection, view, setView, projectId, setProjectId,
     query, setQuery, selectedCaseId, setSelectedCaseId, selectedSuiteId,
