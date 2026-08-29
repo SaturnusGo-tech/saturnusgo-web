@@ -62,6 +62,7 @@ export const ruCaseMessages = {
   "cases.details": "Сведения",
   "cases.showDetails": "Показать сведения о кейсе",
   "cases.hideDetails": "Скрыть сведения о кейсе",
+  "cases.resizeRepository": "Изменить ширину списка тест-кейсов",
   "caseDialog.editTitle": "Изменить тест-кейс",
   "caseDialog.createTitle": "Создать тест-кейс",
   "caseDialog.editSubtitle": "Сохранение создаст новую неизменяемую ревизию.",

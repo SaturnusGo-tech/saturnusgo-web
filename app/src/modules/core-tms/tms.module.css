@@ -3549,19 +3549,20 @@
 .app { font-weight: 400; }
 
 .caseWorkbench {
+  --case-repository-width: 344px;
   position: relative;
   height: 100%;
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: 344px minmax(0, 1fr) 248px;
+  grid-template-columns: var(--case-repository-width) minmax(0, 1fr) 248px;
   grid-template-rows: 64px minmax(0, 1fr);
   overflow: hidden;
   background: #fff;
   transition: grid-template-columns 180ms cubic-bezier(.2, .72, .3, 1);
 }
 
-.caseWorkbenchInspectorClosed { grid-template-columns: 344px minmax(0, 1fr) 0; }
+.caseWorkbenchInspectorClosed { grid-template-columns: var(--case-repository-width) minmax(0, 1fr) 0; }
 
 .caseRepositoryPane {
   grid-column: 1;
@@ -3573,6 +3574,30 @@
   background: #fcfcfd;
   border-right: 1px solid #dadfe7;
 }
+
+.caseRepositoryResizer {
+  position: absolute;
+  z-index: 14;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--case-repository-width) - 5px);
+  width: 10px;
+  padding: 0;
+  cursor: col-resize;
+  touch-action: none;
+}
+.caseRepositoryResizer::before {
+  position: absolute;
+  inset: 0 4px;
+  background: transparent;
+  content: "";
+  transition: inset 140ms ease, background-color 140ms ease;
+}
+.caseRepositoryResizer:hover::before,
+.caseRepositoryResizer:focus-visible::before,
+.caseWorkbenchResizing .caseRepositoryResizer::before { inset-inline: 3px; background: var(--teal); }
+.caseRepositoryResizer:focus-visible { outline: 0; }
+.caseWorkbenchResizing { cursor: col-resize; user-select: none; transition: none; }
 
 .caseRepositoryHeading {
   min-height: 64px;
@@ -3861,7 +3886,7 @@
 
 @media (max-width: 1380px) {
   .caseWorkbench,
-  .caseWorkbenchInspectorClosed { grid-template-columns: 300px minmax(0, 1fr) 0; }
+  .caseWorkbenchInspectorClosed { grid-template-columns: var(--case-repository-width) minmax(0, 1fr) 0; }
   .caseInspector { position: absolute; z-index: 10; top: 64px; right: 0; bottom: 0; width: 288px; display: flex; box-shadow: -12px 0 28px rgb(9 30 66 / 12%); }
   .caseCommandBar { grid-column: 2 / 4; }
   .caseWorkbenchMain { grid-column: 2 / 4; }
@@ -3871,6 +3896,7 @@
 @media (max-width: 820px) {
   .caseWorkbench,
   .caseWorkbenchInspectorClosed { grid-template-columns: 250px minmax(360px, 1fr) 0; }
+  .caseRepositoryResizer { display: none; }
   .caseRepositoryHeading { padding-inline: 12px 10px; }
   .repositoryNewButton { width: 34px; justify-content: center; padding: 0; font-size: 0; }
   .caseCommandBar { padding-left: 14px; }
@@ -4370,4 +4396,70 @@
 @media (prefers-reduced-motion: reduce) {
   .projectSelectorMenu { animation: none; }
   .projectSelectorTrigger svg { transition: none; }
+}
+
+/* Sidebar width and labels animate independently so copy never compresses letter by letter. */
+@media (min-width: 681px) {
+  .frame { transition: grid-template-columns 240ms cubic-bezier(.2, .72, .3, 1); }
+  .frameCollapsed { transition-delay: 110ms; }
+  .navigation { overflow-x: hidden; }
+  .navigationItem { justify-content: flex-start; overflow: hidden; }
+  .navigationItem span {
+    width: 136px;
+    min-width: 136px;
+    max-width: none;
+    flex: 0 0 136px;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateX(0);
+    white-space: nowrap;
+    transition: opacity 140ms ease 140ms, transform 180ms cubic-bezier(.2, .72, .3, 1) 120ms;
+  }
+  .navigationCollapsed .navigationItem {
+    justify-content: flex-start;
+    padding-inline: 15px;
+  }
+  .navigationCollapsed .navigationItem span {
+    display: block;
+    width: 136px;
+    min-width: 136px;
+    max-width: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-7px);
+    transition-delay: 0ms;
+  }
+}
+
+/* Dark workbench contrast: execution copy, suite headings, filters and action menus. */
+:global(.dark) .app .stepActual span { color: var(--ink); }
+:global(.dark) .app .suiteDetailHeader > div > span { color: var(--muted); }
+:global(.dark) .app .suiteDetailHeader h1 { color: var(--ink); }
+:global(.dark) .app .suiteDetailHeader p { color: #c1ccd3; }
+:global(.dark) .app .toolbarPopover {
+  color: var(--ink);
+  background: var(--nav-raised);
+  border-color: var(--line-strong);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 28%);
+}
+:global(.dark) .app .toolbarPopover > label { color: #c1ccd3; }
+:global(.dark) .app .toolbarPopover > label :is(input, select) {
+  color: var(--ink);
+  color-scheme: dark;
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+:global(.dark) .app .popoverHeader { color: var(--ink); border-color: var(--line); }
+:global(.dark) .app .actionMenu > button {
+  color: var(--ink);
+  background: var(--nav-raised);
+  border-color: var(--line);
+}
+:global(.dark) .app .actionMenu > button:hover { background: var(--control-hover); }
+:global(.dark) .app .actionMenu small { color: #aebbc4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .navigationItem span,
+  .caseRepositoryResizer::before { transition: none; }
 }

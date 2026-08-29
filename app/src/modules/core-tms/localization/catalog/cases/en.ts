@@ -60,6 +60,7 @@ export const enCaseMessages = {
   "cases.details": "Details",
   "cases.showDetails": "Show case details",
   "cases.hideDetails": "Hide case details",
+  "cases.resizeRepository": "Resize the test case list",
   "caseDialog.editTitle": "Edit test case",
   "caseDialog.createTitle": "Create test case",
   "caseDialog.editSubtitle": "Saving creates a new immutable revision.",

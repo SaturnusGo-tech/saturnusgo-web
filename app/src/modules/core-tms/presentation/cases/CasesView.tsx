@@ -9,6 +9,7 @@ import type { CaseFilters } from "../../state/types/workspace";
 import { EmptyState } from "../common/empty/EmptyState";
 import { SaturnLoader } from "../common/loading/SaturnLoader";
 import { CaseInformationInspector } from "./inspector/CaseInformationInspector";
+import { CASE_REPOSITORY_MIN, useCaseRepositoryResize } from "./layout/useCaseRepositoryResize";
 import { TestCaseRepositoryTree } from "./repository/TestCaseRepositoryTree";
 import styles from "../../tms.module.css";
 
@@ -42,6 +43,7 @@ export function CasesView(props: CasesViewProps) {
   const [inspectorOverlay, setInspectorOverlay] = useState(false);
   const inspectorCollapseRef = useRef<HTMLButtonElement>(null);
   const inspectorTriggerRef = useRef<HTMLButtonElement>(null);
+  const workbenchRef = useRef<HTMLDivElement>(null);
   const repositoryRef = useRef<HTMLElement>(null);
   const commandBarRef = useRef<HTMLDivElement>(null);
   const documentRef = useRef<HTMLElement>(null);
@@ -85,9 +87,10 @@ export function CasesView(props: CasesViewProps) {
   const preconditions = numberedCopy(revision?.preconditions ?? "");
   const activeFilterCount = Number(filters.priority !== "all") + Number(filters.lifecycle !== "all") + Number(Boolean(filters.tag.trim())) + Number(filters.includeArchived);
   const breadcrumb = testCase?.folderPath.split("/").filter(Boolean) ?? [];
+  const repositoryResize = useCaseRepositoryResize(workbenchRef);
 
   return (
-    <div className={`${styles.caseWorkbench} ${!inspectorOpen ? styles.caseWorkbenchInspectorClosed : ""}`} data-testid="cases-view">
+    <div ref={workbenchRef} style={repositoryResize.style} className={`${styles.caseWorkbench} ${!inspectorOpen ? styles.caseWorkbenchInspectorClosed : ""} ${repositoryResize.resizing ? styles.caseWorkbenchResizing : ""}`} data-testid="cases-view">
       <aside ref={repositoryRef} className={`${styles.pane} ${styles.caseRepositoryPane}`}>
         <div className={styles.caseRepositoryHeading}>
           <strong>{t("cases.title")}</strong>
@@ -113,6 +116,18 @@ export function CasesView(props: CasesViewProps) {
         </div>
         <TestCaseRepositoryTree {...{ groups, collapsed, selectedFolder, selectedCaseId, onToggleFolder, onSelectFolder, onSelectCase, onNew }} />
       </aside>
+      <div
+        {...repositoryResize.handleProps}
+        className={styles.caseRepositoryResizer}
+        role="separator"
+        aria-label={t("cases.resizeRepository")}
+        aria-orientation="vertical"
+        aria-valuemin={CASE_REPOSITORY_MIN}
+        aria-valuemax={560}
+        aria-valuenow={repositoryResize.width}
+        tabIndex={0}
+        title={t("cases.resizeRepository")}
+      />
 
       {testCase && revision && <div ref={commandBarRef} className={styles.caseCommandBar}>
         <div className={styles.caseBreadcrumb}>{breadcrumb.map((part) => <span key={part}>{part}</span>)}<strong>{testCase.key}</strong></div>
