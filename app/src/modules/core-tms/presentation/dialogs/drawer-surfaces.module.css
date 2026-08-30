@@ -75,3 +75,51 @@
 :global(.dark) .modeButton[data-selected="true"] strong,
 :global(.dark) .scopeToggle,
 :global(.dark) .pickerActions button { color: var(--teal); }
+
+/* YouTrack identity: authoritative shared drawer fields. */
+.form { color: var(--ink); font-size: 14px; }
+.body { padding: 0 22px 24px !important; }
+.section { padding: 17px 0 !important; border-color: var(--line) !important; }
+.grid { gap: 12px !important; }
+.form :is(input, select, textarea) {
+  color: var(--ink) !important;
+  background: var(--paper) !important;
+  border-color: var(--line-strong) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+.form :is(input, select, textarea):hover { border-color: var(--line-strong) !important; }
+.form :is(input, select, textarea):focus { border-color: var(--action) !important; box-shadow: 0 0 0 2px rgb(53 116 240 / 28%) !important; }
+
+.modeField { color: var(--ink); font-size: 12px; font-weight: 500; }
+.modeGroup { border-color: var(--line-strong); border-radius: 4px; }
+.modeButton { min-height: 56px; color: var(--ink); background: var(--paper); border-color: var(--line-strong); }
+.modeButton strong,
+.scopeSummary strong { color: var(--ink); }
+.modeButton span,
+.scopeSummary small { color: var(--muted); }
+.modeButton:hover { background: var(--control-hover); }
+.modeButton[data-selected="true"] { background: rgb(53 116 240 / 12%); box-shadow: inset 0 -2px 0 var(--action); }
+.modeButton[data-selected="true"] strong,
+.scopeToggle,
+.pickerActions button { color: var(--yt-link, var(--action)); }
+.scopeToggle { border-radius: 4px; }
+.scopeToggle:hover { background: rgb(53 116 240 / 12%); }
+.search { background: var(--paper) !important; border-color: var(--line-strong) !important; }
+.caseList { border-color: var(--line-strong) !important; }
+
+:global(.dark) .form :is(input, select, textarea) { color: var(--ink) !important; background: var(--control) !important; border-color: var(--line-strong) !important; }
+:global(.dark) .form :is(input, select, textarea):hover { border-color: var(--line-strong) !important; }
+:global(.dark) .form :is(input, select, textarea):focus { border-color: var(--action) !important; box-shadow: 0 0 0 2px rgb(53 116 240 / 35%) !important; }
+:global(.dark) .modeGroup,
+:global(.dark) .modeButton,
+:global(.dark) .search,
+:global(.dark) .caseList { border-color: var(--line-strong) !important; }
+:global(.dark) .modeButton,
+:global(.dark) .search { color: var(--ink); background: var(--control) !important; }
+:global(.dark) .modeButton:hover { background: var(--control-hover) !important; }
+:global(.dark) .modeButton[data-selected="true"] { background: rgb(53 116 240 / 22%) !important; box-shadow: inset 0 -2px 0 var(--action); }
+:global(.dark) .modeButton[data-selected="true"] strong,
+:global(.dark) .scopeToggle,
+:global(.dark) .pickerActions button { color: #99bbff; }
+:global(.dark) .scopeToggle:hover { background: rgb(53 116 240 / 22%); }

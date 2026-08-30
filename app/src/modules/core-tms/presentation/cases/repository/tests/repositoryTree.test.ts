@@ -29,8 +29,8 @@ test("recognizes every ancestor of the current folder path", () => {
 });
 
 test("bounds the resizable repository without starving the case document", () => {
-  assert.equal(clampCaseRepositoryWidth(120, 1440), 248);
-  assert.equal(clampCaseRepositoryWidth(480, 1440), 480);
-  assert.equal(clampCaseRepositoryWidth(900, 1440), 560);
-  assert.equal(clampCaseRepositoryWidth(500, 900), 380);
+  assert.equal(clampCaseRepositoryWidth(120, 1440), 230);
+  assert.equal(clampCaseRepositoryWidth(480, 1440), 320);
+  assert.equal(clampCaseRepositoryWidth(900, 1440), 320);
+  assert.equal(clampCaseRepositoryWidth(500, 900), 240);
 });

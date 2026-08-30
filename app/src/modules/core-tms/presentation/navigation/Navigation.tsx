@@ -15,7 +15,7 @@ import type { ReactNode } from "react";
 import type { TmsMessageKey } from "../../localization/catalog/messages";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { View } from "../../state/types/workspace";
-import styles from "../../tms.module.css";
+import shellStyles from "../workspace/tms-shell.module.css";
 
 const navigationItems: Array<{
   id: View;
@@ -54,38 +54,63 @@ export function Navigation({
   return (
     <nav
       id="tms-navigation"
-      className={`${styles.navigation} ${collapsed ? styles.navigationCollapsed : ""}`}
+      className={`${shellStyles.navigation} ${collapsed ? shellStyles.navigationCollapsed : ""}`}
       aria-label={t("nav.ariaLabel")}
     >
-      {navigationItems.map((item) => {
-        const label = t(item.labelKey);
-        return (
-          <button
-            key={item.id}
-            className={`${styles.navigationItem} ${
-              !disabled && view === item.id ? styles.navigationItemActive : ""
-            }`}
-            onClick={() => onChange(item.id)}
-            disabled={disabled}
-            aria-label={label}
-            aria-current={!disabled && view === item.id ? "page" : undefined}
-            title={label}
-            data-testid={`nav-${item.id}`}
-          >
-            {item.icon}
-            <span>{label}</span>
-          </button>
-        );
-      })}
+      <div className={shellStyles.brandArea}>
+        <button
+          type="button"
+          className={shellStyles.brandButton}
+          onClick={() => onChange("dashboard")}
+          aria-label={t("header.dashboardAria")}
+          title={t("header.dashboardAria")}
+        >
+          <span className={shellStyles.saturnLogo} aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className={shellStyles.navigationItems}>
+        {navigationItems.map((item) => {
+          const label = t(item.labelKey);
+          const active = !disabled && view === item.id;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`${shellStyles.navigationItem} ${
+                active ? shellStyles.navigationItemActive : ""
+              }`}
+              onClick={() => onChange(item.id)}
+              disabled={disabled}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
+              title={collapsed ? label : undefined}
+              data-testid={`nav-${item.id}`}
+            >
+              <span className={shellStyles.navigationIcon} aria-hidden="true">
+                {item.icon}
+              </span>
+              <span className={shellStyles.navigationLabel}>{label}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <button
         type="button"
-        className={styles.navigationToggle}
+        className={shellStyles.navigationToggle}
         onClick={onToggleCollapsed}
         aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
         aria-expanded={!collapsed}
         title={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
       >
-        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        <span className={shellStyles.navigationIcon} aria-hidden="true">
+          {collapsed ? <ChevronRight size={19} /> : <ChevronLeft size={19} />}
+        </span>
+        <span className={shellStyles.navigationLabel}>
+          {t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+        </span>
       </button>
     </nav>
   );

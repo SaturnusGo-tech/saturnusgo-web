@@ -1,10 +1,6 @@
 import { Archive, Check, ChevronDown, ChevronRight, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type {
-  RunItemSummary,
-  TestCaseSummary,
-  TestRunSummary,
-} from "../../../../../core/tms/contracts/legacy-contract";
+import type { RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
@@ -34,14 +30,24 @@ export function RunNavigator({
   const { locale, t } = useTmsLocale();
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
-  const titles = useMemo(
-    () => new Map(cases.map((item) => [item.id, item.title])),
-    [cases],
-  );
+  const pickerTriggerRef = useRef<HTMLButtonElement>(null);
+  const titles = useMemo(() => new Map(cases.map((item) => [item.id, item.title])), [cases]);
   const activeCount = runs.filter((run) => !run.archivedAt).length;
   const archivedCount = runs.length - activeCount;
   const visibleRuns = runs.filter((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
   const emptyLabel = mode === "archived" ? t("runs.noArchived") : t("runs.noActive");
+  const selectedPickerIndex = Math.max(0, visibleRuns.findIndex((run) => run.id === selectedRun?.id));
+
+  function pickerOptions() { return Array.from(pickerRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ?? []); }
+  function openPickerAt(index: number) {
+    setPickerOpen(true);
+    requestAnimationFrame(() => pickerOptions()[index]?.focus());
+  }
+
+  function closePicker(restoreFocus = false) {
+    setPickerOpen(false);
+    if (restoreFocus) requestAnimationFrame(() => pickerTriggerRef.current?.focus());
+  }
 
   useEffect(() => setPickerOpen(false), [mode, selectedRun?.id]);
   useEffect(() => {
@@ -49,15 +55,8 @@ export function RunNavigator({
     function closeOnPointer(event: PointerEvent) {
       if (!pickerRef.current?.contains(event.target as Node)) setPickerOpen(false);
     }
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setPickerOpen(false);
-    }
     document.addEventListener("pointerdown", closeOnPointer);
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", closeOnPointer);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
+    return () => document.removeEventListener("pointerdown", closeOnPointer);
   }, [pickerOpen]);
 
   return (
@@ -80,6 +79,7 @@ export function RunNavigator({
 
       <div className={styles.picker} ref={pickerRef}>
         <button
+          ref={pickerTriggerRef}
           className={styles.pickerTrigger}
           type="button"
           disabled={visibleRuns.length === 0}
@@ -88,6 +88,17 @@ export function RunNavigator({
           aria-controls="run-picker-list"
           aria-label={t("runs.openRunList")}
           onClick={() => setPickerOpen((current) => !current)}
+          onKeyDown={(event) => {
+            if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+              event.preventDefault();
+              const index = event.key === "ArrowUp" || event.key === "End" ? visibleRuns.length - 1 : event.key === "Home" ? 0 : selectedPickerIndex;
+              openPickerAt(index);
+            }
+            if (event.key === "Escape" && pickerOpen) {
+              event.preventDefault();
+              closePicker(true);
+            }
+          }}
         >
           <strong>{selectedRun?.name ?? emptyLabel}</strong>
           <ChevronDown size={17} aria-hidden="true" />
@@ -96,7 +107,24 @@ export function RunNavigator({
           <Plus size={16} />
         </button>
         {pickerOpen && (
-          <div className={styles.pickerMenu} id="run-picker-list" role="listbox" aria-label={t("runs.current")}>
+          <div className={styles.pickerMenu} id="run-picker-list" role="listbox" aria-label={t("runs.current")} onKeyDown={(event) => {
+            const options = pickerOptions();
+            const current = Math.max(0, options.indexOf(document.activeElement as HTMLButtonElement));
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+              const direction = event.key === "ArrowDown" ? 1 : -1;
+              options[(current + direction + options.length) % options.length]?.focus();
+            }
+            if (event.key === "Home" || event.key === "End") {
+              event.preventDefault();
+              options[event.key === "Home" ? 0 : options.length - 1]?.focus();
+            }
+            if (event.key === "Escape") {
+              event.preventDefault();
+              closePicker(true);
+            }
+            if (event.key === "Tab") closePicker();
+          }}>
             {visibleRuns.map((run) => {
               const selected = run.id === selectedRun?.id;
               return (
@@ -106,7 +134,8 @@ export function RunNavigator({
                   type="button"
                   role="option"
                   aria-selected={selected}
-                  onClick={() => { onSelectRun(run.id); setPickerOpen(false); }}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => { onSelectRun(run.id); closePicker(true); }}
                 >
                   <span><strong>{run.name}</strong><small>{run.key}</small></span>
                   {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
@@ -150,6 +179,7 @@ export function RunNavigator({
                 className={item.id === selectedItemId ? styles.itemActive : styles.item}
                 key={item.id}
                 type="button"
+                aria-current={item.id === selectedItemId ? "true" : undefined}
                 onClick={() => onSelectItem(item.id)}
               >
                 <span className={styles.itemStatus}>{statusIcon[item.status]}</span>

@@ -1,11 +1,13 @@
 import {
   CalendarDays,
+  GitBranch,
   Menu,
+  Server,
 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
-import styles from "../../tms.module.css";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
+import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
   model,
@@ -37,50 +39,58 @@ export function WorkspaceHeader({
     minute: "2-digit",
   });
   const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
+
   return (
-    <header className={styles.tabsBar}>
+    <header className={shellStyles.header}>
       <button
-        className={styles.homeButton}
+        type="button"
+        className={shellStyles.mobileNavigationButton}
         onClick={onToggleSidebar}
         aria-label={t("header.toggleNavigation")}
         title={t("header.toggleNavigation")}
         aria-controls="tms-navigation"
         aria-expanded={!sidebarCollapsed}
       >
-        <Menu size={21} />
+        <Menu size={19} aria-hidden="true" />
       </button>
-      <button
-        className={styles.brandButton}
-        onClick={() => model.setView("dashboard")}
-        aria-label={t("header.dashboardAria")}
-      >
-        <span className={styles.saturnLogo} aria-hidden="true" />
-      </button>
-      <ProjectSelector
-        activeProjectId={model.project?.id ?? null}
-        projects={model.projects}
-        disabled={!workspaceReady}
-        currentProjectLabel={t("header.currentProject")}
-        createProjectLabel={model.project ? t("header.createProject") : t("header.createFirstProject")}
-        onSelect={model.chooseProject}
-        onCreate={model.openNewProject}
-      />
-      <div className={styles.headerMeta}>
-        <div className={styles.headerMetaItem}>
-          <span>{t("header.environment")}</span>
-          <strong>{activeEnvironment}</strong>
+
+      <div className={shellStyles.projectContext}>
+        <span className={shellStyles.projectEyebrow} aria-hidden="true">
+          {t("header.project")}
+        </span>
+        <div className={shellStyles.projectSelectorSlot}>
+          <ProjectSelector
+            activeProjectId={model.project?.id ?? null}
+            projects={model.projects}
+            disabled={!workspaceReady}
+            currentProjectLabel={t("header.currentProject")}
+            createProjectLabel={model.project ? t("header.createProject") : t("header.createFirstProject")}
+            onSelect={model.chooseProject}
+            onCreate={model.openNewProject}
+          />
         </div>
-        <div className={styles.headerMetaItem}>
-          <span>{t("header.build")}</span>
-          <strong>{activeBuild}</strong>
-        </div>
-        <div className={styles.headerClock}>
-          <CalendarDays size={17} />
+      </div>
+
+      <div className={shellStyles.headerMeta}>
+        <div className={shellStyles.headerMetaItem} title={`${t("header.environment")}: ${activeEnvironment}`}>
+          <Server size={15} aria-hidden="true" />
           <span>
-            <strong>{today}</strong>
-            <small>
-              {weekday} {localTime}
-            </small>
+            <small>{t("header.environment")}</small>
+            <strong>{activeEnvironment}</strong>
+          </span>
+        </div>
+        <div className={shellStyles.headerMetaItem} title={`${t("header.build")}: ${activeBuild}`}>
+          <GitBranch size={15} aria-hidden="true" />
+          <span>
+            <small>{t("header.build")}</small>
+            <strong>{activeBuild}</strong>
+          </span>
+        </div>
+        <div className={shellStyles.headerClock} title={`${weekday}, ${today} ${localTime}`}>
+          <CalendarDays size={15} aria-hidden="true" />
+          <span>
+            <strong>{localTime}</strong>
+            <small>{today}</small>
           </span>
         </div>
       </div>

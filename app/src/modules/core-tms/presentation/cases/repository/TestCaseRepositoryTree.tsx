@@ -1,17 +1,8 @@
-import {
-  Archive,
-  ChevronDown,
-  ChevronRight,
-  Folder,
-  FolderOpen,
-  Plus,
-  Search,
-} from "lucide-react";
-import { type CSSProperties, useMemo } from "react";
+import { Archive, ChevronDown, ChevronRight, Folder, FolderOpen, Plus, Search } from "lucide-react";
+import { useMemo } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import styles from "../../../tms.module.css";
-import { EmptyState } from "../../common/empty/EmptyState";
+import styles from "../cases.module.css";
 import {
   buildRepositoryTree,
   normalizeRepositoryPath,
@@ -43,35 +34,28 @@ function FolderBranch(props: FolderBranchProps) {
   } = props;
   const isCollapsed = collapsedPaths.has(node.path);
   const isSelected = normalizeRepositoryPath(selectedFolder) === node.path;
-  const depthStyle = { "--repository-depth": `${depth * 18}px` } as CSSProperties;
 
   return (
     <div className={styles.repositoryFolderBranch}>
-      <div
-        className={`${styles.repositoryFolderRow} ${isSelected ? styles.repositoryFolderRowActive : ""}`}
-        style={depthStyle}
-      >
+      <div className={`${styles.folderLine} ${isSelected ? styles.folderLineActive : ""}`}>
         <button
-          className={styles.repositoryFolderToggle}
+          className={styles.folderToggle}
           onClick={() => onToggleFolder(node.path)}
           aria-label={`${isCollapsed ? t("cases.expand") : t("cases.collapse")} ${node.label}`}
         >
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
         </button>
         <button
-          className={styles.repositoryFolderButton}
+          className={styles.folderButton}
           onClick={() => onSelectFolder(node.path)}
           aria-current={isSelected ? "true" : undefined}
           title={node.path}
         >
-          <span className={styles.repositoryFolderIcon}>
-            {isCollapsed ? <Folder size={16} /> : <FolderOpen size={16} />}
-          </span>
-          <span className={styles.repositoryFolderLabel}>{node.label}</span>
-          <small className={styles.repositoryFolderCount}>{node.caseCount}</small>
+          {isCollapsed ? <Folder size={15} /> : <FolderOpen size={15} />}
+          <span>{node.label}</span><small>{node.caseCount}</small>
         </button>
         <button
-          className={styles.repositoryFolderAdd}
+          className={styles.folderAdd}
           onClick={() => onNew(node.path)}
           aria-label={t("cases.createInFolder", { folder: node.path })}
           title={t("cases.createInFolder", { folder: node.path })}
@@ -80,27 +64,36 @@ function FolderBranch(props: FolderBranchProps) {
         </button>
       </div>
       {!isCollapsed && (
-        <div className={styles.repositoryFolderChildren}>
+        <div className={styles.folderCases}>
           {node.cases.map((item) => (
             <button
               key={item.id}
-              className={`${styles.repositoryCaseRow} ${selectedCaseId === item.id ? styles.repositoryCaseRowActive : ""}`}
-              style={{ "--repository-depth": `${(depth + 1) * 18}px` } as CSSProperties}
-              onClick={() => onSelectCase(item.id)}
+              className={`${styles.repositoryCase} ${selectedCaseId === item.id ? styles.repositoryCaseActive : ""}`}
+              data-repository-case
+              tabIndex={selectedCaseId === item.id ? 0 : -1}
+              onClick={() => { onSelectFolder(node.path); onSelectCase(item.id); }}
+              onKeyDown={(event) => {
+                if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+                event.preventDefault();
+                const items = event.currentTarget.closest(`.${styles.folderTree}`)?.querySelectorAll<HTMLButtonElement>("[data-repository-case]");
+                if (!items?.length) return;
+                const index = Array.from(items).indexOf(event.currentTarget);
+                const nextIndex = event.key === "Home" ? 0
+                  : event.key === "End" ? items.length - 1
+                  : Math.max(0, Math.min(items.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)));
+                items[nextIndex]?.focus();
+              }}
               aria-current={selectedCaseId === item.id ? "page" : undefined}
               title={`${item.key} · ${item.title}`}
             >
-              <span className={`${styles.repositoryCaseState} ${item.archivedAt ? styles.dotArchived : styles[`dot_${item.lifecycle}`]}`} />
-              <small className={styles.repositoryCaseKey}>{item.key}</small>
-              <strong className={styles.repositoryCaseTitle}>{item.title}</strong>
-              {item.archivedAt && <Archive className={styles.repositoryCaseArchive} size={12} />}
+              <span>{item.key}</span><small>{item.title}</small>{item.archivedAt && <Archive size={12} />}
             </button>
           ))}
           {node.children.map((child) => (
             <FolderBranch key={child.path} {...props} node={child} depth={depth + 1} />
           ))}
           {node.cases.length === 0 && node.children.length === 0 && isSelected && (
-            <button className={styles.repositoryEmptyFolder} style={depthStyle} onClick={() => onNew(node.path)}>
+            <button className={styles.emptyFolder} onClick={() => onNew(node.path)}>
               <Plus size={13} /> {t("cases.addFirst")}
             </button>
           )}
@@ -118,13 +111,9 @@ export function TestCaseRepositoryTree(props: TestCaseRepositoryTreeProps) {
     [props.collapsed],
   );
   return (
-    <nav className={styles.repositoryTree} aria-label={t("cases.title")}>
+    <div className={styles.folderTree} aria-label={t("cases.title")}>
       {tree.length === 0 ? (
-        <EmptyState
-          icon={<Search size={25} />}
-          title={t("cases.nothingFound")}
-          text={t("cases.nothingFoundHint")}
-        />
+        <div className={styles.repositoryTreeEmpty}><Search size={20} /><strong>{t("cases.nothingFound")}</strong><span>{t("cases.nothingFoundHint")}</span></div>
       ) : tree.map((node) => (
         <FolderBranch
           key={node.path}
@@ -134,6 +123,6 @@ export function TestCaseRepositoryTree(props: TestCaseRepositoryTreeProps) {
           collapsedPaths={collapsedPaths}
         />
       ))}
-    </nav>
+    </div>
   );
 }

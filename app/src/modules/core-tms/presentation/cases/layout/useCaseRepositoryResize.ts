@@ -1,10 +1,10 @@
 import type { CSSProperties, KeyboardEvent, PointerEvent, RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
-export const CASE_REPOSITORY_DEFAULT = 344;
-export const CASE_REPOSITORY_MIN = 248;
-const CASE_REPOSITORY_MAX = 560;
-const CASE_DOCUMENT_MIN = 520;
+export const CASE_REPOSITORY_DEFAULT = 242;
+export const CASE_REPOSITORY_MIN = 230;
+const CASE_REPOSITORY_MAX = 320;
+const CASE_DOCUMENT_MIN = 660;
 const STORAGE_KEY = "tms.cases.repository-width.v1";
 
 export function clampCaseRepositoryWidth(value: number, containerWidth: number) {

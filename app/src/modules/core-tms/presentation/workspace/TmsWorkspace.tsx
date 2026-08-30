@@ -11,15 +11,18 @@ import { WorkspaceDialogs } from "../workspace-dialogs/WorkspaceDialogs";
 import { WorkspaceStage } from "../workspace-stage/WorkspaceStage";
 import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
+import shellStyles from "./tms-shell.module.css";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   const { t } = useTmsLocale();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   useEffect(() => {
     const saved = window.localStorage.getItem("tms.sidebar.collapsed.v1");
-    setSidebarCollapsed(saved === null || saved === "true");
+    setSidebarCollapsed(saved === "true");
   }, []);
+
   function toggleSidebar() {
     setSidebarCollapsed((current) => {
       const next = !current;
@@ -27,22 +30,27 @@ function LocalizedWorkspace() {
       return next;
     });
   }
+
   return (
-    <div className={styles.app} data-testid="tms-workspace">
-      <WorkspaceHeader
-        model={model}
-        sidebarCollapsed={sidebarCollapsed}
-        onToggleSidebar={toggleSidebar}
+    <div
+      className={`${styles.app} ${shellStyles.shell}`}
+      data-sidebar={sidebarCollapsed ? "collapsed" : "expanded"}
+      data-testid="tms-workspace"
+    >
+      <Navigation
+        view={model.view}
+        onChange={model.setView}
+        disabled={!model.project}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={toggleSidebar}
       />
-      <div className={`${styles.frame} ${sidebarCollapsed ? styles.frameCollapsed : ""}`}>
-        <Navigation
-          view={model.view}
-          onChange={model.setView}
-          disabled={!model.project}
-          collapsed={sidebarCollapsed}
-          onToggleCollapsed={toggleSidebar}
+      <div className={shellStyles.workspaceColumn}>
+        <WorkspaceHeader
+          model={model}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
         />
-        <main className={styles.stage}>
+        <main className={`${styles.stage} ${shellStyles.stage}`}>
           {model.connection === "demo" && (
             <div
               className={styles.demoNotice}

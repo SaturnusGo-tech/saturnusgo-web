@@ -8,11 +8,12 @@ import { useAttachmentClient } from "../../attachments/presentation/context/Atta
 import { inferDefectIntegrationTarget } from "../../defects/model/integration-target";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { localizedComponentLabel } from "../../localization/format/labels";
 import { FormError } from "../common/error/FormError";
 import { Field } from "../common/field/Field";
 import { AnimatedSelect } from "../common/select/AnimatedSelect";
 import { getDefectDialogCopy } from "../dialogs/defect/copy";
-import styles from "../../tms.module.css";
+import runStyles from "./runs.module.css";
 export function InlineDefectComposer({ projectId, run, item, step, components, offline, onCreated }: { projectId: string; run: TestRunSummary; item: RunItem; step: TestStep; components: string[]; offline: boolean; onCreated: (defect: Defect) => void }) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
@@ -26,7 +27,11 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [priority, setPriority] = useState<Defect["priority"]>("high");
   const componentOptions = Array.from(new Set([item.snapshot.component, ...components].map((value) => value.trim()).filter(Boolean)));
-  if (componentOptions.length === 0) componentOptions.push(t("inlineDefect.categoryDefault"));
+  if (componentOptions.length === 0) componentOptions.push("Core product");
+  const localizedComponentOptions = componentOptions.map((value) => ({
+    value,
+    label: localizedComponentLabel(locale, value),
+  }));
   const [component, setComponent] = useState(componentOptions[0]);
   const [integrationTarget, setIntegrationTarget] = useState<Defect["integrationTarget"]>(() =>
     inferDefectIntegrationTarget(item.snapshot.tags, item.snapshot.component));
@@ -58,14 +63,14 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
     }
   }
 
-  return <form id={`defect-form-${item.id}`} className={styles.inlineDefect} onSubmit={submit} data-testid="inline-defect-composer">
-    <div className={styles.inlineDefectHeader}><div><Bug size={17} /><h2>{t("inlineDefect.step", { step: step.order })}</h2></div><label>{t("inlineDefect.linkStep")} <select value={step.id} disabled><option value={step.id}>{step.order}</option></select></label></div>
-    <div className={styles.inlineDefectGrid}>
-      <div className={styles.inlineDefectFields}>
+  return <form id={`defect-form-${item.id}`} className={runStyles.defect} onSubmit={submit} data-testid="inline-defect-composer">
+    <div className={runStyles.defectHeader}><div><Bug size={17} /><h2>{t("inlineDefect.step", { step: step.order })}</h2></div><div className={runStyles.defectStep}><span>{t("inlineDefect.linkStep")}</span><strong className={runStyles.defectStepValue}>{step.order}</strong></div></div>
+    <div className={runStyles.defectGrid}>
+      <div className={runStyles.defectFields}>
         <Field label={t("inlineDefect.title")} wide><input required value={title} onChange={(event) => setTitle(event.target.value)} /></Field>
-        <Field label={t("inlineDefect.severity")}><select value={severity} onChange={(event) => setSeverity(event.target.value as Defect["severity"])}><option value="critical">{t("severity.critical")}</option><option value="high">{t("severity.major")}</option><option value="medium">{t("severity.minor")}</option><option value="low">{t("severity.low")}</option></select></Field>
-        <Field label={t("inlineDefect.priority")}><select value={priority} onChange={(event) => setPriority(event.target.value as Defect["priority"])}><option value="critical">{t("inlineDefect.priorityUrgent")}</option><option value="high">{t("priority.high")}</option><option value="medium">{t("priority.medium")}</option><option value="low">{t("priority.low")}</option></select></Field>
-        <Field label={t("inlineDefect.category")} wide><select value={component} onChange={(event) => setComponent(event.target.value)}>{componentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></Field>
+        <Field label={t("inlineDefect.severity")}><AnimatedSelect label={t("inlineDefect.severity")} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[{ value: "critical", label: t("severity.critical") }, { value: "high", label: t("severity.major") }, { value: "medium", label: t("severity.minor") }, { value: "low", label: t("severity.low") }]} /></Field>
+        <Field label={t("inlineDefect.priority")}><AnimatedSelect label={t("inlineDefect.priority")} value={priority} onChange={(value) => setPriority(value as Defect["priority"])} options={[{ value: "critical", label: t("inlineDefect.priorityUrgent") }, { value: "high", label: t("priority.high") }, { value: "medium", label: t("priority.medium") }, { value: "low", label: t("priority.low") }]} /></Field>
+        <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={localizedComponentOptions} /></Field>
         <Field label={defectCopy.youTrackTarget} wide><AnimatedSelect label={defectCopy.youTrackTarget}
           value={integrationTarget ?? "none"}
           onChange={(value) => setIntegrationTarget(value === "none" ? null : value as Exclude<Defect["integrationTarget"], null>)}
@@ -76,15 +81,15 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
         <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
         <Field label={t("inlineDefect.reproSteps")} wide><textarea required value={repro} onChange={(event) => setRepro(event.target.value)} /></Field>
       </div>
-      <div className={styles.inlineDefectEvidence}>
+      <div className={runStyles.defectEvidence}>
         <span>{t("inlineDefect.evidence")}</span>
-        <label className={styles.inlineUpload} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); } }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setFiles(Array.from(event.dataTransfer.files)); }}><ImageIcon size={26} /><strong>{t("inlineDefect.dropFiles")}</strong><small>{t("inlineDefect.chooseFiles")}</small><em>{t("inlineDefect.fileTypes")}</em><input id={`inline-evidence-${item.id}`} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} /></label>
-        {files.length > 0 && <div className={styles.inlineFiles}>{files.map((file) => <span key={`${file.name}-${file.lastModified}`}>{/\.(mp4|mov|webm)$/i.test(file.name) ? <Video size={14} /> : <Paperclip size={14} />}{file.name}<button type="button" aria-label={`${t("inlineDefect.removeFile")} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>)}</div>}
-        <Field label={t("inlineDefect.deepLink")} wide><div className={styles.linkInput}><input value={link} onChange={(event) => setLink(event.target.value)} /><ExternalLink size={15} /></div></Field>
-        <div className={styles.snapshotNote}><RefreshCw size={16} /><span><strong>{t("inlineDefect.runSnapshot")}</strong><small>{t("inlineDefect.runSnapshotHint")}</small></span></div>
+        <label className={runStyles.upload} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); } }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setFiles(Array.from(event.dataTransfer.files)); }}><ImageIcon size={26} /><strong>{t("inlineDefect.dropFiles")}</strong><small>{t("inlineDefect.chooseFiles")}</small><em>{t("inlineDefect.fileTypes")}</em><input id={`inline-evidence-${item.id}`} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} /></label>
+        {files.length > 0 && <div className={runStyles.files}>{files.map((file) => <span key={`${file.name}-${file.lastModified}`}>{/\.(mp4|mov|webm)$/i.test(file.name) ? <Video size={14} /> : <Paperclip size={14} />}{file.name}<button type="button" aria-label={`${t("inlineDefect.removeFile")} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>)}</div>}
+        <Field label={t("inlineDefect.deepLink")} wide><div className={runStyles.linkInput}><input value={link} onChange={(event) => setLink(event.target.value)} /><ExternalLink size={15} /></div></Field>
+        <div className={runStyles.snapshot}><RefreshCw size={16} /><span><strong>{t("inlineDefect.runSnapshot")}</strong><small>{t("inlineDefect.runSnapshotHint")}</small></span></div>
       </div>
     </div>
     {error && <FormError message={error} />}
-    <div className={styles.inlineDefectFooter}><span>{created ? t("inlineDefect.linked", { key: created.key }) : `${item.caseKey} · ${run.environment.name} · ${run.build}`}</span><small>{submitting ? t("inlineDefect.creating") : created ? t("inlineDefect.saved") : t("inlineDefect.saveHint")}</small></div>
+    <div className={runStyles.defectFooter}><span>{created ? t("inlineDefect.linked", { key: created.key }) : `${item.caseKey} · ${run.environment.name} · ${run.build}`}</span><small>{submitting ? t("inlineDefect.creating") : created ? t("inlineDefect.saved") : t("inlineDefect.saveHint")}</small></div>
   </form>;
 }

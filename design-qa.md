@@ -4,7 +4,7 @@ Date: 2026-08-29
 
 ## Sources and evidence
 
-- Selected visual direction: `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-d9f43ff0-27e6-4fe2-81f0-03a845d99f33.png`
+- Selected visual direction: ImageGen session asset `exec-d9f43ff0-27e6-4fe2-81f0-03a845d99f33.png`.
 - Final dashboard comparison: `design-qa-evidence/redesign-dashboard-comparison.png`
 - Final drawer comparison: `design-qa-evidence/redesign-drawer-comparison.png`
 - Final browser-rendered dashboard: `design-qa-evidence/redesign-final-dashboard.png`
@@ -120,6 +120,19 @@ Date: 2026-08-29
 
 final result: passed
 
+## YouTrack identity redesign — final local pass
+
+- Direction: the selected list-first concept was rebuilt with the actual YouTrack visual language instead of the former blue TMS skin.
+- Reference evidence: `.design-qa/reference-crop.png`; local implementation evidence: `.design-qa/cases-dark-expanded.jpg`, `.design-qa/cases-light.png`, and `.design-qa/youtrack-vs-tms.png`.
+- Shell: full-height navy-to-charcoal navigation, compact system typography, 40px rows, flat selected states, thin `#43454a` dividers, and `#3574f0` reserved for primary, focus, and selection.
+- Cases: all loaded project cases are presented in a dense list-first workspace with resizable repository, keyboard-roving rows, document detail, persistent information rail, and a mobile list-to-detail transition with an explicit return action.
+- Surfaces: API testing, selects, configuration, drawers, run planning, hooks, integrations, reports, and run navigation share the same light and dark token system without floating card stacks or old dark-blue panels.
+- Visual checks: dark desktop, light responsive layout, filter popovers, creation drawer, dashboard, case selection, mobile detail/back flow, expanded navigation, and reference/implementation side-by-side comparison.
+- Accessibility checks: selected list and repository items are the only tab stops in their respective collections; Arrow keys, Home, and End move selection; mobile detail has a labelled return control; focus indicators remain high contrast.
+- Security note: visual QA used a temporary local-only preview path that was fully reverted. The final source retains the normal Auth0 boundary and contains no preview bypass marker.
+- Verification: adapters 58/58, auth 17/17, attachments 4/4, TypeScript, 204-file architecture gate, production build 61/61, and `git diff --check` all passed.
+- Final result: passed.
+
 ## Saturn identity and dark theme — final pass
 
 - Source: ImageGen-produced minimal ringed Saturn on a transparent background, with no lettering; the first selected concept was reused as the single brand mark.
@@ -158,3 +171,15 @@ final result: passed
 - Production artifact evidence: source commit `27547929` and Pages commit `b283021e` are on their respective `main` branches. The live TMS bundle contains the custom `menuitemradio` selector and dark-theme stylesheet, and contains zero `tms-command-search` elements.
 - Visual verification limit: the post-release in-app browser session reached the production Auth0 boundary without an authenticated TMS session, so the final signed-in pixels could not be recaptured in that browser. The implementation comparison is grounded in the accepted user-supplied screenshots plus the shipped production CSS/DOM artifact; no authenticated visual state was fabricated.
 - Final result: passed, with the named authenticated-browser capture limitation.
+
+## YouTrack total-system redesign — release pass
+
+- Reference: the supplied YouTrack Issues screenshot, inspected at original detail for its full-height gradient navigation, graphite content surfaces, compact system typography, 40px rows, thin dividers, and restrained `#3574f0` selection/action color.
+- Combined comparison: `.design-qa/youtrack-total-final/final-comparison.jpg` places the reference beside the final Dashboard, Test Cases, Integrations, Configuration, and Run Planner states. The file is intentionally ignored release evidence and is not shipped to production.
+- Coverage: the application shell, Dashboard, Test Cases, Test Runs and history, run execution, Run Planner, Suites, Integrations, Hooks, Reports, API Testing, Configuration, shared drawers, popovers, filters, buttons, fields, and animated selects now use one flat light/dark YouTrack-derived system.
+- Dark tokens: content `#1e1f22`, navigation `#18191b`, controls `#2b2d30`, hover `#393b40`, borders `#43454a`/`#4e5157`, muted text `#9da0a8`, primary `#3574f0`, and links `#99bbff`. The selected full-navigation navy-to-charcoal gradient remains the only large gradient treatment.
+- UX corrections: Russian component labels are presentation-only while API payloads keep canonical values; run scope sorting and filters use the same custom animated listbox control as other TMS selectors; keyboard navigation, focus return, table semantics, active/history state, and responsive density are preserved.
+- Visual states: dark desktop Dashboard, Test Cases, Integrations, and Runs; dark responsive Configuration and Run Planner; light responsive Dashboard; active/history navigation and archived-run controls. The Hooks demo could render only its authenticated-service recovery state locally, so its populated state was verified by source, types, architecture, and focused tests rather than fabricated browser data.
+- Security cleanup: the temporary local visual-QA authentication bypass and its query marker were removed before the release gate.
+- Verification: TypeScript passed; architecture passed for 204 files; Auth0 17/17; attachments 4/4; TMS adapters and UI models 58/58; generated OpenAPI contract unchanged; `git diff --check` passed; production build generated 61/61 pages.
+- Final result: passed.

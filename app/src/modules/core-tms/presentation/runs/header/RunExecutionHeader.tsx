@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "../../../tms.module.css";
+import runStyles from "../runs.module.css";
 
 type Props = {
   run: TestRunSummary;
@@ -43,21 +44,21 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, onAr
   }, [confirmOpen]);
 
   return (
-    <header className={styles.executionHeader}>
+    <header className={runStyles.header}>
       <div><span>{item.caseKey}</span><h1>{item.snapshot.title}</h1><p>{item.snapshot.description}</p></div>
-      <div className={styles.executionHeaderActions} ref={actionsRef}>
-        <button className={styles.iconButton} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>
+      <div className={runStyles.headerActions} ref={actionsRef}>
+        <button className={`${styles.iconButton} ${runStyles.headerIconButton}`} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>
         {canArchive && !run.archivedAt && (
-          <button ref={archiveButtonRef} className={`${styles.iconButton} ${styles.runArchiveButton}`} aria-label={t("runs.removeFromList")} title={t("runs.removeFromList")} aria-expanded={confirmOpen} onClick={() => setConfirmOpen((current) => !current)}><Trash2 size={17} /></button>
+          <button ref={archiveButtonRef} className={`${styles.iconButton} ${runStyles.headerIconButton} ${runStyles.archiveButton}`} aria-label={t("runs.removeFromList")} title={t("runs.removeFromList")} aria-expanded={confirmOpen} onClick={() => setConfirmOpen((current) => !current)}><Trash2 size={17} /></button>
         )}
         {confirmOpen && (
-          <section className={styles.runArchivePopover} role="dialog" aria-label={t("runs.removeConfirm", { key: run.key })}>
-            <button className={styles.runArchiveClose} type="button" aria-label={t("common.close")} onClick={() => closeConfirm()}><X size={15} /></button>
+          <section className={runStyles.archivePopover} role="dialog" aria-label={t("runs.removeConfirm", { key: run.key })}>
+            <button className={runStyles.archiveClose} type="button" aria-label={t("common.close")} onClick={() => closeConfirm()}><X size={15} /></button>
             <strong>{t("runs.removeConfirm", { key: run.key })}</strong>
             <p>{t("runs.removeKeepsHistory")}</p>
             <div>
               <button ref={cancelButtonRef} type="button" onClick={() => closeConfirm()}>{t("common.cancel")}</button>
-              <button className={styles.runArchiveConfirmButton} type="button" disabled={archivePending} onClick={() => onArchive(run)}><Trash2 size={14} /> {archivePending ? t("runs.archiving") : t("runs.removeAction")}</button>
+              <button className={runStyles.archiveConfirmButton} type="button" disabled={archivePending} onClick={() => onArchive(run)}><Trash2 size={14} /> {archivePending ? t("runs.archiving") : t("runs.removeAction")}</button>
             </div>
           </section>
         )}

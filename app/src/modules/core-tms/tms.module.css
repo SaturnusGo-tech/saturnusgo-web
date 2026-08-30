@@ -4569,3 +4569,615 @@
   .runArchivePopover,
   .executionPaneTransition { animation: none; }
 }
+
+/* YouTrack identity -------------------------------------------------------
+   Final authoritative layer. Keep this last: the module contains several
+   historical visual passes and these tokens intentionally replace them. */
+.app {
+  --yt-content: #ffffff;
+  --yt-chrome: #18191b;
+  --yt-control: #f0f1f3;
+  --yt-control-hover: #e5e6e8;
+  --yt-border: #d9dadd;
+  --yt-border-strong: #b9bbc0;
+  --yt-text: #27282e;
+  --yt-muted: #6f737b;
+  --yt-primary: #3574f0;
+  --yt-primary-hover: #2f68d8;
+  --yt-link: #315fbd;
+  --yt-selection: rgb(53 116 240 / 12%);
+  --yt-focus: rgb(53 116 240 / 28%);
+
+  --ink: var(--yt-text);
+  --muted: var(--yt-muted);
+  --line: var(--yt-border);
+  --line-strong: var(--yt-border-strong);
+  --canvas: #f7f8fa;
+  --paper: var(--yt-content);
+  --nav: var(--yt-chrome);
+  --nav-raised: #2b2d30;
+  --nav-text: #ffffff;
+  --teal: var(--yt-primary);
+  --teal-dark: var(--yt-primary-hover);
+  --teal-soft: #e8f0fe;
+  --green: #2f7d46;
+  --green-soft: #e7f3ea;
+  --red: #c33b3b;
+  --red-soft: #fbeaea;
+  --amber: #8a6500;
+  --amber-soft: #fff4ce;
+  --control: var(--yt-control);
+  --control-hover: var(--yt-control-hover);
+  --action: var(--yt-primary);
+  --action-foreground: #ffffff;
+  --chart-1: #3574f0;
+  --chart-2: #db5c5c;
+  --chart-3: #57965c;
+  --chart-4: #7a7e85;
+  --chart-grid: var(--yt-border);
+  --radius-control: 4px;
+  --radius-panel: 4px;
+  --radius-modal: 6px;
+
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42;
+  color-scheme: light;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.app ::selection { color: #ffffff; background: var(--action); }
+.app :is(a, .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
+.app :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--paper);
+}
+
+.app :is(input, select, textarea) { accent-color: var(--action); }
+.app :is(input, textarea)::placeholder { color: var(--muted); opacity: 1; }
+
+/* Dense YouTrack control language. */
+.app :is(
+  .primaryButton,
+  .secondaryButton,
+  .successButton,
+  .dangerButton,
+  .reportButton,
+  .textButton,
+  .iconButton,
+  .toolbarPrimary,
+  .authAction,
+  .runCreateButton,
+  .repositoryNewButton,
+  .caseCommandActions button,
+  .executionFooter button,
+  .executionFooter label
+) {
+  min-height: 32px;
+  border-radius: var(--radius-control);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.app :is(.primaryButton, .reportButton, .toolbarPrimary, .authAction) {
+  color: #ffffff;
+  background: var(--action);
+  border-color: var(--action);
+}
+
+.app :is(.primaryButton, .reportButton, .toolbarPrimary, .authAction):hover {
+  color: #ffffff;
+  background: var(--yt-primary-hover);
+  border-color: var(--yt-primary-hover);
+}
+
+.app :is(.secondaryButton, .iconButton) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+
+.app :is(.secondaryButton, .iconButton):hover {
+  color: var(--ink);
+  background: var(--control-hover);
+  border-color: var(--line-strong);
+}
+
+.app .textButton { color: var(--ink); background: transparent; border-color: transparent; }
+.app .textButton:hover { color: var(--ink); background: var(--control-hover); border-color: transparent; }
+.app .successButton { color: var(--green); background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 48%, transparent); }
+.app .dangerButton { color: var(--red); background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 48%, transparent); }
+
+/* The hierarchy is made with dividers, not floating cards. */
+.app :is(
+  .authPanel,
+  .onboardingPanel,
+  .panel,
+  .metricCard,
+  .environmentCard,
+  .suiteCard,
+  .reportStats,
+  .integrationOverview,
+  .dashboardLedger,
+  .dashboardChartPanel,
+  .dashboardOperationsPanel,
+  .toolbarPopover,
+  .runArchivePopover,
+  .projectSelectorMenu,
+  .modal,
+  .modalDrawer,
+  .inlineDefect,
+  .stepEditor,
+  .checkList,
+  .evidenceFields,
+  .reportEvidence,
+  .reviewStats,
+  .reviewSteps,
+  .runReview,
+  .widgetPreview
+) {
+  border-color: var(--line);
+  border-radius: var(--radius-panel);
+  box-shadow: none;
+}
+
+.app :is(.toolbarPopover, .runArchivePopover, .projectSelectorMenu) {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+}
+
+.app :is(
+  .stage,
+  .pageScroll,
+  .pane,
+  .largePane,
+  .repositoryPane,
+  .listPane,
+  .executionPane,
+  .contextPane,
+  .caseWorkbench,
+  .caseRepositoryPane,
+  .caseWorkbenchMain,
+  .caseInspector,
+  .integrationWorkspace,
+  .executionShell,
+  .runQueue,
+  .modal,
+  .modalDrawer,
+  .drawerBody,
+  .executionFooter,
+  .executionStep,
+  .inlineDefect,
+  .dashboardChartPanel,
+  .dashboardOperationsPanel
+) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+.app :is(
+  .repositoryToolbar,
+  .listPaneHeader,
+  .panelHeader,
+  .workbenchPageHeader,
+  .caseRepositoryHeading,
+  .caseRepositoryControls,
+  .caseCommandBar,
+  .integrationTableHead,
+  .dataTableHead,
+  .stepsHead,
+  .executionStepHead,
+  .executionMeta,
+  .precondition,
+  .compactUpload,
+  .filterSummary,
+  .snapshotNote,
+  .caseSteps thead th,
+  .dashboardRunTable th
+) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line);
+}
+
+.app :is(
+  .repositoryToolbar,
+  .listPaneHeader,
+  .panelHeader,
+  .workbenchPageHeader,
+  .caseRepositoryHeading,
+  .caseRepositoryControls,
+  .caseCommandBar,
+  .caseDocumentHeader,
+  .casePropertyStrip,
+  .casePropertyStrip > div,
+  .casePreconditions li,
+  .caseSection .sectionTitle,
+  .caseSteps th,
+  .caseSteps td,
+  .caseInspector,
+  .caseInspectorGroup,
+  .caseInspectorEvidence > *,
+  .suiteDetailHeader,
+  .suiteScopeLine,
+  .dataTable,
+  .dataTableHead,
+  .dataTableRow,
+  .integrationTable,
+  .integrationTableHead,
+  .integrationRow,
+  .executionHeader,
+  .executionMeta,
+  .executionSteps,
+  .executionStepHead,
+  .executionStep,
+  .executionFooter,
+  .dashboardHeader,
+  .dashboardPanelHeading,
+  .dashboardRunTable th,
+  .dashboardRunTable td,
+  .dashboardActivityList li,
+  .drawerSection,
+  .drawerDisclosure,
+  .modalDrawer > header
+) { border-color: var(--line); }
+
+.app :is(
+  .formField input,
+  .formField select,
+  .formField textarea,
+  .stepEditorRow textarea,
+  .checklistEditorRow textarea,
+  .compactStepRow textarea,
+  .compactChecklistRow textarea,
+  .searchField,
+  .tableSearch,
+  .projectSwitcher > select,
+  .inlineDefectHeader select,
+  .stepActual textarea,
+  .linkInput
+) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line-strong);
+  border-radius: var(--radius-control);
+  box-shadow: none;
+}
+
+.app :is(
+  .formField input,
+  .formField select,
+  .formField textarea,
+  .stepEditorRow textarea,
+  .checklistEditorRow textarea,
+  .compactStepRow textarea,
+  .compactChecklistRow textarea,
+  .searchField,
+  .tableSearch
+):focus-within {
+  border-color: var(--action);
+  box-shadow: 0 0 0 2px var(--yt-focus);
+}
+
+.app :is(.workbenchPageHeader h1, .dashboardTitleRow h1, .suiteDetailHeader h1, .caseDocumentHeader h1) {
+  color: var(--ink);
+  font-size: clamp(20px, 1.7vw, 24px);
+  font-weight: 650;
+  letter-spacing: -.015em;
+}
+
+.app :is(.panelHeader h2, .dashboardPanelHeading h2, .suiteListHeader h2, .inlineDefectHeader h2) {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.app :is(
+  .dashboardTitleRow p,
+  .dashboardRangeRow,
+  .dashboardMetric > div,
+  .dashboardMetric > p,
+  .dashboardPanelHeading p,
+  .dashboardLegend,
+  .dashboardRunTable small,
+  .dashboardActivityList small,
+  .dashboardActivityList time,
+  .caseDocumentHeader > p,
+  .caseTagLine,
+  .casePropertyStrip dt,
+  .caseSection > h2,
+  .caseTestData > h2,
+  .caseInspectorMeta dt,
+  .caseInspectorGroup h3,
+  .suiteListHeader p,
+  .suiteCard small,
+  .suiteCard > span,
+  .suiteDetailHeader p,
+  .suiteScopeLine,
+  .runSummary small,
+  .runSummary em,
+  .runItem small,
+  .executionHeader > div > span,
+  .executionHeader p,
+  .executionMeta strong,
+  .precondition,
+  .precondition strong,
+  .executionStepHead,
+  .stepNumber,
+  .modalDrawer > header p,
+  .drawerSectionHeading > span,
+  .drawerDisclosure > summary small
+) { color: var(--muted); }
+
+.app :is(
+  .dashboardMetric > strong,
+  .dashboardPanelHeading h2,
+  .dashboardRunTable td,
+  .dashboardPanelEmpty strong,
+  .caseRepositoryHeading > strong,
+  .repositoryFolderButton,
+  .repositoryCaseRow,
+  .caseBreadcrumb strong,
+  .caseDocument,
+  .caseDocumentHeader h1,
+  .casePropertyStrip dd,
+  .caseSection > p,
+  .caseTestData > p,
+  .casePreconditions p,
+  .caseSteps tbody td,
+  .caseInspectorMeta dd,
+  .caseInspectorActivity strong,
+  .suiteCard,
+  .suiteDetailHeader h1,
+  .suiteScopeLine strong,
+  .dataTableRow,
+  .tableEmpty,
+  .runSummary h2,
+  .runItem,
+  .executionHeader h1,
+  .executionMeta > span,
+  .executionStep,
+  .stepAction,
+  .stepExpected,
+  .stepActual,
+  .stepStatus,
+  .drawerSectionHeading,
+  .drawerDisclosure > summary,
+  .modalDrawer > header h2
+) { color: var(--ink); }
+
+.app :is(.dashboardRunTable tr:hover td, .dataTableRow:hover, .integrationRow:hover, .caseRow:hover, .runItem:hover, .suiteCard:hover, .repositoryFolderRow:hover, .repositoryCaseRow:hover) {
+  background: var(--control-hover);
+}
+
+.app :is(
+  .navigationItemActive,
+  .folderRowActive,
+  .caseRowActive,
+  .repositoryFolderRowActive,
+  .repositoryCaseRowActive,
+  .suiteCardActive,
+  .runItemActive,
+  .casePickerSelected,
+  .contextTabSelected,
+  .segmentedActive
+) {
+  color: var(--ink);
+  background: var(--yt-selection);
+  border-color: var(--action);
+  box-shadow: inset 3px 0 0 var(--action);
+}
+
+.app :is(.navigationItemActive, .segmentedActive) { color: #ffffff; }
+.app :is(.iconButtonActive, .repositoryCreateButton) { color: var(--yt-link); background: var(--yt-selection); border-color: transparent; }
+.app :is(.folderAdd, .repositoryFolderToggle, .repositoryFolderAdd):hover { color: var(--yt-link); background: var(--yt-selection); }
+
+.app :is(.dataTableHead, .integrationTableHead, .defectTableHead, .stepsHead, .executionStepHead, .dashboardRunTable th, .caseSteps thead th) {
+  color: var(--muted);
+  background: var(--control);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.app :is(.dataTableRow, .integrationRow, .defectRow, .stepRow, .executionStep, .dashboardRunTable td, .caseSteps td) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+.app :is(.dashboardLedger, .reportStats, .integrationOverview) { background: transparent; border-radius: 0; }
+.app :is(.dashboardMetric, .reportStats > span, .integrationOverview > div) { border-color: var(--line); }
+.app :is(.dashboardStatus, .statusPill, .tagRow > span) { border-radius: 999px; }
+
+.app .modalBackdropDrawer { background: rgb(0 0 0 / 46%); backdrop-filter: none; }
+.app .modalDrawer { border-radius: 0; box-shadow: -1px 0 0 var(--line); }
+.app .modalDrawer > header,
+.app :is(.drawerForm, .productionDrawerForm) > .modalFooter { color: var(--ink); background: var(--paper); border-color: var(--line); box-shadow: none; }
+.app .toast { color: #ffffff; background: #2b2d30; border-color: #43454a; border-radius: var(--radius-control); box-shadow: 0 8px 20px rgb(0 0 0 / 18%); }
+
+:global(.dark) .app {
+  --yt-content: #1e1f22;
+  --yt-chrome: #18191b;
+  --yt-control: #2b2d30;
+  --yt-control-hover: #393b40;
+  --yt-border: #43454a;
+  --yt-border-strong: #4e5157;
+  --yt-text: #ffffff;
+  --yt-muted: #9da0a8;
+  --yt-primary: #3574f0;
+  --yt-primary-hover: #467ff2;
+  --yt-link: #99bbff;
+  --yt-selection: rgb(53 116 240 / 22%);
+  --yt-focus: rgb(53 116 240 / 35%);
+
+  --ink: var(--yt-text);
+  --muted: var(--yt-muted);
+  --line: var(--yt-border);
+  --line-strong: var(--yt-border-strong);
+  --canvas: var(--yt-content);
+  --paper: var(--yt-content);
+  --nav: var(--yt-chrome);
+  --nav-raised: var(--yt-control);
+  --nav-text: var(--yt-text);
+  --teal: var(--yt-primary);
+  --teal-dark: var(--yt-primary-hover);
+  --teal-soft: rgb(53 116 240 / 22%);
+  --green: #57965c;
+  --green-soft: rgb(87 150 92 / 18%);
+  --red: #db5c5c;
+  --red-soft: rgb(219 92 92 / 18%);
+  --amber: #f2b45d;
+  --amber-soft: rgb(242 180 93 / 18%);
+  --control: var(--yt-control);
+  --control-hover: var(--yt-control-hover);
+  --action: var(--yt-primary);
+  --action-foreground: #ffffff;
+  --chart-1: #6c9eff;
+  --chart-2: #db5c5c;
+  --chart-3: #6fad73;
+  --chart-4: #9da0a8;
+  --chart-grid: var(--yt-border);
+  color-scheme: dark;
+}
+
+:global(.dark) .app :is(a, .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
+
+:global(.dark) .app :is(
+  .stage,
+  .pageScroll,
+  .pane,
+  .largePane,
+  .repositoryPane,
+  .listPane,
+  .executionPane,
+  .contextPane,
+  .caseWorkbench,
+  .caseRepositoryPane,
+  .caseWorkbenchMain,
+  .caseInspector,
+  .integrationWorkspace,
+  .executionShell,
+  .runQueue,
+  .modal,
+  .modalDrawer,
+  .drawerBody,
+  .executionFooter,
+  .executionStep,
+  .inlineDefect,
+  .dashboardChartPanel,
+  .dashboardOperationsPanel,
+  .caseSteps thead th,
+  .dashboardRunTable th
+) {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+:global(.dark) .app :is(
+  .repositoryToolbar,
+  .listPaneHeader,
+  .panelHeader,
+  .workbenchPageHeader,
+  .caseRepositoryHeading,
+  .caseRepositoryControls,
+  .caseCommandBar,
+  .integrationTableHead,
+  .dataTableHead,
+  .stepsHead,
+  .executionStepHead,
+  .executionMeta,
+  .precondition,
+  .compactUpload,
+  .drawerSummaryLine,
+  .filterSummary,
+  .snapshotNote,
+  .dashboardRunTable th
+) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line);
+}
+
+:global(.dark) .app :is(
+  .formField input,
+  .formField select,
+  .formField textarea,
+  .stepEditorRow textarea,
+  .checklistEditorRow textarea,
+  .compactStepRow textarea,
+  .compactChecklistRow textarea,
+  .searchField,
+  .tableSearch,
+  .projectSwitcher > select,
+  .inlineDefectHeader select,
+  .stepActual textarea,
+  .linkInput
+) {
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
+}
+
+:global(.dark) .app :is(.primaryButton, .reportButton, .toolbarPrimary, .authAction) {
+  color: #ffffff !important;
+  background: var(--action);
+  border-color: var(--action);
+}
+
+:global(.dark) .app :is(.primaryButton, .reportButton, .toolbarPrimary, .authAction):hover {
+  color: #ffffff !important;
+  background: var(--yt-primary-hover);
+  border-color: var(--yt-primary-hover);
+}
+
+:global(.dark) .app :is(.secondaryButton, .iconButton) { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .app :is(.secondaryButton, .iconButton):hover { color: var(--ink); background: var(--control-hover); border-color: var(--line-strong); }
+:global(.dark) .app .textButton { color: var(--ink); background: transparent; border-color: transparent; }
+:global(.dark) .app .textButton:hover { color: var(--ink); background: var(--control-hover); }
+:global(.dark) .app .successButton { color: #b6e2b9 !important; background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 62%, transparent); }
+:global(.dark) .app .dangerButton { color: #ffb3b3 !important; background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 62%, transparent); }
+
+:global(.dark) .app :is(
+  .navigationItemActive,
+  .folderRowActive,
+  .caseRowActive,
+  .repositoryFolderRowActive,
+  .repositoryCaseRowActive,
+  .suiteCardActive,
+  .runItemActive,
+  .casePickerSelected,
+  .contextTabSelected,
+  .segmentedActive
+) {
+  color: var(--ink);
+  background: var(--yt-selection);
+  border-color: var(--action);
+  box-shadow: inset 3px 0 0 var(--action);
+}
+
+:global(.dark) .app :is(.navigationItemActive, .segmentedActive) { color: #ffffff !important; }
+:global(.dark) .app :is(.toolbarPopover, .runArchivePopover, .projectSelectorMenu, .actionMenu) { color: var(--ink); background: var(--control); border-color: var(--line-strong); box-shadow: 0 8px 20px rgb(0 0 0 / 28%); }
+:global(.dark) .app :is(.toolbarPopover button, .projectSelectorList > button, .projectSelectorCreate, .actionMenu > button) { color: var(--ink); background: transparent; border-color: var(--line); }
+:global(.dark) .app :is(.toolbarPopover button, .projectSelectorList > button, .projectSelectorCreate, .actionMenu > button):hover { background: var(--control-hover); }
+:global(.dark) .app .modalBackdropDrawer { background: rgb(0 0 0 / 62%); }
+:global(.dark) .app .dashboardActivityList li > span { color: #ffffff; background: #4e5157; }
+
+@media (prefers-reduced-motion: reduce) {
+  .app *,
+  .app *::before,
+  .app *::after {
+    scroll-behavior: auto;
+    transition-duration: .01ms;
+    animation-duration: .01ms;
+    animation-iteration-count: 1;
+  }
+}

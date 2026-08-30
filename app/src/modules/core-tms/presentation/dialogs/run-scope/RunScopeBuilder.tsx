@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
 import type { RunDialogCopy } from "../run/copy";
 import {
@@ -44,7 +45,9 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
       <button type="button" className={filterCount ? styles.filterActive : styles.filterButton} onClick={() => setFiltersOpen((value) => !value)} aria-expanded={filtersOpen}>
         <Filter size={15} />{filtersOpen ? copy.hideFilters : copy.showFilters}{filterCount > 0 && <b>{filterCount}</b>}
       </button>
-      <label className={styles.sortField}><span>{copy.sort}</span><select value={filters.sort} onChange={(event) => update("sort", event.target.value as RunScopeFilters["sort"])}><option value="updated_desc">{copy.updatedRecently}</option><option value="key_asc">{copy.keyAsc}</option><option value="title_asc">{copy.titleAsc}</option></select></label>
+      <div className={styles.sortField}><span>{copy.sort}</span><AnimatedSelect label={copy.sort} value={filters.sort}
+        onChange={(value) => update("sort", value as RunScopeFilters["sort"])}
+        options={[{ value: "updated_desc", label: copy.updatedRecently }, { value: "key_asc", label: copy.keyAsc }, { value: "title_asc", label: copy.titleAsc }]} /></div>
     </div>
 
     {filtersOpen && <div className={styles.filterGrid}>
@@ -81,5 +84,6 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
 }
 
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: Array<[string, string]>; onChange: (value: string) => void }) {
-  return <label className={styles.filterField}><span>{label}</span><select value={value} onChange={(event) => onChange(event.target.value)}>{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
+  return <div className={styles.filterField}><span>{label}</span><AnimatedSelect label={label} value={value} onChange={onChange}
+    options={options.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))} /></div>;
 }

@@ -96,3 +96,47 @@
   .trigger > svg,
   .menu { transition: none; }
 }
+
+/* YouTrack identity: authoritative select surface. */
+.trigger {
+  min-height: 36px;
+  padding: 7px 9px;
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line-strong);
+  border-radius: 4px;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.compactTrigger { min-height: 32px; padding-block: 5px; }
+.trigger:hover { color: var(--ink); background: var(--control-hover); border-color: var(--line-strong); }
+.trigger:focus-visible,
+.trigger[aria-expanded="true"] { background: var(--paper); border-color: var(--action); box-shadow: 0 0 0 2px rgb(53 116 240 / 28%); }
+.trigger > svg { color: var(--muted); }
+
+.menu {
+  top: calc(100% + 4px);
+  padding: 4px;
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line-strong);
+  border-radius: 4px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 14%);
+}
+
+.menu > button { min-height: 34px; padding: 6px 8px; color: var(--ink); border-radius: 3px; font-size: 12px; }
+.menu > button:hover,
+.menu > button:focus-visible { background: var(--control-hover); }
+.menu > button[data-selected="true"] { color: var(--ink); background: rgb(53 116 240 / 12%); box-shadow: inset 2px 0 var(--action); }
+.menu > button > svg { color: var(--action); }
+
+:global(.dark) .trigger { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+:global(.dark) .trigger:hover,
+:global(.dark) .trigger:focus-visible,
+:global(.dark) .trigger[aria-expanded="true"] { color: var(--ink); background: var(--control-hover); border-color: var(--action); box-shadow: 0 0 0 2px rgb(53 116 240 / 35%); }
+:global(.dark) .menu { color: var(--ink); background: var(--control); border-color: var(--line-strong); box-shadow: 0 8px 20px rgb(0 0 0 / 28%); }
+:global(.dark) .menu > button:hover,
+:global(.dark) .menu > button:focus-visible { background: var(--control-hover); }
+:global(.dark) .menu > button[data-selected="true"] { color: var(--ink); background: rgb(53 116 240 / 22%); box-shadow: inset 2px 0 var(--action); }
+:global(.dark) .menu > button > svg { color: #99bbff; }

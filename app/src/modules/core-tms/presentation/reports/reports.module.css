@@ -152,3 +152,83 @@
 :global(.dark) .evidence button { color: var(--ink); }
 :global(.dark) .detailEvidence > span,
 :global(.dark) .detailEvidence > a { color: var(--ink); background: var(--control); border-color: var(--line); }
+
+/* YouTrack identity: authoritative report ledger and detail view. */
+.page { color: var(--ink); background: var(--paper); font-size: 14px; }
+.header { min-height: 72px; padding-bottom: 16px; border-color: var(--line); }
+.header h1 { color: var(--ink); font-size: 22px; font-weight: 650; letter-spacing: -.015em; }
+.header p { margin-top: 5px; color: var(--muted); font-size: 13px; }
+.header button,
+.detailActions > button,
+.detailActions > a { min-height: 34px; border-radius: 4px; }
+
+.ledger { min-height: 54px; border-color: var(--line); }
+.ledger > div { padding-inline: 18px; border-color: var(--line); }
+.ledger dt { color: var(--muted); }
+.ledger dd { color: var(--ink); font-size: 18px; font-weight: 650; }
+
+.tableViewport { margin-top: 14px; border-color: var(--line); }
+.table th { padding: 8px 10px; color: var(--muted); background: var(--control); font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.table td { padding: 9px 10px; color: var(--ink); background: var(--paper); border-color: var(--line); font-size: 12px; }
+.table tbody tr:hover td { background: var(--control-hover); }
+.table td:first-child,
+.summary b { color: var(--ink); }
+.summary small,
+.defectLink > svg,
+.empty,
+.empty small { color: var(--muted); }
+.keyLink,
+.defectLink { color: var(--ink); }
+.keyLink:hover,
+.keyLink:focus-visible,
+.defectLink:hover b,
+.defectLink:focus-visible b { color: var(--yt-link, var(--action)); }
+.severity,
+.status { color: var(--muted); }
+.evidence > span,
+.detailEvidence > span,
+.detailEvidence > a { color: var(--ink); background: var(--control); border-color: var(--line); border-radius: 4px; }
+.evidence button { color: var(--ink); }
+.empty strong { color: var(--ink); }
+
+.backButton { min-height: 32px; margin-bottom: 14px; color: var(--muted); }
+.backButton:hover,
+.backButton:focus-visible { color: var(--ink); }
+.detailHeader { padding-bottom: 18px; border-color: var(--line); }
+.detailKey,
+.detailHeading p,
+.detailMeta dt,
+.contextList dt,
+.sectionHeading > span,
+.mutedText,
+.labelsSection p { color: var(--muted); }
+.detailHeading h1 { margin-top: 6px; color: var(--ink); font-size: clamp(22px, 2.4vw, 28px); font-weight: 650; letter-spacing: -.02em; }
+.detailHeading p { margin-top: 9px; font-size: 13px; line-height: 1.55; }
+.detailMeta { padding-block: 14px; border-color: var(--line); }
+.detailMeta > div,
+.detailColumns,
+.detailSection + .detailSection,
+.contextSection,
+.contextList > div,
+.evidenceSection,
+.labelsSection { border-color: var(--line); }
+.detailMeta dd,
+.contextList dd,
+.detailSection p { color: var(--ink); }
+.detailSection,
+.contextSection,
+.evidenceSection,
+.labelsSection { padding-block: 19px; }
+.detailSection h2,
+.contextSection h2,
+.evidenceSection h2,
+.labelsSection h2 { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.actualSection::before { background: var(--red); }
+
+:global(.dark) .page { color: var(--ink); background: var(--paper); }
+:global(.dark) :is(.header, .ledger, .ledger > div, .tableViewport, .table td, .detailHeader, .detailMeta, .detailMeta > div, .detailColumns, .detailSection + .detailSection, .contextSection, .contextList > div, .evidenceSection, .labelsSection) { border-color: var(--line); }
+:global(.dark) .table th { color: var(--muted); background: var(--control); }
+:global(.dark) .table td { color: var(--ink); background: var(--paper); }
+:global(.dark) .table tbody tr:hover td { background: var(--control-hover); }
+:global(.dark) :is(.evidence > span, .detailEvidence > span, .detailEvidence > a) { color: var(--ink); background: var(--control); border-color: var(--line); }
+:global(.dark) :is(.keyLink:hover, .keyLink:focus-visible, .defectLink:hover b, .defectLink:focus-visible b) { color: #99bbff; }

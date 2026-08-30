@@ -2,7 +2,7 @@ import { Activity, ChevronRight, PlayCircle } from "lucide-react";
 import { activityLabel } from "../../../localization/activity/label";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
-import styles from "../../../tms.module.css";
+import surface from "../dashboard.module.css";
 import type { DashboardSnapshot } from "../model/createDashboardSnapshot";
 
 export function DashboardOperations({
@@ -21,14 +21,14 @@ export function DashboardOperations({
   }).format(new Date(value));
 
   return (
-    <div className={styles.dashboardOperationsGrid}>
-      <section className={styles.dashboardOperationsPanel}>
-        <header className={styles.dashboardPanelHeading}>
+    <div className={surface.operationsGrid}>
+      <section className={surface.operationsPanel}>
+        <header className={surface.panelHeading}>
           <div><h2>{t("dashboard.recentRuns")}</h2><p>{t("dashboard.releaseStatus")}</p></div>
         </header>
         {snapshot.recentRuns.length ? (
-          <div className={styles.dashboardRunTableWrap}>
-            <table className={styles.dashboardRunTable}>
+          <div className={surface.runTableWrap}>
+            <table className={surface.runTable}>
               <thead><tr>
                 <th>{t("dashboard.run")}</th>
                 <th>{t("dashboard.environment")}</th>
@@ -48,26 +48,26 @@ export function DashboardOperations({
                     <td><button onClick={onOpenRuns}><strong>{run.name}</strong><small>{run.key} · {dateTime(run.startedAt ?? run.createdAt)}</small></button></td>
                     <td>{run.environment.name}</td>
                     <td>{passed}</td>
-                    <td className={failed ? styles.dashboardFailureValue : undefined}>{failed}</td>
-                    <td><span className={styles.dashboardRate}><i style={{ width: `${rate}%` }} /><b>{rate}%</b></span></td>
-                    <td><span className={`${styles.dashboardStatus} ${styles[`dashboardStatus_${run.status}`]}`}>{localizedLabel(locale, run.status)}</span></td>
+                    <td className={failed ? surface.failureValue : undefined}>{failed}</td>
+                    <td><span className={surface.rate}><i style={{ width: `${rate}%` }} /><b>{rate}%</b></span></td>
+                    <td><span className={`${surface.status} ${surface[`status_${run.status}`]}`}>{localizedLabel(locale, run.status)}</span></td>
                   </tr>
                 );
               })}</tbody>
             </table>
           </div>
         ) : (
-          <div className={styles.dashboardPanelEmpty}><PlayCircle size={24} /><strong>{t("dashboard.noRuns")}</strong><span>{t("dashboard.noRunsHint")}</span></div>
+          <div className={surface.panelEmpty}><PlayCircle size={24} /><strong>{t("dashboard.noRuns")}</strong><span>{t("dashboard.noRunsHint")}</span></div>
         )}
-        <button className={styles.dashboardPanelLink} onClick={onOpenRuns}>{t("dashboard.openAll")} <ChevronRight size={15} /></button>
+        <button className={surface.panelLink} onClick={onOpenRuns}>{t("dashboard.openAll")} <ChevronRight size={15} /></button>
       </section>
-      <section className={styles.dashboardOperationsPanel}>
-        <header className={styles.dashboardPanelHeading}>
+      <section className={surface.operationsPanel}>
+        <header className={surface.panelHeading}>
           <div><h2>{t("dashboard.activity")}</h2><p>{t("dashboard.latestChanges")}</p></div>
           <Activity size={17} aria-hidden="true" />
         </header>
         {snapshot.recentActivity.length ? (
-          <ol className={styles.dashboardActivityList}>
+          <ol className={surface.activityList}>
             {snapshot.recentActivity.map((entry) => (
               <li key={entry.id}>
                 <span aria-hidden="true">{entry.actor.slice(0, 1).toUpperCase()}</span>
@@ -77,7 +77,7 @@ export function DashboardOperations({
             ))}
           </ol>
         ) : (
-          <div className={styles.dashboardPanelEmpty}><Activity size={24} /><strong>{t("dashboard.noActivity")}</strong></div>
+          <div className={surface.panelEmpty}><Activity size={24} /><strong>{t("dashboard.noActivity")}</strong></div>
         )}
       </section>
     </div>

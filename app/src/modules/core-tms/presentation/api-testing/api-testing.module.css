@@ -18,3 +18,31 @@
 @media (prefers-reduced-motion: reduce) {
   .page, .header, .webview { scroll-behavior: auto; }
 }
+
+/* YouTrack identity: authoritative API workspace surface. */
+.page { color: var(--ink); background: var(--canvas); font-size: 14px; }
+.header { min-height: 52px; padding: 10px 20px; background: var(--paper); border-color: var(--line); }
+.header h1 { color: var(--ink); font-size: 21px; font-weight: 650; letter-spacing: -.015em; }
+.toolTabs { min-height: 40px; gap: 20px; padding-inline: 20px; background: var(--paper); border-color: var(--line); }
+.toolTab,
+.toolTabActive { color: var(--muted); font-size: 13px; font-weight: 500; }
+.toolTab:hover,
+.toolTabActive { color: var(--ink); }
+.toolTabActive::after { background: var(--action); }
+.toolTab:focus-visible,
+.toolTabActive:focus-visible { outline-color: var(--action); }
+.webview,
+.frame,
+.loading { background: var(--paper); }
+
+:global(.dark) .page,
+:global(.dark) .header,
+:global(.dark) .toolTabs,
+:global(.dark) .webview,
+:global(.dark) .frame,
+:global(.dark) .loading { color: var(--ink); background: var(--paper); border-color: var(--line); }
+:global(.dark) .toolTab,
+:global(.dark) .toolTabActive { color: var(--muted); }
+:global(.dark) .toolTab:hover,
+:global(.dark) .toolTabActive { color: var(--ink); }
+:global(.dark) .toolTabActive::after { background: var(--action); }

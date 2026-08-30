@@ -17,14 +17,14 @@ import {
 } from "recharts";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
-import styles from "../../../tms.module.css";
+import surface from "../dashboard.module.css";
 import type { DashboardSnapshot } from "../model/createDashboardSnapshot";
 
 const COLORS = {
-  passRate: "#1769d2",
-  failures: "#d8342f",
-  defects: "#2b8a4b",
-  runs: "#667786",
+  passRate: "var(--chart-1)",
+  failures: "var(--chart-2)",
+  defects: "var(--chart-3)",
+  runs: "var(--chart-4)",
 };
 
 export function DashboardTrendChart({ snapshot }: { snapshot: DashboardSnapshot }) {
@@ -42,35 +42,35 @@ export function DashboardTrendChart({ snapshot }: { snapshot: DashboardSnapshot 
   const hasDistribution = distribution.some((item) => item.value > 0);
 
   return (
-    <div className={styles.dashboardAnalyticsGrid}>
-      <section className={styles.dashboardChartPanel}>
-        <header className={styles.dashboardPanelHeading}>
+    <div className={surface.analyticsGrid}>
+      <section className={surface.chartPanel}>
+        <header className={surface.panelHeading}>
           <div>
             <h2>{t("dashboard.qualityTrend")}</h2>
             <p>{t("dashboard.qualityTrendHint")}</p>
           </div>
         </header>
-        <div className={styles.dashboardLegend} aria-hidden="true">
+        <div className={surface.legend} aria-hidden="true">
           <span><i style={{ background: COLORS.passRate }} />{t("dashboard.passRate")}</span>
           <span><i style={{ background: COLORS.failures }} />{t("dashboard.failures")}</span>
           <span><i style={{ background: COLORS.defects }} />{t("dashboard.openDefects")}</span>
           <span><i style={{ background: COLORS.runs }} />{t("dashboard.runsStarted")}</span>
         </div>
         <div
-          className={styles.dashboardTrendChart}
+          className={surface.trendChart}
           role="img"
           aria-label={t("dashboard.qualityTrendAria")}
         >
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={snapshot.trend} margin={{ top: 12, right: 2, bottom: 2, left: -12 }}>
-              <CartesianGrid stroke="#e6ebef" vertical={false} />
+              <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
               <XAxis
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
                 minTickGap={28}
                 tickFormatter={dateLabel}
-                tick={{ fill: "#657687", fontSize: 11 }}
+                tick={{ fill: "var(--muted)", fontSize: 11 }}
               />
               <YAxis
                 yAxisId="rate"
@@ -78,7 +78,7 @@ export function DashboardTrendChart({ snapshot }: { snapshot: DashboardSnapshot 
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(value: number) => `${value}%`}
-                tick={{ fill: "#657687", fontSize: 11 }}
+                tick={{ fill: "var(--muted)", fontSize: 11 }}
               />
               <YAxis
                 yAxisId="count"
@@ -86,11 +86,13 @@ export function DashboardTrendChart({ snapshot }: { snapshot: DashboardSnapshot 
                 allowDecimals={false}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#657687", fontSize: 11 }}
+                tick={{ fill: "var(--muted)", fontSize: 11 }}
               />
               <Tooltip
                 labelFormatter={(day) => dateLabel(String(day))}
-                contentStyle={{ border: "1px solid #d5dde4", borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 4, fontSize: 12 }}
+                labelStyle={{ color: "var(--ink)" }}
+                itemStyle={{ color: "var(--ink)" }}
               />
               <Area
                 yAxisId="rate"
@@ -112,29 +114,34 @@ export function DashboardTrendChart({ snapshot }: { snapshot: DashboardSnapshot 
           </ResponsiveContainer>
         </div>
       </section>
-      <section className={styles.dashboardChartPanel}>
-        <header className={styles.dashboardPanelHeading}>
+      <section className={surface.chartPanel}>
+        <header className={surface.panelHeading}>
           <div>
             <h2>{t("dashboard.failureDistribution")}</h2>
             <p>{t("dashboard.currentResults")}</p>
           </div>
         </header>
         {hasDistribution ? (
-          <div className={styles.dashboardDistributionChart} role="img" aria-label={t("dashboard.failureDistributionAria")}>
+          <div className={surface.distributionChart} role="img" aria-label={t("dashboard.failureDistributionAria")}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={distribution} layout="vertical" margin={{ top: 12, right: 34, bottom: 4, left: 4 }}>
-                <CartesianGrid stroke="#edf0f2" horizontal={false} />
-                <XAxis type="number" allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "#657687", fontSize: 11 }} />
-                <YAxis type="category" dataKey="label" width={78} axisLine={false} tickLine={false} tick={{ fill: "#475a69", fontSize: 11 }} />
-                <Tooltip cursor={{ fill: "#f5f7f9" }} />
+                <CartesianGrid stroke="var(--chart-grid)" horizontal={false} />
+                <XAxis type="number" allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+                <YAxis type="category" dataKey="label" width={78} axisLine={false} tickLine={false} tick={{ fill: "var(--ink)", fontSize: 11 }} />
+                <Tooltip
+                  cursor={{ fill: "var(--control-hover)" }}
+                  contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 4, fontSize: 12 }}
+                  labelStyle={{ color: "var(--ink)" }}
+                  itemStyle={{ color: "var(--ink)" }}
+                />
                 <Bar dataKey="value" name={t("dashboard.results")} radius={[0, 4, 4, 0]} isAnimationActive={!reduceMotion}>
-                  {distribution.map((item) => <Cell key={item.status} fill={item.status === "failed" ? COLORS.failures : item.status === "blocked" ? "#d08a28" : "#8493a0"} />)}
-                  <LabelList dataKey="value" position="right" fill="#354755" fontSize={11} />
+                  {distribution.map((item) => <Cell key={item.status} fill={item.status === "failed" ? COLORS.failures : item.status === "blocked" ? "var(--amber)" : "var(--muted)"} />)}
+                  <LabelList dataKey="value" position="right" fill="var(--ink)" fontSize={11} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-        ) : <p className={styles.dashboardChartEmpty}>{t("dashboard.noFailureResults")}</p>}
+        ) : <p className={surface.chartEmpty}>{t("dashboard.noFailureResults")}</p>}
       </section>
     </div>
   );

@@ -1,5 +1,5 @@
 import { Check, Play } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { Bootstrap, Project, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
@@ -11,6 +11,7 @@ import { formatCount } from "../../../localization/format/count";
 import { useResolvedSuiteCount } from "../../../state/run-builder/useResolvedSuiteCount";
 import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { RunScopeBuilder } from "../run-scope/RunScopeBuilder";
 import { createDefaultRunName } from "../run-builder/model";
 import { getRunDialogCopy, type RunDialogCopy } from "./copy";
@@ -51,6 +52,8 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const operation = useRef<PendingOperation | null>(null);
+  const environmentField = useRef<HTMLLabelElement>(null);
+  const focusEnvironmentOnMount = useRef(!builderOpen);
   const selectedSuite = suites.find((item) => item.id === suiteId);
   const { count: suiteCount, error: suiteError } = useResolvedSuiteCount(http, selectedSuite, offline, copy.suiteResolveError);
   const selectedCases = cases.filter((item) => caseIds.includes(item.id));
@@ -59,6 +62,10 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
   const countLabel = (count: number) => formatCount(locale, count, ["case", "cases"], ["кейс", "кейса", "кейсов"]);
   const title = fastCase && presetCase ? `${copy.runCase}: ${presetCase.key}` : initialSuite ? `${copy.runSuite}: ${initialSuite.name}` : copy.title;
   const subtitle = fastCase && presetCase ? `${presetCase.title} · ${project.name}` : copy.subtitle;
+
+  useEffect(() => {
+    if (focusEnvironmentOnMount.current) environmentField.current?.querySelector("button")?.focus();
+  }, []);
 
   const changeType = (next: TestRunSummary["type"]) => { setType(next); if (!nameEdited) setName(makeName(next, build, selectedSuite?.key)); };
   const changeBuild = (next: string) => { setBuild(next); if (!nameEdited) setName(makeName(type, next, selectedSuite?.key)); };
@@ -83,10 +90,10 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
   const targetSection = <section className={styles.section}>
     <header className={styles.sectionHeading}><div><h3>{copy.targetTitle}</h3><p>{copy.targetHint}</p></div></header>
     {environments.length === 0 ? <div className={styles.blocker}><strong>{copy.environmentRequired}</strong><span>{copy.environmentRequiredHint}</span></div> : <div className={styles.targetGrid}>
-      <label><span>{copy.environment}</span><select autoFocus={!builderOpen} value={environmentId} onChange={(event) => setEnvironmentId(event.target.value)}>{environments.map((environment) => <option key={environment.id} value={environment.id}>{environment.name} · {environment.baseUrl}</option>)}</select></label>
+      <label ref={environmentField}><span>{copy.environment}</span><AnimatedSelect label={copy.environment} value={environmentId} onChange={setEnvironmentId} options={environments.map((environment) => ({ value: environment.id, label: `${environment.name} · ${environment.baseUrl}` }))} /></label>
       <label><span>{copy.build}</span><input value={build} onChange={(event) => changeBuild(event.target.value)} /></label>
       <label className={styles.nameField}><span>{copy.name}</span><input required value={name} onChange={(event) => { setNameEdited(true); setName(event.target.value); }} /></label>
-      <label><span>{copy.type}</span><select value={type} onChange={(event) => changeType(event.target.value as TestRunSummary["type"])}><option value="smoke">{copy.smoke}</option><option value="regression">{copy.regression}</option><option value="acceptance">{copy.acceptance}</option><option value="ad_hoc">{copy.adHoc}</option></select></label>
+      <label><span>{copy.type}</span><AnimatedSelect label={copy.type} value={type} onChange={(value) => changeType(value as TestRunSummary["type"])} options={[{ value: "smoke", label: copy.smoke }, { value: "regression", label: copy.regression }, { value: "acceptance", label: copy.acceptance }, { value: "ad_hoc", label: copy.adHoc }]} /></label>
     </div>}
   </section>;
   const scopeSection = <section className={styles.section}>
@@ -94,7 +101,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
     {!builderOpen && fastCase && presetCase && <div className={styles.scopeSummary}><Check size={17} /><span><small>{copy.currentCase}</small><strong>{presetCase.key} · {presetCase.title}</strong><em>{countLabel(caseIds.length)}</em></span></div>}
     {!builderOpen && initialSuite && <SuiteSummary suite={initialSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} />}
     {builderOpen && <>
-      <label className={styles.sourceField}><span>{copy.source}</span><select value={suiteId} onChange={(event) => changeSuite(event.target.value)}><option value="">{copy.customSelection}</option>{suites.map((suite) => <option key={suite.id} value={suite.id}>{suite.name} · {suite.type === "dynamic" ? copy.dynamicSuite : countLabel(suite.caseCount)}</option>)}</select></label>
+      <label className={styles.sourceField}><span>{copy.source}</span><AnimatedSelect label={copy.source} value={suiteId} onChange={changeSuite} options={[{ value: "", label: copy.customSelection }, ...suites.map((suite) => ({ value: suite.id, label: `${suite.name} · ${suite.type === "dynamic" ? copy.dynamicSuite : countLabel(suite.caseCount)}` }))]} /></label>
       {selectedSuite ? <SuiteSummary suite={selectedSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} /> : <RunScopeBuilder cases={cases} caseIds={caseIds} setCaseIds={setCaseIds} copy={copy} />}
     </>}
     {selectedCases.length > 0 && !fastCase && !selectedSuite && <p className={styles.selectedPreview}>{selectedCases.slice(0, 4).map((item) => item.key).join(", ")}{selectedCases.length > 4 ? ` +${selectedCases.length - 4}` : ""}</p>}

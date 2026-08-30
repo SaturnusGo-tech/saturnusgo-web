@@ -38,7 +38,8 @@ test("resource hydration uses Saturn instead of a false empty state", () => {
     "utf8",
   );
 
-  assert.match(casesSource, /!revision \? <SaturnLoader/);
+  assert.match(casesSource, /props\.testCase && !revision/);
+  assert.match(casesSource, /<SaturnLoader[^>]*testId="case-detail-loading"/);
   assert.match(suitesSource, /!detail \? <SaturnLoader/);
   assert.match(runsSource, /selectedRun && selectedIsVisible && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
