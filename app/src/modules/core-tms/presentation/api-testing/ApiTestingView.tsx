@@ -1,21 +1,43 @@
 "use client";
 
-import { ExternalLink, RefreshCw } from "lucide-react";
+import { ExternalLink, LogOut, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { SaturnLoader } from "../common/loading/SaturnLoader";
 import styles from "../../tms.module.css";
 import surface from "./api-testing.module.css";
-import { UMBRELLA_API_SWAGGER_URL } from "./model";
+import {
+  UMBRELLA_API_SWAGGER_LOGOUT_URL,
+  UMBRELLA_API_SWAGGER_URL,
+} from "./model";
 
 export function ApiTestingView() {
   const { t } = useTmsLocale();
   const [loaded, setLoaded] = useState(false);
   const [frameKey, setFrameKey] = useState(0);
+  const [frameUrl, setFrameUrl] = useState(UMBRELLA_API_SWAGGER_URL);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   function reload() {
     setLoaded(false);
+    setLoggingOut(false);
+    setFrameUrl(UMBRELLA_API_SWAGGER_URL);
     setFrameKey((current) => current + 1);
+  }
+
+  function signOut() {
+    setLoaded(false);
+    setLoggingOut(true);
+    setFrameUrl(UMBRELLA_API_SWAGGER_LOGOUT_URL);
+  }
+
+  function handleFrameLoad() {
+    if (loggingOut) {
+      setLoggingOut(false);
+      setFrameUrl(UMBRELLA_API_SWAGGER_URL);
+      return;
+    }
+    setLoaded(true);
   }
 
   return <section className={surface.page} data-testid="api-testing-view">
@@ -29,6 +51,9 @@ export function ApiTestingView() {
         <button className={styles.secondaryButton} type="button" onClick={reload}>
           <RefreshCw size={16} />{t("apiTesting.reload")}
         </button>
+        <button className={styles.secondaryButton} type="button" onClick={signOut}>
+          <LogOut size={16} />{t("apiTesting.signOut")}
+        </button>
         <a className={styles.secondaryButton} href={UMBRELLA_API_SWAGGER_URL} target="_blank" rel="noreferrer">
           <ExternalLink size={16} />{t("apiTesting.openExternal")}
         </a>
@@ -39,9 +64,9 @@ export function ApiTestingView() {
       <iframe
         key={frameKey}
         className={surface.frame}
-        src={UMBRELLA_API_SWAGGER_URL}
+        src={frameUrl}
         title={t("apiTesting.frameTitle")}
-        onLoad={() => setLoaded(true)}
+        onLoad={handleFrameLoad}
         referrerPolicy="no-referrer"
         sandbox="allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
         allow="clipboard-write"

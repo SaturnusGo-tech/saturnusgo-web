@@ -116,6 +116,7 @@ export const enViewMessages = {
   "apiTesting.authHint": "Swagger uses its own sign-in. Your TMS session is not shared.",
   "apiTesting.openExternal": "Open Swagger",
   "apiTesting.reload": "Reload",
+  "apiTesting.signOut": "Sign out of Swagger",
   "apiTesting.loading": "Loading Swagger documentation",
   "apiTesting.frameTitle": "Umbrella API Swagger documentation",
   "reports.eyebrow": "Defects and results",

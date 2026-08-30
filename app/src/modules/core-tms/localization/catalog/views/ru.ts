@@ -118,6 +118,7 @@ export const ruViewMessages = {
   "apiTesting.authHint": "Swagger использует собственный вход. Сессия TMS ему не передаётся.",
   "apiTesting.openExternal": "Открыть Swagger",
   "apiTesting.reload": "Перезагрузить",
+  "apiTesting.signOut": "Выйти из Swagger",
   "apiTesting.loading": "Загрузка документации Swagger",
   "apiTesting.frameTitle": "Документация Umbrella API в Swagger",
   "reports.eyebrow": "Дефекты и результаты",
