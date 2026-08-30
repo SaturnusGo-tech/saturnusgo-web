@@ -4,6 +4,7 @@ export type View =
   | "dashboard"
   | "cases"
   | "integrations"
+  | "api"
   | "suites"
   | "config"
   | "runs"

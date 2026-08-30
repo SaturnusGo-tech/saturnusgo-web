@@ -36,6 +36,7 @@ export const ruShellMessages = {
   "nav.dashboard": "Дашборд",
   "nav.cases": "Тест-кейсы",
   "nav.integrations": "Интеграционное тестирование",
+  "nav.apiTesting": "API Testing",
   "nav.runs": "Тест-раны",
   "nav.suites": "Тест-сьюты",
   "nav.hooks": "Хуки",

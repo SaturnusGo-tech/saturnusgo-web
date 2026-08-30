@@ -1,6 +1,7 @@
 import {
   ChevronLeft,
   ChevronRight,
+  Code2,
   FileBarChart,
   FolderKanban,
   LayoutDashboard,
@@ -28,6 +29,7 @@ const navigationItems: Array<{
     labelKey: "nav.integrations",
     icon: <Network size={20} />,
   },
+  { id: "api", labelKey: "nav.apiTesting", icon: <Code2 size={20} /> },
   { id: "runs", labelKey: "nav.runs", icon: <PlayCircle size={20} /> },
   { id: "suites", labelKey: "nav.suites", icon: <ListChecks size={20} /> },
   { id: "hooks", labelKey: "nav.hooks", icon: <Link2 size={20} /> },

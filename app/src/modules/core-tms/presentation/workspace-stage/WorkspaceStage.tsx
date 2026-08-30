@@ -1,6 +1,7 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { CasesView } from "../cases/CasesView";
+import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
 import { DashboardView } from "../dashboard/DashboardView";
 import { HooksView } from "../hooks/HooksView";
@@ -101,6 +102,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "api") return <ApiTestingView />;
   if (model.view === "suites") {
     return (
       <SuitesView
