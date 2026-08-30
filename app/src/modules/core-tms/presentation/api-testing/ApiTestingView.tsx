@@ -23,7 +23,7 @@ export function ApiTestingView() {
       <button className={surface.toolTabActive} type="button" aria-current="page">
         Swagger
       </button>
-      <a className={surface.toolTab} href={POSTMAN_WEB_URL} rel="noreferrer">
+      <a className={surface.toolTab} href={POSTMAN_WEB_URL} target="_blank" rel="noopener noreferrer">
         <Send size={15} />Postman
       </a>
     </nav>

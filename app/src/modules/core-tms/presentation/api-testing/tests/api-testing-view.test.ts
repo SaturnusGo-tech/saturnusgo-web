@@ -20,11 +20,10 @@ test("uses the shared Saturn loading state and a constrained iframe", () => {
   assert.match(source, /title=\{t\("apiTesting\.frameTitle"\)\}/);
 });
 
-test("navigates the current tab to Postman without sharing TMS credentials", () => {
+test("opens Postman in a separate tab without sharing TMS credentials", () => {
   const postman = new URL(POSTMAN_WEB_URL);
   assert.equal(postman.origin, "https://web.postman.co");
-  assert.match(source, /href=\{POSTMAN_WEB_URL\} rel="noreferrer"/);
-  assert.doesNotMatch(source, /target="_blank"/);
+  assert.match(source, /href=\{POSTMAN_WEB_URL\} target="_blank" rel="noopener noreferrer"/);
   assert.doesNotMatch(source, /<iframe[^>]+POSTMAN_WEB_URL/);
   assert.doesNotMatch(source, /Authorization|accessToken|Bearer|credentials=/);
 });
