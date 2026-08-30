@@ -3,3 +3,5 @@ export const UMBRELLA_API_SWAGGER_URL =
 
 export const UMBRELLA_API_SWAGGER_LOGOUT_URL =
   "https://sieger-assistente-production.up.railway.app/docs/logout";
+
+export const POSTMAN_WEB_URL = "https://web.postman.co/";
