@@ -8,7 +8,8 @@ import { uploadEvidence } from "../evidence/uploadEvidence";
 import { createUid } from "../../helpers/id/createUid";
 import type { TmsLocale } from "../../localization/model/locale";
 
-type DefectPayload = Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds">;
+type DefectPayload = Omit<Defect,
+  "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue">;
 
 export async function createDefect(input: {
   http: TmsHttpClient;
@@ -33,6 +34,7 @@ export async function createDefect(input: {
       createdAt: new Date().toISOString(),
       attachmentIds: [],
       linkIds: [],
+      externalIssue: null,
       ...input.payload,
     };
   }
@@ -45,6 +47,7 @@ export async function createDefect(input: {
     reproducibility: input.payload.reproducibility,
     assigneeIdentityId: input.payload.assigneeIdentityId,
     component: input.payload.component,
+    integrationTarget: input.payload.integrationTarget,
     labels: input.payload.labels,
     runId: input.payload.runId,
     runItemId: input.payload.runItemId,

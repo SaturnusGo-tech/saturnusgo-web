@@ -73,7 +73,8 @@ const data: Bootstrap = {
     {
       id: "defect-1", projectId: "project-1", key: "BUG-1", title: "Open", description: "",
       severity: "high", priority: "high", status: "open", reproducibility: "always",
-      assigneeIdentityId: null, component: "Core", labels: [], runId: null, runItemId: null,
+      assigneeIdentityId: null, component: "Core", integrationTarget: null, externalIssue: null,
+      labels: [], runId: null, runItemId: null,
       stepId: null, expectedResult: "", actualResult: "", attachmentIds: [], linkIds: [],
       createdAt: "2026-08-18T09:00:00.000Z",
     },

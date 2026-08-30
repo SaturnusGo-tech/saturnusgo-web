@@ -5,15 +5,19 @@ import type { Defect, RunItem, TestRunSummary, TestStep } from "../../../../core
 import { createDefect } from "../../application/defects/createDefect";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
+import { inferDefectIntegrationTarget } from "../../defects/model/integration-target";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { FormError } from "../common/error/FormError";
 import { Field } from "../common/field/Field";
+import { AnimatedSelect } from "../common/select/AnimatedSelect";
+import { getDefectDialogCopy } from "../dialogs/defect/copy";
 import styles from "../../tms.module.css";
 export function InlineDefectComposer({ projectId, run, item, step, components, offline, onCreated }: { projectId: string; run: TestRunSummary; item: RunItem; step: TestStep; components: string[]; offline: boolean; onCreated: (defect: Defect) => void }) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
+  const defectCopy = getDefectDialogCopy(locale);
   const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;
   const failedResult = attempt.stepResults.find((entry) => entry.stepId === step.id);
@@ -24,6 +28,8 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
   const componentOptions = Array.from(new Set([item.snapshot.component, ...components].map((value) => value.trim()).filter(Boolean)));
   if (componentOptions.length === 0) componentOptions.push(t("inlineDefect.categoryDefault"));
   const [component, setComponent] = useState(componentOptions[0]);
+  const [integrationTarget, setIntegrationTarget] = useState<Defect["integrationTarget"]>(() =>
+    inferDefectIntegrationTarget(item.snapshot.tags, item.snapshot.component));
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
   const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}\n\n${t("inlineDefect.actualPrefix")}: ${observed}`);
   const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl)
@@ -40,7 +46,7 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
     if (submitting || created) return;
     setSubmitting(true);
     setError("");
-    const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds"> = { projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`, severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null, component, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id, stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed };
+    const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = { projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`, severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null, component, integrationTarget, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id, stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed };
     try {
       const next = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
       setCreated(next);
@@ -60,6 +66,13 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
         <Field label={t("inlineDefect.severity")}><select value={severity} onChange={(event) => setSeverity(event.target.value as Defect["severity"])}><option value="critical">{t("severity.critical")}</option><option value="high">{t("severity.major")}</option><option value="medium">{t("severity.minor")}</option><option value="low">{t("severity.low")}</option></select></Field>
         <Field label={t("inlineDefect.priority")}><select value={priority} onChange={(event) => setPriority(event.target.value as Defect["priority"])}><option value="critical">{t("inlineDefect.priorityUrgent")}</option><option value="high">{t("priority.high")}</option><option value="medium">{t("priority.medium")}</option><option value="low">{t("priority.low")}</option></select></Field>
         <Field label={t("inlineDefect.category")} wide><select value={component} onChange={(event) => setComponent(event.target.value)}>{componentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></Field>
+        <Field label={defectCopy.youTrackTarget} wide><AnimatedSelect label={defectCopy.youTrackTarget}
+          value={integrationTarget ?? "none"}
+          onChange={(value) => setIntegrationTarget(value === "none" ? null : value as Exclude<Defect["integrationTarget"], null>)}
+          options={[{ value: "none", label: defectCopy.tmsOnly },
+            { value: "android", label: defectCopy.youTrackAndroid },
+            { value: "ios", label: defectCopy.youTrackIos },
+            { value: "backend", label: defectCopy.youTrackBackend }]} /></Field>
         <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
         <Field label={t("inlineDefect.reproSteps")} wide><textarea required value={repro} onChange={(event) => setRepro(event.target.value)} /></Field>
       </div>

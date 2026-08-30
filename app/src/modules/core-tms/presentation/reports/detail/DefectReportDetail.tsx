@@ -30,9 +30,13 @@ export function DefectReportDetail({ defect, run, links, onBack, onOpenRun }: {
         <h1>{defect.title}</h1>
         <p>{defect.description || t("reports.noDescription")}</p>
       </div>
-      {defect.runId && <button className={styles.primaryButton} type="button" onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
-        <PlayCircle size={16} />{t("reports.openRun")}
-      </button>}
+      <div className={surface.detailActions}>
+        {defect.externalIssue && <a className={styles.secondaryButton} href={defect.externalIssue.url}
+          target="_blank" rel="noreferrer"><span>{defect.externalIssue.key}</span><ExternalLinkIcon size={15} /></a>}
+        {defect.runId && <button className={styles.primaryButton} type="button" onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
+          <PlayCircle size={16} />{t("reports.openRun")}
+        </button>}
+      </div>
     </header>
 
     <dl className={surface.detailMeta}>

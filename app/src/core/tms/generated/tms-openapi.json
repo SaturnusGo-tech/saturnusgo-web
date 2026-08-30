@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.5",
+    "version": "1.0.0-checkpoint.6",
     "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -30,14 +30,15 @@
     { "name": "Attachments" },
     { "name": "External links" },
     { "name": "Dashboards" },
-    { "name": "Activity" }
+    { "name": "Activity" },
+    { "name": "Integrations" }
   ],
   "paths": {
     "/health": {
       "get": {
         "tags": ["Health"],
         "summary": "Report API readiness",
-        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0014.",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0015.",
         "operationId": "getHealth",
         "security": [],
         "responses": {
@@ -1667,6 +1668,44 @@
         }
       }
     },
+    "/integrations/youtrack/status": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Read bounded YouTrack synchronization status",
+        "operationId": "getYouTrackIntegrationStatus",
+        "parameters": [{ "$ref": "#/components/parameters/WorkspaceIdQueryRequired" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/YouTrackIntegrationStatusResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/integrations/youtrack/webhooks": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Integrations"],
+        "summary": "Accept an authenticated YouTrack lifecycle webhook",
+        "operationId": "acceptYouTrackWebhook",
+        "security": [],
+        "x-tms-idempotency": "not-applicable",
+        "parameters": [{ "$ref": "#/components/parameters/YouTrackWebhookToken" }],
+        "requestBody": { "$ref": "#/components/requestBodies/YouTrackWebhook" },
+        "responses": {
+          "204": {
+            "description": "Webhook accepted or replayed by its canonical payload hash.",
+            "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/activity": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -1759,6 +1798,13 @@
         "required": true,
         "description": "Required tenant boundary for the query.",
         "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "YouTrackWebhookToken": {
+        "name": "X-YouTrack-Token",
+        "in": "header",
+        "required": true,
+        "description": "Shared 64-character hexadecimal webhook secret. It is never returned or logged.",
+        "schema": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       },
       "ProjectIdPath": {
         "name": "projectId",
@@ -1974,6 +2020,10 @@
       "DefectStatusTransition": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectStatusTransitionRequest" } } }
+      },
+      "YouTrackWebhook": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackWebhookRequest" } } }
       },
       "AttachmentUploadIntentCreate": {
         "required": true,
@@ -2238,6 +2288,11 @@
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ActivityListEnvelope" } } }
       },
+      "YouTrackIntegrationStatusResponse": {
+        "description": "Bounded workspace-scoped YouTrack synchronization status without credentials.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackIntegrationStatusEnvelope" } } }
+      },
       "DashboardListResponse": {
         "description": "A page of bounded dashboard summaries ordered newest first.",
         "headers": {
@@ -2344,6 +2399,7 @@
         "type": "string",
         "enum": ["open", "triaged", "in_progress", "ready_for_retest", "verified", "closed", "reopened"]
       },
+      "DefectIntegrationTarget": { "type": "string", "enum": ["android", "ios", "backend"] },
       "AttachmentOwnerKind": {
         "type": "string",
         "enum": ["test_case_revision", "run", "run_attempt", "defect"]
@@ -3200,7 +3256,7 @@
       "Defect": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "title", "description", "severity", "priority", "status", "reproducibility", "assigneeIdentityId", "component", "labels", "occurrence", "expectedResult", "actualResult", "attachmentIds", "linkIds", "createdByIdentityId", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "title", "description", "severity", "priority", "status", "reproducibility", "assigneeIdentityId", "component", "labels", "integrationTarget", "externalIssue", "occurrence", "expectedResult", "actualResult", "attachmentIds", "linkIds", "createdByIdentityId", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
@@ -3214,6 +3270,8 @@
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
+          "externalIssue": { "oneOf": [{ "$ref": "#/components/schemas/DefectExternalIssue" }, { "type": "null" }] },
           "occurrence": { "oneOf": [{ "$ref": "#/components/schemas/DefectOccurrence" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
           "actualResult": { "$ref": "#/components/schemas/LongText" },
@@ -3238,6 +3296,7 @@
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
           "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
@@ -3258,6 +3317,7 @@
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
           "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
           "actualResult": { "$ref": "#/components/schemas/LongText" }
         }
@@ -3269,6 +3329,92 @@
         "properties": {
           "status": { "$ref": "#/components/schemas/DefectStatus" },
           "reason": { "type": "string", "maxLength": 2000 }
+        }
+      },
+      "DefectExternalIssue": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "id", "key", "url", "syncStatus"],
+        "properties": {
+          "provider": { "const": "youtrack" },
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "url": { "type": "string", "format": "uri", "maxLength": 2048 },
+          "syncStatus": { "type": "string", "enum": ["linked", "error", "deleted"] }
+        }
+      },
+      "YouTrackIntegrationStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "baseUrl", "targets", "linked", "pending", "failed", "lastSyncedAt"],
+        "properties": {
+          "provider": { "const": "youtrack" },
+          "baseUrl": { "type": "string", "format": "uri", "maxLength": 2048 },
+          "targets": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["android", "ios", "backend"],
+            "properties": {
+              "android": { "$ref": "#/components/schemas/YouTrackTarget" },
+              "ios": { "$ref": "#/components/schemas/YouTrackTarget" },
+              "backend": { "$ref": "#/components/schemas/YouTrackTarget" }
+            }
+          },
+          "linked": { "type": "integer", "minimum": 0 },
+          "pending": { "type": "integer", "minimum": 0 },
+          "failed": { "type": "integer", "minimum": 0 },
+          "lastSyncedAt": { "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }] }
+        }
+      },
+      "YouTrackTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["shortName"],
+        "properties": { "shortName": { "type": "string", "minLength": 1, "maxLength": 64 } }
+      },
+      "YouTrackIntegrationStatusEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/YouTrackIntegrationStatus" } }
+      },
+      "YouTrackWebhookRequest": {
+        "type": "object",
+        "required": ["event", "timestamp", "id", "numberInProject", "summary", "project"],
+        "properties": {
+          "event": { "type": "string", "enum": ["issueUpdated", "issueDeleted"] },
+          "timestamp": { "$ref": "#/components/schemas/Timestamp" },
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "numberInProject": { "type": "integer", "minimum": 1 },
+          "summary": { "type": "string", "maxLength": 500 },
+          "project": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "shortName"],
+            "properties": {
+              "id": { "$ref": "#/components/schemas/Identifier" },
+              "name": { "type": "string", "maxLength": 200 },
+              "shortName": { "type": "string", "minLength": 1, "maxLength": 64 }
+            }
+          },
+          "updatedBy": {
+            "type": "object",
+            "required": ["login"],
+            "properties": { "login": { "type": "string", "maxLength": 255 } }
+          },
+          "changedFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": { "type": "string", "maxLength": 200 },
+                "value": {},
+                "oldValue": {}
+              }
+            }
+          }
         }
       },
       "DefectEnvelope": {

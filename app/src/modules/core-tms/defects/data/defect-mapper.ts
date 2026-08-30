@@ -14,6 +14,8 @@ export function mapDefect(dto: components["schemas"]["Defect"]): Defect {
     reproducibility: dto.reproducibility,
     assigneeIdentityId: dto.assigneeIdentityId,
     component: dto.component,
+    integrationTarget: dto.integrationTarget,
+    externalIssue: dto.externalIssue,
     labels: [...dto.labels],
     runId: dto.occurrence?.runId ?? null,
     runItemId: dto.occurrence?.runItemId ?? null,

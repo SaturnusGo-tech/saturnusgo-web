@@ -173,7 +173,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (model.view === "hooks") return <HooksView />;
+  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} />;
   return (
     <ReportsView
       defects={model.projectDefects}

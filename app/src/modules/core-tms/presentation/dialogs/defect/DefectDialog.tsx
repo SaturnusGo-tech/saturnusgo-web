@@ -13,6 +13,7 @@ import { useAttachmentClient } from "../../../attachments/presentation/context/A
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
+import { inferDefectIntegrationTarget } from "../../../defects/model/integration-target";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -76,6 +77,9 @@ export function DefectDialog({
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
   const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
+  const [integrationTarget, setIntegrationTarget] = useState<Defect["integrationTarget"]>(() =>
+    inferDefectIntegrationTarget(item?.snapshot.tags ?? [], item?.snapshot.component ?? ""),
+  );
   const [filesRef] = useAutoAnimate<HTMLDivElement>({ duration: 160 });
   const [files, setFiles] = useState<File[]>([]);
   const [link, setLink] = useState("");
@@ -88,7 +92,8 @@ export function DefectDialog({
     if (submitting) return;
     setSubmitting(true);
     setError(false);
-    const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds"> = {
+    const payload: Omit<Defect,
+      "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId,
       title,
       description,
@@ -98,6 +103,7 @@ export function DefectDialog({
       reproducibility,
       assigneeIdentityId: null,
       component,
+      integrationTarget,
       labels: ["manual-run", run?.type ?? "reported"],
       runId: run?.id ?? null,
       runItemId: item?.id ?? null,
@@ -135,6 +141,14 @@ export function DefectDialog({
           </Field>
           <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.component}</span>
             <AnimatedSelect label={copy.component} value={component} onChange={setComponent} options={localizedComponentOptions} />
+          </div>
+          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.youTrackTarget}</span>
+            <AnimatedSelect label={copy.youTrackTarget} value={integrationTarget ?? "none"}
+              onChange={(value) => setIntegrationTarget(value === "none" ? null : value as Exclude<Defect["integrationTarget"], null>)}
+              options={[{ value: "none", label: copy.tmsOnly },
+                { value: "android", label: copy.youTrackAndroid },
+                { value: "ios", label: copy.youTrackIos },
+                { value: "backend", label: copy.youTrackBackend }]} />
           </div>
           <div className={styles.formField}><span>{copy.severity}</span>
             <AnimatedSelect label={copy.severity} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[

@@ -151,9 +151,18 @@ export const enViewMessages = {
   "reports.noEvidence": "No files or external links were attached.",
   "reports.labels": "Labels",
   "reports.noLabels": "No labels",
-  "hooks.title": "Hooks are prepared",
-  "hooks.description": "The extension point is visible now; CI, webhooks, and automation hooks will be connected in a later iteration.",
-  "hooks.addLater": "Add hook · coming later",
+  "hooks.loading": "Loading YouTrack status",
+  "hooks.loadError": "YouTrack status is unavailable.",
+  "hooks.retry": "Retry",
+  "hooks.integration": "Issue integration",
+  "hooks.openYouTrack": "Open YouTrack",
+  "hooks.linked": "Linked defects",
+  "hooks.pending": "Pending sync",
+  "hooks.failed": "Failed",
+  "hooks.lastSync": "Last sync",
+  "hooks.routing": "Project routing",
+  "hooks.routingHint": "Bug reports are sent only to the explicitly selected project.",
+  "hooks.refresh": "Refresh",
 } as const;
 
 export type ViewMessages = typeof enViewMessages;

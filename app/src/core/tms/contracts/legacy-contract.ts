@@ -86,6 +86,14 @@ export type Defect = {
   reproducibility: string;
   assigneeIdentityId: string | null;
   component: string;
+  integrationTarget: "android" | "ios" | "backend" | null;
+  externalIssue: {
+    provider: "youtrack";
+    id: string;
+    key: string;
+    url: string;
+    syncStatus: "linked" | "error" | "deleted";
+  } | null;
   labels: string[];
   runId: string | null;
   runItemId: string | null;

@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0014.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0015.
          */
         get: operations["getHealth"];
         put?: never;
@@ -1107,6 +1107,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/integrations/youtrack/status": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** Read bounded YouTrack synchronization status */
+        get: operations["getYouTrackIntegrationStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/youtrack/webhooks": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept an authenticated YouTrack lifecycle webhook */
+        post: operations["acceptYouTrackWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/activity": {
         parameters: {
             query?: never;
@@ -1154,6 +1194,8 @@ export interface components {
         ExecutionStatus: "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
         /** @enum {string} */
         DefectStatus: "open" | "triaged" | "in_progress" | "ready_for_retest" | "verified" | "closed" | "reopened";
+        /** @enum {string} */
+        DefectIntegrationTarget: "android" | "ios" | "backend";
         /** @enum {string} */
         AttachmentOwnerKind: "test_case_revision" | "run" | "run_attempt" | "defect";
         PageMeta: {
@@ -1668,6 +1710,8 @@ export interface components {
             assigneeIdentityId: components["schemas"]["Identifier"] | null;
             component: components["schemas"]["ShortText"];
             labels: string[];
+            integrationTarget: components["schemas"]["DefectIntegrationTarget"] | null;
+            externalIssue: components["schemas"]["DefectExternalIssue"] | null;
             occurrence: components["schemas"]["DefectOccurrence"] | null;
             expectedResult: components["schemas"]["LongText"];
             actualResult: components["schemas"]["LongText"];
@@ -1687,6 +1731,7 @@ export interface components {
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
             labels?: string[];
+            integrationTarget?: components["schemas"]["DefectIntegrationTarget"] | null;
             runId?: components["schemas"]["Identifier"] | null;
             runItemId?: components["schemas"]["Identifier"] | null;
             stepId?: components["schemas"]["Identifier"] | null;
@@ -1702,12 +1747,65 @@ export interface components {
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
             labels?: string[];
+            integrationTarget?: components["schemas"]["DefectIntegrationTarget"] | null;
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
         };
         DefectStatusTransitionRequest: {
             status: components["schemas"]["DefectStatus"];
             reason?: string;
+        };
+        DefectExternalIssue: {
+            /** @constant */
+            provider: "youtrack";
+            id: components["schemas"]["Identifier"];
+            key: string;
+            /** Format: uri */
+            url: string;
+            /** @enum {string} */
+            syncStatus: "linked" | "error" | "deleted";
+        };
+        YouTrackIntegrationStatus: {
+            /** @constant */
+            provider: "youtrack";
+            /** Format: uri */
+            baseUrl: string;
+            targets: {
+                android: components["schemas"]["YouTrackTarget"];
+                ios: components["schemas"]["YouTrackTarget"];
+                backend: components["schemas"]["YouTrackTarget"];
+            };
+            linked: number;
+            pending: number;
+            failed: number;
+            lastSyncedAt: components["schemas"]["Timestamp"] | null;
+        };
+        YouTrackTarget: {
+            shortName: string;
+        };
+        YouTrackIntegrationStatusEnvelope: {
+            data: components["schemas"]["YouTrackIntegrationStatus"];
+        };
+        YouTrackWebhookRequest: {
+            /** @enum {string} */
+            event: "issueUpdated" | "issueDeleted";
+            timestamp: components["schemas"]["Timestamp"];
+            id: components["schemas"]["Identifier"];
+            numberInProject: number;
+            summary: string;
+            project: {
+                id: components["schemas"]["Identifier"];
+                name: string;
+                shortName: string;
+            };
+            updatedBy?: {
+                login: string;
+            };
+            changedFields?: {
+                name: string;
+                value?: unknown;
+                oldValue?: unknown;
+            }[];
         };
         DefectEnvelope: {
             data: components["schemas"]["Defect"];
@@ -2561,6 +2659,16 @@ export interface components {
                 "application/json": components["schemas"]["ActivityListEnvelope"];
             };
         };
+        /** @description Bounded workspace-scoped YouTrack synchronization status without credentials. */
+        YouTrackIntegrationStatusResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["YouTrackIntegrationStatusEnvelope"];
+            };
+        };
         /** @description A page of bounded dashboard summaries ordered newest first. */
         DashboardListResponse: {
             headers: {
@@ -2710,6 +2818,8 @@ export interface components {
         WorkspaceIdPath: components["schemas"]["Identifier"];
         /** @description Required tenant boundary for the query. */
         WorkspaceIdQueryRequired: components["schemas"]["Identifier"];
+        /** @description Shared 64-character hexadecimal webhook secret. It is never returned or logged. */
+        YouTrackWebhookToken: string;
         ProjectIdPath: components["schemas"]["Identifier"];
         ProjectIdQuery: components["schemas"]["Identifier"];
         /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
@@ -2819,6 +2929,11 @@ export interface components {
         DefectStatusTransition: {
             content: {
                 "application/json": components["schemas"]["DefectStatusTransitionRequest"];
+            };
+        };
+        YouTrackWebhook: {
+            content: {
+                "application/json": components["schemas"]["YouTrackWebhookRequest"];
             };
         };
         AttachmentUploadIntentCreate: {
@@ -4640,6 +4755,56 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getYouTrackIntegrationStatus: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["YouTrackIntegrationStatusResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    acceptYouTrackWebhook: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Shared 64-character hexadecimal webhook secret. It is never returned or logged. */
+                "X-YouTrack-Token": components["parameters"]["YouTrackWebhookToken"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["YouTrackWebhook"];
+        responses: {
+            /** @description Webhook accepted or replayed by its canonical payload hash. */
+            204: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };
