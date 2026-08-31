@@ -29,6 +29,7 @@
   background: var(--runs-bg);
   font: 14px/1.35 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color-scheme: light;
+  container: runs-shell / inline-size;
 }
 
 :global(.dark) .shell {
@@ -342,11 +343,29 @@
 .pager,
 .actions,
 .completion { min-width: 0; display: flex; align-items: center; gap: 5px; }
-.actions { flex-wrap: wrap; justify-content: flex-end; }
-.completion { justify-content: flex-end; color: var(--runs-muted); font-size: 12px; }
-.footer :is(button, label) { min-height: 32px; border-radius: 4px; }
+.actions { flex-wrap: nowrap; justify-content: flex-end; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: none; }
+.actions::-webkit-scrollbar { display: none; }
+.completion { justify-content: flex-end; color: var(--runs-muted); font-size: 12px; white-space: nowrap; }
+.footer :is(button, label) { min-height: 32px; border-radius: 4px; white-space: nowrap; }
 .footer label input { display: none; }
 .footer [role="alert"] { grid-column: 1 / -1; }
+
+@container runs-shell (max-width: 1500px) {
+  .footer { gap: 6px; padding-inline: 8px; }
+  .actions { gap: 4px; justify-content: flex-start; }
+  .compactActionLabel { display: none; }
+  .compactAction { width: 32px; min-width: 32px; padding-inline: 0; }
+}
+
+@container runs-shell (max-width: 1320px) {
+  .pagerLabel { display: none; }
+  .pager > button { width: 32px; min-width: 32px; padding-inline: 0; }
+}
+
+@container runs-shell (max-width: 1050px) {
+  .mobileActionLabel { display: none; }
+  .wideAction { width: 32px; min-width: 32px; padding-inline: 0; }
+}
 
 .defect {
   margin: 14px 16px 0;
