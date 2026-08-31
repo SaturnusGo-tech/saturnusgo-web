@@ -69,11 +69,13 @@
   gap: 8px;
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
-  padding: 0 9px 0 11px;
+  padding: 6px 9px 6px 11px;
   text-align: left;
 }
 
-.pickerTrigger strong { display: block; overflow: hidden; color: #172633; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.pickerTriggerText { display: block; min-width: 0; }
+.pickerTriggerText strong { color: #172633; display: block; font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; white-space: normal; }
+.pickerTriggerText small { color: #617281; display: block; font-size: 10px; line-height: 1.25; margin-top: 3px; }
 .pickerTrigger > svg { color: #617281; transition: transform 160ms ease; }
 .pickerTrigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
 .pickerTrigger:disabled { color: #7a8994; cursor: not-allowed; }
@@ -122,7 +124,7 @@
 .pickerOption > span:first-child,
 .pickerOptionActive > span:first-child { min-width: 0; }
 .pickerOption strong,
-.pickerOptionActive strong,
+.pickerOptionActive strong { display: block; overflow-wrap: anywhere; white-space: normal; }
 .pickerOption small,
 .pickerOptionActive small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pickerOption strong,
@@ -243,7 +245,8 @@
 :global(.dark) .pickerTrigger:hover:not(:disabled),
 :global(.dark) .pickerCreate:hover { background: var(--control-hover); }
 :global(.dark) :is(.pickerOption, .pickerOptionActive) small { color: var(--muted); }
-:global(.dark) .pickerTrigger strong { color: var(--ink); }
+:global(.dark) .pickerTriggerText strong { color: var(--ink); }
+:global(.dark) .pickerTriggerText small { color: var(--muted); }
 :global(.dark) .pickerMenu { background: var(--nav-raised); border-color: var(--line-strong); box-shadow: 0 14px 32px rgb(0 0 0 / 30%); }
 :global(.dark) :is(.pickerOption, .pickerOptionActive) { color: var(--ink); }
 :global(.dark) .pickerOption:hover,
@@ -306,8 +309,9 @@
   border-radius: 4px;
 }
 
-.pickerTrigger { padding-inline: 9px 7px; }
-.pickerTrigger strong { color: var(--runs-text, var(--ink)); font-size: 12px; font-weight: 500; }
+.pickerTrigger { min-height: 44px; padding: 6px 7px 6px 9px; }
+.pickerTriggerText strong { color: var(--runs-text, var(--ink)); font-size: 12px; font-weight: 500; }
+.pickerTriggerText small { color: var(--runs-muted, var(--muted)); font-size: 10px; }
 .pickerTrigger > svg { color: var(--runs-muted, var(--muted)); }
 .pickerTrigger:hover:not(:disabled),
 .pickerCreate:hover { background: var(--runs-hover, var(--control-hover)); border-color: var(--runs-border-strong, var(--line-strong)); }
@@ -328,8 +332,8 @@
 
 .pickerOption,
 .pickerOptionActive {
-  min-height: 40px;
-  padding: 4px 7px;
+  min-height: 48px;
+  padding: 6px 7px;
   color: var(--runs-text, var(--ink));
   border-radius: 3px;
 }

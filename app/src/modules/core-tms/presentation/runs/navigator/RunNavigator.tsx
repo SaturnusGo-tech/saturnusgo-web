@@ -100,7 +100,9 @@ export function RunNavigator({
             }
           }}
         >
-          <strong>{selectedRun?.name ?? emptyLabel}</strong>
+          <span className={styles.pickerTriggerText}><strong title={selectedRun?.name ?? emptyLabel}>{selectedRun?.name ?? emptyLabel}</strong>
+            {selectedRun ? <small>{selectedRun.key}</small> : null}
+          </span>
           <ChevronDown size={17} aria-hidden="true" />
         </button>
         <button className={styles.pickerCreate} type="button" onClick={onCreate} aria-label={t("runs.new")} title={t("runs.new")}>
@@ -137,7 +139,7 @@ export function RunNavigator({
                   tabIndex={selected ? 0 : -1}
                   onClick={() => { onSelectRun(run.id); closePicker(true); }}
                 >
-                  <span><strong>{run.name}</strong><small>{run.key}</small></span>
+                  <span><strong title={run.name}>{run.name}</strong><small>{run.key}</small></span>
                   {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
                 </button>
               );
