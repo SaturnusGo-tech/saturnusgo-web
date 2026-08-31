@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
-import { clampCaseRepositoryWidth } from "../../layout/useCaseRepositoryResize";
+import {
+  clampCaseDetailWidth,
+  clampCaseRepositoryWidth,
+} from "../../layout/useCaseRepositoryResize";
 import { buildRepositoryTree, isRepositoryPathBranch } from "../repositoryTree";
 
 function caseSummary(id: string, folderPath: string) {
@@ -32,5 +35,12 @@ test("bounds the resizable repository without starving the case document", () =>
   assert.equal(clampCaseRepositoryWidth(120, 1440), 230);
   assert.equal(clampCaseRepositoryWidth(480, 1440), 320);
   assert.equal(clampCaseRepositoryWidth(900, 1440), 320);
-  assert.equal(clampCaseRepositoryWidth(500, 900), 240);
+  assert.equal(clampCaseRepositoryWidth(500, 900), 320);
+});
+
+test("starts with a wide case document and preserves a scrollable list floor", () => {
+  assert.equal(clampCaseDetailWidth(510, 1372, 230), 510);
+  assert.equal(clampCaseDetailWidth(680, 1372, 230), 622);
+  assert.equal(clampCaseDetailWidth(300, 1372, 230), 340);
+  assert.equal(clampCaseDetailWidth(510, 1089, 230), 510);
 });

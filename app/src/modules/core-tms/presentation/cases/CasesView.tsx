@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { formatCount } from "../../localization/format/count";
 import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
 import { CasesTable } from "./list/CasesTable";
 import {
@@ -23,19 +24,36 @@ export function CasesView(props: CasesViewProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [repositoryMenuOpen, setRepositoryMenuOpen] = useState(false);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const [detailFullscreen, setDetailFullscreen] = useState(false);
   const [sort, setSort] = useState<CaseSort>({ key: "key", direction: "asc" });
   const workbenchRef = useRef<HTMLDivElement>(null);
+  const deepLinkOpenedRef = useRef(false);
   const repositoryResize = useCaseRepositoryResize(workbenchRef);
   const flatRows = useMemo(() => flattenCaseGroups(props.groups), [props.groups]);
   const rows = useMemo(() => sortCaseRows(flatRows, sort, languageTag), [flatRows, sort, languageTag]);
   const countLabel = formatCount(locale, rows.length, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
 
   useEffect(() => {
+    if (deepLinkOpenedRef.current) return;
+    const linkedCaseId = readCaseDeepLink(window.location.href).caseId;
+    if (!linkedCaseId) {
+      deepLinkOpenedRef.current = true;
+      return;
+    }
+    if (linkedCaseId !== props.testCase?.id) return;
+    deepLinkOpenedRef.current = true;
+    setMobileDetailOpen(true);
+  }, [props.testCase?.id]);
+
+  useEffect(() => {
     function closeMenus(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
       setFilterOpen(false);
       setRepositoryMenuOpen(false);
-      setMobileDetailOpen(false);
+      setDetailFullscreen((current) => {
+        if (!current) setMobileDetailOpen(false);
+        return false;
+      });
     }
     function closeOutside(event: PointerEvent) {
       if (event.target instanceof Element && event.target.closest("[data-case-popover-root]")) return;
@@ -91,7 +109,7 @@ export function CasesView(props: CasesViewProps) {
       <CasesToolbar locale={locale} query={props.query} countLabel={countLabel} filters={props.filters} filterOpen={filterOpen} selectedFolder={props.selectedFolder} onQuery={props.onQuery} onFilters={props.onFilters} onFilterOpen={() => { setFilterOpen((value) => !value); setRepositoryMenuOpen(false); }} onNew={props.onNew} />
       <CasesTable locale={locale} rows={rows} selectedCaseId={props.selectedCaseId} sort={sort} onSort={toggleSort} onSelect={selectRow} onCreate={() => props.onNew(props.selectedFolder)} />
     </section>
-    <div
+    {!detailFullscreen && <div
       {...repositoryResize.detailHandleProps}
       className={styles.detailResizeHandle}
       role="separator"
@@ -101,10 +119,10 @@ export function CasesView(props: CasesViewProps) {
       aria-valuemax={CASE_DETAIL_MAX}
       aria-valuenow={repositoryResize.detailWidth}
       tabIndex={0}
-    />
-    {mobileDetailOpen && <button type="button" className={styles.detailScrim} onClick={() => setMobileDetailOpen(false)} aria-label={locale === "ru" ? "Закрыть детали тест-кейса" : "Close test case details"} />}
-    <aside id="case-detail-panel" className={`${styles.detailPanel} ${mobileDetailOpen ? styles.detailPanelMobileOpen : ""}`} aria-label={locale === "ru" ? "Детали тест-кейса" : "Test case details"}>
-      {props.testCase && !revision ? <SaturnLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} selectedFolder={props.selectedFolder} onNew={props.onNew} onEdit={props.onEdit} onClone={props.onClone} onArchive={props.onArchive} onRunCase={props.onRunCase} onClose={() => setMobileDetailOpen(false)} />}
+    />}
+    {mobileDetailOpen && !detailFullscreen && <button type="button" className={styles.detailScrim} onClick={() => setMobileDetailOpen(false)} aria-label={locale === "ru" ? "Закрыть детали тест-кейса" : "Close test case details"} />}
+    <aside id="case-detail-panel" className={`${styles.detailPanel} ${mobileDetailOpen ? styles.detailPanelMobileOpen : ""} ${detailFullscreen ? styles.detailPanelFullscreen : ""}`} aria-label={locale === "ru" ? "Детали тест-кейса" : "Test case details"}>
+      {props.testCase && !revision ? <SaturnLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} selectedFolder={props.selectedFolder} onNew={props.onNew} onEdit={props.onEdit} onClone={props.onClone} onArchive={props.onArchive} onRunCase={props.onRunCase} fullscreen={detailFullscreen} onToggleFullscreen={() => { setDetailFullscreen((current) => !current); setMobileDetailOpen(true); }} onClose={() => setMobileDetailOpen(false)} />}
     </aside>
   </div>;
 }

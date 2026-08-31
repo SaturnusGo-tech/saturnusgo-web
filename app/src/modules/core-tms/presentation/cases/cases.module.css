@@ -20,7 +20,7 @@
   --cases-on-primary: #fff;
   --cases-primary: #3574f0;
   --case-repository-width: 230px;
-  --case-detail-width: 340px;
+  --case-detail-width: 510px;
   height: 100%;
   min-width: 0;
   min-height: 0;
@@ -116,8 +116,8 @@
   cursor: pointer;
 }
 
-.primaryIconButton { color: var(--cases-on-primary); background: var(--cases-primary); }
-.primaryIconButton:hover { background: #2d68dc; }
+.primaryIconButton { color: var(--cases-secondary-text); background: var(--cases-control); border-color: var(--cases-control-border); }
+.primaryIconButton:hover { color: var(--cases-strong); background: var(--cases-hover-strong); }
 .iconButton:hover,
 .repositoryHeading button:hover,
 .folderToggle:hover,
@@ -336,7 +336,7 @@
 .resizeHandle:focus-visible::after { width: 2px; background: var(--cases-primary); }
 
 .listPane {
-  min-width: 800px;
+  min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   display: flex;
@@ -445,6 +445,7 @@
   min-height: 0;
   flex: 1;
   overflow: auto;
+  scrollbar-gutter: stable;
   scrollbar-color: var(--cases-control-border) transparent;
 }
 
@@ -559,11 +560,11 @@
 .detailEmpty button { margin-top: 7px; }
 
 .detailPanel {
-  width: var(--case-detail-width, 340px);
+  width: var(--case-detail-width, 510px);
   min-width: 340px;
-  max-width: 440px;
+  max-width: 680px;
   min-height: 0;
-  flex: 0 0 var(--case-detail-width, 340px);
+  flex: 0 0 var(--case-detail-width, 510px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -575,7 +576,7 @@
   position: absolute;
   z-index: 10;
   top: 0;
-  right: calc(var(--case-detail-width, 340px) - 4px);
+  right: calc(var(--case-detail-width, 510px) - 4px);
   bottom: 0;
   width: 7px;
   cursor: col-resize;
@@ -609,13 +610,23 @@
   border-bottom: 1px solid var(--cases-border);
 }
 
-.detailToolbar > span { color: var(--cases-link); font-size: 12px; font-weight: 650; }
-.detailIdentity { min-width: 0; display: flex; align-items: center; gap: 5px; }
+.detailPrimaryActions,
+.detailSecondaryActions { min-width: 0; display: flex; align-items: center; gap: 3px; }
 .mobileBackButton { width: 28px; height: 28px; display: none; place-items: center; padding: 0; color: var(--cases-secondary-text); background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
 .mobileBackButton:hover { background: var(--cases-hover); }
-.detailToolbar > div { display: flex; align-items: center; gap: 3px; }
 .runButton { height: 28px; padding: 0 9px; font-size: 12px; }
 .detailToolbar .iconButton { width: 28px; height: 28px; color: var(--cases-secondary-text); }
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .detailTitle {
   min-height: 72px;
@@ -723,7 +734,7 @@
   .titleCellContent small { display: none; }
 }
 
-@container cases-workspace (max-width: 1369px) {
+@container cases-workspace (max-width: 1089px) {
   .detailResizeHandle { display: none; }
   .detailScrim {
     position: absolute;
@@ -741,9 +752,9 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(var(--case-detail-width, 340px), 100%);
+    width: min(var(--case-detail-width, 510px), 100%);
     min-width: min(340px, 100%);
-    max-width: min(440px, 100%);
+    max-width: min(680px, 100%);
     display: none;
     flex-basis: auto;
     box-shadow: -12px 0 30px rgb(0 0 0 / 24%);
@@ -752,7 +763,7 @@
   .mobileBackButton { display: grid; }
 }
 
-@container cases-workspace (max-width: 1029px) {
+@container cases-workspace (max-width: 559px) {
   .repositoryColumn { display: none; }
   .resizeHandle { display: none; }
 }
@@ -765,4 +776,29 @@
 
 @container cases-workspace (max-width: 700px) {
   .detailPanel { inset: 0; width: 100%; min-width: 0; max-width: none; box-shadow: none; }
+}
+
+.detailPanel.detailPanelFullscreen {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  display: flex;
+  flex-basis: auto;
+  border-left: 0;
+  box-shadow: none;
+}
+
+.detailPanelFullscreen .detailTitle,
+.detailPanelFullscreen .detailTabs,
+.detailPanelFullscreen .detailScroll > * { width: min(1120px, 100%); margin-inline: auto; }
+.detailPanelFullscreen .facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.detailPanelFullscreen .facts > div { border-right: 1px solid var(--cases-row-border); }
+.detailPanelFullscreen .facts > div:nth-child(4n) { border-right: 0; }
+
+@container cases-workspace (max-width: 760px) {
+  .detailPanelFullscreen .facts { grid-template-columns: 1fr 1fr; }
+  .detailPanelFullscreen .facts > div:nth-child(even) { border-right: 0; }
 }

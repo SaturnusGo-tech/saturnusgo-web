@@ -3,8 +3,10 @@ import { useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { getFolderDialogCopy } from "./copy";
-import styles from "../../../tms.module.css";
+import shared from "../../../tms.module.css";
+import styles from "./FolderDialog.module.css";
 export function FolderDialog({ existing, selectedParent, onClose, onCreated }: { existing: string[]; selectedParent: string; onClose: () => void; onCreated: (path: string) => void }) {
   const { locale } = useTmsLocale();
   const copy = getFolderDialogCopy(locale);
@@ -13,14 +15,23 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated }: {
   const cleanName = name.trim().replace(/^\/+|\/+$/g, "");
   const path = `${parent === "/" ? "" : parent}/${cleanName}`.replace(/\/{2,}/g, "/") || "/Unsorted";
   const duplicate = existing.includes(path);
-  return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose}>
-    <form onSubmit={(event) => { event.preventDefault(); if (cleanName && !duplicate) onCreated(path); }}>
-      <div className={styles.formGrid}>
+  const parents = [
+    { value: "/", label: copy.root },
+    ...Array.from(new Set(existing)).sort((left, right) => left.localeCompare(right)).map((folderName) => ({ value: folderName, label: folderName })),
+  ];
+  return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose} drawer panelClassName={styles.drawer}>
+    <form className={`${shared.drawerForm} ${shared.productionDrawerForm}`} onSubmit={(event) => { event.preventDefault(); if (cleanName && !duplicate) onCreated(path); }}>
+      <div className={`${shared.drawerBody} ${styles.body}`}>
+        <div className={shared.formGrid}>
         <Field label={copy.name} wide><input required autoFocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" /></Field>
-        <Field label={copy.parent} wide><select value={parent} onChange={(event) => setParent(event.target.value)}><option value="/">{copy.root}</option>{existing.map((folderName) => <option key={folderName} value={folderName}>{folderName}</option>)}</select></Field>
+        <Field label={copy.parent} wide><AnimatedSelect label={copy.parent} value={parent} options={parents} onChange={setParent} /></Field>
+        </div>
+        <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
+          <Folder size={16} aria-hidden="true" />
+          <span><small>{copy.path}</small><strong>{path}</strong>{duplicate && <em>{copy.duplicate}</em>}</span>
+        </div>
       </div>
-      <div className={`${styles.pathPreview} ${duplicate ? styles.pathPreviewError : ""}`}><Folder size={17} /><span><small>{copy.path}</small><strong>{path}</strong>{duplicate && <em>{copy.duplicate}</em>}</span></div>
-      <div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button><button className={styles.primaryButton} disabled={!cleanName || duplicate}><FolderPlus size={16} /> {copy.create}</button></div>
+      <div className={shared.modalFooter}><button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button><button className={shared.primaryButton} disabled={!cleanName || duplicate}><FolderPlus size={16} /> {copy.create}</button></div>
     </form>
   </Modal>;
 }

@@ -196,3 +196,18 @@ final result: passed
 - Security cleanup: the temporary local visual-QA authentication bypass was fully reverted; the final source contains no preview query marker or authentication exception.
 - Verification: TypeScript, 204-file architecture gate, focused Cases 6/6, TMS adapters/UI models 58/58, Auth0 17/17, attachments 4/4, production build 61/61, and `git diff --check` passed.
 final result: passed
+
+## Test Case detail controls and deep links — final pass
+
+- Source: the user-supplied 31 August dark Test Case workspace capture plus the accepted YouTrack-derived shell and compact table density.
+- Combined comparison: `.design-qa/case-detail-controls/comparison-reference-current.png`; implementation states: `.design-qa/case-detail-controls/default-panel-dark-1440x780.png`, `.design-qa/case-detail-controls/fullscreen-dark-1440x780.png`, and `.design-qa/case-detail-controls/folder-drawer-dark-1440x780.png`. These are ignored local QA artifacts and are not shipped.
+- Detail geometry: the default inspector is now 510px instead of the legacy 340px. The repository remains 230px, the document list receives the remaining 633px at the measured 1441×780 browser viewport, and the 800px table owns horizontal overflow (`scrollWidth=800`, `clientWidth=633`) instead of compressing its six columns.
+- Resizing: the detail separator exposes vertical separator semantics and supports pointer, Arrow, Home, End, and double-click reset. Browser evidence measured 510→494→340→623→510 while preserving the list floor.
+- Detail header: the redundant Test Case ID was removed. Run is the first action; Copy link, Full screen, Edit, Clone, and Archive follow in a stable order, with Full screen immediately before Edit.
+- Full screen: the document expands over the complete Cases content area while retaining the fixed global shell; the same control exits full screen, and Escape restores the split workspace.
+- Deep links: Copy produces a canonical same-origin URL containing only `projectId` and `caseId`. Reload selects the linked project and case; temporary release/debug parameters are deliberately stripped. The browser clipboard matched the visible canonical URL exactly and announced localized success through `role=status`.
+- Folder creation: the former square mixed-theme modal is now a flat right drawer using the shared graphite controls, custom animated parent-folder selector, continuous path preview, and sticky action footer.
+- Security cleanup: the localhost-only visual-QA Auth0 bypass was fully reverted before release verification. No production authentication exception or preview marker remains.
+- Accessibility: every icon action has a localized accessible name and tooltip; link copy reports nonvisual status; resize controls remain keyboard-operable; the drawer retains dialog focus management and Escape dismissal.
+
+final result: passed

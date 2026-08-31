@@ -1,0 +1,30 @@
+.drawer { width: min(468px, calc(100vw - 20px)); }
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-top: 22px;
+}
+
+.path {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  padding: 14px 0;
+  color: var(--muted);
+  border-block: 1px solid var(--line);
+}
+
+.path > svg { margin-top: 2px; }
+.path > span { min-width: 0; display: grid; gap: 3px; }
+.path small { color: var(--muted); font-size: 11px; }
+.path strong { overflow-wrap: anywhere; color: var(--ink); font-size: 13px; font-weight: 600; }
+.path em { color: var(--red); font-size: 11px; font-style: normal; }
+.pathError { border-color: var(--red); }
+
+@media (max-width: 520px) {
+  .drawer { width: 100%; }
+  .body { padding-top: 18px; }
+}

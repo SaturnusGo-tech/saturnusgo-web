@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from "react";
 export const CASE_REPOSITORY_DEFAULT = 230;
 export const CASE_REPOSITORY_MIN = 230;
 export const CASE_REPOSITORY_MAX = 320;
-export const CASE_DETAIL_DEFAULT = 340;
+export const CASE_DETAIL_DEFAULT = 510;
 export const CASE_DETAIL_MIN = 340;
-export const CASE_DETAIL_MAX = 440;
-export const CASE_LIST_MIN = 800;
+export const CASE_DETAIL_MAX = 680;
+export const CASE_LIST_MIN = 520;
 export const CASE_REPOSITORY_VISIBLE_MIN = CASE_REPOSITORY_MIN + CASE_LIST_MIN;
 export const CASE_INLINE_MIN = CASE_REPOSITORY_MIN + CASE_LIST_MIN + CASE_DETAIL_MIN;
-const CASE_DOCUMENT_MIN = 660;
+const CASE_DOCUMENT_MIN = CASE_LIST_MIN;
 const REPOSITORY_STORAGE_KEY = "tms.cases.repository-width.v1";
-const DETAIL_STORAGE_KEY = "tms.cases.detail-width.v1";
+const DETAIL_STORAGE_KEY = "tms.cases.detail-width.v2";
 
 export function clampCaseRepositoryWidth(value: number, containerWidth: number) {
   const available = containerWidth > 0

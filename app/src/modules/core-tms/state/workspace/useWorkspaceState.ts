@@ -9,6 +9,7 @@ import type { CaseFilters, Dialog, View } from "../types/workspace";
 import { useWorkspaceBootstrap } from "./useWorkspaceBootstrap";
 import { getRun, getRunItem, listRunItems } from "../../runs/data/run-api";
 import { getTestCase } from "../../test-cases/data/test-case-api";
+import { buildCaseDeepLink, readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { useSelectedSuiteResource } from "../workspace-resources/useSelectedSuiteResource";
 
 const defaultFilters: CaseFilters = {
@@ -56,12 +57,18 @@ export function useWorkspaceState() {
 
   useEffect(() => {
     if (connection !== "connected" && connection !== "demo") return;
+    const linked = readCaseDeepLink(window.location.href);
     const remembered = window.localStorage.getItem("tms.project.v1");
     const active = data.projects.filter((item) => item.status !== "archived");
-    const initialProjectId = active.some((item) => item.id === remembered)
+    const initialProjectId = active.some((item) => item.id === linked.projectId)
+      ? linked.projectId!
+      : active.some((item) => item.id === remembered)
       ? remembered!
       : (active[0]?.id ?? "");
-    const initialCase = data.testCases.find(
+    const linkedCase = data.testCases.find(
+      (item) => item.projectId === initialProjectId && item.id === linked.caseId,
+    );
+    const initialCase = linkedCase ?? data.testCases.find(
       (item) => item.projectId === initialProjectId && !item.archivedAt,
     );
     setProjectId(initialProjectId);
@@ -75,6 +82,17 @@ export function useWorkspaceState() {
     );
     setNotice(connection === "connected" ? t("actions.workspaceConnected") : "");
   }, [bootstrap.generation]);
+
+  useEffect(() => {
+    if ((connection !== "connected" && connection !== "demo") || !selectedCaseId) return;
+    const selected = data.testCases.find((item) => item.id === selectedCaseId);
+    if (!selected) return;
+    const next = buildCaseDeepLink(window.location.href, {
+      caseId: selected.id,
+      projectId: selected.projectId,
+    });
+    if (next !== window.location.href) window.history.replaceState(null, "", next);
+  }, [connection, data.testCases, selectedCaseId]);
 
   useEffect(() => {
     if (connection === "demo") { const detail = data.testCases.find((item) => item.id === selectedCaseId); setSelectedCaseDetail(detail && "current" in detail ? detail as TestCase : null); return; }

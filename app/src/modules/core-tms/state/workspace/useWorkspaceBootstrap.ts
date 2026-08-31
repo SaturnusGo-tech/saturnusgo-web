@@ -6,6 +6,7 @@ import {
 } from "../../../../core/tms/fallback/bootstrap";
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
+import { readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { loadProjectCollections, loadWorkspace } from "../../workspace/data/workspace-api";
 
 export type WorkspaceConnection =
@@ -64,7 +65,10 @@ export function useWorkspaceBootstrap() {
     activeController.current = controller;
     setConnection("loading");
     setFailure(null);
-    const preferredProjectId = window.localStorage.getItem("tms.project.v1") ?? undefined;
+    const linkedProjectId = readCaseDeepLink(window.location.href).projectId;
+    const preferredProjectId = linkedProjectId
+      ?? window.localStorage.getItem("tms.project.v1")
+      ?? undefined;
     loadWorkspace(http, preferredProjectId, controller.signal)
       .then((payload) => {
         if (controller.signal.aborted || requestId !== activeRequest.current) return;
