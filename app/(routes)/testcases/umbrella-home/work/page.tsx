@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TmsWorkspace } from "../../../../src/modules/core-tms";
+import { TmsFavicon } from "./TmsFavicon";
 
 export const metadata: Metadata = {
   title: "TESSIQ",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TmsWorkspace />;
+  return (
+    <>
+      <TmsFavicon />
+      <TmsWorkspace />
+    </>
+  );
 }
