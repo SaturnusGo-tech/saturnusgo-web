@@ -321,3 +321,18 @@ final result: passed
 - Release evidence: source commit `cad3006c0a46abba47295ad0fa344db51cb3b4a8` is on `saturnusgo-web/main`; Pages commit `6c04fe3f9d34762e46bd460b0a25d8371a128be5` is on `saturnusgo-web.github.io/main`.
 
 final result: passed
+
+## Compact test-run selector and overflow marquee — final pass
+
+- Source: the user-supplied compact run-navigation capture from 31 August plus the later focused regression capture in which the selected run and every menu option expanded into tall multiline blocks. The focused source image is 554×380 pixels.
+- Production evidence: `.design-qa/run-selector-marquee/production-closed.png` and `.design-qa/run-selector-marquee/production-open.png`, captured from the authenticated live TESSIQ release at 1087×814 CSS pixels with real active runs. The focused before/after comparison is `.design-qa/run-selector-marquee/before-after.png`; these local QA artifacts are ignored and not shipped.
+- Root cause: commit `774499c8` added a second key line to the trigger and allowed `white-space: normal` plus `overflow-wrap: anywhere`, so long names increased the control and option heights instead of staying within the established navigation rhythm.
+- Geometry: the selected-run trigger is again a fixed 32px single-line control; list options are fixed 40px rows. Production measurements were exactly 32px for the trigger and 40px for all three real options, with no height change for long names.
+- Overflow behavior: the trigger measures its real hidden distance and uses a slow 7–18 second alternate left/right pan only when content overflows. Menu names remain still until their row is hovered or keyboard-focused, avoiding a noisy list; the selected production name measured 286px of overflow with a 15.21 second cycle.
+- Discoverability: every run-name viewport retains the complete native `title` value. Production inspection returned the full selected name and all three full option names, so the operating-system tooltip remains available without another custom surface.
+- Motion and accessibility: ResizeObserver keeps the travel distance correct after layout changes; `prefers-reduced-motion` disables both automatic and interaction motion. Arrow, Home, End, Tab, Escape, selected-state, listbox semantics, focus return, and Create-run behavior are unchanged.
+- Visual review: the compact hierarchy, graphite/white theme surfaces, typography, four-pixel menu radii, option key secondary line, selected blue focus treatment, and surrounding run execution layout match the accepted TESSIQ/YouTrack identity. No P0, P1, or P2 visual regression remained after the production comparison.
+- Console and gates: authenticated production console reported zero errors. TypeScript, the 210-file architecture gate, focused selector regression, 64/64 TMS adapter/UI tests, `git diff --check`, clean production build 61/61, SHA-bound Pages prepare, and approved Pages publish passed.
+- Release evidence: source commit `b452b201926e04efcd60d8493bf1c456b22f2da5` is on `saturnusgo-web/main`; Pages commit `3d1df1af` is on `saturnusgo-web.github.io/main`.
+
+final result: passed
