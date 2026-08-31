@@ -21,7 +21,7 @@ import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
 import { getSuiteDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
-import surface from "../drawer-surfaces.module.css";
+import dialog from "./suite-dialog.module.css";
 export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClose, onSaved }: { projectId: string; cases: TestCaseSummary[]; suite?: Suite; suiteEtag?: string | null; offline: boolean; onClose: () => void; onSaved: (suite: Suite, etag: string | null) => void }) {
   const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
@@ -62,24 +62,24 @@ export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClo
     try { const saved = await saveSuite({ http, suite, suiteEtag, projectId, name, description, type, caseIds, tags: normalizedTags, offline, operationKey: operation.current.key }); onSaved(saved.data, saved.etag); }
     catch (caught) { setError(formatTmsMutationFailure(toTmsMutationFailure(caught), copy.error)); setSubmitting(false); }
   }
-  return <Modal title={suite ? copy.configureTitle : copy.createTitle} subtitle={copy.subtitle} onClose={onClose} wide drawer>
-    <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm} ${surface.form}`}>
-      <div className={`${styles.drawerBody} ${surface.body}`}><section className={`${styles.drawerSection} ${surface.section}`}><div className={`${styles.formGrid} ${surface.grid}`}>
+  return <Modal title={suite ? copy.configureTitle : copy.createTitle} subtitle={copy.subtitle} onClose={onClose} panelClassName={dialog.panel} wide drawer>
+    <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm} ${dialog.form}`}>
+      <div className={`${styles.drawerBody} ${dialog.body}`}><section className={dialog.section}><div className={`${styles.formGrid} ${dialog.grid}`}>
         <Field label={copy.name} wide><input required autoFocus value={name} onChange={(event) => setName(event.target.value)} /></Field>
-        <Field label={copy.description} wide><textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
-        <div className={surface.modeField}><span>{copy.mode}</span><div className={surface.modeGroup} role="group" aria-label={copy.mode}>
-          <button type="button" className={surface.modeButton} data-selected={type === "static"} aria-pressed={type === "static"} onClick={() => setType("static")}><strong>{copy.staticMode}</strong><span>{copy.staticModeHint}</span></button>
-          <button type="button" className={surface.modeButton} data-selected={type === "dynamic"} aria-pressed={type === "dynamic"} onClick={() => setType("dynamic")}><strong>{copy.dynamicMode}</strong><span>{copy.dynamicModeHint}</span></button>
+        <Field label={copy.description} wide><textarea className={`${styles.drawerTextarea} ${dialog.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
+        <div className={dialog.modeField}><span>{copy.mode}</span><div className={dialog.modeGroup} role="group" aria-label={copy.mode}>
+          <button type="button" className={dialog.modeButton} data-selected={type === "static"} aria-pressed={type === "static"} onClick={() => setType("static")}><strong>{copy.staticMode}</strong><span>{copy.staticModeHint}</span></button>
+          <button type="button" className={dialog.modeButton} data-selected={type === "dynamic"} aria-pressed={type === "dynamic"} onClick={() => setType("dynamic")}><strong>{copy.dynamicMode}</strong><span>{copy.dynamicModeHint}</span></button>
         </div></div>
         {type === "dynamic" && <Field label={copy.tags} wide><input required value={tags} onChange={(event) => setTags(event.target.value)} placeholder={copy.tagsPlaceholder} /></Field>}
       </div></section>
-      <section ref={scopeRef} className={`${styles.drawerSection} ${surface.section} ${surface.scope}`}><div className={surface.scopeSummary}><span><strong>{caseCount(effectiveIds.length)} {copy.scope}</strong><small>{type === "dynamic" ? copy.dynamicHint : copy.staticHint}</small></span><button type="button" className={surface.scopeToggle} data-expanded={showCases} aria-expanded={showCases} onClick={() => setShowCases((current) => !current)}>{showCases ? copy.hideCases : copy.reviewCases}<ChevronDown size={14} aria-hidden /></button></div>
-      {showCases && <div className={surface.picker}>
-        {type === "static" && <div className={surface.pickerActions}><button type="button" onClick={() => setCaseIds(Array.from(new Set([...caseIds, ...visibleCases.map((item) => item.id)])))}>{copy.selectVisible}</button><button type="button" onClick={() => setCaseIds((current) => current.filter((id) => !visibleCases.some((item) => item.id === id)))}>{copy.clearVisible}</button></div>}
-        <label className={`${styles.searchField} ${surface.search}`}><Search size={15} /><input aria-label={copy.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} /></label>
-        <div className={`${styles.casePicker} ${styles.compactCasePicker} ${surface.caseList}`}>
-          {previewCases.map((item) => { const checked = effectiveIds.includes(item.id); return <label key={item.id} className={checked ? styles.casePickerSelected : ""}><input type="checkbox" checked={checked} disabled={type === "dynamic"} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} /><span><small>{item.key} · {item.folderPath}</small><strong>{item.title}</strong></span><em className={styles[`priority_${item.priority}`]}>{copy[item.priority]}</em></label>; })}
-          {previewCases.length === 0 && <div className={styles.compactPickerEmpty}>{copy.noMatching}</div>}
+      <section ref={scopeRef} className={dialog.section}><div className={dialog.scopeSummary}><span><strong>{caseCount(effectiveIds.length)} {copy.scope}</strong><small>{type === "dynamic" ? copy.dynamicHint : copy.staticHint}</small></span><button type="button" className={dialog.scopeToggle} data-expanded={showCases} aria-expanded={showCases} onClick={() => setShowCases((current) => !current)}>{showCases ? copy.hideCases : copy.reviewCases}<ChevronDown size={14} aria-hidden /></button></div>
+      {showCases && <div className={dialog.picker}>
+        {type === "static" && <div className={dialog.pickerActions}><button type="button" onClick={() => setCaseIds(Array.from(new Set([...caseIds, ...visibleCases.map((item) => item.id)])))}>{copy.selectVisible}</button><button type="button" onClick={() => setCaseIds((current) => current.filter((id) => !visibleCases.some((item) => item.id === id)))}>{copy.clearVisible}</button></div>}
+        <label className={dialog.search}><Search size={15} /><input aria-label={copy.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} /></label>
+        <div className={dialog.caseList}>
+          {previewCases.map((item) => { const checked = effectiveIds.includes(item.id); return <label key={item.id} className={dialog.caseRow} data-selected={checked}><input type="checkbox" checked={checked} disabled={type === "dynamic"} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} /><span className={dialog.caseCopy}><strong>{item.title}</strong><small>{item.key} · {item.folderPath}</small></span><em className={dialog.priority} data-priority={item.priority}>{copy[item.priority]}</em></label>; })}
+          {previewCases.length === 0 && <div className={dialog.empty}>{copy.noMatching}</div>}
         </div>
       </div>}
       {error && <FormError message={error} />}</section>

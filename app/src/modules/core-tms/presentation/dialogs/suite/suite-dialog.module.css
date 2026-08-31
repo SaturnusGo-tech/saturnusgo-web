@@ -1,0 +1,135 @@
+.panel { width: min(720px, calc(100vw - 24px)) !important; }
+.form { color: var(--ink); background: var(--paper); font-size: 14px; }
+.body { padding: 0 22px 24px !important; }
+.section { padding: 18px 0; border-bottom: 1px solid var(--line); animation: suite-section-enter 150ms ease-out both; }
+.section:last-child { border-bottom: 0; }
+.section:nth-child(2) { animation-delay: 35ms; }
+.grid { gap: 12px !important; }
+
+.form label > span,
+.modeField > span { color: var(--muted); font-size: 11px; font-weight: 600; }
+.form label > :is(input, textarea) {
+  color: var(--ink) !important;
+  background: var(--paper) !important;
+  border-color: var(--line-strong) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  font: inherit;
+}
+.form label > :is(input, textarea):hover { border-color: var(--line-strong) !important; }
+.form label > :is(input, textarea):focus { border-color: var(--action) !important; box-shadow: 0 0 0 2px var(--yt-focus) !important; }
+.textarea { min-height: 70px !important; resize: vertical; }
+
+.modeField { grid-column: 1 / -1; display: grid; gap: 6px; }
+.modeGroup { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 4px; }
+.modeButton {
+  min-height: 50px;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 1px;
+  padding: 7px 11px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  border-right: 1px solid var(--line-strong);
+  cursor: pointer;
+  text-align: left;
+}
+.modeButton:last-child { border-right: 0; }
+.modeButton:hover { background: var(--control-hover); }
+.modeButton[data-selected="true"] { background: var(--yt-selection); box-shadow: inset 0 -2px 0 var(--action); }
+.modeButton strong { color: var(--ink); font-size: 12px; font-weight: 600; }
+.modeButton span { color: var(--muted); font-size: 10px; line-height: 1.25; }
+.modeButton[data-selected="true"] strong { color: var(--yt-link); }
+
+.scopeSummary { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.scopeSummary > span { min-width: 0; display: grid; gap: 2px; }
+.scopeSummary strong { color: var(--ink); font-size: 13px; font-weight: 600; }
+.scopeSummary small { color: var(--muted); font-size: 10px; }
+.scopeToggle {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  color: var(--yt-link);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.scopeToggle:hover { background: var(--yt-selection); }
+.scopeToggle svg { transition: transform 150ms ease; }
+.scopeToggle[data-expanded="true"] svg { transform: rotate(180deg); }
+.picker { margin-top: 10px; animation: suite-picker-enter 150ms ease-out; }
+.pickerActions { min-height: 32px; display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+.pickerActions button { padding: 0; color: var(--yt-link); background: transparent; border: 0; cursor: pointer; font-size: 11px; }
+.pickerActions button:hover { text-decoration: underline; }
+
+.search {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  color: var(--muted);
+  background: var(--control);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px 4px 0 0;
+}
+.search:focus-within { border-color: var(--action); box-shadow: 0 0 0 2px var(--yt-focus); }
+.search input { width: 100%; min-width: 0; color: var(--ink); background: transparent; border: 0; outline: 0; font: inherit; }
+.search input::placeholder { color: var(--muted); }
+.caseList { max-height: 340px; overflow: auto; border: 1px solid var(--line-strong); border-top: 0; border-radius: 0 0 4px 4px; }
+.caseRow {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  color: var(--ink);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.caseRow:last-child { border-bottom: 0; }
+.caseRow:hover { background: var(--control-hover); }
+.caseRow[data-selected="true"] { background: var(--yt-selection); box-shadow: inset 3px 0 0 var(--action); }
+.caseRow input { accent-color: var(--action); }
+.caseRow input:disabled { opacity: .75; }
+.caseCopy { min-width: 0; display: grid; gap: 2px; }
+.caseCopy strong { overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.caseCopy small { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.priority { padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 10px; font-style: normal; white-space: nowrap; }
+.priority[data-priority="low"] { color: var(--muted); }
+.priority[data-priority="medium"] { color: var(--yt-link); background: var(--yt-selection); border-color: color-mix(in srgb, var(--action) 48%, transparent); }
+.priority[data-priority="high"] { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 52%, transparent); }
+.priority[data-priority="critical"] { color: var(--red); background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 52%, transparent); }
+.empty { min-height: 64px; display: flex; align-items: center; padding: 12px; color: var(--muted); background: var(--paper); font-size: 12px; }
+
+:global(.dark) .form label > :is(input, textarea),
+:global(.dark) .modeButton,
+:global(.dark) .search { background: var(--control) !important; }
+
+@keyframes suite-section-enter { from { opacity: 0; transform: translateX(5px); } }
+@keyframes suite-picker-enter { from { opacity: 0; transform: translateY(-4px); } }
+
+@media (max-width: 680px) {
+  .panel { width: 100% !important; }
+  .body { padding-inline: 16px !important; }
+  .modeGroup { grid-template-columns: 1fr; }
+  .modeButton { border-right: 0; border-bottom: 1px solid var(--line-strong); }
+  .modeButton:last-child { border-bottom: 0; }
+  .scopeSummary { align-items: flex-start; flex-direction: column; gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .picker { animation: none; }
+  .scopeToggle svg { transition: none; }
+}
