@@ -32,6 +32,7 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
     folderSnapshots.current = {};
   }, [editor]);
   function begin(section: InspectorSection) {
+    if (snapshots.current[section]) return;
     snapshots.current[section] = copyInspectorRevision(value);
     folderSnapshots.current[section] = editor?.folderPath ?? "";
     setEditing((current) => new Set(current).add(section));

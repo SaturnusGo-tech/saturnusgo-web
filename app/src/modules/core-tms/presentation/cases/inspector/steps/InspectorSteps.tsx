@@ -117,7 +117,7 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
         </div>)
       : revision.steps.map((step, index) => <div className={css.editStep} key={step.id}>
           <b>{index + 1}</b>
-          <label>
+          <div className={css.markdownControl}>
             <span>{ru ? "Действие" : "Action"}</span>
             <MarkdownField
               compact
@@ -126,8 +126,8 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
               value={step.action}
               onChange={(action) => updateStep(step.id, { action })}
             />
-          </label>
-          <label>
+          </div>
+          <div className={css.markdownControl}>
             <span>{ru ? "Ожидаемый результат" : "Expected result"}</span>
             <MarkdownField
               compact
@@ -135,8 +135,8 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
               value={step.expectedResult}
               onChange={(expectedResult) => updateStep(step.id, { expectedResult })}
             />
-          </label>
-          <label>
+          </div>
+          <div className={css.markdownControl}>
             <span>{ru ? "Тестовые данные" : "Test data"}</span>
             <MarkdownField
               compact
@@ -144,7 +144,7 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
               value={step.testData ?? ""}
               onChange={(testData) => updateStep(step.id, { testData })}
             />
-          </label>
+          </div>
           <label className={css.requiredToggle}>
             <input type="checkbox" checked={step.required} onChange={(event) => updateStep(step.id, { required: event.target.checked })} />
             {ru ? "Обязательный" : "Required"}

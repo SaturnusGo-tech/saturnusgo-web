@@ -46,7 +46,7 @@ export function InspectorSectionView(props: Props) {
     <header>
       <h3>{props.title}</h3>
       {props.count !== undefined && <span className={css.count}>{props.count}</span>}
-      {!props.persistentEditing && <button
+      {!props.persistentEditing && !active && <button
         ref={editButton}
         type="button"
         className={css.iconButton}
@@ -54,7 +54,6 @@ export function InspectorSectionView(props: Props) {
         onClick={() => props.onEdit(props.section)}
         aria-label={props.editLabel ?? `${props.ru ? "Изменить" : "Edit"} ${props.title}`}
         title={props.editLabel ?? `${props.ru ? "Изменить" : "Edit"} ${props.title}`}
-        aria-expanded={active}
       >
         <Pencil size={14} />
       </button>}

@@ -167,6 +167,10 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
 
   assert.match(popovers, /role="combobox"/);
   assert.match(popovers, /aria-autocomplete="list"/);
+  assert.match(popovers, /const renderedSuggestions = suggestions\.slice\(0, 10\)/);
+  assert.match(popovers, /aria-activedescendant=\{open && renderedSuggestions\[activeIndex\]/);
+  assert.match(popovers, /event\.key === "Enter" && open && renderedSuggestions\[activeIndex\]/);
+  assert.doesNotMatch(popovers, /suggestions\.slice\(0, 10\)\.map/);
   assert.match(popovers, /event\.key === "ArrowDown" \|\| event\.key === "ArrowUp"/);
   assert.match(popovers, /"ArrowDown", "ArrowUp", "Home", "End"/);
   assert.match(popovers, /data-filter-section="folders"/);

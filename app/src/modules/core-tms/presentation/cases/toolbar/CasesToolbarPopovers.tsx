@@ -149,7 +149,11 @@ export function CaseQlAutocomplete(props: QlProps) {
     const dynamic = canonicalField === "folder" ? props.folders : canonicalField === "component" ? props.components : field?.values ?? [];
     return dynamic.filter((value) => value.toLocaleLowerCase().includes(valueQuery.toLocaleLowerCase())).map((value) => ({ value, label: canonicalField === "component" ? localizedComponentLabel(props.locale, value) : value, field: false }));
   }, [body, fieldKey, props.components, props.folders, props.locale, ru, separator, valueQuery]);
+  const renderedSuggestions = suggestions.slice(0, 10);
   useEffect(() => { setActiveIndex(0); }, [token]);
+  useEffect(() => {
+    setActiveIndex((current) => Math.max(0, Math.min(renderedSuggestions.length - 1, current)));
+  }, [renderedSuggestions.length]);
   useEffect(() => {
     const close = (event: PointerEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false); };
     window.addEventListener("pointerdown", close); return () => window.removeEventListener("pointerdown", close);
@@ -163,16 +167,16 @@ export function CaseQlAutocomplete(props: QlProps) {
     if (event.key === "Escape") { setOpen(false); return; }
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault(); setOpen(true);
-      setActiveIndex((current) => Math.max(0, Math.min(suggestions.length - 1, current + (event.key === "ArrowDown" ? 1 : -1))));
+      setActiveIndex((current) => Math.max(0, Math.min(renderedSuggestions.length - 1, current + (event.key === "ArrowDown" ? 1 : -1))));
     }
-    if (event.key === "Enter" && open && suggestions[activeIndex]) { event.preventDefault(); apply(suggestions[activeIndex].value, suggestions[activeIndex].field); }
+    if (event.key === "Enter" && open && renderedSuggestions[activeIndex]) { event.preventDefault(); apply(renderedSuggestions[activeIndex].value, renderedSuggestions[activeIndex].field); }
   }
   return <div ref={rootRef} className={styles.qlRoot} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>
-    <label className={styles.inputShell}><input role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls="case-ql-suggestions" aria-activedescendant={open && suggestions[activeIndex] ? `case-ql-option-${activeIndex}` : undefined} value={props.query} onFocus={() => setOpen(true)} onKeyDown={onKeyDown} onChange={(event) => { props.onQuery(event.target.value); setOpen(true); }} placeholder={ru ? "Введите QL-запрос" : "Enter a QL query"} aria-label={ru ? "QL-запрос" : "QL query"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
+    <label className={styles.inputShell}><input role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls="case-ql-suggestions" aria-activedescendant={open && renderedSuggestions[activeIndex] ? `case-ql-option-${activeIndex}` : undefined} value={props.query} onFocus={() => setOpen(true)} onKeyDown={onKeyDown} onChange={(event) => { props.onQuery(event.target.value); setOpen(true); }} placeholder={ru ? "Введите QL-запрос" : "Enter a QL query"} aria-label={ru ? "QL-запрос" : "QL query"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
     {open && <div className={`${styles.popover} ${styles.qlSuggestions}`} id="case-ql-suggestions" role="listbox">
       <div className={styles.qlSyntax}><span><kbd>:</kbd>{ru ? "значение поля" : "field value"}</span><span><kbd>-</kbd>{ru ? "исключить" : "exclude"}</span></div>
-      {suggestions.slice(0, 10).map((suggestion, index) => <button type="button" role="option" aria-selected={index === activeIndex} id={`case-ql-option-${index}`} className={index === activeIndex ? styles.optionActive : ""} key={`${suggestion.field ? "field" : "value"}-${suggestion.value}`} onMouseDown={(event) => event.preventDefault()} onClick={() => apply(suggestion.value, suggestion.field)}><span>{suggestion.label}</span><code>{suggestion.field ? `${suggestion.value}:` : suggestion.value}</code></button>)}
-      {suggestions.length === 0 && <span className={styles.noOptions}>{separator >= 0 ? (ru ? "Продолжите ввод значения" : "Continue typing a value") : (ru ? "Поле не найдено" : "No matching field")}</span>}
+      {renderedSuggestions.map((suggestion, index) => <button type="button" role="option" aria-selected={index === activeIndex} id={`case-ql-option-${index}`} className={index === activeIndex ? styles.optionActive : ""} key={`${suggestion.field ? "field" : "value"}-${suggestion.value}`} onMouseDown={(event) => event.preventDefault()} onClick={() => apply(suggestion.value, suggestion.field)}><span>{suggestion.label}</span><code>{suggestion.field ? `${suggestion.value}:` : suggestion.value}</code></button>)}
+      {renderedSuggestions.length === 0 && <span className={styles.noOptions}>{separator >= 0 ? (ru ? "Продолжите ввод значения" : "Continue typing a value") : (ru ? "Поле не найдено" : "No matching field")}</span>}
     </div>}
   </div>;
 }

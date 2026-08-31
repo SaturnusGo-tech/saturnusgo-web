@@ -64,7 +64,11 @@ export function AnimatedSelect({
             event.preventDefault();
             openAndFocus(event.key === "ArrowDown" ? selectedIndex : options.length - 1);
           }
-          if (event.key === "Escape") closeAndRestoreFocus();
+          if (event.key === "Escape" && open) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAndRestoreFocus();
+          }
         }}
       >
         <span>{selected?.label ?? "—"}</span>
@@ -91,6 +95,7 @@ export function AnimatedSelect({
           }
           if (event.key === "Escape") {
             event.preventDefault();
+            event.stopPropagation();
             closeAndRestoreFocus();
           }
           if (event.key === "Tab") setOpen(false);

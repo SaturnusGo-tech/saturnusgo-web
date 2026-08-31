@@ -58,8 +58,8 @@
 .sectionActions .saveButton { color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
 .sectionActions button:disabled { cursor: wait; opacity: .6; }
 .compactFields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.compactFields label { min-width: 0; display: grid; gap: 4px; }
-.compactFields label > span, .editStep label > span { color: var(--cases-muted); font-size: 10px; }
+.compactFields label, .compactFields .markdownControl { min-width: 0; display: grid; gap: 4px; }
+.compactFields label > span, .compactFields .markdownControl > span, .editStep label > span, .editStep .markdownControl > span { color: var(--cases-muted); font-size: 10px; }
 .wideField { grid-column: 1 / -1; }
 .compactSummary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
 .compactSummary > div { min-width: 0; }
@@ -73,7 +73,7 @@
 .steps em { color: var(--cases-muted); font-size: 10px; font-style: normal; }
 .stepEditor { display: grid; gap: 7px; }
 .editStep { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 7px; padding: 9px 36px 9px 9px; background: var(--cases-raised); border: 1px solid var(--cases-border); border-radius: 4px; }
-.editStep label { min-width: 0; display: grid; gap: 4px; grid-column: 2; }
+.editStep label, .editStep .markdownControl { min-width: 0; display: grid; gap: 4px; grid-column: 2; }
 .editStep .requiredToggle { display: flex; align-items: center; gap: 6px; color: var(--cases-secondary-text); font-size: 10px; }
 .editStep .requiredToggle input { width: 14px; height: 14px; }
 .editStep > textarea { grid-column: 2; }
