@@ -4,13 +4,13 @@ import type {
   TestCaseSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
 import type { CaseFilters } from "../../state/types/workspace";
+import type { CaseInspectorEditor } from "./inspector/model";
 
 export type CasesViewProps = {
   query: string;
   onQuery: (value: string) => void;
+  testCases: TestCaseSummary[];
   groups: Array<[string, TestCaseSummary[]]>;
-  collapsed: string[];
-  onToggleFolder: (folder: string) => void;
   selectedFolder: string;
   onSelectFolder: (folder: string) => void;
   selectedCaseId: string;
@@ -27,9 +27,9 @@ export type CasesViewProps = {
   filters: CaseFilters;
   onFilters: (filters: CaseFilters) => void;
   onNewFolder: () => void;
-  onNewProject: () => void;
-  onCollapseAll: () => void;
-  onExpandAll: () => void;
+  detailLoadError: boolean;
+  onRetryDetail: () => void;
+  editor?: CaseInspectorEditor;
 };
 
 export type CaseListRow = {

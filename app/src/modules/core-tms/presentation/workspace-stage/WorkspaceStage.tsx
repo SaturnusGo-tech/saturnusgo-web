@@ -44,18 +44,11 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   }
   if (model.view === "cases") {
     return (
-      <CasesView
+      <CasesView key={model.project.id}
         query={model.query}
         onQuery={model.setQuery}
+        testCases={model.projectCases}
         groups={model.folderGroups}
-        collapsed={model.collapsedFolders}
-        onToggleFolder={(folderName) =>
-          model.setCollapsedFolders((current) =>
-            current.includes(folderName)
-              ? current.filter((item) => item !== folderName)
-              : [...current, folderName],
-          )
-        }
         selectedFolder={model.selectedFolder}
         onSelectFolder={model.selectFolder}
         selectedCaseId={model.selectedCase?.id ?? ""}
@@ -78,13 +71,24 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         filters={model.caseFilters}
         onFilters={model.setCaseFilters}
         onNewFolder={() => model.setDialog("folder")}
-        onNewProject={model.openNewProject}
-        onCollapseAll={() =>
-          model.setCollapsedFolders(
-            model.folderGroups.map(([folderName]) => folderName),
-          )
-        }
-        onExpandAll={() => model.setCollapsedFolders([])}
+        detailLoadError={model.selectedCaseDetailError}
+        onRetryDetail={model.retrySelectedCaseDetail}
+        editor={model.dialog === "case" ? {
+          mode: model.editing ? "edit" : "create",
+          value: model.caseDraft,
+          folderPath: model.caseFolderPath,
+          folders: model.folderGroups.map(([folderName]) => folderName),
+          components: Array.from(new Set(
+            model.projectCases.map((testCase) => testCase.component).filter(Boolean),
+          )).sort(),
+          onChange: model.setCaseDraft,
+          onFolderPath: model.setCaseFolderPath,
+          onSubmit: model.saveCase,
+          submitting: model.caseSubmitting,
+          onCancel: () => {
+            if (!model.caseSubmitting) model.resetCaseEditor(model.selectedFolder);
+          },
+        } : undefined}
       />
     );
   }

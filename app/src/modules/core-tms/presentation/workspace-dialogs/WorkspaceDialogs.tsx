@@ -1,6 +1,5 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
-import { CaseDialog } from "../dialogs/case/CaseDialog";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
 import { IntegrationDialog } from "../dialogs/integration/IntegrationDialog";
 import { ProjectDialog } from "../dialogs/project/ProjectDialog";
@@ -63,20 +62,6 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           close();
           model.notify(t("actions.folderCreated", { path: folderPath }));
         }}
-      />
-    );
-  }
-  if (model.dialog === "case") {
-    return (
-      <CaseDialog
-        value={model.caseDraft}
-        onChange={model.setCaseDraft}
-        folderPath={model.caseFolderPath}
-        onFolderPath={model.setCaseFolderPath}
-        folders={model.folderGroups.map(([folderName]) => folderName)}
-        editing={model.editing}
-        onClose={close}
-        onSubmit={model.saveCase}
       />
     );
   }

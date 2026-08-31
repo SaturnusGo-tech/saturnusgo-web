@@ -336,3 +336,18 @@ final result: passed
 - Release evidence: source commit `b452b201926e04efcd60d8493bf1c456b22f2da5` is on `saturnusgo-web/main`; Pages commit `3d1df1af` is on `saturnusgo-web.github.io/main`.
 
 final result: passed
+
+## Unified test-case listing and inspector — final pass
+
+- Sources: all nine user-supplied dark test-management references from 1 September 2026. They consistently define a dense case list on the left and one persistent document inspector on the right, with create and edit states rendered in that same inspector rather than in a separate modal or drawer.
+- Comparison evidence: `.design-qa/test-cases-unified/reference-vs-view-final.png` and `.design-qa/test-cases-unified/reference-vs-edit-final.png` place the supplied references beside the implemented desktop states. Additional verified captures cover view, create, section edit, groups and filters at 1440×900, plus the 900×800 overlay state.
+- Information architecture: the obsolete repository column and separate case dialog are removed from the Cases workspace. Folder hierarchy remains available through QL, grouping, and multi-select filters; the main canvas is now the horizontally scrollable list plus the resizable 680px inspector.
+- Listing fidelity: the toolbar provides title search, QL, List/Groups modes, grouping, dependent folder/component filters, priority/lifecycle/tag filters, accurate visible counts, and natural case-key sorting. Rows use the real case identifiers, statuses, titles, components, estimates, and 240-case cursor-hydrated project collection without placeholder records or truncation.
+- Inspector fidelity: General, Comments, Attachments, and History stay in one right document. The General view exposes description, functionality, preconditions, execution details, steps, tags, owner, test data, revision note, and attachments. Section pencils use local Apply/Cancel while one stable global Save/Cancel commits the complete revision.
+- Create and edit behavior: New case opens the same inspector at the title field with every editable section available; it never opens a second drawer. Manual and checklist cases enforce a valid non-empty procedure, protect the final step/item, preserve every revision field, upload pending evidence once, and prevent duplicate submissions or silent draft replacement.
+- State correctness: editor actions are locked while a draft is active; failed project switches preserve the draft; successful project switches reset project-local list state; selected-case hydration exposes a retryable error instead of a false empty or endless loading state.
+- Responsive and accessibility: the inspector is keyboard-resizable on desktop, becomes a labelled modal overlay at narrow widths, transfers and restores focus, traps Tab, makes the background inert, and closes predictably. Tabs support Arrow/Home/End; row focus remains valid after search/group changes; popovers and panels use restrained motion with `prefers-reduced-motion` fallbacks.
+- Visual result: graphite-violet surfaces, compact controls, 46px list rhythm, restrained semantic badges, thin separators, and the persistent document composition match the supplied direction while retaining the established TESSIQ shell and real application behaviors.
+- Verification: browser QA covered view, create, section edit, filters/groups, desktop, and narrow overlay states. TypeScript passed; the 223-file TMS architecture gate passed; TMS adapters/UI models passed 97/97; auth passed 27/27; attachments passed 4/4; `git diff --check` passed; production build generated 61/61 pages. The only build messages are pre-existing dependency/Autoprefixer advisories outside TMS.
+
+final result: passed

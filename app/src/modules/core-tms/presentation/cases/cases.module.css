@@ -20,7 +20,7 @@
   --cases-on-primary: #fff;
   --cases-primary: #3574f0;
   --case-repository-width: 280px;
-  --case-detail-width: 510px;
+  --case-inspector-width: 680px;
   height: 100%;
   min-width: 0;
   min-height: 0;
@@ -28,31 +28,33 @@
   overflow: hidden;
   color: var(--cases-text);
   background: var(--cases-bg);
-  font: 14px/1.35 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.35;
   color-scheme: light;
   position: relative;
   container: cases-workspace / inline-size;
 }
 
 :global(.dark) .workspace {
-  --cases-bg: #1e1f22;
-  --cases-deep: #18191b;
-  --cases-raised: #25262a;
-  --cases-hover: #292a2e;
-  --cases-hover-strong: #383a3f;
-  --cases-border: #43454a;
-  --cases-row-border: #36383d;
-  --cases-control: #242529;
-  --cases-control-border: #55575d;
-  --cases-icon-bg: #303136;
-  --cases-avatar: #3a3b40;
-  --cases-muted: #9da0a8;
-  --cases-faint: #81848b;
-  --cases-icon: #b4b7be;
-  --cases-text: #fff;
-  --cases-strong: #f4f4f5;
-  --cases-secondary-text: #dedfe2;
-  --cases-link: #99bbff;
+  --cases-bg: #2d2b35;
+  --cases-deep: #25232c;
+  --cases-raised: #34323c;
+  --cases-hover: #383641;
+  --cases-hover-strong: #413f47;
+  --cases-border: #4a4853;
+  --cases-row-border: #3d3b46;
+  --cases-control: #302e38;
+  --cases-control-border: #57545f;
+  --cases-icon-bg: #403e49;
+  --cases-avatar: #484650;
+  --cases-muted: #aaa7b2;
+  --cases-faint: #8d8995;
+  --cases-icon: #c1bec8;
+  --cases-text: #f5f4f7;
+  --cases-strong: #fff;
+  --cases-secondary-text: #dedce3;
+  --cases-link: #9abaff;
   color-scheme: dark;
 }
 
@@ -64,7 +66,6 @@
 .workspace input,
 .workspace select { font: inherit; }
 
-.workspace button { color: inherit; }
 .workspaceResizing { cursor: col-resize; user-select: none; }
 
 .repositoryColumn {
@@ -570,11 +571,11 @@
 .detailEmpty button { margin-top: 7px; }
 
 .detailPanel {
-  width: var(--case-detail-width, 510px);
-  min-width: 340px;
-  max-width: 680px;
+  width: var(--case-inspector-width, 680px);
+  min-width: 520px;
+  max-width: 820px;
   min-height: 0;
-  flex: 0 0 var(--case-detail-width, 510px);
+  flex: 0 0 var(--case-inspector-width, 680px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -589,7 +590,7 @@
   position: absolute;
   z-index: 10;
   top: 0;
-  right: calc(var(--case-detail-width, 510px) - 4px);
+  right: calc(var(--case-inspector-width, 680px) - 4px);
   bottom: 0;
   width: 7px;
   cursor: col-resize;
@@ -609,7 +610,7 @@
 
 .detailResizeHandle:hover::after,
 .detailResizeHandle:focus-visible::after { width: 2px; background: var(--cases-primary); }
-.workspaceResizing :is(.repositoryColumn, .detailPanel, .resizeHandle, .detailResizeHandle) { transition: none; }
+.workspaceResizing :is(.detailPanel, .detailResizeHandle) { transition: none; }
 .detailScrim { display: none; }
 
 .detailPanelInner { min-height: 0; height: 100%; display: flex; flex-direction: column; }
@@ -749,7 +750,7 @@
   .titleCellContent small { display: none; }
 }
 
-@container cases-workspace (max-width: 1089px) {
+@container cases-workspace (max-width: 959px) {
   .detailResizeHandle { display: none; }
   .detailScrim {
     position: absolute;
@@ -760,6 +761,7 @@
     background: rgb(17 19 24 / 38%);
     border: 0;
     cursor: default;
+    animation: caseScrimIn 150ms ease-out both;
   }
   .detailPanel {
     position: absolute;
@@ -767,14 +769,17 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(var(--case-detail-width, 510px), 100%);
-    min-width: min(340px, 100%);
-    max-width: min(680px, 100%);
+    width: min(var(--case-inspector-width, 680px), 100%);
+    min-width: min(520px, 100%);
+    max-width: min(820px, 100%);
     display: none;
     flex-basis: auto;
     box-shadow: -12px 0 30px rgb(0 0 0 / 24%);
   }
-  .detailPanelMobileOpen { display: flex; }
+  .detailPanelOpen {
+    display: flex;
+    animation: caseInspectorIn 180ms cubic-bezier(.2, .72, .3, 1) both;
+  }
   .mobileBackButton { display: grid; }
 }
 
@@ -791,6 +796,21 @@
 
 @container cases-workspace (max-width: 700px) {
   .detailPanel { inset: 0; width: 100%; min-width: 0; max-width: none; box-shadow: none; }
+}
+
+@keyframes caseScrimIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes caseInspectorIn {
+  from { opacity: .84; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detailScrim,
+  .detailPanelOpen { animation: none; }
 }
 
 .detailPanel.detailPanelFullscreen {

@@ -51,6 +51,7 @@ export function useCaseActions(
   }
 
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
+    if (state.isCaseSubmitting()) return;
     caseOperation.current = null;
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
@@ -59,7 +60,7 @@ export function useCaseActions(
   }
 
   function openEditCase() {
-    if (!derived.selectedRevision) return;
+    if (state.isCaseSubmitting() || !derived.selectedRevision) return;
     caseOperation.current = null;
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
@@ -69,7 +70,7 @@ export function useCaseActions(
 
   async function saveCase(event: FormEvent, files: File[] = []) {
     event.preventDefault();
-    if (!derived.project || !state.caseDraft.title.trim()) return;
+    if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
     const input = {
       projectId: derived.project.id,
       folderPath: state.caseFolderPath || "/Unsorted",
@@ -79,7 +80,7 @@ export function useCaseActions(
     try {
       if (state.connection === "demo") {
         const now = new Date().toISOString();
-        const previous = state.selectedCaseDetail;
+        const previous = state.editing ? state.selectedCaseDetail : null;
         const revision = { ...input.revision, revision: previous ? previous.currentRevision + 1 : 1, createdAt: now };
         const testCase: TestCase = previous
           ? { ...previous, folderPath: input.folderPath, currentRevision: revision.revision, revisionCount: previous.revisionCount + 1, current: revision, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, updatedAt: now }
@@ -132,6 +133,8 @@ export function useCaseActions(
         : t("actions.caseCreateError");
       notify(formatTmsMutationFailure(toTmsMutationFailure(caught), fallback));
       return;
+    } finally {
+      state.finishCaseSubmission();
     }
     caseOperation.current = null;
     state.setDialog(null);

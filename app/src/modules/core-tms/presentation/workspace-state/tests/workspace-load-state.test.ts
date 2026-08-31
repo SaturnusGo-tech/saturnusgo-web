@@ -38,9 +38,59 @@ test("resource hydration uses TESSIQ instead of a false empty state", () => {
     "utf8",
   );
 
-  assert.match(casesSource, /props\.testCase && !revision/);
+  assert.match(casesSource, /!props\.editor && props\.testCase && !props\.revision/);
   assert.match(casesSource, /<TessiqLoader[^>]*testId="case-detail-loading"/);
+  assert.match(casesSource, /props\.detailLoadError/);
+  assert.match(casesSource, /data-testid="case-detail-error"/);
+  assert.match(casesSource, /onClick=\{props\.onRetryDetail\}/);
   assert.match(suitesSource, /!detail \? <TessiqLoader/);
   assert.match(runsSource, /selectedRun && selectedIsVisible && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
+});
+
+test("case detail hydration exposes a retryable failure state", () => {
+  const resourceSource = readFileSync(
+    new URL("../../../state/case-resource/useSelectedCaseResource.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(resourceSource, /setFailed\(true\)/);
+  assert.match(resourceSource, /setRequestVersion\(\(current\) => current \+ 1\)/);
+  assert.match(resourceSource, /if \(!controller\.signal\.aborted\)/);
+  assert.doesNotMatch(resourceSource, /catch\(\(\) => \{\}\)/);
+});
+
+test("case creation controls preserve an active editor", () => {
+  const toolbarSource = readFileSync(
+    new URL("../../cases/toolbar/CasesToolbar.tsx", import.meta.url),
+    "utf8",
+  );
+  const controllerSource = readFileSync(
+    new URL("../../cases/view/useCasesViewController.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(toolbarSource, /interactionLocked\?: boolean/);
+  assert.match(toolbarSource, /aria-disabled=\{props\.interactionLocked \|\| undefined\}/);
+  assert.match(toolbarSource, /guardCreateInteraction/);
+  assert.match(controllerSource, /document\.getElementById\("case-editor-actions"\)\?\.focus\(\)/);
+});
+
+test("project switching resets editors only after a successful load", () => {
+  const actionsSource = readFileSync(
+    new URL("../../../state/workspace-actions/useWorkspaceActions.ts", import.meta.url),
+    "utf8",
+  );
+  const stageSource = readFileSync(
+    new URL("../../workspace-stage/WorkspaceStage.tsx", import.meta.url),
+    "utf8",
+  );
+  const failureGuard = actionsSource.indexOf('if (state.connection !== "demo" && !remote) return;');
+  const reset = actionsSource.indexOf("state.resetCaseEditor(");
+
+  assert.ok(failureGuard >= 0);
+  assert.ok(reset > failureGuard);
+  assert.match(actionsSource.slice(failureGuard), /state\.setQuery\(""\)/);
+  assert.match(actionsSource.slice(failureGuard), /state\.setCaseFilters\(\{/);
+  assert.match(stageSource, /<CasesView key=\{model\.project\.id\}/);
 });

@@ -2,7 +2,7 @@ import { Archive } from "lucide-react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { localizedLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
-import styles from "../cases.module.css";
+import styles from "../listing/caseListing.module.css";
 
 export function LifecycleBadge({
   locale,
@@ -15,7 +15,7 @@ export function LifecycleBadge({
 }) {
   const value = archived ? "archived" : lifecycle;
   return (
-    <span className={`${styles.badge} ${styles[`lifecycle_${value}`]}`}>
+    <span className={`${styles.statusBadge} ${styles[`status_${value}`]}`}>
       {archived && <Archive size={12} aria-hidden="true" />}
       {localizedLabel(locale, value)}
     </span>
@@ -30,7 +30,7 @@ export function PriorityBadge({
   priority: TestCaseSummary["priority"];
 }) {
   return (
-    <span className={`${styles.badge} ${styles[`priority_${priority}`]}`}>
+    <span className={`${styles.priorityBadge} ${styles[`priority_${priority}`]}`}>
       <i aria-hidden="true" />
       {localizedLabel(locale, priority)}
     </span>

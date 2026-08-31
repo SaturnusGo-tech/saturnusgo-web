@@ -8,9 +8,11 @@ export function useWorkspaceActions(
   const notify = (message: string) => state.setNotice(message);
 
   async function chooseProject(nextProjectId: string) {
+    if (state.isCaseSubmitting()) return;
     const remote = state.connection === "demo"
       ? null
       : await state.loadProject(nextProjectId);
+    if (state.isCaseSubmitting()) return;
     if (state.connection !== "demo" && !remote) return;
     window.localStorage.setItem("tms.project.v1", nextProjectId);
     state.setProjectId(nextProjectId);
@@ -20,6 +22,7 @@ export function useWorkspaceActions(
     const nextCase = testCases.find(
       (item) => item.projectId === nextProjectId,
     );
+    state.resetCaseEditor(nextCase?.folderPath ?? "/Unsorted");
     state.setSelectedCaseId(nextCase?.id ?? "");
     state.setSelectedFolder(nextCase?.folderPath ?? "/Unsorted");
     state.setSelectedSuiteId(

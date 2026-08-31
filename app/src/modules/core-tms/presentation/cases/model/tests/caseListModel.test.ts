@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
-import { flattenCaseGroups, sortCaseRows } from "../caseListModel";
+import {
+  dynamicGroupBy,
+  filterCaseRows,
+  flattenCaseGroups,
+  groupCaseRows,
+  parseCaseQlQuery,
+  resolveDependentCaseFacets,
+  sanitizeDependentCaseFacets,
+  sortCaseRows,
+  visibleCaseTabStop,
+} from "../caseListModel";
 
 function createCase(index: number, priority: "low" | "medium" | "high" | "critical" = "medium"): TestCaseSummary {
   const folderPath = `/Folder ${Math.floor(index / 60) + 1}`;
@@ -51,4 +61,99 @@ test("supports descending priority sorting", () => {
   ]]]);
   const sorted = sortCaseRows(rows, { key: "priority", direction: "desc" }, "en-US");
   assert.deepEqual(sorted.map((row) => row.testCase.priority), ["critical", "high", "low"]);
+});
+
+test("parses quoted QL values, aliases, and exclusions", () => {
+  assert.deepEqual(parseCaseQlQuery('status:ready component:"Web client" -tag:flaky'), [
+    { field: "lifecycle", value: "ready", exclude: false },
+    { field: "component", value: "Web client", exclude: false },
+    { field: "tag", value: "flaky", exclude: true },
+  ]);
+});
+
+test("filters title separately and applies every QL predicate", () => {
+  const api = { ...createCase(1, "critical"), title: "Create account", component: "API", tags: ["smoke"] };
+  const web = { ...createCase(2, "high"), title: "Create profile", component: "Web", tags: ["regression"] };
+  const rows = flattenCaseGroups([["/Accounts", [api, web]]]);
+  assert.deepEqual(filterCaseRows(rows, { titleQuery: "create", qlQuery: "priority:critical tag:smoke" }).map((row) => row.testCase.id), ["case-1"]);
+  assert.deepEqual(filterCaseRows(rows, { qlQuery: "component:web -tag:smoke" }).map((row) => row.testCase.id), ["case-2"]);
+  assert.deepEqual(filterCaseRows(rows, { titleQuery: "accounts" }).map((row) => row.testCase.id), ["case-1", "case-2"]);
+  assert.deepEqual(filterCaseRows(rows, { titleQuery: "regression" }).map((row) => row.testCase.id), ["case-2"]);
+});
+
+test("groups every visible row without losing real case identities", () => {
+  const rows = flattenCaseGroups([["/A", [createCase(1), createCase(2)]], ["/B", [createCase(3)]]]);
+  const groups = groupCaseRows(rows, "folder");
+  assert.deepEqual(groups.map((group) => [group.value, group.rows.length]), [["/A", 2], ["/B", 1]]);
+  assert.equal(new Set(groups.flatMap((group) => group.rows.map((row) => row.testCase.id))).size, 3);
+});
+
+test("applies folder and component facets as OR inside and AND across", () => {
+  const rows = flattenCaseGroups([
+    ["/Host/Archive", [{ ...createCase(1), component: "Archive" }, { ...createCase(2), component: "Legal" }]],
+    ["/Host/Orders", [{ ...createCase(3), component: "Orders" }]],
+  ]);
+  const filtered = filterCaseRows(rows, { facets: { folders: ["/Host/Archive"], components: ["Archive", "Legal"] } });
+  assert.deepEqual(filtered.map((row) => row.testCase.id), ["case-1", "case-2"]);
+});
+
+test("keeps folders stable while components follow the selected folder OR-scope", () => {
+  const rows = flattenCaseGroups([
+    ["/Host/Archive", [{ ...createCase(1), component: "Archive" }, { ...createCase(2), component: "Legal" }]],
+    ["/Host/Orders", [{ ...createCase(3), component: "Orders" }]],
+  ]);
+  assert.deepEqual(resolveDependentCaseFacets(rows, { folders: [], components: ["Archive"] }).folders, ["/Host", "/Host/Archive", "/Host/Orders"]);
+  assert.deepEqual(resolveDependentCaseFacets(rows, { folders: ["/Host/Archive"], components: [] }).components, ["Archive", "Legal"]);
+  assert.deepEqual(resolveDependentCaseFacets(rows, { folders: ["/Host/Archive", "/Host/Orders"], components: [] }).components, ["Archive", "Legal", "Orders"]);
+});
+
+test("sanitizes only components that become incompatible with the stable folder scope", () => {
+  const rows = flattenCaseGroups([
+    ["/Host/Archive", [{ ...createCase(1), component: "Archive" }, { ...createCase(2), component: "Legal" }]],
+    ["/Host/Orders", [{ ...createCase(3), component: "Orders" }]],
+  ]);
+  assert.deepEqual(sanitizeDependentCaseFacets(rows, {
+    folders: ["/Host/Archive"],
+    components: ["Archive", "Orders"],
+  }), {
+    folders: ["/Host/Archive"],
+    components: ["Archive"],
+  });
+  assert.deepEqual(sanitizeDependentCaseFacets(rows, {
+    folders: ["/Host/Archive", "/Host/Orders"],
+    components: ["Archive", "Orders"],
+  }), {
+    folders: ["/Host/Archive", "/Host/Orders"],
+    components: ["Archive", "Orders"],
+  });
+});
+
+test("offers implicit repository ancestors and keeps subtree boundaries exact", () => {
+  const rows = flattenCaseGroups([
+    ["/Host/Archive/Errors", [{ ...createCase(1), component: "Archive" }]],
+    ["/Host/Archive-old", [{ ...createCase(2), component: "Legacy" }]],
+  ]);
+  assert.deepEqual(resolveDependentCaseFacets(rows, { folders: [], components: ["Archive"] }).folders, [
+    "/Host",
+    "/Host/Archive",
+    "/Host/Archive-old",
+    "/Host/Archive/Errors",
+  ]);
+  assert.deepEqual(filterCaseRows(rows, { facets: { folders: ["/Host/Archive"], components: [] } }).map((row) => row.testCase.id), ["case-1"]);
+});
+
+test("dynamic mode defaults to folder grouping and preserves an explicit facet", () => {
+  assert.equal(dynamicGroupBy("none"), "folder");
+  assert.equal(dynamicGroupBy("component"), "component");
+});
+
+test("keeps one visible row tabbable when selection is filtered or collapsed", () => {
+  const rows = flattenCaseGroups([
+    ["/A", [createCase(1)]],
+    ["/B", [createCase(2)]],
+  ]);
+  const groups = groupCaseRows(rows, "folder");
+  assert.equal(visibleCaseTabStop(groups, new Set(), "missing"), "case-1");
+  assert.equal(visibleCaseTabStop(groups, new Set(["folder:/A"]), "case-1"), "case-2");
+  assert.equal(visibleCaseTabStop(groups, new Set(["folder:/A", "folder:/B"]), "case-1"), null);
 });

@@ -1,128 +1,152 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { formatCount } from "../../localization/format/count";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
-import { readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
 import { CasesTable } from "./list/CasesTable";
 import {
-  CASE_DETAIL_MAX,
-  CASE_DETAIL_MIN,
-  CASE_REPOSITORY_MAX,
-  CASE_REPOSITORY_MIN,
-  useCaseRepositoryResize,
-} from "./layout/useCaseRepositoryResize";
-import { flattenCaseGroups, sortCaseRows } from "./model/caseListModel";
-import { CaseRepositoryPanel } from "./toolbar/CaseRepositoryPanel";
+  CASE_INSPECTOR_MAX,
+  CASE_INSPECTOR_MIN,
+} from "./split/useCaseInspectorResize";
 import { CasesToolbar } from "./toolbar/CasesToolbar";
-import type { CaseListRow, CaseSort, CaseSortKey, CasesViewProps } from "./types";
+import type { CasesViewProps } from "./types";
+import { useCasesViewController } from "./view/useCasesViewController";
 import styles from "./cases.module.css";
 
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
-  const { revision } = props;
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [repositoryMenuOpen, setRepositoryMenuOpen] = useState(false);
-  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
-  const [detailFullscreen, setDetailFullscreen] = useState(false);
-  const [sort, setSort] = useState<CaseSort>({ key: "key", direction: "asc" });
-  const workbenchRef = useRef<HTMLDivElement>(null);
-  const deepLinkOpenedRef = useRef(false);
-  const repositoryResize = useCaseRepositoryResize(workbenchRef);
-  const flatRows = useMemo(() => flattenCaseGroups(props.groups), [props.groups]);
-  const rows = useMemo(() => sortCaseRows(flatRows, sort, languageTag), [flatRows, sort, languageTag]);
-  const countLabel = formatCount(locale, rows.length, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
+  const view = useCasesViewController(props, locale, languageTag);
+  const detailPanelRef = useRef<HTMLElement>(null);
+  const listPaneRef = useRef<HTMLElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const focusEditorActions = () => document.getElementById("case-editor-actions")?.focus();
 
   useEffect(() => {
-    if (deepLinkOpenedRef.current) return;
-    const linkedCaseId = readCaseDeepLink(window.location.href).caseId;
-    if (!linkedCaseId) {
-      deepLinkOpenedRef.current = true;
-      return;
+    if (!view.inspectorOpen || !view.inspectorResize.overlay) return;
+    const panel = detailPanelRef.current;
+    const list = listPaneRef.current;
+    returnFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement : null;
+    if (list) list.inert = true;
+    panel?.focus();
+    function trapFocus(event: KeyboardEvent) {
+      if (event.key !== "Tab" || !panel) return;
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])',
+      )).filter((element) => !element.hidden && element.getClientRects().length > 0);
+      if (!focusable.length) { event.preventDefault(); panel.focus(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) {
+        event.preventDefault(); last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault(); first.focus();
+      }
     }
-    if (linkedCaseId !== props.testCase?.id) return;
-    deepLinkOpenedRef.current = true;
-    setMobileDetailOpen(true);
-  }, [props.testCase?.id]);
-
-  useEffect(() => {
-    function closeMenus(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      setFilterOpen(false);
-      setRepositoryMenuOpen(false);
-      setDetailFullscreen((current) => {
-        if (!current) setMobileDetailOpen(false);
-        return false;
-      });
-    }
-    function closeOutside(event: PointerEvent) {
-      if (event.target instanceof Element && event.target.closest("[data-case-popover-root]")) return;
-      setFilterOpen(false);
-      setRepositoryMenuOpen(false);
-    }
-    window.addEventListener("keydown", closeMenus);
-    window.addEventListener("pointerdown", closeOutside);
+    window.addEventListener("keydown", trapFocus);
     return () => {
-      window.removeEventListener("keydown", closeMenus);
-      window.removeEventListener("pointerdown", closeOutside);
+      window.removeEventListener("keydown", trapFocus);
+      if (list) list.inert = false;
+      const target = returnFocusRef.current;
+      returnFocusRef.current = null;
+      if (target?.isConnected) requestAnimationFrame(() => target.focus());
     };
-  }, []);
+  }, [view.inspectorOpen, view.inspectorResize.overlay]);
 
-  function toggleSort(key: CaseSortKey) {
-    setSort((current) => current.key === key
-      ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
-      : { key, direction: "asc" });
-  }
-
-  function selectRow(row: CaseListRow) {
-    if (row.folderPath !== props.selectedFolder) props.onSelectFolder(row.folderPath);
-    props.onSelectCase(row.testCase.id);
-    setMobileDetailOpen(true);
-  }
-
-  return <div ref={workbenchRef} style={repositoryResize.style} className={`${styles.workspace} ${repositoryResize.resizing ? styles.workspaceResizing : ""}`} data-testid="cases-view">
-    <div className={styles.repositoryColumn}>
-      <CaseRepositoryPanel
-        groups={props.groups} collapsed={props.collapsed} selectedFolder={props.selectedFolder}
-        selectedCaseId={props.selectedCaseId} filters={props.filters} menuOpen={repositoryMenuOpen}
-        onMenuOpen={() => { setRepositoryMenuOpen((value) => !value); setFilterOpen(false); }}
-        onFilters={props.onFilters} onToggleFolder={props.onToggleFolder}
-        onSelectFolder={props.onSelectFolder} onSelectCase={(id) => { props.onSelectCase(id); setMobileDetailOpen(true); }}
-        onNew={props.onNew} onNewFolder={props.onNewFolder}
-        onNewProject={() => { setRepositoryMenuOpen(false); props.onNewProject(); }}
-        onCollapseAll={() => { setRepositoryMenuOpen(false); props.onCollapseAll(); }}
-        onExpandAll={() => { setRepositoryMenuOpen(false); props.onExpandAll(); }}
+  return <div
+    ref={view.workspaceRef}
+    style={view.inspectorResize.style}
+    className={`${styles.workspace} ${view.inspectorResize.resizing ? styles.workspaceResizing : ""}`}
+    data-testid="cases-view"
+  >
+    <section ref={listPaneRef} className={styles.listPane} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
+      <CasesToolbar
+        locale={locale}
+        query={props.query}
+        countLabel={view.countLabel}
+        estimateLabel={view.estimateLabel}
+        filters={props.filters}
+        filterOpen={view.filterOpen}
+        selectedFolder={props.selectedFolder}
+        qlQuery={view.qlQuery}
+        viewMode={view.viewMode}
+        groupBy={view.groupBy}
+        facetFilters={view.facetFilters}
+        facetOptions={view.facetOptions}
+        onQuery={props.onQuery}
+        onQlQuery={view.setQlQuery}
+        onViewMode={view.setViewMode}
+        onGroupBy={view.setGroupBy}
+        onFacetFilters={view.setFacetFilters}
+        onFilters={props.onFilters}
+        onFilterOpen={() => view.setFilterOpen((value) => !value)}
+        onNew={view.createCase}
+        onNewFolder={props.onNewFolder}
+        interactionLocked={Boolean(props.editor)}
+        onLockedInteraction={focusEditorActions}
       />
-    </div>
-    <div
-      {...repositoryResize.handleProps}
-      className={styles.resizeHandle}
-      role="separator"
-      aria-label={locale === "ru" ? "Изменить ширину репозитория" : "Resize repository"}
-      aria-orientation="vertical"
-      aria-valuemin={CASE_REPOSITORY_MIN}
-      aria-valuemax={CASE_REPOSITORY_MAX}
-      aria-valuenow={repositoryResize.width}
-      tabIndex={0}
-    />
-    <section className={styles.listPane} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
-      <CasesToolbar locale={locale} query={props.query} countLabel={countLabel} filters={props.filters} filterOpen={filterOpen} selectedFolder={props.selectedFolder} onQuery={props.onQuery} onFilters={props.onFilters} onFilterOpen={() => { setFilterOpen((value) => !value); setRepositoryMenuOpen(false); }} onNew={props.onNew} />
-      <CasesTable locale={locale} rows={rows} selectedCaseId={props.selectedCaseId} sort={sort} onSort={toggleSort} onSelect={selectRow} onCreate={() => props.onNew(props.selectedFolder)} />
+      <CasesTable
+        locale={locale}
+        rows={view.rows}
+        selectedCaseId={props.selectedCaseId}
+        sort={view.sort}
+        viewMode={view.viewMode}
+        groupBy={view.groupBy}
+        interactionLocked={Boolean(props.editor)}
+        onLockedInteraction={focusEditorActions}
+        onSort={view.toggleSort}
+        onSelect={view.selectRow}
+        onCreate={() => view.createCase()}
+      />
     </section>
-    {!detailFullscreen && <div
-      {...repositoryResize.detailHandleProps}
+    {view.inspectorOpen && !view.detailFullscreen && <div
+      {...view.inspectorResize.handleProps}
       className={styles.detailResizeHandle}
       role="separator"
-      aria-label={locale === "ru" ? "Изменить ширину деталей тест-кейса" : "Resize test case details"}
+      aria-label={locale === "ru" ? "Изменить ширину инспектора" : "Resize inspector"}
       aria-orientation="vertical"
-      aria-valuemin={CASE_DETAIL_MIN}
-      aria-valuemax={CASE_DETAIL_MAX}
-      aria-valuenow={repositoryResize.detailWidth}
+      aria-valuemin={CASE_INSPECTOR_MIN}
+      aria-valuemax={CASE_INSPECTOR_MAX}
+      aria-valuenow={view.inspectorResize.width}
       tabIndex={0}
     />}
-    {mobileDetailOpen && !detailFullscreen && <button type="button" className={styles.detailScrim} onClick={() => setMobileDetailOpen(false)} aria-label={locale === "ru" ? "Закрыть детали тест-кейса" : "Close test case details"} />}
-    <aside id="case-detail-panel" className={`${styles.detailPanel} ${mobileDetailOpen ? styles.detailPanelMobileOpen : ""} ${detailFullscreen ? styles.detailPanelFullscreen : ""}`} aria-label={locale === "ru" ? "Детали тест-кейса" : "Test case details"}>
-      {props.testCase && !revision ? <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} selectedFolder={props.selectedFolder} onNew={props.onNew} onEdit={props.onEdit} onClone={props.onClone} onArchive={props.onArchive} onRunCase={props.onRunCase} fullscreen={detailFullscreen} onToggleFullscreen={() => { setDetailFullscreen((current) => !current); setMobileDetailOpen(true); }} onClose={() => setMobileDetailOpen(false)} />}
-    </aside>
+    {view.inspectorOpen && <button type="button" className={styles.detailScrim} onClick={view.closeInspector} aria-label={locale === "ru" ? "Закрыть тест-кейс" : "Close test case"} />}
+    {view.inspectorOpen && <aside
+      ref={detailPanelRef}
+      id="case-detail-panel"
+      className={`${styles.detailPanel} ${styles.detailPanelOpen} ${view.detailFullscreen ? styles.detailPanelFullscreen : ""}`}
+      role={view.inspectorResize.overlay ? "dialog" : "complementary"}
+      aria-modal={view.inspectorResize.overlay || undefined}
+      aria-label={locale === "ru" ? "Тест-кейс" : "Test case"}
+      tabIndex={view.inspectorResize.overlay ? -1 : undefined}
+    >
+      {!props.editor && props.testCase && !props.revision
+        ? props.detailLoadError
+          ? <div className={styles.detailEmpty} role="alert" data-testid="case-detail-error">
+              <strong>{locale === "ru" ? "Не удалось загрузить тест-кейс" : "Could not load the test case"}</strong>
+              <span>{locale === "ru" ? "Проверьте подключение и повторите загрузку." : "Check the connection and try loading it again."}</span>
+              <button type="button" className={styles.secondaryButton} onClick={props.onRetryDetail}>
+                {locale === "ru" ? "Повторить" : "Retry"}
+              </button>
+            </div>
+          : <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" />
+        : <CaseDetailPanel
+            locale={locale}
+            languageTag={languageTag}
+            testCase={props.testCase}
+            revision={props.editor?.value ?? props.revision}
+            editor={props.editor}
+            linkIds={props.linkIds}
+            activity={props.activity}
+            selectedFolder={props.selectedFolder}
+            onNew={view.createCase}
+            onEdit={props.onEdit}
+            onClone={props.onClone}
+            onArchive={props.onArchive}
+            onRunCase={props.onRunCase}
+            fullscreen={view.detailFullscreen}
+            onToggleFullscreen={() => view.setDetailFullscreen((current) => !current)}
+            onClose={view.closeInspector}
+          />}
+    </aside>}
   </div>;
 }

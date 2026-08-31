@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import type {
-  RunItem, RunItemSummary, TestCase, TestCaseRevision,
+  RunItem, RunItemSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
-import { createEmptyRevision } from "../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters, Dialog, View } from "../types/workspace";
 import { useWorkspaceBootstrap } from "./useWorkspaceBootstrap";
 import { getRun, getRunItem, listRunItems } from "../../runs/data/run-api";
-import { getTestCase } from "../../test-cases/data/test-case-api";
 import { buildCaseDeepLink, readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { useSelectedSuiteResource } from "../workspace-resources/useSelectedSuiteResource";
+import { useCaseEditorState } from "../case-editor/useCaseEditorState";
+import { useSelectedCaseResource } from "../case-resource/useSelectedCaseResource";
 
 const defaultFilters: CaseFilters = {
   priority: "all",
@@ -32,11 +32,9 @@ export function useWorkspaceState() {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [selectedRunItemId, setSelectedRunItemId] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
-  const [editing, setEditing] = useState(false);
-  const [caseDraft, setCaseDraft] = useState<TestCaseRevision>(() =>
-    createEmptyRevision(locale),
-  );
-  const [caseFolderPath, setCaseFolderPath] = useState("/Unsorted");
+  const caseEditor = useCaseEditorState(locale, () => {
+    setDialog((current) => current === "case" ? null : current);
+  });
   const [selectedFolder, setSelectedFolder] = useState("/Unsorted");
   const [customFolders, setCustomFolders] = useState<Record<string, string[]>>(
     {},
@@ -47,8 +45,7 @@ export function useWorkspaceState() {
   const [runPresetSuiteId, setRunPresetSuiteId] = useState("");
   const [notice, setNotice] = useState("");
   const [collapsedFolders, setCollapsedFolders] = useState<string[]>([]);
-  const [selectedCaseDetail, setSelectedCaseDetail] = useState<TestCase | null>(null);
-  const [selectedCaseEtag, setSelectedCaseEtag] = useState<string | null>(null);
+  const selectedCase = useSelectedCaseResource(http, connection, data.testCases, selectedCaseId);
   const selectedSuite = useSelectedSuiteResource(http, connection === "connected", selectedSuiteId);
   const [runItems, setRunItems] = useState<RunItemSummary[]>([]);
   const [selectedRunEtag, setSelectedRunEtag] = useState<string | null>(null);
@@ -93,20 +90,6 @@ export function useWorkspaceState() {
     });
     if (next !== window.location.href) window.history.replaceState(null, "", next);
   }, [connection, data.testCases, selectedCaseId]);
-
-  useEffect(() => {
-    if (connection === "demo") { const detail = data.testCases.find((item) => item.id === selectedCaseId); setSelectedCaseDetail(detail && "current" in detail ? detail as TestCase : null); return; }
-    setSelectedCaseDetail(null);
-    setSelectedCaseEtag(null);
-    if (connection !== "connected" || !selectedCaseId) return;
-    const controller = new AbortController();
-    getTestCase(http, selectedCaseId, controller.signal).then((resource) => {
-      if (controller.signal.aborted) return;
-      setSelectedCaseDetail(resource.data);
-      setSelectedCaseEtag(resource.etag);
-    }).catch(() => {});
-    return () => controller.abort();
-  }, [connection, data.testCases, http, selectedCaseId]);
 
   useEffect(() => {
     setRunItems([]);
@@ -183,14 +166,15 @@ export function useWorkspaceState() {
     ...bootstrap, data, setData, connection, view, setView, projectId, setProjectId,
     query, setQuery, selectedCaseId, setSelectedCaseId, selectedSuiteId,
     setSelectedSuiteId, selectedRunId, setSelectedRunId, selectedRunItemId,
-    setSelectedRunItemId, dialog, setDialog, editing, setEditing, caseDraft,
-    setCaseDraft, caseFolderPath, setCaseFolderPath, selectedFolder,
+    setSelectedRunItemId, dialog, setDialog, ...caseEditor, selectedFolder,
     setSelectedFolder, customFolders, setCustomFolders, caseFilters,
     setCaseFilters, editingSuiteId, setEditingSuiteId, runPresetCaseIds,
     setRunPresetCaseIds, runPresetSuiteId, setRunPresetSuiteId, notice,
     setNotice, collapsedFolders, setCollapsedFolders,
-    selectedCaseDetail, setSelectedCaseDetail, selectedCaseEtag,
-    setSelectedCaseEtag, selectedSuiteDetail: selectedSuite.detail,
+    selectedCaseDetail: selectedCase.detail, setSelectedCaseDetail: selectedCase.setDetail,
+    selectedCaseEtag: selectedCase.etag, setSelectedCaseEtag: selectedCase.setEtag,
+    selectedCaseDetailError: selectedCase.failed,
+    retrySelectedCaseDetail: selectedCase.retry, selectedSuiteDetail: selectedSuite.detail,
     setSelectedSuiteDetail: selectedSuite.setDetail, selectedSuiteEtag: selectedSuite.etag,
     setSelectedSuiteEtag: selectedSuite.setEtag, runItems, setRunItems, selectedRunEtag,
     setSelectedRunEtag, selectedRunItemDetail, setSelectedRunItemDetail,
