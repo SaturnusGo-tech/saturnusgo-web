@@ -8,12 +8,13 @@ import type {
   TestRunSummary,
 } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
+import { describeDefectCreateError } from "../../../application/defects/describeDefectCreateError";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
-import { inferDefectIntegrationTarget } from "../../../defects/model/integration-target";
+import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -23,24 +24,12 @@ import styles from "../../../tms.module.css";
 import surface from "../drawer-surfaces.module.css";
 
 type DefectDialogProps = {
-  projectId: string;
-  run: TestRunSummary | null;
-  item: RunItem | null;
-  components: string[];
-  offline: boolean;
-  onClose: () => void;
-  onCreated: (defect: Defect) => void;
+  projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
+  offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
 };
 
-export function DefectDialog({
-  projectId,
-  run,
-  item,
-  components,
-  offline,
-  onClose,
-  onCreated,
-}: DefectDialogProps) {
+export function DefectDialog({ projectId, run, item, components, offline, onClose,
+  onCreated }: DefectDialogProps) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
@@ -77,21 +66,22 @@ export function DefectDialog({
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
   const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
-  const [integrationTarget, setIntegrationTarget] = useState<Defect["integrationTarget"]>(() =>
-    inferDefectIntegrationTarget(item?.snapshot.tags ?? [], item?.snapshot.component ?? ""),
-  );
+  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>(() =>
+    initialDefectIntegrationChoice(item?.snapshot.tags ?? [], item?.snapshot.component ?? ""));
+  const routing = resolveDefectIntegrationChoice(integrationChoice);
   const [filesRef] = useAutoAnimate<HTMLDivElement>({ duration: 160 });
   const [files, setFiles] = useState<File[]>([]);
   const [link, setLink] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [operationKey] = useState(() => crypto.randomUUID());
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
+    if (!routing.resolved) { setError(copy.youTrackRequired); return; }
     setSubmitting(true);
-    setError(false);
+    setError("");
     const payload: Omit<Defect,
       "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId,
@@ -103,7 +93,7 @@ export function DefectDialog({
       reproducibility,
       assigneeIdentityId: null,
       component,
-      integrationTarget,
+      integrationTarget: routing.target,
       labels: ["manual-run", run?.type ?? "reported"],
       runId: run?.id ?? null,
       runItemId: item?.id ?? null,
@@ -115,8 +105,8 @@ export function DefectDialog({
       onCreated(
         await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale }),
       );
-    } catch {
-      setError(true);
+    } catch (caught) {
+      setError(describeDefectCreateError(caught, copy.error, locale));
       setSubmitting(false);
     }
   }
@@ -143,12 +133,13 @@ export function DefectDialog({
             <AnimatedSelect label={copy.component} value={component} onChange={setComponent} options={localizedComponentOptions} />
           </div>
           <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.youTrackTarget}</span>
-            <AnimatedSelect label={copy.youTrackTarget} value={integrationTarget ?? "none"}
-              onChange={(value) => setIntegrationTarget(value === "none" ? null : value as Exclude<Defect["integrationTarget"], null>)}
-              options={[{ value: "none", label: copy.tmsOnly },
+            <AnimatedSelect label={copy.youTrackTarget} value={integrationChoice}
+              onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)}
+              options={[{ value: "", label: copy.youTrackPlaceholder }, { value: "tms", label: copy.tmsOnly },
                 { value: "android", label: copy.youTrackAndroid },
                 { value: "ios", label: copy.youTrackIos },
                 { value: "backend", label: copy.youTrackBackend }]} />
+            {!routing.resolved && <small className={styles.fieldValidation} role="alert">{copy.youTrackRequired}</small>}
           </div>
           <div className={styles.formField}><span>{copy.severity}</span>
             <AnimatedSelect label={copy.severity} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[
@@ -186,11 +177,11 @@ export function DefectDialog({
         </div><div ref={filesRef} className={styles.compactFileList}>{files.map((file) => (
             <span key={`${file.name}-${file.lastModified}`}><Paperclip size={13} />{file.name}<button type="button" aria-label={`${copy.removeFile} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>
           ))}</div></section>
-          {error && <FormError message={copy.error} />}
+          {error && <FormError message={error} />}
         </div>
         <div className={styles.modalFooter}>
           <button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button>
-          <button className={styles.primaryButton} data-testid="create-defect" disabled={submitting}>
+          <button className={styles.primaryButton} data-testid="create-defect" disabled={submitting || !routing.resolved}>
             <Bug size={16} /> {submitting ? copy.creating : copy.create}
           </button>
         </div>

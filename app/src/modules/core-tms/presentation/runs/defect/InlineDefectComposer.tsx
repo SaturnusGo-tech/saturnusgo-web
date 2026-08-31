@@ -3,9 +3,10 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Defect, RunItem, TestRunSummary, TestStep } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
+import { describeDefectCreateError } from "../../../application/defects/describeDefectCreateError";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
-import { inferDefectIntegrationTarget } from "../../../defects/model/integration-target";
+import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
@@ -44,7 +45,8 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [priority, setPriority] = useState<Defect["priority"]>("high");
   const [component, setComponent] = useState(componentOptions[0]);
-  const [integrationTarget, setIntegrationTarget] = useState<Defect["integrationTarget"]>(() => inferDefectIntegrationTarget(item.snapshot.tags, item.snapshot.component));
+  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>(() => initialDefectIntegrationChoice(item.snapshot.tags, item.snapshot.component));
+  const routing = resolveDefectIntegrationChoice(integrationChoice);
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
   const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}\n\n${t("inlineDefect.actualPrefix")}: ${observed}`);
   const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl) ? run.environment.baseUrl : "");
@@ -56,20 +58,21 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
+    if (!routing.resolved) { setError(copy.youTrackRequired); return; }
     setSubmitting(true);
     setError("");
     const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`,
       severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null,
-      component, integrationTarget, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id,
+      component, integrationTarget: routing.target, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id,
       stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed,
     };
     try {
       const next = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
       onCreated(next);
       onClose();
-    } catch {
-      setError(t("inlineDefect.saveError"));
+    } catch (caught) {
+      setError(describeDefectCreateError(caught, t("inlineDefect.saveError"), locale));
       setSubmitting(false);
     }
   }
@@ -84,7 +87,7 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
             <Field label={t("inlineDefect.severity")}><AnimatedSelect label={t("inlineDefect.severity")} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[{ value: "critical", label: t("severity.critical") }, { value: "high", label: t("severity.major") }, { value: "medium", label: t("severity.minor") }, { value: "low", label: t("severity.low") }]} /></Field>
             <Field label={t("inlineDefect.priority")}><AnimatedSelect label={t("inlineDefect.priority")} value={priority} onChange={(value) => setPriority(value as Defect["priority"])} options={[{ value: "critical", label: t("inlineDefect.priorityUrgent") }, { value: "high", label: t("priority.high") }, { value: "medium", label: t("priority.medium") }, { value: "low", label: t("priority.low") }]} /></Field>
             <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={componentChoices} /></Field>
-            <Field label={copy.youTrackTarget} wide><AnimatedSelect label={copy.youTrackTarget} value={integrationTarget ?? "none"} onChange={(value) => setIntegrationTarget(value === "none" ? null : value as Exclude<Defect["integrationTarget"], null>)} options={[{ value: "none", label: copy.tmsOnly }, { value: "android", label: copy.youTrackAndroid }, { value: "ios", label: copy.youTrackIos }, { value: "backend", label: copy.youTrackBackend }]} /></Field>
+            <Field label={copy.youTrackTarget} wide><AnimatedSelect label={copy.youTrackTarget} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={[{ value: "", label: copy.youTrackPlaceholder }, { value: "tms", label: copy.tmsOnly }, { value: "android", label: copy.youTrackAndroid }, { value: "ios", label: copy.youTrackIos }, { value: "backend", label: copy.youTrackBackend }]} />{!routing.resolved && <small className={shared.fieldValidation} role="alert">{copy.youTrackRequired}</small>}</Field>
             <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
           </div>
         </section>
@@ -101,7 +104,7 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
         </section>
         {error && <FormError message={error} />}
       </div>
-      <div className={`${shared.modalFooter} ${styles.footer}`}><span>{item.caseKey} · {t("inlineDefect.linkStep")} {step.order}</span><div><button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button><button className={shared.primaryButton} disabled={submitting}><Bug size={15} />{submitting ? t("inlineDefect.creating") : copy.create}</button></div></div>
+      <div className={`${shared.modalFooter} ${styles.footer}`}><span>{item.caseKey} · {t("inlineDefect.linkStep")} {step.order}</span><div><button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button><button className={shared.primaryButton} disabled={submitting || !routing.resolved}><Bug size={15} />{submitting ? t("inlineDefect.creating") : copy.create}</button></div></div>
     </form>
   </Modal>;
 }

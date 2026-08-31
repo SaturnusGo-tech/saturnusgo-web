@@ -1,14 +1,33 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createTmsHttpClient } from "../../../../core/tms/transport/http";
+import { createTmsHttpClient, TmsApiError } from "../../../../core/tms/transport/http";
+import { describeDefectCreateError } from "../../application/defects/describeDefectCreateError";
 import { createDefectResource } from "../data/defect-api";
-import { inferDefectIntegrationTarget } from "../model/integration-target";
+import {
+  inferDefectIntegrationTarget, initialDefectIntegrationChoice,
+  resolveDefectIntegrationChoice,
+} from "../model/integration-target";
 
 test("infers only an unambiguous YouTrack target", () => {
   assert.equal(inferDefectIntegrationTarget(["android", "positive"], "Checkout"), "android");
   assert.equal(inferDefectIntegrationTarget(["ios", "android"], "Checkout"), null);
   assert.equal(inferDefectIntegrationTarget([], "Payments API"), "backend");
+});
+
+test("ambiguous routing stays unselected until the tester chooses", () => {
+  const choice = initialDefectIntegrationChoice(["ios", "android"], "Host");
+  assert.equal(choice, "");
+  assert.deepEqual(resolveDefectIntegrationChoice(choice), { resolved: false, target: null });
+});
+
+test("explicit routing preserves raw YouTrack targets and deliberate TMS-only", () => {
+  assert.deepEqual(resolveDefectIntegrationChoice("android"),
+    { resolved: true, target: "android" });
+  assert.deepEqual(resolveDefectIntegrationChoice("ios"), { resolved: true, target: "ios" });
+  assert.deepEqual(resolveDefectIntegrationChoice("backend"),
+    { resolved: true, target: "backend" });
+  assert.deepEqual(resolveDefectIntegrationChoice("tms"), { resolved: true, target: null });
 });
 
 test("defect create sends the explicit YouTrack target", async () => {
@@ -30,4 +49,11 @@ test("defect create sends the explicit YouTrack target", async () => {
   const body = JSON.parse(String(request?.body)) as { integrationTarget?: string };
   assert.equal(body.integrationTarget, "android");
   assert.equal(new Headers(request?.headers).get("idempotency-key"), "defect-operation-key");
+});
+
+test("defect creation surfaces a safe API error and request ID", () => {
+  const error = new TmsApiError("YouTrack routing failed.", 502, "request-safe-1", "HTTP_ERROR");
+  assert.equal(describeDefectCreateError(error, "Fallback", "ru"),
+    "YouTrack routing failed. (ID запроса: request-safe-1)");
+  assert.equal(describeDefectCreateError(new Error("raw"), "Fallback", "en"), "Fallback");
 });
