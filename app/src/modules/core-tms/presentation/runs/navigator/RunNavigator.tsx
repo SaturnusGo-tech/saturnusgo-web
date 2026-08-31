@@ -4,6 +4,7 @@ import type { RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../.
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
+import { RunNameMarquee } from "./RunNameMarquee";
 
 export type RunListMode = "active" | "archived";
 
@@ -100,9 +101,7 @@ export function RunNavigator({
             }
           }}
         >
-          <span className={styles.pickerTriggerText}><strong title={selectedRun?.name ?? emptyLabel}>{selectedRun?.name ?? emptyLabel}</strong>
-            {selectedRun ? <small>{selectedRun.key}</small> : null}
-          </span>
+          <span className={styles.pickerTriggerText}><RunNameMarquee name={selectedRun?.name ?? emptyLabel} motion="always" /></span>
           <ChevronDown size={17} aria-hidden="true" />
         </button>
         <button className={styles.pickerCreate} type="button" onClick={onCreate} aria-label={t("runs.new")} title={t("runs.new")}>
@@ -139,7 +138,7 @@ export function RunNavigator({
                   tabIndex={selected ? 0 : -1}
                   onClick={() => { onSelectRun(run.id); closePicker(true); }}
                 >
-                  <span><strong title={run.name}>{run.name}</strong><small>{run.key}</small></span>
+                  <span><RunNameMarquee name={run.name} motion="interaction" /><small>{run.key}</small></span>
                   {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
                 </button>
               );

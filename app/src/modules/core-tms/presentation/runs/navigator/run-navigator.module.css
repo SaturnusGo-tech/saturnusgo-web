@@ -69,13 +69,24 @@
   gap: 8px;
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
-  padding: 6px 9px 6px 11px;
+  padding: 0 9px 0 11px;
   text-align: left;
 }
 
 .pickerTriggerText { display: block; min-width: 0; }
-.pickerTriggerText strong { color: #172633; display: block; font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; white-space: normal; }
-.pickerTriggerText small { color: #617281; display: block; font-size: 10px; line-height: 1.25; margin-top: 3px; }
+.pickerTriggerText strong { color: #172633; font-size: 12px; line-height: 1.35; }
+.runNameViewport { display: block; min-width: 0; overflow: hidden; white-space: nowrap; }
+.runNameAlways,
+.runNameOnInteraction { display: block; width: max-content; }
+.runNameAlways[data-overflow="true"] {
+  animation: run-name-pan var(--run-name-duration) ease-in-out 800ms infinite alternate;
+}
+.pickerOption:hover .runNameOnInteraction[data-overflow="true"],
+.pickerOption:focus-visible .runNameOnInteraction[data-overflow="true"],
+.pickerOptionActive:hover .runNameOnInteraction[data-overflow="true"],
+.pickerOptionActive:focus-visible .runNameOnInteraction[data-overflow="true"] {
+  animation: run-name-pan var(--run-name-duration) ease-in-out 350ms infinite alternate;
+}
 .pickerTrigger > svg { color: #617281; transition: transform 160ms ease; }
 .pickerTrigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
 .pickerTrigger:disabled { color: #7a8994; cursor: not-allowed; }
@@ -124,7 +135,7 @@
 .pickerOption > span:first-child,
 .pickerOptionActive > span:first-child { min-width: 0; }
 .pickerOption strong,
-.pickerOptionActive strong { display: block; overflow-wrap: anywhere; white-space: normal; }
+.pickerOptionActive strong { display: block; }
 .pickerOption small,
 .pickerOptionActive small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pickerOption strong,
@@ -225,11 +236,21 @@
 @media (prefers-reduced-motion: reduce) {
   .pickerTrigger > svg { transition: none; }
   .pickerMenu { animation: none; }
+  .runNameAlways[data-overflow="true"],
+  .pickerOption:hover .runNameOnInteraction[data-overflow="true"],
+  .pickerOption:focus-visible .runNameOnInteraction[data-overflow="true"],
+  .pickerOptionActive:hover .runNameOnInteraction[data-overflow="true"],
+  .pickerOptionActive:focus-visible .runNameOnInteraction[data-overflow="true"] { animation: none; }
 }
 
 @keyframes run-picker-enter {
   from { opacity: 0; transform: translateY(-5px) scale(.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes run-name-pan {
+  0%, 14% { transform: translateX(0); }
+  86%, 100% { transform: translateX(calc(-1 * var(--run-name-distance))); }
 }
 
 :global(.dark) .navigator { color: var(--ink); background: var(--paper); border-color: var(--line); }
@@ -309,9 +330,8 @@
   border-radius: 4px;
 }
 
-.pickerTrigger { min-height: 44px; padding: 6px 7px 6px 9px; }
+.pickerTrigger { min-height: 32px; padding: 0 7px 0 9px; }
 .pickerTriggerText strong { color: var(--runs-text, var(--ink)); font-size: 12px; font-weight: 500; }
-.pickerTriggerText small { color: var(--runs-muted, var(--muted)); font-size: 10px; }
 .pickerTrigger > svg { color: var(--runs-muted, var(--muted)); }
 .pickerTrigger:hover:not(:disabled),
 .pickerCreate:hover { background: var(--runs-hover, var(--control-hover)); border-color: var(--runs-border-strong, var(--line-strong)); }
@@ -332,8 +352,8 @@
 
 .pickerOption,
 .pickerOptionActive {
-  min-height: 48px;
-  padding: 6px 7px;
+  min-height: 40px;
+  padding: 4px 7px;
   color: var(--runs-text, var(--ink));
   border-radius: 3px;
 }
