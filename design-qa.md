@@ -120,6 +120,19 @@ Date: 2026-08-29
 
 final result: passed
 
+## Responsive active-run action bar — final pass
+
+- Source: the user-supplied 31 August active-run capture at 2880×1562 device pixels, normalized to its 1440×781 CSS viewport. It showed the persistent run actions wrapping into two rows while completion progress occupied a third vertical alignment.
+- Production evidence: `.design-qa/run-toolbar-responsive/implementation-production-1087x814.png` and `.design-qa/run-toolbar-responsive/implementation-production-collapsed-1087x814.png`; focused source/implementation comparison: `.design-qa/run-toolbar-responsive/footer-comparison.png`. These are ignored QA artifacts and are not shipped.
+- Responsive behavior: the action group is a single non-wrapping row. At wide widths all labels remain visible; at constrained run-shell widths status actions, pager labels, and then evidence/defect labels progressively collapse to icon buttons instead of moving to another line.
+- Measured improvement: the source footer was 84px high with actions at two different vertical positions. The deployed footer remains 48px high at a stricter 1087×814 viewport with both expanded and collapsed global navigation; actions and `Выполнено: 0%` share one row.
+- Layout safety: a horizontal overflow fallback preserves every action at intermediate widths. The existing mobile layout remains intentionally stacked below 720px, where a desktop-style single row would no longer meet touch-target and readability requirements.
+- Accessibility: hidden visual labels retain localized `aria-label` and tooltip text. Previous/next controls now have explicit localized accessible names, and no focus or command behavior changed.
+- Fidelity review: typography, YouTrack-derived light tokens, semantic pass/fail/block colors, borders, icons, run data, and execution behavior remain unchanged. The fix is limited to responsive action-bar geometry.
+- Production verification: the live TMS loaded the new page/CSS chunks, authenticated through the existing SSO session, rendered the active run at 1087×814, and produced no browser console errors or warnings during expanded/collapsed navigation checks.
+
+final result: passed
+
 ## TESSIQ identity replacement — final local pass
 
 - Source visual truth: `app/src/modules/core-tms/assets/brand-exploration/02-tessiq.png` (1536×1024 px), the user-selected second identity direction.
