@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { formatCount } from "../../localization/format/count";
-import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
 import { CasesTable } from "./list/CasesTable";
@@ -122,7 +122,7 @@ export function CasesView(props: CasesViewProps) {
     />}
     {mobileDetailOpen && !detailFullscreen && <button type="button" className={styles.detailScrim} onClick={() => setMobileDetailOpen(false)} aria-label={locale === "ru" ? "Закрыть детали тест-кейса" : "Close test case details"} />}
     <aside id="case-detail-panel" className={`${styles.detailPanel} ${mobileDetailOpen ? styles.detailPanelMobileOpen : ""} ${detailFullscreen ? styles.detailPanelFullscreen : ""}`} aria-label={locale === "ru" ? "Детали тест-кейса" : "Test case details"}>
-      {props.testCase && !revision ? <SaturnLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} selectedFolder={props.selectedFolder} onNew={props.onNew} onEdit={props.onEdit} onClone={props.onClone} onArchive={props.onArchive} onRunCase={props.onRunCase} fullscreen={detailFullscreen} onToggleFullscreen={() => { setDetailFullscreen((current) => !current); setMobileDetailOpen(true); }} onClose={() => setMobileDetailOpen(false)} />}
+      {props.testCase && !revision ? <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" /> : <CaseDetailPanel locale={locale} languageTag={languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} selectedFolder={props.selectedFolder} onNew={props.onNew} onEdit={props.onEdit} onClone={props.onClone} onArchive={props.onArchive} onRunCase={props.onRunCase} fullscreen={detailFullscreen} onToggleFullscreen={() => { setDetailFullscreen((current) => !current); setMobileDetailOpen(true); }} onClose={() => setMobileDetailOpen(false)} />}
     </aside>
   </div>;
 }

@@ -120,6 +120,44 @@ Date: 2026-08-29
 
 final result: passed
 
+## TESSIQ identity replacement — final local pass
+
+- Source visual truth: `app/src/modules/core-tms/assets/brand-exploration/02-tessiq.png` (1536×1024 px), the user-selected second identity direction.
+- Production assets: `app/src/modules/core-tms/assets/tessiq/tessiq-mark-dark.png` and `app/src/modules/core-tms/assets/tessiq/tessiq-mark-light.png` (512×512 px, transparent PNG). The other three approved explorations remain under `app/src/modules/core-tms/assets/brand-exploration/`.
+- Browser-rendered implementation: `.design-qa/tessiq-dark-collapsed.png`, `.design-qa/tessiq-dark-expanded.png`, and `.design-qa/tessiq-light-expanded.png` (1153×649 px exports from a 1153×648 CSS viewport, DPR 2.22). The comparison input is `.design-qa/tessiq-source-vs-implementation.png`; the source was aspect-preserved at 1100×733 and the implementation focused regions were cropped to 600×260 without stretching.
+- State: local development demo behind a temporary QA-only authentication bridge, Russian locale, selected Test Cases workspace; collapsed/expanded navigation in dark mode and expanded navigation on the unchanged legacy light theme. The bridge was fully reverted before final gates.
+- Full-view evidence: the cube remains fully visible and uncropped in the 68px collapsed rail; the expanded 269px rail adds the TESSIQ wordmark without shifting the icon or changing the surrounding navigation hierarchy.
+- Focused comparison evidence: the selected 3×3 verification-matrix cube, red top-center module, white/graphite inverse, compact uppercase wordmark, and flat technical identity all remain recognizable in the 40px production slot. No Saturn artwork, CSS-drawn approximation, inline SVG, emoji, or placeholder remains.
+- Typography: the wordmark is a fixed-width 21px/750 uppercase lockup with stable letter spacing. Its 156px layout width is constant during motion, so letters fade/translate as one unit instead of compressing.
+- Spacing and layout rhythm: the 40px mark and 13px wordmark gap align to the existing 48px brand row and the YouTrack-derived navigation density.
+- Colors and tokens: dark navigation uses the white/red cube; the light inverse asset is bundled for light content/loading surfaces. Existing light-theme product colors are unchanged.
+- Image quality: both marks were inspected at original 512×512 detail after background removal and de-fringing; edges are sharp, transparent, and free of crop or halo artifacts at the rendered 40px/82px sizes.
+- Copy/content: the visible product lockup is exactly `TESSIQ`; the old visible Saturn identity and loader names are removed. Technical API/schema compatibility names were intentionally not renamed.
+- Interaction evidence: collapse and expand were exercised from the visible bottom chevron. Computed wordmark width stayed 155.997px in both states; opacity changed 0→1 with the configured 140ms fade and 190ms translation. `prefers-reduced-motion` disables these transitions.
+- Console: no TESSIQ runtime error was recorded. The only warning is the pre-existing unrelated investor stylesheet autoprefixer warning.
+- Comparison history: the initial integration used the correct cube but had not yet been verified in both navigation states. Post-fix evidence confirmed stable icon geometry, non-compressing wordmark motion, dark/light theme behavior, and removal of the obsolete tracked Saturn raster.
+- Verification: TypeScript, architecture (206 files), adapters 61/61, production build 61/61, and `git diff --check` passed.
+
+final result: passed
+
+## YouTrack sidebar utilities and gradient — final pass
+
+- Source visual truth: `.design-qa/sidebar-utilities/source-youtrack.png`, copied from the user-supplied YouTrack sidebar capture. Source dimensions are 446×1552 device pixels; the browser capture is consistent with a high-density sidebar reference rather than a 446px CSS navigation rail.
+- Implementation evidence: `.design-qa/sidebar-utilities/implementation-expanded.jpg`, captured from the local TESSIQ workspace in the Codex in-app browser at a 1153×648 CSS viewport with `devicePixelRatio=2.2200000286102295`. The screenshot artifact is 1153×649 pixels because the browser capture is normalized to CSS-pixel output.
+- State: dark theme, Russian locale, populated development demo, expanded global navigation, and the Create pop-up open. A separate collapsed-navigation pass verified that the pop-up escapes the 68px rail without clipping or an oversized invisible hit target.
+- Full-view comparison evidence: `.design-qa/sidebar-utilities/full-comparison.png` places the complete YouTrack reference beside the final TESSIQ sidebar. The source was proportionally normalized to the implementation capture height; the implementation was cropped to its 269px visible navigation region.
+- Focused comparison evidence: `.design-qa/sidebar-utilities/focused-comparison.png` places equal 269×458 crops together for the logo, upper navigation, gradient spot, active row, and Create interaction. This focused crop was necessary because the complete reference and implementation use different viewport heights.
+- Layout and spacing: Create, Settings, Help, and Notifications form a dedicated bottom utility group above the existing collapse chevron. Row height, icon alignment, label rhythm, and the restrained Create surface follow the reference without importing unrelated YouTrack product items.
+- Colors and gradient: the old full-height linear navy treatment was replaced by a localized 430×700px radial spot anchored beyond the upper-left edge. It moves from `#172352` through `#172244`/`#171d2d` and resolves into the `#18191b` graphite base, matching the reference's uneven upper-left glow rather than painting the whole rail blue.
+- Typography and copy: the existing system font and compact TESSIQ shell scale are preserved. Russian utility labels are explicit and the Create menu uses short action titles with one-line contextual descriptions.
+- Icons and imagery: the approved TESSIQ raster mark remains sharp and uncropped. All utility actions use the established Lucide icon system; no emoji, generated decoration, or code-drawn logo was introduced.
+- Interaction evidence: Create opened an animated keyboard menu; New test case opened the Test Case drawer; New bug report opened the Defect drawer; Settings navigated to Configuration and acquired current-page state; Escape/outside dismissal and arrow-key cycling are implemented; Help and Notifications are intentionally presentational shells for later behavior.
+- Console: the in-app browser recorded no error-level console entries during expanded, menu-open, drawer-open, settings, and collapsed states. Only React development info and expected Fast Refresh logs were present.
+- Comparison history: the first collapsed-state check exposed that allowing navigation overflow also left 280px button hit areas outside the 68px rail. The collapsed brand, item list, utility group, buttons, and chevron were constrained to 68/48px, then recaptured; the Create menu opened to the right without clipping and no oversized focus outline remained.
+- Verification: TypeScript passed; architecture passed for 207 TMS files; the adapter/UI suite passed 61/61; production build generated 61/61 pages; `git diff --check` passed; the temporary local visual-QA authentication bypass was fully reverted.
+
+final result: passed
+
 ## YouTrack identity redesign — final local pass
 
 - Direction: the selected list-first concept was rebuilt with the actual YouTrack visual language instead of the former blue TMS skin.

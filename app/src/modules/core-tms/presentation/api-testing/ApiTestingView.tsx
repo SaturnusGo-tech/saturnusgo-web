@@ -3,7 +3,7 @@
 import { Send } from "lucide-react";
 import { useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import surface from "./api-testing.module.css";
 import { POSTMAN_WEB_URL, UMBRELLA_API_SWAGGER_URL } from "./model";
 
@@ -28,7 +28,7 @@ export function ApiTestingView() {
       </a>
     </nav>
     <div className={surface.webview} role="tabpanel">
-      {!loaded && <div className={surface.loading}><SaturnLoader pane label={t("apiTesting.loading")} testId="api-swagger-loading" /></div>}
+      {!loaded && <div className={surface.loading}><TessiqLoader pane label={t("apiTesting.loading")} testId="api-swagger-loading" /></div>}
       <iframe
         className={surface.frame}
         src={UMBRELLA_API_SWAGGER_URL}

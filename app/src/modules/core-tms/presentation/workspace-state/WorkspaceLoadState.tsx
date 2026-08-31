@@ -1,7 +1,7 @@
 import { AlertTriangle, FlaskConical, RefreshCw } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceFailure } from "../../state/workspace/useWorkspaceBootstrap";
-import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import styles from "../../tms.module.css";
 
 export function WorkspaceLoadState({
@@ -17,7 +17,7 @@ export function WorkspaceLoadState({
 }) {
   const { t } = useTmsLocale();
   if (!failure) {
-    return <SaturnLoader label={t("workspace.loading")} testId="workspace-loading" />;
+    return <TessiqLoader label={t("workspace.loading")} testId="workspace-loading" />;
   }
 
   const status = failure.detail.match(/status\s+(\d+)/i)?.[1];

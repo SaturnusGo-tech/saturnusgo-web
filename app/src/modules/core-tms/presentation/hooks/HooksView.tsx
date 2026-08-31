@@ -5,7 +5,7 @@ import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import type { YouTrackIntegrationStatus } from "../../application/integrations/getYouTrackIntegrationStatus";
 import { getYouTrackIntegrationStatus } from "../../application/integrations/getYouTrackIntegrationStatus";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import surface from "./hooks.module.css";
 
 export function HooksView({ workspaceId }: { workspaceId: string }) {
@@ -32,7 +32,7 @@ export function HooksView({ workspaceId }: { workspaceId: string }) {
   if (!status && !failure) {
     return (
       <div className={surface.statePage}>
-        <SaturnLoader pane label={t("hooks.loading")} testId="youtrack-status-loading" />
+        <TessiqLoader pane label={t("hooks.loading")} testId="youtrack-status-loading" />
       </div>
     );
   }

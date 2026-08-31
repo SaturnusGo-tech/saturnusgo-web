@@ -194,9 +194,11 @@
   flex: 0 0 var(--sidebar-visible-width);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   color: #e7e9ec;
-  background: linear-gradient(180deg, #19243c 0%, #191d27 28%, #18191b 66%, #18191b 100%);
+  background:
+    radial-gradient(ellipse 430px 700px at -76px 92px, #172352 0%, #172244 33%, #171d2d 54%, #18191b 78%),
+    #18191b;
   border-right: 1px solid #43454a;
   transition:
     width 240ms cubic-bezier(.2, .72, .3, 1),
@@ -207,6 +209,14 @@
   --sidebar-visible-width: 68px;
 }
 
+.navigationCollapsed :is(.brandArea, .navigationItems, .navigationUtilities) {
+  width: 68px;
+}
+
+.navigationCollapsed :is(.navigationItem, .navigationUtilityButton, .navigationToggle) {
+  width: 48px;
+}
+
 .brandArea {
   width: var(--sidebar-expanded-width);
   height: 88px;
@@ -214,34 +224,61 @@
   display: flex;
   align-items: center;
   padding: 0 14px;
+  overflow: hidden;
   border-bottom: 1px solid rgb(78 81 87 / 72%);
 }
 
 .brandButton {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  flex: 0 0 42px;
-  place-items: center;
+  width: calc(var(--sidebar-expanded-width) - 28px);
+  height: 48px;
+  display: flex;
+  flex: 0 0 calc(var(--sidebar-expanded-width) - 28px);
+  align-items: center;
+  gap: 13px;
   padding: 0;
+  overflow: hidden;
   color: #f2f3f5;
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
+  text-align: left;
 }
 
 .brandButton:hover {
   background: rgb(255 255 255 / 8%);
 }
 
-.saturnLogo {
-  width: 38px;
-  height: 36px;
+.tessiqMark {
+  width: 40px;
+  height: 40px;
   display: block;
-  color: currentColor;
-  background: currentColor;
-  -webkit-mask: url("../../assets/saturn-mark.png") center / contain no-repeat;
-  mask: url("../../assets/saturn-mark.png") center / contain no-repeat;
+  flex: 0 0 40px;
+  background: url("../../assets/tessiq/tessiq-mark-dark.png") center / contain no-repeat;
+}
+
+.tessiqWordmark {
+  width: 156px;
+  min-width: 156px;
+  flex: 0 0 156px;
+  overflow: hidden;
+  color: #f5f6f7;
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: .075em;
+  line-height: 1;
+  opacity: 1;
+  transform: translateX(0);
+  white-space: nowrap;
+  transition:
+    opacity 140ms ease 100ms,
+    transform 190ms cubic-bezier(.2, .72, .3, 1) 80ms;
+}
+
+.navigationCollapsed .tessiqWordmark {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-8px);
+  transition-delay: 0ms;
 }
 
 .navigationItems {
@@ -297,6 +334,10 @@
   background: transparent;
 }
 
+.navigationItem[data-testid="nav-config"] {
+  display: none;
+}
+
 .navigationIcon {
   width: 22px;
   height: 22px;
@@ -329,6 +370,142 @@
   pointer-events: none;
   transform: translateX(-6px);
   transition-delay: 0ms;
+}
+
+.navigationUtilities {
+  width: var(--sidebar-expanded-width);
+  flex: 0 0 auto;
+  padding: 8px 10px 2px;
+  overflow: visible;
+}
+
+.navigationCreateSlot {
+  position: relative;
+  width: 100%;
+}
+
+.navigationUtilityButton {
+  width: calc(var(--sidebar-expanded-width) - 20px);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 13px;
+  overflow: hidden;
+  color: #dde0e4;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.navigationUtilityButton:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 8%);
+}
+
+.navigationUtilityButton:disabled {
+  cursor: not-allowed;
+  opacity: .4;
+}
+
+.navigationUtilityButtonActive,
+.navigationUtilityButtonActive:hover {
+  color: #fff;
+  background: rgb(81 95 104 / 50%);
+  font-weight: 600;
+}
+
+.navigationCreateButton {
+  margin-bottom: 6px;
+  background: rgb(255 255 255 / 10%);
+}
+
+.navigationCreateButton:hover,
+.navigationCreateButton[aria-expanded="true"] {
+  background: rgb(255 255 255 / 15%);
+}
+
+.navigationCreateMenu {
+  position: absolute;
+  z-index: 80;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 270px;
+  padding: 6px;
+  color: #e8eaed;
+  background: #2b2d30;
+  border: 1px solid #4e5157;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 42%);
+  transform-origin: left bottom;
+  animation: navigationMenuIn 150ms cubic-bezier(.2, .72, .3, 1) both;
+}
+
+.navigationCollapsed .navigationCreateMenu {
+  left: 58px;
+}
+
+.navigationCreateMenu button {
+  width: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 9px 10px;
+  color: #e8eaed;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.navigationCreateMenu button:hover,
+.navigationCreateMenu button:focus-visible {
+  background: #393b40;
+}
+
+.navigationCreateMenu button > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #aab4c7;
+}
+
+.navigationCreateMenu button > span {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navigationCreateMenu strong {
+  color: #f2f3f5;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.navigationCreateMenu small {
+  color: #9da1a8;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+@keyframes navigationMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .navigationToggle {
@@ -465,13 +642,27 @@
   .navigationCollapsed .navigationLabel {
     display: none;
   }
+
+  .navigationUtilities {
+    display: none;
+  }
+
+  .navigationItem[data-testid="nav-config"] {
+    display: flex;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .navigation,
   .navigationItem,
   .navigationToggle,
-  .navigationLabel {
+  .navigationUtilityButton,
+  .navigationLabel,
+  .tessiqWordmark {
     transition: none;
+  }
+
+  .navigationCreateMenu {
+    animation: none;
   }
 }

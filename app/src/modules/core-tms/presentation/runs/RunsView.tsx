@@ -8,7 +8,7 @@ import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { EmptyState } from "../common/empty/EmptyState";
 import { FormError } from "../common/error/FormError";
-import { SaturnLoader } from "../common/loading/SaturnLoader";
+import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
@@ -119,7 +119,7 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
     onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
     archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
   />;
-  if (selectedRun && selectedIsVisible && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><SaturnLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
+  if (selectedRun && selectedIsVisible && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><EmptyState icon={<PlayCircle size={36} />} title={listMode === "archived" ? t("runs.noArchived") : t("runs.noActive")} text={listMode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")} action={listMode === "active" ? <button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button> : undefined} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);

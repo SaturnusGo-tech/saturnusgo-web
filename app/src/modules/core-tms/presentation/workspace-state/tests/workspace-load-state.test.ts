@@ -8,7 +8,7 @@ test("workspace loading keeps copy screen-reader-only", () => {
     "utf8",
   );
   const loaderSource = readFileSync(
-    new URL("../../common/loading/SaturnLoader.tsx", import.meta.url),
+    new URL("../../common/loading/TessiqLoader.tsx", import.meta.url),
     "utf8",
   );
   const loadingBranch = workspaceSource.slice(
@@ -17,14 +17,14 @@ test("workspace loading keeps copy screen-reader-only", () => {
   );
 
   assert.match(loadingBranch, /testId="workspace-loading"/);
-  assert.match(loadingBranch, /SaturnLoader/);
+  assert.match(loadingBranch, /TessiqLoader/);
   assert.match(loaderSource, /aria-busy="true"/);
   assert.match(loaderSource, /styles\.srOnly/);
-  assert.match(loaderSource, /workspaceLoaderOrbit/);
+  assert.match(loaderSource, /workspaceLoaderBrand/);
   assert.doesNotMatch(loadingBranch, /workspace\.loadingDescription|<h1|<p/);
 });
 
-test("resource hydration uses Saturn instead of a false empty state", () => {
+test("resource hydration uses TESSIQ instead of a false empty state", () => {
   const casesSource = readFileSync(
     new URL("../../cases/CasesView.tsx", import.meta.url),
     "utf8",
@@ -39,8 +39,8 @@ test("resource hydration uses Saturn instead of a false empty state", () => {
   );
 
   assert.match(casesSource, /props\.testCase && !revision/);
-  assert.match(casesSource, /<SaturnLoader[^>]*testId="case-detail-loading"/);
-  assert.match(suitesSource, /!detail \? <SaturnLoader/);
+  assert.match(casesSource, /<TessiqLoader[^>]*testId="case-detail-loading"/);
+  assert.match(suitesSource, /!detail \? <TessiqLoader/);
   assert.match(runsSource, /selectedRun && selectedIsVisible && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
 });

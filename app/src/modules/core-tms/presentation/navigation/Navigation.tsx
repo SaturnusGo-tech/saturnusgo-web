@@ -16,6 +16,7 @@ import type { TmsMessageKey } from "../../localization/catalog/messages";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { View } from "../../state/types/workspace";
 import shellStyles from "../workspace/tms-shell.module.css";
+import { NavigationUtilityMenu } from "./NavigationUtilityMenu";
 
 const navigationItems: Array<{
   id: View;
@@ -43,12 +44,16 @@ export function Navigation({
   disabled,
   collapsed,
   onToggleCollapsed,
+  onCreateCase,
+  onCreateDefect,
 }: {
   view: View;
   onChange: (view: View) => void;
   disabled: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  onCreateCase: () => void;
+  onCreateDefect: () => void;
 }) {
   const { t } = useTmsLocale();
   return (
@@ -65,7 +70,10 @@ export function Navigation({
           aria-label={t("header.dashboardAria")}
           title={t("header.dashboardAria")}
         >
-          <span className={shellStyles.saturnLogo} aria-hidden="true" />
+          <span className={shellStyles.tessiqMark} aria-hidden="true" />
+          <span className={shellStyles.tessiqWordmark} aria-hidden="true">
+            TESSIQ
+          </span>
         </button>
       </div>
 
@@ -96,6 +104,14 @@ export function Navigation({
           );
         })}
       </div>
+
+      <NavigationUtilityMenu
+        disabled={disabled}
+        settingsActive={!disabled && view === "config"}
+        onCreateCase={onCreateCase}
+        onCreateDefect={onCreateDefect}
+        onOpenSettings={() => onChange("config")}
+      />
 
       <button
         type="button"
