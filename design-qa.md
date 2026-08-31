@@ -307,3 +307,17 @@ final result: passed
 - Release evidence: source commit `22c0c5fe` is on `saturnusgo-web/main`; Pages commit `49848cb6` is on `saturnusgo-web.github.io/main`. The authenticated production route served the new scoped suite CSS and rendered the real `HOST-1` suite in both themes.
 
 final result: passed
+
+## Run defect drawer — final pass
+
+- Source: the user-supplied 31 August capture of the former inline defect composer, a 2190×1150 image in which the form occupied the entire execution canvas and competed visually with the active run.
+- Production implementation: `.design-qa/inline-defect-drawer-production.png`, captured from the authenticated live TESSIQ release at 1087×814 CSS px with real run `HOST-TR-10`, failed step 2, and the defect form open. The combined before/after evidence is `.design-qa/inline-defect-drawer-comparison.png`.
+- Composition: the defect flow is now a 540px right drawer over the still-visible run context. The former two-column canvas, oversized upload drop zone, broad snapshot panel, and persistent saved-state strip were removed from the execution document.
+- Hierarchy: title and run context form a compact header; severity and priority share one row; component, YouTrack destination, description, reproduction steps, immutable run snapshot, evidence, and deep link follow in one predictable vertical sequence. The sticky footer contains only context, Cancel, and the primary create action.
+- Behavioral parity: the defect payload still carries severity, priority, localized component display with canonical payload value, YouTrack target, run/item/step identity, reproduction steps, deep link, and attachments. Successful creation still reports through the existing toast and now closes the drawer instead of leaving a large saved form embedded in the run.
+- Interaction and accessibility: the shared dialog supplies labelled dialog semantics, focus trap, outside-click dismissal, Escape behavior, and focus restoration. Production QA opened the drawer from `Завести баг`, closed it without mutation, and confirmed focus returned to that trigger.
+- Responsive and visual fidelity: desktop uses the compact right panel; narrow screens switch to a full-width single-column drawer. Controls, borders, typography, graphite overlay, white panel, semantic selectors, and `#3574f0` primary action match the accepted TESSIQ/YouTrack identity without adding cards or decorative chrome.
+- Console and gates: production browser console reported zero errors. TypeScript, the 209-file TMS architecture gate, focused layout regression 1/1, full TMS adapters/UI models 64/64, `git diff --check`, production build 61/61, SHA-bound Pages prepare, and approved Pages publish passed. The only build warning remains the unrelated legacy investor stylesheet Autoprefixer notice.
+- Release evidence: source commit `cad3006c0a46abba47295ad0fa344db51cb3b4a8` is on `saturnusgo-web/main`; Pages commit `6c04fe3f9d34762e46bd460b0a25d8371a128be5` is on `saturnusgo-web.github.io/main`.
+
+final result: passed
