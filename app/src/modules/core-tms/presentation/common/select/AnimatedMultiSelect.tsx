@@ -46,7 +46,7 @@ export function AnimatedMultiSelect({
     const next = selected.has(value)
       ? values.filter((item) => item !== value)
       : [...values, value];
-    onChange(next.length === options.length ? [] : next);
+    onChange(next);
   }
 
   return <div className={styles.root} ref={rootRef}>

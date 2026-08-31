@@ -1,5 +1,5 @@
 import { Filter, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -11,7 +11,11 @@ import {
   activeRunFilterCount,
   filterRunCases,
   initialRunScopeFilters,
+  reconcileRunScopeFilters,
+  runScopeFacetOptions,
   type RunScopeFilters,
+  updateRunScopeComponents,
+  updateRunScopeFolders,
 } from "../run-builder/model";
 import styles from "../run/RunDialog.module.css";
 
@@ -27,14 +31,17 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
   const [filters, setFilters] = useState<RunScopeFilters>(initialRunScopeFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const visibleCases = useMemo(() => filterRunCases(cases, filters), [cases, filters]);
-  const components = useMemo(() => Array.from(new Set(cases.map((item) => item.component).filter(Boolean))).sort(), [cases]);
-  const folders = useMemo(() => Array.from(new Set(cases.map((item) => item.folderPath))).sort(), [cases]);
+  const facets = useMemo(() => runScopeFacetOptions(cases, filters), [cases, filters]);
   const selected = useMemo(() => new Set(caseIds), [caseIds]);
   const filterCount = activeRunFilterCount(filters);
   const update = <K extends keyof RunScopeFilters>(key: K, value: RunScopeFilters[K]) =>
     setFilters((current) => ({ ...current, [key]: value }));
   const selectMatches = () => setCaseIds((current) => Array.from(new Set([...current, ...visibleCases.map((item) => item.id)])));
   const clearMatches = () => setCaseIds((current) => current.filter((id) => !visibleCases.some((item) => item.id === id)));
+
+  useEffect(() => {
+    setFilters((current) => reconcileRunScopeFilters(cases, current));
+  }, [cases]);
 
   return <div className={styles.scopeBuilder} data-testid="run-case-picker">
     <div className={styles.scopeToolbar}>
@@ -56,12 +63,19 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
       <div className={styles.filterField}><span>{copy.component}</span><AnimatedMultiSelect
         label={copy.component}
         values={filters.components}
-        options={components.map((value) => ({ value, label: localizedComponentLabel(locale, value) }))}
+        options={facets.components.map((value) => ({ value, label: localizedComponentLabel(locale, value) }))}
         allLabel={copy.allComponents}
         selectedLabel={copy.selected}
-        onChange={(values) => update("components", values)}
+        onChange={(values) => setFilters((current) => updateRunScopeComponents(cases, current, values))}
       /></div>
-      <FilterSelect label={copy.folder} value={filters.folder} onChange={(value) => update("folder", value)} options={[["all", copy.allFolders], ...folders.map((value) => [value, value] as [string, string])]} />
+      <div className={styles.filterField}><span>{copy.folder}</span><AnimatedMultiSelect
+        label={copy.folder}
+        values={filters.folders}
+        options={facets.folders.map((value) => ({ value, label: value }))}
+        allLabel={copy.allFolders}
+        selectedLabel={copy.selected}
+        onChange={(values) => setFilters((current) => updateRunScopeFolders(cases, current, values))}
+      /></div>
       <FilterSelect label={copy.priority} value={filters.priority} onChange={(value) => update("priority", value as RunScopeFilters["priority"])} options={[["all", copy.allPriorities], ["critical", copy.critical], ["high", copy.high], ["medium", copy.medium], ["low", copy.low]]} />
       <FilterSelect label={copy.lifecycle} value={filters.lifecycle} onChange={(value) => update("lifecycle", value as RunScopeFilters["lifecycle"])} options={[["all", copy.allStates], ["ready", copy.ready], ["draft", copy.draft], ["deprecated", copy.deprecated]]} />
       <button type="button" className={styles.resetFilters} onClick={() => setFilters(initialRunScopeFilters)} disabled={filterCount === 0}>{copy.resetFilters}</button>

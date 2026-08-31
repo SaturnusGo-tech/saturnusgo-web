@@ -5,7 +5,7 @@ export type RunScopeFilters = {
   scenario: "all" | "positive" | "negative" | "corner";
   platform: "all" | "ios" | "android";
   components: string[];
-  folder: string;
+  folders: string[];
   priority: "all" | TestCaseSummary["priority"];
   lifecycle: "all" | TestCaseSummary["lifecycle"];
   sort: "updated_desc" | "key_asc" | "title_asc";
@@ -16,7 +16,7 @@ export const initialRunScopeFilters: RunScopeFilters = {
   scenario: "all",
   platform: "all",
   components: [],
-  folder: "all",
+  folders: [],
   priority: "all",
   lifecycle: "all",
   sort: "updated_desc",
@@ -37,14 +37,114 @@ function matchesQuery(item: TestCaseSummary, query: string) {
   return terms.every((term) => haystack.includes(term));
 }
 
+function normalizeFolderPath(value: string) {
+  const segments = value.split("/").filter(Boolean);
+  return segments.length === 0 ? "/" : `/${segments.join("/")}`;
+}
+
+function folderPrefixes(value: string) {
+  const segments = normalizeFolderPath(value).split("/").filter(Boolean);
+  return segments.map((_, index) => `/${segments.slice(0, index + 1).join("/")}`);
+}
+
+function isInsideFolder(folderPath: string, selectedFolder: string) {
+  const folder = normalizeFolderPath(folderPath);
+  const selected = normalizeFolderPath(selectedFolder);
+  if (selected === "/") return true;
+  return folder === selected || folder.startsWith(`${selected}/`);
+}
+
+function matchesFolders(item: TestCaseSummary, folders: readonly string[]) {
+  return folders.length === 0 || folders.some((folder) => isInsideFolder(item.folderPath, folder));
+}
+
+function matchesComponents(item: TestCaseSummary, components: readonly string[]) {
+  return components.length === 0 || components.includes(item.component);
+}
+
+const uniqueSorted = (values: readonly string[]) =>
+  Array.from(new Set(values.filter(Boolean))).sort(keyCollator.compare);
+
+function allFolderOptions(cases: TestCaseSummary[]) {
+  return uniqueSorted(cases.flatMap((item) => folderPrefixes(item.folderPath)));
+}
+
+function knownFolders(cases: TestCaseSummary[], values: readonly string[]) {
+  const known = new Set(allFolderOptions(cases));
+  return uniqueSorted(values.map(normalizeFolderPath)).filter((value) => known.has(value));
+}
+
+function knownComponents(cases: TestCaseSummary[], values: readonly string[]) {
+  const known = new Set(cases.map((item) => item.component).filter(Boolean));
+  return uniqueSorted(values).filter((value) => known.has(value));
+}
+
+function sameValues(left: readonly string[], right: readonly string[]) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+export function runScopeFacetOptions(cases: TestCaseSummary[], filters: RunScopeFilters) {
+  const allFolders = allFolderOptions(cases);
+  const componentCases = cases.filter((item) => matchesComponents(item, filters.components));
+  const eligibleFolders = new Set(componentCases.flatMap((item) => folderPrefixes(item.folderPath)));
+  return {
+    components: uniqueSorted(cases
+      .filter((item) => matchesFolders(item, filters.folders))
+      .map((item) => item.component)),
+    folders: allFolders.filter((folder) => eligibleFolders.has(folder)),
+  };
+}
+
+export function reconcileRunScopeFilters(cases: TestCaseSummary[], filters: RunScopeFilters) {
+  let folders = knownFolders(cases, filters.folders);
+  let components = knownComponents(cases, filters.components);
+  if (folders.length > 0) {
+    const allowed = new Set(cases.filter((item) => matchesFolders(item, folders)).map((item) => item.component));
+    components = components.filter((value) => allowed.has(value));
+  }
+  if (components.length > 0) {
+    const allowed = new Set(cases
+      .filter((item) => matchesComponents(item, components))
+      .flatMap((item) => folderPrefixes(item.folderPath)));
+    folders = folders.filter((value) => allowed.has(value));
+  }
+  return sameValues(folders, filters.folders) && sameValues(components, filters.components)
+    ? filters
+    : { ...filters, folders, components };
+}
+
+export function updateRunScopeFolders(
+  cases: TestCaseSummary[], filters: RunScopeFilters, folders: string[],
+) {
+  const next = {
+    ...filters,
+    folders: knownFolders(cases, folders),
+    components: knownComponents(cases, filters.components),
+  };
+  const allowedComponents = new Set(runScopeFacetOptions(cases, next).components);
+  return { ...next, components: next.components.filter((value) => allowedComponents.has(value)) };
+}
+
+export function updateRunScopeComponents(
+  cases: TestCaseSummary[], filters: RunScopeFilters, components: string[],
+) {
+  const next = {
+    ...filters,
+    folders: knownFolders(cases, filters.folders),
+    components: knownComponents(cases, components),
+  };
+  const allowedFolders = new Set(runScopeFacetOptions(cases, next).folders);
+  return { ...next, folders: next.folders.filter((value) => allowedFolders.has(value)) };
+}
+
 export function filterRunCases(cases: TestCaseSummary[], filters: RunScopeFilters) {
   const filtered = cases.filter((item) => {
     const tags = normalizedTags(item);
     if (!matchesQuery(item, filters.query)) return false;
     if (filters.scenario !== "all" && !tags.includes(filters.scenario)) return false;
     if (filters.platform !== "all" && !tags.includes(filters.platform)) return false;
-    if (filters.components.length > 0 && !filters.components.includes(item.component)) return false;
-    if (filters.folder !== "all" && item.folderPath !== filters.folder && !item.folderPath.startsWith(`${filters.folder}/`)) return false;
+    if (!matchesComponents(item, filters.components)) return false;
+    if (!matchesFolders(item, filters.folders)) return false;
     if (filters.priority !== "all" && item.priority !== filters.priority) return false;
     if (filters.lifecycle !== "all" && item.lifecycle !== filters.lifecycle) return false;
     return true;
@@ -61,7 +161,7 @@ export function activeRunFilterCount(filters: RunScopeFilters) {
     + Number(filters.scenario !== "all")
     + Number(filters.platform !== "all")
     + Number(filters.components.length > 0)
-    + Number(filters.folder !== "all")
+    + Number(filters.folders.length > 0)
     + Number(filters.priority !== "all")
     + Number(filters.lifecycle !== "all");
 }
