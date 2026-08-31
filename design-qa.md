@@ -120,6 +120,19 @@ Date: 2026-08-29
 
 final result: passed
 
+## Run selector readable names — production pass
+
+- Source: the user-supplied 31 August crop showing all active run names truncated in the trigger and list. Production evidence: `.design-qa/run-picker-readable-production.png`; focused comparison: `.design-qa/run-picker-before-after.png`. The evidence assets are ignored and are not shipped.
+- Production state: authenticated TESSIQ Test Runs at 1280×720 CSS px, dark theme, three active real runs. The selector was opened after Pages propagation and checked against the actual production records.
+- Trigger: the selected run name now wraps to its natural multi-line height instead of ellipsizing; its immutable run key is shown on a separate secondary line.
+- Options: every run name wraps without line-clamp or text-overflow. The full HOST-TC-90 run, HOST-1 smoke run, and Android regression run are readable while their HOST-TR keys remain separate and aligned.
+- Interaction: listbox semantics, Arrow/Home/End navigation, Escape dismissal, focus restoration, selected marker, and the existing restrained opening animation are unchanged.
+- Accessibility: the complete name remains the accessible option name and is also available through the native `title` tooltip.
+- Verification: TypeScript passed; architecture passed for 208 files; focused layout regression 1/1; TMS adapter/UI tests 63/63; `git diff --check` passed; production build and approved Pages publish generated 61/61 pages.
+- Release evidence: source commit `774499c8` is on `saturnusgo-web/main`; Pages commit `5da38156` is on `saturnusgo-web.github.io/main`. The authenticated production selector was recaptured after deployment.
+
+final result: passed
+
 ## Responsive active-run action bar — final pass
 
 - Source: the user-supplied 31 August active-run capture at 2880×1562 device pixels, normalized to its 1440×781 CSS viewport. It showed the persistent run actions wrapping into two rows while completion progress occupied a third vertical alignment.
