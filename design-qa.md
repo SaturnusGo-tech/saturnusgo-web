@@ -279,3 +279,18 @@ final result: passed
 - Security cleanup: the temporary local design-preview authentication condition was removed before final verification; the auth boundary has zero diff.
 
 final result: passed
+
+## Test Suites identity refresh — final pass
+
+- Source: the two user-supplied 31 August captures showing the legacy dark Test Suites detail and Create Suite drawer. The source exposed three concrete regressions: a dark shell containing white case rows, the old oversized segmented-card treatment, and legacy typography/spacing that no longer matched the accepted TESSIQ/YouTrack system.
+- Implementation evidence: authenticated production Test Suites in light and dark themes plus the local light/dark drawer states. Files are stored under `.design-qa/suites-refresh/`; `detail-comparison.png` and `drawer-comparison.png` place the source and implementation together for the final visual judgement.
+- Viewport and state: the populated production suite was verified at 1087×814 CSS px with one real static suite and two real Host cases. The drawer was verified locally at 979×733 CSS px and in production at 1087×814 with the full 240-case repository. Source captures were cropped to the same surface and normalized to the implementation viewport before comparison.
+- Suite workspace: the left rail is now a 280px flat navigation surface with compact 60px rows, thin dividers, a restrained selection line, current graphite controls, and no legacy card chrome. The detail uses a 116px header, a 46px scope line, and a dense four-column table with one fluid Test Case column.
+- Drawer: the panel is 720px on desktop and full-width on narrow screens. Fields, mode selector, search, case rows, priority chips, and sticky footer now use the shared TESSIQ tokens in both themes. Dark mode contains no white case-row or light-field leak; light mode keeps the accepted white canvas and dark readable text.
+- Content hierarchy: case titles are primary; key and folder form the secondary line; priority is a compact semantic chip. The selected mode uses a bottom action line instead of a large blue card. The case list remains bounded and scrollable for all 240 records.
+- Motion and accessibility: drawer sections and case picker use restrained 150ms entry motion; the expand chevron animates; reduced-motion removes these effects. Dialog labelling, focus management, mode `aria-pressed`, picker `aria-expanded`, checkbox names, and close focus restoration remain intact.
+- Interaction verification: opened and closed the drawer, expanded and collapsed the 240-case picker, switched between static and dynamic modes, and returned to the populated suite without creating or mutating production data.
+- Console and gates: production browser console reported zero errors. TypeScript, the 207-file TMS architecture gate, 61/61 TMS adapter/UI tests, `git diff --check`, production build 61/61, SHA-bound Pages prepare, and approved Pages publish passed. The only build warning is the pre-existing unrelated investor stylesheet Autoprefixer notice.
+- Release evidence: source commit `22c0c5fe` is on `saturnusgo-web/main`; Pages commit `49848cb6` is on `saturnusgo-web.github.io/main`. The authenticated production route served the new scoped suite CSS and rendered the real `HOST-1` suite in both themes.
+
+final result: passed
