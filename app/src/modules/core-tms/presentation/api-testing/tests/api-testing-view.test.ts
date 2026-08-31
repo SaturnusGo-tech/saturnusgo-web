@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { POSTMAN_WEB_URL, UMBRELLA_API_SWAGGER_URL } from "../model";
+import { POSTMAN_WEB_URL, swaggerFrameUrl, UMBRELLA_API_SWAGGER_URL } from "../model";
 
 const source = readFileSync(fileURLToPath(new URL("../ApiTestingView.tsx", import.meta.url)), "utf8");
 
@@ -16,8 +16,20 @@ test("embeds only the approved Swagger origin without TMS credentials", () => {
 
 test("uses the shared TESSIQ loading state and a constrained iframe", () => {
   assert.match(source, /<TessiqLoader pane/);
+  assert.match(source, /swaggerFrameUrl\(theme, locale\)/);
   assert.match(source, /sandbox="allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"/);
   assert.match(source, /title=\{t\("apiTesting\.frameTitle"\)\}/);
+});
+
+test("synchronizes the embedded access screen with TESSIQ theme and language", () => {
+  const darkRussian = new URL(swaggerFrameUrl("dark", "ru"));
+  assert.equal(darkRussian.searchParams.get("theme"), "dark");
+  assert.equal(darkRussian.searchParams.get("lang"), "ru");
+  assert.equal(darkRussian.hash, "#/");
+
+  const unresolvedEnglish = new URL(swaggerFrameUrl(undefined, "en"));
+  assert.equal(unresolvedEnglish.searchParams.has("theme"), false);
+  assert.equal(unresolvedEnglish.searchParams.get("lang"), "en");
 });
 
 test("opens Postman in a separate tab without sharing TMS credentials", () => {

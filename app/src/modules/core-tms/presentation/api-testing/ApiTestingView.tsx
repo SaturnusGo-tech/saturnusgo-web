@@ -1,15 +1,20 @@
 "use client";
 
 import { Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useColorMode } from "../../../../shared/_hooks/useColorMode";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import surface from "./api-testing.module.css";
-import { POSTMAN_WEB_URL, UMBRELLA_API_SWAGGER_URL } from "./model";
+import { POSTMAN_WEB_URL, swaggerFrameUrl } from "./model";
 
 export function ApiTestingView() {
-  const { t } = useTmsLocale();
+  const { locale, t } = useTmsLocale();
+  const { theme } = useColorMode();
   const [loaded, setLoaded] = useState(false);
+  const frameUrl = swaggerFrameUrl(theme, locale);
+
+  useEffect(() => setLoaded(false), [frameUrl]);
 
   function handleFrameLoad() {
     setLoaded(true);
@@ -31,7 +36,7 @@ export function ApiTestingView() {
       {!loaded && <div className={surface.loading}><TessiqLoader pane label={t("apiTesting.loading")} testId="api-swagger-loading" /></div>}
       <iframe
         className={surface.frame}
-        src={UMBRELLA_API_SWAGGER_URL}
+        src={frameUrl}
         title={t("apiTesting.frameTitle")}
         onLoad={handleFrameLoad}
         referrerPolicy="no-referrer"
