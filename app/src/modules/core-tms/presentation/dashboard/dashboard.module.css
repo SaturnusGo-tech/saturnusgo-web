@@ -10,6 +10,12 @@
   font-size: 14px;
 }
 
+.page.page {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 16px;
+}
+
 .page > * { flex-shrink: 0; }
 
 .header {

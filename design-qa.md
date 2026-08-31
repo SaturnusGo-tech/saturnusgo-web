@@ -249,3 +249,20 @@ final result: passed
 - Accessibility: every icon action has a localized accessible name and tooltip; link copy reports nonvisual status; resize controls remain keyboard-operable; the drawer retains dialog focus management and Escape dismissal.
 
 final result: passed
+
+## Light-mode polish and workspace motion — final pass
+
+- Source: authenticated production TESSIQ in the light theme at `https://tms.saturnusgo.com/testcases/umbrella-home/work/`; implementation: the same light-theme surfaces in the local demo workspace. Evidence is stored under `.design-qa/light-polish/`.
+- Combined comparison inputs: `cases-light-comparison.png`, `dashboard-light-comparison.png`, and `reports-light-comparison.png`. Source and implementation captures are shown together; production and local data differ, so the comparison is limited to shell geometry, typography, controls, colors, and content framing rather than record-for-record pixels.
+- Primary actions: the shared workspace button inheritance previously overrode the Cases primary-button foreground. `Новый кейс` and `Запустить` now compute to `#fff` on `#3574f0` in light mode.
+- Test-case markers: draft, ready, deprecated, and archived checklist marks now use darker foregrounds, explicit borders, and restrained semantic fills. The checked-list glyph remains visible against the light selected row.
+- Priority semantics: low, medium, high, and critical chips now use distinct neutral, blue, amber, and red systems with stronger foreground/border contrast; labels and payload values are unchanged.
+- Navigation: `Интеграционное тестирование` wraps into two complete lines in the existing 280px expanded sidebar. It no longer ellipsizes, and its label retains a fixed text measure while opacity/transform animate independently of the 240ms sidebar width transition.
+- Dashboard and Reports: both page roots now use the full stage width with 16px inline padding and no max-width cap. Browser-computed values were `max-width:none` and `16px` left/right padding.
+- Cases resizing: pointer movement updates CSS variables in animation frames without re-rendering the 240-row list on every event; React state and persistence commit once after the gesture. Keyboard QA changed repository width from 230px to 278px and detail width from 510px to 531px while preserving the 420px list floor.
+- Motion: repository, detail, handles, shell navigation, brand area, nav collections, and utility controls use the shared restrained easing. Direct pointer drag remains one-to-one by disabling interpolation only while the pointer is held; programmatic, keyboard, breakpoint, and burger transitions animate over 170–240ms.
+- Accessibility: both resize separators remain keyboard-operable; the full integration label is exposed; no semantic role or visible focus treatment was removed.
+- Browser console: no application error occurred during Cases, Dashboard, Reports, sidebar, or keyboard-resize QA. The only warning is the existing unrelated investor stylesheet Autoprefixer notice.
+- Security cleanup: the temporary local design-preview authentication condition was removed before final verification; the auth boundary has zero diff.
+
+final result: passed

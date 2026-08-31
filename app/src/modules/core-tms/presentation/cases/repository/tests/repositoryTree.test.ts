@@ -38,9 +38,10 @@ test("bounds the resizable repository without starving the case document", () =>
   assert.equal(clampCaseRepositoryWidth(500, 900), 320);
 });
 
-test("starts with a wide case document and preserves a scrollable list floor", () => {
+test("starts with a wide case document and leaves the case table horizontally scrollable", () => {
+  assert.equal(clampCaseDetailWidth(510, 1160, 230), 510);
   assert.equal(clampCaseDetailWidth(510, 1372, 230), 510);
-  assert.equal(clampCaseDetailWidth(680, 1372, 230), 622);
+  assert.equal(clampCaseDetailWidth(680, 1372, 230), 680);
   assert.equal(clampCaseDetailWidth(300, 1372, 230), 340);
   assert.equal(clampCaseDetailWidth(510, 1089, 230), 510);
 });

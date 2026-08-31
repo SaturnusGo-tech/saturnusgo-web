@@ -76,6 +76,9 @@
   flex: 0 0 var(--case-repository-width, 230px);
   background: var(--cases-bg);
   border-right: 1px solid var(--cases-border);
+  transition:
+    width 170ms cubic-bezier(.2, .72, .3, 1),
+    flex-basis 170ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .repository {
@@ -320,6 +323,7 @@
   width: 7px;
   cursor: col-resize;
   touch-action: none;
+  transition: left 170ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .resizeHandle::after {
@@ -376,6 +380,7 @@
 
 .primaryButton,
 .runButton { color: var(--cases-on-primary); background: var(--cases-primary); border: 1px solid var(--cases-primary); }
+.workspace :is(.primaryButton, .runButton) { color: var(--cases-on-primary); }
 .primaryButton:hover,
 .runButton:hover { background: #2d68dc; border-color: #2d68dc; }
 .secondaryButton { color: var(--cases-secondary-text); background: var(--cases-hover); border: 1px solid var(--cases-control-border); }
@@ -493,11 +498,11 @@
 .titleCellContent { min-width: 0; display: flex; align-items: center; }
 .keyCellContent { gap: 7px; }
 .keyCellContent strong { min-width: 0; overflow: hidden; font-size: 12px; font-weight: 600; text-overflow: ellipsis; }
-.caseTypeMark { width: 21px; height: 21px; display: grid; place-items: center; flex: 0 0 auto; color: var(--cases-icon); background: var(--cases-icon-bg); border-radius: 3px; }
-.mark_ready { color: #89d3a6; }
-.mark_draft { color: #e5bd6a; }
+.caseTypeMark { width: 21px; height: 21px; display: grid; place-items: center; flex: 0 0 auto; color: var(--cases-icon); background: var(--cases-icon-bg); border: 1px solid transparent; border-radius: 3px; }
+.mark_ready { color: #237447; background: #e5f4eb; border-color: #9bcbae; }
+.mark_draft { color: #805b08; background: #fff3cf; border-color: #dbbd64; }
 .mark_deprecated,
-.mark_archived { color: #8d9097; }
+.mark_archived { color: #5f646c; background: #eff0f2; border-color: #bfc2c8; }
 
 .titleCellContent { gap: 8px; }
 .titleCellContent strong { min-width: 0; flex: 1 1 auto; overflow: hidden; color: var(--cases-strong); font-size: 13px; font-weight: 500; text-overflow: ellipsis; }
@@ -526,10 +531,15 @@
 .lifecycle_draft { color: #755210; background: #fff7df; border-color: #ddc581; }
 .lifecycle_deprecated,
 .lifecycle_archived { color: #555960; background: #f0f1f3; border-color: #c9cbd0; }
-.priority_low { color: var(--cases-icon); background: var(--cases-control); border-color: var(--cases-control-border); }
-.priority_medium { color: #294f9f; background: #edf3ff; border-color: #b8c9eb; }
-.priority_high { color: #7a4b00; background: #fff4de; border-color: #e0be78; }
-.priority_critical { color: #9c2f2f; background: #fff0f0; border-color: #e3adad; }
+.priority_low { color: #50555d; background: #f0f1f3; border-color: #b9bcc3; }
+.priority_medium { color: #1f55ae; background: #e7efff; border-color: #89a8e6; }
+.priority_high { color: #7b3500; background: #ffedd3; border-color: #df9940; }
+.priority_critical { color: #a51d24; background: #fde7e8; border-color: #de777d; }
+
+:global(.dark) .mark_ready { color: #89d3a6; background: rgba(68, 154, 102, .18); border-color: rgba(87, 177, 122, .35); }
+:global(.dark) .mark_draft { color: #e5bd6a; background: rgba(190, 139, 45, .16); border-color: rgba(213, 160, 63, .32); }
+:global(.dark) .mark_deprecated,
+:global(.dark) .mark_archived { color: #b4b6bc; background: rgba(141, 144, 151, .14); border-color: rgba(141, 144, 151, .3); }
 
 :global(.dark) .lifecycle_ready { color: #9bd7b3; background: rgba(68, 154, 102, .18); border-color: rgba(87, 177, 122, .35); }
 :global(.dark) .lifecycle_draft { color: #e5bd6a; background: rgba(190, 139, 45, .16); border-color: rgba(213, 160, 63, .32); }
@@ -570,6 +580,9 @@
   overflow: hidden;
   background: var(--cases-bg);
   border-left: 1px solid var(--cases-border);
+  transition:
+    width 170ms cubic-bezier(.2, .72, .3, 1),
+    flex-basis 170ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .detailResizeHandle {
@@ -581,6 +594,7 @@
   width: 7px;
   cursor: col-resize;
   touch-action: none;
+  transition: right 170ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .detailResizeHandle::after {
@@ -595,6 +609,7 @@
 
 .detailResizeHandle:hover::after,
 .detailResizeHandle:focus-visible::after { width: 2px; background: var(--cases-primary); }
+.workspaceResizing :is(.repositoryColumn, .detailPanel, .resizeHandle, .detailResizeHandle) { transition: none; }
 .detailScrim { display: none; }
 
 .detailPanelInner { min-height: 0; height: 100%; display: flex; flex-direction: column; }

@@ -1,4 +1,5 @@
 .page { max-width: 1240px; color: #102039; background: #fff; animation: reports-enter 160ms ease-out; }
+.page.page { max-width: none; margin-inline: 0; padding-inline: 16px; }
 .header { min-height: 94px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding-bottom: 22px; border-bottom: 1px solid #dfe3e8; }
 .header > div { min-width: 0; }
 .header h1 { margin: 0; font-size: 28px; line-height: 1.2; letter-spacing: -.025em; }

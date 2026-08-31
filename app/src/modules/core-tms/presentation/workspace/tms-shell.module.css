@@ -200,6 +200,7 @@
     radial-gradient(ellipse 430px 700px at -76px 92px, #172352 0%, #172244 33%, #171d2d 54%, #18191b 78%),
     #18191b;
   border-right: 1px solid #43454a;
+  will-change: width, flex-basis;
   transition:
     width 240ms cubic-bezier(.2, .72, .3, 1),
     flex-basis 240ms cubic-bezier(.2, .72, .3, 1);
@@ -226,6 +227,7 @@
   padding: 0 14px;
   overflow: hidden;
   border-bottom: 1px solid rgb(78 81 87 / 72%);
+  transition: width 240ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .brandButton {
@@ -290,6 +292,7 @@
   padding: 12px 10px 8px;
   scrollbar-color: #4b4e54 transparent;
   scrollbar-width: thin;
+  transition: width 240ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .navigationItem,
@@ -306,7 +309,10 @@
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
-  transition: color 140ms ease, background-color 140ms ease;
+  transition:
+    width 240ms cubic-bezier(.2, .72, .3, 1),
+    color 140ms ease,
+    background-color 140ms ease;
 }
 
 .navigationItem + .navigationItem {
@@ -336,6 +342,12 @@
 
 .navigationItem[data-testid="nav-config"] {
   display: none;
+}
+
+.navigationItem[data-testid="nav-integrations"] .navigationLabel {
+  line-height: 1.15;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .navigationIcon {
@@ -377,6 +389,7 @@
   flex: 0 0 auto;
   padding: 8px 10px 2px;
   overflow: visible;
+  transition: width 240ms cubic-bezier(.2, .72, .3, 1);
 }
 
 .navigationCreateSlot {
@@ -399,7 +412,10 @@
   cursor: pointer;
   font: inherit;
   text-align: left;
-  transition: color 140ms ease, background-color 140ms ease;
+  transition:
+    width 240ms cubic-bezier(.2, .72, .3, 1),
+    color 140ms ease,
+    background-color 140ms ease;
 }
 
 .navigationUtilityButton:hover {
