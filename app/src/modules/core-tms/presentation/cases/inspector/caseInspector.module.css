@@ -49,10 +49,10 @@
 }
 .sectionBody > p { margin: 0; color: var(--cases-secondary-text); font-size: 12px; line-height: 1.55; white-space: pre-wrap; }
 .sectionBody .empty { color: var(--cases-faint); font-style: italic; }
-.section textarea, .section input { width: 100%; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; font: inherit; outline: 0; }
-.section textarea { min-height: 68px; resize: vertical; padding: 8px; line-height: 1.45; }
-.section input { height: 32px; padding: 0 8px; }
-.section :is(textarea, input):focus { border-color: var(--cases-primary); box-shadow: 0 0 0 1px var(--cases-primary); }
+.compactFields > label > :is(textarea, input) { width: 100%; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; font: inherit; outline: 0; }
+.compactFields > label > textarea { min-height: 68px; resize: vertical; padding: 8px; line-height: 1.45; }
+.compactFields > label > input { height: 32px; padding: 0 8px; }
+.compactFields > label > :is(textarea, input):focus { border-color: var(--cases-link); box-shadow: none; }
 .sectionActions { display: flex; justify-content: flex-end; gap: 5px; padding: 0 14px 10px; }
 .sectionActions button, .addButton { min-height: 27px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 8px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
 .sectionActions .saveButton { color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
@@ -60,6 +60,7 @@
 .compactFields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .compactFields label { min-width: 0; display: grid; gap: 4px; }
 .compactFields label > span, .editStep label > span { color: var(--cases-muted); font-size: 10px; }
+.wideField { grid-column: 1 / -1; }
 .compactSummary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
 .compactSummary > div { min-width: 0; }
 .compactSummary dt { color: var(--cases-muted); font-size: 10px; }
@@ -68,8 +69,7 @@
 .steps { margin: 0; padding: 0; list-style: none; }
 .steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; margin-bottom: 6px; padding: 9px 10px; background: var(--cases-raised); border: 1px solid var(--cases-border); border-radius: 4px; }
 .steps li > span, .editStep > b { width: 20px; height: 20px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-icon-bg); border-radius: 3px; font-size: 10px; font-weight: 600; }
-.steps strong { color: var(--cases-strong); font-size: 12px; font-weight: 500; line-height: 1.45; }
-.steps p { display: grid; gap: 2px; margin: 7px 0 0; padding-left: 7px; color: var(--cases-secondary-text); border-left: 2px solid var(--cases-link); font-size: 11px; line-height: 1.4; }
+.stepResult { display: grid; gap: 2px; margin: 7px 0 0; padding-left: 7px; color: var(--cases-secondary-text); border-left: 2px solid var(--cases-link); font-size: 11px; line-height: 1.4; }
 .steps em { color: var(--cases-muted); font-size: 10px; font-style: normal; }
 .stepEditor { display: grid; gap: 7px; }
 .editStep { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 7px; padding: 9px 36px 9px 9px; background: var(--cases-raised); border: 1px solid var(--cases-border); border-radius: 4px; }

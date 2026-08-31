@@ -3,15 +3,11 @@ import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { InspectorDetails } from "./details/InspectorDetails";
+import { MarkdownField } from "./markdown/MarkdownField";
 import { InspectorSectionView } from "./section/InspectorSectionView";
 import { InspectorSteps } from "./steps/InspectorSteps";
 import type { CaseInspectorEditor, InspectorSection } from "./model";
-import {
-  copyInspectorRevision,
-  inspectorSectionForMode,
-  isInspectorSectionEditing,
-  restoreInspectorSection,
-} from "./model";
+import { copyInspectorRevision, isInspectorSectionEditing, restoreInspectorSection } from "./model";
 import css from "./caseInspector.module.css";
 type Props = {
   locale: TmsLocale;
@@ -22,45 +18,54 @@ type Props = {
 export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }: Props) {
   const ru = locale === "ru";
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
-  const [editing, setEditing] = useState<InspectorSection | null>(
-    inspectorSectionForMode(editor?.mode),
-  );
-  const snapshot = useRef(copyInspectorRevision(revision));
-  const folderSnapshot = useRef(editor?.folderPath ?? "");
+  const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
+  const snapshots = useRef<Partial<Record<InspectorSection, TestCaseRevision>>>({});
+  const folderSnapshots = useRef<Partial<Record<InspectorSection, string>>>({});
   const value = editor?.value ?? visible;
   const editorMode = editor?.mode;
   const creating = editorMode === "create";
   useEffect(() => { setVisible(copyInspectorRevision(revision)); }, [revision]);
-  useEffect(() => { if (!editor && editing) setEditing(null); }, [editor, editing]);
   useEffect(() => {
-    if (editorMode !== "create" || !editor) return;
-    snapshot.current = copyInspectorRevision(editor.value);
-    folderSnapshot.current = editor.folderPath;
-    setEditing(inspectorSectionForMode(editorMode));
-  }, [editorMode]);
+    if (editor) return;
+    setEditing(new Set());
+    snapshots.current = {};
+    folderSnapshots.current = {};
+  }, [editor]);
   function begin(section: InspectorSection) {
-    snapshot.current = copyInspectorRevision(value);
-    folderSnapshot.current = editor?.folderPath ?? "";
-    setEditing(section);
+    snapshots.current[section] = copyInspectorRevision(value);
+    folderSnapshots.current[section] = editor?.folderPath ?? "";
+    setEditing((current) => new Set(current).add(section));
     if (!editor) onRequestEdit();
   }
   function patch(next: Partial<TestCaseRevision>) {
     if (editor) editor.onChange({ ...editor.value, ...next });
   }
   function cancel(section: InspectorSection) {
-    if (editor) {
-      editor.onChange(restoreInspectorSection(editor.value, snapshot.current, section));
-      if (section === "component") editor.onFolderPath(folderSnapshot.current);
+    const snapshot = snapshots.current[section];
+    if (editor && snapshot) {
+      editor.onChange(restoreInspectorSection(editor.value, snapshot, section));
+      if (section === "component") {
+        editor.onFolderPath(folderSnapshots.current[section] ?? editor.folderPath);
+      }
     }
-    setEditing(null);
+    closeSection(section);
   }
-  function saveSection() {
+  function closeSection(section: InspectorSection) {
+    delete snapshots.current[section];
+    delete folderSnapshots.current[section];
+    setEditing((current) => {
+      const next = new Set(current);
+      next.delete(section);
+      return next;
+    });
+  }
+  function saveSection(section: InspectorSection) {
     setVisible(copyInspectorRevision(value));
-    setEditing(null);
+    closeSection(section);
   }
   const controls = (section: InspectorSection) => ({
     section,
-    editing: creating ? section : editing,
+    editing: creating || editing.has(section),
     persistentEditing: creating,
     ru,
     onEdit: begin,
@@ -84,17 +89,14 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
       </label>
     </div>}
     <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
-      {sectionEditing("description") && editor
-        ? <textarea
-            autoFocus={!creating}
-            aria-label={ru ? "Описание" : "Description"}
-            rows={4}
-            value={value.description}
-            onChange={(event) => patch({ description: event.target.value })}
-          />
-        : <p className={!value.description ? css.empty : ""}>
-            {value.description || (ru ? "Описание не указано" : "No description")}
-          </p>}
+      <MarkdownField
+        value={value.description}
+        label={ru ? "Описание" : "Description"}
+        autoFocus={!creating}
+        onChange={sectionEditing("description") && editor
+          ? (description) => patch({ description }) : undefined}
+        emptyLabel={ru ? "Описание не указано" : "No description"}
+      />
     </InspectorSectionView>
     <InspectorSectionView
       title={ru ? "Функциональность" : "Functionality"}
@@ -135,19 +137,14 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
       editLabel={ru ? "Изменить условия" : "Edit conditions"}
       {...controls("preconditions")}
     >
-      {sectionEditing("preconditions") && editor
-        ? <textarea
-            autoFocus={!creating}
-            aria-label={ru ? "Предусловия" : "Preconditions"}
-            rows={4}
-            value={value.preconditions}
-            onChange={(event) => patch({ preconditions: event.target.value })}
-          />
-        : <p className={!value.preconditions ? css.empty : ""}>
-            {value.preconditions || (
-              ru ? "Предусловия не указаны" : "No preconditions specified"
-            )}
-          </p>}
+      <MarkdownField
+        value={value.preconditions}
+        label={ru ? "Предусловия" : "Preconditions"}
+        autoFocus={!creating}
+        onChange={sectionEditing("preconditions") && editor
+          ? (preconditions) => patch({ preconditions }) : undefined}
+        emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"}
+      />
     </InspectorSectionView>
     <InspectorSectionView
       title={ru ? "Данные выполнения" : "Execution details"}

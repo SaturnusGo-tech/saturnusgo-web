@@ -4958,12 +4958,14 @@
 .app .toast { color: #ffffff; background: #2b2d30; border-color: #43454a; border-radius: var(--radius-control); box-shadow: 0 8px 20px rgb(0 0 0 / 18%); }
 
 :global(.dark) .app {
-  --yt-content: #1e1f22;
+  --yt-content: #2d2b35;
+  --yt-deep: #25232c;
+  --yt-raised: #34323c;
   --yt-chrome: #18191b;
-  --yt-control: #2b2d30;
-  --yt-control-hover: #393b40;
-  --yt-border: #43454a;
-  --yt-border-strong: #4e5157;
+  --yt-control: #302e38;
+  --yt-control-hover: var(--yt-raised);
+  --yt-border: #4a4853;
+  --yt-border-strong: #57545f;
   --yt-text: #ffffff;
   --yt-muted: #9da0a8;
   --yt-primary: #3574f0;
@@ -4976,10 +4978,10 @@
   --muted: var(--yt-muted);
   --line: var(--yt-border);
   --line-strong: var(--yt-border-strong);
-  --canvas: var(--yt-content);
+  --canvas: var(--yt-deep);
   --paper: var(--yt-content);
   --nav: var(--yt-chrome);
-  --nav-raised: var(--yt-control);
+  --nav-raised: var(--yt-raised);
   --nav-text: var(--yt-text);
   --teal: var(--yt-primary);
   --teal-dark: var(--yt-primary-hover);

@@ -351,3 +351,20 @@ final result: passed
 - Verification: browser QA covered view, create, section edit, filters/groups, desktop, and narrow overlay states. TypeScript passed; the 223-file TMS architecture gate passed; TMS adapters/UI models passed 97/97; auth passed 27/27; attachments passed 4/4; `git diff --check` passed; production build generated 61/61 pages. The only build messages are pre-existing dependency/Autoprefixer advisories outside TMS.
 
 final result: passed
+
+## Test-case editing, filters, metadata and unified palette — final pass
+
+- Sources: the two user-supplied 1 September captures defining the compact QL/filter menus and the nine previously supplied inspector references defining inline Markdown editing, metadata chips, and a persistent right-side case document.
+- Browser evidence: `.design-qa/test-case-editor-polish/listing-dark-1440x900.jpg`, `edit-markdown-dark-1440x900.jpg`, `filters-dark-1440x900.jpg`, `ql-dark-1440x900.jpg`, and `folder-dialog-dark-1440x900.jpg`. The requested viewport was 1440×900; the in-app browser normalized the captured CSS viewport to 1297×811.
+- Combined comparisons: `.design-qa/test-case-editor-polish/comparison-edit.jpg`, `comparison-filters.jpg`, and `comparison-ql.jpg` place each supplied reference beside the corresponding implementation state. These ignored QA artifacts are not shipped.
+- Markdown editing: Description, Preconditions, execution data, checklist content, and every step action/expected result/test-data field use the same compact Markdown toolbar. Bold, italic, strike, headings, lists, quote, link, code, and safe rendered Markdown were exercised. Functionality remains a compact non-Markdown field as requested.
+- Concurrent editing: Description and Steps remained open simultaneously, and the metadata pencil opened without forcing either section to save or cancel. Each section keeps its own Apply/Cancel snapshot while one global Save/Cancel commits the case revision.
+- Focus and icons: the browser exposed and confirmed the former black toolbar-SVG fill and doubled native focus outlines. Toolbar icons now inherit the graphite theme, native textarea/search/QL outlines are removed, and the owning control renders one restrained 1px focus border with no second glow.
+- Metadata: lifecycle, priority, type, and estimate use custom keyboard listboxes rather than native platform menus. The visible and editable states share the same compact semantic chips; browser QA opened the lifecycle menu and verified the localized Draft, Ready, and Deprecated options. Archive remains a separate case action.
+- Listing controls: the former large filter canvas is replaced by a compact 264px contextual menu with independent searchable Folder and Component multiselects plus Priority, Status, Tag, Archive, and Reset controls. The folder submenu and QL `lifecycle:` autocomplete were exercised with Arrow/Home/End/Escape focus behavior.
+- Creation surfaces: the New Case/New Folder actions share one compact popup. New Folder opens as a centered 420px dialog with current graphite controls instead of the former mixed-theme oversized surface.
+- Palette: browser-computed primary stage color was `rgb(45, 43, 53)` across Test Cases, Dashboard, Integrations, Runs, Suites, Hooks, Reports, API Testing, and Settings. Screen-local legacy dark colors no longer create visible palette breaks.
+- Console and assets: browser console reported zero application errors. The only message was the pre-existing unrelated investor stylesheet Autoprefixer warning. Existing Lucide icons and TESSIQ brand assets are preserved; no improvised SVG, emoji, or CSS illustration was introduced.
+- Verification: TypeScript, TMS architecture, authentication, attachment, adapter/UI, generated-contract, production-build, and `git diff --check` gates passed after the final visual fixes.
+
+final result: passed

@@ -19,12 +19,12 @@
 
 :global(.dark) .root,
 :global(.dark) .statePage {
-  --hooks-bg: #1e1f22;
-  --hooks-raised: #2b2d30;
-  --hooks-control: #2b2d30;
-  --hooks-hover: #393b40;
-  --hooks-border: #43454a;
-  --hooks-border-strong: #4e5157;
+  --hooks-bg: #2d2b35;
+  --hooks-raised: #34323c;
+  --hooks-control: #302e38;
+  --hooks-hover: #34323c;
+  --hooks-border: #4a4853;
+  --hooks-border-strong: #57545f;
   --hooks-text: #dedfe2;
   --hooks-strong: #f4f4f5;
   --hooks-muted: #9da0a8;

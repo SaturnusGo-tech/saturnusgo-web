@@ -112,6 +112,13 @@ test("create mode exposes every section in the single inspector form", () => {
   assert.equal(isInspectorSectionEditing("edit", "description", "steps"), false);
 });
 
+test("edit mode can expose several independently editable sections", () => {
+  const active = new Set(["description", "steps"] as const);
+  assert.equal(isInspectorSectionEditing("edit", active, "description"), true);
+  assert.equal(isInspectorSectionEditing("edit", active, "steps"), true);
+  assert.equal(isInspectorSectionEditing("edit", active, "details"), false);
+});
+
 test("manual revisions require one complete step and keep the final row", () => {
   assert.equal(inspectorRevisionProblem(revision, "/Main"), null);
   assert.equal(inspectorRevisionProblem({ ...revision, steps: [] }, "/Main"), "manualSteps");

@@ -368,11 +368,11 @@
 }
 
 :global(.dark) .runPanel {
-  --builder-bg: #1e1f22;
-  --builder-control: #2b2d30;
-  --builder-hover: #393b40;
-  --builder-border: #43454a;
-  --builder-border-strong: #4e5157;
+  --builder-bg: #2d2b35;
+  --builder-control: #302e38;
+  --builder-hover: #34323c;
+  --builder-border: #4a4853;
+  --builder-border-strong: #57545f;
   --builder-text: #ffffff;
   --builder-muted: #9da0a8;
   --builder-link: #99bbff;

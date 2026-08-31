@@ -1,20 +1,45 @@
-.drawer { width: min(468px, calc(100vw - 20px)); }
+.dialog {
+  width: min(420px, calc(100vw - 24px));
+  border-radius: 5px;
+}
+
+.dialog > header {
+  min-height: 48px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dialog > header h2 {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.dialog > .form {
+  overflow: visible;
+  padding: 0;
+}
+
+.form { display: flex; flex-direction: column; }
 
 .body {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding-top: 22px;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
 }
+
+.fields { display: grid; gap: 10px; }
 
 .path {
   min-width: 0;
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr);
-  gap: 10px;
-  padding: 14px 0;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px;
   color: var(--muted);
-  border-block: 1px solid var(--line);
+  background: var(--control);
+  border: 1px solid var(--line);
+  border-radius: 4px;
 }
 
 .path > svg { margin-top: 2px; }
@@ -24,7 +49,19 @@
 .path em { color: var(--red); font-size: 11px; font-style: normal; }
 .pathError { border-color: var(--red); }
 
+.footer {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.footer button { min-height: 30px; }
+
 @media (max-width: 520px) {
-  .drawer { width: 100%; }
-  .body { padding-top: 18px; }
+  .dialog { width: calc(100vw - 16px); }
 }

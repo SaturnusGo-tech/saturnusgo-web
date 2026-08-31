@@ -1,5 +1,5 @@
 import {
-  Archive, Check, Clock3, Copy, Link2, ListChecks, Maximize2,
+  Archive, Check, Copy, Link2, ListChecks, Maximize2,
   Minimize2, Pencil, Play, RotateCcw, X,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -10,7 +10,6 @@ import type {
 } from "../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
-import { LifecycleBadge, PriorityBadge } from "../list/CaseBadges";
 import {
   editorSessionClosed,
   inspectorRevisionProblem,
@@ -19,6 +18,7 @@ import {
 import inspector from "../inspector/caseInspector.module.css";
 import { InspectorPendingAttachments } from "../inspector/attachments/InspectorPendingAttachments";
 import { CaseOverview } from "./CaseOverview";
+import { CaseMetadataControls } from "./metadata/CaseMetadataControls";
 import {
   CaseContextTab,
   type DetailTab,
@@ -160,22 +160,20 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         </div>
       </div>
       <div className={inspector.metaRow}>
-        {props.editor && (creating || headerEditing === "meta") ? <div className={inspector.metaEditor}>
-          <select autoFocus={headerEditing === "meta"} aria-label={ru ? "Статус" : "Status"} value={revision.lifecycle} onChange={(event) => props.editor?.onChange({ ...revision, lifecycle: event.target.value as TestCaseRevision["lifecycle"] })}><option value="draft">{ru ? "Черновик" : "Draft"}</option><option value="ready">{ru ? "Готов" : "Ready"}</option><option value="deprecated">{ru ? "Устарел" : "Deprecated"}</option></select>
-          <select aria-label={ru ? "Приоритет" : "Priority"} value={revision.priority} onChange={(event) => props.editor?.onChange({ ...revision, priority: event.target.value as TestCaseRevision["priority"] })}><option value="low">{ru ? "Низкий" : "Low"}</option><option value="medium">{ru ? "Средний" : "Medium"}</option><option value="high">{ru ? "Высокий" : "High"}</option><option value="critical">{ru ? "Критический" : "Critical"}</option></select>
-          <select aria-label={ru ? "Тип" : "Type"} value={revision.type} onChange={(event) => props.editor?.onChange({ ...revision, type: event.target.value as TestCaseRevision["type"] })}><option value="manual">{ru ? "Ручной" : "Manual"}</option><option value="checklist">{ru ? "Чек-лист" : "Checklist"}</option></select>
-          <input aria-label={ru ? "Оценка в минутах" : "Estimate in minutes"} type="number" min={1} value={revision.estimatedMinutes ?? ""} onChange={(event) => props.editor?.onChange({ ...revision, estimatedMinutes: event.target.value ? Number(event.target.value) : null })} />
-        </div> : <>
-          <LifecycleBadge locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase?.archivedAt)} />
-          <PriorityBadge locale={props.locale} priority={revision.priority} />
-          <span className={inspector.estimate}><Clock3 size={11} />{revision.estimatedMinutes ? `${revision.estimatedMinutes} ${ru ? "мин" : "min"}` : (ru ? "Без оценки" : "No estimate")}</span>
-        </>}
-        {!creating && !props.editor && <button ref={metaEditButton} type="button" className={inspector.iconButton} onClick={() => beginHeaderEdit("meta")} aria-label={ru ? "Изменить статус, приоритет и оценку" : "Edit status, priority, and estimate"}><Pencil size={13} /></button>}
+        <CaseMetadataControls
+          locale={props.locale}
+          revision={revision}
+          archived={Boolean(props.testCase?.archivedAt)}
+          editing={Boolean(props.editor && (creating || headerEditing === "meta"))}
+          autoFocus={headerEditing === "meta"}
+          onChange={props.editor?.onChange}
+        />
+        {!creating && headerEditing !== "meta" && <button ref={metaEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("meta")} aria-label={ru ? "Изменить статус, приоритет, тип и оценку" : "Edit status, priority, type, and estimate"}><Pencil size={13} /></button>}
       </div>
       <div className={inspector.titleRow}>
         <span className={inspector.titleMark}><ListChecks size={17} /></span>
         {props.editor && (creating || headerEditing === "title") ? <input autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <h2>{revision.title}</h2>}
-        {!creating && !props.editor && <button ref={titleEditButton} type="button" className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
+        {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
       {props.editor && <div id="case-editor-actions" tabIndex={-1} className={inspector.createActions}>
         {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}

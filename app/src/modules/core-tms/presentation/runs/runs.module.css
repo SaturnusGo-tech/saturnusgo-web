@@ -33,12 +33,12 @@
 }
 
 :global(.dark) .shell {
-  --runs-bg: #1e1f22;
-  --runs-nav: #18191b;
-  --runs-control: #2b2d30;
-  --runs-hover: #393b40;
-  --runs-border: #43454a;
-  --runs-border-strong: #4e5157;
+  --runs-bg: #2d2b35;
+  --runs-nav: #25232c;
+  --runs-control: #302e38;
+  --runs-hover: #34323c;
+  --runs-border: #4a4853;
+  --runs-border-strong: #57545f;
   --runs-text: #ffffff;
   --runs-muted: #9da0a8;
   --runs-link: #99bbff;

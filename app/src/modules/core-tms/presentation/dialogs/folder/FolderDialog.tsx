@@ -1,5 +1,6 @@
 import { Folder, FolderPlus } from "lucide-react";
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -19,19 +20,33 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated }: {
     { value: "/", label: copy.root },
     ...Array.from(new Set(existing)).sort((left, right) => left.localeCompare(right)).map((folderName) => ({ value: folderName, label: folderName })),
   ];
-  return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose} drawer panelClassName={styles.drawer}>
-    <form className={`${shared.drawerForm} ${shared.productionDrawerForm}`} onSubmit={(event) => { event.preventDefault(); if (cleanName && !duplicate) onCreated(path); }}>
-      <div className={`${shared.drawerBody} ${styles.body}`}>
-        <div className={shared.formGrid}>
-        <Field label={copy.name} wide><input required autoFocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" /></Field>
-        <Field label={copy.parent} wide><AnimatedSelect label={copy.parent} value={parent} options={parents} onChange={setParent} /></Field>
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    if (cleanName && !duplicate) onCreated(path);
+  }
+
+  return <Modal title={copy.title} onClose={onClose} panelClassName={styles.dialog}>
+    <form className={styles.form} onSubmit={submit}>
+      <div className={styles.body}>
+        <div className={styles.fields}>
+          <Field label={copy.name} wide>
+            <input required autoFocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" />
+          </Field>
+          <Field label={copy.parent} wide>
+            <AnimatedSelect label={copy.parent} value={parent} options={parents} onChange={setParent} />
+          </Field>
         </div>
         <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
           <Folder size={16} aria-hidden="true" />
           <span><small>{copy.path}</small><strong>{path}</strong>{duplicate && <em>{copy.duplicate}</em>}</span>
         </div>
       </div>
-      <div className={shared.modalFooter}><button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button><button className={shared.primaryButton} disabled={!cleanName || duplicate}><FolderPlus size={16} /> {copy.create}</button></div>
+      <div className={styles.footer}>
+        <button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button>
+        <button className={shared.primaryButton} disabled={!cleanName || duplicate}>
+          <FolderPlus size={15} /> {copy.create}
+        </button>
+      </div>
     </form>
   </Modal>;
 }

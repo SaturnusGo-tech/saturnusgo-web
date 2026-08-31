@@ -742,8 +742,9 @@
 .tabEmpty { min-height: 240px; padding: 20px; font-size: 12px; }
 
 .workspace :is(button, input, select, [tabindex]):focus-visible {
-  outline: 2px solid var(--cases-primary);
+  outline: 1px solid var(--cases-primary);
   outline-offset: -1px;
+  box-shadow: none;
 }
 
 @media (max-width: 1600px) {

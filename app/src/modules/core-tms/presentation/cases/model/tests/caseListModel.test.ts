@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import {
@@ -64,8 +65,9 @@ test("supports descending priority sorting", () => {
 });
 
 test("parses quoted QL values, aliases, and exclusions", () => {
-  assert.deepEqual(parseCaseQlQuery('status:ready component:"Web client" -tag:flaky'), [
+  assert.deepEqual(parseCaseQlQuery('status:ready lifecycle:draft component:"Web client" -tag:flaky'), [
     { field: "lifecycle", value: "ready", exclude: false },
+    { field: "lifecycle", value: "draft", exclude: false },
     { field: "component", value: "Web client", exclude: false },
     { field: "tag", value: "flaky", exclude: true },
   ]);
@@ -156,4 +158,36 @@ test("keeps one visible row tabbable when selection is filtered or collapsed", (
   assert.equal(visibleCaseTabStop(groups, new Set(), "missing"), "case-1");
   assert.equal(visibleCaseTabStop(groups, new Set(["folder:/A"]), "case-1"), "case-2");
   assert.equal(visibleCaseTabStop(groups, new Set(["folder:/A", "folder:/B"]), "case-1"), null);
+});
+
+test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", () => {
+  const toolbar = readFileSync(new URL("../../toolbar/CasesToolbar.tsx", import.meta.url), "utf8");
+  const popovers = readFileSync(new URL("../../toolbar/CasesToolbarPopovers.tsx", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
+
+  assert.match(popovers, /role="combobox"/);
+  assert.match(popovers, /aria-autocomplete="list"/);
+  assert.match(popovers, /event\.key === "ArrowDown" \|\| event\.key === "ArrowUp"/);
+  assert.match(popovers, /"ArrowDown", "ArrowUp", "Home", "End"/);
+  assert.match(popovers, /data-filter-section="folders"/);
+  assert.match(popovers, /returnSectionRef/);
+  assert.match(popovers, /status: "lifecycle"/);
+  assert.match(popovers, /role="listbox" aria-multiselectable=/);
+  assert.match(popovers, /Поиск папок/);
+  assert.match(popovers, /Поиск компонентов/);
+  assert.match(css, /\.filterPanel \{[^}]*max-height: min\(362px/s);
+  assert.match(css, /\.facetOptions \{[^}]*max-height: 244px/s);
+  assert.doesNotMatch(toolbar, /filterField|facetList/);
+});
+
+test("toolbar keeps subtle focus and editor-locked create actions", () => {
+  const toolbar = readFileSync(new URL("../../toolbar/CasesToolbar.tsx", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
+  const inputFocus = css.match(/\.inputShell:focus-within \{([^}]*)\}/)?.[1] ?? "";
+
+  assert.match(inputFocus, /border-color: var\(--cases-primary\)/);
+  assert.match(inputFocus, /box-shadow: none/);
+  assert.match(toolbar, /aria-disabled=\{props\.interactionLocked \|\| undefined\}/);
+  assert.match(toolbar, /guardCreateInteraction/);
+  assert.match(toolbar, /role="menuitem"/);
 });

@@ -4,6 +4,7 @@ import type {
   TestStep,
 } from "../../../../../../core/tms/contracts/legacy-contract";
 import { canRemoveInspectorRow } from "../model";
+import { MarkdownField } from "../markdown/MarkdownField";
 import css from "../caseInspector.module.css";
 
 type Props = {
@@ -65,15 +66,19 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
       {rows.map((step) => <li key={step.id}>
         <span>{step.order}</span>
         <div>
-          <strong>{step.action}</strong>
-          {step.expectedResult && <p>
+          <MarkdownField
+            value={step.action}
+            label={ru ? "Действие" : "Action"}
+            emptyLabel={ru ? "Действие не указано" : "No action"}
+          />
+          {step.expectedResult && <div className={css.stepResult}>
             <em>{ru ? "Ожидаемый результат" : "Expected result"}</em>
-            {step.expectedResult}
-          </p>}
-          {step.testData && <p>
+            <MarkdownField value={step.expectedResult} label={ru ? "Ожидаемый результат" : "Expected result"} />
+          </div>}
+          {step.testData && <div className={css.stepResult}>
             <em>{ru ? "Тестовые данные" : "Test data"}</em>
-            {step.testData}
-          </p>}
+            <MarkdownField value={step.testData} label={ru ? "Тестовые данные" : "Test data"} />
+          </div>}
         </div>
       </li>)}
     </ol>;
@@ -83,14 +88,14 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
     {revision.type === "checklist"
       ? revision.checklist.map((item, index) => <div className={css.editStep} key={item.id}>
           <b>{index + 1}</b>
-          <textarea
+          <MarkdownField
+            compact
             autoFocus={autoFocus && index === 0}
-            aria-label={`${ru ? "Пункт" : "Item"} ${index + 1}`}
-            rows={2}
+            label={`${ru ? "Пункт" : "Item"} ${index + 1}`}
             value={item.text}
-            onChange={(event) => onPatch({
+            onChange={(text) => onPatch({
               checklist: revision.checklist.map((entry) =>
-                entry.id === item.id ? { ...entry, text: event.target.value } : entry,
+                entry.id === item.id ? { ...entry, text } : entry,
               ),
             })}
           />
@@ -114,27 +119,30 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
           <b>{index + 1}</b>
           <label>
             <span>{ru ? "Действие" : "Action"}</span>
-            <textarea
+            <MarkdownField
+              compact
               autoFocus={autoFocus && index === 0}
-              rows={2}
+              label={`${ru ? "Действие" : "Action"} ${index + 1}`}
               value={step.action}
-              onChange={(event) => updateStep(step.id, { action: event.target.value })}
+              onChange={(action) => updateStep(step.id, { action })}
             />
           </label>
           <label>
             <span>{ru ? "Ожидаемый результат" : "Expected result"}</span>
-            <textarea
-              rows={2}
+            <MarkdownField
+              compact
+              label={`${ru ? "Ожидаемый результат" : "Expected result"} ${index + 1}`}
               value={step.expectedResult}
-              onChange={(event) => updateStep(step.id, { expectedResult: event.target.value })}
+              onChange={(expectedResult) => updateStep(step.id, { expectedResult })}
             />
           </label>
           <label>
             <span>{ru ? "Тестовые данные" : "Test data"}</span>
-            <textarea
-              rows={2}
+            <MarkdownField
+              compact
+              label={`${ru ? "Тестовые данные" : "Test data"} ${index + 1}`}
               value={step.testData ?? ""}
-              onChange={(event) => updateStep(step.id, { testData: event.target.value })}
+              onChange={(testData) => updateStep(step.id, { testData })}
             />
           </label>
           <label className={css.requiredToggle}>

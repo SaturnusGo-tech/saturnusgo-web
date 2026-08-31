@@ -7,20 +7,20 @@ type Props = {
   title: string;
   editLabel?: string;
   section: InspectorSection;
-  editing: InspectorSection | null;
+  editing: boolean;
   persistentEditing?: boolean;
   ru: boolean;
   count?: number;
   disabled?: boolean;
   onEdit: (section: InspectorSection) => void;
   onCancel: (section: InspectorSection) => void;
-  onSave: () => void;
+  onSave: (section: InspectorSection) => void;
   children: React.ReactNode;
 };
 
 export function InspectorSectionView(props: Props) {
   const editButton = useRef<HTMLButtonElement>(null);
-  const active = props.editing === props.section;
+  const active = props.editing;
   function restoreFocus() {
     requestAnimationFrame(() => editButton.current?.focus());
   }
@@ -31,7 +31,7 @@ export function InspectorSectionView(props: Props) {
   }
   function save() {
     if (props.disabled) return;
-    props.onSave();
+    props.onSave(props.section);
     restoreFocus();
   }
   return <section
@@ -50,7 +50,7 @@ export function InspectorSectionView(props: Props) {
         ref={editButton}
         type="button"
         className={css.iconButton}
-        disabled={props.editing !== null || props.disabled}
+        disabled={props.disabled}
         onClick={() => props.onEdit(props.section)}
         aria-label={props.editLabel ?? `${props.ru ? "Изменить" : "Edit"} ${props.title}`}
         title={props.editLabel ?? `${props.ru ? "Изменить" : "Edit"} ${props.title}`}

@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+
+const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
+const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
+const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
+const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
+
+test("markdown fields use an edit-only toolbar and never render raw HTML", () => {
+  assert.match(source, /preview="edit"/);
+  assert.match(source, /extraCommands=\{\[\]\}/);
+  assert.match(source, /commands\.bold/);
+  assert.match(source, /commands\.orderedListCommand/);
+  assert.match(source, /urlTransform=\{safeUrl\}/);
+  assert.equal(source.match(/skipHtml/g)?.length, 2);
+});
+
+test("rich text is scoped to narrative test-case fields", () => {
+  assert.match(content, /value=\{value\.description\}/);
+  assert.match(content, /value=\{value\.preconditions\}/);
+  assert.match(details, /value=\{revision\.testData\}/);
+  assert.match(steps, /value=\{step\.action\}/);
+  assert.doesNotMatch(content, /<MarkdownField[^>]+value=\{value\.component\}/s);
+});

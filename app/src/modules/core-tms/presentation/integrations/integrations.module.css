@@ -24,12 +24,12 @@
 }
 
 :global(.dark) .page {
-  --integration-bg: #1e1f22;
-  --integration-raised: #2b2d30;
-  --integration-control: #2b2d30;
-  --integration-hover: #393b40;
-  --integration-border: #43454a;
-  --integration-border-strong: #4e5157;
+  --integration-bg: #2d2b35;
+  --integration-raised: #34323c;
+  --integration-control: #302e38;
+  --integration-hover: #34323c;
+  --integration-border: #4a4853;
+  --integration-border-strong: #57545f;
   --integration-text: #dedfe2;
   --integration-strong: #f4f4f5;
   --integration-muted: #9da0a8;

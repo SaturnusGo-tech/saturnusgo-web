@@ -17,10 +17,11 @@ export function inspectorSectionForMode(mode?: CaseInspectorEditor["mode"]) {
 
 export function isInspectorSectionEditing(
   mode: CaseInspectorEditor["mode"] | undefined,
-  active: InspectorSection | null,
+  active: InspectorSection | ReadonlySet<InspectorSection> | null,
   section: InspectorSection,
 ) {
-  return mode === "create" || active === section;
+  return mode === "create" || active === section
+    || (typeof active === "object" && active !== null && active.has(section));
 }
 
 export function inspectorTabsForMode(creating: boolean): InspectorTabId[] {
