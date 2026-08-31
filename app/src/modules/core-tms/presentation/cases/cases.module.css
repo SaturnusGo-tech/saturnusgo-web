@@ -19,7 +19,7 @@
   --cases-link: #315fba;
   --cases-on-primary: #fff;
   --cases-primary: #3574f0;
-  --case-repository-width: 230px;
+  --case-repository-width: 280px;
   --case-detail-width: 510px;
   height: 100%;
   min-width: 0;
@@ -69,11 +69,11 @@
 
 .repositoryColumn {
   position: relative;
-  width: var(--case-repository-width, 230px);
+  width: var(--case-repository-width, 280px);
   min-width: 230px;
-  max-width: 320px;
+  max-width: 480px;
   min-height: 0;
-  flex: 0 0 var(--case-repository-width, 230px);
+  flex: 0 0 var(--case-repository-width, 280px);
   background: var(--cases-bg);
   border-right: 1px solid var(--cases-border);
   transition:
@@ -318,7 +318,7 @@
   position: absolute;
   z-index: 9;
   top: 0;
-  left: calc(var(--case-repository-width, 230px) - 4px);
+  left: calc(var(--case-repository-width, 280px) - 4px);
   bottom: 0;
   width: 7px;
   cursor: col-resize;
@@ -778,7 +778,7 @@
   .mobileBackButton { display: grid; }
 }
 
-@container cases-workspace (max-width: 559px) {
+@container cases-workspace (max-width: 649px) {
   .repositoryColumn { display: none; }
   .resizeHandle { display: none; }
 }

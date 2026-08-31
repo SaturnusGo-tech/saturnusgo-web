@@ -51,6 +51,8 @@ export const ruShellMessages = {
   "nav.notifications": "Уведомления",
   "nav.expandSidebar": "Раскрыть навигацию",
   "nav.collapseSidebar": "Свернуть навигацию",
+  "nav.expandSidebarShort": "Раскрыть",
+  "nav.collapseSidebarShort": "Свернуть",
   "header.openDashboard": "Открыть дашборд",
   "header.toggleNavigation": "Свернуть или раскрыть навигацию",
   "header.dashboard": "Дашборд",

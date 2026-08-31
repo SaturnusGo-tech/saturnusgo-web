@@ -1,30 +1,25 @@
 import type { CSSProperties, KeyboardEvent, PointerEvent, RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
+import {
+  CASE_DETAIL_DEFAULT,
+  CASE_DETAIL_MAX,
+  CASE_DETAIL_MIN,
+  CASE_REPOSITORY_DEFAULT,
+  CASE_REPOSITORY_MAX,
+  CASE_REPOSITORY_MIN,
+  clampCaseDetailPreference,
+  clampCaseRepositoryPreference,
+  resolveCasePaneWidths,
+} from "./caseRepositoryGeometry";
 
-export const CASE_REPOSITORY_DEFAULT = 230;
-export const CASE_REPOSITORY_MIN = 230;
-export const CASE_REPOSITORY_MAX = 320;
-export const CASE_DETAIL_DEFAULT = 510;
-export const CASE_DETAIL_MIN = 340;
-export const CASE_DETAIL_MAX = 680;
-export const CASE_LIST_MIN = 420;
-export const CASE_REPOSITORY_VISIBLE_MIN = CASE_REPOSITORY_MIN + CASE_LIST_MIN;
-export const CASE_INLINE_MIN = 1090;
-const CASE_DOCUMENT_MIN = CASE_LIST_MIN;
-const REPOSITORY_STORAGE_KEY = "tms.cases.repository-width.v1";
+const REPOSITORY_STORAGE_KEY = "tms.cases.repository-width.v2";
 const DETAIL_STORAGE_KEY = "tms.cases.detail-width.v2";
-export function clampCaseRepositoryWidth(value: number, containerWidth: number) {
-  const available = containerWidth > 0
-    ? Math.max(CASE_REPOSITORY_MIN, containerWidth - CASE_DOCUMENT_MIN)
-    : CASE_REPOSITORY_MAX;
-  return Math.round(Math.min(Math.max(value, CASE_REPOSITORY_MIN), CASE_REPOSITORY_MAX, available));
-}
-export function clampCaseDetailWidth(value: number, containerWidth: number, repositoryWidth: number) {
-  const available = containerWidth >= CASE_INLINE_MIN
-    ? Math.max(CASE_DETAIL_MIN, containerWidth - repositoryWidth - CASE_LIST_MIN)
-    : CASE_DETAIL_MAX;
-  return Math.round(Math.min(Math.max(value, CASE_DETAIL_MIN), CASE_DETAIL_MAX, available));
-}
+export {
+  CASE_DETAIL_MAX, CASE_DETAIL_MIN, CASE_REPOSITORY_MAX, CASE_REPOSITORY_MIN,
+  clampCaseDetailWidth, clampCaseRepositoryWidth, resolveCasePaneWidths,
+} from "./caseRepositoryGeometry";
+
+type ResizeKind = "repository" | "detail";
 
 function readStoredWidth(key: string, fallback: number) {
   try {
@@ -44,46 +39,45 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
   const [resizing, setResizing] = useState(false);
   const widthRef = useRef(width);
   const detailWidthRef = useRef(detailWidth);
-  const dragRef = useRef<{ kind: "repository" | "detail"; pointerId: number; startX: number; startWidth: number } | null>(null);
+  const preferredWidthRef = useRef(width);
+  const preferredDetailWidthRef = useRef(detailWidth);
+  const dragRef = useRef<{ kind: ResizeKind; pointerId: number; startX: number; startWidth: number } | null>(null);
   const frameRef = useRef<number | null>(null);
   const resizeCommitRef = useRef<number | null>(null);
-  const pendingRef = useRef<{ repository: number; detail: number } | null>(null);
+  const pendingRef = useRef<{ repository: number; detail: number; remember: ResizeKind | null } | null>(null);
 
   function containerWidth() {
     return containerRef.current?.getBoundingClientRect().width ?? window.innerWidth;
   }
-  function update(repository: number, detail: number, commit = true) {
+  function update(repository: number, detail: number, commit = true, remember: ResizeKind | null = null) {
     const available = containerWidth();
-    let boundedRepository = clampCaseRepositoryWidth(repository, available);
-    if (available >= CASE_REPOSITORY_VISIBLE_MIN) {
-      boundedRepository = Math.min(
-        boundedRepository,
-        Math.max(
-          CASE_REPOSITORY_MIN,
-          available - CASE_LIST_MIN - (available >= CASE_INLINE_MIN ? CASE_DETAIL_MIN : 0),
-        ),
-      );
+    if (remember === "repository") {
+      repository = clampCaseRepositoryPreference(repository);
+      preferredWidthRef.current = repository;
+    } else if (remember === "detail") {
+      detail = clampCaseDetailPreference(detail);
+      preferredDetailWidthRef.current = detail;
     }
-    const boundedDetail = clampCaseDetailWidth(detail, available, boundedRepository);
-    widthRef.current = boundedRepository;
-    detailWidthRef.current = boundedDetail;
-    containerRef.current?.style.setProperty("--case-repository-width", `${boundedRepository}px`);
-    containerRef.current?.style.setProperty("--case-detail-width", `${boundedDetail}px`);
+    const bounded = resolveCasePaneWidths(repository, detail, available);
+    widthRef.current = bounded.repository;
+    detailWidthRef.current = bounded.detail;
+    containerRef.current?.style.setProperty("--case-repository-width", `${bounded.repository}px`);
+    containerRef.current?.style.setProperty("--case-detail-width", `${bounded.detail}px`);
     if (commit) {
-      setWidth(boundedRepository);
-      setDetailWidth(boundedDetail);
+      setWidth(bounded.repository);
+      setDetailWidth(bounded.detail);
     }
-    return { repository: boundedRepository, detail: boundedDetail };
+    return bounded;
   }
 
-  function queueUpdate(repository: number, detail: number) {
-    pendingRef.current = { repository, detail };
+  function queueUpdate(repository: number, detail: number, remember: ResizeKind | null = null) {
+    pendingRef.current = { repository, detail, remember };
     if (frameRef.current !== null) return;
     frameRef.current = window.requestAnimationFrame(() => {
       frameRef.current = null;
       const pending = pendingRef.current;
       pendingRef.current = null;
-      if (pending) update(pending.repository, pending.detail, false);
+      if (pending) update(pending.repository, pending.detail, false, pending.remember);
     });
   }
 
@@ -92,20 +86,19 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
     frameRef.current = null;
     const pending = pendingRef.current;
     pendingRef.current = null;
-    if (pending) update(pending.repository, pending.detail, false);
+    if (pending) update(pending.repository, pending.detail, false, pending.remember);
     setWidth(widthRef.current);
     setDetailWidth(detailWidthRef.current);
   }
 
   useEffect(() => {
-    update(
-      readStoredWidth(REPOSITORY_STORAGE_KEY, CASE_REPOSITORY_DEFAULT),
-      readStoredWidth(DETAIL_STORAGE_KEY, CASE_DETAIL_DEFAULT),
-    );
+    preferredWidthRef.current = clampCaseRepositoryPreference(readStoredWidth(REPOSITORY_STORAGE_KEY, CASE_REPOSITORY_DEFAULT));
+    preferredDetailWidthRef.current = clampCaseDetailPreference(readStoredWidth(DETAIL_STORAGE_KEY, CASE_DETAIL_DEFAULT));
+    update(preferredWidthRef.current, preferredDetailWidthRef.current);
     const target = containerRef.current;
     if (!target || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => {
-      queueUpdate(widthRef.current, detailWidthRef.current);
+      queueUpdate(preferredWidthRef.current, preferredDetailWidthRef.current);
       if (resizeCommitRef.current !== null) window.clearTimeout(resizeCommitRef.current);
       resizeCommitRef.current = window.setTimeout(flushUpdate, 180);
     });
@@ -117,7 +110,7 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
     };
   }, []);
 
-  function onPointerDown(kind: "repository" | "detail", event: PointerEvent<HTMLDivElement>) {
+  function onPointerDown(kind: ResizeKind, event: PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) return;
     dragRef.current = {
       kind,
@@ -135,8 +128,9 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
     if (!drag || drag.pointerId !== event.pointerId) return;
     const delta = event.clientX - drag.startX;
     queueUpdate(
-      drag.kind === "repository" ? drag.startWidth + delta : widthRef.current,
-      drag.kind === "detail" ? drag.startWidth - delta : detailWidthRef.current,
+      drag.kind === "repository" ? drag.startWidth + delta : preferredWidthRef.current,
+      drag.kind === "detail" ? drag.startWidth - delta : preferredDetailWidthRef.current,
+      drag.kind,
     );
   }
 
@@ -147,10 +141,10 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
     flushUpdate();
     setResizing(false);
     const key = drag.kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY;
-    persistWidth(key, drag.kind === "repository" ? widthRef.current : detailWidthRef.current);
+    persistWidth(key, drag.kind === "repository" ? preferredWidthRef.current : preferredDetailWidthRef.current);
   }
 
-  function onKeyDown(kind: "repository" | "detail", event: KeyboardEvent<HTMLDivElement>) {
+  function onKeyDown(kind: ResizeKind, event: KeyboardEvent<HTMLDivElement>) {
     const direction = event.key === "ArrowLeft" ? -16 : event.key === "ArrowRight" ? 16 : 0;
     if (!direction && event.key !== "Home" && event.key !== "End") return;
     event.preventDefault();
@@ -159,21 +153,28 @@ export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement |
     const current = kind === "repository" ? widthRef.current : detailWidthRef.current;
     const arrowStep = kind === "detail" ? -direction : direction;
     const next = event.key === "Home" ? minimum : event.key === "End" ? maximum : current + arrowStep;
-    const bounded = update(kind === "repository" ? next : widthRef.current, kind === "detail" ? next : detailWidthRef.current);
-    const value = kind === "repository" ? bounded.repository : bounded.detail;
-    persistWidth(kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY, value);
-  }
-
-  function reset(kind: "repository" | "detail") {
-    const bounded = update(
-      kind === "repository" ? CASE_REPOSITORY_DEFAULT : widthRef.current,
-      kind === "detail" ? CASE_DETAIL_DEFAULT : detailWidthRef.current,
+    update(
+      kind === "repository" ? next : preferredWidthRef.current,
+      kind === "detail" ? next : preferredDetailWidthRef.current,
+      true,
+      kind,
     );
-    const value = kind === "repository" ? bounded.repository : bounded.detail;
+    const value = kind === "repository" ? preferredWidthRef.current : preferredDetailWidthRef.current;
     persistWidth(kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY, value);
   }
 
-  function handleProps(kind: "repository" | "detail") {
+  function reset(kind: ResizeKind) {
+    update(
+      kind === "repository" ? CASE_REPOSITORY_DEFAULT : preferredWidthRef.current,
+      kind === "detail" ? CASE_DETAIL_DEFAULT : preferredDetailWidthRef.current,
+      true,
+      kind,
+    );
+    const value = kind === "repository" ? preferredWidthRef.current : preferredDetailWidthRef.current;
+    persistWidth(kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY, value);
+  }
+
+  function handleProps(kind: ResizeKind) {
     return {
       onDoubleClick: () => reset(kind),
       onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => onKeyDown(kind, event),

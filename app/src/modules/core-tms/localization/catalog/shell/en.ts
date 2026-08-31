@@ -49,6 +49,8 @@ export const enShellMessages = {
   "nav.notifications": "Notifications",
   "nav.expandSidebar": "Expand navigation",
   "nav.collapseSidebar": "Collapse navigation",
+  "nav.expandSidebarShort": "Expand",
+  "nav.collapseSidebarShort": "Collapse",
   "header.openDashboard": "Open dashboard",
   "header.toggleNavigation": "Toggle navigation",
   "header.dashboard": "Dashboard",

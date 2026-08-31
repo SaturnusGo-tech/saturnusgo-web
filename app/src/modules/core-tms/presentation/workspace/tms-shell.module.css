@@ -186,7 +186,7 @@
 }
 
 .navigation {
-  --sidebar-expanded-width: 280px;
+  --sidebar-expanded-width: 240px;
   --sidebar-visible-width: var(--sidebar-expanded-width);
   width: var(--sidebar-visible-width);
   height: 100dvh;
@@ -547,10 +547,6 @@
 }
 
 @media (max-width: 1180px) {
-  .navigation {
-    --sidebar-expanded-width: 270px;
-  }
-
   .headerClock {
     display: none;
   }

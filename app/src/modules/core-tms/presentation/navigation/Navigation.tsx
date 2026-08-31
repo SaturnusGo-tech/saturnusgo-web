@@ -1,6 +1,6 @@
 import {
-  ChevronLeft,
-  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Code2,
   FileBarChart,
   FolderKanban,
@@ -122,10 +122,10 @@ export function Navigation({
         title={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
       >
         <span className={shellStyles.navigationIcon} aria-hidden="true">
-          {collapsed ? <ChevronRight size={19} /> : <ChevronLeft size={19} />}
+          {collapsed ? <ChevronsRight size={19} /> : <ChevronsLeft size={19} />}
         </span>
         <span className={shellStyles.navigationLabel}>
-          {t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
+          {t(collapsed ? "nav.expandSidebarShort" : "nav.collapseSidebarShort")}
         </span>
       </button>
     </nav>

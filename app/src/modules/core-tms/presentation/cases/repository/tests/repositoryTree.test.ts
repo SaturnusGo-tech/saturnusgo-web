@@ -4,6 +4,7 @@ import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legac
 import {
   clampCaseDetailWidth,
   clampCaseRepositoryWidth,
+  resolveCasePaneWidths,
 } from "../../layout/useCaseRepositoryResize";
 import { buildRepositoryTree, isRepositoryPathBranch } from "../repositoryTree";
 
@@ -33,15 +34,21 @@ test("recognizes every ancestor of the current folder path", () => {
 
 test("bounds the resizable repository without starving the case document", () => {
   assert.equal(clampCaseRepositoryWidth(120, 1440), 230);
-  assert.equal(clampCaseRepositoryWidth(480, 1440), 320);
-  assert.equal(clampCaseRepositoryWidth(900, 1440), 320);
-  assert.equal(clampCaseRepositoryWidth(500, 900), 320);
+  assert.equal(clampCaseRepositoryWidth(480, 1440), 480);
+  assert.equal(clampCaseRepositoryWidth(900, 1440), 480);
+  assert.equal(clampCaseRepositoryWidth(500, 900), 480);
 });
 
 test("starts with a wide case document and leaves the case table horizontally scrollable", () => {
-  assert.equal(clampCaseDetailWidth(510, 1160, 230), 510);
-  assert.equal(clampCaseDetailWidth(510, 1372, 230), 510);
-  assert.equal(clampCaseDetailWidth(680, 1372, 230), 680);
-  assert.equal(clampCaseDetailWidth(300, 1372, 230), 340);
-  assert.equal(clampCaseDetailWidth(510, 1089, 230), 510);
+  assert.equal(clampCaseDetailWidth(510, 1160, 280), 460);
+  assert.equal(clampCaseDetailWidth(510, 1372, 280), 510);
+  assert.equal(clampCaseDetailWidth(680, 1372, 280), 672);
+  assert.equal(clampCaseDetailWidth(300, 1372, 280), 340);
+  assert.equal(clampCaseDetailWidth(510, 1089, 280), 510);
+});
+
+test("restores preferred pane widths after a temporary responsive clamp", () => {
+  assert.deepEqual(resolveCasePaneWidths(480, 510, 1200), { repository: 440, detail: 340 });
+  assert.deepEqual(resolveCasePaneWidths(480, 510, 1372), { repository: 480, detail: 472 });
+  assert.deepEqual(resolveCasePaneWidths(280, 510, 1372), { repository: 280, detail: 510 });
 });
