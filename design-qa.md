@@ -183,3 +183,16 @@ final result: passed
 - Security cleanup: the temporary local visual-QA authentication bypass and its query marker were removed before the release gate.
 - Verification: TypeScript passed; architecture passed for 204 files; Auth0 17/17; attachments 4/4; TMS adapters and UI models 58/58; generated OpenAPI contract unchanged; `git diff --check` passed; production build generated 61/61 pages.
 - Final result: passed.
+
+## Test Case workspace geometry hotfix — final pass
+
+- Source: the two user-supplied 31 August captures showing the compact Test Case workspace and the shifted six-column table. The full-layout source was normalized from 2880×1560 device pixels to the matching 1440×780 CSS viewport before comparison.
+- Implementation evidence: `.design-qa/case-geometry/implementation-populated-1440x780.png` and `.design-qa/case-geometry/implementation-overlay-open-1280x780.png`; combined source/implementation evidence: `.design-qa/case-geometry/comparison-before-after.png`. These files are ignored local QA artifacts and are not shipped.
+- Root cause: `display:flex` was applied directly to the ID and title `<td>` elements. That removed them from table-cell formatting, stacked both values in the first column, shifted Status/Priority/Component/Estimate one column left, left Estimate empty, and doubled row height from 40px to about 80px.
+- Table correction: all six `<td>` elements now retain native table semantics; flex alignment lives in inner wrappers. A six-column `<colgroup>` assigns 132px to ID, 104px to Status, 112px to Priority, 126px to Component, 78px to Estimate, and the remaining width to Title. Header and row boundaries match exactly and rows remain 40px high.
+- Workspace correction: at a 1372px Cases workspace the measured desktop geometry is 230px repository + 802px list + 340px inspector. The list has an 800px floor, the inspector no longer shrinks below 340px, and property labels/values use readable vertical alignment rather than 35px value slots.
+- Responsive correction: below the inline threshold the inspector becomes a 340px overlay with an explicit scrim/back action; below the repository threshold the repository is removed so the table keeps its readable floor. Both repository and inspector separators support pointer and keyboard resizing with persisted, ResizeObserver-clamped widths.
+- Fidelity review: typography, graphite tokens, 40px density, borders, selection blue, Saturn asset, localized copy, button sizing, and the accepted YouTrack-derived shell remain unchanged. The hotfix only repairs geometry and responsiveness.
+- Security cleanup: the temporary local visual-QA authentication bypass was fully reverted; the final source contains no preview query marker or authentication exception.
+- Verification: TypeScript, 204-file architecture gate, focused Cases 6/6, TMS adapters/UI models 58/58, Auth0 17/17, attachments 4/4, production build 61/61, and `git diff --check` passed.
+final result: passed

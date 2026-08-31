@@ -1,11 +1,18 @@
 import type { CSSProperties, KeyboardEvent, PointerEvent, RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
-export const CASE_REPOSITORY_DEFAULT = 242;
+export const CASE_REPOSITORY_DEFAULT = 230;
 export const CASE_REPOSITORY_MIN = 230;
-const CASE_REPOSITORY_MAX = 320;
+export const CASE_REPOSITORY_MAX = 320;
+export const CASE_DETAIL_DEFAULT = 340;
+export const CASE_DETAIL_MIN = 340;
+export const CASE_DETAIL_MAX = 440;
+export const CASE_LIST_MIN = 800;
+export const CASE_REPOSITORY_VISIBLE_MIN = CASE_REPOSITORY_MIN + CASE_LIST_MIN;
+export const CASE_INLINE_MIN = CASE_REPOSITORY_MIN + CASE_LIST_MIN + CASE_DETAIL_MIN;
 const CASE_DOCUMENT_MIN = 660;
-const STORAGE_KEY = "tms.cases.repository-width.v1";
+const REPOSITORY_STORAGE_KEY = "tms.cases.repository-width.v1";
+const DETAIL_STORAGE_KEY = "tms.cases.detail-width.v1";
 
 export function clampCaseRepositoryWidth(value: number, containerWidth: number) {
   const available = containerWidth > 0
@@ -14,77 +21,144 @@ export function clampCaseRepositoryWidth(value: number, containerWidth: number) 
   return Math.round(Math.min(Math.max(value, CASE_REPOSITORY_MIN), CASE_REPOSITORY_MAX, available));
 }
 
+export function clampCaseDetailWidth(value: number, containerWidth: number, repositoryWidth: number) {
+  const available = containerWidth >= CASE_INLINE_MIN
+    ? Math.max(CASE_DETAIL_MIN, containerWidth - repositoryWidth - CASE_LIST_MIN)
+    : CASE_DETAIL_MAX;
+  return Math.round(Math.min(Math.max(value, CASE_DETAIL_MIN), CASE_DETAIL_MAX, available));
+}
+
+function readStoredWidth(key: string, fallback: number) {
+  try {
+    const value = Number(window.localStorage.getItem(key));
+    return Number.isFinite(value) && value > 0 ? value : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function persistWidth(key: string, value: number) {
+  try { window.localStorage.setItem(key, String(value)); } catch { /* Storage can be unavailable. */ }
+}
+
 export function useCaseRepositoryResize(containerRef: RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(CASE_REPOSITORY_DEFAULT);
+  const [detailWidth, setDetailWidth] = useState(CASE_DETAIL_DEFAULT);
   const [resizing, setResizing] = useState(false);
-  const [ready, setReady] = useState(false);
   const widthRef = useRef(width);
-  const dragRef = useRef<{ pointerId: number; startX: number; startWidth: number } | null>(null);
+  const detailWidthRef = useRef(detailWidth);
+  const dragRef = useRef<{ kind: "repository" | "detail"; pointerId: number; startX: number; startWidth: number } | null>(null);
 
   function containerWidth() {
     return containerRef.current?.getBoundingClientRect().width ?? window.innerWidth;
   }
-  function update(next: number) {
-    const bounded = clampCaseRepositoryWidth(next, containerWidth());
-    widthRef.current = bounded;
-    setWidth(bounded);
-    return bounded;
-  }
-  function persist(next = widthRef.current) {
-    window.localStorage.setItem(STORAGE_KEY, String(next));
+
+  function update(repository: number, detail: number) {
+    const available = containerWidth();
+    let boundedRepository = clampCaseRepositoryWidth(repository, available);
+    if (available >= CASE_REPOSITORY_VISIBLE_MIN) {
+      boundedRepository = Math.min(
+        boundedRepository,
+        Math.max(
+          CASE_REPOSITORY_MIN,
+          available - CASE_LIST_MIN - (available >= CASE_INLINE_MIN ? CASE_DETAIL_MIN : 0),
+        ),
+      );
+    }
+    const boundedDetail = clampCaseDetailWidth(detail, available, boundedRepository);
+    widthRef.current = boundedRepository;
+    detailWidthRef.current = boundedDetail;
+    setWidth(boundedRepository);
+    setDetailWidth(boundedDetail);
+    return { repository: boundedRepository, detail: boundedDetail };
   }
 
   useEffect(() => {
-    const saved = Number(window.localStorage.getItem(STORAGE_KEY));
-    if (Number.isFinite(saved) && saved > 0) update(saved);
-    const frame = window.requestAnimationFrame(() => setReady(true));
-    return () => window.cancelAnimationFrame(frame);
+    update(
+      readStoredWidth(REPOSITORY_STORAGE_KEY, CASE_REPOSITORY_DEFAULT),
+      readStoredWidth(DETAIL_STORAGE_KEY, CASE_DETAIL_DEFAULT),
+    );
+    const target = containerRef.current;
+    if (!target || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => update(widthRef.current, detailWidthRef.current));
+    observer.observe(target);
+    return () => observer.disconnect();
   }, []);
 
-  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+  function onPointerDown(kind: "repository" | "detail", event: PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) return;
-    dragRef.current = { pointerId: event.pointerId, startX: event.clientX, startWidth: widthRef.current };
+    dragRef.current = {
+      kind,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startWidth: kind === "repository" ? widthRef.current : detailWidthRef.current,
+    };
     event.currentTarget.setPointerCapture(event.pointerId);
     setResizing(true);
   }
+
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
-    update(drag.startWidth + event.clientX - drag.startX);
+    const delta = event.clientX - drag.startX;
+    update(
+      drag.kind === "repository" ? drag.startWidth + delta : widthRef.current,
+      drag.kind === "detail" ? drag.startWidth - delta : detailWidthRef.current,
+    );
   }
+
   function finishResize(event: PointerEvent<HTMLDivElement>) {
-    if (dragRef.current?.pointerId !== event.pointerId) return;
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
     dragRef.current = null;
     setResizing(false);
-    persist();
+    const key = drag.kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY;
+    persistWidth(key, drag.kind === "repository" ? widthRef.current : detailWidthRef.current);
   }
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+
+  function onKeyDown(kind: "repository" | "detail", event: KeyboardEvent<HTMLDivElement>) {
     const direction = event.key === "ArrowLeft" ? -16 : event.key === "ArrowRight" ? 16 : 0;
     if (!direction && event.key !== "Home" && event.key !== "End") return;
     event.preventDefault();
-    const next = event.key === "Home"
-      ? CASE_REPOSITORY_MIN
-      : event.key === "End"
-        ? CASE_REPOSITORY_MAX
-        : widthRef.current + direction;
-    persist(update(next));
+    const minimum = kind === "repository" ? CASE_REPOSITORY_MIN : CASE_DETAIL_MIN;
+    const maximum = kind === "repository" ? CASE_REPOSITORY_MAX : CASE_DETAIL_MAX;
+    const current = kind === "repository" ? widthRef.current : detailWidthRef.current;
+    const arrowStep = kind === "detail" ? -direction : direction;
+    const next = event.key === "Home" ? minimum : event.key === "End" ? maximum : current + arrowStep;
+    const bounded = update(kind === "repository" ? next : widthRef.current, kind === "detail" ? next : detailWidthRef.current);
+    const value = kind === "repository" ? bounded.repository : bounded.detail;
+    persistWidth(kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY, value);
   }
-  function reset() {
-    persist(update(CASE_REPOSITORY_DEFAULT));
+
+  function reset(kind: "repository" | "detail") {
+    const bounded = update(
+      kind === "repository" ? CASE_REPOSITORY_DEFAULT : widthRef.current,
+      kind === "detail" ? CASE_DETAIL_DEFAULT : detailWidthRef.current,
+    );
+    const value = kind === "repository" ? bounded.repository : bounded.detail;
+    persistWidth(kind === "repository" ? REPOSITORY_STORAGE_KEY : DETAIL_STORAGE_KEY, value);
+  }
+
+  function handleProps(kind: "repository" | "detail") {
+    return {
+      onDoubleClick: () => reset(kind),
+      onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => onKeyDown(kind, event),
+      onPointerCancel: finishResize,
+      onPointerDown: (event: PointerEvent<HTMLDivElement>) => onPointerDown(kind, event),
+      onPointerMove,
+      onPointerUp: finishResize,
+    };
   }
 
   return {
     width,
+    detailWidth,
     resizing,
-    ready,
-    style: { "--case-repository-width": `${width}px` } as CSSProperties,
-    handleProps: {
-      onDoubleClick: reset,
-      onKeyDown,
-      onPointerCancel: finishResize,
-      onPointerDown,
-      onPointerMove,
-      onPointerUp: finishResize,
-    },
+    style: {
+      "--case-repository-width": `${width}px`,
+      "--case-detail-width": `${detailWidth}px`,
+    } as CSSProperties,
+    handleProps: handleProps("repository"),
+    detailHandleProps: handleProps("detail"),
   };
 }

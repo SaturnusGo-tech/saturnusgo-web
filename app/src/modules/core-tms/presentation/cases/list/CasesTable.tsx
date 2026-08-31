@@ -33,9 +33,12 @@ export function CasesTable(props: Props) {
         <span>{ru ? "Измените запрос или фильтры." : "Adjust the search or filters."}</span>
         <button className={styles.secondaryButton} onClick={props.onCreate}><ListChecks size={15} />{ru ? "Создать кейс" : "Create case"}</button>
       </div> : <table className={styles.caseTable}>
+        <colgroup>
+          {columns.map((column) => <col className={column.className} key={column.key} />)}
+        </colgroup>
         <thead>
           <tr>
-            {columns.map((column) => <th className={column.className} key={column.key} aria-sort={props.sort.key === column.key ? (props.sort.direction === "asc" ? "ascending" : "descending") : "none"}>
+            {columns.map((column) => <th key={column.key} scope="col" aria-sort={props.sort.key === column.key ? (props.sort.direction === "asc" ? "ascending" : "descending") : "none"}>
               <button onClick={() => props.onSort(column.key)}>
                 {column.label}
                 {props.sort.key !== column.key ? <ChevronsUpDown size={13} /> : props.sort.direction === "asc" ? <ArrowUp size={13} /> : <ArrowDown size={13} />}
@@ -69,8 +72,18 @@ export function CasesTable(props: Props) {
                 }
               }}
             >
-              <td className={styles.keyCell}><span className={`${styles.caseTypeMark} ${styles[`mark_${row.testCase.lifecycle}`]}`}><ListChecks size={14} /></span><strong>{row.testCase.key}</strong></td>
-              <td className={styles.titleCell}><strong title={row.testCase.title}>{row.testCase.title}</strong><small title={row.folderPath}>{row.folderPath}</small></td>
+              <td className={styles.keyCell}>
+                <span className={styles.keyCellContent}>
+                  <span className={`${styles.caseTypeMark} ${styles[`mark_${row.testCase.lifecycle}`]}`}><ListChecks size={14} /></span>
+                  <strong>{row.testCase.key}</strong>
+                </span>
+              </td>
+              <td>
+                <span className={styles.titleCellContent}>
+                  <strong title={row.testCase.title}>{row.testCase.title}</strong>
+                  <small title={row.folderPath}>{row.folderPath}</small>
+                </span>
+              </td>
               <td><LifecycleBadge locale={props.locale} lifecycle={row.testCase.lifecycle} archived={Boolean(row.testCase.archivedAt)} /></td>
               <td><PriorityBadge locale={props.locale} priority={row.testCase.priority} /></td>
               <td className={styles.truncatedCell} title={localizedComponentLabel(props.locale, row.testCase.component)}>
