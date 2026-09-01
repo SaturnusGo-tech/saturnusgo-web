@@ -74,11 +74,13 @@ export function CasesView(props: CasesViewProps) {
         groupBy={view.groupBy}
         facetFilters={view.facetFilters}
         facetOptions={view.facetOptions}
+        selectionMode={view.selectionMode}
         onQuery={props.onQuery}
         onQlQuery={view.setQlQuery}
         onViewMode={view.setViewMode}
         onGroupBy={view.setGroupBy}
         onFacetFilters={view.setFacetFilters}
+        onSelectionMode={view.toggleSelectionMode}
         onFilters={props.onFilters}
         onFilterOpen={() => view.setFilterOpen((value) => !value)}
         onNew={view.createCase}
@@ -103,6 +105,7 @@ export function CasesView(props: CasesViewProps) {
         selectedCount={view.bulkSelection.selectedIds.length}
         selectableCount={view.selectableCount}
         visibleCoverage={view.bulkSelection.visibleCoverage}
+        selectionMode={view.selectionMode}
         onToggleCase={view.bulkSelection.toggleOne}
         onToggleScope={view.bulkSelection.toggleScope}
         onSelectVisible={view.bulkSelection.selectVisible}

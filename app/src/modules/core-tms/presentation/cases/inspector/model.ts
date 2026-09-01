@@ -3,13 +3,11 @@ import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-
 
 export type InspectorSection =
   | "description" | "component" | "preconditions" | "details" | "steps";
-export type InspectorTabId = "overview" | "comments" | "files" | "activity";
+export type InspectorTabId = "overview" | "files" | "activity";
 export type InspectorTabKey = "ArrowLeft" | "ArrowRight" | "Home" | "End";
 export type InspectorRevisionProblem = "title" | "folder" | "manualSteps" | "checklist";
 
-const INSPECTOR_TAB_ORDER: InspectorTabId[] = [
-  "overview", "comments", "files", "activity",
-];
+const INSPECTOR_TAB_ORDER: InspectorTabId[] = ["overview", "files", "activity"];
 
 export function inspectorSectionForMode(mode?: CaseInspectorEditor["mode"]) {
   return mode === "create" ? "description" as const : null;

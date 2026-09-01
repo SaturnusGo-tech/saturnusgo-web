@@ -27,6 +27,7 @@ type Props = {
   selectedCount: number;
   selectableCount: number;
   visibleCoverage: SelectionCoverage;
+  selectionMode: boolean;
   onToggleCase: (id: string) => void;
   onToggleScope: (ids: readonly string[]) => void;
   onSelectVisible: () => void;
@@ -87,10 +88,10 @@ export function CasesTable(props: Props) {
   </div>;
 
   return <div className={`${styles.tableScroll} ${props.selectedCount > 0 ? styles.tableScrollBulkActive : ""}`}>
-    <table className={styles.table}>
+    <table className={`${styles.table} ${props.selectionMode ? styles.selectionMode : ""}`}>
       <colgroup>{columns.map((column, index) => <col className={styles[column.className]} key={`${column.key ?? "icon"}-${index}`} />)}</colgroup>
       <thead><tr>{columns.map((column, index) => <th key={`${column.key ?? "icon"}-${index}`} scope="col" aria-sort={column.key && props.sort.key === column.key ? (props.sort.direction === "asc" ? "ascending" : "descending") : undefined}>
-        {index === 0 ? <CaseSelectionHeader
+        {index === 0 ? props.selectionMode ? <CaseSelectionHeader
           locale={props.locale}
           visibleCount={props.rows.filter((row) => props.selectableIds.has(row.testCase.id)).length}
           allCount={props.selectableCount}
@@ -101,7 +102,7 @@ export function CasesTable(props: Props) {
           onSelectVisible={props.onSelectVisible}
           onSelectAll={props.onSelectAll}
           onClear={props.onClearSelection}
-        /> : column.key ? <button onClick={() => props.onSort(column.key!)}>
+        /> : <span aria-hidden="true" /> : column.key ? <button onClick={() => props.onSort(column.key!)}>
           {ru ? column.ru : column.en}
           {props.sort.key === column.key && (props.sort.direction === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
         </button> : <span aria-hidden="true" />}
@@ -112,12 +113,12 @@ export function CasesTable(props: Props) {
         return <Fragment key={group.key}>
           {isGrouped && <tr className={styles.groupRow} key={`${group.key}-heading`}><td colSpan={columns.length}>
             <div className={styles.groupHeading}>
-              <CaseSelectionCheckbox
+              {props.selectionMode && <CaseSelectionCheckbox
                 coverage={selectionCoverage(props.selectedIds, group.rows.filter((row) => props.selectableIds.has(row.testCase.id)).map((row) => row.testCase.id))}
                 disabled={props.interactionLocked || !group.rows.some((row) => props.selectableIds.has(row.testCase.id))}
                 label={ru ? `Выбрать группу ${groupLabel(props.locale, effectiveGroup, group.value)}` : `Select ${groupLabel(props.locale, effectiveGroup, group.value)} group`}
                 onToggle={() => props.onToggleScope(group.rows.filter((row) => props.selectableIds.has(row.testCase.id)).map((row) => row.testCase.id))}
-              />
+              />}
               <button onClick={() => setCollapsed((current) => {
                 const next = new Set(current); next.has(group.key) ? next.delete(group.key) : next.add(group.key); return next;
               })}>{isCollapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}<strong>{groupLabel(props.locale, effectiveGroup, group.value)}</strong><small>{group.rows.length}</small></button>
@@ -137,7 +138,7 @@ export function CasesTable(props: Props) {
                 } else if (event.key === "Enter" || event.key === " ") { event.preventDefault(); props.onSelect(row); }
                 else moveFocus(event);
               }}>
-              <td className={styles.selectionCell}><CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} /></td>
+              <td className={styles.selectionCell}>{props.selectionMode && <CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} />}</td>
               <td className={styles.flagCell}><AlertTriangle className={styles[`priorityFlag_${item.priority}`]} size={13} aria-label={localizedLabel(props.locale, item.priority)} /></td>
               <td className={styles.typeCell}>{item.type === "manual" ? <Hand size={13} aria-label={ru ? "Ручной" : "Manual"} /> : <ListChecks size={13} aria-label={ru ? "Чеклист" : "Checklist"} />}</td>
               <td className={styles.keyCell} title={item.key}><strong>{item.key}</strong></td>

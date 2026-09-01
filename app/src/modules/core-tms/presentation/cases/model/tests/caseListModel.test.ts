@@ -187,12 +187,14 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
 
 test("toolbar keeps subtle focus and editor-locked create actions", () => {
   const toolbar = readFileSync(new URL("../../toolbar/CasesToolbar.tsx", import.meta.url), "utf8");
+  const table = readFileSync(new URL("../../list/CasesTable.tsx", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
+  const bulkCss = readFileSync(new URL("../../bulk/styles/caseBulk.module.css", import.meta.url), "utf8");
   const inputFocus = css.match(/\.inputShell:focus-within \{([^}]*)\}/)?.[1] ?? "";
-
-  assert.match(inputFocus, /border-color: var\(--cases-primary\)/);
-  assert.match(inputFocus, /box-shadow: none/);
-  assert.match(toolbar, /aria-disabled=\{props\.interactionLocked \|\| undefined\}/);
-  assert.match(toolbar, /guardCreateInteraction/);
-  assert.match(toolbar, /role="menuitem"/);
+  assert.match(inputFocus, /border-color: var\(--cases-primary\)/); assert.match(inputFocus, /box-shadow: none/);
+  assert.match(toolbar, /aria-disabled=\{props\.interactionLocked \|\| undefined\}/); assert.match(toolbar, /guardCreateInteraction/);
+  assert.match(toolbar, /role="menuitem"/); assert.match(toolbar, /Выбрать тест-кейсы|Select test cases/);
+  assert.match(toolbar, /aria-pressed=\{props\.selectionMode\}/); assert.match(table, /props\.selectionMode \? <CaseSelectionHeader/); assert.match(table, /props\.selectionMode && <CaseSelectionCheckbox/);
+  assert.match(css, /\.selectionColumn \{ width: 0; transition:/); assert.match(css, /\.selectionMode \.selectionColumn \{ width: 34px; \}/);
+  assert.match(bulkCss, /animation: bulkBarReveal 220ms/); assert.match(bulkCss, /clip-path: inset\(0 0 100% 0\)/);
 });

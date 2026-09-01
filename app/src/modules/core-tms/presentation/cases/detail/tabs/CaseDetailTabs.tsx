@@ -20,7 +20,6 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, onActive }: P
   const ru = locale === "ru";
   const labels: Record<InspectorTabId, string> = {
     overview: ru ? "Общее" : "General",
-    comments: ru ? "Комментарии" : "Comments",
     files: ru ? "Вложения" : "Attachments",
     activity: ru ? "История" : "Change history",
   };

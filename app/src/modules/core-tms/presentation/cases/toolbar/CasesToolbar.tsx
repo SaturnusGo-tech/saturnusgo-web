@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, FilePlus2, Filter, FolderPlus, List, ListTree, MoreHorizontal, Search, X } from "lucide-react";
+import { Check, ChevronDown, FilePlus2, Filter, FolderPlus, List, ListTree, MoreHorizontal, Search, SquareCheckBig, X } from "lucide-react";
 import type { TmsLocale } from "../../../localization/model/locale";
 import type { CaseFilters } from "../../../state/types/workspace";
 import { dynamicGroupBy, type CaseFacetFilters, type CaseFacetOptions, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
@@ -13,6 +13,7 @@ type Props = {
   qlQuery?: string; onQlQuery?: (value: string) => void; viewMode?: CaseListViewMode; onViewMode?: (value: CaseListViewMode) => void;
   groupBy?: CaseGroupBy; onGroupBy?: (value: CaseGroupBy) => void; estimateLabel?: string;
   facetFilters?: CaseFacetFilters; facetOptions?: CaseFacetOptions; onFacetFilters?: (value: CaseFacetFilters) => void;
+  selectionMode: boolean; onSelectionMode: () => void;
   interactionLocked?: boolean; onLockedInteraction?: () => void;
 };
 
@@ -69,6 +70,12 @@ export function CasesToolbar(props: Props) {
     <div className={styles.controls}>
       <div className={styles.searchLine}>
         <label className={styles.inputShell}><Search size={14} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Поиск по названию" : "Search by title"} aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить" : "Clear"}><X size={12} /></button>}</label>
+        <button type="button" aria-pressed={props.selectionMode}
+          className={`${styles.secondaryButton} ${styles.selectionModeButton} ${props.selectionMode ? styles.selectionModeActive : ""}`}
+          aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined}
+          onClick={() => { if (!guardCreateInteraction()) props.onSelectionMode(); }}>
+          <SquareCheckBig size={14} /><span>{ru ? "Выбрать тест-кейсы" : "Select test cases"}</span>
+        </button>
         <div className={styles.segments} aria-label={ru ? "Режим списка" : "List mode"}>
           <button type="button" aria-pressed={viewMode === "list"} className={`${styles.segmentButton} ${viewMode === "list" ? styles.segmentActive : ""}`} onClick={() => chooseViewMode("list")}><List size={13} /><span>{text.list}</span></button>
           <button type="button" aria-pressed={viewMode === "dynamic"} className={`${styles.segmentButton} ${viewMode === "dynamic" ? styles.segmentActive : ""}`} onClick={() => chooseViewMode("dynamic")}><ListTree size={13} /><span>{text.dynamic}</span></button>

@@ -7,7 +7,6 @@ import type {
 import { AttachmentLink } from "../../../../attachments/presentation/link/AttachmentLink";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { CaseActivityTab } from "../../collaboration/defects/CaseActivityTab";
-import { CaseCommentsTab } from "../../collaboration/comments/CaseCommentsTab";
 import type { CaseCollaborationViewModel } from "../../collaboration/model";
 import { InspectorPendingAttachments } from "../../inspector/attachments/InspectorPendingAttachments";
 import type { InspectorTabId } from "../../inspector/model";
@@ -31,14 +30,6 @@ type Props = {
 
 export function CaseContextTab(props: Props) {
   const ru = props.locale === "ru";
-  if (props.tab === "comments") {
-    return <CaseCommentsTab
-      caseId={props.testCase?.id ?? ""}
-      locale={props.locale}
-      languageTag={props.languageTag}
-      model={props.collaboration}
-    />;
-  }
   if (props.tab === "activity") {
     return <CaseActivityTab
       locale={props.locale}

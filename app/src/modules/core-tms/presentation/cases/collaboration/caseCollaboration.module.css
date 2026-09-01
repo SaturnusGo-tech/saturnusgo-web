@@ -11,6 +11,19 @@
   text-align: center;
 }
 .loadState strong { color: var(--cases-strong); }
+.commentsSection { border-top: 1px solid var(--cases-border); }
+.commentsHeading {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  color: var(--cases-muted);
+  background: var(--cases-bg);
+  border-bottom: 1px solid var(--cases-border);
+}
+.commentsHeading h3 { margin: 0; color: var(--cases-strong); font-size: 13px; font-weight: 650; }
+.commentsHeading span { min-width: 19px; height: 18px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-control); border-radius: 3px; font-size: 10px; }
 .sectionLoadState { min-height: 104px; border-bottom: 1px solid var(--cases-border); }
 .loadState button,
 .retestButton {
@@ -29,9 +42,11 @@
   font-size: 11px;
 }
 .composerLabel { color: var(--cases-strong); font-size: 11px; font-weight: 650; }
+.commentComposer { display: grid; gap: 7px; padding: 10px 14px 12px; border-bottom: 1px solid var(--cases-border); }
 .composerFooter { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .composerFooter > span { color: var(--cases-faint); font-size: 10px; }
-.composerFooter button { display: inline-flex; align-items: center; gap: 5px; }
+.composerFooter button { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 0 9px; color: var(--cases-on-primary); background: var(--cases-primary); border: 1px solid var(--cases-primary); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
+.composerFooter button:disabled { cursor: default; opacity: .55; }
 .inlineError {
   display: flex;
   align-items: flex-start;
@@ -62,7 +77,7 @@
 .comment header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .comment strong { color: var(--cases-strong); font-size: 12px; }
 .comment time { color: var(--cases-muted); font-size: 10px; white-space: nowrap; }
-.comment p { margin: 4px 0 0; color: var(--cases-secondary-text); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }
+.commentMarkdown { min-width: 0; margin-top: 4px; overflow-wrap: anywhere; }
 .pagination { display: grid; justify-items: center; gap: 6px; padding: 10px 12px; color: var(--cases-muted); font-size: 10px; text-align: center; }
 .pagination button { min-height: 28px; padding: 0 10px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
 .pagination button:disabled { cursor: wait; opacity: .55; }

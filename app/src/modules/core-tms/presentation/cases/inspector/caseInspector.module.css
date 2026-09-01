@@ -92,12 +92,6 @@
 .pendingFiles span > b { overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .pendingFiles button { width: 23px; height: 23px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
 .pendingFiles button:hover { color: #d35f65; background: var(--cases-hover); }
-.commentComposer { display: grid; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--cases-border); }
-.commentComposer textarea { min-height: 70px; resize: vertical; padding: 8px; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; font: inherit; outline: 0; }
-.commentComposer textarea:focus { border-color: var(--cases-primary); box-shadow: 0 0 0 1px var(--cases-primary); }
-.commentComposer button { min-height: 27px; justify-self: end; padding: 0 9px; color: var(--cases-on-primary); background: var(--cases-primary); border: 1px solid var(--cases-primary); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
-.commentComposer button:disabled { cursor: default; opacity: .55; }
-
 @keyframes inspectorSectionIn {
   from { opacity: .72; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }

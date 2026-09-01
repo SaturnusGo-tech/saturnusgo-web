@@ -80,6 +80,8 @@
   border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 6px;
   box-shadow: 0 8px 24px rgb(0 0 0 / 26%);
+  transform-origin: top center;
+  animation: bulkBarReveal 220ms cubic-bezier(.2, .76, .28, 1) both;
 }
 
 .bulkBar > strong {
@@ -217,5 +219,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .selectionMenu,
-  .bulkMenu { animation: none; }
+  .bulkMenu,
+  .bulkBar { animation: none; }
+}
+
+@keyframes bulkBarReveal {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(-9px) scaleY(.88); }
+  to { opacity: 1; clip-path: inset(0); transform: translateY(0) scaleY(1); }
 }

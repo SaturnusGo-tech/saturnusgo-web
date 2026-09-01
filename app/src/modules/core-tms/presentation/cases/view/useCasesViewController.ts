@@ -27,6 +27,7 @@ export function useCasesViewController(
   const [qlQuery, setQlQuery] = useState("");
   const [viewMode, setViewMode] = useState<CaseListViewMode>("list");
   const [groupBy, setGroupBy] = useState<CaseGroupBy>("none");
+  const [selectionMode, setSelectionMode] = useState(false);
   const [facetFilters, setFacetFilters] = useState<CaseFacetFilters>({ folders: [], components: [] });
   const workspaceRef = useRef<HTMLDivElement>(null);
   const deepLinkOpenedRef = useRef(false);
@@ -131,13 +132,20 @@ export function useCasesViewController(
     setDetailFullscreen(false);
     setDetailOpen(false);
   }
+  function toggleSelectionMode() {
+    setSelectionMode((current) => {
+      if (current) bulkSelection.clear();
+      return !current;
+    });
+  }
 
   return {
     workspaceRef, inspectorResize, filterOpen, setFilterOpen, detailFullscreen,
     setDetailFullscreen, inspectorOpen: detailOpen || Boolean(props.editor), sort,
     toggleSort, qlQuery, setQlQuery, viewMode, setViewMode, groupBy, setGroupBy,
     facetFilters, setFacetFilters, facetOptions, rows, countLabel, estimateLabel,
-    selectRow, createCase, closeInspector, bulkSelection, selectableIds,
+    selectRow, createCase, closeInspector, selectionMode, toggleSelectionMode,
+    bulkSelection, selectableIds,
     selectableCount: selectableRows.length,
   };
 }

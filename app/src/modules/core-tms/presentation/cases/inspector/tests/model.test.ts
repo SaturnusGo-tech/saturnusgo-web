@@ -82,7 +82,7 @@ test("tab keyboard navigation wraps and supports boundary keys", () => {
   assert.equal(inspectorTabAfterKey("overview", "ArrowLeft"), "activity");
   assert.equal(inspectorTabAfterKey("activity", "ArrowRight"), "overview");
   assert.equal(inspectorTabAfterKey("files", "Home"), "overview");
-  assert.equal(inspectorTabAfterKey("comments", "End"), "activity");
+  assert.equal(inspectorTabAfterKey("overview", "End"), "activity");
 });
 
 test("pending evidence clears only when an editor session closes", () => {
@@ -97,7 +97,7 @@ test("create mode starts in General and initializes its first local editor", () 
   assert.equal(inspectorSectionForMode("edit"), null);
   assert.deepEqual(inspectorTabsForMode(true), ["overview"]);
   assert.deepEqual(inspectorTabsForMode(false), [
-    "overview", "comments", "files", "activity",
+    "overview", "files", "activity",
   ]);
 });
 

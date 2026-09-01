@@ -61,6 +61,9 @@
 .clearButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
 
 .segments { flex: 0 0 auto; display: flex; }
+.selectionModeButton { flex: 0 0 auto; }
+.selectionModeActive,
+.selectionModeActive:hover { color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
 .segmentButton { border-radius: 0; }
 .segmentButton:first-child { border-radius: 4px 0 0 4px; }
 .segmentButton:last-child { margin-left: -1px; border-radius: 0 4px 4px 0; }
@@ -159,7 +162,8 @@
 .table .selectedRow td:first-child { box-shadow: inset 2px 0 0 var(--cases-primary); }
 .table tbody tr[data-case-row]:focus-visible td { box-shadow: inset 0 0 0 1px var(--cases-primary); }
 
-.selectionColumn { width: 34px; }
+.selectionColumn { width: 0; transition: width 180ms cubic-bezier(.2, .72, .3, 1); }
+.selectionMode .selectionColumn { width: 34px; }
 .flagColumn { width: 28px; }
 .typeColumn { width: 30px; }
 .keyColumn { width: 112px; }
@@ -168,7 +172,10 @@
 .functionColumn { width: 180px; }
 .priorityColumn { width: 112px; }
 .estimateColumn { width: 90px; }
-.selectionCell { padding-inline: 9px 4px !important; }
+.selectionCell { padding-inline: 0 !important; transition: padding 180ms cubic-bezier(.2, .72, .3, 1); }
+.selectionMode .selectionCell { padding-inline: 9px 4px !important; }
+.selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
+.selectionMode th:first-child button { animation: selectionControlIn 180ms cubic-bezier(.2, .72, .3, 1) both; }
 .flagCell { padding-right: 0 !important; text-align: right; }
 .priorityFlag_critical { color: #ef4d55; fill: currentColor; }
 .priorityFlag_high { color: #e9a23b; fill: currentColor; }
@@ -217,13 +224,24 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes selectionControlIn {
+  from { opacity: 0; transform: translateX(-7px) scale(.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .popover { animation: none; }
+  .popover,
+  .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
+  .selectionMode th:first-child button { animation: none; }
+  .selectionColumn,
+  .selectionCell { transition: none; }
 }
 
 @container cases-workspace (max-width: 820px) {
   .segments span,
+  .selectionModeButton span,
   .primaryButton span { display: none; }
+  .selectionModeButton { width: 30px; padding: 0; }
   .segmentButton { width: 30px; padding: 0; }
 }
 
