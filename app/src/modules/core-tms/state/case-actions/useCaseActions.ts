@@ -12,7 +12,7 @@ import {
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
 import { uploadEvidence } from "../../application/evidence/uploadEvidence";
-import { createEmptyRevision } from "../../helpers/cases/caseRevision";
+import { createEmptyRevision, normalizeRevisionTags } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import {
@@ -76,7 +76,7 @@ export function useCaseActions(
     const input = {
       projectId: derived.project.id,
       folderPath: state.caseFolderPath || "/Unsorted",
-      revision: { ...state.caseDraft, tags: state.caseDraft.tags.filter(Boolean) },
+      revision: { ...state.caseDraft, tags: normalizeRevisionTags(state.caseDraft.tags) },
     };
     let caseCommitted = false;
     try {

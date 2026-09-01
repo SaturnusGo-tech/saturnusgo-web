@@ -1,11 +1,17 @@
 import {
-  Ban, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp, CircleDashed,
+  AlertTriangle, Ban, Bot, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp, CircleDashed,
   Clock3, FileText, ListChecks, Minus,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
+import {
+  changeRevisionType,
+  discardedProcedureCount,
+} from "../../../../helpers/cases/caseRevision";
 import { localizedLabel } from "../../../../localization/format/labels";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import shared from "../../../../tms.module.css";
+import { Modal } from "../../../common/modal/Modal";
 import {
   EstimateBadge,
   LifecycleBadge,
@@ -26,6 +32,7 @@ type Props = {
 };
 
 export function CaseMetadataControls(props: Props) {
+  const [pendingType, setPendingType] = useState<TestCaseRevision["type"] | null>(null);
   const ru = props.locale === "ru";
   if (!props.editing || !props.onChange) {
     return <>
@@ -50,6 +57,7 @@ export function CaseMetadataControls(props: Props) {
   const type: Array<MetadataOption<TestCaseRevision["type"]>> = [
     { value: "manual", label: localizedLabel(props.locale, "manual"), icon: <FileText size={11} />, tone: styles.typeManual },
     { value: "checklist", label: localizedLabel(props.locale, "checklist"), icon: <ListChecks size={11} />, tone: styles.typeChecklist },
+    { value: "automated", label: localizedLabel(props.locale, "automated"), icon: <Bot size={11} />, tone: styles.typeAutomated },
   ];
   const rawEstimate = props.revision.estimatedMinutes === null
     ? "none" : String(props.revision.estimatedMinutes);
@@ -69,11 +77,36 @@ export function CaseMetadataControls(props: Props) {
   };
   const labelled = (label: string, control: ReactNode) => props.showLabels
     ? <div className={styles.labelledControl}><span>{label}</span>{control}</div> : control;
+  const requestTypeChange = (type: TestCaseRevision["type"]) => {
+    if (discardedProcedureCount(props.revision, type) > 0) setPendingType(type);
+    else props.onChange?.(changeRevisionType(props.revision, type));
+  };
+  const discardCount = pendingType
+    ? discardedProcedureCount(props.revision, pendingType) : 0;
 
-  return <div className={styles.controls}>
-    {labelled(ru ? "Статус" : "Status", <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus} />)}
-    {labelled(ru ? "Приоритет" : "Priority", <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} onChange={(value) => update("priority", value)} />)}
-    {labelled(ru ? "Тип" : "Type", <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} onChange={(value) => update("type", value)} />)}
-    {labelled(ru ? "Оценка" : "Estimate", <MetadataSelect label={ru ? "Оценка" : "Estimate"} value={rawEstimate} options={estimate} onChange={(value) => update("estimatedMinutes", value === "none" ? null : Number(value))} />)}
-  </div>;
+  return <>
+    <div className={styles.controls}>
+      {labelled(ru ? "Статус" : "Status", <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus} />)}
+      {labelled(ru ? "Приоритет" : "Priority", <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} onChange={(value) => update("priority", value)} />)}
+      {labelled(ru ? "Тип" : "Type", <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} onChange={requestTypeChange} />)}
+      {labelled(ru ? "Оценка" : "Estimate", <MetadataSelect label={ru ? "Оценка" : "Estimate"} value={rawEstimate} options={estimate} onChange={(value) => update("estimatedMinutes", value === "none" ? null : Number(value))} />)}
+    </div>
+    {pendingType && <Modal
+      title={ru ? "Сменить тип тест-кейса?" : "Change test case type?"}
+      subtitle={ru ? "Процедура другого типа несовместима с новым типом." : "The existing procedure is incompatible with the new type."}
+      onClose={() => setPendingType(null)}
+      panelClassName={styles.typeChangeDialog}
+    >
+      <div className={styles.typeChangeWarning}><AlertTriangle size={20} aria-hidden="true" /><p>{ru
+        ? `Будет удалено строк: ${discardCount}. Отмена сохранит текущий черновик.`
+        : `${discardCount} procedure row${discardCount === 1 ? "" : "s"} will be removed. Cancel keeps the current draft.`}</p></div>
+      <div className={styles.typeChangeActions}>
+        <button autoFocus type="button" className={shared.textButton} onClick={() => setPendingType(null)}>{ru ? "Отмена" : "Cancel"}</button>
+        <button type="button" className={shared.dangerButton} onClick={() => {
+          props.onChange?.(changeRevisionType(props.revision, pendingType));
+          setPendingType(null);
+        }}>{ru ? "Сменить и удалить" : "Change and remove"}</button>
+      </div>
+    </Modal>}
+  </>;
 }

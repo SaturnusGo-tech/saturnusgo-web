@@ -154,7 +154,9 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
     <InspectorSectionView
       title={value.type === "checklist"
         ? (ru ? "Чек-лист" : "Checklist")
-        : (ru ? "Шаги" : "Steps")}
+        : value.type === "automated"
+          ? (ru ? "Шаги автотеста" : "Automated steps")
+          : (ru ? "Шаги" : "Steps")}
       count={value.type === "checklist" ? value.checklist.length : value.steps.length}
       editLabel={ru ? "Изменить шаги" : "Edit steps"}
       {...controls("steps")}

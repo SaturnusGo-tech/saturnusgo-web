@@ -2,6 +2,7 @@ import { Copy, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { CaseTypeIcon } from "../../cases/list/CaseBadges";
 import styles from "../../../tms.module.css";
 import runStyles from "../runs.module.css";
 
@@ -14,7 +15,7 @@ type Props = {
 };
 
 export function RunExecutionHeader({ run, item, canArchive, archivePending, onArchive }: Props) {
-  const { t } = useTmsLocale();
+  const { locale, t } = useTmsLocale();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);
   const archiveButtonRef = useRef<HTMLButtonElement>(null);
@@ -45,7 +46,7 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, onAr
 
   return (
     <header className={runStyles.header}>
-      <div><span>{item.caseKey}</span><h1>{item.snapshot.title}</h1><p>{item.snapshot.description}</p></div>
+      <div><span className={runStyles.caseIdentity}><CaseTypeIcon locale={locale} type={item.snapshot.type} /><b>{item.caseKey}</b></span><h1>{item.snapshot.title}</h1><p>{item.snapshot.description}</p></div>
       <div className={runStyles.headerActions} ref={actionsRef}>
         <button className={`${styles.iconButton} ${runStyles.headerIconButton}`} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>
         {canArchive && !run.archivedAt && (

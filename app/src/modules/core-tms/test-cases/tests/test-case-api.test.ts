@@ -1,26 +1,27 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
-import { createTmsHttpClient } from "../../../../core/tms/transport/http";
+import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
+import { createTmsHttpClient, type TmsHttpClient, type TmsMutationOptions } from "../../../../core/tms/transport/http";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
-import { listTestCases } from "../data/test-case-api";
+import { createTestCase, listTestCases } from "../data/test-case-api";
 
 type Api = components["schemas"];
 const time = "2026-08-28T00:00:00.000Z";
 const revision: Api["TestCaseRevision"] = {
-  revision: 3, title: "Sign in", description: "", preconditions: "", type: "manual",
+  revision: 3, title: "Sign in", description: "", preconditions: "", type: "automated",
   lifecycle: "ready", priority: "critical", component: "Auth", ownerIdentityId: null,
   tags: ["smoke"], estimatedMinutes: 3, testData: "", steps: [], checklist: [],
   attachmentIds: [], changeNote: "Clarified", createdBy: "identity-1", createdAt: time,
 };
 const summary: Api["TestCaseRevisionSummary"] = {
-  revision: 3, title: "Sign in", type: "manual", lifecycle: "ready", priority: "critical",
+  revision: 3, title: "Sign in", type: "automated", lifecycle: "ready", priority: "critical",
   component: "Auth", ownerIdentityId: null, estimatedMinutes: 3, changeNote: "Clarified",
   createdBy: "identity-1", createdAt: time,
 };
 const caseSummary = (id: number): Api["TestCaseSummary"] => ({
   id: `case-${id}`, projectId: "project-1", key: `HOST-TC-${id}`,
-  folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "manual",
+  folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "automated",
   lifecycle: "ready", priority: "medium", component: "Host", ownerIdentityId: null,
   tags: ["Host", "Ui"], estimatedMinutes: 2, revisionCount: 1, archivedAt: null,
   createdAt: time, updatedAt: time, etag: `"case-${id}:1"`,
@@ -89,4 +90,32 @@ test("revision history preserves cursor pagination and immutable detail", async 
   assert.equal(page.items[0]?.changeNote, "Clarified");
   assert.deepEqual(detail.tags, ["smoke"]);
   assert.equal(urls[1]?.endsWith("/test-cases/case-1/revisions/3"), true);
+});
+
+test("create serializes automated type while preserving normalized arbitrary tags", async () => {
+  const requests: Array<{ path: string; body: unknown; options?: TmsMutationOptions }> = [];
+  const http = {
+    async mutateResource(path: string, _method: string, body: unknown, options?: TmsMutationOptions) {
+      requests.push({ path, body, options });
+      return { data: {
+        id: "case-1", projectId: "project-1", key: "HOST-TC-1", folderPath: "/Host",
+        currentRevision: 3, current: revision, revisionCount: 3, linkIds: [], archivedAt: null,
+        createdAt: time, updatedAt: time,
+      }, etag: '"case-1:3"' };
+    },
+  } as unknown as TmsHttpClient;
+  const draft: TestCaseRevision = {
+    ...revision,
+    tags: [" Smoke ", "ci.backend", "", "smoke", "OWNER-team-a"],
+  };
+  const created = await createTestCase(http, {
+    projectId: "project-1", folderPath: "/Host", revision: draft,
+  }, "create-automated-key");
+  const body = requests[0]?.body as { type: string; tags: string[]; checklist: unknown[] };
+  assert.equal(requests[0]?.path, "/test-cases");
+  assert.equal(requests[0]?.options?.idempotencyKey, "create-automated-key");
+  assert.equal(body.type, "automated");
+  assert.deepEqual(body.tags, ["smoke", "ci.backend", "owner-team-a"]);
+  assert.deepEqual(body.checklist, []);
+  assert.equal(created.data.current.type, "automated");
 });

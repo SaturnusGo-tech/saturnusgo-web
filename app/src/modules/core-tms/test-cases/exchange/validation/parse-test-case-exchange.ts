@@ -1,9 +1,11 @@
 import {
+  LEGACY_TEST_CASE_EXCHANGE_SCHEMA,
   TEST_CASE_EXCHANGE_SCHEMA,
   TEST_CASE_IMPORT_LIMIT,
   type PortableChecklistItem,
   type PortableTestCase,
   type PortableTestStep,
+  type TestCaseExchangeSchema,
   type TestCaseExchangeDocument,
 } from "../model/test-case-exchange";
 
@@ -68,9 +70,16 @@ function checklistItem(value: unknown, index: number): PortableChecklistItem {
   };
 }
 
-function testCase(value: unknown, index: number): PortableTestCase {
+function testCase(
+  value: unknown,
+  index: number,
+  schemaVersion: TestCaseExchangeSchema,
+): PortableTestCase {
   const item = object(value, `testCases[${index}]`);
-  const type = choice(item.type ?? "manual", `testCases[${index}].type`, ["manual", "checklist"]);
+  const types = schemaVersion === LEGACY_TEST_CASE_EXCHANGE_SCHEMA
+    ? ["manual", "checklist"] as const
+    : ["manual", "checklist", "automated"] as const;
+  const type = choice(item.type ?? "manual", `testCases[${index}].type`, types);
   const folderPath = text(item.folderPath ?? "/", `testCases[${index}].folderPath`, 500, true);
   if (!FOLDER.test(folderPath)) throw new Error(`testCases[${index}].folderPath is invalid.`);
   const tags = Array.isArray(item.tags)
@@ -81,7 +90,9 @@ function testCase(value: unknown, index: number): PortableTestCase {
   }
   const steps = Array.isArray(item.steps) ? item.steps.map(step) : [];
   const checklist = Array.isArray(item.checklist) ? item.checklist.map(checklistItem) : [];
-  if (steps.length > 500 || checklist.length > 500 || (type === "manual" ? checklist.length : steps.length)) {
+  const incompatibleProcedure = type === "checklist" ? steps.length : checklist.length;
+  if (steps.length > 500 || checklist.length > 500 || incompatibleProcedure
+    || (type === "automated" && steps.length === 0)) {
     throw new Error(`testCases[${index}] has an invalid procedure.`);
   }
   const estimate = item.estimatedMinutes;
@@ -107,16 +118,21 @@ export function parseTestCaseExchange(source: string): TestCaseExchangeDocument 
   let parsed: unknown;
   try { parsed = JSON.parse(source.replace(/^\uFEFF/, "")); } catch { throw new Error("The selected file is not valid JSON."); }
   const document = object(parsed, "document");
-  if (document.schemaVersion !== TEST_CASE_EXCHANGE_SCHEMA) throw new Error("Unsupported test-case exchange schema.");
+  const schemaVersion = choice(document.schemaVersion, "schemaVersion", [
+    LEGACY_TEST_CASE_EXCHANGE_SCHEMA,
+    TEST_CASE_EXCHANGE_SCHEMA,
+  ]);
   const project = object(document.project, "project");
   if (!Array.isArray(document.testCases) || document.testCases.length > TEST_CASE_IMPORT_LIMIT) {
     throw new Error(`testCases must contain at most ${TEST_CASE_IMPORT_LIMIT} items.`);
   }
-  const testCases = document.testCases.map(testCase);
+  const testCases = document.testCases.map((value, index) => (
+    testCase(value, index, schemaVersion)
+  ));
   const keys = testCases.flatMap((item) => item.sourceKey ? [item.sourceKey] : []);
   if (new Set(keys).size !== keys.length) throw new Error("sourceKey values must be unique.");
   return {
-    schemaVersion: TEST_CASE_EXCHANGE_SCHEMA,
+    schemaVersion,
     exportedAt: text(document.exportedAt, "exportedAt", 64, true),
     project: { key: text(project.key, "project.key", 128, true), name: text(project.name, "project.name", 200, true) },
     metadata: document.metadata === undefined ? undefined : object(document.metadata, "metadata"),

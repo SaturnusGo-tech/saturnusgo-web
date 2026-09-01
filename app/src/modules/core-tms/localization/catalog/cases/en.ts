@@ -64,7 +64,7 @@ export const enCaseMessages = {
   "caseDialog.editTitle": "Edit test case",
   "caseDialog.createTitle": "Create test case",
   "caseDialog.editSubtitle": "Saving creates a new immutable revision.",
-  "caseDialog.createSubtitle": "A guided flow for a repeatable manual verification.",
+  "caseDialog.createSubtitle": "A guided flow for a repeatable test case.",
   "caseDialog.basics": "1. Basics",
   "caseDialog.procedure": "2. Procedure",
   "caseDialog.review": "3. Review",

@@ -110,6 +110,8 @@
   font-weight: 600;
   letter-spacing: .025em;
 }
+.header > div:first-child > .caseIdentity { display: flex; align-items: center; gap: 5px; }
+.caseIdentity b { color: inherit; font: inherit; }
 
 .header h1 {
   margin: 3px 0 4px;

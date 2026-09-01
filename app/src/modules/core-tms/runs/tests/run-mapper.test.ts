@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
+import { executableSteps } from "../../helpers/cases/caseRevision";
 import { listRuns } from "../data/run-api";
 import { mapRun, mapRunAttemptSummary, mapRunItem } from "../data/run-mapper";
 
@@ -74,15 +75,20 @@ test("maps one selected item detail and keeps attempt history summary bounded", 
     assigneeIdentityId: null, status: "not_run", attemptCount: 1, activeAttemptNo: 1,
     createdAt: time, updatedAt: time,
     snapshot: {
-      revision: 2, title: "Sign in", description: "", preconditions: "", type: "manual",
+      revision: 2, title: "Sign in", description: "", preconditions: "", type: "automated",
       lifecycle: "ready", priority: "high", component: "Auth", ownerIdentityId: null,
-      tags: [], estimatedMinutes: 2, testData: "", steps: [], checklist: [], attachmentIds: [],
+      tags: ["ci.backend"], estimatedMinutes: 2, testData: "",
+      steps: [{ id: "step-1", order: 1, action: "Run the job", expectedResult: "The job passes", required: true, attachmentIds: [] }],
+      checklist: [], attachmentIds: [],
       changeNote: "Created", createdBy: "identity-1", createdAt: time,
     },
     activeAttempt: attempt,
   });
   assert.equal(item.attempts.length, 1);
   assert.equal(item.attempts[0]?.stepResults.length, 1);
+  assert.equal(item.snapshot.type, "automated");
+  assert.deepEqual(item.snapshot.tags, ["ci.backend"]);
+  assert.equal(executableSteps(item.snapshot)[0]?.action, "Run the job");
   const summary = mapRunAttemptSummary(attempt);
   assert.equal("stepResults" in summary, false);
 });

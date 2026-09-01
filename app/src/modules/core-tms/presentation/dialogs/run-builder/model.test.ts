@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import {
+  activeRunFilterCount,
   createDefaultRunName,
   filterRunCases,
   initialRunScopeFilters,
@@ -40,6 +41,20 @@ test("run filters combine facets and search without losing the full collection",
   });
   assert.deepEqual(result.map((item) => item.id), ["3"]);
   assert.equal(cases.length, 5);
+});
+
+test("run scope can select automated cases independently from tags", () => {
+  const automated = makeCase({
+    id: "automated", key: "HOST-TC-20", title: "CI checkout",
+    type: "automated", tags: ["Host", "Ci", "owner-team-a"],
+  });
+  const result = filterRunCases([...cases, automated], {
+    ...initialRunScopeFilters,
+    caseType: "automated",
+  });
+  assert.deepEqual(result.map((item) => item.id), ["automated"]);
+  assert.deepEqual(result[0]?.tags, ["Host", "Ci", "owner-team-a"]);
+  assert.equal(activeRunFilterCount({ ...initialRunScopeFilters, caseType: "automated" }), 1);
 });
 
 test("component filter matches any selected component", () => {

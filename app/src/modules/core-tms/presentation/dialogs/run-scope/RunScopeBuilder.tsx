@@ -60,6 +60,7 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
     {filtersOpen && <div className={styles.filterGrid}>
       <FilterSelect label={copy.scenario} value={filters.scenario} onChange={(value) => update("scenario", value as RunScopeFilters["scenario"])} options={[["all", copy.allScenarios], ["positive", copy.positive], ["negative", copy.negative], ["corner", copy.corner]]} />
       <FilterSelect label={copy.platform} value={filters.platform} onChange={(value) => update("platform", value as RunScopeFilters["platform"])} options={[["all", copy.allPlatforms], ["ios", copy.ios], ["android", copy.android]]} />
+      <FilterSelect label={copy.caseType} value={filters.caseType} onChange={(value) => update("caseType", value as RunScopeFilters["caseType"])} options={[["all", copy.allCaseTypes], ["manual", copy.manual], ["checklist", copy.checklist], ["automated", copy.automated]]} />
       <div className={styles.filterField}><span>{copy.component}</span><AnimatedMultiSelect
         label={copy.component}
         values={filters.components}

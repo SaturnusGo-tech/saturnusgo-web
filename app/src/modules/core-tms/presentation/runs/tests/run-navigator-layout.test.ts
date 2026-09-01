@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 const view = readFileSync(fileURLToPath(new URL("../navigator/RunNavigator.tsx", import.meta.url)), "utf8");
 const marquee = readFileSync(fileURLToPath(new URL("../navigator/RunNameMarquee.tsx", import.meta.url)), "utf8");
 const styles = readFileSync(fileURLToPath(new URL("../navigator/run-navigator.module.css", import.meta.url)), "utf8");
+const executionHeader = readFileSync(fileURLToPath(new URL("../header/RunExecutionHeader.tsx", import.meta.url)), "utf8");
 
 test("run picker keeps long names compact and calmly reveals their full text", () => {
   assert.match(view, /className=\{styles\.pickerTriggerText\}/);
@@ -20,4 +21,8 @@ test("run picker keeps long names compact and calmly reveals their full text", (
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.runNameAlways\[data-overflow="true"\][\s\S]*animation: none;/);
   assert.match(styles, /\.pickerTrigger\s*\{[^}]*min-height: 32px;/s);
   assert.match(styles, /\.pickerOptionActive\s*\{[^}]*min-height: 40px;/s);
+});
+
+test("run execution identifies the case type from its immutable snapshot", () => {
+  assert.match(executionHeader, /<CaseTypeIcon locale=\{locale\} type=\{item\.snapshot\.type\}/);
 });

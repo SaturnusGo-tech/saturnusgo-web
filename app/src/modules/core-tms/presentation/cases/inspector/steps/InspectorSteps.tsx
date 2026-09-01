@@ -159,7 +159,7 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
             })}
           />
         </div>)}
-    <button type="button" autoFocus={autoFocus && (revision.type === "manual" ? revision.steps : revision.checklist).length === 0} className={css.addButton} onClick={addStep}>
+    <button type="button" autoFocus={autoFocus && (revision.type === "checklist" ? revision.checklist : revision.steps).length === 0} className={css.addButton} onClick={addStep}>
       <Plus size={14} />{revision.type === "checklist" ? (ru ? "Добавить пункт" : "Add item") : (ru ? "Добавить шаг" : "Add step")}
     </button>
   </div>;

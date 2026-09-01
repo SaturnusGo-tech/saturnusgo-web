@@ -15,7 +15,7 @@ export type TestCaseRevision = {
   title: string;
   description: string;
   preconditions: string;
-  type: "manual" | "checklist";
+  type: "manual" | "checklist" | "automated";
   lifecycle: "draft" | "ready" | "deprecated";
   priority: "low" | "medium" | "high" | "critical";
   component: string;

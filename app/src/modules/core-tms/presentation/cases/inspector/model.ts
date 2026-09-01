@@ -1,11 +1,13 @@
 import type { FormEvent } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
+import { revisionTagsAreValid } from "../../../helpers/cases/caseRevision";
 
 export type InspectorSection =
   | "description" | "component" | "preconditions" | "details" | "steps";
 export type InspectorTabId = "overview" | "files" | "activity";
 export type InspectorTabKey = "ArrowLeft" | "ArrowRight" | "Home" | "End";
-export type InspectorRevisionProblem = "title" | "folder" | "manualSteps" | "checklist";
+export type InspectorRevisionProblem =
+  | "title" | "folder" | "tags" | "manualSteps" | "automatedSteps" | "checklist";
 
 const INSPECTOR_TAB_ORDER: InspectorTabId[] = ["overview", "files", "activity"];
 
@@ -64,10 +66,15 @@ export function inspectorRevisionProblem(
 ): InspectorRevisionProblem | null {
   if (!revision.title.trim()) return "title";
   if (!folderPath.trim()) return "folder";
-  if (revision.type === "manual") {
-    return revision.steps.length > 0 && revision.steps.every((step) => (
+  if (!revisionTagsAreValid(revision.tags)) return "tags";
+  if (revision.type !== "checklist") {
+    const complete = revision.steps.every((step) => (
       step.action.trim() && step.expectedResult.trim()
-    )) ? null : "manualSteps";
+    ));
+    if (revision.type === "automated") {
+      return revision.steps.length > 0 && complete ? null : "automatedSteps";
+    }
+    return revision.steps.length > 0 && complete ? null : "manualSteps";
   }
   return revision.checklist.length > 0
     && revision.checklist.every((item) => item.text.trim()) ? null : "checklist";

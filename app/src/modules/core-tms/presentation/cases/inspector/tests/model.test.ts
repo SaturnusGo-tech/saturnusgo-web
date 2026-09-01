@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import {
+  changeRevisionType,
+  discardedProcedureCount,
+  normalizeRevisionTags,
+  revisionTagsAreValid,
+} from "../../../../helpers/cases/caseRevision";
+import {
   canRemoveInspectorRow,
   copyInspectorRevision,
   editorSessionClosed,
@@ -128,4 +134,61 @@ test("manual revisions require one complete step and keep the final row", () => 
   }, "/Main"), "manualSteps");
   assert.equal(canRemoveInspectorRow(1), false);
   assert.equal(canRemoveInspectorRow(2), true);
+});
+
+test("automated revisions require one complete step and keep the final row", () => {
+  assert.equal(inspectorRevisionProblem({ ...revision, type: "automated", steps: [] }, "/Main"), "automatedSteps");
+  assert.equal(inspectorRevisionProblem({
+    ...revision,
+    type: "automated",
+    steps: [{ ...revision.steps[0], action: " " }],
+  }, "/Main"), "automatedSteps");
+  assert.equal(inspectorRevisionProblem({ ...revision, type: "automated" }, "/Main"), null);
+  assert.equal(canRemoveInspectorRow(1), false);
+});
+
+test("type changes clear only incompatible procedure data and preserve tags", () => {
+  const automated = changeRevisionType(revision, "automated");
+  assert.equal(automated.type, "automated");
+  assert.deepEqual(automated.steps, revision.steps);
+  assert.deepEqual(automated.checklist, []);
+  assert.deepEqual(automated.tags, ["smoke"]);
+
+  const checklist = changeRevisionType(revision, "checklist");
+  assert.equal(discardedProcedureCount(revision, "checklist"), 1);
+  assert.equal(discardedProcedureCount({
+    ...revision,
+    steps: [{ ...revision.steps[0], action: "", expectedResult: "", testData: "", attachmentIds: [] }],
+  }, "checklist"), 0);
+  assert.equal(discardedProcedureCount({
+    ...revision,
+    steps: [{ ...revision.steps[0], action: "", expectedResult: "", testData: "" }],
+  }, "checklist"), 1);
+  assert.equal(discardedProcedureCount(revision, "automated"), 0);
+  assert.deepEqual(checklist.steps, []);
+  const backToAutomated = changeRevisionType({
+    ...checklist,
+    checklist: [{ id: "check-1", order: 1, text: "Healthy", required: true }],
+  }, "automated");
+  assert.equal(discardedProcedureCount({
+    ...checklist,
+    checklist: [{ id: "check-1", order: 1, text: " ", required: true }],
+  }, "automated"), 0);
+  assert.equal(discardedProcedureCount({
+    ...checklist,
+    checklist: [{ id: "check-1", order: 1, text: "Healthy", required: true }],
+  }, "automated"), 1);
+  assert.deepEqual(backToAutomated.checklist, []);
+  assert.deepEqual(backToAutomated.tags, ["smoke"]);
+});
+
+test("tag normalization preserves values and order without blank duplicates", () => {
+  assert.deepEqual(
+    normalizeRevisionTags([" Smoke ", "ci.backend", "", "smoke", "OWNER-team-a"]),
+    ["smoke", "ci.backend", "owner-team-a"],
+  );
+  assert.equal(revisionTagsAreValid(["smoke", "ci.backend", "owner-team-a"]), true);
+  assert.equal(revisionTagsAreValid(["invalid tag"]), false);
+  assert.equal(revisionTagsAreValid([`a${"b".repeat(64)}`]), false);
+  assert.equal(inspectorRevisionProblem({ ...revision, tags: ["invalid tag"] }, "/Main"), "tags");
 });

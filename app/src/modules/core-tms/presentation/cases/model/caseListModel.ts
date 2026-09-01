@@ -43,7 +43,8 @@ function aliases(value: string) {
     ready: ["ready", "готов", "actual", "актуальный"], draft: ["draft", "черновик"],
     deprecated: ["deprecated", "устарел"], archived: ["archived", "архив"],
     critical: ["critical", "критический"], high: ["high", "высокий"],
-    medium: ["medium", "средний"], low: ["low", "низкий"], manual: ["manual", "ручной"], checklist: ["checklist", "чеклист"],
+    medium: ["medium", "средний"], low: ["low", "низкий"], manual: ["manual", "ручной"],
+    checklist: ["checklist", "чеклист"], automated: ["automated", "автоматизированный", "автотест"],
   };
   return map[value] ?? [value];
 }

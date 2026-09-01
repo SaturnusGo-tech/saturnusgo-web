@@ -1,6 +1,7 @@
 import type { components } from "../../../../core/tms/generated/tms-api";
 import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
 import type { TmsHttpClient, TmsResource } from "../../../../core/tms/transport/http";
+import { normalizeRevisionTags } from "../../helpers/cases/caseRevision";
 import {
   mapRevisionSummary,
   mapTestCase,
@@ -33,7 +34,7 @@ function revisionWrite(revision: TestCaseRevision) {
     priority: revision.priority,
     component: revision.component,
     ownerIdentityId: revision.ownerIdentityId,
-    tags: revision.tags.filter(Boolean),
+    tags: normalizeRevisionTags(revision.tags),
     estimatedMinutes: revision.estimatedMinutes,
     testData: revision.testData,
     steps: revision.steps.map(({ id, order, action, expectedResult, testData, required }) => (

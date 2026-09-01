@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { TEST_CASE_EXCHANGE_SCHEMA } from "../model/test-case-exchange";
+import {
+  LEGACY_TEST_CASE_EXCHANGE_SCHEMA,
+  TEST_CASE_EXCHANGE_SCHEMA,
+} from "../model/test-case-exchange";
 import { parseTestCaseExchange } from "../validation/parse-test-case-exchange";
 
 function source(overrides: Record<string, unknown> = {}) {
@@ -47,5 +50,61 @@ test("rejects duplicate source keys", () => {
 test("rejects incompatible manual checklist content", () => {
   const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
   base.testCases[0] = { ...base.testCases[0], checklist: [{ text: "Unexpected" }] };
+  assert.throws(() => parseTestCaseExchange(JSON.stringify(base)), /invalid procedure/);
+});
+
+test("parses automated cases without reinterpreting their tags", () => {
+  const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
+  base.testCases[0] = {
+    ...base.testCases[0],
+    type: "automated",
+    tags: ["smoke", "ci.backend", "owner-team-a"],
+  };
+  const parsed = parseTestCaseExchange(JSON.stringify(base));
+  assert.equal(parsed.testCases[0]?.type, "automated");
+  assert.deepEqual(parsed.testCases[0]?.tags, ["smoke", "ci.backend", "owner-team-a"]);
+  assert.equal(parsed.testCases[0]?.steps.length, 1);
+});
+
+test("imports legacy v1 manual and checklist cases without widening its enum", () => {
+  const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
+  const manual = parseTestCaseExchange(JSON.stringify({
+    ...base,
+    schemaVersion: LEGACY_TEST_CASE_EXCHANGE_SCHEMA,
+  }));
+  const checklist = parseTestCaseExchange(JSON.stringify({
+    ...base,
+    schemaVersion: LEGACY_TEST_CASE_EXCHANGE_SCHEMA,
+    testCases: [{ ...base.testCases[0], type: "checklist", steps: [],
+      checklist: [{ order: 1, text: "Healthy", required: true }] }],
+  }));
+  assert.equal(manual.schemaVersion, LEGACY_TEST_CASE_EXCHANGE_SCHEMA);
+  assert.equal(manual.testCases[0]?.type, "manual");
+  assert.equal(checklist.testCases[0]?.type, "checklist");
+});
+
+test("rejects automated cases mislabelled as legacy v1", () => {
+  const base = JSON.parse(source()) as {
+    schemaVersion: string;
+    testCases: Record<string, unknown>[];
+  };
+  base.schemaVersion = LEGACY_TEST_CASE_EXCHANGE_SCHEMA;
+  base.testCases[0] = { ...base.testCases[0], type: "automated" };
+  assert.throws(() => parseTestCaseExchange(JSON.stringify(base)), /unsupported value/);
+});
+
+test("requires at least one complete automated step", () => {
+  const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
+  base.testCases[0] = { ...base.testCases[0], type: "automated", steps: [] };
+  assert.throws(() => parseTestCaseExchange(JSON.stringify(base)), /invalid procedure/);
+});
+
+test("rejects checklist content for automated cases", () => {
+  const base = JSON.parse(source()) as { testCases: Record<string, unknown>[] };
+  base.testCases[0] = {
+    ...base.testCases[0],
+    type: "automated",
+    checklist: [{ text: "Unexpected" }],
+  };
   assert.throws(() => parseTestCaseExchange(JSON.stringify(base)), /invalid procedure/);
 });

@@ -6,7 +6,7 @@ import { describeDefectCreateError } from "../../application/defects/describeDef
 import { createDefectResource } from "../data/defect-api";
 import {
   inferDefectIntegrationTarget, initialDefectIntegrationChoice,
-  resolveDefectIntegrationChoice,
+  resolveDefectIntegrationChoice, runDefectLabels,
 } from "../model/integration-target";
 
 test("infers only an unambiguous YouTrack target", () => {
@@ -28,6 +28,13 @@ test("explicit routing preserves raw YouTrack targets and deliberate TMS-only", 
   assert.deepEqual(resolveDefectIntegrationChoice("backend"),
     { resolved: true, target: "backend" });
   assert.deepEqual(resolveDefectIntegrationChoice("tms"), { resolved: true, target: null });
+});
+
+test("run defect labels identify the immutable case type", () => {
+  assert.deepEqual(runDefectLabels("manual", "regression"), ["manual-run", "regression"]);
+  assert.deepEqual(runDefectLabels("automated", "smoke"), ["automated-run", "smoke"]);
+  assert.deepEqual(runDefectLabels("checklist", "acceptance"), ["checklist-run", "acceptance"]);
+  assert.deepEqual(runDefectLabels(null, null), ["reported"]);
 });
 
 test("defect create sends the explicit YouTrack target", async () => {

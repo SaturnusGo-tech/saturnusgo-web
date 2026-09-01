@@ -18,7 +18,10 @@ export function CaseCreationSections({ locale, revision, editor }: Props) {
   const ru = locale === "ru";
   const patch = (next: Partial<TestCaseRevision>) => editor.onChange({ ...revision, ...next });
   const typeLabel = revision.type === "checklist"
-    ? (ru ? "Чек-лист" : "Checklist") : (ru ? "Шаги" : "Steps");
+    ? (ru ? "Чек-лист" : "Checklist")
+    : revision.type === "automated"
+      ? (ru ? "Шаги автотеста" : "Automated steps")
+      : (ru ? "Шаги" : "Steps");
 
   return <div className={`${css.content} ${css.creationContent}`}>
     <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>

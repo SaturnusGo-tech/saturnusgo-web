@@ -21,6 +21,7 @@ export function useWorkspaceDerived(
     return (
       text.includes(state.query.toLowerCase()) &&
       (filters.includeArchived || !item.archivedAt) &&
+      (filters.type === "all" || item.type === filters.type) &&
       (filters.priority === "all" || item.priority === filters.priority) &&
       (filters.lifecycle === "all" ||
         item.lifecycle === filters.lifecycle) &&

@@ -37,6 +37,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       <DashboardView
         data={model.data}
         projectId={model.project.id}
+        serverAnalytics={model.connection === "connected"}
         onCreate={() => model.setDialog("dashboard")}
         onOpenRuns={() => model.setView("runs")}
       />

@@ -32,7 +32,7 @@ export function CasesToolbar(props: Props) {
   const viewMode = props.viewMode ?? "list";
   const groupBy = props.groupBy ?? "none";
   const lockedTitle = ru ? "Сначала сохраните или отмените изменения в редакторе" : "Save or cancel the editor changes first";
-  const activeFilterCount = Number(props.filters.priority !== "all") + Number(props.filters.lifecycle !== "all")
+  const activeFilterCount = Number(props.filters.type !== "all") + Number(props.filters.priority !== "all") + Number(props.filters.lifecycle !== "all")
     + Number(Boolean(props.filters.tag.trim())) + Number(props.filters.includeArchived) + facets.folders.length + facets.components.length;
   const text = {
     list: ru ? "Список" : "List", dynamic: ru ? "Группы" : "Dynamic groups", group: ru ? "Группировать:" : "Group by:",

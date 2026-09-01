@@ -1,6 +1,6 @@
 import {
-  Archive, Ban, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp,
-  CircleDashed, Clock3, FileText, ListChecks, Minus,
+  Archive, Ban, Bot, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp,
+  CircleDashed, Clock3, Hand, ListChecks, Minus,
 } from "lucide-react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { localizedLabel } from "../../../localization/format/labels";
@@ -29,11 +29,22 @@ export function PriorityBadge({ locale, priority }: {
   return <span className={`${styles.chip} ${styles[`priority${capital(priority)}`]}`}>{icon}{localizedLabel(locale, priority)}</span>;
 }
 
+export function CaseTypeIcon({ locale, type, size = 13 }: {
+  locale: TmsLocale;
+  type: TestCaseSummary["type"];
+  size?: number;
+}) {
+  const label = localizedLabel(locale, type);
+  if (type === "automated") return <Bot size={size} aria-label={label} />;
+  if (type === "checklist") return <ListChecks size={size} aria-label={label} />;
+  return <Hand size={size} aria-label={label} />;
+}
+
 export function TypeBadge({ locale, type }: {
   locale: TmsLocale;
   type: TestCaseSummary["type"];
 }) {
-  const icon = type === "manual" ? <FileText size={11} /> : <ListChecks size={11} />;
+  const icon = <span aria-hidden="true"><CaseTypeIcon locale={locale} type={type} size={11} /></span>;
   return <span className={`${styles.chip} ${styles[`type${capital(type)}`]}`}>{icon}{localizedLabel(locale, type)}</span>;
 }
 

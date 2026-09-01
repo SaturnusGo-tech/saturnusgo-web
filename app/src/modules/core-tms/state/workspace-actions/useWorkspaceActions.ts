@@ -39,6 +39,7 @@ export function useWorkspaceActions(
     state.setRunItems([]);
     state.setQuery("");
     state.setCaseFilters({
+      type: "all",
       priority: "all",
       lifecycle: "all",
       tag: "",

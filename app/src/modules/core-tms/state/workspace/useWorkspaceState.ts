@@ -13,6 +13,7 @@ import { useCaseEditorState } from "../case-editor/useCaseEditorState";
 import { useSelectedCaseResource } from "../case-resource/useSelectedCaseResource";
 
 const defaultFilters: CaseFilters = {
+  type: "all",
   priority: "all",
   lifecycle: "all",
   tag: "",

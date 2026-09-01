@@ -38,6 +38,7 @@ export function useCasesViewController(
   })), [props.testCases]);
   const baseRows = useMemo(() => filterCaseRows(allRows.filter(({ testCase }) => (
     (props.filters.includeArchived || !testCase.archivedAt)
+    && (props.filters.type === "all" || testCase.type === props.filters.type)
     && (props.filters.priority === "all" || testCase.priority === props.filters.priority)
     && (props.filters.lifecycle === "all" || testCase.lifecycle === props.filters.lifecycle)
     && (!props.filters.tag.trim() || testCase.tags.some((tag) => (

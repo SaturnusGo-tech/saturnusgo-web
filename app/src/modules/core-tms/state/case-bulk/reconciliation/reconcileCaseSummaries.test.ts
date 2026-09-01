@@ -60,3 +60,23 @@ test("bulk recovery refreshes every response that can invalidate the selected sc
   assert.equal(bulkFailureInvalidatesSelection("CONFLICT"), true);
   assert.equal(bulkFailureInvalidatesSelection("PRECONDITION_FAILED"), false);
 });
+
+test("bulk lifecycle updates preserve automated type and arbitrary tags", () => {
+  const automated = {
+    ...summary("automated"),
+    type: "automated" as const,
+    tags: ["smoke", "ci.backend", "owner-team-a"],
+  };
+  const [result] = reconcileCaseSummaries([automated], [{
+    id: automated.id,
+    key: automated.key,
+    currentRevision: 2,
+    lifecycle: "ready",
+    priority: "high",
+    updatedAt: "2026-09-01T01:00:00Z",
+    etag: '"automated:2"',
+    changed: true,
+  }]);
+  assert.equal(result?.type, "automated");
+  assert.deepEqual(result?.tags, ["smoke", "ci.backend", "owner-team-a"]);
+});

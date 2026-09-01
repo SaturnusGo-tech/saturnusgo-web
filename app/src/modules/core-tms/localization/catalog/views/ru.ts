@@ -87,7 +87,7 @@ export const ruViewMessages = {
   "config.exchangeFailed": "Не удалось выполнить импорт или экспорт тест-кейсов.",
   "config.exchangeFileTooLarge": "Файл превышает лимит импорта 5 МБ.",
   "config.exchangeConnectedOnly": "Импорт и экспорт доступны при подключении к TMS.",
-  "config.exchangeFormat": "Формат: saturnusgo.tms.test-cases.v1 · до 2000 кейсов · повторный импорт безопасен.",
+  "config.exchangeFormat": "Формат: saturnusgo.tms.test-cases.v2 · импорт v1 поддерживается · до 2000 кейсов.",
   "integrations.eyebrow": "Качество взаимодействия систем",
   "integrations.title": "Интеграционное тестирование",
   "integrations.description": "Описывайте контракты между системами отдельно и запускайте их с неизменяемой историей материалов.",

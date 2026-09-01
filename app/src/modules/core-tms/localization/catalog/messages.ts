@@ -2,6 +2,8 @@ import { enActionMessages } from "./actions/en";
 import { ruActionMessages } from "./actions/ru";
 import { enCaseMessages } from "./cases/en";
 import { ruCaseMessages } from "./cases/ru";
+import { enDashboardMessages } from "./dashboard/en";
+import { ruDashboardMessages } from "./dashboard/ru";
 import { enRunMessages } from "./runs/en";
 import { ruRunMessages } from "./runs/ru";
 import { enShellMessages } from "./shell/en";
@@ -14,6 +16,7 @@ const enMessages = {
   ...enCaseMessages,
   ...enRunMessages,
   ...enViewMessages,
+  ...enDashboardMessages,
   ...enActionMessages,
 } as const;
 
@@ -22,6 +25,7 @@ const ruMessages = {
   ...ruCaseMessages,
   ...ruRunMessages,
   ...ruViewMessages,
+  ...ruDashboardMessages,
   ...ruActionMessages,
 } satisfies Record<keyof typeof enMessages, string>;
 

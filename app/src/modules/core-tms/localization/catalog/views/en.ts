@@ -85,7 +85,7 @@ export const enViewMessages = {
   "config.exchangeFailed": "The test-case exchange failed.",
   "config.exchangeFileTooLarge": "The file is larger than the 5 MB import limit.",
   "config.exchangeConnectedOnly": "Import and export are available when TMS is connected.",
-  "config.exchangeFormat": "Format: saturnusgo.tms.test-cases.v1 · up to 2,000 cases · repeat-safe import.",
+  "config.exchangeFormat": "Format: saturnusgo.tms.test-cases.v2 · v1 import supported · up to 2,000 cases.",
   "integrations.eyebrow": "Cross-system quality",
   "integrations.title": "Integration testing",
   "integrations.description": "Model source-to-target contracts separately, then run them with the same immutable evidence trail.",

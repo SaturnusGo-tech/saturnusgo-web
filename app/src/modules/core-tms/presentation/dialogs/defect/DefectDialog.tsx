@@ -14,7 +14,7 @@ import { useAttachmentClient } from "../../../attachments/presentation/context/A
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
-import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, runDefectLabels, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -94,7 +94,7 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
       assigneeIdentityId: null,
       component,
       integrationTarget: routing.target,
-      labels: ["manual-run", run?.type ?? "reported"],
+      labels: runDefectLabels(item?.snapshot.type ?? null, run?.type ?? null),
       runId: run?.id ?? null,
       runItemId: item?.id ?? null,
       stepId: failedStep?.id ?? null,

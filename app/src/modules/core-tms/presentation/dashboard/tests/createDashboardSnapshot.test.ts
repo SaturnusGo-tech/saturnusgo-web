@@ -46,7 +46,7 @@ const data: Bootstrap = {
     {
       id: "case-1", projectId: "project-1", key: "TC-1", folderPath: "/", currentRevision: 1,
       title: "Current", type: "manual", lifecycle: "ready", priority: "high", component: "Core",
-      ownerIdentityId: null, tags: [], estimatedMinutes: 5, revisionCount: 1, archivedAt: null,
+      ownerIdentityId: null, tags: ["smoke"], estimatedMinutes: 5, revisionCount: 1, archivedAt: null,
       createdAt: "2026-08-10T10:00:00.000Z", updatedAt: "2026-08-10T10:00:00.000Z",
       etag: '"case-1:1"',
     },
@@ -93,17 +93,25 @@ const data: Bootstrap = {
 };
 
 test("dashboard snapshot uses only authoritative project records in its 30-day window", () => {
-  const result = createDashboardSnapshot(data, "project-1");
-  assert.equal(result.cases, 1);
-  assert.equal(result.casesCreated, 1);
-  assert.equal(result.runsStarted, 2);
-  assert.equal(result.runsStartedRecent, 1);
-  assert.equal(result.failures, 3);
-  assert.equal(result.failuresRecent, 3);
-  assert.equal(result.openDefects, 1);
-  assert.equal(result.passRate, 55.6);
+  const result = createDashboardSnapshot(data, {
+    workspaceId: "workspace-1", projectId: "project-1", period: "30d",
+  });
+  assert.equal(result.metrics.currentCases, 1);
+  assert.equal(result.metrics.casesCreated, 1);
+  assert.equal(result.metrics.runsLaunched, 1);
+  assert.equal(result.metrics.completedRuns, 2);
+  assert.equal(result.metrics.openDefects, 1);
+  assert.equal(result.metrics.reportedDefects, 1);
+  assert.equal(result.metrics.passRate, null);
+  assert.equal(result.trend.every(({ passRate }) => passRate === null), true);
   assert.equal(result.trend.length, 30);
-  assert.equal(result.trend.find(({ day }) => day === "2026-08-16")?.runs, 1);
-  assert.equal(result.trend.find(({ day }) => day === "2026-08-17")?.failures, 1);
-  assert.deepEqual(result.distribution.map(({ value }) => value), [3, 1, 2]);
+  assert.equal(result.trend.find(({ day }) => day === "2026-08-16")?.launched, 1);
+  assert.equal(result.trend.find(({ day }) => day === "2026-08-17")?.failed, 1);
+  assert.deepEqual(result.runOutcomes.map(({ value }) => value), [0, 2, 0, 0, 0, 0]);
+  assert.deepEqual(result.caseTypes.map(({ value }) => value), [1, 0, 0]);
+  assert.equal(result.tags[0]?.key, "smoke");
+  assert.equal(result.hotspots[0]?.kind, "component");
+  assert.deepEqual(result.hotspots[0]?.drills.cases.filter, {
+    entity: "test_case", basis: "current", component: "Core",
+  });
 });

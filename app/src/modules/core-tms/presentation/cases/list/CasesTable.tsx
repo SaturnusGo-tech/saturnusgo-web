@@ -1,10 +1,10 @@
 import { Fragment, useMemo, useState } from "react";
-import { AlertTriangle, ArrowDown, ArrowUp, ChevronDown, ChevronRight, Hand, ListChecks, Search } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, ChevronDown, ChevronRight, ListChecks, Search } from "lucide-react";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { groupCaseRows, visibleCaseTabStop, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
 import type { CaseListRow, CaseSort, CaseSortKey } from "../types";
-import { LifecycleBadge, PriorityBadge } from "./CaseBadges";
+import { CaseTypeIcon, LifecycleBadge, PriorityBadge } from "./CaseBadges";
 import { CaseSelectionCheckbox } from "../bulk/checkbox/CaseSelectionCheckbox";
 import { CaseSelectionHeader } from "../bulk/checkbox/CaseSelectionHeader";
 import { selectionCoverage, type SelectionCoverage } from "../bulk/selection/caseSelection";
@@ -140,7 +140,7 @@ export function CasesTable(props: Props) {
               }}>
               <td className={styles.selectionCell}>{props.selectionMode && <CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} />}</td>
               <td className={styles.flagCell}><AlertTriangle className={styles[`priorityFlag_${item.priority}`]} size={13} aria-label={localizedLabel(props.locale, item.priority)} /></td>
-              <td className={styles.typeCell}>{item.type === "manual" ? <Hand size={13} aria-label={ru ? "Ручной" : "Manual"} /> : <ListChecks size={13} aria-label={ru ? "Чеклист" : "Checklist"} />}</td>
+              <td className={styles.typeCell}><CaseTypeIcon locale={props.locale} type={item.type} /></td>
               <td className={styles.keyCell} title={item.key}><strong>{item.key}</strong></td>
               <td><LifecycleBadge locale={props.locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></td>
               <td className={styles.titleCell}><strong title={`${item.title}\n${row.folderPath}`}>{item.title}</strong></td>

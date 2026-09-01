@@ -6,7 +6,7 @@ import { createDefect } from "../../../application/defects/createDefect";
 import { describeDefectCreateError } from "../../../application/defects/describeDefectCreateError";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
-import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, runDefectLabels, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
@@ -64,7 +64,8 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
     const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`,
       severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null,
-      component, integrationTarget: routing.target, labels: ["manual-run", run.type], runId: run.id, runItemId: item.id,
+      component, integrationTarget: routing.target,
+      labels: runDefectLabels(item.snapshot.type, run.type), runId: run.id, runItemId: item.id,
       stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed,
     };
     try {

@@ -1,4 +1,8 @@
-import type { Defect } from "../../../../core/tms/contracts/legacy-contract";
+import type {
+  Defect,
+  TestCaseRevision,
+  TestRunSummary,
+} from "../../../../core/tms/contracts/legacy-contract";
 
 export type DefectIntegrationTarget = Defect["integrationTarget"];
 export type DefectIntegrationChoice = "" | "tms" | Exclude<DefectIntegrationTarget, null>;
@@ -34,4 +38,14 @@ export function resolveDefectIntegrationChoice(
 ): ResolvedDefectIntegrationChoice {
   if (choice === "") return Object.freeze({ resolved: false, target: null });
   return Object.freeze({ resolved: true, target: choice === "tms" ? null : choice });
+}
+
+export function runDefectLabels(
+  caseType: TestCaseRevision["type"] | null,
+  runType: TestRunSummary["type"] | null,
+): string[] {
+  return Array.from(new Set([
+    caseType ? `${caseType}-run` : "reported",
+    runType ?? "reported",
+  ]));
 }

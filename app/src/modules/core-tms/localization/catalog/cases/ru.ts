@@ -66,7 +66,7 @@ export const ruCaseMessages = {
   "caseDialog.editTitle": "Изменить тест-кейс",
   "caseDialog.createTitle": "Создать тест-кейс",
   "caseDialog.editSubtitle": "Сохранение создаст новую неизменяемую ревизию.",
-  "caseDialog.createSubtitle": "Пошаговое создание повторяемой ручной проверки.",
+  "caseDialog.createSubtitle": "Пошаговое создание повторяемого тест-кейса.",
   "caseDialog.basics": "1. Основное",
   "caseDialog.procedure": "2. Процедура",
   "caseDialog.review": "3. Проверка",

@@ -16,11 +16,11 @@ function document(): TestCaseExchangeDocument {
       title: "Host entry",
       description: "Description",
       preconditions: "Signed out",
-      type: "manual",
+      type: "automated",
       lifecycle: "ready",
       priority: "critical",
       component: "Host Entry",
-      tags: ["host", "ui"],
+      tags: ["host", "ui", "ci.backend"],
       estimatedMinutes: 4,
       testData: "",
       steps: [{ order: 1, action: "Open", expectedResult: "Visible", testData: "", required: true }],
@@ -45,6 +45,8 @@ test("imports with a stable key and preserves the external source marker", async
   const body = requests[0]?.body as { ownerIdentityId: unknown; tags: string[]; changeNote: string };
   assert.equal(body.ownerIdentityId, null);
   assert.ok(body.tags.includes("source-host-entry-001"));
+  assert.deepEqual(body.tags.slice(0, 3), ["host", "ui", "ci.backend"]);
+  assert.equal((requests[0]?.body as { type: string }).type, "automated");
   assert.equal(body.changeNote, "Imported from HOST-ENTRY-001");
 });
 
@@ -60,14 +62,17 @@ test("exports all cursor pages and current revision content", async () => {
       key: path.endsWith("case-1") ? "HOST-TC-1" : "HOST-TC-2",
       folderPath: "/Host",
       current: {
-        title: "Case", description: "", preconditions: "", type: "manual", lifecycle: "ready",
-        priority: "high", component: "Host", tags: ["host"], estimatedMinutes: 3, testData: "",
+        title: "Case", description: "", preconditions: "", type: "automated", lifecycle: "ready",
+        priority: "high", component: "Host", tags: ["host", "ci.backend"], estimatedMinutes: 3, testData: "",
         steps: [{ order: 1, action: "Act", expectedResult: "Observe", required: true }], checklist: [],
       },
     }, etag: '"1"' }),
   } as unknown as TmsHttpClient;
   const exported = await exportProjectCases(http, { id: "project-host", key: "HOST", name: "Umbrella-Host" });
+  assert.equal(exported.schemaVersion, "saturnusgo.tms.test-cases.v2");
   assert.equal(exported.testCases.length, 2);
   assert.deepEqual(exported.testCases.map((item) => item.sourceKey), ["HOST-TC-1", "HOST-TC-2"]);
   assert.equal(exported.testCases[0]?.steps[0]?.testData, "");
+  assert.equal(exported.testCases[0]?.type, "automated");
+  assert.deepEqual(exported.testCases[0]?.tags, ["host", "ci.backend"]);
 });

@@ -93,7 +93,7 @@ export const ruShellMessages = {
   "workspace.loadingLatest": "Загружаем актуальное состояние рабочего пространства.",
   "workspace.projectDescription": "Проекты изолируют тест-кейсы, окружения, сьюты, раны и дефекты. Начните с реального проекта — демо-данные не добавляются.",
   "workspace.buildRepository": "Соберите репозиторий",
-  "workspace.buildRepositoryDescription": "Создайте папки, ручные тест-кейсы и чек-листы.",
+  "workspace.buildRepositoryDescription": "Создайте папки, ручные или автоматизированные тест-кейсы и чек-листы.",
   "workspace.defineCoverage": "Определите покрытие",
   "workspace.defineCoverageDescription": "Объединяйте выбранные кейсы в смоук- и регресс-сьюты.",
   "workspace.runAndReport": "Запускайте и фиксируйте",

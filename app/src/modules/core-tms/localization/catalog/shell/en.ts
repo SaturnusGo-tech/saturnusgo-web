@@ -91,7 +91,7 @@ export const enShellMessages = {
   "workspace.loadingLatest": "Loading the latest workspace state.",
   "workspace.projectDescription": "Projects keep test cases, environments, suites, runs, and defects isolated. Start with a real project—no sample records will be added.",
   "workspace.buildRepository": "Build the repository",
-  "workspace.buildRepositoryDescription": "Create folders, manual cases, and checklists.",
+  "workspace.buildRepositoryDescription": "Create folders, manual or automated cases, and checklists.",
   "workspace.defineCoverage": "Define coverage",
   "workspace.defineCoverageDescription": "Group exact cases into smoke or regression suites.",
   "workspace.runAndReport": "Run and report",

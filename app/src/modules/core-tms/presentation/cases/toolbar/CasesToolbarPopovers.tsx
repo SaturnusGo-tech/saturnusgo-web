@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Box, Check, ChevronRight, CircleDot, Flag, Folder, Search, X } from "lucide-react";
+import { ArrowLeft, Bot, Box, Check, ChevronRight, CircleDot, Flag, Folder, Search, X } from "lucide-react";
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import type { CaseFilters } from "../../../state/types/workspace";
 import type { CaseFacetFilters, CaseFacetOptions } from "../model/caseListModel";
 import styles from "../listing/caseListing.module.css";
 
-const resetFilters: CaseFilters = { priority: "all", lifecycle: "all", tag: "", includeArchived: false };
+const resetFilters: CaseFilters = { type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false };
 const priorities = ["all", "critical", "high", "medium", "low"] as const;
 const lifecycles = ["all", "ready", "draft", "deprecated"] as const;
-type FilterSection = "folders" | "components" | "priority" | "lifecycle";
+const caseTypes = ["all", "manual", "checklist", "automated"] as const;
+type FilterSection = "folders" | "components" | "type" | "priority" | "lifecycle";
 
 type FilterProps = {
   locale: TmsLocale; filters: CaseFilters; facets: CaseFacetFilters; options: CaseFacetOptions;
@@ -23,14 +24,14 @@ export function CaseFilterMenu(props: FilterProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
   const returnSectionRef = useRef<FilterSection | null>(null);
-  const labels = { folders: ru ? "Папки" : "Folders", components: ru ? "Компоненты" : "Components", priority: ru ? "Приоритет" : "Priority", lifecycle: ru ? "Статус" : "Status" };
+  const labels = { folders: ru ? "Папки" : "Folders", components: ru ? "Компоненты" : "Components", type: ru ? "Тип" : "Type", priority: ru ? "Приоритет" : "Priority", lifecycle: ru ? "Статус" : "Status" };
   const valueLabel = (value: string) => {
     const values: Record<string, string> = ru
-      ? { all: "Все", critical: "Критический", high: "Высокий", medium: "Средний", low: "Низкий", ready: "Готов", draft: "Черновик", deprecated: "Устарел" }
-      : { all: "All", critical: "Critical", high: "High", medium: "Medium", low: "Low", ready: "Ready", draft: "Draft", deprecated: "Deprecated" };
+      ? { all: "Все", manual: "Ручной", checklist: "Чек-лист", automated: "Автоматизированный", critical: "Критический", high: "Высокий", medium: "Средний", low: "Низкий", ready: "Готов", draft: "Черновик", deprecated: "Устарел" }
+      : { all: "All", manual: "Manual", checklist: "Checklist", automated: "Automated", critical: "Critical", high: "High", medium: "Medium", low: "Low", ready: "Ready", draft: "Draft", deprecated: "Deprecated" };
     return values[value] ?? value;
   };
-  const values = section === "folders" ? props.options.folders : section === "components" ? props.options.components : section === "priority" ? priorities : lifecycles;
+  const values = section === "folders" ? props.options.folders : section === "components" ? props.options.components : section === "type" ? caseTypes : section === "priority" ? priorities : lifecycles;
   const visibleValues = values.filter((value) => {
     const label = section === "components" ? localizedComponentLabel(props.locale, value) : valueLabel(value);
     return label.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase());
@@ -48,6 +49,7 @@ export function CaseFilterMenu(props: FilterProps) {
     props.onFacets({ ...props.facets, [field]: current.includes(value) ? current.filter((item) => item !== value) : [...current, value] });
   }
   function chooseSingle(value: string) {
+    if (section === "type") props.onFilters({ ...props.filters, type: value as CaseFilters["type"] });
     if (section === "priority") props.onFilters({ ...props.filters, priority: value as CaseFilters["priority"] });
     if (section === "lifecycle") props.onFilters({ ...props.filters, lifecycle: value as CaseFilters["lifecycle"] });
     setSection(null);
@@ -85,7 +87,7 @@ export function CaseFilterMenu(props: FilterProps) {
       {(section === "folders" || section === "components") && <label className={styles.facetSearch}><Search size={13} /><input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === "ArrowDown" || event.key === "End") { event.preventDefault(); focusFacetOption(event.key === "End" ? "last" : "first"); } }} aria-controls={`case-filter-options-${section}`} placeholder={section === "folders" ? (ru ? "Поиск папок" : "Search folders") : (ru ? "Поиск компонентов" : "Search components")} /></label>}
       <div ref={optionsRef} id={`case-filter-options-${section}`} className={styles.facetOptions} role="listbox" aria-multiselectable={section === "folders" || section === "components"} aria-label={labels[section]} onKeyDown={onFacetOptionsKeyDown}>
         {visibleValues.map((value) => {
-          const selected = section === "folders" ? props.facets.folders.includes(value) : section === "components" ? props.facets.components.includes(value) : section === "priority" ? props.filters.priority === value : props.filters.lifecycle === value;
+          const selected = section === "folders" ? props.facets.folders.includes(value) : section === "components" ? props.facets.components.includes(value) : section === "type" ? props.filters.type === value : section === "priority" ? props.filters.priority === value : props.filters.lifecycle === value;
           const label = section === "components" ? localizedComponentLabel(props.locale, value) : valueLabel(value);
           return <button type="button" role="option" tabIndex={-1} aria-selected={selected} key={value} className={selected ? styles.optionActive : ""} onClick={() => section === "folders" || section === "components" ? toggleMulti(section, value) : chooseSingle(value)}><span title={label}>{label}</span>{selected && <Check size={12} />}</button>;
         })}
@@ -94,6 +96,7 @@ export function CaseFilterMenu(props: FilterProps) {
     </> : <div className={styles.filterMenuBody} role="menu" aria-label={ru ? "Параметры фильтра" : "Filter options"}>
       <button type="button" role="menuitem" data-filter-section="folders" aria-haspopup="listbox" onClick={() => openSection("folders")}><Folder size={13} /><span>{labels.folders}</span><small>{selectedCount("folders") || (ru ? "Все" : "All")}</small><ChevronRight size={13} /></button>
       <button type="button" role="menuitem" data-filter-section="components" aria-haspopup="listbox" onClick={() => openSection("components")}><Box size={13} /><span>{labels.components}</span><small>{selectedCount("components") || (ru ? "Все" : "All")}</small><ChevronRight size={13} /></button>
+      <button type="button" role="menuitem" data-filter-section="type" aria-haspopup="listbox" onClick={() => openSection("type")}><Bot size={13} /><span>{labels.type}</span><small>{valueLabel(props.filters.type)}</small><ChevronRight size={13} /></button>
       <button type="button" role="menuitem" data-filter-section="priority" aria-haspopup="listbox" onClick={() => openSection("priority")}><Flag size={13} /><span>{labels.priority}</span><small>{valueLabel(props.filters.priority)}</small><ChevronRight size={13} /></button>
       <button type="button" role="menuitem" data-filter-section="lifecycle" aria-haspopup="listbox" onClick={() => openSection("lifecycle")}><CircleDot size={13} /><span>{labels.lifecycle}</span><small>{valueLabel(props.filters.lifecycle)}</small><ChevronRight size={13} /></button>
       <label className={styles.compactTag}><span>{ru ? "Тег" : "Tag"}</span><input value={props.filters.tag} onChange={(event) => props.onFilters({ ...props.filters, tag: event.target.value })} placeholder={ru ? "Содержит…" : "Contains…"} /></label>
@@ -109,7 +112,7 @@ const qlFields: QlField[] = [
   { key: "lifecycle", ru: "Статус", en: "Status", values: ["ready", "draft", "deprecated", "archived"] },
   { key: "priority", ru: "Приоритет", en: "Priority", values: ["critical", "high", "medium", "low"] },
   { key: "component", ru: "Компонент", en: "Component" }, { key: "folder", ru: "Папка", en: "Folder" },
-  { key: "tag", ru: "Тег", en: "Tag" }, { key: "type", ru: "Тип", en: "Type", values: ["manual", "checklist"] },
+  { key: "tag", ru: "Тег", en: "Tag" }, { key: "type", ru: "Тип", en: "Type", values: ["manual", "checklist", "automated"] },
   { key: "owner", ru: "Ответственный", en: "Owner" },
 ];
 const qlFieldAliases: Record<string, string> = {

@@ -128,11 +128,12 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
   const activeTab: DetailTab = creating ? "overview" : tab;
-  const problem = props.editor
-    ? inspectorRevisionProblem(revision, props.editor.folderPath) : null;
+  const problem = props.editor ? inspectorRevisionProblem(revision, props.editor.folderPath) : null;
   const problemMessage = problem === "title" ? (ru ? "Укажите название" : "Add a title")
     : problem === "folder" ? (ru ? "Укажите папку" : "Choose a folder")
+    : problem === "tags" ? (ru ? "Теги: до 100 значений из строчных латинских букв, цифр, ., _ или -" : "Tags: up to 100 lowercase values using letters, numbers, ., _, or -")
     : problem === "manualSteps" ? (ru ? "Заполните действие и результат шага" : "Complete each step action and result")
+    : problem === "automatedSteps" ? (ru ? "Добавьте хотя бы один шаг автотеста и заполните действие и результат" : "Add at least one automated step and complete its action and result")
     : problem === "checklist" ? (ru ? "Добавьте пункт чек-листа" : "Add a checklist item") : "";
   const keyLabel = creating
     ? (ru ? "Новый тест-кейс" : "New test case")

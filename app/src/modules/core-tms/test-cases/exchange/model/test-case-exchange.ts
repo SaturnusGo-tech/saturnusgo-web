@@ -1,6 +1,11 @@
-export const TEST_CASE_EXCHANGE_SCHEMA = "saturnusgo.tms.test-cases.v1";
+export const LEGACY_TEST_CASE_EXCHANGE_SCHEMA = "saturnusgo.tms.test-cases.v1";
+export const TEST_CASE_EXCHANGE_SCHEMA = "saturnusgo.tms.test-cases.v2";
 export const TEST_CASE_IMPORT_LIMIT = 2_000;
 export const TEST_CASE_IMPORT_BYTES = 5_000_000;
+
+export type TestCaseExchangeSchema =
+  | typeof LEGACY_TEST_CASE_EXCHANGE_SCHEMA
+  | typeof TEST_CASE_EXCHANGE_SCHEMA;
 
 export type PortableTestStep = Readonly<{
   order: number;
@@ -22,7 +27,7 @@ export type PortableTestCase = Readonly<{
   title: string;
   description: string;
   preconditions: string;
-  type: "manual" | "checklist";
+  type: "manual" | "checklist" | "automated";
   lifecycle: "draft" | "ready" | "deprecated";
   priority: "low" | "medium" | "high" | "critical";
   component: string;
@@ -34,7 +39,7 @@ export type PortableTestCase = Readonly<{
 }>;
 
 export type TestCaseExchangeDocument = Readonly<{
-  schemaVersion: typeof TEST_CASE_EXCHANGE_SCHEMA;
+  schemaVersion: TestCaseExchangeSchema;
   exportedAt: string;
   project: Readonly<{ key: string; name: string }>;
   metadata?: Readonly<Record<string, unknown>>;

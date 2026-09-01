@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0016.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is compatible with the running artifact. Stage A accepts 0017 through 0018 with both new feature flags disabled; Stage B requires exactly 0018.
          */
         get: operations["getHealth"];
         put?: never;
@@ -1106,6 +1106,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dashboard-analytics/summary": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read bounded testing analytics and transparent risk hotspots
+         * @description Returns current inventory separately from event-window metrics. Product means canonical Project; Component is free text and remains a separate dimension. Workspace scope includes active Projects only, while an explicit projectId may select an archived Project. Tag buckets are multi-valued and are not a pie total. Risk hotspots expose raw counts and rates and use the documented deterministic ordering rather than an opaque score. Work is capped at 1,000 Projects, 2,000 event runs and 100,000 run items.
+         */
+        get: operations["getDashboardAnalyticsSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard-analytics/test-cases": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Drill into an exact test-case analytics cohort
+         * @description current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Current-revision dimensions and coverage apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.
+         */
+        get: operations["listDashboardAnalyticsTestCases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard-analytics/runs": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Drill into an exact run analytics cohort
+         * @description launched uses startedAt; completed uses completedAt or abortedAt; active is the current live set and ignores the period. A passed outcome requires every run item to pass; any skipped item makes an otherwise terminal run incomplete. Component and itemStatus are container filters that select runs containing a matching immutable case snapshot item. Use the run-items drill when a displayed item count must reconcile 1:1.
+         */
+        get: operations["listDashboardAnalyticsRuns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard-analytics/run-items": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Drill into exact completed-run item counts
+         * @description Returns one row per run item, so meta.total reconciles 1:1 with timeline completedItems and every risk run-item count. The half-open event window uses the parent run completedAt or abortedAt. Omit status for total runItemsInPeriod; use a terminal status for timeline item counts. Component is read from the immutable case revision referenced by the run snapshot; componentIsEmpty selects its null/empty bucket.
+         */
+        get: operations["listDashboardAnalyticsRunItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard-analytics/defects": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Drill into an exact defect analytics cohort with safe links
+         * @description reported uses createdAt in the period and includes archived records; current is the live non-archived set and ignores the period. Returned links are Falcon or active HTTPS external/YouTrack links only. occurrence identifies the immutable originating run item, case revision and step. Current risk filters reproduce Component, active/open and critical hotspot cohorts.
+         */
+        get: operations["listDashboardAnalyticsDefects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dashboards": {
         parameters: {
             query?: never;
@@ -1296,8 +1411,369 @@ export interface components {
             hasMore: boolean;
             nextCursor: string | null;
         };
+        /** @description Non-negative server-owned count within JavaScript safe-integer range. */
+        AnalyticsCount: number;
+        AnalyticsPeriod: {
+            /** @enum {string} */
+            preset: "7d" | "30d" | "90d" | "custom";
+            /** @description Inclusive UTC event bound. */
+            from: components["schemas"]["Timestamp"];
+            /** @description Exclusive UTC event bound. */
+            to: components["schemas"]["Timestamp"];
+        };
+        AnalyticsPageMeta: {
+            limit: number;
+            hasMore: boolean;
+            nextCursor: string | null;
+            period: components["schemas"]["AnalyticsPeriod"];
+            /** @description False for live current/active bases that intentionally ignore the event window. */
+            periodApplied: boolean;
+        };
+        AnalyticsRunItemPageMeta: {
+            limit: number;
+            hasMore: boolean;
+            nextCursor: string | null;
+            period: components["schemas"]["AnalyticsPeriod"];
+            /** @constant */
+            periodApplied: true;
+            total: components["schemas"]["AnalyticsCount"];
+        };
         /** @enum {string} */
-        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "INTERNAL_ERROR";
+        AnalyticsTestCaseType: "manual" | "checklist" | "automated";
+        /**
+         * @description passed requires every run item to pass; a terminal run containing skipped items is incomplete.
+         * @enum {string}
+         */
+        AnalyticsRunOutcome: "passed" | "failed" | "blocked" | "incomplete" | "not_started" | "aborted";
+        AnalyticsTestCaseTypeBucket: {
+            key: components["schemas"]["AnalyticsTestCaseType"];
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsRunStatusBucket: {
+            key: components["schemas"]["RunStatus"];
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsRunOutcomeBucket: {
+            key: components["schemas"]["AnalyticsRunOutcome"];
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsDefectStatusBucket: {
+            key: components["schemas"]["DefectStatus"];
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsStringBucket: {
+            key: string;
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsNullableStringBucket: {
+            key: string | null;
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsProjectBucket: {
+            projectId: components["schemas"]["Identifier"];
+            projectKey: string;
+            projectName: string;
+            count: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsStringDimension: {
+            buckets: components["schemas"]["AnalyticsStringBucket"][];
+            totalBuckets: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        AnalyticsNullableStringDimension: {
+            buckets: components["schemas"]["AnalyticsNullableStringBucket"][];
+            totalBuckets: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        AnalyticsProjectDimension: {
+            buckets: components["schemas"]["AnalyticsProjectBucket"][];
+            totalBuckets: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        DashboardAnalyticsBasis: {
+            /** @constant */
+            testCaseCurrent: "current_inventory_at_as_of";
+            /** @constant */
+            testCaseCreated: "created_at";
+            /** @constant */
+            runLaunched: "started_at";
+            /** @constant */
+            runCompleted: "completed_at_or_aborted_at";
+            /** @constant */
+            runActive: "current_at_as_of";
+            /** @constant */
+            defectReported: "created_at";
+            /** @constant */
+            defectCurrent: "current_at_as_of";
+        };
+        DashboardAnalyticsTestCases: {
+            current: {
+                total: components["schemas"]["AnalyticsCount"];
+                byType: components["schemas"]["AnalyticsTestCaseTypeBucket"][];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+                /** @description Multi-valued tag buckets overlap and are not a pie total. */
+                byTag: components["schemas"]["AnalyticsStringDimension"];
+                untagged: components["schemas"]["AnalyticsCount"];
+                /** @description Available only for explicit Project scope. Null/empty Component uses a null bucket key. */
+                byComponent: components["schemas"]["AnalyticsNullableStringDimension"] | null;
+            };
+            createdInPeriod: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsTimelineCompletedOutcomes: {
+            passed: components["schemas"]["AnalyticsCount"];
+            failed: components["schemas"]["AnalyticsCount"];
+            blocked: components["schemas"]["AnalyticsCount"];
+            incomplete: components["schemas"]["AnalyticsCount"];
+            notStarted: components["schemas"]["AnalyticsCount"];
+            aborted: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsTimelineCompletedItems: {
+            passed: components["schemas"]["AnalyticsCount"];
+            failed: components["schemas"]["AnalyticsCount"];
+            blocked: components["schemas"]["AnalyticsCount"];
+            skipped: components["schemas"]["AnalyticsCount"];
+        };
+        AnalyticsRunTimelineBucket: {
+            /** @description Inclusive exact UTC bound. Drill launched runs with basis=launched, outcomes with basis=completed, or item counts through /dashboard-analytics/run-items; use period=custom, from=start and to=end. */
+            start: components["schemas"]["Timestamp"];
+            /** @description Exclusive exact UTC bound. */
+            end: components["schemas"]["Timestamp"];
+            launched: components["schemas"]["AnalyticsCount"];
+            completedOutcomes: components["schemas"]["AnalyticsTimelineCompletedOutcomes"];
+            completedItems: components["schemas"]["AnalyticsTimelineCompletedItems"];
+            /** @description passed items divided by passed+failed+blocked items; skipped items are excluded. Null when that denominator is zero. */
+            passRate: number | null;
+        };
+        AnalyticsRunTimeline: {
+            /** @constant */
+            timezone: "UTC";
+            /**
+             * @description day for 7d/30d and custom windows no longer than 31 exact days; otherwise week. Buckets are fixed 24h/168h intervals anchored at period.from, not local calendar boundaries.
+             * @enum {string}
+             */
+            granularity: "day" | "week";
+            /** @description Server-zero-filled contiguous half-open buckets; the final bucket may be shorter and ends exactly at period.to. */
+            buckets: components["schemas"]["AnalyticsRunTimelineBucket"][];
+        };
+        DashboardAnalyticsRuns: {
+            timeline: components["schemas"]["AnalyticsRunTimeline"];
+            launchedInPeriod: {
+                total: components["schemas"]["AnalyticsCount"];
+                byStatus: components["schemas"]["AnalyticsRunStatusBucket"][];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+            };
+            completedInPeriod: {
+                total: components["schemas"]["AnalyticsCount"];
+                byOutcome: components["schemas"]["AnalyticsRunOutcomeBucket"][];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+            };
+            currentActive: {
+                total: components["schemas"]["AnalyticsCount"];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+            };
+        };
+        DashboardAnalyticsDefects: {
+            reportedInPeriod: {
+                total: components["schemas"]["AnalyticsCount"];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+            };
+            current: {
+                total: components["schemas"]["AnalyticsCount"];
+                linked: components["schemas"]["AnalyticsCount"];
+                totalExternalLinks: components["schemas"]["AnalyticsCount"];
+                byStatus: components["schemas"]["AnalyticsDefectStatusBucket"][];
+                byProject: components["schemas"]["AnalyticsProjectDimension"];
+            };
+        };
+        AnalyticsRiskMetrics: {
+            currentTestCases: components["schemas"]["AnalyticsCount"];
+            coveredTestCases: components["schemas"]["AnalyticsCount"];
+            /** @description Exact /dashboard-analytics/run-items total with matching Project/Component and no status filter. */
+            runItemsInPeriod: components["schemas"]["AnalyticsCount"];
+            /** @description Exact run-items total with status=passed. */
+            passedRunItems: components["schemas"]["AnalyticsCount"];
+            /** @description Exact run-items total with status=failed. */
+            failedRunItems: components["schemas"]["AnalyticsCount"];
+            /** @description Exact run-items total with status=blocked. */
+            blockedRunItems: components["schemas"]["AnalyticsCount"];
+            openDefects: components["schemas"]["AnalyticsCount"];
+            criticalOpenDefects: components["schemas"]["AnalyticsCount"];
+            passRate: number | null;
+            coverageRate: number | null;
+        };
+        AnalyticsProjectRiskHotspot: components["schemas"]["AnalyticsRiskMetrics"] & {
+            projectId: components["schemas"]["Identifier"];
+            projectKey: string;
+            projectName: string;
+        };
+        AnalyticsComponentRiskHotspot: components["schemas"]["AnalyticsProjectRiskHotspot"] & {
+            component: string | null;
+        };
+        AnalyticsProjectRiskDimension: {
+            hotspots: components["schemas"]["AnalyticsProjectRiskHotspot"][];
+            totalHotspots: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+            /** @constant */
+            sort: "failed_desc_blocked_desc_critical_open_defects_desc_open_defects_desc_coverage_asc_pass_rate_asc_key_asc";
+        };
+        AnalyticsComponentRiskDimension: {
+            hotspots: components["schemas"]["AnalyticsComponentRiskHotspot"][];
+            totalHotspots: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+            /** @constant */
+            sort: "failed_desc_blocked_desc_critical_open_defects_desc_open_defects_desc_coverage_asc_pass_rate_asc_key_asc";
+        };
+        DashboardAnalyticsRiskHotspots: {
+            basis: {
+                /** @constant */
+                runItems: "runs_completed_at_or_aborted_at_in_period";
+                /** @constant */
+                coverage: "current_cases_in_runs_started_in_period";
+                /** @constant */
+                defects: "current_open_at_as_of";
+            };
+            byProject: components["schemas"]["AnalyticsProjectRiskDimension"];
+            byComponent: components["schemas"]["AnalyticsComponentRiskDimension"];
+        };
+        DashboardAnalyticsSummary: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            generatedAt: components["schemas"]["Timestamp"];
+            /** @description Live snapshot statement time for all current sections; this is not a historical as-of query. */
+            asOf: components["schemas"]["Timestamp"];
+            period: components["schemas"]["AnalyticsPeriod"];
+            basis: components["schemas"]["DashboardAnalyticsBasis"];
+            testCases: components["schemas"]["DashboardAnalyticsTestCases"];
+            runs: components["schemas"]["DashboardAnalyticsRuns"];
+            defects: components["schemas"]["DashboardAnalyticsDefects"];
+            riskHotspots: components["schemas"]["DashboardAnalyticsRiskHotspots"];
+        };
+        DashboardAnalyticsSummaryEnvelope: {
+            data: components["schemas"]["DashboardAnalyticsSummary"];
+        };
+        DashboardAnalyticsTestCase: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            type: components["schemas"]["AnalyticsTestCaseType"];
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            component: string;
+            tags: string[];
+            /** Format: date-time */
+            archivedAt: string | null;
+            /** @enum {string} */
+            basis: "current" | "created";
+            etag: string;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            sortAt: components["schemas"]["Timestamp"];
+        };
+        DashboardAnalyticsRunProgress: {
+            total: components["schemas"]["AnalyticsCount"];
+            notRun: components["schemas"]["AnalyticsCount"];
+            inProgress: components["schemas"]["AnalyticsCount"];
+            passed: components["schemas"]["AnalyticsCount"];
+            failed: components["schemas"]["AnalyticsCount"];
+            blocked: components["schemas"]["AnalyticsCount"];
+            skipped: components["schemas"]["AnalyticsCount"];
+        };
+        DashboardAnalyticsRun: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            name: string;
+            type: components["schemas"]["RunType"];
+            status: components["schemas"]["RunStatus"];
+            outcome: components["schemas"]["AnalyticsRunOutcome"];
+            /** @enum {string} */
+            basis: "launched" | "completed" | "active";
+            progress: components["schemas"]["DashboardAnalyticsRunProgress"];
+            /** Format: date-time */
+            startedAt: string | null;
+            /** Format: date-time */
+            completedAt: string | null;
+            /** Format: date-time */
+            abortedAt: string | null;
+            /** Format: date-time */
+            archivedAt: string | null;
+            updatedAt: components["schemas"]["Timestamp"];
+            sortAt: components["schemas"]["Timestamp"];
+        };
+        DashboardAnalyticsRunItem: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runKey: string;
+            runName: string;
+            runType: components["schemas"]["RunType"];
+            testCaseId: components["schemas"]["Identifier"];
+            testCaseKey: string;
+            revisionNo: number;
+            title: string;
+            caseType: components["schemas"]["AnalyticsTestCaseType"];
+            component: string | null;
+            status: components["schemas"]["ExecutionStatus"];
+            attemptNo: number;
+            /** @description Parent run completedAt or abortedAt, used as the immutable half-open period and cursor basis. */
+            eventAt: components["schemas"]["Timestamp"];
+            sortAt: components["schemas"]["Timestamp"];
+        };
+        DashboardAnalyticsDefectOccurrence: {
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            testCaseId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId: components["schemas"]["Identifier"] | null;
+        };
+        DashboardAnalyticsDefectLink: {
+            /** @enum {string} */
+            kind: "falcon" | "external" | "youtrack";
+            label: string;
+            /** Format: uri */
+            url: string;
+        };
+        DashboardAnalyticsDefect: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            status: components["schemas"]["DefectStatus"];
+            severity: components["schemas"]["Priority"];
+            priority: components["schemas"]["Priority"];
+            component: string;
+            occurrence: components["schemas"]["DashboardAnalyticsDefectOccurrence"] | null;
+            defectEtag: string;
+            /** @description Always starts with the safe Falcon resource link, followed by at most five active HTTPS external/YouTrack links. */
+            links: components["schemas"]["DashboardAnalyticsDefectLink"][];
+            linksTruncated: boolean;
+            /** @enum {string} */
+            basis: "reported" | "current";
+            /** Format: date-time */
+            archivedAt: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            sortAt: components["schemas"]["Timestamp"];
+        };
+        DashboardAnalyticsTestCaseListEnvelope: {
+            data: components["schemas"]["DashboardAnalyticsTestCase"][];
+            meta: components["schemas"]["AnalyticsPageMeta"];
+        };
+        DashboardAnalyticsRunListEnvelope: {
+            data: components["schemas"]["DashboardAnalyticsRun"][];
+            meta: components["schemas"]["AnalyticsPageMeta"];
+        };
+        DashboardAnalyticsRunItemListEnvelope: {
+            data: components["schemas"]["DashboardAnalyticsRunItem"][];
+            meta: components["schemas"]["AnalyticsRunItemPageMeta"];
+        };
+        DashboardAnalyticsDefectListEnvelope: {
+            data: components["schemas"]["DashboardAnalyticsDefect"][];
+            meta: components["schemas"]["AnalyticsPageMeta"];
+        };
+        /** @enum {string} */
+        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "INTERNAL_ERROR";
         ValidationIssue: {
             field: string;
             code: string;
@@ -1441,8 +1917,11 @@ export interface components {
             title: string;
             description: components["schemas"]["LongText"];
             preconditions: components["schemas"]["LongText"];
-            /** @enum {string} */
-            type: "manual" | "checklist";
+            /**
+             * @description The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance.
+             * @enum {string}
+             */
+            type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
             component: components["schemas"]["ShortText"];
@@ -1456,7 +1935,7 @@ export interface components {
             changeNote: components["schemas"]["ShortText"];
             createdBy: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
-        } & (unknown & unknown);
+        } & (unknown & unknown & unknown);
         TestCase: {
             id: components["schemas"]["Identifier"];
             projectId: components["schemas"]["Identifier"];
@@ -1482,7 +1961,7 @@ export interface components {
              * @default manual
              * @enum {string}
              */
-            type: "manual" | "checklist";
+            type: "manual" | "checklist" | "automated";
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
             priority?: components["schemas"]["Priority"];
             component?: components["schemas"]["ShortText"];
@@ -1493,14 +1972,17 @@ export interface components {
             steps?: components["schemas"]["TestStepInput"][];
             checklist?: components["schemas"]["ChecklistItemInput"][];
             changeNote?: components["schemas"]["ShortText"];
-        } & (unknown & unknown);
+        } & (unknown & unknown & unknown);
         TestCasePatchRequest: {
             folderPath?: string;
             title?: string;
             description?: components["schemas"]["LongText"];
             preconditions?: components["schemas"]["LongText"];
-            /** @enum {string} */
-            type?: "manual" | "checklist";
+            /**
+             * @description Validated against the fully resolved revision: automated requires at least one complete step and an empty checklist; manual may have zero steps.
+             * @enum {string}
+             */
+            type?: "manual" | "checklist" | "automated";
             lifecycle?: components["schemas"]["TestCaseLifecycle"];
             priority?: components["schemas"]["Priority"];
             component?: components["schemas"]["ShortText"];
@@ -1645,7 +2127,7 @@ export interface components {
             currentRevision: number;
             title: string;
             /** @enum {string} */
-            type: "manual" | "checklist";
+            type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
             component: components["schemas"]["ShortText"];
@@ -1663,7 +2145,7 @@ export interface components {
             revision: number;
             title: string;
             /** @enum {string} */
-            type: "manual" | "checklist";
+            type: "manual" | "checklist" | "automated";
             lifecycle: components["schemas"]["TestCaseLifecycle"];
             priority: components["schemas"]["Priority"];
             component: components["schemas"]["ShortText"];
@@ -1924,6 +2406,7 @@ export interface components {
             reproducibility: components["schemas"]["ShortText"];
             assigneeIdentityId: components["schemas"]["Identifier"] | null;
             component: components["schemas"]["ShortText"];
+            /** @description Normalized labels. Occurrence defects include two immutable server-derived provenance labels: <case-type>-run and the run type. */
             labels: string[];
             integrationTarget: components["schemas"]["DefectIntegrationTarget"] | null;
             externalIssue: components["schemas"]["DefectExternalIssue"] | null;
@@ -1945,6 +2428,7 @@ export interface components {
             reproducibility?: components["schemas"]["ShortText"];
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
+            /** @description Client labels. When runId/runItemId identify an occurrence, at most 98 are accepted and provenance names are reserved for two immutable server-derived labels. */
             labels?: string[];
             integrationTarget?: components["schemas"]["DefectIntegrationTarget"] | null;
             runId?: components["schemas"]["Identifier"] | null;
@@ -1952,7 +2436,7 @@ export interface components {
             stepId?: components["schemas"]["Identifier"] | null;
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
-        };
+        } & unknown;
         DefectPatchRequest: {
             title?: string;
             description?: components["schemas"]["LongText"];
@@ -1961,6 +2445,7 @@ export interface components {
             reproducibility?: components["schemas"]["ShortText"];
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             component?: components["schemas"]["ShortText"];
+            /** @description Replacement client labels. Existing occurrence defects accept at most 98 and always preserve/recompute their two reserved provenance labels. */
             labels?: string[];
             integrationTarget?: components["schemas"]["DefectIntegrationTarget"] | null;
             expectedResult?: components["schemas"]["LongText"];
@@ -2995,6 +3480,60 @@ export interface components {
                 "application/json": components["schemas"]["YouTrackIntegrationStatusEnvelope"];
             };
         };
+        /** @description Bounded current inventory, event-window metrics and transparent risk hotspots. Counts and drill filters share server-owned semantics. */
+        DashboardAnalyticsSummaryResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardAnalyticsSummaryEnvelope"];
+            };
+        };
+        /** @description A bounded exact test-case cohort ordered by immutable createdAt then ID, newest first. */
+        DashboardAnalyticsTestCaseListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardAnalyticsTestCaseListEnvelope"];
+            };
+        };
+        /** @description A bounded exact run cohort ordered by its immutable basis event time then ID, newest first. */
+        DashboardAnalyticsRunListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardAnalyticsRunListEnvelope"];
+            };
+        };
+        /** @description A bounded exact run-item cohort ordered by parent run event time, run ID and item ID, newest first. meta.total is the exact bounded cohort count. */
+        DashboardAnalyticsRunItemListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardAnalyticsRunItemListEnvelope"];
+            };
+        };
+        /** @description A bounded exact defect cohort ordered by immutable createdAt then ID, newest first, with safe links and originating occurrence. */
+        DashboardAnalyticsDefectListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardAnalyticsDefectListEnvelope"];
+            };
+        };
         /** @description A page of bounded dashboard summaries ordered newest first. */
         DashboardListResponse: {
             headers: {
@@ -3119,6 +3658,26 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
+        /** @description The selected project or event cohort exceeds the bounded analytics load budget. Narrow the Project or time period and retry. */
+        AnalyticsLimitExceeded: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description The bounded analytics query reached its statement or lock timeout. The client may retry or choose a narrower scope. */
+        AnalyticsUnavailable: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
         /** @description Unexpected server error; internal details are never exposed. */
         InternalError: {
             headers: {
@@ -3148,6 +3707,12 @@ export interface components {
         YouTrackWebhookToken: string;
         ProjectIdPath: components["schemas"]["Identifier"];
         ProjectIdQuery: components["schemas"]["Identifier"];
+        /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+        AnalyticsPeriodQuery: "7d" | "30d" | "90d" | "custom";
+        /** @description Inclusive UTC bound. Required only with period=custom. */
+        AnalyticsFromQuery: string;
+        /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+        AnalyticsToQuery: string;
         /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
         ProjectIdQueryRequired: components["schemas"]["Identifier"];
         EnvironmentIdPath: components["schemas"]["Identifier"];
@@ -3712,6 +4277,8 @@ export interface operations {
                 search?: string;
                 lifecycle?: components["schemas"]["TestCaseLifecycle"];
                 priority?: components["schemas"]["Priority"];
+                type?: "manual" | "checklist" | "automated";
+                component?: string;
                 tag?: string[];
             };
             header?: {
@@ -5077,6 +5644,207 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    getDashboardAnalyticsSummary: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                dimensionLimit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardAnalyticsSummaryResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["AnalyticsLimitExceeded"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardAnalyticsTestCases: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                basis?: "current" | "created";
+                type?: "manual" | "checklist" | "automated";
+                tag?: string;
+                untagged?: boolean;
+                component?: string;
+                componentIsEmpty?: boolean;
+                coverage?: "covered" | "uncovered";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardAnalyticsTestCaseListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardAnalyticsRuns: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                basis?: "launched" | "completed" | "active";
+                status?: components["schemas"]["RunStatus"];
+                outcome?: components["schemas"]["AnalyticsRunOutcome"];
+                component?: string;
+                componentIsEmpty?: boolean;
+                itemStatus?: "passed" | "failed" | "blocked" | "skipped";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardAnalyticsRunListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["AnalyticsLimitExceeded"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardAnalyticsRunItems: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                status?: "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
+                component?: string;
+                componentIsEmpty?: boolean;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardAnalyticsRunItemListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["AnalyticsLimitExceeded"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardAnalyticsDefects: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                /** @description Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor. */
+                period?: components["parameters"]["AnalyticsPeriodQuery"];
+                /** @description Inclusive UTC bound. Required only with period=custom. */
+                from?: components["parameters"]["AnalyticsFromQuery"];
+                /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
+                to?: components["parameters"]["AnalyticsToQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                basis?: "reported" | "current";
+                status?: components["schemas"]["DefectStatus"];
+                /** @description Filters active safe HTTPS external/YouTrack links. The always-present Falcon resource link is not part of this predicate. */
+                hasLink?: boolean;
+                component?: string;
+                componentIsEmpty?: boolean;
+                severity?: components["schemas"]["Priority"];
+                activeOnly?: boolean;
+                runId?: components["schemas"]["Identifier"];
+                testCaseId?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardAnalyticsDefectListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
         };
     };
     listDashboards: {

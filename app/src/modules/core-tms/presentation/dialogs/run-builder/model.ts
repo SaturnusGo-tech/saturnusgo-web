@@ -4,6 +4,7 @@ export type RunScopeFilters = {
   query: string;
   scenario: "all" | "positive" | "negative" | "corner";
   platform: "all" | "ios" | "android";
+  caseType: "all" | TestCaseSummary["type"];
   components: string[];
   folders: string[];
   priority: "all" | TestCaseSummary["priority"];
@@ -15,6 +16,7 @@ export const initialRunScopeFilters: RunScopeFilters = {
   query: "",
   scenario: "all",
   platform: "all",
+  caseType: "all",
   components: [],
   folders: [],
   priority: "all",
@@ -143,6 +145,7 @@ export function filterRunCases(cases: TestCaseSummary[], filters: RunScopeFilter
     if (!matchesQuery(item, filters.query)) return false;
     if (filters.scenario !== "all" && !tags.includes(filters.scenario)) return false;
     if (filters.platform !== "all" && !tags.includes(filters.platform)) return false;
+    if (filters.caseType !== "all" && item.type !== filters.caseType) return false;
     if (!matchesComponents(item, filters.components)) return false;
     if (!matchesFolders(item, filters.folders)) return false;
     if (filters.priority !== "all" && item.priority !== filters.priority) return false;
@@ -160,6 +163,7 @@ export function activeRunFilterCount(filters: RunScopeFilters) {
   return Number(Boolean(filters.query.trim()))
     + Number(filters.scenario !== "all")
     + Number(filters.platform !== "all")
+    + Number(filters.caseType !== "all")
     + Number(filters.components.length > 0)
     + Number(filters.folders.length > 0)
     + Number(filters.priority !== "all")

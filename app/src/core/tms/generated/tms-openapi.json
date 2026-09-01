@@ -3,8 +3,8 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.7",
-    "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
+    "version": "1.0.0-checkpoint.8",
+    "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
     {
@@ -30,6 +30,7 @@
     { "name": "Attachments" },
     { "name": "External links" },
     { "name": "Dashboards" },
+    { "name": "Analytics" },
     { "name": "Activity" },
     { "name": "Integrations" }
   ],
@@ -38,7 +39,7 @@
       "get": {
         "tags": ["Health"],
         "summary": "Report API readiness",
-        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0016.",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is compatible with the running artifact. Stage A accepts 0017 through 0018 with both new feature flags disabled; Stage B requires exactly 0018.",
         "operationId": "getHealth",
         "security": [],
         "responses": {
@@ -391,6 +392,18 @@
             "in": "query",
             "required": false,
             "schema": { "$ref": "#/components/schemas/Priority" }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["manual", "checklist", "automated"] }
+          },
+          {
+            "name": "component",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "maxLength": 500 }
           },
           {
             "name": "tag",
@@ -1653,6 +1666,199 @@
         }
       }
     },
+    "/dashboard-analytics/summary": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Read bounded testing analytics and transparent risk hotspots",
+        "description": "Returns current inventory separately from event-window metrics. Product means canonical Project; Component is free text and remains a separate dimension. Workspace scope includes active Projects only, while an explicit projectId may select an archived Project. Tag buckets are multi-valued and are not a pie total. Risk hotspots expose raw counts and rates and use the documented deterministic ordering rather than an opaque score. Work is capped at 1,000 Projects, 2,000 event runs and 100,000 run items.",
+        "operationId": "getDashboardAnalyticsSummary",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/AnalyticsPeriodQuery" },
+          { "$ref": "#/components/parameters/AnalyticsFromQuery" },
+          { "$ref": "#/components/parameters/AnalyticsToQuery" },
+          { "name": "dimensionLimit", "in": "query", "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardAnalyticsSummaryResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/AnalyticsLimitExceeded" },
+          "503": { "$ref": "#/components/responses/AnalyticsUnavailable" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboard-analytics/test-cases": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Drill into an exact test-case analytics cohort",
+        "description": "current is the live inventory at request time; created uses createdAt in the inclusive-from, exclusive-to window. Current-revision dimensions and coverage apply only to current. componentIsEmpty represents the null/empty Component bucket. coverage means a current case did or did not appear in a run started in the exact period.",
+        "operationId": "listDashboardAnalyticsTestCases",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/AnalyticsPeriodQuery" },
+          { "$ref": "#/components/parameters/AnalyticsFromQuery" },
+          { "$ref": "#/components/parameters/AnalyticsToQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "name": "basis", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["current", "created"], "default": "current" } },
+          { "name": "type", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["manual", "checklist", "automated"] } },
+          { "name": "tag", "in": "query", "required": false,
+            "schema": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
+          { "name": "untagged", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } },
+          { "name": "component", "in": "query", "required": false,
+            "schema": { "type": "string", "maxLength": 500 } },
+          { "name": "componentIsEmpty", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } },
+          { "name": "coverage", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["covered", "uncovered"] } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardAnalyticsTestCaseListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "503": { "$ref": "#/components/responses/AnalyticsUnavailable" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboard-analytics/runs": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Drill into an exact run analytics cohort",
+        "description": "launched uses startedAt; completed uses completedAt or abortedAt; active is the current live set and ignores the period. A passed outcome requires every run item to pass; any skipped item makes an otherwise terminal run incomplete. Component and itemStatus are container filters that select runs containing a matching immutable case snapshot item. Use the run-items drill when a displayed item count must reconcile 1:1.",
+        "operationId": "listDashboardAnalyticsRuns",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/AnalyticsPeriodQuery" },
+          { "$ref": "#/components/parameters/AnalyticsFromQuery" },
+          { "$ref": "#/components/parameters/AnalyticsToQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "name": "basis", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["launched", "completed", "active"], "default": "launched" } },
+          { "name": "status", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/RunStatus" } },
+          { "name": "outcome", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/AnalyticsRunOutcome" } },
+          { "name": "component", "in": "query", "required": false,
+            "schema": { "type": "string", "maxLength": 500 } },
+          { "name": "componentIsEmpty", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } },
+          { "name": "itemStatus", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["passed", "failed", "blocked", "skipped"] } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardAnalyticsRunListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/AnalyticsLimitExceeded" },
+          "503": { "$ref": "#/components/responses/AnalyticsUnavailable" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboard-analytics/run-items": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Drill into exact completed-run item counts",
+        "description": "Returns one row per run item, so meta.total reconciles 1:1 with timeline completedItems and every risk run-item count. The half-open event window uses the parent run completedAt or abortedAt. Omit status for total runItemsInPeriod; use a terminal status for timeline item counts. Component is read from the immutable case revision referenced by the run snapshot; componentIsEmpty selects its null/empty bucket.",
+        "operationId": "listDashboardAnalyticsRunItems",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/AnalyticsPeriodQuery" },
+          { "$ref": "#/components/parameters/AnalyticsFromQuery" },
+          { "$ref": "#/components/parameters/AnalyticsToQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "name": "status", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["not_run", "in_progress", "passed", "failed", "blocked", "skipped"] } },
+          { "name": "component", "in": "query", "required": false,
+            "schema": { "type": "string", "maxLength": 500 } },
+          { "name": "componentIsEmpty", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardAnalyticsRunItemListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/AnalyticsLimitExceeded" },
+          "503": { "$ref": "#/components/responses/AnalyticsUnavailable" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/dashboard-analytics/defects": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Drill into an exact defect analytics cohort with safe links",
+        "description": "reported uses createdAt in the period and includes archived records; current is the live non-archived set and ignores the period. Returned links are Falcon or active HTTPS external/YouTrack links only. occurrence identifies the immutable originating run item, case revision and step. Current risk filters reproduce Component, active/open and critical hotspot cohorts.",
+        "operationId": "listDashboardAnalyticsDefects",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/ProjectIdQuery" },
+          { "$ref": "#/components/parameters/AnalyticsPeriodQuery" },
+          { "$ref": "#/components/parameters/AnalyticsFromQuery" },
+          { "$ref": "#/components/parameters/AnalyticsToQuery" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "name": "basis", "in": "query", "required": false,
+            "schema": { "type": "string", "enum": ["reported", "current"], "default": "current" } },
+          { "name": "status", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/DefectStatus" } },
+          { "name": "hasLink", "in": "query", "required": false,
+            "description": "Filters active safe HTTPS external/YouTrack links. The always-present Falcon resource link is not part of this predicate.",
+            "schema": { "type": "boolean" } },
+          { "name": "component", "in": "query", "required": false,
+            "schema": { "type": "string", "maxLength": 500 } },
+          { "name": "componentIsEmpty", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } },
+          { "name": "severity", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/Priority" } },
+          { "name": "activeOnly", "in": "query", "required": false,
+            "schema": { "type": "boolean", "default": false } },
+          { "name": "runId", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/Identifier" } },
+          { "name": "testCaseId", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/Identifier" } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DashboardAnalyticsDefectListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "503": { "$ref": "#/components/responses/AnalyticsUnavailable" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/dashboards": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -1939,6 +2145,27 @@
         "in": "query",
         "required": false,
         "schema": { "$ref": "#/components/schemas/Identifier" }
+      },
+      "AnalyticsPeriodQuery": {
+        "name": "period",
+        "in": "query",
+        "required": false,
+        "description": "Server-owned UTC event window preset. Presets reject from/to; custom requires both exact bounds and is capped at 366 days. Preset bounds are frozen into every continuation cursor.",
+        "schema": { "type": "string", "enum": ["7d", "30d", "90d", "custom"], "default": "30d" }
+      },
+      "AnalyticsFromQuery": {
+        "name": "from",
+        "in": "query",
+        "required": false,
+        "description": "Inclusive UTC bound. Required only with period=custom.",
+        "schema": { "type": "string", "format": "date-time" }
+      },
+      "AnalyticsToQuery": {
+        "name": "to",
+        "in": "query",
+        "required": false,
+        "description": "Exclusive UTC bound. Required only with period=custom and cannot be in the future.",
+        "schema": { "type": "string", "format": "date-time" }
       },
       "ProjectIdQueryRequired": {
         "name": "projectId",
@@ -2473,6 +2700,43 @@
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackIntegrationStatusEnvelope" } } }
       },
+      "DashboardAnalyticsSummaryResponse": {
+        "description": "Bounded current inventory, event-window metrics and transparent risk hotspots. Counts and drill filters share server-owned semantics.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardAnalyticsSummaryEnvelope" } } }
+      },
+      "DashboardAnalyticsTestCaseListResponse": {
+        "description": "A bounded exact test-case cohort ordered by immutable createdAt then ID, newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardAnalyticsTestCaseListEnvelope" } } }
+      },
+      "DashboardAnalyticsRunListResponse": {
+        "description": "A bounded exact run cohort ordered by its immutable basis event time then ID, newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardAnalyticsRunListEnvelope" } } }
+      },
+      "DashboardAnalyticsRunItemListResponse": {
+        "description": "A bounded exact run-item cohort ordered by parent run event time, run ID and item ID, newest first. meta.total is the exact bounded cohort count.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardAnalyticsRunItemListEnvelope" } } }
+      },
+      "DashboardAnalyticsDefectListResponse": {
+        "description": "A bounded exact defect cohort ordered by immutable createdAt then ID, newest first, with safe links and originating occurrence.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardAnalyticsDefectListEnvelope" } } }
+      },
       "DashboardListResponse": {
         "description": "A page of bounded dashboard summaries ordered newest first.",
         "headers": {
@@ -2543,6 +2807,16 @@
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
       },
+      "AnalyticsLimitExceeded": {
+        "description": "The selected project or event cohort exceeds the bounded analytics load budget. Narrow the Project or time period and retry.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "AnalyticsUnavailable": {
+        "description": "The bounded analytics query reached its statement or lock timeout. The client may retry or choose a narrower scope.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
       "InternalError": {
         "description": "Unexpected server error; internal details are never exposed.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
@@ -2594,6 +2868,552 @@
           "nextCursor": { "type": ["string", "null"], "minLength": 1, "maxLength": 1024 }
         }
       },
+      "AnalyticsCount": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991,
+        "description": "Non-negative server-owned count within JavaScript safe-integer range."
+      },
+      "AnalyticsPeriod": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["preset", "from", "to"],
+        "properties": {
+          "preset": { "type": "string", "enum": ["7d", "30d", "90d", "custom"] },
+          "from": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Inclusive UTC event bound." },
+          "to": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Exclusive UTC event bound." }
+        }
+      },
+      "AnalyticsPageMeta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["limit", "hasMore", "nextCursor", "period", "periodApplied"],
+        "properties": {
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "hasMore": { "type": "boolean" },
+          "nextCursor": { "type": ["string", "null"], "minLength": 1, "maxLength": 1024 },
+          "period": { "$ref": "#/components/schemas/AnalyticsPeriod" },
+          "periodApplied": { "type": "boolean", "description": "False for live current/active bases that intentionally ignore the event window." }
+        }
+      },
+      "AnalyticsRunItemPageMeta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["limit", "hasMore", "nextCursor", "period", "periodApplied", "total"],
+        "properties": {
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "hasMore": { "type": "boolean" },
+          "nextCursor": { "type": ["string", "null"], "minLength": 1, "maxLength": 1024 },
+          "period": { "$ref": "#/components/schemas/AnalyticsPeriod" },
+          "periodApplied": { "type": "boolean", "const": true },
+          "total": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsTestCaseType": {
+        "type": "string",
+        "enum": ["manual", "checklist", "automated"]
+      },
+      "AnalyticsRunOutcome": {
+        "type": "string",
+        "enum": ["passed", "failed", "blocked", "incomplete", "not_started", "aborted"],
+        "description": "passed requires every run item to pass; a terminal run containing skipped items is incomplete."
+      },
+      "AnalyticsTestCaseTypeBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "$ref": "#/components/schemas/AnalyticsTestCaseType" },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsRunStatusBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "$ref": "#/components/schemas/RunStatus" },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsRunOutcomeBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "$ref": "#/components/schemas/AnalyticsRunOutcome" },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsDefectStatusBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "$ref": "#/components/schemas/DefectStatus" },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsStringBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "type": "string", "maxLength": 500 },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsNullableStringBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "count"],
+        "properties": {
+          "key": { "type": ["string", "null"], "maxLength": 500 },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsProjectBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "projectKey", "projectName", "count"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "projectKey": { "type": "string", "minLength": 2, "maxLength": 12 },
+          "projectName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "count": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsStringDimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["buckets", "totalBuckets", "truncated"],
+        "properties": {
+          "buckets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/AnalyticsStringBucket" } },
+          "totalBuckets": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "truncated": { "type": "boolean" }
+        }
+      },
+      "AnalyticsNullableStringDimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["buckets", "totalBuckets", "truncated"],
+        "properties": {
+          "buckets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/AnalyticsNullableStringBucket" } },
+          "totalBuckets": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "truncated": { "type": "boolean" }
+        }
+      },
+      "AnalyticsProjectDimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["buckets", "totalBuckets", "truncated"],
+        "properties": {
+          "buckets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/AnalyticsProjectBucket" } },
+          "totalBuckets": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "truncated": { "type": "boolean" }
+        }
+      },
+      "DashboardAnalyticsBasis": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["testCaseCurrent", "testCaseCreated", "runLaunched", "runCompleted", "runActive", "defectReported", "defectCurrent"],
+        "properties": {
+          "testCaseCurrent": { "type": "string", "const": "current_inventory_at_as_of" },
+          "testCaseCreated": { "type": "string", "const": "created_at" },
+          "runLaunched": { "type": "string", "const": "started_at" },
+          "runCompleted": { "type": "string", "const": "completed_at_or_aborted_at" },
+          "runActive": { "type": "string", "const": "current_at_as_of" },
+          "defectReported": { "type": "string", "const": "created_at" },
+          "defectCurrent": { "type": "string", "const": "current_at_as_of" }
+        }
+      },
+      "DashboardAnalyticsTestCases": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["current", "createdInPeriod"],
+        "properties": {
+          "current": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["total", "byType", "byProject", "byTag", "untagged", "byComponent"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byType": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/components/schemas/AnalyticsTestCaseTypeBucket" } },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" },
+              "byTag": { "allOf": [{ "$ref": "#/components/schemas/AnalyticsStringDimension" }], "description": "Multi-valued tag buckets overlap and are not a pie total." },
+              "untagged": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byComponent": { "oneOf": [{ "$ref": "#/components/schemas/AnalyticsNullableStringDimension" }, { "type": "null" }], "description": "Available only for explicit Project scope. Null/empty Component uses a null bucket key." }
+            }
+          },
+          "createdInPeriod": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsTimelineCompletedOutcomes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["passed", "failed", "blocked", "incomplete", "notStarted", "aborted"],
+        "properties": {
+          "passed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "failed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "blocked": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "incomplete": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "notStarted": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "aborted": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsTimelineCompletedItems": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["passed", "failed", "blocked", "skipped"],
+        "properties": {
+          "passed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "failed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "blocked": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "skipped": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "AnalyticsRunTimelineBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["start", "end", "launched", "completedOutcomes", "completedItems", "passRate"],
+        "properties": {
+          "start": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Inclusive exact UTC bound. Drill launched runs with basis=launched, outcomes with basis=completed, or item counts through /dashboard-analytics/run-items; use period=custom, from=start and to=end." },
+          "end": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Exclusive exact UTC bound." },
+          "launched": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "completedOutcomes": { "$ref": "#/components/schemas/AnalyticsTimelineCompletedOutcomes" },
+          "completedItems": { "$ref": "#/components/schemas/AnalyticsTimelineCompletedItems" },
+          "passRate": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "passed items divided by passed+failed+blocked items; skipped items are excluded. Null when that denominator is zero." }
+        }
+      },
+      "AnalyticsRunTimeline": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["timezone", "granularity", "buckets"],
+        "properties": {
+          "timezone": { "type": "string", "const": "UTC" },
+          "granularity": { "type": "string", "enum": ["day", "week"], "description": "day for 7d/30d and custom windows no longer than 31 exact days; otherwise week. Buckets are fixed 24h/168h intervals anchored at period.from, not local calendar boundaries." },
+          "buckets": { "type": "array", "minItems": 1, "maxItems": 54, "description": "Server-zero-filled contiguous half-open buckets; the final bucket may be shorter and ends exactly at period.to.", "items": { "$ref": "#/components/schemas/AnalyticsRunTimelineBucket" } }
+        }
+      },
+      "DashboardAnalyticsRuns": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["timeline", "launchedInPeriod", "completedInPeriod", "currentActive"],
+        "properties": {
+          "timeline": { "$ref": "#/components/schemas/AnalyticsRunTimeline" },
+          "launchedInPeriod": {
+            "type": "object", "additionalProperties": false,
+            "required": ["total", "byStatus", "byProject"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byStatus": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/components/schemas/AnalyticsRunStatusBucket" } },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" }
+            }
+          },
+          "completedInPeriod": {
+            "type": "object", "additionalProperties": false,
+            "required": ["total", "byOutcome", "byProject"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byOutcome": { "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/components/schemas/AnalyticsRunOutcomeBucket" } },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" }
+            }
+          },
+          "currentActive": {
+            "type": "object", "additionalProperties": false,
+            "required": ["total", "byProject"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" }
+            }
+          }
+        }
+      },
+      "DashboardAnalyticsDefects": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reportedInPeriod", "current"],
+        "properties": {
+          "reportedInPeriod": {
+            "type": "object", "additionalProperties": false,
+            "required": ["total", "byProject"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" }
+            }
+          },
+          "current": {
+            "type": "object", "additionalProperties": false,
+            "required": ["total", "linked", "totalExternalLinks", "byStatus", "byProject"],
+            "properties": {
+              "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "linked": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "totalExternalLinks": { "$ref": "#/components/schemas/AnalyticsCount" },
+              "byStatus": { "type": "array", "minItems": 7, "maxItems": 7, "items": { "$ref": "#/components/schemas/AnalyticsDefectStatusBucket" } },
+              "byProject": { "$ref": "#/components/schemas/AnalyticsProjectDimension" }
+            }
+          }
+        }
+      },
+      "AnalyticsRiskMetrics": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["currentTestCases", "coveredTestCases", "runItemsInPeriod", "passedRunItems", "failedRunItems", "blockedRunItems", "openDefects", "criticalOpenDefects", "passRate", "coverageRate"],
+        "properties": {
+          "currentTestCases": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "coveredTestCases": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "runItemsInPeriod": { "allOf": [{ "$ref": "#/components/schemas/AnalyticsCount" }], "description": "Exact /dashboard-analytics/run-items total with matching Project/Component and no status filter." },
+          "passedRunItems": { "allOf": [{ "$ref": "#/components/schemas/AnalyticsCount" }], "description": "Exact run-items total with status=passed." },
+          "failedRunItems": { "allOf": [{ "$ref": "#/components/schemas/AnalyticsCount" }], "description": "Exact run-items total with status=failed." },
+          "blockedRunItems": { "allOf": [{ "$ref": "#/components/schemas/AnalyticsCount" }], "description": "Exact run-items total with status=blocked." },
+          "openDefects": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "criticalOpenDefects": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "passRate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "coverageRate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+        }
+      },
+      "AnalyticsProjectRiskHotspot": {
+        "allOf": [
+          { "$ref": "#/components/schemas/AnalyticsRiskMetrics" },
+          {
+            "type": "object",
+            "required": ["projectId", "projectKey", "projectName"],
+            "properties": {
+              "projectId": { "$ref": "#/components/schemas/Identifier" },
+              "projectKey": { "type": "string", "minLength": 2, "maxLength": 12 },
+              "projectName": { "type": "string", "minLength": 1, "maxLength": 120 }
+            }
+          }
+        ]
+      },
+      "AnalyticsComponentRiskHotspot": {
+        "allOf": [
+          { "$ref": "#/components/schemas/AnalyticsProjectRiskHotspot" },
+          {
+            "type": "object",
+            "required": ["component"],
+            "properties": { "component": { "type": ["string", "null"], "maxLength": 500 } }
+          }
+        ]
+      },
+      "AnalyticsProjectRiskDimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hotspots", "totalHotspots", "truncated", "sort"],
+        "properties": {
+          "hotspots": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/AnalyticsProjectRiskHotspot" } },
+          "totalHotspots": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "truncated": { "type": "boolean" },
+          "sort": { "type": "string", "const": "failed_desc_blocked_desc_critical_open_defects_desc_open_defects_desc_coverage_asc_pass_rate_asc_key_asc" }
+        }
+      },
+      "AnalyticsComponentRiskDimension": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hotspots", "totalHotspots", "truncated", "sort"],
+        "properties": {
+          "hotspots": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/AnalyticsComponentRiskHotspot" } },
+          "totalHotspots": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "truncated": { "type": "boolean" },
+          "sort": { "type": "string", "const": "failed_desc_blocked_desc_critical_open_defects_desc_open_defects_desc_coverage_asc_pass_rate_asc_key_asc" }
+        }
+      },
+      "DashboardAnalyticsRiskHotspots": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["basis", "byProject", "byComponent"],
+        "properties": {
+          "basis": {
+            "type": "object", "additionalProperties": false,
+            "required": ["runItems", "coverage", "defects"],
+            "properties": {
+              "runItems": { "type": "string", "const": "runs_completed_at_or_aborted_at_in_period" },
+              "coverage": { "type": "string", "const": "current_cases_in_runs_started_in_period" },
+              "defects": { "type": "string", "const": "current_open_at_as_of" }
+            }
+          },
+          "byProject": { "$ref": "#/components/schemas/AnalyticsProjectRiskDimension" },
+          "byComponent": { "$ref": "#/components/schemas/AnalyticsComponentRiskDimension" }
+        }
+      },
+      "DashboardAnalyticsSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workspaceId", "projectId", "generatedAt", "asOf", "period", "basis", "testCases", "runs", "defects", "riskHotspots"],
+        "properties": {
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "generatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "asOf": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Live snapshot statement time for all current sections; this is not a historical as-of query." },
+          "period": { "$ref": "#/components/schemas/AnalyticsPeriod" },
+          "basis": { "$ref": "#/components/schemas/DashboardAnalyticsBasis" },
+          "testCases": { "$ref": "#/components/schemas/DashboardAnalyticsTestCases" },
+          "runs": { "$ref": "#/components/schemas/DashboardAnalyticsRuns" },
+          "defects": { "$ref": "#/components/schemas/DashboardAnalyticsDefects" },
+          "riskHotspots": { "$ref": "#/components/schemas/DashboardAnalyticsRiskHotspots" }
+        }
+      },
+      "DashboardAnalyticsSummaryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/DashboardAnalyticsSummary" } }
+      },
+      "DashboardAnalyticsTestCase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "title", "type", "lifecycle", "priority", "component", "tags", "archivedAt", "basis", "etag", "createdAt", "updatedAt", "sortAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "type": { "$ref": "#/components/schemas/AnalyticsTestCaseType" },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "type": "string", "maxLength": 500 },
+          "tags": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64 } },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "basis": { "type": "string", "enum": ["current", "created"] },
+          "etag": { "type": "string", "pattern": "^\"[^\"]+\"$" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "sortAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardAnalyticsRunProgress": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["total", "notRun", "inProgress", "passed", "failed", "blocked", "skipped"],
+        "properties": {
+          "total": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "notRun": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "inProgress": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "passed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "failed": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "blocked": { "$ref": "#/components/schemas/AnalyticsCount" },
+          "skipped": { "$ref": "#/components/schemas/AnalyticsCount" }
+        }
+      },
+      "DashboardAnalyticsRun": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "name", "type", "status", "outcome", "basis", "progress", "startedAt", "completedAt", "abortedAt", "archivedAt", "updatedAt", "sortAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "type": { "$ref": "#/components/schemas/RunType" },
+          "status": { "$ref": "#/components/schemas/RunStatus" },
+          "outcome": { "$ref": "#/components/schemas/AnalyticsRunOutcome" },
+          "basis": { "type": "string", "enum": ["launched", "completed", "active"] },
+          "progress": { "$ref": "#/components/schemas/DashboardAnalyticsRunProgress" },
+          "startedAt": { "type": ["string", "null"], "format": "date-time" },
+          "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "abortedAt": { "type": ["string", "null"], "format": "date-time" },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "sortAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardAnalyticsRunItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "runId", "runKey", "runName", "runType", "testCaseId", "testCaseKey", "revisionNo", "title", "caseType", "component", "status", "attemptNo", "eventAt", "sortAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runKey": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "runName": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "runType": { "$ref": "#/components/schemas/RunType" },
+          "testCaseId": { "$ref": "#/components/schemas/Identifier" },
+          "testCaseKey": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "revisionNo": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "caseType": { "$ref": "#/components/schemas/AnalyticsTestCaseType" },
+          "component": { "type": ["string", "null"], "maxLength": 500 },
+          "status": { "$ref": "#/components/schemas/ExecutionStatus" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "eventAt": { "allOf": [{ "$ref": "#/components/schemas/Timestamp" }], "description": "Parent run completedAt or abortedAt, used as the immutable half-open period and cursor basis." },
+          "sortAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardAnalyticsDefectOccurrence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["runId", "runItemId", "testCaseId", "attemptNo", "stepId"],
+        "properties": {
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "testCaseId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] }
+        }
+      },
+      "DashboardAnalyticsDefectLink": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "label", "url"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["falcon", "external", "youtrack"] },
+          "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "url": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 }
+        }
+      },
+      "DashboardAnalyticsDefect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "key", "title", "status", "severity", "priority", "component", "occurrence", "defectEtag", "links", "linksTruncated", "basis", "archivedAt", "createdAt", "updatedAt", "sortAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "status": { "$ref": "#/components/schemas/DefectStatus" },
+          "severity": { "$ref": "#/components/schemas/Priority" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "component": { "type": "string", "maxLength": 500 },
+          "occurrence": { "oneOf": [{ "$ref": "#/components/schemas/DashboardAnalyticsDefectOccurrence" }, { "type": "null" }] },
+          "defectEtag": { "type": "string", "pattern": "^\"[^\"]+\"$" },
+          "links": { "type": "array", "minItems": 1, "maxItems": 6, "description": "Always starts with the safe Falcon resource link, followed by at most five active HTTPS external/YouTrack links.", "items": { "$ref": "#/components/schemas/DashboardAnalyticsDefectLink" } },
+          "linksTruncated": { "type": "boolean" },
+          "basis": { "type": "string", "enum": ["reported", "current"] },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "sortAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DashboardAnalyticsTestCaseListEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardAnalyticsTestCase" } },
+          "meta": { "$ref": "#/components/schemas/AnalyticsPageMeta" }
+        }
+      },
+      "DashboardAnalyticsRunListEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardAnalyticsRun" } },
+          "meta": { "$ref": "#/components/schemas/AnalyticsPageMeta" }
+        }
+      },
+      "DashboardAnalyticsRunItemListEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardAnalyticsRunItem" } },
+          "meta": { "$ref": "#/components/schemas/AnalyticsRunItemPageMeta" }
+        }
+      },
+      "DashboardAnalyticsDefectListEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/DashboardAnalyticsDefect" } },
+          "meta": { "$ref": "#/components/schemas/AnalyticsPageMeta" }
+        }
+      },
       "ErrorCode": {
         "type": "string",
         "enum": [
@@ -2618,6 +3438,9 @@
           "ATTACHMENT_DIGEST_MISMATCH",
           "PAYLOAD_TOO_LARGE",
           "UNSUPPORTED_MEDIA_TYPE",
+          "ANALYTICS_WINDOW_TOO_LARGE",
+          "ANALYTICS_SCOPE_TOO_LARGE",
+          "ANALYTICS_TEMPORARILY_UNAVAILABLE",
           "INTERNAL_ERROR"
         ]
       },
@@ -2864,7 +3687,7 @@
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "preconditions": { "$ref": "#/components/schemas/LongText" },
-          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "type": { "type": "string", "enum": ["manual", "checklist", "automated"], "description": "The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance." },
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
@@ -2883,6 +3706,10 @@
           {
             "if": { "properties": { "type": { "const": "manual" } }, "required": ["type"] },
             "then": { "properties": { "checklist": { "maxItems": 0 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "automated" } }, "required": ["type"] },
+            "then": { "properties": { "steps": { "minItems": 1 }, "checklist": { "maxItems": 0 } } }
           },
           {
             "if": { "properties": { "type": { "const": "checklist" } }, "required": ["type"] },
@@ -2918,7 +3745,7 @@
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "preconditions": { "$ref": "#/components/schemas/LongText" },
-          "type": { "type": "string", "enum": ["manual", "checklist"], "default": "manual" },
+          "type": { "type": "string", "enum": ["manual", "checklist", "automated"], "default": "manual" },
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
@@ -2936,6 +3763,10 @@
             "then": { "properties": { "checklist": { "maxItems": 0 } } }
           },
           {
+            "if": { "properties": { "type": { "const": "automated" } }, "required": ["type"] },
+            "then": { "properties": { "steps": { "minItems": 1 }, "checklist": { "maxItems": 0 } } }
+          },
+          {
             "if": { "properties": { "type": { "const": "checklist" } }, "required": ["type"] },
             "then": { "properties": { "steps": { "maxItems": 0 } } }
           }
@@ -2950,7 +3781,7 @@
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "description": { "$ref": "#/components/schemas/LongText" },
           "preconditions": { "$ref": "#/components/schemas/LongText" },
-          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "type": { "type": "string", "enum": ["manual", "checklist", "automated"], "description": "Validated against the fully resolved revision: automated requires at least one complete step and an empty checklist; manual may have zero steps." },
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
@@ -3194,7 +4025,7 @@
           "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" },
           "currentRevision": { "type": "integer", "minimum": 1 },
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
-          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "type": { "type": "string", "enum": ["manual", "checklist", "automated"] },
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
@@ -3215,7 +4046,7 @@
         "properties": {
           "revision": { "type": "integer", "minimum": 1 },
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
-          "type": { "type": "string", "enum": ["manual", "checklist"] },
+          "type": { "type": "string", "enum": ["manual", "checklist", "automated"] },
           "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
           "priority": { "$ref": "#/components/schemas/Priority" },
           "component": { "$ref": "#/components/schemas/ShortText" },
@@ -3669,7 +4500,7 @@
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "description": "Normalized labels. Occurrence defects include two immutable server-derived provenance labels: <case-type>-run and the run type.", "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
           "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
           "externalIssue": { "oneOf": [{ "$ref": "#/components/schemas/DefectExternalIssue" }, { "type": "null" }] },
           "occurrence": { "oneOf": [{ "$ref": "#/components/schemas/DefectOccurrence" }, { "type": "null" }] },
@@ -3695,14 +4526,20 @@
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "description": "Client labels. When runId/runItemId identify an occurrence, at most 98 are accepted and provenance names are reserved for two immutable server-derived labels.", "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
           "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
           "runId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "runItemId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
           "actualResult": { "$ref": "#/components/schemas/LongText" }
-        }
+        },
+        "allOf": [
+          {
+            "if": { "required": ["runId"], "properties": { "runId": { "type": "string" } } },
+            "then": { "properties": { "labels": { "maxItems": 98 } } }
+          }
+        ]
       },
       "DefectPatchRequest": {
         "type": "object",
@@ -3716,7 +4553,7 @@
           "reproducibility": { "$ref": "#/components/schemas/ShortText" },
           "assigneeIdentityId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
           "component": { "$ref": "#/components/schemas/ShortText" },
-          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+          "labels": { "type": "array", "maxItems": 100, "uniqueItems": true, "description": "Replacement client labels. Existing occurrence defects accept at most 98 and always preserve/recompute their two reserved provenance labels.", "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } },
           "integrationTarget": { "oneOf": [{ "$ref": "#/components/schemas/DefectIntegrationTarget" }, { "type": "null" }] },
           "expectedResult": { "$ref": "#/components/schemas/LongText" },
           "actualResult": { "$ref": "#/components/schemas/LongText" }
