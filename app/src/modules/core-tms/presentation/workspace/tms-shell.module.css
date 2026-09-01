@@ -34,7 +34,7 @@
 
 .header {
   position: relative;
-  z-index: 20;
+  z-index: 60;
   min-width: 0;
   height: 52px;
   display: flex;

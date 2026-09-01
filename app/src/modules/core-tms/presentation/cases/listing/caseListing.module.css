@@ -108,8 +108,26 @@
 .actionAnchor,
 .filterAnchor { position: relative; }
 
-.filterActive { border-color: var(--cases-primary); }
-.filterActive b { min-width: 16px; height: 16px; display: grid; place-items: center; padding: 0 4px; color: var(--cases-on-primary); background: var(--cases-primary); border-radius: 3px; font-size: 10px; }
+.filterActive { position: relative; border-color: var(--cases-primary); }
+.filterActive b {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  padding: 0 3px;
+  color: var(--cases-on-primary);
+  background: var(--cases-primary);
+  border: 2px solid var(--cases-bg);
+  border-radius: 999px;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
 .filterPanel { right: 0; width: 264px; max-height: min(362px, calc(100vh - 112px)); overflow: hidden; padding: 3px; }
 .filterMenuHeader { height: 32px; display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; padding: 0 2px; border-bottom: 1px solid var(--cases-row-border); }
 .filterMenuHeader strong { grid-column: 2; color: var(--cases-strong); font-size: 11px; font-weight: 650; }

@@ -13,7 +13,6 @@ import {
   sortCaseRows,
   visibleCaseTabStop,
 } from "../caseListModel";
-
 function createCase(index: number, priority: "low" | "medium" | "high" | "critical" = "medium"): TestCaseSummary {
   const folderPath = `/Folder ${Math.floor(index / 60) + 1}`;
   return {
@@ -184,7 +183,6 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
   assert.match(css, /\.facetOptions \{[^}]*max-height: 244px/s);
   assert.doesNotMatch(toolbar, /filterField|facetList/);
 });
-
 test("toolbar keeps subtle focus and editor-locked create actions", () => {
   const toolbar = readFileSync(new URL("../../toolbar/CasesToolbar.tsx", import.meta.url), "utf8");
   const table = readFileSync(new URL("../../list/CasesTable.tsx", import.meta.url), "utf8");
@@ -197,4 +195,6 @@ test("toolbar keeps subtle focus and editor-locked create actions", () => {
   assert.match(toolbar, /aria-pressed=\{props\.selectionMode\}/); assert.match(table, /props\.selectionMode \? <CaseSelectionHeader/); assert.match(table, /props\.selectionMode && <CaseSelectionCheckbox/);
   assert.match(css, /\.selectionColumn \{ width: 0; transition:/); assert.match(css, /\.selectionMode \.selectionColumn \{ width: 34px; \}/);
   assert.match(bulkCss, /animation: bulkBarReveal 220ms/); assert.match(bulkCss, /clip-path: inset\(0 0 100% 0\)/);
+  assert.match(css, /\.filterActive \{ position: relative;/); assert.match(css, /\.filterActive b \{[^}]*position: absolute;[^}]*border-radius: 999px/s);
+  assert.match(toolbar, /aria-hidden="true">\{activeFilterCount\}/);
 });

@@ -414,3 +414,16 @@ final result: passed
 - Final production review found no remaining P0, P1, or P2 visual, accessibility, or interaction issue in the requested scope.
 
 final result: passed
+
+## 2026-09-01 — YouTrack evidence and case-toolbar layering
+
+- Source: user-provided filter-count screenshot plus the signed-in production project menu at the same desktop state.
+- Browser: Codex in-app Browser only; production before and local after were captured at the same 979×733 viewport. Dark-mode comparisons are stored in `.design-qa/youtrack-evidence-toolbar/`.
+- Project selector: passed. Its menu now remains above the search and QL layers; the QL border/text no longer cuts through the menu.
+- Filter count: passed. The count is a compact circular corner badge on one unchanged 30px filter control, not a second blue button segment. The accessible name includes the active count and the visible badge is hidden from assistive technology to avoid duplicate speech.
+- Keyboard/interaction: passed. Existing button/menu semantics and focus-return behavior are unchanged.
+- Responsive/theme: passed for light and dark desktop captures. The badge border inherits the case surface token, so it remains visually separated in both themes.
+- Evidence sync is server-side and has no new visual surface in this pass: private Cloudflare R2 media is streamed to YouTrack issue attachments and referenced by stable Markdown filenames.
+- Evidence: `project-popup-before.png`, `project-popup-after-dark.png`, `project-popup-dark-comparison.png`, `filter-badge-after-clean.png`, `filter-badge-after-dark.png`, and `filter-reference-comparison.png`.
+
+final result: passed
