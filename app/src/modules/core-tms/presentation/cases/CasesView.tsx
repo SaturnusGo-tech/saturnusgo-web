@@ -8,9 +8,11 @@ import {
   CASE_INSPECTOR_MIN,
 } from "./split/useCaseInspectorResize";
 import { CasesToolbar } from "./toolbar/CasesToolbar";
+import { CaseBulkActionBar } from "./bulk/action/CaseBulkActionBar";
 import type { CasesViewProps } from "./types";
 import { useCasesViewController } from "./view/useCasesViewController";
 import styles from "./cases.module.css";
+import { MAX_CASE_BULK_MUTATION_ITEMS } from "../../../../core/tms/contracts/test-cases/bulk-case-contract";
 
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
@@ -58,7 +60,7 @@ export function CasesView(props: CasesViewProps) {
     className={`${styles.workspace} ${view.inspectorResize.resizing ? styles.workspaceResizing : ""}`}
     data-testid="cases-view"
   >
-    <section ref={listPaneRef} className={styles.listPane} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
+    <section ref={listPaneRef} className={styles.listPane} data-bulk-active={view.bulkSelection.selectedIds.length > 0 || undefined} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
       <CasesToolbar
         locale={locale}
         query={props.query}
@@ -96,7 +98,27 @@ export function CasesView(props: CasesViewProps) {
         onSort={view.toggleSort}
         onSelect={view.selectRow}
         onCreate={() => view.createCase()}
+        selectedIds={view.bulkSelection.selected}
+        selectableIds={view.selectableIds}
+        selectedCount={view.bulkSelection.selectedIds.length}
+        selectableCount={view.selectableCount}
+        visibleCoverage={view.bulkSelection.visibleCoverage}
+        onToggleCase={view.bulkSelection.toggleOne}
+        onToggleScope={view.bulkSelection.toggleScope}
+        onSelectVisible={view.bulkSelection.selectVisible}
+        onSelectAll={view.bulkSelection.selectAll}
+        onClearSelection={view.bulkSelection.clear}
       />
+      {view.bulkSelection.selectedIds.length > 0 && !props.editor && <CaseBulkActionBar
+        locale={locale}
+        selectedCount={view.bulkSelection.selectedIds.length}
+        mutationLimit={MAX_CASE_BULK_MUTATION_ITEMS}
+        mutationEnabled={props.bulkMutationEnabled}
+        onClear={view.bulkSelection.clear}
+        onCreateRun={() => props.onRunCases(view.bulkSelection.selectedIds)}
+        onChangeLifecycle={(value) => props.onBulkChangeLifecycle(view.bulkSelection.selectedIds, value)}
+        onChangePriority={(value) => props.onBulkChangePriority(view.bulkSelection.selectedIds, value)}
+      />}
     </section>
     {view.inspectorOpen && !view.detailFullscreen && <div
       {...view.inspectorResize.handleProps}

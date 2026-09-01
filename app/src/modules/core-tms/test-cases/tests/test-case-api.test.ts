@@ -23,7 +23,7 @@ const caseSummary = (id: number): Api["TestCaseSummary"] => ({
   folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "manual",
   lifecycle: "ready", priority: "medium", component: "Host", ownerIdentityId: null,
   tags: ["Host", "Ui"], estimatedMinutes: 2, revisionCount: 1, archivedAt: null,
-  createdAt: time, updatedAt: time,
+  createdAt: time, updatedAt: time, etag: `"case-${id}:1"`,
 });
 
 test("test-case collection follows every cursor page", async () => {

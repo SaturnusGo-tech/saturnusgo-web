@@ -426,6 +426,29 @@
         }
       }
     },
+    "/test-cases/bulk": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "patch": {
+        "tags": ["Test cases"],
+        "summary": "Atomically revise lifecycle or priority for explicit test cases",
+        "description": "Validates the full authorized project-scoped selection and every strong per-case ETag before writing. Changed cases receive one immutable revision; cases already at the requested values are returned unchanged without a revision, audit event, or outbox message. The command never partially succeeds.",
+        "operationId": "bulkMutateTestCases",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "per-item-required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/TestCaseBulkMutation" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseBulkMutationResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/TestCaseBulkPreconditionFailed" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/test-cases/{caseId}": {
       "parameters": [
         { "$ref": "#/components/parameters/XRequestId" },
@@ -1973,6 +1996,10 @@
         "required": true,
         "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/TestCasePatchRequest" } } }
       },
+      "TestCaseBulkMutation": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseBulkMutationRequest" } } }
+      },
       "TestCaseClone": {
         "required": false,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCloneRequest" } } }
@@ -2122,6 +2149,19 @@
           "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseEnvelope" } } }
+      },
+      "TestCaseBulkMutationResponse": {
+        "description": "All requested cases in request order, with changed and unchanged counts.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseBulkMutationEnvelope" } } }
+      },
+      "TestCaseBulkPreconditionFailed": {
+        "description": "At least one supplied per-case ETag is malformed, belongs to another case, or is stale. No case is changed.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
       },
       "TestCaseRevisionListResponse": {
         "description": "A page of bounded immutable revision summaries.",
@@ -2784,10 +2824,83 @@
           "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" }
         }
       },
+      "TestCaseStrongEtag": {
+        "type": "string",
+        "minLength": 20,
+        "maxLength": 256,
+        "pattern": "^\"test-case:[A-Za-z0-9][A-Za-z0-9._:-]{0,127}:v[1-9][0-9]*\"$"
+      },
+      "TestCaseBulkMutationTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "ifMatch"],
+        "properties": {
+          "caseId": { "$ref": "#/components/schemas/Identifier" },
+          "ifMatch": { "$ref": "#/components/schemas/TestCaseStrongEtag" }
+        }
+      },
+      "TestCaseBulkMutationPatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" }
+        }
+      },
+      "TestCaseBulkMutationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "items", "patch"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "description": "Explicit targets. caseId values must be unique; the server validates this independently of full-object uniqueness.",
+            "items": { "$ref": "#/components/schemas/TestCaseBulkMutationTarget" }
+          },
+          "patch": { "$ref": "#/components/schemas/TestCaseBulkMutationPatch" },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" }
+        }
+      },
+      "TestCaseBulkMutationItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "key", "currentRevision", "lifecycle", "priority", "updatedAt", "etag", "changed"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "currentRevision": { "type": "integer", "minimum": 1 },
+          "lifecycle": { "$ref": "#/components/schemas/TestCaseLifecycle" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "etag": { "$ref": "#/components/schemas/TestCaseStrongEtag" },
+          "changed": { "type": "boolean" }
+        }
+      },
+      "TestCaseBulkMutationData": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["items", "updatedCount", "unchangedCount"],
+        "properties": {
+          "items": { "type": "array", "minItems": 1, "maxItems": 1000, "items": { "$ref": "#/components/schemas/TestCaseBulkMutationItem" } },
+          "updatedCount": { "type": "integer", "minimum": 0, "maximum": 1000 },
+          "unchangedCount": { "type": "integer", "minimum": 0, "maximum": 1000 }
+        }
+      },
+      "TestCaseBulkMutationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/TestCaseBulkMutationData" } }
+      },
       "TestCaseSummary": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "title", "type", "lifecycle", "priority", "component", "ownerIdentityId", "tags", "estimatedMinutes", "revisionCount", "archivedAt", "createdAt", "updatedAt"],
+        "required": ["id", "projectId", "key", "folderPath", "currentRevision", "title", "type", "lifecycle", "priority", "component", "ownerIdentityId", "tags", "estimatedMinutes", "revisionCount", "archivedAt", "etag", "createdAt", "updatedAt"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "projectId": { "$ref": "#/components/schemas/Identifier" },
@@ -2804,6 +2917,7 @@
           "estimatedMinutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 100000 },
           "revisionCount": { "type": "integer", "minimum": 1 },
           "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "etag": { "$ref": "#/components/schemas/TestCaseStrongEtag" },
           "createdAt": { "$ref": "#/components/schemas/Timestamp" },
           "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
         }

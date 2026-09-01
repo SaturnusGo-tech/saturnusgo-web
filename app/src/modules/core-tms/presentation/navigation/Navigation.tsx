@@ -46,6 +46,7 @@ export function Navigation({
   onToggleCollapsed,
   onCreateCase,
   onCreateDefect,
+  activeRunCount,
 }: {
   view: View;
   onChange: (view: View) => void;
@@ -54,8 +55,9 @@ export function Navigation({
   onToggleCollapsed: () => void;
   onCreateCase: () => void;
   onCreateDefect: () => void;
+  activeRunCount: number;
 }) {
-  const { t } = useTmsLocale();
+  const { locale, t } = useTmsLocale();
   return (
     <nav
       id="tms-navigation"
@@ -81,6 +83,10 @@ export function Navigation({
         {navigationItems.map((item) => {
           const label = t(item.labelKey);
           const active = !disabled && view === item.id;
+          const runActive = item.id === "runs" && activeRunCount > 0;
+          const accessibleLabel = runActive
+            ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}`
+            : label;
 
           return (
             <button
@@ -91,13 +97,14 @@ export function Navigation({
               }`}
               onClick={() => onChange(item.id)}
               disabled={disabled}
-              aria-label={label}
+              aria-label={accessibleLabel}
               aria-current={active ? "page" : undefined}
               title={collapsed ? label : undefined}
               data-testid={`nav-${item.id}`}
             >
               <span className={shellStyles.navigationIcon} aria-hidden="true">
                 {item.icon}
+                {runActive && <span className={shellStyles.activeRunDot} />}
               </span>
               <span className={shellStyles.navigationLabel}>{label}</span>
             </button>

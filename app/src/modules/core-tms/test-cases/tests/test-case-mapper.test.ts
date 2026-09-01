@@ -14,6 +14,7 @@ test("maps bounded case summaries without fabricating revision content", () => {
     currentRevision: 3, title: "Sign in", type: "manual", lifecycle: "ready",
     priority: "critical", component: "Auth", ownerIdentityId: null,
     tags: ["smoke"], estimatedMinutes: 5, revisionCount: 3, archivedAt: null,
+    etag: '"case-1:3"',
     ...timestamps,
   };
   assert.deepEqual(mapTestCaseSummary(dto), dto);

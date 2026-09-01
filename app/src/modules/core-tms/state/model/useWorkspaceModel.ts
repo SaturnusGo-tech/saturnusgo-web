@@ -5,6 +5,7 @@ import { useWorkspaceActions } from "../workspace-actions/useWorkspaceActions";
 import { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import { useWorkspaceResourceActions } from "../workspace-resources/useWorkspaceResourceActions";
 import { useWorkspaceState } from "../workspace/useWorkspaceState";
+import { useCaseBulkActions } from "../case-bulk/useCaseBulkActions";
 
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
@@ -18,6 +19,7 @@ export function useWorkspaceModel() {
   const cases = useCaseActions(state, derived, workspace.notify);
   const runs = useRunActions(state, derived, workspace.notify);
   const runArchive = useRunArchive(state, derived, workspace.notify);
+  const caseBulk = useCaseBulkActions(state, derived, workspace.notify);
   return {
     ...state,
     ...derived,
@@ -26,6 +28,7 @@ export function useWorkspaceModel() {
     ...cases,
     ...runs,
     ...runArchive,
+    ...caseBulk,
   };
 }
 

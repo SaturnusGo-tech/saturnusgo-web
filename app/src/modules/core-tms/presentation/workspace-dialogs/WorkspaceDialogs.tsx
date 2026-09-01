@@ -72,11 +72,11 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
         casesCount={model.projectCases.length}
         offline={model.connection === "demo"}
         onClose={close}
-        onCreated={(testCase) => {
+        onCreated={(testCase, etag) => {
           const { current: _current, linkIds: _linkIds, ...summary } = testCase;
           model.setData((current) => ({
             ...current,
-            testCases: [...current.testCases, summary],
+            testCases: [...current.testCases, { ...summary, etag: etag ?? "" }],
           }));
           model.setSelectedCaseId(testCase.id);
           model.setSelectedFolder(testCase.folderPath);

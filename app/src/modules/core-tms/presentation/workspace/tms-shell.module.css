@@ -351,12 +351,25 @@
 }
 
 .navigationIcon {
+  position: relative;
   width: 22px;
   height: 22px;
   display: grid;
   flex: 0 0 22px;
   place-items: center;
   color: #aeb7c8;
+}
+
+.activeRunDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  background: #f05252;
+  border: 1px solid #25282d;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(240 82 82 / 22%);
 }
 
 .navigationItemActive .navigationIcon {

@@ -41,9 +41,10 @@ export type TestCaseSummary = {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  etag: string;
 };
 
-export type TestCase = TestCaseSummary & {
+export type TestCase = Omit<TestCaseSummary, "etag"> & {
   current: TestCaseRevision;
   linkIds: string[];
 };

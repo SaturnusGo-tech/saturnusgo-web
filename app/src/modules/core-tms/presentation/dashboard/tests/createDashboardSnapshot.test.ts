@@ -48,6 +48,7 @@ const data: Bootstrap = {
       title: "Current", type: "manual", lifecycle: "ready", priority: "high", component: "Core",
       ownerIdentityId: null, tags: [], estimatedMinutes: 5, revisionCount: 1, archivedAt: null,
       createdAt: "2026-08-10T10:00:00.000Z", updatedAt: "2026-08-10T10:00:00.000Z",
+      etag: '"case-1:1"',
     },
     {
       id: "case-2", projectId: "project-1", key: "TC-2", folderPath: "/", currentRevision: 1,
@@ -55,6 +56,7 @@ const data: Bootstrap = {
       ownerIdentityId: null, tags: [], estimatedMinutes: null, revisionCount: 1,
       archivedAt: "2026-08-20T10:00:00.000Z", createdAt: "2026-08-20T10:00:00.000Z",
       updatedAt: "2026-08-20T10:00:00.000Z",
+      etag: '"case-2:1"',
     },
   ],
   suites: [],

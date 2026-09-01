@@ -1,0 +1,221 @@
+.selectionCheckbox {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin: 0;
+  accent-color: var(--cases-primary);
+  cursor: pointer;
+}
+
+.selectionCheckbox:disabled { cursor: not-allowed; opacity: .45; }
+
+.selectionHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.selectionMenuButton.selectionMenuButton {
+  width: 17px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--cases-muted);
+  border-radius: 3px;
+}
+
+.selectionMenuButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
+
+.selectionMenu {
+  position: absolute;
+  z-index: 45;
+  top: 27px;
+  left: 0;
+  width: 220px;
+  padding: 4px;
+  color: var(--cases-secondary-text);
+  background: var(--cases-raised);
+  border: 1px solid var(--cases-control-border);
+  border-radius: 5px;
+  box-shadow: 0 9px 24px rgb(0 0 0 / 30%);
+}
+
+.selectionMenu button {
+  width: 100%;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 7px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.selectionMenu button:hover,
+.selectionMenu button:focus-visible { color: var(--cases-strong); background: var(--cases-hover-strong); }
+.selectionMenu button:disabled { cursor: not-allowed; opacity: .45; }
+.selectionMenu button span { min-width: 0; flex: 1; }
+.selectionMenu button small { color: var(--cases-faint); font-size: 10px; }
+
+.bulkBar {
+  position: absolute;
+  z-index: 24;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  container-type: inline-size;
+  padding: 6px 9px 6px 12px;
+  color: #fff;
+  background: #3574f0;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 26%);
+}
+
+.bulkBar > strong {
+  flex: 0 0 auto;
+  margin-right: 7px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bulkSpacer { flex: 1 1 auto; }
+.bulkActionsViewport {
+  min-width: 0;
+  display: flex;
+  flex: 0 1 auto;
+  gap: 4px;
+  overflow: visible;
+}
+.bulkHint { min-width: 0; display: block; flex: 0 0 auto; }
+.bulkShortLabel { display: none; }
+
+.bulkAction,
+.bulkRun,
+.bulkClose {
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  color: #fff;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.bulkRun { border-color: rgb(255 255 255 / 48%); }
+.bulkRun:hover,
+.bulkAction:hover,
+.bulkClose:hover { background: rgb(0 0 0 / 13%); }
+.bulkAction:disabled,
+.bulkRun:disabled,
+.bulkClose:disabled { cursor: not-allowed; opacity: .52; }
+.bulkClose {
+  width: 30px;
+  padding: 0;
+}
+
+.bulkMenuRoot { position: relative; }
+.bulkMenu {
+  position: absolute;
+  z-index: 48;
+  bottom: calc(100% + 7px);
+  left: 0;
+  width: 190px;
+  padding: 4px;
+  color: var(--cases-secondary-text);
+  background: var(--cases-raised);
+  border: 1px solid var(--cases-control-border);
+  border-radius: 5px;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 32%);
+}
+
+.bulkMenu button {
+  width: 100%;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.bulkMenu button:hover,
+.bulkMenu button:focus-visible { color: var(--cases-strong); background: var(--cases-hover-strong); }
+.bulkError { max-width: 260px; overflow: hidden; color: #fff; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.critical { color: #ef4d55; fill: currentColor; }
+.high { color: #e9a23b; fill: currentColor; }
+.medium { color: #75a7ff; fill: currentColor; }
+.low { color: #69bd88; fill: currentColor; }
+
+@container (max-width: 650px) {
+  .bulkBar > strong { margin-right: 2px; }
+  .bulkAction,
+  .bulkRun { gap: 3px; padding-inline: 5px; }
+  .bulkLongLabel { display: none; }
+  .bulkShortLabel { display: inline; }
+  .bulkError {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 6px);
+    left: 0;
+    max-width: none;
+    padding: 6px 8px;
+    color: var(--cases-strong);
+    background: var(--cases-raised);
+    border: 1px solid var(--cases-control-border);
+    border-radius: 5px;
+    box-shadow: 0 8px 22px rgb(0 0 0 / 24%);
+    white-space: normal;
+  }
+  .bulkHint:last-child .bulkMenu { right: 0; left: auto; }
+}
+
+@media (max-width: 820px) {
+  .bulkBar { right: 7px; bottom: 7px; left: 7px; }
+}
+
+@container case-list-pane (max-width: 340px) {
+  .bulkBar {
+    min-height: 78px;
+    flex-wrap: wrap;
+    align-content: center;
+    row-gap: 2px;
+  }
+  .bulkBar > strong { order: 1; }
+  .bulkSpacer { order: 2; }
+  .bulkClose { order: 3; }
+  .bulkActionsViewport {
+    order: 4;
+    flex: 0 0 100%;
+    justify-content: space-between;
+  }
+  .bulkRun,
+  .bulkHint { min-width: 0; flex: 1 1 0; }
+  .bulkMenuRoot,
+  .bulkAction { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selectionMenu,
+  .bulkMenu { animation: none; }
+}

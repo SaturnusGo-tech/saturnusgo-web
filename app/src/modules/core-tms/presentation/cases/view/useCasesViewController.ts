@@ -12,6 +12,7 @@ import {
   type CaseListViewMode,
 } from "../model/caseListModel";
 import { useCaseInspectorResize } from "../split/useCaseInspectorResize";
+import { useCaseBulkSelection } from "../bulk/selection-hook/useCaseBulkSelection";
 import type { CaseListRow, CaseSort, CaseSortKey, CasesViewProps } from "../types";
 
 export function useCasesViewController(
@@ -49,6 +50,18 @@ export function useCasesViewController(
   const rows = useMemo(() => sortCaseRows(filterCaseRows(baseRows, {
     qlQuery, facets: facetFilters,
   }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort]);
+  const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
+    !testCase.archivedAt && Boolean(testCase.etag)
+  )), [allRows]);
+  const selectableIds = useMemo(
+    () => new Set(selectableRows.map(({ testCase }) => testCase.id)),
+    [selectableRows],
+  );
+  const selectableVisibleRows = useMemo(
+    () => rows.filter(({ testCase }) => selectableIds.has(testCase.id)),
+    [rows, selectableIds],
+  );
+  const bulkSelection = useCaseBulkSelection(selectableRows, selectableVisibleRows);
   const totalLabel = formatCount(locale, allRows.length, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
   const countLabel = rows.length === allRows.length
     ? totalLabel
@@ -124,6 +137,7 @@ export function useCasesViewController(
     setDetailFullscreen, inspectorOpen: detailOpen || Boolean(props.editor), sort,
     toggleSort, qlQuery, setQlQuery, viewMode, setViewMode, groupBy, setGroupBy,
     facetFilters, setFacetFilters, facetOptions, rows, countLabel, estimateLabel,
-    selectRow, createCase, closeInspector,
+    selectRow, createCase, closeInspector, bulkSelection, selectableIds,
+    selectableCount: selectableRows.length,
   };
 }

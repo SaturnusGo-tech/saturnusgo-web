@@ -120,6 +120,24 @@ Date: 2026-08-29
 
 final result: passed
 
+## Test-case WYSIWYG, bulk actions and run handoff — final pass
+
+- Sources: the eleven user-supplied 1 September references covering full-list selection, group/project selection, the persistent bottom action bar, lifecycle and priority menus, parameter editing, and test-run creation. The previous accepted inspector references remain the source for fullscreen geometry and inline editing.
+- Combined comparisons: `.design-qa/case-bulk/compare-priority-source-left.png` and `.design-qa/case-bulk/compare-run-source-left.png` place the normalized references beside the implemented priority and run states. Inspector evidence is stored under `.design-qa/case-visual-refinement/`; all evidence is ignored and is not shipped.
+- Fullscreen inspector: fullscreen preserves the normal case-document composition and expands from the 68px navigation boundary to the viewport edge with no centered max-width or oversized side gutters.
+- Metadata controls: lifecycle, priority, type, and estimate are single semantic controls with an integrated chevron. View and edit states retain the same semantic color treatment and use keyboard listboxes rather than system menus.
+- WYSIWYG: Description, Preconditions, execution data, checklist text, and step action/result/data fields use a client-only in-place editor. Bold and italic appear immediately as formatted content without raw Markdown markers; saved rendering suppresses raw HTML and rejects unsafe link protocols. Dark and light captures confirm visibly stronger emphasis.
+- Listing semantics: List and Groups use white active text on `#3574f0` in light mode. Every row exposes a priority triangle—red Critical, amber High, blue Medium, and green Low—alongside the manual/checklist indicator and real case key.
+- Selection workflow: one case, a group, the current filtered result, or every active case in the project can be selected without losing out-of-filter selections. Archived cases and summaries without authoritative ETags are unavailable. The bottom bar exposes Create test run, Change status, Change priority, and Clear with keyboard navigation and focus restoration.
+- Responsive action bar: the full-list state retains complete labels. Inspector-narrow layouts use compact visible labels without horizontal overflow; the 414px state and its 190px priority menu were recaptured. At phone-sized list widths the bar becomes two rows, reserves 94px below the table, right-aligns the final menu, and keeps failure alerts visible and announced above the bar. The final phone recapture was blocked when the selected in-app browser became unavailable; source/container behavior and cleanup were verified without substituting another browser.
+- Run handoff: Create test run reuses the production run dialog with the exact selected IDs. Active non-archived runs add an accessible red navigation dot and opening Runs selects the active run.
+- Mutation contract: `PATCH /api/v1/test-cases/bulk` accepts 1–1000 unique case IDs with strong per-case ETags and one idempotency key. The backend authorizes the entire workspace/project scope, validates and locks the full batch before writing, preserves request order, creates immutable revisions only for changed cases, and returns changed/unchanged counts atomically. Stale, missing, and archived scopes produce no partial writes; the client refreshes on 412, 404, and 409.
+- Security cleanup: all temporary visual harnesses and authentication exceptions were reverted byte-for-byte. No QA marker, credential literal, generated cache, or ignored screenshot enters the release stage.
+- Recovery hardening: legacy raw HTML is normalized into the parent draft as soon as the WYSIWYG editor opens. Scope-changing 404/409 failures refresh the list, use localized copy, and also reach the global notice surface if selection reconciliation removes the bottom bar.
+- Verification: frontend TypeScript, 244-file architecture, 27/27 auth, 4/4 attachments, 116/116 adapter/UI tests, focused bulk recovery, exact regenerated OpenAPI, clean production build with 61/61 pages, and `git diff --check` passed. Backend 210/210 tests, build, typecheck, lint, architecture, 72-operation OpenAPI validation, 15 migrations, and `git diff --check` passed.
+
+final result: passed
+
 ## Run selector readable names — production pass
 
 - Source: the user-supplied 31 August crop showing all active run names truncated in the trigger and list. Production evidence: `.design-qa/run-picker-readable-production.png`; focused comparison: `.design-qa/run-picker-before-after.png`. The evidence assets are ignored and are not shipped.

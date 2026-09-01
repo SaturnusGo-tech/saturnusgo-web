@@ -67,6 +67,10 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
           model.selectedCase &&
           model.openRunDialog({ caseIds: [model.selectedCase.id] })
         }
+        onRunCases={(caseIds) => model.openRunDialog({ caseIds })}
+        onBulkChangeLifecycle={model.bulkChangeCaseLifecycle}
+        onBulkChangePriority={model.bulkChangeCasePriority}
+        bulkMutationEnabled={model.connection === "connected"}
         activity={model.data.activity}
         filters={model.caseFilters}
         onFilters={model.setCaseFilters}

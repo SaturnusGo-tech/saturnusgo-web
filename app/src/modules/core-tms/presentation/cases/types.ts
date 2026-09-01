@@ -5,6 +5,7 @@ import type {
 } from "../../../../core/tms/contracts/legacy-contract";
 import type { CaseFilters } from "../../state/types/workspace";
 import type { CaseInspectorEditor } from "./inspector/model";
+import type { BulkCaseMutationResult } from "../../../../core/tms/contracts/test-cases/bulk-case-contract";
 
 export type CasesViewProps = {
   query: string;
@@ -23,6 +24,16 @@ export type CasesViewProps = {
   onClone: () => void;
   onArchive: () => void;
   onRunCase: () => void;
+  onRunCases: (caseIds: string[]) => void;
+  onBulkChangeLifecycle: (
+    caseIds: string[],
+    lifecycle: TestCaseRevision["lifecycle"],
+  ) => Promise<BulkCaseMutationResult>;
+  onBulkChangePriority: (
+    caseIds: string[],
+    priority: TestCaseRevision["priority"],
+  ) => Promise<BulkCaseMutationResult>;
+  bulkMutationEnabled: boolean;
   activity: Activity[];
   filters: CaseFilters;
   onFilters: (filters: CaseFilters) => void;

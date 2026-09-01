@@ -239,6 +239,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/test-cases/bulk": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Atomically revise lifecycle or priority for explicit test cases
+         * @description Validates the full authorized project-scoped selection and every strong per-case ETag before writing. Changed cases receive one immutable revision; cases already at the requested values are returned unchanged without a revision, audit event, or outbox message. The command never partially succeeds.
+         */
+        patch: operations["bulkMutateTestCases"];
+        trace?: never;
+    };
     "/test-cases/{caseId}": {
         parameters: {
             query?: never;
@@ -1423,6 +1446,40 @@ export interface components {
             title?: string;
             folderPath?: string;
         };
+        TestCaseStrongEtag: string;
+        TestCaseBulkMutationTarget: {
+            caseId: components["schemas"]["Identifier"];
+            ifMatch: components["schemas"]["TestCaseStrongEtag"];
+        };
+        TestCaseBulkMutationPatch: {
+            lifecycle?: components["schemas"]["TestCaseLifecycle"];
+            priority?: components["schemas"]["Priority"];
+        };
+        TestCaseBulkMutationRequest: {
+            projectId: components["schemas"]["Identifier"];
+            /** @description Explicit targets. caseId values must be unique; the server validates this independently of full-object uniqueness. */
+            items: components["schemas"]["TestCaseBulkMutationTarget"][];
+            patch: components["schemas"]["TestCaseBulkMutationPatch"];
+            changeNote?: components["schemas"]["ShortText"];
+        };
+        TestCaseBulkMutationItem: {
+            id: components["schemas"]["Identifier"];
+            key: string;
+            currentRevision: number;
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            updatedAt: components["schemas"]["Timestamp"];
+            etag: components["schemas"]["TestCaseStrongEtag"];
+            changed: boolean;
+        };
+        TestCaseBulkMutationData: {
+            items: components["schemas"]["TestCaseBulkMutationItem"][];
+            updatedCount: number;
+            unchangedCount: number;
+        };
+        TestCaseBulkMutationEnvelope: {
+            data: components["schemas"]["TestCaseBulkMutationData"];
+        };
         TestCaseSummary: {
             id: components["schemas"]["Identifier"];
             projectId: components["schemas"]["Identifier"];
@@ -1441,6 +1498,7 @@ export interface components {
             revisionCount: number;
             /** Format: date-time */
             archivedAt: string | null;
+            etag: components["schemas"]["TestCaseStrongEtag"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         };
@@ -2432,6 +2490,27 @@ export interface components {
                 "application/json": components["schemas"]["TestCaseEnvelope"];
             };
         };
+        /** @description All requested cases in request order, with changed and unchanged counts. */
+        TestCaseBulkMutationResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["TestCaseBulkMutationEnvelope"];
+            };
+        };
+        /** @description At least one supplied per-case ETag is malformed, belongs to another case, or is stale. No case is changed. */
+        TestCaseBulkPreconditionFailed: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
         /** @description A page of bounded immutable revision summaries. */
         TestCaseRevisionListResponse: {
             headers: {
@@ -2869,6 +2948,11 @@ export interface components {
         TestCasePatch: {
             content: {
                 "application/merge-patch+json": components["schemas"]["TestCasePatchRequest"];
+            };
+        };
+        TestCaseBulkMutation: {
+            content: {
+                "application/json": components["schemas"]["TestCaseBulkMutationRequest"];
             };
         };
         TestCaseClone: {
@@ -3408,6 +3492,30 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    bulkMutateTestCases: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["TestCaseBulkMutation"];
+        responses: {
+            200: components["responses"]["TestCaseBulkMutationResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["TestCaseBulkPreconditionFailed"];
             500: components["responses"]["InternalError"];
         };
     };

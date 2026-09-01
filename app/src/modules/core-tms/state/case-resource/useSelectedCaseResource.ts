@@ -22,7 +22,9 @@ export function useSelectedCaseResource(
     setFailed(false);
     if (connection === "demo") {
       const selected = testCases.find((item) => item.id === caseId);
-      setDetail(selected && "current" in selected ? selected as TestCase : null);
+      setDetail(selected && "current" in selected && "linkIds" in selected
+        ? selected as unknown as TestCase
+        : null);
       setEtag(null);
       return;
     }

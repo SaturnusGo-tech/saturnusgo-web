@@ -5,6 +5,9 @@ import type { TmsLocale } from "../../../localization/model/locale";
 import { groupCaseRows, visibleCaseTabStop, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
 import type { CaseListRow, CaseSort, CaseSortKey } from "../types";
 import { LifecycleBadge, PriorityBadge } from "./CaseBadges";
+import { CaseSelectionCheckbox } from "../bulk/checkbox/CaseSelectionCheckbox";
+import { CaseSelectionHeader } from "../bulk/checkbox/CaseSelectionHeader";
+import { selectionCoverage, type SelectionCoverage } from "../bulk/selection/caseSelection";
 import styles from "../listing/caseListing.module.css";
 
 type Props = {
@@ -19,9 +22,20 @@ type Props = {
   groupBy?: CaseGroupBy;
   interactionLocked?: boolean;
   onLockedInteraction?: () => void;
+  selectedIds: ReadonlySet<string>;
+  selectableIds: ReadonlySet<string>;
+  selectedCount: number;
+  selectableCount: number;
+  visibleCoverage: SelectionCoverage;
+  onToggleCase: (id: string) => void;
+  onToggleScope: (ids: readonly string[]) => void;
+  onSelectVisible: () => void;
+  onSelectAll: () => void;
+  onClearSelection: () => void;
 };
 
 const columns: Array<{ key?: CaseSortKey; ru: string; en: string; className: keyof typeof styles }> = [
+  { ru: "", en: "", className: "selectionColumn" },
   { ru: "", en: "", className: "flagColumn" },
   { ru: "", en: "", className: "typeColumn" },
   { key: "key", ru: "ID", en: "ID", className: "keyColumn" },
@@ -72,11 +86,22 @@ export function CasesTable(props: Props) {
     }}><ListChecks size={14} />{ru ? "Создать кейс" : "Create case"}</button>
   </div>;
 
-  return <div className={styles.tableScroll}>
+  return <div className={`${styles.tableScroll} ${props.selectedCount > 0 ? styles.tableScrollBulkActive : ""}`}>
     <table className={styles.table}>
       <colgroup>{columns.map((column, index) => <col className={styles[column.className]} key={`${column.key ?? "icon"}-${index}`} />)}</colgroup>
       <thead><tr>{columns.map((column, index) => <th key={`${column.key ?? "icon"}-${index}`} scope="col" aria-sort={column.key && props.sort.key === column.key ? (props.sort.direction === "asc" ? "ascending" : "descending") : undefined}>
-        {column.key ? <button onClick={() => props.onSort(column.key!)}>
+        {index === 0 ? <CaseSelectionHeader
+          locale={props.locale}
+          visibleCount={props.rows.filter((row) => props.selectableIds.has(row.testCase.id)).length}
+          allCount={props.selectableCount}
+          selectedCount={props.selectedCount}
+          disabled={props.interactionLocked}
+          visibleCoverage={props.visibleCoverage}
+          onToggleVisible={() => props.onToggleScope(props.rows.filter((row) => props.selectableIds.has(row.testCase.id)).map((row) => row.testCase.id))}
+          onSelectVisible={props.onSelectVisible}
+          onSelectAll={props.onSelectAll}
+          onClear={props.onClearSelection}
+        /> : column.key ? <button onClick={() => props.onSort(column.key!)}>
           {ru ? column.ru : column.en}
           {props.sort.key === column.key && (props.sort.direction === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
         </button> : <span aria-hidden="true" />}
@@ -86,22 +111,34 @@ export function CasesTable(props: Props) {
         const isCollapsed = collapsed.has(group.key);
         return <Fragment key={group.key}>
           {isGrouped && <tr className={styles.groupRow} key={`${group.key}-heading`}><td colSpan={columns.length}>
-            <button onClick={() => setCollapsed((current) => {
-              const next = new Set(current); next.has(group.key) ? next.delete(group.key) : next.add(group.key); return next;
-            })}>{isCollapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}<strong>{groupLabel(props.locale, effectiveGroup, group.value)}</strong><small>{group.rows.length}</small></button>
+            <div className={styles.groupHeading}>
+              <CaseSelectionCheckbox
+                coverage={selectionCoverage(props.selectedIds, group.rows.filter((row) => props.selectableIds.has(row.testCase.id)).map((row) => row.testCase.id))}
+                disabled={props.interactionLocked || !group.rows.some((row) => props.selectableIds.has(row.testCase.id))}
+                label={ru ? `Выбрать группу ${groupLabel(props.locale, effectiveGroup, group.value)}` : `Select ${groupLabel(props.locale, effectiveGroup, group.value)} group`}
+                onToggle={() => props.onToggleScope(group.rows.filter((row) => props.selectableIds.has(row.testCase.id)).map((row) => row.testCase.id))}
+              />
+              <button onClick={() => setCollapsed((current) => {
+                const next = new Set(current); next.has(group.key) ? next.delete(group.key) : next.add(group.key); return next;
+              })}>{isCollapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}<strong>{groupLabel(props.locale, effectiveGroup, group.value)}</strong><small>{group.rows.length}</small></button>
+            </div>
           </td></tr>}
           {!isCollapsed && group.rows.map((row) => {
             const item = row.testCase;
             const selected = item.id === props.selectedCaseId;
-            return <tr key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
+            const bulkSelected = props.selectedIds.has(item.id);
+            const selectable = props.selectableIds.has(item.id);
+            return <tr key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} data-bulk-selected={bulkSelected || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
               onClick={() => props.interactionLocked ? props.onLockedInteraction?.() : props.onSelect(row)} onKeyDown={(event) => {
+                if (event.target instanceof Element && event.target.closest("input, button, a, select, textarea")) return;
                 if (props.interactionLocked && ["Enter", " ", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
                   event.preventDefault();
                   props.onLockedInteraction?.();
                 } else if (event.key === "Enter" || event.key === " ") { event.preventDefault(); props.onSelect(row); }
                 else moveFocus(event);
               }}>
-              <td className={styles.flagCell}>{item.priority === "critical" && <AlertTriangle className={styles.criticalIcon} size={13} aria-label={ru ? "Критический" : "Critical"} />}</td>
+              <td className={styles.selectionCell}><CaseSelectionCheckbox coverage={bulkSelected ? "all" : "none"} disabled={props.interactionLocked || !selectable} label={selectable ? (ru ? `Выбрать ${item.key}` : `Select ${item.key}`) : (ru ? `${item.key} недоступен для массовых действий` : `${item.key} is unavailable for bulk actions`)} onToggle={() => props.onToggleCase(item.id)} /></td>
+              <td className={styles.flagCell}><AlertTriangle className={styles[`priorityFlag_${item.priority}`]} size={13} aria-label={localizedLabel(props.locale, item.priority)} /></td>
               <td className={styles.typeCell}>{item.type === "manual" ? <Hand size={13} aria-label={ru ? "Ручной" : "Manual"} /> : <ListChecks size={13} aria-label={ru ? "Чеклист" : "Checklist"} />}</td>
               <td className={styles.keyCell} title={item.key}><strong>{item.key}</strong></td>
               <td><LifecycleBadge locale={props.locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></td>

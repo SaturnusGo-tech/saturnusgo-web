@@ -66,6 +66,7 @@ export function mapTestCaseSummary(dto: ApiSummary): TestCaseSummary {
     archivedAt: dto.archivedAt,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
+    etag: dto.etag,
   };
 }
 

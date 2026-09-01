@@ -18,6 +18,7 @@ const makeCase = (value: Partial<TestCaseSummary> & Pick<TestCaseSummary, "id" |
   tags: ["Host", "Ui", "Positive", "Ios", "Android"], estimatedMinutes: 2,
   revisionCount: 1, archivedAt: null, createdAt: "2026-08-29T00:00:00Z",
   updatedAt: "2026-08-29T00:00:00Z", ...value,
+  etag: value.etag ?? '"case:1"',
 });
 
 const cases = [

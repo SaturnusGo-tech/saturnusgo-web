@@ -34,6 +34,7 @@ function createCase(index: number, priority: "low" | "medium" | "high" | "critic
     archivedAt: null,
     createdAt: "2026-08-31T00:00:00.000Z",
     updatedAt: "2026-08-31T00:00:00.000Z",
+    etag: `"case-${index}:1"`,
   };
 }
 

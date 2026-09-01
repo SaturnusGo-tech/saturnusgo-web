@@ -1,7 +1,9 @@
 "use client";
 
-import MDEditor, { commands } from "@uiw/react-md-editor/nohighlight";
+import MDEditor from "@uiw/react-md-editor/nohighlight";
+import dynamic from "next/dynamic";
 import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
+import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import css from "./markdownField.module.css";
 
 type Props = {
@@ -13,26 +15,20 @@ type Props = {
   emptyLabel?: string;
 };
 
-const EDIT_COMMANDS = [
-  commands.bold,
-  commands.italic,
-  commands.strikethrough,
-  commands.divider,
-  commands.title,
-  commands.unorderedListCommand,
-  commands.orderedListCommand,
-  commands.quote,
-  commands.link,
-  commands.code,
-];
+const WysiwygMarkdownEditor = dynamic(
+  () => import("./InitializedMarkdownEditor"),
+  { ssr: false, loading: () => <div className={css.editorLoading} aria-hidden="true" /> },
+);
 
-function safeUrl(url: string) {
-  if (/^(https?:|mailto:|tel:)/i.test(url)) return url;
-  return /^(#|\/|\.\/|\.\.\/)/.test(url) ? url : "";
+function isSafeUrl(url: string) {
+  const value = url.trim();
+  return /^(https?:|mailto:|tel:)/i.test(value)
+    || /^(#|\/|\.\/|\.\.\/)/.test(value);
 }
 
 export function MarkdownField(props: Props) {
   const { theme } = useColorMode();
+  const { locale } = useTmsLocale();
   const colorMode = theme === "dark" ? "dark" : "light";
   if (!props.onChange) {
     if (!props.value.trim()) {
@@ -42,25 +38,19 @@ export function MarkdownField(props: Props) {
       className={css.rendered}
       source={props.value}
       skipHtml
-      urlTransform={safeUrl}
+      urlTransform={(url) => isSafeUrl(url) ? url : ""}
       wrapperElement={{ "data-color-mode": colorMode }}
     />;
   }
-  return <div className={css.field} data-color-mode={colorMode}>
-    <MDEditor
-      aria-label={props.label}
-      value={props.value}
-      onChange={(value) => props.onChange?.(value ?? "")}
-      preview="edit"
-      commands={EDIT_COMMANDS}
-      extraCommands={[]}
-      visibleDragbar={false}
-      height={props.compact ? 96 : 116}
-      minHeight={props.compact ? 88 : 104}
+  return <div className={css.field} data-color-mode={colorMode} role="group" aria-label={props.label}>
+    <WysiwygMarkdownEditor
+      markdown={props.value}
+      label={props.label}
+      locale={locale}
+      compact={props.compact}
       autoFocus={props.autoFocus}
-      enableScroll
-      previewOptions={{ skipHtml: true, urlTransform: safeUrl }}
-      textareaProps={{ "aria-label": props.label }}
+      validateUrl={isSafeUrl}
+      onChange={props.onChange}
     />
   </div>;
 }

@@ -3,6 +3,9 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
+const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
+const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
+const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
@@ -10,13 +13,35 @@ const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.ur
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
 const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.meta.url), "utf8");
 
-test("markdown fields use an edit-only toolbar and never render raw HTML", () => {
-  assert.match(source, /preview="edit"/);
-  assert.match(source, /extraCommands=\{\[\]\}/);
-  assert.match(source, /commands\.bold/);
-  assert.match(source, /commands\.orderedListCommand/);
-  assert.match(source, /urlTransform=\{safeUrl\}/);
-  assert.equal(source.match(/skipHtml/g)?.length, 2);
+test("markdown fields use a client-only WYSIWYG editor without a raw source pane", () => {
+  assert.match(source, /dynamic\([\s\S]*ssr: false/);
+  assert.match(initialized, /<MDXEditor/);
+  assert.match(initialized, /BoldItalicUnderlineToggles options=\{\["Bold", "Italic"\]\}/);
+  assert.match(initialized, /<ListsToggle \/>/);
+  assert.doesNotMatch(initialized, /diffSourcePlugin|DiffSourceToggleWrapper/);
+  assert.doesNotMatch(source, /preview="(?:edit|live)"/);
+});
+
+test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", () => {
+  assert.match(initialized, /suppressHtmlProcessing/);
+  assert.match(initialized, /stripRawHtml\(markdown\)/);
+  assert.match(initialized, /safe !== props\.markdown\) props\.onChange\(safe\)/);
+  assert.match(initialized, /linkPlugin\(\{ validateUrl: props\.validateUrl \}\)/);
+  assert.match(source, /skipHtml/);
+  assert.match(source, /isSafeUrl\(url\) \? url : ""/);
+  assert.match(styles, /\.editorContent strong/);
+  assert.match(styles, /\.editorContent em/);
+  assert.match(styles, /font-weight: 750/);
+  assert.match(styles, /color: var\(--cases-strong\) !important/);
+});
+
+test("fullscreen inspector content keeps the normal full-width layout", () => {
+  const fullscreenRule = layoutStyles.match(/\.detailPanelFullscreen \.detailTitle,[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.match(fullscreenRule, /width: 100%/);
+  assert.match(fullscreenRule, /max-width: none/);
+  assert.match(fullscreenRule, /margin-inline: 0/);
+  assert.doesNotMatch(fullscreenRule, /1120px/);
+  assert.doesNotMatch(layoutStyles, /detailPanelFullscreen \.facts/);
 });
 
 test("rich text is scoped to narrative test-case fields", () => {

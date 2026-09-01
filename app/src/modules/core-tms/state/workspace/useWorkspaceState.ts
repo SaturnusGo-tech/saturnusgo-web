@@ -75,7 +75,9 @@ export function useWorkspaceState() {
       data.suites.find((item) => item.projectId === initialProjectId)?.id ?? "",
     );
     setSelectedRunId(
-      data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id ?? null,
+      data.runs.find((item) => item.projectId === initialProjectId && item.status === "active" && !item.archivedAt)?.id
+        ?? data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id
+        ?? null,
     );
     setNotice(connection === "connected" ? t("actions.workspaceConnected") : "");
   }, [bootstrap.generation]);

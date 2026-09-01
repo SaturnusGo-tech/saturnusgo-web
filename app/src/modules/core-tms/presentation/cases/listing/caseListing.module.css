@@ -65,7 +65,9 @@
 .segmentButton:first-child { border-radius: 4px 0 0 4px; }
 .segmentButton:last-child { margin-left: -1px; border-radius: 0 4px 4px 0; }
 .segmentActive { position: relative; z-index: 1; color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
-.segmentActive:hover { color: var(--cases-on-primary); background: var(--cases-primary); }
+.segmentButton.segmentActive,
+.segmentButton.segmentActive:hover { color: var(--cases-on-primary); background-color: var(--cases-primary); }
+.segmentButton.segmentActive :is(span, svg) { color: var(--cases-on-primary); }
 
 .qlLine { position: relative; z-index: 20; }
 .qlRoot { position: relative; width: 100%; }
@@ -143,18 +145,21 @@
 .controls button:focus-visible { outline: 1px solid var(--cases-primary); outline-offset: -1px; }
 
 .tableScroll { min-width: 0; min-height: 0; flex: 1; overflow: auto; scrollbar-gutter: stable; scrollbar-color: var(--cases-control-border) transparent; }
+.tableScrollBulkActive { padding-bottom: 58px; }
 .table { width: 100%; min-width: 930px; border-spacing: 0; table-layout: fixed; }
 .table th { position: sticky; z-index: 5; top: 0; height: 32px; padding: 0 8px; color: var(--cases-muted); background: var(--cases-bg); border-bottom: 1px solid var(--cases-border); font-size: 10px; font-weight: 650; text-align: left; }
-.table th button { width: 100%; height: 31px; display: flex; align-items: center; gap: 4px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
-.table th button:hover { color: var(--cases-strong); }
+.table th > button { width: 100%; height: 31px; display: flex; align-items: center; gap: 4px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
+.table th > button:hover { color: var(--cases-strong); }
 .table tbody tr[data-case-row] { height: 46px; cursor: pointer; outline: 0; }
 .table tbody tr[data-case-row][data-interaction-locked="true"] { cursor: not-allowed; }
 .table td { height: 46px; padding: 0 8px; overflow: hidden; color: var(--cases-secondary-text); border-bottom: 1px solid var(--cases-row-border); font-size: 12px; vertical-align: middle; }
 .table tbody tr[data-case-row]:hover td { background: var(--cases-hover); }
+.table tbody tr[data-case-row][data-bulk-selected="true"] td { background: color-mix(in srgb, var(--cases-primary) 12%, var(--cases-bg)); }
 .table .selectedRow td { background: var(--cases-hover-strong); }
 .table .selectedRow td:first-child { box-shadow: inset 2px 0 0 var(--cases-primary); }
 .table tbody tr[data-case-row]:focus-visible td { box-shadow: inset 0 0 0 1px var(--cases-primary); }
 
+.selectionColumn { width: 34px; }
 .flagColumn { width: 28px; }
 .typeColumn { width: 30px; }
 .keyColumn { width: 112px; }
@@ -163,8 +168,12 @@
 .functionColumn { width: 180px; }
 .priorityColumn { width: 112px; }
 .estimateColumn { width: 90px; }
+.selectionCell { padding-inline: 9px 4px !important; }
 .flagCell { padding-right: 0 !important; text-align: right; }
-.criticalIcon { color: #ef4d55; fill: currentColor; }
+.priorityFlag_critical { color: #ef4d55; fill: currentColor; }
+.priorityFlag_high { color: #e9a23b; fill: currentColor; }
+.priorityFlag_medium { color: #558bea; fill: currentColor; }
+.priorityFlag_low { color: #4c9b69; fill: currentColor; }
 .typeCell { padding-inline: 5px !important; color: var(--cases-icon) !important; text-align: center; }
 .keyCell { overflow: hidden; color: var(--cases-link) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
 .titleCell { min-width: 0; }
@@ -173,6 +182,7 @@
 .estimateCell { color: var(--cases-muted) !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .groupRow td { position: sticky; z-index: 3; top: 32px; height: 30px; padding: 0 8px; color: var(--cases-muted); background: var(--cases-raised); border-bottom: 1px solid var(--cases-border); font-size: 11px; }
+.groupHeading { display: flex; align-items: center; gap: 10px; }
 .groupRow button { display: inline-flex; align-items: center; gap: 6px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; }
 .groupRow strong { color: var(--cases-secondary-text); font-weight: 600; }
 .groupRow small { color: var(--cases-faint); }
@@ -215,4 +225,8 @@
   .segments span,
   .primaryButton span { display: none; }
   .segmentButton { width: 30px; padding: 0; }
+}
+
+@container case-list-pane (max-width: 340px) {
+  .tableScrollBulkActive { padding-bottom: 94px; }
 }

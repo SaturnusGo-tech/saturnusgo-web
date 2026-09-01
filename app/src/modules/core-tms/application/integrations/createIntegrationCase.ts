@@ -65,5 +65,6 @@ export async function createIntegrationCase(input: {
     folderPath: "/Integrations",
     revision,
   }, crypto.randomUUID());
-  return (await getTestCase(input.http, created.data.id)).data;
+  const resource = await getTestCase(input.http, created.data.id);
+  return { testCase: resource.data, etag: resource.etag };
 }

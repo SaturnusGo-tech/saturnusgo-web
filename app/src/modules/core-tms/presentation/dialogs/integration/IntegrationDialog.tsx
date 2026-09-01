@@ -10,7 +10,7 @@ import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
 import { getIntegrationDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
-export function IntegrationDialog({ project, casesCount, offline, onClose, onCreated }: { project: Project; casesCount: number; offline: boolean; onClose: () => void; onCreated: (testCase: TestCase) => void }) {
+export function IntegrationDialog({ project, casesCount, offline, onClose, onCreated }: { project: Project; casesCount: number; offline: boolean; onClose: () => void; onCreated: (testCase: TestCase, etag: string | null) => void }) {
   const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getIntegrationDialogCopy(locale);
@@ -27,7 +27,10 @@ export function IntegrationDialog({ project, casesCount, offline, onClose, onCre
     if (submitting) return;
     setSubmitting(true);
     setError(false);
-    try { onCreated(await createIntegrationCase({ http, project, casesCount, name, source, target, contract, endpoint, description, offline, locale })); }
+    try {
+      const created = await createIntegrationCase({ http, project, casesCount, name, source, target, contract, endpoint, description, offline, locale });
+      onCreated(created.testCase, created.etag);
+    }
     catch { setError(true); setSubmitting(false); }
   }
   return <Modal title={copy.title} subtitle={copy.subtitle} onClose={onClose} wide drawer>

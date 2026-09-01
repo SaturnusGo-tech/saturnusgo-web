@@ -73,7 +73,7 @@ export function MetadataSelect<T extends string>({
       <button
         ref={triggerRef}
         type="button"
-        className={styles.trigger}
+        className={`${styles.trigger} ${selected?.tone ?? ""}`}
         aria-label={label}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -94,7 +94,7 @@ export function MetadataSelect<T extends string>({
           }
         }}
       >
-        <span className={`${styles.chip} ${selected?.tone ?? ""}`}>{selected?.icon}{selected?.label}</span>
+        <span className={styles.triggerLabel}>{selected?.icon}{selected?.label}</span>
         <ChevronDown size={13} aria-hidden="true" />
       </button>
       <div
@@ -137,7 +137,7 @@ export function MetadataSelect<T extends string>({
               close();
             }}
           >
-            <span className={`${styles.chip} ${option.tone}`}>{option.icon}{option.label}</span>
+            <span className={`${styles.optionLabel} ${option.tone}`}>{option.icon}{option.label}</span>
             {option.value === value && <Check size={13} aria-hidden="true" />}
           </button>
         ))}

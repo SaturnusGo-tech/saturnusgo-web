@@ -31,6 +31,17 @@ function LocalizedWorkspace() {
     });
   }
 
+  function changeView(next: typeof model.view) {
+    if (next === "runs") {
+      const activeRun = model.activeProjectRuns[0];
+      if (activeRun) {
+        model.setSelectedRunId(activeRun.id);
+        model.setSelectedRunItemId(null);
+      }
+    }
+    model.setView(next);
+  }
+
   return (
     <div
       className={`${styles.app} ${shellStyles.shell}`}
@@ -39,7 +50,7 @@ function LocalizedWorkspace() {
     >
       <Navigation
         view={model.view}
-        onChange={model.setView}
+        onChange={changeView}
         disabled={!model.project}
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebar}
@@ -48,6 +59,7 @@ function LocalizedWorkspace() {
           model.openNewCase();
         }}
         onCreateDefect={() => model.setDialog("defect")}
+        activeRunCount={model.activeProjectRuns.length}
       />
       <div className={shellStyles.workspaceColumn}>
         <WorkspaceHeader

@@ -1,6 +1,10 @@
 import { useMemo } from "react";
-import type { TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
+import type { TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
+
+export const isAuthoritativelyActiveRun = (
+  run: Pick<TestRunSummary, "status" | "archivedAt">,
+) => run.status === "active" && !run.archivedAt;
 
 export function useWorkspaceDerived(
   state: ReturnType<typeof useWorkspaceState>,
@@ -45,8 +49,10 @@ export function useWorkspaceDerived(
   const projectRuns = state.data.runs.filter(
     (item) => item.projectId === project?.id,
   );
+  const activeProjectRuns = projectRuns.filter(isAuthoritativelyActiveRun);
   const selectedRun =
     state.data.runs.find((item) => item.id === state.selectedRunId) ??
+    activeProjectRuns[0] ??
     projectRuns.find((item) => !item.archivedAt) ??
     null;
   const selectedRunItem = state.selectedRunItemDetail?.id === state.selectedRunItemId
@@ -79,6 +85,7 @@ export function useWorkspaceDerived(
   return {
     projects, project, projectCases, visibleCases, selectedCase,
     selectedRevision, projectSuites, selectedSuite, projectEnvironments, projectRuns,
+    activeProjectRuns,
     selectedRun, selectedRunItem, projectDefects, projectLinks, folderGroups,
     executionProgress,
   };

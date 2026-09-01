@@ -21,9 +21,9 @@ import {
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 
-function summaryOf(testCase: TestCase): TestCaseSummary {
+function summaryOf(testCase: TestCase, etag: string): TestCaseSummary {
   const { current: _current, linkIds: _linkIds, ...summary } = testCase;
-  return summary;
+  return { ...summary, etag };
 }
 
 export function useCaseActions(
@@ -37,7 +37,9 @@ export function useCaseActions(
   const caseOperation = useRef<PendingOperation | null>(null);
 
   function commit(testCase: TestCase, etag: string | null, append = false) {
-    const summary: TestCaseSummary = state.connection === "demo" ? testCase : summaryOf(testCase);
+    const summary: TestCaseSummary = state.connection === "demo"
+      ? summaryOf(testCase, "")
+      : summaryOf(testCase, etag ?? "");
     state.setData((current) => ({
       ...current,
       testCases: append
