@@ -137,11 +137,16 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const keyLabel = creating
     ? (ru ? "Новый тест-кейс" : "New test case")
     : `${props.testCase?.key} · ${props.testCase?.folderPath}`;
+  const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={`${inspector.createActions} ${creating ? inspector.creationFooter : ""}`}>
+    {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}
+    <button type="button" disabled={props.editor.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>
+    <button type="submit" form={formId} disabled={props.editor.submitting || Boolean(problem)}>{props.editor.submitting ? (ru ? "Сохранение…" : "Saving…") : creating ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>
+  </div>;
 
   return <div
     ref={panelRef}
     tabIndex={-1}
-    className={`${styles.detailPanelInner} ${inspector.shell}`}
+    className={`${styles.detailPanelInner} ${inspector.shell} ${creating ? inspector.creatingShell : ""}`}
     onKeyDown={(event) => {
       if (event.key !== "Escape" || !props.editor || event.defaultPrevented) return;
       event.preventDefault();
@@ -149,7 +154,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       cancelEditor();
     }}
   >
-    <header className={inspector.caseHeader}>
+    <header className={`${inspector.caseHeader} ${creating ? inspector.creationHeader : ""}`}>
       <div className={inspector.utilityRow}>
         <span className={inspector.caseKey}>{keyLabel}</span>
         <div className={inspector.headerActions}>
@@ -168,6 +173,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
           archived={Boolean(props.testCase?.archivedAt)}
           editing={Boolean(props.editor && (creating || headerEditing === "meta"))}
           autoFocus={headerEditing === "meta"}
+          showLabels={creating}
           onChange={props.editor?.onChange}
         />
         {readyDefects > 0 && <span className={inspector.retestBadge} role="status">{ru ? "Готово к тестированию" : "Ready for testing"} · {readyDefects}</span>}
@@ -175,21 +181,19 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>
       <div className={inspector.titleRow}>
         <span className={inspector.titleMark}><ListChecks size={17} /></span>
+        {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}
         {props.editor && (creating || headerEditing === "title") ? <input autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <h2>{revision.title}</h2>}
         {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
-      {props.editor && <div id="case-editor-actions" tabIndex={-1} className={inspector.createActions}>
-        {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}
-        <button type="button" disabled={props.editor.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>
-        <button type="submit" form={formId} disabled={props.editor.submitting || Boolean(problem)}>{props.editor.submitting ? (ru ? "Сохранение…" : "Saving…") : creating ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>
-      </div>}
-      <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating} onActive={setTab} />
+      {!creating && editorActions}
+      {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating} onActive={setTab} />}
     </header>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
-      <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${activeTab}`} tabIndex={0}>
+      <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
         {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} editor={props.editor} collaboration={props.collaboration} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} files={files} onFiles={setFiles} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} pendingFiles={files} onPendingFiles={props.editor ? setFiles : undefined} />}
       </div>
     </form>
+    {creating && editorActions}
     <span className={styles.visuallyHidden} role="status" aria-live="polite">{linkCopied ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>
   </div>;
 }

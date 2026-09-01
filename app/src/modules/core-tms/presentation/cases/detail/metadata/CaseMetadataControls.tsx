@@ -2,6 +2,7 @@ import {
   Ban, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp, CircleDashed,
   Clock3, FileText, ListChecks, Minus,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import { localizedLabel } from "../../../../localization/format/labels";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -20,6 +21,7 @@ type Props = {
   archived?: boolean;
   editing: boolean;
   autoFocus?: boolean;
+  showLabels?: boolean;
   onChange?: (revision: TestCaseRevision) => void;
 };
 
@@ -65,11 +67,13 @@ export function CaseMetadataControls(props: Props) {
   const update = <Key extends keyof TestCaseRevision>(key: Key, value: TestCaseRevision[Key]) => {
     props.onChange?.({ ...props.revision, [key]: value });
   };
+  const labelled = (label: string, control: ReactNode) => props.showLabels
+    ? <div className={styles.labelledControl}><span>{label}</span>{control}</div> : control;
 
   return <div className={styles.controls}>
-    <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus} />
-    <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} onChange={(value) => update("priority", value)} />
-    <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} onChange={(value) => update("type", value)} />
-    <MetadataSelect label={ru ? "Оценка" : "Estimate"} value={rawEstimate} options={estimate} onChange={(value) => update("estimatedMinutes", value === "none" ? null : Number(value))} />
+    {labelled(ru ? "Статус" : "Status", <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus} />)}
+    {labelled(ru ? "Приоритет" : "Priority", <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} onChange={(value) => update("priority", value)} />)}
+    {labelled(ru ? "Тип" : "Type", <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} onChange={(value) => update("type", value)} />)}
+    {labelled(ru ? "Оценка" : "Estimate", <MetadataSelect label={ru ? "Оценка" : "Estimate"} value={rawEstimate} options={estimate} onChange={(value) => update("estimatedMinutes", value === "none" ? null : Number(value))} />)}
   </div>;
 }

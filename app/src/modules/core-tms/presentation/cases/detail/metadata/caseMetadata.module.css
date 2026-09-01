@@ -1,4 +1,7 @@
 .controls { display: flex; flex-wrap: wrap; gap: 5px; }
+.labelledControl { min-width: 0; display: grid; flex: 1 1 112px; gap: 4px; }
+.labelledControl > span { color: var(--cases-muted); font-size: 10px; font-weight: 550; }
+.labelledControl .select { width: 100%; }
 .select { position: relative; min-width: 112px; }
 .select:focus-within { z-index: 70; }
 .select:last-child { min-width: 104px; }

@@ -8,6 +8,10 @@ const styles = readFileSync(new URL("../markdown/markdownField.module.css", impo
 const globalStyles = readFileSync(new URL("../../../../../../shared/styles/globals.css", import.meta.url), "utf8");
 const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
+const creation = readFileSync(new URL("../creation/CaseCreationSections.tsx", import.meta.url), "utf8");
+const detailPanel = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
+const projectDialog = readFileSync(new URL("../../../dialogs/project/ProjectDialog.tsx", import.meta.url), "utf8");
+const projectStyles = readFileSync(new URL("../../../dialogs/project/projectDialog.module.css", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
@@ -77,4 +81,24 @@ test("section snapshots and rich field labels remain interaction-safe", () => {
 test("a handled select Escape cannot close its containing modal", () => {
   assert.equal(select.match(/event\.stopPropagation\(\)/g)?.length, 2);
   assert.match(modal, /if \(event\.defaultPrevented\) return/);
+});
+
+test("create mode uses guided sections and a stable bottom action bar", () => {
+  assert.match(content, /creating && editor[\s\S]*<CaseCreationSections/);
+  assert.match(creation, /number="1"[\s\S]*number="2"[\s\S]*number="3"/);
+  assert.match(creation, /<details[\s\S]*creationOptional/);
+  assert.match(creation, /<MarkdownField[\s\S]*revision\.description/);
+  assert.match(creation, /<InspectorSteps revision=\{revision\} editing/);
+  assert.ok(detailPanel.lastIndexOf("</form>") < detailPanel.lastIndexOf("{creating && editorActions}"));
+  assert.match(detailPanel, /!creating && editorActions/);
+  assert.match(detailPanel, /!creating && <CaseDetailTabs/);
+});
+
+test("project dialog shares the guided form language without a detached footer", () => {
+  assert.match(projectDialog, /panelClassName=\{styles\.panel\}/);
+  assert.match(projectDialog, /identitySection/);
+  assert.match(projectDialog, /setupSection/);
+  assert.match(projectDialog, /<details className=\{styles\.optional\}/);
+  assert.doesNotMatch(projectDialog, /snapshotNote|modalFooter/);
+  assert.match(projectStyles, /\.actions[\s\S]*background: var\(--paper\)/);
 });

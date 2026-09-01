@@ -427,3 +427,14 @@ final result: passed
 - Evidence: `project-popup-before.png`, `project-popup-after-dark.png`, `project-popup-dark-comparison.png`, `filter-badge-after-clean.png`, `filter-badge-after-dark.png`, and `filter-reference-comparison.png`.
 
 final result: passed
+
+## Guided creation surfaces — local review pending
+
+- Selected source: Product Design option 2, `Guided Sections`, at `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-9a039bae-eea6-4ad4-940e-46d42ac51ae9.png` (1440×1024).
+- Implemented surfaces: the existing test-case inspector create mode and the existing project create/edit dialog. No new route or second test-case drawer was introduced.
+- Test-case create mode now uses numbered `Основное`, `Содержание`, `Условия и шаги`, and collapsed optional-detail sections, labelled metadata controls, restrained tinted headers, and one integrated bottom action bar. All Markdown, step, folder, component, metadata, attachment, and validation behavior remains wired to the existing editor state.
+- Project create/edit now uses the same guided hierarchy, compact required fields, an optional description disclosure, and actions on the same modal surface. The former promotional block and detached white footer are removed.
+- Code verification passed: TypeScript, 261-file TMS architecture, focused creation-source assertions, 137/137 TMS adapter/UI tests, 27/27 auth tests, 4/4 attachment tests, generated-contract drift check, `git diff --check`, and the 61-page production build.
+- Visual verification blocker: the Codex in-app Browser rejected navigation to the running localhost preview under its URL policy. Per the Product Design/browser rules, no alternate browser or standalone Playwright substitute was used. Light/dark same-state screenshots and the combined source/implementation comparison therefore remain pending user-visible local preview access.
+
+final result: blocked — in-app Browser localhost policy

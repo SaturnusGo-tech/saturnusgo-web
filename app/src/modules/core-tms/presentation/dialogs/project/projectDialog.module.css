@@ -1,0 +1,44 @@
+.panel { width: min(560px, 100%); }
+.panel > header { min-height: 66px; padding: 13px 18px; }
+.panel > header h2 { font-size: 18px; }
+.panel > header p { font-size: 12px; }
+.form { display: grid; gap: 11px; padding: 14px 16px 0 !important; }
+.section,
+.optional { overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+.section > header,
+.optional > summary { min-height: 48px; display: flex; align-items: center; gap: 9px; padding: 8px 11px; list-style: none; }
+.section > header > span,
+.optional > summary > span { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; color: var(--muted); background: color-mix(in srgb, var(--paper) 72%, #8daee2); border: 1px solid color-mix(in srgb, var(--line) 70%, #6f8fbe); border-radius: 50%; font-size: 10px; font-weight: 750; }
+.section > header > div,
+.optional > summary > div { min-width: 0; display: grid; gap: 1px; }
+.section strong,
+.optional strong { color: var(--ink); font-size: 12px; }
+.section small,
+.optional small { color: var(--muted); font-size: 10px; font-weight: 450; }
+.identitySection > header { background: color-mix(in srgb, var(--paper) 91%, #91b5e8); }
+.setupSection > header { background: color-mix(in srgb, var(--paper) 91%, #93c6aa); }
+.optional > summary { cursor: pointer; background: color-mix(in srgb, var(--paper) 91%, #b3a8d4); }
+.optional > summary::-webkit-details-marker { display: none; }
+.optional > summary > svg { margin-left: auto; color: var(--muted); transition: transform 140ms ease; }
+.optional[open] > summary > svg { transform: rotate(180deg); }
+.sectionBody { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; padding: 12px; border-top: 1px solid var(--line); }
+.sectionBody label { min-width: 0; display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 600; }
+.sectionBody input,
+.sectionBody textarea { width: 100%; min-width: 0; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 6px; outline: 0; font: inherit; font-size: 12px; }
+.sectionBody input { height: 36px; padding: 0 9px; }
+.sectionBody textarea { min-height: 76px; padding: 9px; resize: vertical; line-height: 1.45; }
+.sectionBody :is(input, textarea):focus { border-color: #4e78b7; box-shadow: 0 0 0 1px rgb(78 120 183 / 18%); }
+.wide { grid-column: 1 / -1; }
+.actions { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 9px; margin: 2px -16px 0; padding: 10px 16px; background: var(--paper); border-top: 1px solid var(--line); }
+.actions button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 13px; color: var(--ink); background: transparent; border: 1px solid var(--line-strong); border-radius: 6px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
+.actions button:hover { background: var(--control-hover); }
+.actions .primary { min-width: 132px; color: #fff; background: var(--action); border-color: var(--action); }
+.actions .primary:hover { background: var(--yt-primary-hover); border-color: var(--yt-primary-hover); }
+.actions button:disabled { cursor: not-allowed; opacity: .55; }
+:global(.dark) .panel .sectionBody :is(input, textarea) { background: var(--control); }
+@media (prefers-reduced-motion: reduce) { .optional > summary > svg { transition: none; } }
+@media (max-width: 560px) {
+  .panel { width: 100%; }
+  .sectionBody { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
+}

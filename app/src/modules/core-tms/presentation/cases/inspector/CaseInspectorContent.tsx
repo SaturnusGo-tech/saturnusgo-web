@@ -3,6 +3,7 @@ import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { InspectorDetails } from "./details/InspectorDetails";
+import { CaseCreationSections } from "./creation/CaseCreationSections";
 import { MarkdownField } from "./markdown/MarkdownField";
 import { InspectorSectionView } from "./section/InspectorSectionView";
 import { InspectorSteps } from "./steps/InspectorSteps";
@@ -77,18 +78,9 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
   const sectionEditing = (section: InspectorSection) => (
     Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
+  if (creating && editor) return <CaseCreationSections locale={locale} revision={value} editor={editor} />;
   return <div className={css.content}>
     {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
-    {editor?.mode === "create" && <div className={css.createPlacement}>
-      <label>
-        <span>{ru ? "Папка репозитория" : "Repository folder"}</span>
-        <input
-          list="case-inspector-folders"
-          value={editor.folderPath}
-          onChange={(event) => editor.onFolderPath(normalizeFolder(event.target.value))}
-        />
-      </label>
-    </div>}
     <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
       <MarkdownField
         value={value.description}
