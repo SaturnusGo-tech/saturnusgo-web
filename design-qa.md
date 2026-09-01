@@ -401,3 +401,16 @@ final result: passed
 - Verification: TypeScript, TMS architecture, authentication, attachment, adapter/UI, generated-contract, production-build, and `git diff --check` gates passed after the final visual fixes.
 
 final result: passed
+
+## Markdown block-type popup and Falcon sidebar palette — final production pass
+
+- Source capture: authenticated pre-release Falcon production at 1087×814 with the Description block-type selector open. Because MDXEditor portals its listbox to `body`, the former editor-scoped theme never reached it; `Абзац`, `Цитата`, and headings were painted as uncontained text across the inspector document.
+- Combined comparison: the in-app browser placed the captured pre-release state and the corrected dark-theme state in one review input at the same viewport. The corrected popup is a bounded 156px surface anchored to the toolbar trigger, with a graphite background, 1px border, six-pixel radius, restrained shadow, selected row, highlighted row, stable scrollbar gutter, and a 224px responsive height cap.
+- Shared behavior: the fix targets the single portal class under `html[data-tms="1"]`, so Description, Preconditions, execution data, every step field, checklist content, and inline Comments receive the same menu without per-field forks. Production QA opened the menu in both Description and Comments.
+- Theme parity: light mode uses the existing white/control-border palette; dark mode uses the established case tokens mirrored as `#34323c`, `#57545f`, `#413f47`, and the restrained primary selection tint. The menu enters in 130ms and respects `prefers-reduced-motion`.
+- Keyboard and semantics: the Radix listbox/option contract is preserved. Production QA moved active focus from `Абзац` to `Цитата` with ArrowDown and kept the selected state distinguishable from hover/focus.
+- Sidebar: the former concentrated blue radial surface is replaced by a 160-degree linear graphite/slate progression (`#252a36 → #282936 → #292731 → #25232c`). It retains enough separation from the `#2d2b35` workspace while no longer reading as a separate saturated blue product shell.
+- Verification: focused visual/source tests passed 9/9; TMS adapters 135/135, auth 27/27, attachments 4/4, typecheck, 260-file architecture, generated contract, `git diff --check`, standalone production build 61/61, and Pages export 60/60 passed. Production source commit `ddea52d3` is served by Pages commit `b91e6b72`.
+- Final production review found no remaining P0, P1, or P2 visual, accessibility, or interaction issue in the requested scope.
+
+final result: passed
