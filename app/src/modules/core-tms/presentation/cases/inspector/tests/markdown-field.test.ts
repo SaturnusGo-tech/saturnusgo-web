@@ -5,6 +5,7 @@ import test from "node:test";
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
+const globalStyles = readFileSync(new URL("../../../../../../shared/styles/globals.css", import.meta.url), "utf8");
 const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
@@ -33,6 +34,17 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
   assert.match(styles, /\.editorContent em/);
   assert.match(styles, /font-weight: 750/);
   assert.match(styles, /color: var\(--cases-strong\) !important/);
+});
+
+test("portal-rendered block type options use a bounded themed popup", () => {
+  assert.match(globalStyles, /html\[data-tms="1"\] \.mdxeditor-select-content/);
+  assert.match(globalStyles, /max-height: min\(224px, var\(--radix-select-content-available-height\)\)/);
+  assert.match(globalStyles, /overflow-y: auto/);
+  assert.match(globalStyles, /scrollbar-gutter: stable/);
+  assert.match(globalStyles, /html\.dark\[data-tms="1"\] \.mdxeditor-select-content/);
+  assert.match(globalStyles, /\[role="option"\]\[data-highlighted\]/);
+  assert.match(globalStyles, /\[role="option"\]\[data-state="checked"\]/);
+  assert.match(globalStyles, /animation: tms-markdown-select-in/);
 });
 
 test("fullscreen inspector content keeps the normal full-width layout", () => {

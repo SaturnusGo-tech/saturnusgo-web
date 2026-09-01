@@ -196,9 +196,7 @@
   flex-direction: column;
   overflow: visible;
   color: #e7e9ec;
-  background:
-    radial-gradient(ellipse 430px 700px at -76px 92px, #172352 0%, #172244 33%, #171d2d 54%, #18191b 78%),
-    #18191b;
+  background: linear-gradient(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%);
   border-right: 1px solid #43454a;
   will-change: width, flex-basis;
   transition:

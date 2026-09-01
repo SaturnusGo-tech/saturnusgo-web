@@ -69,6 +69,7 @@
   border-radius: 3px;
   font-size: 11px;
 }
+
 .wysiwyg :global(.mdxeditor-root-contenteditable) { height: calc(100% - 31px); min-height: 0; overflow: auto; background: var(--cases-control); }
 .wysiwyg .editorContent { min-height: 100%; padding: 8px 10px; color: var(--cases-secondary-text); font: inherit; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
 .editorContent :is(p, ul, ol, blockquote, pre) { margin: 0 0 7px; }

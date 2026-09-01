@@ -32,6 +32,8 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /prefers-color-scheme: light/);
   assert.match(activeSources, /prefers-color-scheme: dark/);
   assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);
+  assert.match(shellSource, /background: linear-gradient\(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%\)/);
+  assert.doesNotMatch(shellSource, /radial-gradient\(ellipse 430px 700px/);
   assert.doesNotMatch(activeSources, /workspaceLoaderPulse/);
   assert.doesNotMatch(activeSources, /TESSIQ|assets\/tessiq\//);
   assert.doesNotMatch(activeSources, /assets\/falcon\/falcon-mark\.png/);

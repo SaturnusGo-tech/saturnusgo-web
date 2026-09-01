@@ -3843,3 +3843,80 @@ html.theme-switching::view-transition-new(root) {
 @media (prefers-reduced-motion: reduce) {
   html.theme-switching::view-transition-new(root) { animation: none; }
 }
+
+/* MDXEditor block types render in a body portal, outside the case theme scope. */
+html[data-tms="1"] .mdxeditor-select-content {
+  position: relative;
+  z-index: 140;
+  width: max(var(--radix-select-trigger-width), 156px);
+  max-height: min(224px, var(--radix-select-content-available-height));
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: #1f2329;
+  background: #fff;
+  border: 1px solid #b9bcc3;
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgb(17 19 24 / 18%);
+  scrollbar-color: #b9bcc3 transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  transform-origin: var(--radix-select-content-transform-origin);
+  animation: tms-markdown-select-in 130ms cubic-bezier(.2, .72, .3, 1) both;
+}
+
+html[data-tms="1"] .mdxeditor-select-content [role="option"] {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 6px 9px;
+  color: #373a40;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  outline: 0;
+  user-select: none;
+}
+
+html[data-tms="1"] .mdxeditor-select-content [role="option"][data-highlighted] {
+  color: #111318;
+  background: #f0f1f3;
+}
+
+html[data-tms="1"] .mdxeditor-select-content [role="option"][data-state="checked"] {
+  color: #1f5ecf;
+  background: rgb(53 116 240 / 12%);
+  font-weight: 650;
+}
+
+html.dark[data-tms="1"] .mdxeditor-select-content {
+  color: #f5f4f7;
+  background: #34323c;
+  border-color: #57545f;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 42%);
+  scrollbar-color: #57545f transparent;
+}
+
+html.dark[data-tms="1"] .mdxeditor-select-content [role="option"] { color: #d7d5dc; }
+
+html.dark[data-tms="1"] .mdxeditor-select-content [role="option"][data-highlighted] {
+  color: #fff;
+  background: #413f47;
+}
+
+html.dark[data-tms="1"] .mdxeditor-select-content [role="option"][data-state="checked"] {
+  color: #c5d8ff;
+  background: rgb(53 116 240 / 22%);
+}
+
+@keyframes tms-markdown-select-in {
+  from { opacity: 0; transform: translateY(-3px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-tms="1"] .mdxeditor-select-content { animation: none; }
+}
