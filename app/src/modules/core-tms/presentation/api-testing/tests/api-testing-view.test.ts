@@ -14,14 +14,14 @@ test("embeds only the approved Swagger origin without TMS credentials", () => {
   assert.doesNotMatch(source, /Authorization|accessToken|Bearer|credentials=/);
 });
 
-test("uses the shared TESSIQ loading state and a constrained iframe", () => {
+test("uses the shared branded loading state and a constrained iframe", () => {
   assert.match(source, /<TessiqLoader pane/);
   assert.match(source, /swaggerFrameUrl\(theme, locale\)/);
   assert.match(source, /sandbox="allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"/);
   assert.match(source, /title=\{t\("apiTesting\.frameTitle"\)\}/);
 });
 
-test("synchronizes the embedded access screen with TESSIQ theme and language", () => {
+test("synchronizes the embedded access screen with the application theme and language", () => {
   const darkRussian = new URL(swaggerFrameUrl("dark", "ru"));
   assert.equal(darkRussian.searchParams.get("theme"), "dark");
   assert.equal(darkRussian.searchParams.get("lang"), "ru");

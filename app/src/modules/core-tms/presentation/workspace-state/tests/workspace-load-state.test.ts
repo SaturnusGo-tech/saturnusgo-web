@@ -24,7 +24,7 @@ test("workspace loading keeps copy screen-reader-only", () => {
   assert.doesNotMatch(loadingBranch, /workspace\.loadingDescription|<h1|<p/);
 });
 
-test("resource hydration uses TESSIQ instead of a false empty state", () => {
+test("resource hydration uses the branded loader instead of a false empty state", () => {
   const casesSource = readFileSync(
     new URL("../../cases/CasesView.tsx", import.meta.url),
     "utf8",

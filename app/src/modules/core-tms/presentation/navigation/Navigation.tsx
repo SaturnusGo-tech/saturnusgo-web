@@ -74,7 +74,7 @@ export function Navigation({
         >
           <span className={shellStyles.tessiqMark} aria-hidden="true" />
           <span className={shellStyles.tessiqWordmark} aria-hidden="true">
-            TESSIQ
+            FALCON
           </span>
         </button>
       </div>

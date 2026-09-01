@@ -2196,7 +2196,7 @@
   width: 82px;
   height: 82px;
   display: block;
-  background: url("./assets/tessiq/tessiq-mark-light.png") center / contain no-repeat;
+  background: url("./assets/falcon/falcon-loader-on-light.png") center / contain no-repeat;
   animation: workspace-loader-brand-breathe 1500ms cubic-bezier(.4, 0, .2, 1) infinite;
 }
 .workspaceLoaderPulse {
@@ -2216,7 +2216,7 @@
   72% { opacity: 0; transform: scale(1.18); }
 }
 :global(.dark) .app .workspaceLoaderMark {
-  background-image: url("./assets/tessiq/tessiq-mark-dark.png");
+  background-image: url("./assets/falcon/falcon-loader-on-dark.png");
 }
 .onboardingSteps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 36px; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
 .onboardingSteps > div { min-width: 0; min-height: 168px; display: grid; grid-template-columns: 1fr auto; align-content: start; gap: 8px; padding: 20px; border-right: 1px solid var(--line); }
