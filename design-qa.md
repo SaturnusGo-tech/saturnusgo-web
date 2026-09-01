@@ -120,6 +120,20 @@ Date: 2026-08-29
 
 final result: passed
 
+## Inline case comments and explicit bulk-selection mode — final production pass
+
+- Visual sources: the user-supplied 1 September test-case listing reference at 1280×827 and case-inspector editing reference at 1280×802. The focused source/production comparisons are `.design-qa/case-comments-selection/comparison-selection-toolbar.png`, `comparison-selection-bar.png`, and `comparison-comments-editor.png`.
+- Production evidence: `.design-qa/case-comments-selection/production-default.png`, `production-selection.png`, and `production-comments.png`, captured from the authenticated Falcon production route at a 1280×720 CSS viewport after the CDN served source release `ac930c14`.
+- Comments: the separate Comments tab is removed. A labelled `Комментарии` region now follows the case procedure inside General, so history and discussion remain part of the same case document rather than a parallel screen.
+- Markdown behavior: the new-comment composer reuses the established client-only WYSIWYG Markdown editor and sanitized saved renderer. The compact toolbar exposes undo/redo, bold, italic, strike, code, block type, lists, and link controls without showing raw Markdown syntax during editing.
+- Selection hierarchy: no row or header selection checkbox is rendered in the default list. `Выбрать тест-кейсы` sits immediately before List/Groups, exposes pressed state, and reveals or removes the checkbox column with restrained width/opacity/transform motion. Leaving selection mode clears the prior selection instead of keeping hidden bulk state.
+- Bulk feedback: selecting the first case reveals the blue action bar with the production `caseBulk_bulkBarReveal` top-to-bottom animation (`0.22s`). The existing Run, lifecycle, priority, overflow, compact-container, keyboard, and focus-return behavior remains intact.
+- Production interaction QA: default mode contained zero case-selection checkboxes; selection mode exposed all 240 hydrated case checkboxes; one selected case produced the action bar; disabling selection returned to zero checkboxes and removed the bar. General exposed Comments inline and no Comments tab. Browser console errors and warnings were empty.
+- Visual review: the implementation preserves the accepted Falcon graphite palette, compact table rhythm, restrained blue controls, dense inspector composition, and existing icon language. Equal focused crops were used where the source and production viewport heights differed. No P0, P1, or P2 visual or interaction regression remained.
+- Verification: focused collaboration/selection tests passed 22/22; TMS adapters 134/134, auth 27/27, attachments 4/4, typecheck, 260-file architecture, generated contract, production build 61/61, and `git diff --check` passed before the release. Pages deployment `58b04f10` serves source release `ac930c14`.
+
+final result: passed
+
 ## Test-case WYSIWYG, bulk actions and run handoff — final pass
 
 - Sources: the eleven user-supplied 1 September references covering full-list selection, group/project selection, the persistent bottom action bar, lifecycle and priority menus, parameter editing, and test-run creation. The previous accepted inspector references remain the source for fullscreen geometry and inline editing.
