@@ -22,12 +22,12 @@ export function DashboardPortfolio({
       {snapshot.hotspots.length ? (
         <div className={surface.hotspotTable} role="table" aria-label={t("dashboard.riskHotspots")}>
           <div className={surface.hotspotHeader} role="row">
-            <span role="columnheader">{scopeLabel}</span>
-            <span role="columnheader">{t("dashboard.passRate")}</span>
-            <span role="columnheader">{t("dashboard.coverageRate")}</span>
-            <span role="columnheader">{t("dashboard.failedItems")}</span>
-            <span role="columnheader">{t("dashboard.blockedItems")}</span>
-            <span role="columnheader">{t("dashboard.defects")}</span>
+            <span role="columnheader" title={scopeLabel}>{scopeLabel}</span>
+            <span role="columnheader" aria-label={t("dashboard.passRate")} title={t("dashboard.passRate")}>{t("dashboard.passRateShort")}</span>
+            <span role="columnheader" aria-label={t("dashboard.coverageRate")} title={t("dashboard.coverageRate")}>{t("dashboard.coverageRateShort")}</span>
+            <span role="columnheader" aria-label={t("dashboard.failedItems")} title={t("dashboard.failedItems")}>{t("dashboard.failedItemsShort")}</span>
+            <span role="columnheader" aria-label={t("dashboard.blockedItems")} title={t("dashboard.blockedItems")}>{t("dashboard.blockedItemsShort")}</span>
+            <span role="columnheader" aria-label={t("dashboard.defects")} title={t("dashboard.defects")}>{t("dashboard.defectsShort")}</span>
           </div>
           {snapshot.hotspots.map((row) => (
             <div className={surface.hotspotRow} role="row" key={row.id}>

@@ -457,3 +457,14 @@ final result: blocked — in-app Browser localhost policy
 - Remaining production gate: repeat the connected HTTP-source state after backend Stage B, confirm summary and test-case/run/run-item/defect drill requests against schema 0018, and retain the live capture before declaring the deployment complete.
 
 final result: local visual pass — connected production verification pending
+
+## Hybrid dashboard risk-header correction — post-fix capture pending
+
+- Source visual truth: `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-97fdd115-e101-4660-be11-a1d73cd5c28f.png` (1488×1058). Pre-fix connected implementation evidence: `.design-qa/hybrid-dashboard-production-dark-1488x1058.png` (1488×1058, Russian, dark theme, Project scope, 30 days).
+- P2 finding: the fixed 48–75px risk-signal columns rendered full Russian headers, so `Процент прохождения`, `Покрытие`, `Провалено кейсов`, `Заблокировано кейсов`, and `Дефекты` visually collided. Body values and horizontal mobile scrolling remained intact.
+- Fix: visible labels now use the compact reference vocabulary (`Проход`, `Покр.`, `Провалы`, `Блокеры`, `Дефекты`). Every column header retains its complete localized accessible name and native tooltip. Header cells also enforce `min-width: 0`, single-line clipping, and ellipsis, making cross-column overlap impossible under longer localization.
+- Responsive contract: the ≤720px rule retains a 720px table floor inside the horizontally scrollable portfolio card, so all pass, coverage, failure, blocker, and defect columns remain reachable at 390px without document-level overflow.
+- Source verification: focused dashboard tests cover compact EN/RU copy, complete `aria-label` and `title` values, non-overflow header CSS, and the narrow internal-scroll rules. Focused dashboard tests passed 9/9; TMS adapter/UI tests passed 159/159; TypeScript, 275-file architecture, and `git diff --check` passed.
+- Required final evidence: recapture the same connected Russian/dark/Project/30-day state at exactly 1488×1058 and a ≤390px risk-table state, then compare the focused risk header against the pre-fix image and full source. No post-fix browser screenshot was available to this agent.
+
+final result: blocked

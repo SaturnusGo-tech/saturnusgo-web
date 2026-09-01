@@ -134,6 +134,7 @@
 .hotspotHeader,
 .hotspotRow { display: grid; grid-template-columns: minmax(118px, 1.2fr) minmax(75px, .72fr) minmax(75px, .72fr) 48px 48px 78px; align-items: center; }
 .hotspotHeader { position: sticky; top: 0; z-index: 1; min-height: 29px; padding: 0 8px; color: var(--muted); background: var(--control); border-bottom: 1px solid var(--line); font-size: 9px; font-weight: 680; text-transform: uppercase; }
+.hotspotHeader span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hotspotHeader span:not(:first-child) { text-align: right; }
 .hotspotRow { min-height: 47px; padding: 0 8px; border-bottom: 1px solid var(--line); }
 .hotspotRow:last-child { border-bottom: 0; }
