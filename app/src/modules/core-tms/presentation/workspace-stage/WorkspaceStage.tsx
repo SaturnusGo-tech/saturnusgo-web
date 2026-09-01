@@ -1,6 +1,5 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
-import { CasesView } from "../cases/CasesView";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
 import { DashboardView } from "../dashboard/DashboardView";
@@ -11,6 +10,7 @@ import { ReportsView } from "../reports/ReportsView";
 import { RunsView } from "../runs/RunsView";
 import { SuitesView } from "../suites/SuitesView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
+import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
@@ -43,58 +43,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (model.view === "cases") {
-    return (
-      <CasesView key={model.project.id}
-        query={model.query}
-        onQuery={model.setQuery}
-        testCases={model.projectCases}
-        groups={model.folderGroups}
-        selectedFolder={model.selectedFolder}
-        onSelectFolder={model.selectFolder}
-        selectedCaseId={model.selectedCase?.id ?? ""}
-        onSelectCase={(id) => {
-          model.setSelectedCaseId(id);
-          model.setEditing(false);
-        }}
-        testCase={model.selectedCase}
-        revision={model.selectedRevision}
-        linkIds={model.selectedCaseDetail?.linkIds ?? []}
-        onNew={model.openNewCase}
-        onEdit={model.openEditCase}
-        onClone={model.cloneCase}
-        onArchive={model.toggleArchiveCase}
-        onRunCase={() =>
-          model.selectedCase &&
-          model.openRunDialog({ caseIds: [model.selectedCase.id] })
-        }
-        onRunCases={(caseIds) => model.openRunDialog({ caseIds })}
-        onBulkChangeLifecycle={model.bulkChangeCaseLifecycle}
-        onBulkChangePriority={model.bulkChangeCasePriority}
-        bulkMutationEnabled={model.connection === "connected"}
-        activity={model.data.activity}
-        filters={model.caseFilters}
-        onFilters={model.setCaseFilters}
-        onNewFolder={() => model.setDialog("folder")}
-        detailLoadError={model.selectedCaseDetailError}
-        onRetryDetail={model.retrySelectedCaseDetail}
-        editor={model.dialog === "case" ? {
-          mode: model.editing ? "edit" : "create",
-          value: model.caseDraft,
-          folderPath: model.caseFolderPath,
-          folders: model.folderGroups.map(([folderName]) => folderName),
-          components: Array.from(new Set(
-            model.projectCases.map((testCase) => testCase.component).filter(Boolean),
-          )).sort(),
-          onChange: model.setCaseDraft,
-          onFolderPath: model.setCaseFolderPath,
-          onSubmit: model.saveCase,
-          submitting: model.caseSubmitting,
-          onCancel: () => {
-            if (!model.caseSubmitting) model.resetCaseEditor(model.selectedFolder);
-          },
-        } : undefined}
-      />
-    );
+    return <WorkspaceCasesStage model={model} />;
   }
   if (model.view === "integrations") {
     return (
@@ -184,11 +133,16 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} />;
   return (
     <ReportsView
-      defects={model.projectDefects}
+      defects={model.reportDefects}
       runs={model.projectRuns}
       links={model.projectLinks}
+      selectedDefectId={model.selectedDefectId}
+      onSelectDefect={model.setSelectedDefectId}
+      selectedDefectStatus={model.selectedDefectResource.status}
+      onRetrySelectedDefect={model.selectedDefectResource.retry}
       onNew={() => model.setDialog("defect")}
       onOpenRun={(runId, runItemId) => {
+        model.setSelectedDefectId(null);
         model.setSelectedRunId(runId);
         model.setSelectedRunItemId(runItemId);
         model.setView("runs");

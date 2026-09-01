@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0015.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0016.
          */
         get: operations["getHealth"];
         put?: never;
@@ -287,6 +287,51 @@ export interface paths {
          * @description Never overwrites historical revisions. If-Match is the ETag returned for the current case representation.
          */
         patch: operations["reviseTestCase"];
+        trace?: never;
+    };
+    "/test-cases/{caseId}/comments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        /** List append-only tester comments newest first */
+        get: operations["listTestCaseComments"];
+        put?: never;
+        /** Append a tester comment without revising test-case content */
+        post: operations["createTestCaseComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/test-cases/{caseId}/defects": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        /** List defect reports linked to this case or exact historical step */
+        get: operations["listTestCaseLinkedDefects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/test-cases/{caseId}/revisions": {
@@ -824,6 +869,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/defects/{defectId}/confirm-fix": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a fix from exact successful post-ready retest evidence
+         * @description Requires a linked YouTrack issue, ready_for_retest lifecycle, the same immutable case snapshot, and a passed exact step when the report is step-scoped. Writes verification, transition, audit, and YouTrack outbox atomically.
+         */
+        post: operations["confirmDefectFix"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/links": {
         parameters: {
             query?: never;
@@ -1227,7 +1297,7 @@ export interface components {
             nextCursor: string | null;
         };
         /** @enum {string} */
-        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "INTERNAL_ERROR";
+        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "INTERNAL_ERROR";
         ValidationIssue: {
             field: string;
             code: string;
@@ -1445,6 +1515,93 @@ export interface components {
         TestCaseCloneRequest: {
             title?: string;
             folderPath?: string;
+        };
+        TestCaseCommentAuthor: {
+            identityId: components["schemas"]["Identifier"];
+            displayName: string;
+        };
+        TestCaseComment: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            caseId: components["schemas"]["Identifier"];
+            body: string;
+            author: components["schemas"]["TestCaseCommentAuthor"];
+            createdAt: components["schemas"]["Timestamp"];
+        };
+        TestCaseCommentCreateRequest: {
+            projectId: components["schemas"]["Identifier"];
+            body: string;
+        };
+        TestCaseCommentEnvelope: {
+            data: components["schemas"]["TestCaseComment"];
+        };
+        TestCaseCommentListEnvelope: {
+            data: components["schemas"]["TestCaseComment"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        TestCaseLinkedDefectStatusEvent: {
+            fromStatus: components["schemas"]["DefectStatus"] | null;
+            toStatus: components["schemas"]["DefectStatus"];
+            reason: string;
+            occurredAt: components["schemas"]["Timestamp"];
+        };
+        /** @description Immutable occurrence and step label captured by the original run snapshot. */
+        TestCaseLinkedDefectOccurrence: {
+            id: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId: components["schemas"]["Identifier"] | null;
+            stepOrder: number | null;
+            stepAction: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+        };
+        EligibleDefectRetest: {
+            occurrenceId: components["schemas"]["Identifier"];
+            testCaseId: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId: components["schemas"]["Identifier"] | null;
+            completedAt: components["schemas"]["Timestamp"];
+        };
+        /** @description Durable initial YouTrack delivery truth for a routed defect. Null on deliberately TMS-only defects. */
+        DefectYouTrackCreation: {
+            /** @enum {string} */
+            target: "android" | "ios" | "backend";
+            /** @enum {string} */
+            status: "pending" | "published" | "failed" | "uncertain";
+            lastErrorCode: string | null;
+        };
+        TestCaseLinkedDefect: {
+            defectId: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            status: components["schemas"]["DefectStatus"];
+            defectEtag: string;
+            /** @description True only when Falcon is ready for retest, YouTrack is in a ready/acceptance state, and the production workflow guard has been verified and enabled. */
+            readyForTest: boolean;
+            reportedAt: components["schemas"]["Timestamp"];
+            reportedByIdentityId: components["schemas"]["Identifier"];
+            occurrence: components["schemas"]["TestCaseLinkedDefectOccurrence"];
+            /** Format: uri */
+            falconUrl: string;
+            youTrack: components["schemas"]["DefectExternalIssue"] | null;
+            youTrackCreation: components["schemas"]["DefectYouTrackCreation"] | null;
+            statusHistory: components["schemas"]["TestCaseLinkedDefectStatusEvent"][];
+            historyTruncated: boolean;
+            eligibleRetest: components["schemas"]["EligibleDefectRetest"] | null;
+            fixVerification: components["schemas"]["DefectFixVerification"] | null;
+            youTrackTransition: components["schemas"]["DefectFixYouTrackTransition"] | null;
+            /** @enum {string|null} */
+            fixConfirmationBlockedReason: "not_ready_for_test" | "youtrack_link_required" | "youtrack_workflow_guard_required" | "youtrack_not_ready_for_test" | "retest_required" | null;
+        };
+        TestCaseLinkedDefectEnvelope: {
+            data: components["schemas"]["TestCaseLinkedDefect"];
+        };
+        TestCaseLinkedDefectListEnvelope: {
+            data: components["schemas"]["TestCaseLinkedDefect"][];
+            meta: components["schemas"]["PageMeta"];
         };
         TestCaseStrongEtag: string;
         TestCaseBulkMutationTarget: {
@@ -1813,6 +1970,40 @@ export interface components {
             status: components["schemas"]["DefectStatus"];
             reason?: string;
         };
+        DefectFixConfirmationRequest: {
+            occurrenceId: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId?: components["schemas"]["Identifier"] | null;
+            note?: string;
+        };
+        DefectFixVerification: {
+            occurrenceId: components["schemas"]["Identifier"];
+            testCaseId: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            stepId: components["schemas"]["Identifier"] | null;
+            completedAt: components["schemas"]["Timestamp"];
+            verifiedAt: components["schemas"]["Timestamp"];
+        };
+        DefectFixYouTrackTransition: {
+            /** @enum {string} */
+            status: "pending" | "published" | "failed" | "superseded";
+            /** @enum {string} */
+            targetStatus: "Acceptance" | "Staging" | "Done";
+            observedAccepted: boolean;
+            lastErrorCode: string | null;
+        };
+        DefectFixConfirmation: {
+            defect: components["schemas"]["Defect"];
+            verification: components["schemas"]["DefectFixVerification"];
+            youTrackTransition: components["schemas"]["DefectFixYouTrackTransition"];
+        };
+        DefectFixConfirmationEnvelope: {
+            data: components["schemas"]["DefectFixConfirmation"];
+        };
         DefectExternalIssue: {
             /** @constant */
             provider: "youtrack";
@@ -1822,6 +2013,16 @@ export interface components {
             url: string;
             /** @enum {string} */
             syncStatus: "linked" | "error" | "deleted";
+            status: string;
+            /** @enum {string} */
+            workflowState: "backlog" | "design_review" | "development" | "review" | "ready_for_test" | "acceptance" | "accepted" | "unknown";
+            readyForTest: boolean;
+            lastSyncedAt: components["schemas"]["Timestamp"] | null;
+        };
+        YouTrackWorkflow: {
+            readyForTestStatuses: ("Test" | "Acceptance" | "Staging")[];
+            /** @enum {string} */
+            acceptedStatus: "Acceptance" | "Staging" | "Done";
         };
         YouTrackIntegrationStatus: {
             /** @constant */
@@ -1833,6 +2034,7 @@ export interface components {
                 ios: components["schemas"]["YouTrackTarget"];
                 backend: components["schemas"]["YouTrackTarget"];
             };
+            workflow: components["schemas"]["YouTrackWorkflow"];
             linked: number;
             pending: number;
             failed: number;
@@ -2533,6 +2735,39 @@ export interface components {
                 "application/json": components["schemas"]["TestCaseRevisionEnvelope"];
             };
         };
+        /** @description A bounded page of append-only comments ordered newest first. */
+        TestCaseCommentListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["TestCaseCommentListEnvelope"];
+            };
+        };
+        /** @description New or idempotently replayed append-only comment. */
+        TestCaseCommentResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["TestCaseCommentEnvelope"];
+            };
+        };
+        /** @description A bounded case and historical-step defect trace ordered by report time. */
+        TestCaseLinkedDefectListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["TestCaseLinkedDefectListEnvelope"];
+            };
+        };
         /** @description A page of bounded suite summaries ordered by key then ID. */
         SuiteListResponse: {
             headers: {
@@ -2656,6 +2891,18 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["DefectEnvelope"];
+            };
+        };
+        /** @description Verified local defect and a durable pending YouTrack transition. */
+        DefectFixConfirmationResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectFixConfirmationEnvelope"];
             };
         };
         /** @description A page of private attachment metadata ordered by createdAt descending then ID. */
@@ -2960,6 +3207,11 @@ export interface components {
                 "application/json": components["schemas"]["TestCaseCloneRequest"];
             };
         };
+        TestCaseCommentCreate: {
+            content: {
+                "application/json": components["schemas"]["TestCaseCommentCreateRequest"];
+            };
+        };
         SuiteCreate: {
             content: {
                 "application/json": components["schemas"]["SuiteCreateRequest"];
@@ -3013,6 +3265,11 @@ export interface components {
         DefectStatusTransition: {
             content: {
                 "application/json": components["schemas"]["DefectStatusTransitionRequest"];
+            };
+        };
+        DefectFixConfirmation: {
+            content: {
+                "application/json": components["schemas"]["DefectFixConfirmationRequest"];
             };
         };
         YouTrackWebhook: {
@@ -3594,6 +3851,90 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTestCaseComments: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["TestCaseCommentListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createTestCaseComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["TestCaseCommentCreate"];
+        responses: {
+            201: components["responses"]["TestCaseCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTestCaseLinkedDefects: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                stepId?: components["schemas"]["Identifier"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["TestCaseLinkedDefectListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -4409,6 +4750,35 @@ export interface operations {
         requestBody: components["requestBodies"]["DefectStatusTransition"];
         responses: {
             200: components["responses"]["DefectResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    confirmDefectFix: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["DefectFixConfirmation"];
+        responses: {
+            200: components["responses"]["DefectFixConfirmationResponse"];
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];

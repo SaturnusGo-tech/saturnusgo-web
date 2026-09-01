@@ -159,6 +159,8 @@ export function CasesView(props: CasesViewProps) {
             editor={props.editor}
             linkIds={props.linkIds}
             activity={props.activity}
+            collaboration={props.collaboration}
+            onOpenDefect={props.onOpenDefect}
             selectedFolder={props.selectedFolder}
             onNew={view.createCase}
             onEdit={props.onEdit}

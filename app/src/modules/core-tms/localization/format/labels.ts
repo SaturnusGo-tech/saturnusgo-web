@@ -23,12 +23,15 @@ const labels: Record<string, readonly [string, string]> = {
   passed: ["Passed", "Пройден"],
   quarantined: ["Quarantined", "На карантине"],
   ready: ["Ready", "Готов"],
+  ready_for_retest: ["Ready for testing", "Готов к тестированию"],
   regression: ["Regression", "Регресс"],
+  reopened: ["Reopened", "Переоткрыт"],
   skipped: ["Skipped", "Пропущен"],
   smoke: ["Smoke", "Смоук"],
   static: ["Static", "Статический"],
   dynamic: ["Dynamic", "Динамический"],
   verified: ["Verified", "Проверен"],
+  triaged: ["Triaged", "Разобран"],
 };
 
 const russianComponentLabels: Record<string, string> = {

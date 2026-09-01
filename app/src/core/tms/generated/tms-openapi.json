@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.6",
+    "version": "1.0.0-checkpoint.7",
     "description": "Versioned migration checkpoint for accepted TMS behavior. The frozen prototype does not yet implement this complete contract. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -38,7 +38,7 @@
       "get": {
         "tags": ["Health"],
         "summary": "Report API readiness",
-        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0015.",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly at the production-supported schema version 0016.",
         "operationId": "getHealth",
         "security": [],
         "responses": {
@@ -508,6 +508,75 @@
           "409": { "$ref": "#/components/responses/Conflict" },
           "412": { "$ref": "#/components/responses/PreconditionFailed" },
           "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/comments": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "get": {
+        "tags": ["Test cases"],
+        "summary": "List append-only tester comments newest first",
+        "operationId": "listTestCaseComments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseCommentListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Test cases"],
+        "summary": "Append a tester comment without revising test-case content",
+        "operationId": "createTestCaseComment",
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/TestCaseCommentCreate" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/TestCaseCommentResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/test-cases/{caseId}/defects": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/CaseIdPath" }
+      ],
+      "get": {
+        "tags": ["Defects"],
+        "summary": "List defect reports linked to this case or exact historical step",
+        "operationId": "listTestCaseLinkedDefects",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/ProjectIdQueryRequired" },
+          { "name": "stepId", "in": "query", "required": false,
+            "schema": { "$ref": "#/components/schemas/Identifier" } },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/TestCaseLinkedDefectListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
@@ -1271,6 +1340,36 @@
         }
       }
     },
+    "/defects/{defectId}/confirm-fix": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "$ref": "#/components/parameters/DefectIdPath" }
+      ],
+      "post": {
+        "tags": ["Defects"],
+        "summary": "Confirm a fix from exact successful post-ready retest evidence",
+        "description": "Requires a linked YouTrack issue, ready_for_retest lifecycle, the same immutable case snapshot, and a passed exact step when the report is step-scoped. Writes verification, transition, audit, and YouTrack outbox atomically.",
+        "operationId": "confirmDefectFix",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdempotencyKey" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/DefectFixConfirmation" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/DefectFixConfirmationResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/links": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -2004,6 +2103,10 @@
         "required": false,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCloneRequest" } } }
       },
+      "TestCaseCommentCreate": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCommentCreateRequest" } } }
+      },
       "SuiteCreate": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteCreateRequest" } } }
@@ -2047,6 +2150,10 @@
       "DefectStatusTransition": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectStatusTransitionRequest" } } }
+      },
+      "DefectFixConfirmation": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectFixConfirmationRequest" } } }
       },
       "YouTrackWebhook": {
         "required": true,
@@ -2179,6 +2286,30 @@
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseRevisionEnvelope" } } }
       },
+      "TestCaseCommentListResponse": {
+        "description": "A bounded page of append-only comments ordered newest first.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCommentListEnvelope" } } }
+      },
+      "TestCaseCommentResponse": {
+        "description": "New or idempotently replayed append-only comment.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseCommentEnvelope" } } }
+      },
+      "TestCaseLinkedDefectListResponse": {
+        "description": "A bounded case and historical-step defect trace ordered by report time.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseLinkedDefectListEnvelope" } } }
+      },
       "SuiteListResponse": {
         "description": "A page of bounded suite summaries ordered by key then ID.",
         "headers": {
@@ -2268,6 +2399,15 @@
           "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectEnvelope" } } }
+      },
+      "DefectFixConfirmationResponse": {
+        "description": "Verified local defect and a durable pending YouTrack transition.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectFixConfirmationEnvelope" } } }
       },
       "AttachmentListResponse": {
         "description": "A page of private attachment metadata ordered by createdAt descending then ID.",
@@ -2467,6 +2607,13 @@
           "PRECONDITION_REQUIRED",
           "PRECONDITION_FAILED",
           "IDEMPOTENCY_KEY_REUSED",
+          "RETEST_EVIDENCE_REQUIRED",
+          "RETEST_CASE_MISMATCH",
+          "RETEST_STEP_MISMATCH",
+          "YOUTRACK_LINK_REQUIRED",
+          "YOUTRACK_NOT_READY_FOR_TEST",
+          "YOUTRACK_SYNC_CONFLICT",
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
           "UPLOAD_INTENT_EXPIRED",
           "ATTACHMENT_DIGEST_MISMATCH",
           "PAYLOAD_TOO_LARGE",
@@ -2822,6 +2969,145 @@
         "properties": {
           "title": { "type": "string", "minLength": 1, "maxLength": 300 },
           "folderPath": { "type": "string", "maxLength": 500, "pattern": "^/(?:[^/]+(?:/[^/]+)*)?$" }
+        }
+      },
+      "TestCaseCommentAuthor": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["identityId", "displayName"],
+        "properties": {
+          "identityId": { "$ref": "#/components/schemas/Identifier" },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      },
+      "TestCaseComment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "projectId", "caseId", "body", "author", "createdAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "caseId": { "$ref": "#/components/schemas/Identifier" },
+          "body": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "author": { "$ref": "#/components/schemas/TestCaseCommentAuthor" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "TestCaseCommentCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "body"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "body": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        }
+      },
+      "TestCaseCommentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/TestCaseComment" } }
+      },
+      "TestCaseCommentListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/TestCaseComment" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
+        }
+      },
+      "TestCaseLinkedDefectStatusEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["fromStatus", "toStatus", "reason", "occurredAt"],
+        "properties": {
+          "fromStatus": { "oneOf": [{ "$ref": "#/components/schemas/DefectStatus" }, { "type": "null" }] },
+          "toStatus": { "$ref": "#/components/schemas/DefectStatus" },
+          "reason": { "type": "string", "maxLength": 2000 },
+          "occurredAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "TestCaseLinkedDefectOccurrence": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Immutable occurrence and step label captured by the original run snapshot.",
+        "required": ["id", "runId", "runItemId", "attemptNo", "stepId", "stepOrder", "stepAction", "createdAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "stepOrder": { "type": ["integer", "null"], "minimum": 1 },
+          "stepAction": { "type": ["string", "null"], "maxLength": 500 },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "EligibleDefectRetest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["occurrenceId", "testCaseId", "runId", "runItemId", "attemptNo", "stepId", "completedAt"],
+        "properties": {
+          "occurrenceId": { "$ref": "#/components/schemas/Identifier" },
+          "testCaseId": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "completedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DefectYouTrackCreation": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Durable initial YouTrack delivery truth for a routed defect. Null on deliberately TMS-only defects.",
+        "required": ["target", "status", "lastErrorCode"],
+        "properties": {
+          "target": { "type": "string", "enum": ["android", "ios", "backend"] },
+          "status": { "type": "string", "enum": ["pending", "published", "failed", "uncertain"] },
+          "lastErrorCode": { "type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{0,79}$" }
+        }
+      },
+      "TestCaseLinkedDefect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["defectId", "key", "title", "status", "defectEtag", "readyForTest", "reportedAt", "reportedByIdentityId", "occurrence", "falconUrl", "youTrack", "youTrackCreation", "statusHistory", "historyTruncated", "eligibleRetest", "fixVerification", "youTrackTransition", "fixConfirmationBlockedReason"],
+        "properties": {
+          "defectId": { "$ref": "#/components/schemas/Identifier" },
+          "key": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "status": { "$ref": "#/components/schemas/DefectStatus" },
+          "defectEtag": { "type": "string", "pattern": "^\"defect:[A-Za-z0-9][A-Za-z0-9._:-]{0,127}:[1-9][0-9]*\"$" },
+          "readyForTest": { "type": "boolean", "description": "True only when Falcon is ready for retest, YouTrack is in a ready/acceptance state, and the production workflow guard has been verified and enabled." },
+          "reportedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "reportedByIdentityId": { "$ref": "#/components/schemas/Identifier" },
+          "occurrence": { "$ref": "#/components/schemas/TestCaseLinkedDefectOccurrence" },
+          "falconUrl": { "type": "string", "format": "uri", "maxLength": 2048 },
+          "youTrack": { "oneOf": [{ "$ref": "#/components/schemas/DefectExternalIssue" }, { "type": "null" }] },
+          "youTrackCreation": { "oneOf": [{ "$ref": "#/components/schemas/DefectYouTrackCreation" }, { "type": "null" }] },
+          "statusHistory": { "type": "array", "maxItems": 50, "items": { "$ref": "#/components/schemas/TestCaseLinkedDefectStatusEvent" } },
+          "historyTruncated": { "type": "boolean" },
+          "eligibleRetest": { "oneOf": [{ "$ref": "#/components/schemas/EligibleDefectRetest" }, { "type": "null" }] },
+          "fixVerification": { "oneOf": [{ "$ref": "#/components/schemas/DefectFixVerification" }, { "type": "null" }] },
+          "youTrackTransition": { "oneOf": [{ "$ref": "#/components/schemas/DefectFixYouTrackTransition" }, { "type": "null" }] },
+          "fixConfirmationBlockedReason": { "type": ["string", "null"], "enum": ["not_ready_for_test", "youtrack_link_required", "youtrack_workflow_guard_required", "youtrack_not_ready_for_test", "retest_required", null] }
+        }
+      },
+      "TestCaseLinkedDefectEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/TestCaseLinkedDefect" } }
+      },
+      "TestCaseLinkedDefectListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/TestCaseLinkedDefect" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
         }
       },
       "TestCaseStrongEtag": {
@@ -3445,22 +3731,96 @@
           "reason": { "type": "string", "maxLength": 2000 }
         }
       },
+      "DefectFixConfirmationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["occurrenceId", "runId", "runItemId", "attemptNo"],
+        "properties": {
+          "occurrenceId": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "note": { "type": "string", "maxLength": 2000 }
+        }
+      },
+      "DefectFixVerification": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["occurrenceId", "testCaseId", "runId", "runItemId", "attemptNo", "stepId", "completedAt", "verifiedAt"],
+        "properties": {
+          "occurrenceId": { "$ref": "#/components/schemas/Identifier" },
+          "testCaseId": { "$ref": "#/components/schemas/Identifier" },
+          "runId": { "$ref": "#/components/schemas/Identifier" },
+          "runItemId": { "$ref": "#/components/schemas/Identifier" },
+          "attemptNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "completedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "verifiedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "DefectFixYouTrackTransition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "targetStatus", "observedAccepted", "lastErrorCode"],
+        "properties": {
+          "status": { "type": "string", "enum": ["pending", "published", "failed", "superseded"] },
+          "targetStatus": { "type": "string", "enum": ["Acceptance", "Staging", "Done"] },
+          "observedAccepted": { "type": "boolean" },
+          "lastErrorCode": { "type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{0,79}$" }
+        }
+      },
+      "DefectFixConfirmation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["defect", "verification", "youTrackTransition"],
+        "properties": {
+          "defect": { "$ref": "#/components/schemas/Defect" },
+          "verification": { "$ref": "#/components/schemas/DefectFixVerification" },
+          "youTrackTransition": { "$ref": "#/components/schemas/DefectFixYouTrackTransition" }
+        }
+      },
+      "DefectFixConfirmationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/DefectFixConfirmation" } }
+      },
       "DefectExternalIssue": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provider", "id", "key", "url", "syncStatus"],
+        "required": ["provider", "id", "key", "url", "syncStatus", "status", "workflowState", "readyForTest", "lastSyncedAt"],
         "properties": {
           "provider": { "const": "youtrack" },
           "id": { "$ref": "#/components/schemas/Identifier" },
           "key": { "type": "string", "minLength": 1, "maxLength": 80 },
           "url": { "type": "string", "format": "uri", "maxLength": 2048 },
-          "syncStatus": { "type": "string", "enum": ["linked", "error", "deleted"] }
+          "syncStatus": { "type": "string", "enum": ["linked", "error", "deleted"] },
+          "status": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "workflowState": { "type": "string", "enum": ["backlog", "design_review", "development", "review", "ready_for_test", "acceptance", "accepted", "unknown"] },
+          "readyForTest": { "type": "boolean" },
+          "lastSyncedAt": { "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }] }
+        }
+      },
+      "YouTrackWorkflow": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["readyForTestStatuses", "acceptedStatus"],
+        "properties": {
+          "readyForTestStatuses": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": { "type": "string", "enum": ["Test", "Acceptance", "Staging"] }
+          },
+          "acceptedStatus": { "type": "string", "enum": ["Acceptance", "Staging", "Done"] }
         }
       },
       "YouTrackIntegrationStatus": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provider", "baseUrl", "targets", "linked", "pending", "failed", "lastSyncedAt"],
+        "required": ["provider", "baseUrl", "targets", "workflow", "linked", "pending", "failed", "lastSyncedAt"],
         "properties": {
           "provider": { "const": "youtrack" },
           "baseUrl": { "type": "string", "format": "uri", "maxLength": 2048 },
@@ -3474,6 +3834,7 @@
               "backend": { "$ref": "#/components/schemas/YouTrackTarget" }
             }
           },
+          "workflow": { "$ref": "#/components/schemas/YouTrackWorkflow" },
           "linked": { "type": "integer", "minimum": 0 },
           "pending": { "type": "integer", "minimum": 0 },
           "failed": { "type": "integer", "minimum": 0 },

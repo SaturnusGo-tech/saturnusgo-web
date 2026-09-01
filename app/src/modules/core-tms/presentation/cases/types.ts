@@ -6,6 +6,7 @@ import type {
 import type { CaseFilters } from "../../state/types/workspace";
 import type { CaseInspectorEditor } from "./inspector/model";
 import type { BulkCaseMutationResult } from "../../../../core/tms/contracts/test-cases/bulk-case-contract";
+import type { CaseCollaborationViewModel } from "./collaboration/model";
 
 export type CasesViewProps = {
   query: string;
@@ -35,6 +36,8 @@ export type CasesViewProps = {
   ) => Promise<BulkCaseMutationResult>;
   bulkMutationEnabled: boolean;
   activity: Activity[];
+  collaboration: CaseCollaborationViewModel;
+  onOpenDefect: (defectId: string) => void;
   filters: CaseFilters;
   onFilters: (filters: CaseFilters) => void;
   onNewFolder: () => void;

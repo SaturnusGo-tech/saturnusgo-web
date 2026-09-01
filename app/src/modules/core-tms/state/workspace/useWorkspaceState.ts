@@ -89,7 +89,7 @@ export function useWorkspaceState() {
     const next = buildCaseDeepLink(window.location.href, {
       caseId: selected.id,
       projectId: selected.projectId,
-    });
+    }, { preserveDefectSelection: true });
     if (next !== window.location.href) window.history.replaceState(null, "", next);
   }, [connection, data.testCases, selectedCaseId]);
 

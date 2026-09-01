@@ -32,6 +32,7 @@ function LocalizedWorkspace() {
   }
 
   function changeView(next: typeof model.view) {
+    if (model.selectedDefectId) model.setSelectedDefectId(null);
     if (next === "runs") {
       const activeRun = model.activeProjectRuns[0];
       if (activeRun) {
@@ -55,7 +56,7 @@ function LocalizedWorkspace() {
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebar}
         onCreateCase={() => {
-          model.setView("cases");
+          changeView("cases");
           model.openNewCase();
         }}
         onCreateDefect={() => model.setDialog("defect")}

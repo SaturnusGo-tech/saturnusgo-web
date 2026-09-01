@@ -22,9 +22,10 @@ import { CaseMetadataControls } from "./metadata/CaseMetadataControls";
 import {
   CaseContextTab,
   type DetailTab,
-  type InspectorComment,
 } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
+import type { CaseCollaborationViewModel } from "../collaboration/model";
+import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
 import styles from "../cases.module.css";
 
 export type CaseDetailPanelProps = {
@@ -34,8 +35,8 @@ export type CaseDetailPanelProps = {
   revision: TestCaseRevision | null;
   linkIds: string[];
   activity: Activity[];
-  comments?: InspectorComment[];
-  onAddComment?: (body: string) => void | Promise<void>;
+  collaboration: CaseCollaborationViewModel;
+  onOpenDefect: (defectId: string) => void;
   selectedFolder: string;
   editor?: CaseInspectorEditor;
   onNew: (folder?: string) => void;
@@ -64,6 +65,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const editorOpen = Boolean(props.editor);
   const editorWasOpen = useRef(editorOpen);
   const revision = props.editor?.value ?? props.revision;
+  const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
   useEffect(() => {
     setTab("overview");
     setLinkCopied(false);
@@ -168,6 +170,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
           autoFocus={headerEditing === "meta"}
           onChange={props.editor?.onChange}
         />
+        {readyDefects > 0 && <span className={inspector.retestBadge} role="status">{ru ? "Готово к тестированию" : "Ready for testing"} · {readyDefects}</span>}
         {!creating && headerEditing !== "meta" && <button ref={metaEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("meta")} aria-label={ru ? "Изменить статус, приоритет, тип и оценку" : "Edit status, priority, type, and estimate"}><Pencil size={13} /></button>}
       </div>
       <div className={inspector.titleRow}>
@@ -184,7 +187,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     </header>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} revision={revision} editor={props.editor} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} files={files} onFiles={setFiles} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} comments={props.comments} onAddComment={props.onAddComment} pendingFiles={files} onPendingFiles={props.editor ? setFiles : undefined} />}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} revision={revision} editor={props.editor} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} files={files} onFiles={setFiles} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} pendingFiles={files} onPendingFiles={props.editor ? setFiles : undefined} />}
       </div>
     </form>
     <span className={styles.visuallyHidden} role="status" aria-live="polite">{linkCopied ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>

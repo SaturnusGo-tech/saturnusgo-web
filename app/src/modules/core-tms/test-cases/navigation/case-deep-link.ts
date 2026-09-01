@@ -17,12 +17,22 @@ export function readCaseDeepLink(href: string): CaseDeepLink {
 export function buildCaseDeepLink(
   href: string,
   input: { caseId: string; projectId: string },
+  options: { preserveDefectSelection?: boolean } = {},
 ) {
   const url = new URL(href);
+  const defectId = options.preserveDefectSelection
+    ? url.searchParams.get("defectId") : null;
+  const legacyDefectId = options.preserveDefectSelection
+    ? url.searchParams.get("defect") : null;
+  const legacyReports = Boolean((defectId || legacyDefectId)
+    && url.searchParams.get("view") === "reports");
   url.hash = "";
   url.search = "";
   url.searchParams.set(PROJECT_ID_PARAM, input.projectId);
   url.searchParams.set(CASE_ID_PARAM, input.caseId);
+  if (defectId) url.searchParams.set("defectId", defectId);
+  if (legacyDefectId) url.searchParams.set("defect", legacyDefectId);
+  if (legacyReports) url.searchParams.set("view", "reports");
   return url.toString();
 }
 

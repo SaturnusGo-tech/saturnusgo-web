@@ -86,6 +86,10 @@ test("project switching resets editors only after a successful load", () => {
     new URL("../../workspace-stage/WorkspaceStage.tsx", import.meta.url),
     "utf8",
   );
+  const casesStageSource = readFileSync(
+    new URL("../../workspace-stage/cases/WorkspaceCasesStage.tsx", import.meta.url),
+    "utf8",
+  );
   const failureGuard = actionsSource.indexOf('if (state.connection !== "demo" && !remote) return;');
   const reset = actionsSource.indexOf("state.resetCaseEditor(");
 
@@ -93,5 +97,6 @@ test("project switching resets editors only after a successful load", () => {
   assert.ok(reset > failureGuard);
   assert.match(actionsSource.slice(failureGuard), /state\.setQuery\(""\)/);
   assert.match(actionsSource.slice(failureGuard), /state\.setCaseFilters\(\{/);
-  assert.match(stageSource, /<CasesView key=\{model\.project\.id\}/);
+  assert.match(stageSource, /<WorkspaceCasesStage model=\{model\}/);
+  assert.match(casesStageSource, /<CasesView key=\{model\.project!\.id\}/);
 });
