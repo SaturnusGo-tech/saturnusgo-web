@@ -7,11 +7,14 @@ const root = process.cwd();
 const source = (path: string) => readFileSync(resolve(root, path), "utf8");
 
 test("Falcon is the active user-facing TMS brand", () => {
+  const shellSource = source(
+    "app/src/modules/core-tms/presentation/workspace/tms-shell.module.css",
+  );
   const activeSources = [
     source("app/(routes)/testcases/umbrella-home/work/page.tsx"),
     source("app/(routes)/testcases/umbrella-home/work/TmsFavicon.tsx"),
     source("app/src/modules/core-tms/presentation/navigation/Navigation.tsx"),
-    source("app/src/modules/core-tms/presentation/workspace/tms-shell.module.css"),
+    shellSource,
     source("app/src/modules/core-tms/tms.module.css"),
     source("app/src/modules/core-tms/localization/catalog/shell/en.ts"),
     source("app/src/modules/core-tms/localization/catalog/shell/ru.ts"),
@@ -28,6 +31,8 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /assets\/falcon\/falcon-loader-on-light\.png/);
   assert.match(activeSources, /prefers-color-scheme: light/);
   assert.match(activeSources, /prefers-color-scheme: dark/);
+  assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);
+  assert.doesNotMatch(activeSources, /workspaceLoaderPulse/);
   assert.doesNotMatch(activeSources, /TESSIQ|assets\/tessiq\//);
   assert.doesNotMatch(activeSources, /assets\/falcon\/falcon-mark\.png/);
 });

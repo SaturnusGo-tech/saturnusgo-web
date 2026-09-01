@@ -21,6 +21,7 @@ test("workspace loading keeps copy screen-reader-only", () => {
   assert.match(loaderSource, /aria-busy="true"/);
   assert.match(loaderSource, /styles\.srOnly/);
   assert.match(loaderSource, /workspaceLoaderBrand/);
+  assert.doesNotMatch(loaderSource, /workspaceLoaderPulse/);
   assert.doesNotMatch(loadingBranch, /workspace\.loadingDescription|<h1|<p/);
 });
 

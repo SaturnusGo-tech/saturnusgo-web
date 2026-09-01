@@ -41,9 +41,9 @@
   align-items: center;
   gap: 12px;
   padding: 0 14px;
-  color: #e8eaed;
-  background: #1e1f22;
-  border-bottom: 1px solid #43454a;
+  color: var(--ink);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
 }
 
 .mobileNavigationButton,
@@ -62,15 +62,15 @@
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
-  color: #b8bbc1;
+  color: var(--muted);
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .mobileNavigationButton:hover {
-  color: #f1f2f4;
-  background: #2b2c30;
+  color: var(--ink);
+  background: var(--control-hover);
 }
 
 .projectContext {
@@ -82,13 +82,13 @@
 
 .projectEyebrow {
   flex: 0 0 auto;
-  color: #92959b;
+  color: var(--muted);
   font-size: 12px;
 }
 
 .projectEyebrow::after {
   margin-left: 8px;
-  color: #66696f;
+  color: var(--line-strong);
   content: "/";
 }
 
@@ -104,33 +104,33 @@
   max-width: min(360px, 38vw);
   height: 36px;
   padding: 0 8px;
-  color: #f0f1f3;
+  color: var(--ink);
   border-radius: 6px;
   font-size: 14px;
 }
 
 .projectSelectorSlot > div > button:first-child:hover,
 .projectSelectorSlot > div > button:first-child[aria-expanded="true"] {
-  background: #2a2b2f;
+  background: var(--control-hover);
 }
 
 .projectSelectorSlot > div > div {
-  color: #e8eaed;
-  background: #26272b;
-  border-color: #4e5157;
+  color: var(--ink);
+  background: var(--control);
+  border-color: var(--line-strong);
 }
 
 .projectSelectorSlot > div > div button {
-  color: #e8eaed;
+  color: var(--ink);
 }
 
 .projectSelectorSlot > div > div button:hover,
 .projectSelectorSlot > div > div button:focus-visible {
-  background: #34363a;
+  background: var(--control-hover);
 }
 
 .projectSelectorSlot > div > div svg {
-  color: #7fa7ff;
+  color: var(--action);
 }
 
 .headerMeta {
@@ -150,8 +150,8 @@
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  color: #aeb1b7;
-  border-left: 1px solid #34363a;
+  color: var(--muted);
+  border-left: 1px solid var(--line);
 }
 
 .headerMetaItem > span,
@@ -164,7 +164,7 @@
 
 .headerMetaItem small,
 .headerClock small {
-  color: #85888e;
+  color: var(--muted);
   font-size: 10px;
   line-height: 1.1;
 }
@@ -173,7 +173,7 @@
 .headerClock strong {
   max-width: 136px;
   overflow: hidden;
-  color: #e4e6e9;
+  color: var(--ink);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.25;

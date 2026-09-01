@@ -2199,21 +2199,9 @@
   background: url("./assets/falcon/falcon-loader-on-light.png") center / contain no-repeat;
   animation: workspace-loader-brand-breathe 1500ms cubic-bezier(.4, 0, .2, 1) infinite;
 }
-.workspaceLoaderPulse {
-  position: absolute;
-  inset: 22px;
-  border: 1px solid color-mix(in srgb, var(--action) 40%, transparent);
-  border-radius: 22px;
-  animation: workspace-loader-brand-pulse 1500ms cubic-bezier(.4, 0, .2, 1) infinite;
-}
 @keyframes workspace-loader-brand-breathe {
   0%, 100% { opacity: .72; transform: scale(.92); }
   50% { opacity: 1; transform: scale(1); }
-}
-@keyframes workspace-loader-brand-pulse {
-  0%, 100% { opacity: 0; transform: scale(.76); }
-  48% { opacity: .42; }
-  72% { opacity: 0; transform: scale(1.18); }
 }
 :global(.dark) .app .workspaceLoaderMark {
   background-image: url("./assets/falcon/falcon-loader-on-dark.png");
@@ -3970,10 +3958,8 @@
   .caseWorkbench { transition: none; }
   .caseInspector { animation: none; }
   .caseInspectorScrim { animation: none; }
-  .workspaceLoaderMark,
-  .workspaceLoaderPulse { animation: none; }
+  .workspaceLoaderMark { animation: none; }
   .workspaceLoaderMark { opacity: 1; transform: none; }
-  .workspaceLoaderPulse { opacity: .16; transform: none; }
 }
 
 /* Dark mode keeps the original TMS blue-graphite identity instead of turning black. */
