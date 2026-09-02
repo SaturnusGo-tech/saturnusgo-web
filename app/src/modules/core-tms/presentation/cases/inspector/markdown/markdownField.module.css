@@ -82,6 +82,17 @@
 .editorContent table { width: 100%; border-collapse: collapse; }
 .editorContent :is(th, td) { padding: 4px 6px; border: 1px solid var(--cases-border); }
 .editorError { display: block; padding: 4px 8px; color: #b4494f; background: var(--cases-raised); border-top: 1px solid var(--cases-border); font-size: 10px; }
+.attachmentError { display: block; padding: 4px 8px; color: #b4494f; background: var(--cases-raised); border-top: 1px solid var(--cases-border); font-size: 10px; }
+.hiddenFileInput { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.attachmentStrip { display: flex; gap: 5px; overflow-x: auto; padding: 6px 8px; background: var(--cases-raised); border-top: 1px solid var(--cases-border); scrollbar-width: thin; }
+.attachmentChip { min-width: 0; max-width: 210px; flex: 0 0 auto; display: grid; grid-template-columns: 24px minmax(0, 1fr) 22px; align-items: center; gap: 5px; padding: 3px 4px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 4px; }
+.attachmentChip > img { width: 24px; height: 24px; object-fit: cover; border-radius: 3px; }
+.attachmentChip > svg { justify-self: center; color: var(--cases-muted); }
+.attachmentChip > span { min-width: 0; display: grid; }
+.attachmentChip b { overflow: hidden; font-size: 10px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.attachmentChip small { color: var(--cases-faint); font-size: 9px; }
+.attachmentChip button { width: 22px; height: 22px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
+.attachmentChip button:hover { color: #d35f65; background: var(--cases-hover); }
 .editorLoading { min-height: 132px; background: var(--cases-control); }
 
 .rendered {

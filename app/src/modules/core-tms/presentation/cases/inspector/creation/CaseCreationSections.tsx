@@ -47,14 +47,14 @@ export function CaseCreationSections({ locale, revision, editor }: Props) {
     <CreationSection number="2" title={ru ? "Содержание" : "Content"} hint={ru ? "Что проверяет тест-кейс" : "What the test case verifies"} tone="green">
       <div className={css.creationField}>
         <span>{ru ? "Описание" : "Description"}</span>
-        <MarkdownField value={revision.description} label={ru ? "Описание" : "Description"} onChange={(description) => patch({ description })} />
+        <MarkdownField attachmentKey="description" value={revision.description} label={ru ? "Описание" : "Description"} onChange={(description) => patch({ description })} />
       </div>
     </CreationSection>
 
     <CreationSection number="3" title={ru ? "Условия и шаги" : "Conditions and steps"} hint={ru ? "Подготовка и последовательность проверки" : "Setup and verification flow"} tone="lavender">
       <div className={css.creationField}>
         <span>{ru ? "Предусловия" : "Preconditions"}</span>
-        <MarkdownField value={revision.preconditions} label={ru ? "Предусловия" : "Preconditions"} onChange={(preconditions) => patch({ preconditions })} />
+        <MarkdownField attachmentKey="preconditions" value={revision.preconditions} label={ru ? "Предусловия" : "Preconditions"} onChange={(preconditions) => patch({ preconditions })} />
       </div>
       <div className={css.creationField}>
         <span>{typeLabel}</span>

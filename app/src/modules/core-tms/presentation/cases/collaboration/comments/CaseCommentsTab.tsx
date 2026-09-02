@@ -52,6 +52,7 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
         aria-describedby={model.commentFailure ? `case-comment-error-${caseId}` : undefined}>
         <span className={css.composerLabel}>{ru ? "Новый комментарий" : "New comment"}</span>
         <MarkdownField
+          allowAttachments={false}
           value={body}
           label={ru ? "Текст комментария" : "Comment text"}
           compact

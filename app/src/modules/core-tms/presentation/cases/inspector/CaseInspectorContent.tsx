@@ -3,6 +3,7 @@ import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { InspectorDetails } from "./details/InspectorDetails";
+import { useCaseAttachmentDraft } from "./attachments/CaseAttachmentDraftContext";
 import { CaseCreationSections } from "./creation/CaseCreationSections";
 import { MarkdownField } from "./markdown/MarkdownField";
 import { InspectorSectionView } from "./section/InspectorSectionView";
@@ -18,6 +19,7 @@ type Props = {
 };
 export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }: Props) {
   const ru = locale === "ru";
+  const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
   const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
   const snapshots = useRef<Partial<Record<InspectorSection, TestCaseRevision>>>({});
@@ -50,6 +52,7 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
         editor.onFolderPath(folderSnapshots.current[section] ?? editor.folderPath);
       }
     }
+    attachmentDraft?.removeFields((fieldKey) => attachmentBelongsToSection(section, fieldKey));
     closeSection(section);
   }
   function closeSection(section: InspectorSection) {
@@ -83,6 +86,7 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
     {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
     <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
       <MarkdownField
+        attachmentKey="description"
         value={value.description}
         label={ru ? "Описание" : "Description"}
         autoFocus={!creating}
@@ -131,6 +135,7 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
       {...controls("preconditions")}
     >
       <MarkdownField
+        attachmentKey="preconditions"
         value={value.preconditions}
         label={ru ? "Предусловия" : "Preconditions"}
         autoFocus={!creating}
@@ -172,3 +177,9 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
   </div>;
 }
 function normalizeFolder(value: string) { return value.startsWith("/") ? value : `/${value}`; }
+function attachmentBelongsToSection(section: InspectorSection, fieldKey: string) {
+  if (section === "description" || section === "preconditions") return fieldKey === section;
+  if (section === "details") return fieldKey === "test-data";
+  if (section === "steps") return fieldKey.startsWith("step:") || fieldKey.startsWith("checklist:");
+  return false;
+}

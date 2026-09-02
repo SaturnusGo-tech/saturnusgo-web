@@ -9,6 +9,7 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 import { CaseActivityTab } from "../../collaboration/defects/CaseActivityTab";
 import type { CaseCollaborationViewModel } from "../../collaboration/model";
 import { InspectorPendingAttachments } from "../../inspector/attachments/InspectorPendingAttachments";
+import { useCaseAttachmentDraft } from "../../inspector/attachments/CaseAttachmentDraftContext";
 import type { InspectorTabId } from "../../inspector/model";
 import styles from "../../cases.module.css";
 
@@ -24,12 +25,11 @@ type Props = {
   collaboration: CaseCollaborationViewModel;
   onOpenDefect: (defectId: string) => void;
   onRunCase: () => void;
-  pendingFiles?: File[];
-  onPendingFiles?: (files: File[]) => void;
 };
 
 export function CaseContextTab(props: Props) {
   const ru = props.locale === "ru";
+  const pending = useCaseAttachmentDraft();
   if (props.tab === "activity") {
     return <CaseActivityTab
       locale={props.locale}
@@ -41,12 +41,11 @@ export function CaseContextTab(props: Props) {
       onRunCase={props.onRunCase}
     />;
   }
-  const pending = props.pendingFiles ?? [];
   const empty = props.revision.attachmentIds.length === 0
     && props.linkIds.length === 0
-    && pending.length === 0;
+    && (pending?.entries.length ?? 0) === 0;
   return <div className={styles.contextList}>
-    {props.onPendingFiles && <InspectorPendingAttachments locale={props.locale} files={pending} onFiles={props.onPendingFiles} />}
+    {pending?.enabled && <InspectorPendingAttachments locale={props.locale} />}
     {empty
       ? <TabEmpty
           icon={<Paperclip size={22} />}

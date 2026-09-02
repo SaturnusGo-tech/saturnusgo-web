@@ -1,8 +1,9 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Paperclip, Plus, Trash2 } from "lucide-react";
 import type {
   TestCaseRevision,
   TestStep,
 } from "../../../../../../core/tms/contracts/legacy-contract";
+import { AttachmentLink } from "../../../../attachments/presentation/link/AttachmentLink";
 import { canRemoveInspectorRow } from "../model";
 import { MarkdownField } from "../markdown/MarkdownField";
 import css from "../caseInspector.module.css";
@@ -57,6 +58,7 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
           action: item.text,
           testData: "",
           required: item.required,
+          attachmentIds: [] as string[],
           expectedResult: item.required
             ? (ru ? "Обязательная проверка" : "Required check")
             : "",
@@ -79,6 +81,9 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
             <em>{ru ? "Тестовые данные" : "Test data"}</em>
             <MarkdownField value={step.testData} label={ru ? "Тестовые данные" : "Test data"} />
           </div>}
+          {step.attachmentIds && step.attachmentIds.length > 0 && <div className={css.stepAttachments}>
+            {step.attachmentIds.map((id) => <span key={id}><Paperclip size={13} /><AttachmentLink attachmentId={id} /></span>)}
+          </div>}
         </div>
       </li>)}
     </ol>;
@@ -89,6 +94,7 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
       ? revision.checklist.map((item, index) => <div className={css.editStep} key={item.id}>
           <b>{index + 1}</b>
           <MarkdownField
+            attachmentKey={`checklist:${item.id}`}
             compact
             autoFocus={autoFocus && index === 0}
             label={`${ru ? "Пункт" : "Item"} ${index + 1}`}
@@ -120,6 +126,8 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
           <div className={css.markdownControl}>
             <span>{ru ? "Действие" : "Action"}</span>
             <MarkdownField
+              attachmentKey={`step:${step.id}:action`}
+              attachmentStepId={step.id}
               compact
               autoFocus={autoFocus && index === 0}
               label={`${ru ? "Действие" : "Action"} ${index + 1}`}
@@ -130,6 +138,8 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
           <div className={css.markdownControl}>
             <span>{ru ? "Ожидаемый результат" : "Expected result"}</span>
             <MarkdownField
+              attachmentKey={`step:${step.id}:expected`}
+              attachmentStepId={step.id}
               compact
               label={`${ru ? "Ожидаемый результат" : "Expected result"} ${index + 1}`}
               value={step.expectedResult}
@@ -139,6 +149,8 @@ export function InspectorSteps({ revision, editing, autoFocus = true, ru, onPatc
           <div className={css.markdownControl}>
             <span>{ru ? "Тестовые данные" : "Test data"}</span>
             <MarkdownField
+              attachmentKey={`step:${step.id}:data`}
+              attachmentStepId={step.id}
               compact
               label={`${ru ? "Тестовые данные" : "Test data"} ${index + 1}`}
               value={step.testData ?? ""}

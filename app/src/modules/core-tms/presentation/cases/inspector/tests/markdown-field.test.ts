@@ -4,6 +4,7 @@ import test from "node:test";
 
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
+const attachmentUi = readFileSync(new URL("../markdown/attachments/MarkdownAttachmentUi.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
 const globalStyles = readFileSync(new URL("../../../../../../shared/styles/globals.css", import.meta.url), "utf8");
 const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
@@ -15,6 +16,7 @@ const projectStyles = readFileSync(new URL("../../../dialogs/project/projectDial
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
+const comments = readFileSync(new URL("../../collaboration/comments/CaseCommentsTab.tsx", import.meta.url), "utf8");
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
 const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.meta.url), "utf8");
 
@@ -38,6 +40,22 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
   assert.match(styles, /\.editorContent em/);
   assert.match(styles, /font-weight: 750/);
   assert.match(styles, /color: var\(--cases-strong\) !important/);
+});
+
+test("case Markdown inputs attach or paste private files from the conventional toolbar position", () => {
+  assert.match(initialized, /<CreateLink \/>[\s\S]*<MarkdownAttachmentButton/);
+  assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
+  assert.match(attachmentUi, /type="file" multiple/);
+  assert.doesNotMatch(attachmentUi, /accept=/);
+  assert.match(source, /onPaste=\{\(event\)/);
+  assert.match(source, /filesFromClipboard\(event\.clipboardData\)/);
+  assert.match(source, /event\.preventDefault\(\);[\s\S]*addFiles\(files\)/);
+  assert.match(content, /attachmentKey="description"/);
+  assert.match(content, /attachmentKey="preconditions"/);
+  assert.match(details, /attachmentKey="test-data"/);
+  assert.match(steps, /attachmentKey=\{`checklist:\$\{item\.id\}`\}/);
+  assert.match(steps, /attachmentStepId=\{step\.id\}/);
+  assert.match(comments, /allowAttachments=\{false\}/);
 });
 
 test("portal-rendered block type options use a bounded themed popup", () => {

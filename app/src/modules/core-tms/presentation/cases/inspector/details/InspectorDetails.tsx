@@ -19,7 +19,7 @@ export function InspectorDetails({ revision, editing, autoFocus = true, ru, onPa
     empty: ru ? "Не указано" : "Not specified",
   };
   if (editing) return <div className={css.compactFields}>
-    <div className={`${css.wideField} ${css.markdownControl}`}><span>{labels.testData}</span><MarkdownField compact autoFocus={autoFocus} label={labels.testData} value={revision.testData} onChange={(testData) => onPatch({ testData })} /></div>
+    <div className={`${css.wideField} ${css.markdownControl}`}><span>{labels.testData}</span><MarkdownField attachmentKey="test-data" compact autoFocus={autoFocus} label={labels.testData} value={revision.testData} onChange={(testData) => onPatch({ testData })} /></div>
     <label><span>{labels.owner}</span><input value={revision.ownerIdentityId ?? ""} onChange={(event) => onPatch({ ownerIdentityId: event.target.value.trim() || null })} /></label>
     <label><span>{labels.tags}</span><input value={revision.tags.join(", ")} onChange={(event) => onPatch({ tags: event.target.value.split(",").map((tag) => tag.trim()) })} /></label>
     <label><span>{labels.note}</span><input value={revision.changeNote} onChange={(event) => onPatch({ changeNote: event.target.value })} /></label>

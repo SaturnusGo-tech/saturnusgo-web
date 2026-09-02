@@ -11,7 +11,8 @@ import {
 } from "../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
-import { uploadEvidence } from "../../application/evidence/uploadEvidence";
+import { pendingCaseAttachmentSignature, type PendingCaseAttachment } from "../../application/evidence/case/pendingCaseAttachment";
+import { uploadCaseAttachments } from "../../application/evidence/case/uploadCaseAttachments";
 import { createEmptyRevision, normalizeRevisionTags } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -70,7 +71,7 @@ export function useCaseActions(
     state.setDialog("case");
   }
 
-  async function saveCase(event: FormEvent, files: File[] = []) {
+  async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = []) {
     event.preventDefault();
     if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
     const input = {
@@ -78,6 +79,8 @@ export function useCaseActions(
       folderPath: state.caseFolderPath || "/Unsorted",
       revision: { ...state.caseDraft, tags: normalizeRevisionTags(state.caseDraft.tags) },
     };
+    const validStepIds = new Set(input.revision.steps.map(({ id }) => id));
+    const validFiles = files.filter(({ stepId }) => !stepId || validStepIds.has(stepId));
     let caseCommitted = false;
     try {
       if (state.connection === "demo") {
@@ -94,6 +97,7 @@ export function useCaseActions(
           caseId: state.editing ? derived.selectedCase?.id ?? null : null,
           etag: state.editing ? state.selectedCaseEtag : null,
           input,
+          attachments: pendingCaseAttachmentSignature(validFiles),
         });
         caseOperation.current = resolvePendingOperation(caseOperation.current, signature);
         const key = caseOperation.current.key;
@@ -106,16 +110,13 @@ export function useCaseActions(
         let refreshed = await getTestCase(http, result.data.id);
         commit(refreshed.data, refreshed.etag, !state.editing);
         caseCommitted = true;
-        if (files.length > 0) {
-          await uploadEvidence({
+        if (validFiles.length > 0) {
+          await uploadCaseAttachments({
             client: attachments,
             projectId: refreshed.data.projectId,
-            owner: {
-              kind: "test_case_revision",
-              caseId: refreshed.data.id,
-              revisionNo: refreshed.data.currentRevision,
-            },
-            files,
+            caseId: refreshed.data.id,
+            revisionNo: refreshed.data.currentRevision,
+            attachments: validFiles,
             operationKeyPrefix: `${key}:evidence`,
           });
           refreshed = await getTestCase(http, refreshed.data.id);

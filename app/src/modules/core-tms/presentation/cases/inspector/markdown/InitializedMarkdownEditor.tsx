@@ -23,7 +23,9 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
 
 export type InitializedMarkdownEditorProps = {
@@ -34,6 +36,9 @@ export type InitializedMarkdownEditorProps = {
   autoFocus?: boolean;
   validateUrl: (url: string) => boolean;
   onChange: (markdown: string) => void;
+  pendingAttachments?: PendingCaseAttachment[];
+  onAttachmentFiles?: (files: File[]) => void;
+  onRemoveAttachment?: (id: string) => void;
 };
 
 export function stripRawHtml(markdown: string) {
@@ -107,9 +112,12 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         <StrikeThroughSupSubToggles options={["Strikethrough"]} />
         <CodeToggle /><Separator />
         <BlockTypeSelect /><ListsToggle /><CreateLink />
+        {props.onAttachmentFiles && <MarkdownAttachmentButton
+          locale={props.locale} onFiles={props.onAttachmentFiles}
+        />}
       </>,
     }),
-  ], [props.validateUrl]);
+  ], [props.locale, props.onAttachmentFiles, props.validateUrl]);
 
   useEffect(() => {
     const safe = stripRawHtml(props.markdown);
@@ -147,6 +155,11 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         if (!initialNormalize) props.onChange(next);
       }}
     />
+    {props.onRemoveAttachment && <MarkdownPendingAttachments
+      locale={props.locale}
+      entries={props.pendingAttachments ?? []}
+      onRemove={props.onRemoveAttachment}
+    />}
     {problem && <span className={css.editorError} role="alert">{problem}</span>}
   </>;
 }

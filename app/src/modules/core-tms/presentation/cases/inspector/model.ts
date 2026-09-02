@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
+import type { PendingCaseAttachment } from "../../../application/evidence/case/pendingCaseAttachment";
 import { revisionTagsAreValid } from "../../../helpers/cases/caseRevision";
 
 export type InspectorSection =
@@ -38,7 +39,7 @@ export type CaseInspectorEditor = {
   components: string[];
   onChange: (next: TestCaseRevision) => void;
   onFolderPath: (next: string) => void;
-  onSubmit: (event: FormEvent, files: File[]) => void;
+  onSubmit: (event: FormEvent, files: PendingCaseAttachment[]) => void;
   onCancel: () => void;
   submitting?: boolean;
 };

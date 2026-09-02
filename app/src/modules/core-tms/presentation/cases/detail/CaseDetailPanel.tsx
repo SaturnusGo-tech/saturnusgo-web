@@ -3,26 +3,17 @@ import {
   Minimize2, Pencil, Play, RotateCcw, X,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import type {
-  Activity,
-  TestCaseRevision,
-  TestCaseSummary,
-} from "../../../../../core/tms/contracts/legacy-contract";
+import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
-import {
-  editorSessionClosed,
-  inspectorRevisionProblem,
-  type CaseInspectorEditor,
-} from "../inspector/model";
+import { editorSessionClosed, inspectorRevisionProblem, type CaseInspectorEditor } from "../inspector/model";
 import inspector from "../inspector/caseInspector.module.css";
 import { InspectorPendingAttachments } from "../inspector/attachments/InspectorPendingAttachments";
+import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttachmentDraftContext";
+import type { PendingCaseAttachment } from "../../../application/evidence/case/pendingCaseAttachment";
 import { CaseOverview } from "./CaseOverview";
 import { CaseMetadataControls } from "./metadata/CaseMetadataControls";
-import {
-  CaseContextTab,
-  type DetailTab,
-} from "./tabs/CaseContextTab";
+import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
 import type { CaseCollaborationViewModel } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
@@ -52,7 +43,7 @@ export type CaseDetailPanelProps = {
 export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const [tab, setTab] = useState<DetailTab>("overview");
   const [linkCopied, setLinkCopied] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<PendingCaseAttachment[]>([]);
   const [headerEditing, setHeaderEditing] = useState<"meta" | "title" | null>(null);
   const formId = useId();
   const tabsId = useId();
@@ -189,12 +180,14 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       {!creating && editorActions}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating} onActive={setTab} />}
     </header>
+    <CaseAttachmentDraftProvider locale={props.locale} enabled={Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} editor={props.editor} collaboration={props.collaboration} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} files={files} onFiles={setFiles} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} pendingFiles={files} onPendingFiles={props.editor ? setFiles : undefined} />}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} editor={props.editor} collaboration={props.collaboration} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
       </div>
     </form>
     {creating && editorActions}
+    </CaseAttachmentDraftProvider>
     <span className={styles.visuallyHidden} role="status" aria-live="polite">{linkCopied ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>
   </div>;
 }

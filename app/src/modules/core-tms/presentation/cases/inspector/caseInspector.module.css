@@ -87,6 +87,8 @@
 .steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; margin-bottom: 6px; padding: 9px 10px; background: var(--cases-raised); border: 1px solid var(--cases-border); border-radius: 4px; }
 .steps li > span, .editStep > b { width: 20px; height: 20px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-icon-bg); border-radius: 3px; font-size: 10px; font-weight: 600; }
 .stepResult { display: grid; gap: 2px; margin: 7px 0 0; padding-left: 7px; color: var(--cases-secondary-text); border-left: 2px solid var(--cases-link); font-size: 11px; line-height: 1.4; }
+.stepAttachments { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.stepAttachments > span { min-width: 0; display: flex; align-items: center; gap: 4px; padding: 3px 5px; color: var(--cases-link); background: var(--cases-control); border: 1px solid var(--cases-border); border-radius: 3px; }
 .steps em { color: var(--cases-muted); font-size: 10px; font-style: normal; }
 .stepEditor { display: grid; gap: 7px; }
 .editStep { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 7px; padding: 9px 36px 9px 9px; background: var(--cases-raised); border: 1px solid var(--cases-border); border-radius: 4px; }
