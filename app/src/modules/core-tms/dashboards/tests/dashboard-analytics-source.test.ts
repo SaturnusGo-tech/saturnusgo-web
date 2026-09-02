@@ -4,6 +4,7 @@ import type { Bootstrap, TestRunSummary } from "../../../../core/tms/contracts/l
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createBootstrapDashboardAnalyticsSource } from "../source/bootstrap-dashboard-analytics-source";
 import { createHttpDashboardAnalyticsSource } from "../source/http-dashboard-analytics-source";
+import { relatedDashboardDrill, dashboardFilterValues, filterDashboardRows } from "../../presentation/dashboard/inspector/dashboard-drill-navigation";
 
 const progress = (passed: number, failed: number) => ({
   total: passed + failed, executed: passed + failed, percent: 100,
@@ -85,6 +86,9 @@ test("bootstrap drill honors tag, outcome, link, scope, and cursor filters", asy
   });
   assert.equal(tagged.total, 2);
   assert.equal(tagged.rows[0]?.key, "B-1");
+  assert.equal(tagged.rows[0]?.entity, "test_case");
+  assert.equal(tagged.rows[0]?.type, "checklist");
+  assert.equal(tagged.rows[0]?.projectId, "beta");
   assert.match(tagged.nextCursor ?? "", /^local:.+:1$/);
   const next = await source.drill({
     query, drill: { id: "smoke", label: "smoke", filter: { entity: "test_case", basis: "current", tag: "smoke" } },
@@ -143,4 +147,25 @@ test("HTTP analytics source preserves exact run-item bucket filters and total", 
     limit: "25" });
   assert.equal(page.total, 1);
   assert.equal(page.rows[0]?.key, "RUN-A · A-1");
+  assert.equal(page.rows[0]?.runId, "run-a");
+  assert.equal(page.rows[0]?.runItemId, "item-1");
+});
+
+test("dashboard detail keeps human context and only enables truthful related tabs", () => {
+  const tag = { id: "tag", label: "#smoke", filter: {
+    entity: "test_case" as const, basis: "current" as const, tag: "smoke",
+  } };
+  assert.equal(relatedDashboardDrill(tag, "run"), null);
+  assert.deepEqual(dashboardFilterValues(tag), [{ key: "tag", value: "smoke" }]);
+  const component = { id: "component", label: "Checkout", projectId: "alpha", filter: {
+    entity: "run_item" as const, status: "failed" as const, component: "Checkout",
+  } };
+  assert.deepEqual(relatedDashboardDrill(component, "defect")?.filter, {
+    entity: "defect", basis: "current", component: "Checkout",
+  });
+  const rows = [{ id: "one", entity: "test_case" as const, projectId: "alpha", key: "A-1",
+    title: "Checkout payment", project: "Alpha", detail: "#smoke", component: "Checkout",
+    type: "automated", status: "ready", links: [] }];
+  assert.equal(filterDashboardRows(rows, { query: "payment", project: "", type: "automated", component: "Checkout", status: "ready", priority: "" }).length, 1);
+  assert.equal(filterDashboardRows(rows, { query: "", project: "Beta", type: "", component: "", status: "", priority: "" }).length, 0);
 });

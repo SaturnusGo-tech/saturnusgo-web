@@ -20,6 +20,7 @@ export function Modal({
   children,
   wide = false,
   drawer = false,
+  sheet = false,
   panelClassName = "",
 }: {
   title: string;
@@ -28,6 +29,7 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
   drawer?: boolean;
+  sheet?: boolean;
   panelClassName?: string;
 }) {
   const { t } = useTmsLocale();
@@ -92,7 +94,7 @@ export function Modal({
 
   return (
     <div
-      className={`${styles.modalBackdrop} ${drawer ? styles.modalBackdropDrawer : ""}`}
+      className={`${styles.modalBackdrop} ${drawer ? styles.modalBackdropDrawer : ""} ${sheet ? styles.modalBackdropSheet : ""}`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) closeRef.current();
@@ -100,7 +102,7 @@ export function Modal({
     >
       <section
         ref={panelRef}
-        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""} ${panelClassName}`}
+        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""} ${sheet ? styles.modalSheet : ""} ${panelClassName}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

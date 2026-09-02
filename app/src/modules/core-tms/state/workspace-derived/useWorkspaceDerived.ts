@@ -16,7 +16,7 @@ export function useWorkspaceDerived(
     (item) => item.projectId === project?.id,
   );
   const visibleCases = projectCases.filter((item) => {
-    const text = `${item.key} ${item.folderPath} ${item.title} ${item.tags.join(" ")}`.toLowerCase();
+    const text = `${item.key} ${item.folderPath} ${item.title} ${item.component} ${item.tags.join(" ")}`.toLowerCase();
     const filters = state.caseFilters;
     return (
       text.includes(state.query.toLowerCase()) &&

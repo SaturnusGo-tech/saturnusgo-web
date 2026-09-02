@@ -1,5 +1,7 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
+import type { DashboardDrill, DashboardDrillRow } from "../../dashboards/model/dashboard-analytics";
+import { buildDefectDeepLink } from "../../defects/navigation/defect-deep-link";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
 import { DashboardView } from "../dashboard/DashboardView";
@@ -14,6 +16,36 @@ import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
+  async function selectDrillProject(projectId?: string) {
+    if (projectId && projectId !== model.project?.id) await model.chooseProject(projectId);
+  }
+  async function openDashboardEntity(entity: "test_case" | "run" | "defect", drill: DashboardDrill) {
+    await selectDrillProject(drill.projectId);
+    if (entity === "test_case") {
+      const filter = drill.filter.entity === "test_case" ? drill.filter : null;
+      model.setCaseFilters({ type: filter?.type ?? "all", priority: "all", lifecycle: "all",
+        tag: filter?.tag ?? "", includeArchived: false });
+      model.setQuery(filter?.component ?? "");
+      model.setView("cases");
+    } else model.setView(entity === "run" ? "runs" : "reports");
+  }
+  async function openDashboardRow(row: DashboardDrillRow) {
+    if (row.entity === "defect" && row.projectId !== model.project?.id) {
+      window.location.assign(buildDefectDeepLink(window.location.href, {
+        projectId: row.projectId, defectId: row.id,
+      }));
+      return;
+    }
+    await selectDrillProject(row.projectId);
+    if (row.entity === "test_case") {
+      model.setCaseFilters({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
+      model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
+    } else if (row.entity === "run" || row.entity === "run_item") {
+      model.setSelectedRunId(row.runId ?? row.id);
+      model.setSelectedRunItemId(row.runItemId ?? null);
+      model.setView("runs");
+    } else model.openDefect(row.id);
+  }
   if (model.connection === "loading" || model.connection === "error") {
     return (
       <WorkspaceLoadState
@@ -39,7 +71,9 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         projectId={model.project.id}
         serverAnalytics={model.connection === "connected"}
         onCreate={() => model.setDialog("dashboard")}
-        onOpenRuns={() => model.setView("runs")}
+        onOpenEntity={(entity, drill) => void openDashboardEntity(entity, drill)}
+        onOpenRow={(row) => void openDashboardRow(row)}
+        onCreateRun={(caseIds) => model.openRunDialog({ caseIds })}
       />
     );
   }

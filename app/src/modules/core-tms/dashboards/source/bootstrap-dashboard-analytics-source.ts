@@ -87,8 +87,10 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           if (filter.componentIsEmpty && item.component.trim() !== "") return false;
           return filter.coverage === undefined;
         }).map((item) => ({
-          id: item.id, key: item.key, title: item.title, project: projectLabel(item.projectId),
-          detail: [item.type, item.component, item.tags.join(", ")].filter(Boolean).join(" · "),
+          id: item.id, entity: "test_case" as const, projectId: item.projectId,
+          key: item.key, title: item.title, project: projectLabel(item.projectId),
+          detail: item.tags.map((tag) => `#${tag}`).join(" "), type: item.type,
+          component: item.component, priority: item.priority, tags: item.tags,
           status: item.lifecycle, occurredAt: filter.basis === "created" ? item.createdAt : item.updatedAt,
           links: data.externalLinks.filter((link) => link.owner.kind === "test_case" && link.owner.caseId === item.id && link.status === "active")
             .map((link) => ({ label: link.label, url: link.targetUri })),
@@ -104,8 +106,10 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           if (filter.component !== undefined || filter.componentIsEmpty) return false;
           return !filter.itemStatus || run.progress.counts[filter.itemStatus] > 0;
         }).map((run) => ({
-          id: run.id, key: run.key, title: run.name, project: projectLabel(run.projectId),
+          id: run.id, entity: "run" as const, projectId: run.projectId,
+          key: run.key, title: run.name, project: projectLabel(run.projectId),
           detail: `${run.environment.name} · ${run.progress.executed}/${run.progress.total}`,
+          type: run.type,
           status: filter.outcome ? outcome(run) ?? run.status : run.status,
           occurredAt: filter.basis === "launched" ? run.startedAt ?? run.createdAt : run.completedAt ?? run.startedAt ?? run.createdAt,
           links: data.externalLinks.filter((link) => link.owner.kind === "run" && link.owner.runId === run.id && link.status === "active")
@@ -126,8 +130,9 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           const linked = defectLinks(data, defect).length > 0;
           return filter.hasLink === undefined || filter.hasLink === linked;
         }).map((defect) => ({
-          id: defect.id, key: defect.key, title: defect.title, project: projectLabel(defect.projectId),
-          detail: [defect.severity, defect.component].filter(Boolean).join(" · "), status: defect.status,
+          id: defect.id, entity: "defect" as const, projectId: defect.projectId,
+          key: defect.key, title: defect.title, project: projectLabel(defect.projectId),
+          detail: "", component: defect.component, priority: defect.priority, status: defect.status,
           occurredAt: defect.createdAt, links: defectLinks(data, defect),
         }));
       }

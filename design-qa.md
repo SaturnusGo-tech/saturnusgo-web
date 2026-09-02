@@ -460,6 +460,21 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Dashboard drill detail sheet — selected option 2
+
+- Selected source: `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-83af33f1-5c73-45c6-a169-870a8b024e66.png` (1487×1058). The existing Falcon shell and analytics route remain unchanged; only the dashboard drill experience and supporting categorical palette were redesigned.
+- Complete comparison input: `.design-qa/dashboard-drill-sheet-comparison-final.png` places the full selected source beside the implemented Russian dark-theme state after normalizing the in-app Browser capture to the same 1487×1058 comparison size. `.design-qa/dashboard-drill-sheet-focused-final.png` compares the header, filters, distribution, and first table rows at readable density.
+- Browser states: `.design-qa/dashboard-drill-sheet-local-desktop-final.png` and `.design-qa/dashboard-drill-sheet-local-light-1440x1024.png` were captured from a 1440×1024 CSS viewport (1297×922 captured pixels after the Browser's display normalization). `.design-qa/dashboard-drill-sheet-local-mobile-390x844.png` covers the 390×844 CSS state (351×760 captured pixels).
+- Composition: the narrow right drawer is replaced by one full-width bottom sheet entering from the viewport bottom. It has the selected drag handle, rounded top edge, clear title and human-readable chips, primary actions, related entity tabs, a persistent refinement rail, a muted categorical distribution strip, and a dense results table. Raw workspace IDs, project IDs, entity names, and basis values are not rendered.
+- Useful navigation: the header action opens the selected cohort in Test Cases, Runs, or Defects; individual rows open their exact case, run, or defect; and a project-scoped case cohort can create a run from the currently loaded filtered rows. Related tabs are disabled whenever the backend cannot express a truthful correlation instead of presenting fabricated data.
+- Filtering and table behavior: search, checkbox facets, sort controls, exact row actions, empty state, cursor pagination, and server retry remain interactive. On mobile the actions stack, facets become two columns, the sheet owns the viewport, and the data table scrolls internally without document overflow.
+- Color and hierarchy: the dashboard now uses restrained teal, plum, sand, olive, coral, and slate category tokens. Type, tag, coverage, status, and distribution surfaces are distinguishable without turning the screen into a saturated rainbow; light mode keeps the same semantic mapping on neutral surfaces.
+- Accessibility and motion: the existing modal focus trap and focus restoration are preserved; Escape closes nested run creation first and then the sheet; tabs and primary actions are native buttons; table rows retain explicit names; the bottom-up transition respects reduced motion.
+- Iteration history: the first implementation left a visually dead filter rail; it was replaced with real checkbox facets. The next pass exposed an unstyled/clipped search field; it now has an explicit search role and bounded control styling. The final combined comparison found no remaining P0, P1, or P2 visual or interaction issue in the selected scope.
+- Browser interactions passed: search and empty state, Overview/Test Cases/Runs/Defects tabs, direct Test Cases navigation, exact row action, create-run dialog, nested Escape handling, desktop dark, desktop light, and 390×844 mobile. The local application showed no error state during these flows.
+
+final result: passed
+
 ## Hybrid dashboard risk-header correction — final production pass
 
 - Source visual truth: `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-97fdd115-e101-4660-be11-a1d73cd5c28f.png` (1488×1058). Pre-fix connected implementation evidence: `.design-qa/hybrid-dashboard-production-dark-1488x1058.png` (1488×1058, Russian, dark theme, Project scope, 30 days).

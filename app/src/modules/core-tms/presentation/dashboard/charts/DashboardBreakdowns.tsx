@@ -7,7 +7,11 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
 import surface from "../dashboard.module.css";
 
-const TYPE_COLORS = ["var(--chart-1)", "var(--amber)", "var(--green)"];
+const TYPE_COLORS = ["var(--dash-sand)", "var(--dash-olive)", "var(--dash-plum)"];
+const DIMENSION_COLORS = [
+  "var(--dash-teal)", "var(--dash-plum)", "var(--dash-sand)",
+  "var(--dash-olive)", "var(--dash-coral)", "var(--dash-slate)",
+];
 
 export function DashboardBreakdowns({
   snapshot,
@@ -68,7 +72,9 @@ export function DashboardBreakdowns({
                 <XAxis type="number" domain={[0, tagMax]} allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
                 <YAxis type="category" dataKey="label" width={82} axisLine={false} tickLine={false} tick={{ fill: "var(--ink)", fontSize: 10 }} />
                 <Tooltip cursor={{ fill: "var(--control-hover)" }} contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }} />
-                <Bar dataKey="value" name={t("dashboard.testCases")} fill="var(--chart-1)" radius={[0, 2, 2, 0]} maxBarSize={11} cursor="pointer" onClick={(_, index) => onOpenDrill(tags[index].drill)} isAnimationActive={!reduceMotion} />
+                <Bar dataKey="value" name={t("dashboard.testCases")} radius={[0, 2, 2, 0]} maxBarSize={11} cursor="pointer" onClick={(_, index) => onOpenDrill(tags[index].drill)} isAnimationActive={!reduceMotion}>
+                  {tags.map((item, index) => <Cell key={item.key} fill={DIMENSION_COLORS[index % DIMENSION_COLORS.length]} />)}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -87,17 +93,17 @@ export function DashboardBreakdowns({
               <XAxis type="number" domain={[0, 100]} tickFormatter={(value: number) => `${value}%`} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
               <YAxis type="category" dataKey="label" width={110} axisLine={false} tickLine={false} tick={{ fill: "var(--ink)", fontSize: 10 }} />
               <Tooltip formatter={(value) => [`${value}%`, t("dashboard.coverage")]} contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }} />
-              <Bar dataKey="value" radius={[0, 2, 2, 0]} maxBarSize={14} cursor="pointer" fill="var(--chart-1)" onClick={(_, index) => onOpenDrill(coverage[index].covered)} isAnimationActive={!reduceMotion}>
-                {coverage.map((item) => <Cell key={item.key} />)}
+              <Bar dataKey="value" radius={[0, 2, 2, 0]} maxBarSize={14} cursor="pointer" onClick={(_, index) => onOpenDrill(coverage[index].covered)} isAnimationActive={!reduceMotion}>
+                {coverage.map((item, index) => <Cell key={item.key} fill={DIMENSION_COLORS[index % DIMENSION_COLORS.length]} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
         <div className={surface.coverageList}>
-          {coverage.map((item) => (
+          {coverage.map((item, index) => (
             <div className={surface.coverageActions} key={item.key}>
               <button type="button" onClick={() => onOpenDrill(item.covered)}>
-                <i aria-hidden="true" />
+                <i aria-hidden="true" style={{ background: DIMENSION_COLORS[index % DIMENSION_COLORS.length] }} />
                 <span>{item.label}<small>{t("dashboard.coveredOfTotal", { covered: item.count, total: item.total })}</small></span>
                 <strong>{item.value}%</strong>
               </button>

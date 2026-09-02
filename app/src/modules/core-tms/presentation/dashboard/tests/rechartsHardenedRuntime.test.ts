@@ -7,6 +7,9 @@ const portfolio = readFileSync(new URL("../sections/DashboardPortfolio.tsx", imp
 const styles = readFileSync(new URL("../dashboard.module.css", import.meta.url), "utf8");
 const english = readFileSync(new URL("../../../localization/catalog/dashboard/en.ts", import.meta.url), "utf8");
 const russian = readFileSync(new URL("../../../localization/catalog/dashboard/ru.ts", import.meta.url), "utf8");
+const inspector = readFileSync(new URL("../inspector/DashboardDrillInspector.tsx", import.meta.url), "utf8");
+const modal = readFileSync(new URL("../../common/modal/Modal.tsx", import.meta.url), "utf8");
+const breakdowns = readFileSync(new URL("../charts/DashboardBreakdowns.tsx", import.meta.url), "utf8");
 
 test("Recharts scales render with frozen runtime intrinsics", () => {
   const script = String.raw`
@@ -61,4 +64,23 @@ test("risk headers stay compact while exposing their full accessible labels", ()
 test("narrow dashboard keeps every risk column in a horizontally scrollable surface", () => {
   assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.hotspotTable\s*\{\s*min-width: 720px;\s*\}/);
   assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.portfolioPanel\s*\{\s*overflow-x: auto;\s*\}/);
+});
+
+test("analytics detail is a bottom sheet with human filters and working destinations", () => {
+  assert.match(modal, /sheet \? styles\.modalBackdropSheet/);
+  assert.match(modal, /sheet \? styles\.modalSheet/);
+  assert.match(inspector, /<Modal sheet/);
+  assert.doesNotMatch(inspector, /workspaceId|projectId\}|exactFilters|server filters/i);
+  assert.match(inspector, /onOpenEntity\(activeEntity, props\.selected\)/);
+  assert.match(inspector, /relatedDashboardDrill/);
+  assert.match(styles, /\.drillSheetBody\s*\{[^}]*grid-template-columns: 250px minmax\(0, 1fr\)/s);
+  assert.match(styles, /\.drillTable\s*\{[^}]*min-width: 980px/s);
+});
+
+test("tag and coverage charts use a restrained categorical palette", () => {
+  assert.match(breakdowns, /DIMENSION_COLORS/);
+  assert.match(breakdowns, /<Cell key=\{item\.key\} fill=\{DIMENSION_COLORS/);
+  for (const token of ["dash-teal", "dash-plum", "dash-sand", "dash-olive", "dash-coral"]) {
+    assert.match(styles, new RegExp(`--${token}:`));
+  }
 });

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { Bootstrap } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
-import type { DashboardAnalyticsSource, DashboardDrill, DashboardPeriod } from "../../dashboards/model/dashboard-analytics";
+import type { DashboardAnalyticsSource, DashboardDrill, DashboardDrillRow, DashboardPeriod } from "../../dashboards/model/dashboard-analytics";
 import { createHttpDashboardAnalyticsSource } from "../../dashboards/source/http-dashboard-analytics-source";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import styles from "../../tms.module.css";
@@ -14,6 +14,7 @@ import { DashboardTrendChart } from "./charts/DashboardTrendChart";
 import { useDashboardAnalytics } from "./controller/useDashboardAnalytics";
 import surface from "./dashboard.module.css";
 import { DashboardDrillInspector } from "./inspector/DashboardDrillInspector";
+import type { DashboardDrillTab } from "./inspector/dashboard-drill-navigation";
 import { DashboardOperations } from "./sections/DashboardOperations";
 import { DashboardPortfolio } from "./sections/DashboardPortfolio";
 
@@ -21,13 +22,15 @@ type DashboardViewProps = {
   data: Bootstrap;
   projectId: string;
   onCreate: () => void;
-  onOpenRuns: () => void;
+  onOpenEntity: (tab: Exclude<DashboardDrillTab, "overview">, drill: DashboardDrill) => void;
+  onOpenRow: (row: DashboardDrillRow) => void;
+  onCreateRun: (caseIds: string[]) => void;
   serverAnalytics?: boolean;
   analyticsSource?: DashboardAnalyticsSource;
 };
 
-export function DashboardView({ data, projectId, onCreate, serverAnalytics = false,
-  analyticsSource }: DashboardViewProps) {
+export function DashboardView({ data, projectId, onCreate, onOpenEntity, onOpenRow,
+  onCreateRun, serverAnalytics = false, analyticsSource }: DashboardViewProps) {
   const { languageTag, t } = useTmsLocale();
   const http = useTmsHttpClient();
   const [period, setPeriod] = useState<DashboardPeriod>("30d");
@@ -107,9 +110,14 @@ export function DashboardView({ data, projectId, onCreate, serverAnalytics = fal
       </div>
       <DashboardBreakdowns snapshot={snapshot} onOpenDrill={analytics.openDrill} />
       <DashboardOperations snapshot={snapshot} onOpenDrill={analytics.openDrill} />
-      {analytics.drill.selected && <DashboardDrillInspector
-        query={query} selected={analytics.drill.selected} page={analytics.drill.page}
+      {analytics.drill.selected && analytics.drill.origin && <DashboardDrillInspector
+        query={query} origin={analytics.drill.origin} selected={analytics.drill.selected} page={analytics.drill.page}
         loading={analytics.drill.loading} error={analytics.drill.error}
+        scopeLabel={analytics.drill.origin.projectId
+          ? data.projects.find((item) => item.id === analytics.drill.origin?.projectId)?.name ?? currentProject
+          : workspaceScope ? t("dashboard.workspaceScope") : currentProject}
+        onSelectDrill={analytics.selectRelatedDrill} onOpenEntity={onOpenEntity}
+        onOpenRow={onOpenRow} onCreateRun={onCreateRun}
         onClose={analytics.closeDrill} onRetry={analytics.retryDrill} onLoadMore={analytics.loadMore}
       />}
     </div>

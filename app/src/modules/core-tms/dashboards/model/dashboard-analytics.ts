@@ -65,10 +65,18 @@ export type DashboardDrillRequest = {
 
 export type DashboardDrillRow = {
   id: string;
+  entity: DashboardDrillFilter["entity"];
+  projectId: string;
   key: string;
   title: string;
   project: string;
   detail: string;
+  type?: string;
+  component?: string;
+  priority?: string;
+  tags?: string[];
+  runId?: string;
+  runItemId?: string;
   status?: string;
   occurredAt?: string;
   links: Array<{ label: string; url: string }>;

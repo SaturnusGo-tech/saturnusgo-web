@@ -9,13 +9,14 @@ import type {
 import { createBootstrapDashboardAnalyticsSource } from "../../../dashboards/source/bootstrap-dashboard-analytics-source";
 
 type DrillState = {
+  origin: DashboardDrill | null;
   selected: DashboardDrill | null;
   page: DashboardDrillPage | null;
   loading: boolean;
   error: boolean;
 };
 
-const EMPTY_DRILL: DrillState = { selected: null, page: null, loading: false, error: false };
+const EMPTY_DRILL: DrillState = { origin: null, selected: null, page: null, loading: false, error: false };
 
 export function useDashboardAnalytics(
   data: Bootstrap,
@@ -64,13 +65,14 @@ export function useDashboardAnalytics(
     const controller = new AbortController();
     drillController.current = controller;
     setDrill((current) => ({
+      origin: current.origin ?? selected,
       selected, page: cursor ? current.page : null, loading: true, error: false,
     }));
     void source.drill({ query, drill: selected, cursor, limit: 25 }, controller.signal)
       .then((page) => setDrill((current) => {
         if (current.selected?.id !== selected.id) return current;
         return {
-          selected, loading: false, error: false,
+          origin: current.origin ?? selected, selected, loading: false, error: false,
           page: cursor && current.page
             ? { ...page, rows: [...current.page.rows, ...page.rows] }
             : page,
@@ -86,6 +88,10 @@ export function useDashboardAnalytics(
   }, [queryKey, source]);
 
   const openDrill = useCallback((selected: DashboardDrill) => {
+    setDrill({ origin: selected, selected: null, page: null, loading: false, error: false });
+    loadDrill(selected);
+  }, [loadDrill]);
+  const selectRelatedDrill = useCallback((selected: DashboardDrill) => {
     loadDrill(selected);
   }, [loadDrill]);
   const retryDrill = useCallback(() => {
@@ -104,6 +110,7 @@ export function useDashboardAnalytics(
     refresh: () => setRefreshVersion((value) => value + 1),
     drill,
     openDrill,
+    selectRelatedDrill,
     closeDrill: () => {
       drillController.current?.abort();
       setDrill(EMPTY_DRILL);
