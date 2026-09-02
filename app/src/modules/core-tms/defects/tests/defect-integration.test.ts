@@ -5,8 +5,8 @@ import { createTmsHttpClient, TmsApiError } from "../../../../core/tms/transport
 import { describeDefectCreateError } from "../../application/defects/describeDefectCreateError";
 import { createDefectResource } from "../data/defect-api";
 import {
-  inferDefectIntegrationTarget, initialDefectIntegrationChoice,
-  resolveDefectIntegrationChoice, runDefectLabels,
+  defectClientLabels, inferDefectIntegrationTarget, initialDefectIntegrationChoice,
+  resolveDefectIntegrationChoice,
 } from "../model/integration-target";
 
 test("infers only an unambiguous YouTrack target", () => {
@@ -30,11 +30,9 @@ test("explicit routing preserves raw YouTrack targets and deliberate TMS-only", 
   assert.deepEqual(resolveDefectIntegrationChoice("tms"), { resolved: true, target: null });
 });
 
-test("run defect labels identify the immutable case type", () => {
-  assert.deepEqual(runDefectLabels("manual", "regression"), ["manual-run", "regression"]);
-  assert.deepEqual(runDefectLabels("automated", "smoke"), ["automated-run", "smoke"]);
-  assert.deepEqual(runDefectLabels("checklist", "acceptance"), ["checklist-run", "acceptance"]);
-  assert.deepEqual(runDefectLabels(null, null), ["reported"]);
+test("run defect creation leaves immutable provenance labels to the server", () => {
+  assert.deepEqual(defectClientLabels(true), []);
+  assert.deepEqual(defectClientLabels(false), ["reported"]);
 });
 
 test("defect create sends the explicit YouTrack target", async () => {

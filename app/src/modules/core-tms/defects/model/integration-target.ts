@@ -1,7 +1,5 @@
 import type {
   Defect,
-  TestCaseRevision,
-  TestRunSummary,
 } from "../../../../core/tms/contracts/legacy-contract";
 
 export type DefectIntegrationTarget = Defect["integrationTarget"];
@@ -40,12 +38,8 @@ export function resolveDefectIntegrationChoice(
   return Object.freeze({ resolved: true, target: choice === "tms" ? null : choice });
 }
 
-export function runDefectLabels(
-  caseType: TestCaseRevision["type"] | null,
-  runType: TestRunSummary["type"] | null,
-): string[] {
-  return Array.from(new Set([
-    caseType ? `${caseType}-run` : "reported",
-    runType ?? "reported",
-  ]));
+export function defectClientLabels(hasOccurrence: boolean): string[] {
+  // The API derives immutable case-type and run-type provenance from the run snapshot.
+  // Sending those reserved labels from the browser is rejected as an attempted override.
+  return hasOccurrence ? [] : ["reported"];
 }

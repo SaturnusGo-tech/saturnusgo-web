@@ -14,7 +14,7 @@ import { useAttachmentClient } from "../../../attachments/presentation/context/A
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
-import { initialDefectIntegrationChoice, resolveDefectIntegrationChoice, runDefectLabels, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { defectClientLabels, initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -34,6 +34,7 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
+  const occurrence = run && item ? { run, item } : null;
   const attempt =
     item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ??
     item?.attempts[0];
@@ -94,9 +95,9 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
       assigneeIdentityId: null,
       component,
       integrationTarget: routing.target,
-      labels: runDefectLabels(item?.snapshot.type ?? null, run?.type ?? null),
-      runId: run?.id ?? null,
-      runItemId: item?.id ?? null,
+      labels: defectClientLabels(occurrence !== null),
+      runId: occurrence?.run.id ?? null,
+      runItemId: occurrence?.item.id ?? null,
       stepId: failedStep?.id ?? null,
       expectedResult: failedStep?.expectedResult ?? "",
       actualResult: actual,
