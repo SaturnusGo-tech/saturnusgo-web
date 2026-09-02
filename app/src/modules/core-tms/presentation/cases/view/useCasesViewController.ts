@@ -14,6 +14,7 @@ import {
 import { useCaseInspectorResize } from "../split/useCaseInspectorResize";
 import { useCaseBulkSelection } from "../bulk/selection-hook/useCaseBulkSelection";
 import type { CaseListRow, CaseSort, CaseSortKey, CasesViewProps } from "../types";
+import { formatCaseEstimate } from "../model/formatCaseEstimate";
 
 export function useCasesViewController(
   props: CasesViewProps,
@@ -71,7 +72,7 @@ export function useCasesViewController(
   const allEstimated = rows.length > 0 && rows.every((row) => row.testCase.estimatedMinutes !== null);
   const estimatedMinutes = rows.reduce((total, row) => total + (row.testCase.estimatedMinutes ?? 0), 0);
   const estimateLabel = allEstimated
-    ? (locale === "ru" ? `Оценка: ${estimatedMinutes} мин` : `Estimate: ${estimatedMinutes} min`)
+    ? `${locale === "ru" ? "Оценка" : "Estimate"}: ${formatCaseEstimate(locale, estimatedMinutes)}`
     : (locale === "ru" ? "Оценка не указана" : "Estimate not specified");
 
   useEffect(() => {

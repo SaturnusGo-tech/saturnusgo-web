@@ -22,8 +22,7 @@
   background: var(--cases-bg);
   border-bottom: 1px solid var(--cases-border);
 }
-.commentsHeading h3 { margin: 0; color: var(--cases-strong); font-size: 13px; font-weight: 650; }
-.commentsHeading span { min-width: 19px; height: 18px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-control); border-radius: 3px; font-size: 10px; }
+.commentsHeading h3 { margin: 0; color: var(--cases-strong); font-size: 12px; font-weight: 600; }
 .sectionLoadState { min-height: 104px; border-bottom: 1px solid var(--cases-border); }
 .loadState button,
 .retestButton {
@@ -41,11 +40,32 @@
   font: inherit;
   font-size: 11px;
 }
-.composerLabel { color: var(--cases-strong); font-size: 11px; font-weight: 650; }
+.commentPrompt {
+  width: calc(100% - 28px);
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 14px 12px;
+  padding: 0 10px;
+  color: var(--cases-muted);
+  background: var(--cases-control);
+  border: 1px solid var(--cases-control-border);
+  border-radius: 4px;
+  cursor: text;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+}
+.commentPrompt:hover { color: var(--cases-secondary-text); border-color: var(--cases-muted); }
+.commentsEmpty { min-height: 40px; display: flex; align-items: center; padding: 0 14px 10px; color: var(--cases-faint); font-size: 11px; }
 .commentComposer { display: grid; gap: 7px; padding: 10px 14px 12px; border-bottom: 1px solid var(--cases-border); }
 .composerFooter { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .composerFooter > span { color: var(--cases-faint); font-size: 10px; }
+.composerFooter > div { display: flex; align-items: center; gap: 6px; }
 .composerFooter button { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; padding: 0 9px; color: var(--cases-on-primary); background: var(--cases-primary); border: 1px solid var(--cases-primary); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
+.composerFooter .cancelComment { color: var(--cases-secondary-text); background: transparent; border-color: transparent; }
+.composerFooter .cancelComment:hover { background: var(--cases-hover); border-color: var(--cases-border); }
 .composerFooter button:disabled { cursor: default; opacity: .55; }
 .inlineError {
   display: flex;
@@ -72,10 +92,10 @@
   background: var(--cases-avatar);
   border-radius: 50%;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .comment header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.comment strong { color: var(--cases-strong); font-size: 12px; }
+.comment strong { color: var(--cases-strong); font-size: 12px; font-weight: 600; }
 .comment time { color: var(--cases-muted); font-size: 10px; white-space: nowrap; }
 .commentMarkdown { min-width: 0; margin-top: 4px; overflow-wrap: anywhere; }
 .pagination { display: grid; justify-items: center; gap: 6px; padding: 10px 12px; color: var(--cases-muted); font-size: 10px; text-align: center; }
@@ -134,7 +154,8 @@
 :global(.dark) .statusBadge[data-status="ready_for_retest"] { color: #91d3aa; }
 
 @media (max-width: 560px) {
-  .composerFooter { align-items: flex-end; flex-direction: column; }
+  .composerFooter { align-items: stretch; flex-direction: column; }
+  .composerFooter > div { justify-content: flex-end; }
   .defectHeader { grid-template-columns: 27px minmax(0, 1fr); }
   .statusBadge { grid-column: 2; justify-self: start; }
   .readyBanner { grid-template-columns: 17px minmax(0, 1fr); }

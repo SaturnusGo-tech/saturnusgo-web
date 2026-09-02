@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BlockTypeSelect,
   BoldItalicUnderlineToggles,
   CodeToggle,
   CreateLink,
@@ -61,11 +60,6 @@ const RU_TRANSLATIONS: Record<string, string> = {
   "toolbar.removeInlineCode": "Убрать код",
   "toolbar.undo": "Отменить",
   "toolbar.redo": "Повторить",
-  "toolbar.blockTypes.paragraph": "Абзац",
-  "toolbar.blockTypes.quote": "Цитата",
-  "toolbar.blockTypes.heading": "Заголовок {{level}}",
-  "toolbar.blockTypeSelect.selectBlockTypeTooltip": "Тип блока",
-  "toolbar.blockTypeSelect.placeholder": "Тип блока",
   "toolbar.bulletedList": "Маркированный список",
   "toolbar.numberedList": "Нумерованный список",
   "toolbar.checkList": "Чек-лист",
@@ -111,10 +105,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         <BoldItalicUnderlineToggles options={["Bold", "Italic"]} />
         <StrikeThroughSupSubToggles options={["Strikethrough"]} />
         <CodeToggle /><Separator />
-        <BlockTypeSelect /><ListsToggle /><CreateLink />
-        {props.onAttachmentFiles && <MarkdownAttachmentButton
-          locale={props.locale} onFiles={props.onAttachmentFiles}
-        />}
+        <ListsToggle /><CreateLink />
       </>,
     }),
   ], [props.locale, props.onAttachmentFiles, props.validateUrl]);
@@ -160,6 +151,9 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       entries={props.pendingAttachments ?? []}
       onRemove={props.onRemoveAttachment}
     />}
+    {props.onAttachmentFiles && <div className={css.editorFooter}>
+      <MarkdownAttachmentButton locale={props.locale} onFiles={props.onAttachmentFiles} />
+    </div>}
     {problem && <span className={css.editorError} role="alert">{problem}</span>}
   </>;
 }

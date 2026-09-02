@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { filterCaseRows, flattenCaseGroups } from "../caseListModel";
+import { formatCaseEstimate } from "../formatCaseEstimate";
 
 function summary(id: string): TestCaseSummary {
   return {
@@ -41,4 +42,11 @@ test("case type surfaces expose automated with a robot icon", () => {
   assert.match(popovers, /\["manual", "checklist", "automated"\]/);
   assert.match(popovers, /caseTypes = \["all", "manual", "checklist", "automated"\]/);
   assert.match(popovers, /props\.filters\.type === value/);
+});
+
+test("formats aggregate estimates as readable hours", () => {
+  assert.equal(formatCaseEstimate("ru", 45), "45 мин");
+  assert.equal(formatCaseEstimate("ru", 2_662), "44 ч 22 мин");
+  assert.equal(formatCaseEstimate("ru", 120), "2 ч");
+  assert.equal(formatCaseEstimate("en", 65), "1 h 5 min");
 });

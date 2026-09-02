@@ -1,0 +1,100 @@
+import {
+  Archive, Check, Copy, Files, Link2, Maximize2, Minimize2,
+  Play, RotateCcw, SlidersHorizontal, X,
+} from "lucide-react";
+import { useEffect, useState, type RefObject } from "react";
+import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import type { TmsLocale } from "../../../../localization/model/locale";
+import { buildCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
+import layout from "../../cases.module.css";
+import inspector from "../../inspector/caseInspector.module.css";
+
+type Props = {
+  locale: TmsLocale;
+  testCase?: TestCaseSummary;
+  creating: boolean;
+  editorOpen: boolean;
+  submitting?: boolean;
+  fullscreen: boolean;
+  metaEditButton: RefObject<HTMLButtonElement | null>;
+  onEditMetadata: () => void;
+  onRunCase: () => void;
+  onToggleFullscreen: () => void;
+  onClone: () => void;
+  onArchive: () => void;
+  onClose?: () => void;
+};
+
+export function CaseDetailHeaderActions(props: Props) {
+  const [copied, setCopied] = useState<"key" | "link" | null>(null);
+  const ru = props.locale === "ru";
+  const item = props.testCase;
+  useEffect(() => setCopied(null), [item?.id]);
+
+  async function copy(value: string, kind: "key" | "link") {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(value);
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = value;
+      field.setAttribute("readonly", "");
+      field.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+    setCopied(kind);
+    window.setTimeout(() => setCopied((current) => current === kind ? null : current), 1800);
+  }
+
+  return <div className={inspector.utilityRow}>
+    <div className={inspector.caseIdentity}>
+      <span className={inspector.caseKey}>{props.creating
+        ? (ru ? "Новый тест-кейс" : "New test case")
+        : item?.key}</span>
+      {!props.creating && item && <>
+        <button type="button" className={inspector.iconButton}
+          aria-label={copied === "key" ? (ru ? "ID скопирован" : "ID copied") : (ru ? "Копировать ID" : "Copy ID")}
+          onClick={() => { void copy(item.key, "key"); }}>
+          {copied === "key" ? <Check size={13} /> : <Copy size={13} />}
+        </button>
+        <button type="button" className={inspector.iconButton}
+          aria-label={copied === "link" ? (ru ? "Ссылка скопирована" : "Link copied") : (ru ? "Копировать ссылку" : "Copy link")}
+          onClick={() => { void copy(buildCaseDeepLink(window.location.href, {
+            caseId: item.id, projectId: item.projectId,
+          }), "link"); }}>
+          {copied === "link" ? <Check size={13} /> : <Link2 size={13} />}
+        </button>
+      </>}
+      <button type="button" className={inspector.iconButton}
+        onClick={props.onToggleFullscreen}
+        aria-label={props.fullscreen ? (ru ? "Выйти из полного экрана" : "Exit full screen") : (ru ? "На весь экран" : "Open full screen")}
+        aria-pressed={props.fullscreen}>
+        {props.fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+      </button>
+    </div>
+    <div className={inspector.headerActions}>
+      {!props.creating && <button type="button" disabled={props.editorOpen}
+        className={inspector.iconButton} onClick={props.onRunCase}
+        aria-label={ru ? "Запустить кейс" : "Run case"}><Play size={14} /></button>}
+      {!props.creating && <button ref={props.metaEditButton} type="button" disabled={props.submitting}
+        className={inspector.iconButton} onClick={props.onEditMetadata}
+        aria-label={ru ? "Изменить свойства" : "Edit properties"}><SlidersHorizontal size={14} /></button>}
+      {!props.creating && <button type="button" disabled={props.editorOpen}
+        className={inspector.iconButton} onClick={props.onClone}
+        aria-label={ru ? "Клонировать" : "Clone"}><Files size={14} /></button>}
+      {!props.creating && <button type="button" disabled={props.editorOpen}
+        className={inspector.iconButton} onClick={props.onArchive}
+        aria-label={item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}>
+        {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
+      </button>}
+      {props.onClose && <button type="button" className={inspector.iconButton}
+        onClick={props.onClose} aria-label={ru ? "Закрыть" : "Close"}><X size={15} /></button>}
+    </div>
+    <span className={layout.visuallyHidden} role="status" aria-live="polite">{copied === "key"
+      ? (ru ? "ID тест-кейса скопирован" : "Test case ID copied")
+      : copied === "link" ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>
+  </div>;
+}

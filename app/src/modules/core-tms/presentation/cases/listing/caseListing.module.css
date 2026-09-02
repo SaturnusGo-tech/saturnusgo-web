@@ -15,6 +15,8 @@
   border: 1px solid var(--cases-control-border);
   border-radius: 4px;
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -54,7 +56,7 @@
 }
 
 .inputShell:focus-within { border-color: var(--cases-primary); box-shadow: none; }
-.inputShell input { min-width: 0; flex: 1; color: var(--cases-text); background: transparent; border: 0; outline: 0; }
+.inputShell input { min-width: 0; flex: 1; color: var(--cases-text); background: transparent; border: 0; outline: 0; font-size: 13px; font-weight: 400; }
 .controls .inputShell input:focus-visible { outline: 0; box-shadow: none; }
 .inputShell input::placeholder { color: var(--cases-faint); }
 .clearButton { width: 20px; height: 20px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
@@ -64,6 +66,8 @@
 .selectionModeButton { flex: 0 0 auto; }
 .selectionModeActive,
 .selectionModeActive:hover { color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
+.controls .selectionModeButton[aria-pressed="true"],
+.controls .selectionModeButton[aria-pressed="true"] :is(span, svg) { color: var(--cases-on-primary); }
 .segmentButton { border-radius: 0; }
 .segmentButton:first-child { border-radius: 4px 0 0 4px; }
 .segmentButton:last-child { margin-left: -1px; border-radius: 0 4px 4px 0; }
@@ -76,7 +80,7 @@
 .qlRoot { position: relative; width: 100%; }
 .qlRoot .inputShell { width: 100%; }
 .groupLine { position: relative; display: flex; align-items: center; gap: 7px; }
-.groupLine > strong { color: var(--cases-secondary-text); font-size: 11px; }
+.groupLine > strong { color: var(--cases-secondary-text); font-size: 11px; font-weight: 600; }
 .groupButton { height: 28px; justify-content: space-between; min-width: 150px; padding-inline: 8px; }
 .groupButton > span { overflow: hidden; text-overflow: ellipsis; }
 .meta { margin-left: auto; color: var(--cases-muted); font-size: 11px; }
@@ -124,13 +128,13 @@
   border-radius: 999px;
   font-size: 9px;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   pointer-events: none;
 }
 .filterPanel { right: 0; width: 264px; max-height: min(362px, calc(100vh - 112px)); overflow: hidden; padding: 3px; }
 .filterMenuHeader { height: 32px; display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; padding: 0 2px; border-bottom: 1px solid var(--cases-row-border); }
-.filterMenuHeader strong { grid-column: 2; color: var(--cases-strong); font-size: 11px; font-weight: 650; }
+.filterMenuHeader strong { grid-column: 2; color: var(--cases-strong); font-size: 11px; font-weight: 600; }
 .filterMenuHeader > .backButton { grid-column: 1; grid-row: 1; }
 .filterMenuHeader > .closeButton { grid-column: 3; grid-row: 1; }
 .filterMenuHeader > button { min-height: 24px; justify-content: center; padding: 0; }
@@ -168,12 +172,12 @@
 .tableScroll { min-width: 0; min-height: 0; flex: 1; overflow: auto; scrollbar-gutter: stable; scrollbar-color: var(--cases-control-border) transparent; }
 .tableScrollBulkActive { padding-bottom: 58px; }
 .table { width: 100%; min-width: 930px; border-spacing: 0; table-layout: fixed; }
-.table th { position: sticky; z-index: 5; top: 0; height: 32px; padding: 0 8px; color: var(--cases-muted); background: var(--cases-bg); border-bottom: 1px solid var(--cases-border); font-size: 10px; font-weight: 650; text-align: left; }
+.table th { position: sticky; z-index: 5; top: 0; height: 32px; padding: 0 8px; color: var(--cases-muted); background: var(--cases-bg); border-bottom: 1px solid var(--cases-border); font-size: 10px; font-weight: 600; text-align: left; }
 .table th > button { width: 100%; height: 31px; display: flex; align-items: center; gap: 4px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
 .table th > button:hover { color: var(--cases-strong); }
 .table tbody tr[data-case-row] { height: 46px; cursor: pointer; outline: 0; }
 .table tbody tr[data-case-row][data-interaction-locked="true"] { cursor: not-allowed; }
-.table td { height: 46px; padding: 0 8px; overflow: hidden; color: var(--cases-secondary-text); border-bottom: 1px solid var(--cases-row-border); font-size: 12px; vertical-align: middle; }
+.table td { height: 46px; padding: 0 8px; overflow: hidden; color: var(--cases-secondary-text); border-bottom: 1px solid var(--cases-row-border); font-size: 12px; font-weight: 400; vertical-align: middle; }
 .table tbody tr[data-case-row]:hover td { background: var(--cases-hover); }
 .table tbody tr[data-case-row][data-bulk-selected="true"] td { background: color-mix(in srgb, var(--cases-primary) 12%, var(--cases-bg)); }
 .table .selectedRow td { background: var(--cases-hover-strong); }
@@ -200,9 +204,10 @@
 .priorityFlag_medium { color: #558bea; fill: currentColor; }
 .priorityFlag_low { color: #4c9b69; fill: currentColor; }
 .typeCell { padding-inline: 5px !important; color: var(--cases-icon) !important; text-align: center; }
-.keyCell { overflow: hidden; color: var(--cases-link) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.keyCell { overflow: hidden; color: var(--cases-muted) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.keyCell strong { font-size: 11px; font-weight: 500; letter-spacing: .01em; }
 .titleCell { min-width: 0; }
-.titleCell strong { display: -webkit-box; overflow: hidden; color: var(--cases-strong); font-size: 12px; font-weight: 500; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.titleCell strong { display: -webkit-box; overflow: hidden; color: var(--cases-strong); font-size: 12px; font-weight: 500; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .estimateCell { color: var(--cases-muted) !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
 

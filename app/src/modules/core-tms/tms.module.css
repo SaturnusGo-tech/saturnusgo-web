@@ -48,7 +48,7 @@
 .app button,
 .app input,
 .app textarea,
-.app select { font: inherit; }
+.app select { font-family: inherit; }
 
 .app button,
 .app label { -webkit-tap-highlight-color: transparent; }
@@ -4626,6 +4626,9 @@
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   line-height: 1.42;
   color-scheme: light;
   scrollbar-color: var(--line-strong) transparent;

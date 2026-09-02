@@ -6,8 +6,8 @@ const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
 const attachmentUi = readFileSync(new URL("../markdown/attachments/MarkdownAttachmentUi.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
-const globalStyles = readFileSync(new URL("../../../../../../shared/styles/globals.css", import.meta.url), "utf8");
 const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
+const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const creation = readFileSync(new URL("../creation/CaseCreationSections.tsx", import.meta.url), "utf8");
 const detailPanel = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
@@ -17,6 +17,7 @@ const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.m
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
 const comments = readFileSync(new URL("../../collaboration/comments/CaseCommentsTab.tsx", import.meta.url), "utf8");
+const detailActions = readFileSync(new URL("../../detail/header/CaseDetailHeaderActions.tsx", import.meta.url), "utf8");
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
 const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.meta.url), "utf8");
 
@@ -38,12 +39,13 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
   assert.match(source, /isSafeUrl\(url\) \? url : ""/);
   assert.match(styles, /\.editorContent strong/);
   assert.match(styles, /\.editorContent em/);
-  assert.match(styles, /font-weight: 750/);
+  assert.match(styles, /font-weight: 600/);
   assert.match(styles, /color: var\(--cases-strong\) !important/);
 });
 
-test("case Markdown inputs attach or paste private files from the conventional toolbar position", () => {
-  assert.match(initialized, /<CreateLink \/>[\s\S]*<MarkdownAttachmentButton/);
+test("case Markdown inputs attach or paste private files from the conventional lower-left position", () => {
+  assert.match(initialized, /<ListsToggle \/><CreateLink \/>/);
+  assert.match(initialized, /className=\{css\.editorFooter\}[\s\S]*<MarkdownAttachmentButton/);
   assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
   assert.match(attachmentUi, /type="file" multiple/);
   assert.doesNotMatch(attachmentUi, /accept=/);
@@ -58,15 +60,22 @@ test("case Markdown inputs attach or paste private files from the conventional t
   assert.match(comments, /allowAttachments=\{false\}/);
 });
 
-test("portal-rendered block type options use a bounded themed popup", () => {
-  assert.match(globalStyles, /html\[data-tms="1"\] \.mdxeditor-select-content/);
-  assert.match(globalStyles, /max-height: min\(224px, var\(--radix-select-content-available-height\)\)/);
-  assert.match(globalStyles, /overflow-y: auto/);
-  assert.match(globalStyles, /scrollbar-gutter: stable/);
-  assert.match(globalStyles, /html\.dark\[data-tms="1"\] \.mdxeditor-select-content/);
-  assert.match(globalStyles, /\[role="option"\]\[data-highlighted\]/);
-  assert.match(globalStyles, /\[role="option"\]\[data-state="checked"\]/);
-  assert.match(globalStyles, /animation: tms-markdown-select-in/);
+test("Markdown inputs omit the disruptive block-type selector", () => {
+  assert.doesNotMatch(initialized, /BlockTypeSelect/);
+  assert.doesNotMatch(initialized, /toolbar\.blockTypes|blockTypeSelect/);
+});
+
+test("case chrome is quiet until the user asks to edit", () => {
+  assert.match(detailActions, /Копировать ID/);
+  assert.match(detailActions, /Копировать ссылку/);
+  assert.match(detailActions, /На весь экран/);
+  assert.doesNotMatch(detailPanel, /testCase\??\.folderPath/);
+  assert.doesNotMatch(detailPanel, /className=\{inspector\.titleMark\}/);
+  assert.match(comments, /!composerOpen[\s\S]*commentPrompt/);
+  assert.match(comments, /compact[\s\S]*autoFocus/);
+  assert.doesNotMatch(comments, /comments\.items\.length\}/);
+  assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--cases-muted\) !important/);
+  assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--cases-on-primary\)/);
 });
 
 test("fullscreen inspector content keeps the normal full-width layout", () => {

@@ -1,17 +1,14 @@
-import {
-  Archive, Check, Copy, Link2, ListChecks, Maximize2,
-  Minimize2, Pencil, Play, RotateCcw, X,
-} from "lucide-react";
+import { ListChecks, Pencil } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../localization/model/locale";
-import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
 import { editorSessionClosed, inspectorRevisionProblem, type CaseInspectorEditor } from "../inspector/model";
 import inspector from "../inspector/caseInspector.module.css";
 import { InspectorPendingAttachments } from "../inspector/attachments/InspectorPendingAttachments";
 import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttachmentDraftContext";
 import type { PendingCaseAttachment } from "../../../application/evidence/case/pendingCaseAttachment";
 import { CaseOverview } from "./CaseOverview";
+import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseMetadataControls } from "./metadata/CaseMetadataControls";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
@@ -42,7 +39,6 @@ export type CaseDetailPanelProps = {
 
 export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const [tab, setTab] = useState<DetailTab>("overview");
-  const [linkCopied, setLinkCopied] = useState(false);
   const [files, setFiles] = useState<PendingCaseAttachment[]>([]);
   const [headerEditing, setHeaderEditing] = useState<"meta" | "title" | null>(null);
   const formId = useId();
@@ -59,7 +55,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
   useEffect(() => {
     setTab("overview");
-    setLinkCopied(false);
     setFiles([]);
     setHeaderEditing(null);
     headerReturnFocus.current = null;
@@ -92,30 +87,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     props.editor?.onCancel();
   }
 
-  async function copyLink() {
-    if (!props.testCase) return;
-    const link = buildCaseDeepLink(window.location.href, {
-      caseId: props.testCase.id,
-      projectId: props.testCase.projectId,
-    });
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(link);
-    } catch {
-      const field = document.createElement("textarea");
-      field.value = link;
-      field.setAttribute("readonly", "");
-      field.style.position = "fixed";
-      field.style.opacity = "0";
-      document.body.appendChild(field);
-      field.select();
-      document.execCommand("copy");
-      field.remove();
-    }
-    setLinkCopied(true);
-    window.setTimeout(() => setLinkCopied(false), 1800);
-  }
-
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
   const activeTab: DetailTab = creating ? "overview" : tab;
@@ -126,9 +97,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     : problem === "manualSteps" ? (ru ? "Заполните действие и результат шага" : "Complete each step action and result")
     : problem === "automatedSteps" ? (ru ? "Добавьте хотя бы один шаг автотеста и заполните действие и результат" : "Add at least one automated step and complete its action and result")
     : problem === "checklist" ? (ru ? "Добавьте пункт чек-листа" : "Add a checklist item") : "";
-  const keyLabel = creating
-    ? (ru ? "Новый тест-кейс" : "New test case")
-    : `${props.testCase?.key} · ${props.testCase?.folderPath}`;
   const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={`${inspector.createActions} ${creating ? inspector.creationFooter : ""}`}>
     {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}
     <button type="button" disabled={props.editor.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>
@@ -147,32 +115,34 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     }}
   >
     <header className={`${inspector.caseHeader} ${creating ? inspector.creationHeader : ""}`}>
-      <div className={inspector.utilityRow}>
-        <span className={inspector.caseKey}>{keyLabel}</span>
-        <div className={inspector.headerActions}>
-          {!creating && <button type="button" disabled={editorOpen} className={inspector.iconButton} onClick={props.onRunCase} aria-label={ru ? "Запустить кейс" : "Run case"}><Play size={14} /></button>}
-          {!creating && <button type="button" className={inspector.iconButton} onClick={copyLink} aria-label={linkCopied ? (ru ? "Ссылка скопирована" : "Link copied") : (ru ? "Копировать ссылку" : "Copy link")}>{linkCopied ? <Check size={14} /> : <Link2 size={14} />}</button>}
-          <button type="button" className={inspector.iconButton} onClick={props.onToggleFullscreen} aria-label={props.fullscreen ? (ru ? "Выйти из полного экрана" : "Exit full screen") : (ru ? "На весь экран" : "Open full screen")} aria-pressed={props.fullscreen}>{props.fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}</button>
-          {!creating && <button type="button" disabled={editorOpen} className={inspector.iconButton} onClick={props.onClone} aria-label={ru ? "Клонировать" : "Clone"}><Copy size={14} /></button>}
-          {!creating && <button type="button" disabled={editorOpen} className={inspector.iconButton} onClick={props.onArchive} aria-label={props.testCase?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}>{props.testCase?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}</button>}
-          {props.onClose && <button type="button" className={inspector.iconButton} onClick={props.onClose} aria-label={ru ? "Закрыть" : "Close"}><X size={15} /></button>}
-        </div>
-      </div>
-      <div className={inspector.metaRow}>
-        <CaseMetadataControls
-          locale={props.locale}
-          revision={revision}
-          archived={Boolean(props.testCase?.archivedAt)}
-          editing={Boolean(props.editor && (creating || headerEditing === "meta"))}
-          autoFocus={headerEditing === "meta"}
-          showLabels={creating}
-          onChange={props.editor?.onChange}
-        />
+      <CaseDetailHeaderActions
+        locale={props.locale}
+        testCase={props.testCase}
+        creating={creating}
+        editorOpen={editorOpen}
+        submitting={props.editor?.submitting}
+        fullscreen={props.fullscreen}
+        metaEditButton={metaEditButton}
+        onEditMetadata={() => beginHeaderEdit("meta")}
+        onRunCase={props.onRunCase}
+        onToggleFullscreen={props.onToggleFullscreen}
+        onClone={props.onClone}
+        onArchive={props.onArchive}
+        onClose={props.onClose}
+      />
+      {(creating || headerEditing === "meta" || readyDefects > 0) && <div className={inspector.metaRow}>
+        {(creating || headerEditing === "meta") && <CaseMetadataControls
+            locale={props.locale}
+            revision={revision}
+            archived={Boolean(props.testCase?.archivedAt)}
+            editing={Boolean(props.editor)}
+            autoFocus={headerEditing === "meta"}
+            showLabels={creating}
+            onChange={props.editor?.onChange}
+          />}
         {readyDefects > 0 && <span className={inspector.retestBadge} role="status">{ru ? "Готово к тестированию" : "Ready for testing"} · {readyDefects}</span>}
-        {!creating && headerEditing !== "meta" && <button ref={metaEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("meta")} aria-label={ru ? "Изменить статус, приоритет, тип и оценку" : "Edit status, priority, type, and estimate"}><Pencil size={13} /></button>}
-      </div>
+      </div>}
       <div className={inspector.titleRow}>
-        <span className={inspector.titleMark}><ListChecks size={17} /></span>
         {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}
         {props.editor && (creating || headerEditing === "title") ? <input autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <h2>{revision.title}</h2>}
         {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
@@ -188,6 +158,5 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     </form>
     {creating && editorActions}
     </CaseAttachmentDraftProvider>
-    <span className={styles.visuallyHidden} role="status" aria-live="polite">{linkCopied ? (ru ? "Ссылка на тест-кейс скопирована" : "Test case link copied") : ""}</span>
   </div>;
 }

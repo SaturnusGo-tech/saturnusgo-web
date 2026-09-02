@@ -30,6 +30,9 @@
   background: var(--cases-bg);
   font: inherit;
   font-size: 14px;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   line-height: 1.35;
   color-scheme: light;
   position: relative;
@@ -64,7 +67,7 @@
 
 .workspace button,
 .workspace input,
-.workspace select { font: inherit; }
+.workspace select { font-family: inherit; }
 
 .workspaceResizing { cursor: col-resize; user-select: none; }
 
@@ -101,7 +104,7 @@
   border-bottom: 1px solid var(--cases-border);
 }
 
-.repositoryTopbar strong { font-size: 14px; font-weight: 650; }
+.repositoryTopbar strong { font-size: 14px; font-weight: 600; }
 
 .primaryIconButton,
 .iconButton,
@@ -140,7 +143,7 @@
   display: block;
   color: var(--cases-muted);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: .045em;
   text-transform: uppercase;
 }
@@ -364,7 +367,7 @@
 }
 
 .listTitlebar > div { min-width: 0; display: flex; align-items: baseline; gap: 9px; }
-.listTitlebar h1 { margin: 0; font-size: 16px; font-weight: 650; }
+.listTitlebar h1 { margin: 0; font-size: 16px; font-weight: 600; }
 .listTitlebar span { color: var(--cases-muted); font-size: 12px; white-space: nowrap; }
 
 .primaryButton,
@@ -588,6 +591,11 @@
     flex-basis 170ms cubic-bezier(.2, .72, .3, 1);
 }
 
+.detailPanelOpen {
+  animation: caseInspectorDockIn 220ms cubic-bezier(.2, .72, .3, 1) both;
+  transform-origin: right center;
+}
+
 .detailResizeHandle {
   position: absolute;
   z-index: 10;
@@ -655,7 +663,7 @@
 }
 
 .detailTypeIcon { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 auto; color: var(--cases-icon); background: var(--cases-icon-bg); border-radius: 3px; }
-.detailTitle h2 { margin: 2px 0 0; color: var(--cases-strong); font-size: 17px; font-weight: 650; line-height: 1.3; }
+.detailTitle h2 { margin: 2px 0 0; color: var(--cases-strong); font-size: 17px; font-weight: 600; line-height: 1.3; }
 
 .detailTabs {
   height: 34px;
@@ -699,7 +707,7 @@
 .facts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--cases-strong); font-size: 12px; line-height: 1.35; }
 
 .detailSection { padding: 14px; border-bottom: 1px solid var(--cases-border); }
-.detailSection h3 { margin: 0 0 7px; color: var(--cases-strong); font-size: 12px; font-weight: 650; }
+.detailSection h3 { margin: 0 0 7px; color: var(--cases-strong); font-size: 12px; font-weight: 600; }
 .detailSection > p { margin: 0; color: var(--cases-secondary-text); font-size: 12px; line-height: 1.55; white-space: pre-wrap; }
 .detailSectionHeading { display: flex; align-items: center; justify-content: space-between; }
 .detailSectionHeading span { min-width: 20px; height: 19px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-control); border-radius: 3px; font-size: 10px; }
@@ -737,7 +745,7 @@
 .runRecord small,
 .activityRecord small { overflow: hidden; color: var(--cases-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .runRecord em { color: var(--cases-muted); font-size: 10px; font-style: normal; }
-.activityRecord > span { width: 26px; height: 26px; display: grid; place-items: center; flex: 0 0 auto; color: var(--cases-on-primary); background: var(--cases-avatar); border-radius: 50%; font-size: 11px; font-weight: 650; }
+.activityRecord > span { width: 26px; height: 26px; display: grid; place-items: center; flex: 0 0 auto; color: var(--cases-on-primary); background: var(--cases-avatar); border-radius: 50%; font-size: 11px; font-weight: 600; }
 .fileRecord { color: var(--cases-link); text-decoration: none; }
 .fileRecord > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fileRecord:hover { background: var(--cases-hover); }
@@ -809,6 +817,11 @@
 @keyframes caseInspectorIn {
   from { opacity: .84; transform: translateX(18px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes caseInspectorDockIn {
+  from { width: 0; min-width: 0; flex-basis: 0; opacity: .84; transform: translateX(18px); }
+  to { width: var(--case-inspector-width, 680px); min-width: 520px; flex-basis: var(--case-inspector-width, 680px); opacity: 1; transform: translateX(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {

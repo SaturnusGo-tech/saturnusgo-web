@@ -44,6 +44,8 @@
 
 .field > .wysiwyg { height: 148px; min-height: 132px; }
 .field > .compact { height: 124px; min-height: 112px; }
+.field:has(.editorFooter) > .wysiwyg { height: 116px; min-height: 100px; }
+.field:has(.editorFooter) > .compact { height: 92px; min-height: 80px; }
 .wysiwyg :global(.mdxeditor-toolbar) {
   min-height: 31px;
   gap: 2px;
@@ -58,24 +60,12 @@
 .wysiwyg :global(.mdxeditor-toolbar button) { min-width: 25px; min-height: 24px; padding: 2px 4px; color: var(--cases-muted); border-radius: 3px; }
 .wysiwyg :global(.mdxeditor-toolbar button:hover),
 .wysiwyg :global(.mdxeditor-toolbar button:focus-visible) { color: var(--cases-strong); background: var(--cases-hover); outline: 1px solid var(--cases-control-border); outline-offset: -1px; }
-.wysiwyg.wysiwyg :global(.mdxeditor-toolbar [role="combobox"]) {
-  width: 104px;
-  min-height: 24px;
-  margin: 0 2px;
-  padding: 2px 6px;
-  color: var(--cases-strong);
-  background: var(--cases-control);
-  border: 1px solid var(--cases-control-border);
-  border-radius: 3px;
-  font-size: 11px;
-}
-
 .wysiwyg :global(.mdxeditor-root-contenteditable) { height: calc(100% - 31px); min-height: 0; overflow: auto; background: var(--cases-control); }
 .wysiwyg .editorContent { min-height: 100%; padding: 8px 10px; color: var(--cases-secondary-text); font: inherit; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
 .editorContent :is(p, ul, ol, blockquote, pre) { margin: 0 0 7px; }
-.editorContent :is(h1, h2, h3) { margin: 8px 0 5px; color: var(--cases-strong); font: inherit; font-size: 1em; font-weight: 700; line-height: 1.4; }
-.editorContent strong { color: var(--cases-strong); font-weight: 750; }
-.editorContent em { color: var(--cases-strong); font-style: italic; font-weight: 600; }
+.editorContent :is(h1, h2, h3) { margin: 8px 0 5px; color: var(--cases-strong); font: inherit; font-size: 1em; font-weight: 600; line-height: 1.4; }
+.editorContent strong { color: var(--cases-strong); font-weight: 600; }
+.editorContent em { color: var(--cases-strong); font-style: italic; font-weight: 500; }
 .editorContent a { color: var(--cases-link); }
 .editorContent code { padding: 1px 3px; background: var(--cases-raised); border-radius: 2px; }
 .editorContent blockquote { padding-left: 8px; color: var(--cases-muted); border-left: 2px solid var(--cases-control-border); }
@@ -84,6 +74,11 @@
 .editorError { display: block; padding: 4px 8px; color: #b4494f; background: var(--cases-raised); border-top: 1px solid var(--cases-border); font-size: 10px; }
 .attachmentError { display: block; padding: 4px 8px; color: #b4494f; background: var(--cases-raised); border-top: 1px solid var(--cases-border); font-size: 10px; }
 .hiddenFileInput { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.editorFooter { min-height: 32px; display: flex; align-items: center; padding: 3px 6px; background: var(--cases-raised); border-top: 1px solid var(--cases-border); }
+.attachmentButton { width: 26px; height: 26px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 1px solid transparent; border-radius: 3px; cursor: pointer; }
+.attachmentButton:hover,
+.attachmentButton:focus-visible { color: var(--cases-strong); background: var(--cases-hover); border-color: var(--cases-control-border); }
+.attachmentButton:disabled { cursor: default; opacity: .45; }
 .attachmentStrip { display: flex; gap: 5px; overflow-x: auto; padding: 6px 8px; background: var(--cases-raised); border-top: 1px solid var(--cases-border); scrollbar-width: thin; }
 .attachmentChip { min-width: 0; max-width: 210px; flex: 0 0 auto; display: grid; grid-template-columns: 24px minmax(0, 1fr) 22px; align-items: center; gap: 5px; padding: 3px 4px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 4px; }
 .attachmentChip > img { width: 24px; height: 24px; object-fit: cover; border-radius: 3px; }
@@ -119,19 +114,19 @@
   color: var(--cases-strong) !important;
   font-family: inherit !important;
   font-size: 1em !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   line-height: 1.4 !important;
   border: 0 !important;
 }
 .rendered :global(a) { color: var(--cases-link) !important; }
 .rendered :global(strong) {
   color: var(--cases-strong) !important;
-  font-weight: 750 !important;
+  font-weight: 600 !important;
 }
 .rendered :global(em) {
   color: var(--cases-strong) !important;
   font-style: italic !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 .rendered :global(code) { background: var(--cases-raised) !important; }
 .rendered :global(blockquote) {

@@ -17,11 +17,12 @@ type Props = {
 export function CaseCommentsSection({ caseId, locale, languageTag, model }: Props) {
   const ru = locale === "ru";
   const [body, setBody] = useState("");
-  useEffect(() => { setBody(""); }, [caseId]);
+  const [composerOpen, setComposerOpen] = useState(false);
+  useEffect(() => { setBody(""); setComposerOpen(false); }, [caseId]);
 
   async function submit() {
     if (!body.trim() || model.commentSubmitting) return;
-    if (await model.addComment(body)) setBody("");
+    if (await model.addComment(body)) { setBody(""); setComposerOpen(false); }
   }
 
   function keyboardSubmit(event: KeyboardEvent<HTMLDivElement>) {
@@ -47,34 +48,41 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
     </div>;
   } else {
     content = <>
-      {model.canComment && <div className={css.commentComposer} onKeyDown={keyboardSubmit}
-        aria-invalid={Boolean(model.commentFailure)}
-        aria-describedby={model.commentFailure ? `case-comment-error-${caseId}` : undefined}>
-        <span className={css.composerLabel}>{ru ? "Новый комментарий" : "New comment"}</span>
-        <MarkdownField
-          allowAttachments={false}
-          value={body}
-          label={ru ? "Текст комментария" : "Comment text"}
-          compact
-          autoFocus={false}
-          onChange={(value) => setBody(value.slice(0, 10_000))}
-        />
-        {model.commentFailure && <span
-          id={`case-comment-error-${caseId}`} className={css.inlineError} role="alert"
-        ><AlertCircle size={13} />{commentFailureLabel(locale, model.commentFailure)}</span>}
-        <div className={css.composerFooter}>
-          <span>{ru ? "Ctrl/⌘ + Enter — отправить" : "Ctrl/⌘ + Enter to post"}</span>
-          <button type="button" disabled={!body.trim() || model.commentSubmitting} onClick={() => { void submit(); }}>
-            <Send size={13} />
-            {model.commentSubmitting
-              ? (ru ? "Отправка…" : "Posting…")
-              : model.commentFailure ? (ru ? "Повторить" : "Retry")
-              : (ru ? "Отправить" : "Post")}
+      {model.canComment && (!composerOpen
+        ? <button type="button" className={css.commentPrompt} onClick={() => setComposerOpen(true)}>
+            <MessageSquare size={14} />{ru ? "Написать комментарий…" : "Write a comment…"}
           </button>
-        </div>
-      </div>}
+        : <div className={css.commentComposer} onKeyDown={keyboardSubmit}
+            aria-invalid={Boolean(model.commentFailure)}
+            aria-describedby={model.commentFailure ? `case-comment-error-${caseId}` : undefined}>
+            <MarkdownField
+              allowAttachments={false}
+              value={body}
+              label={ru ? "Текст комментария" : "Comment text"}
+              compact
+              autoFocus
+              onChange={(value) => setBody(value.slice(0, 10_000))}
+            />
+            {model.commentFailure && <span
+              id={`case-comment-error-${caseId}`} className={css.inlineError} role="alert"
+            ><AlertCircle size={13} />{commentFailureLabel(locale, model.commentFailure)}</span>}
+            <div className={css.composerFooter}>
+              <span>{ru ? "Ctrl/⌘ + Enter — отправить" : "Ctrl/⌘ + Enter to post"}</span>
+              <div>
+                <button type="button" className={css.cancelComment} disabled={model.commentSubmitting}
+                  onClick={() => { setBody(""); setComposerOpen(false); }}>{ru ? "Отмена" : "Cancel"}</button>
+                <button type="button" disabled={!body.trim() || model.commentSubmitting} onClick={() => { void submit(); }}>
+                  <Send size={13} />
+                  {model.commentSubmitting
+                    ? (ru ? "Отправка…" : "Posting…")
+                    : model.commentFailure ? (ru ? "Повторить" : "Retry")
+                    : (ru ? "Отправить" : "Post")}
+                </button>
+              </div>
+            </div>
+          </div>)}
       {model.comments.items.length === 0
-        ? <Empty icon={<MessageSquare size={22} />} text={ru ? "Комментариев пока нет" : "No comments yet"} />
+        ? <div className={css.commentsEmpty}>{ru ? "Комментариев пока нет" : "No comments yet"}</div>
         : model.comments.items.map((comment) => <article className={css.comment} key={comment.id}>
             <span aria-hidden="true">{activityActorLabel(comment.author.displayName).slice(0, 1).toUpperCase()}</span>
             <div>
@@ -106,7 +114,6 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
     <header className={css.commentsHeading}>
       <MessageSquare size={15} />
       <h3 id={`case-comments-${caseId}`}>{ru ? "Комментарии" : "Comments"}</h3>
-      {model.comments.status === "ready" && <span>{model.comments.items.length}</span>}
     </header>
     {content}
   </section>;

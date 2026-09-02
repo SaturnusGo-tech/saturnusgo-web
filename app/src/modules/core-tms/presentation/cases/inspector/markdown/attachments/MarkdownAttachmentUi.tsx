@@ -1,6 +1,5 @@
 "use client";
 
-import { ButtonWithTooltip } from "@mdxeditor/editor";
 import { FileText, Film, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PendingCaseAttachment } from "../../../../../application/evidence/case/pendingCaseAttachment";
@@ -17,10 +16,10 @@ export function MarkdownAttachmentButton(props: {
     ? "Добавить изображение, видео или файл"
     : "Attach image, video, or file";
   return <>
-    <ButtonWithTooltip title={label} type="button" disabled={props.disabled}
+    <button className={css.attachmentButton} type="button" disabled={props.disabled}
       aria-label={label} onClick={() => inputRef.current?.click()}>
       <Paperclip size={15} />
-    </ButtonWithTooltip>
+    </button>
     <input ref={inputRef} className={css.hiddenFileInput} tabIndex={-1}
       type="file" multiple
       onChange={(event) => {
