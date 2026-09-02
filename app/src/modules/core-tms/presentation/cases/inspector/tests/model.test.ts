@@ -82,6 +82,11 @@ test("restoreInspectorSection only rolls back the active section", () => {
   assert.equal(details.ownerIdentityId, "qa-1");
   assert.deepEqual(details.tags, ["smoke"]);
   assert.equal(details.title, "Keep changed title");
+  const properties = restoreInspectorSection({ ...changed, lifecycle: "deprecated", priority: "low", type: "checklist", estimatedMinutes: 120, steps: [], checklist: [{ id: "item-1", order: 1, text: "Changed", required: true }] }, revision, "properties");
+  assert.deepEqual(
+    [properties.lifecycle, properties.priority, properties.type, properties.estimatedMinutes, properties.steps[0].action, properties.checklist],
+    ["ready", "high", "manual", 5, "Pay", []],
+  );
 });
 
 test("tab keyboard navigation wraps and supports boundary keys", () => {
@@ -109,7 +114,7 @@ test("create mode starts in General and initializes its first local editor", () 
 
 test("create mode exposes every section in the single inspector form", () => {
   const sections = [
-    "description", "component", "preconditions", "details", "steps",
+    "description", "component", "properties", "preconditions", "details", "steps",
   ] as const;
   for (const section of sections) {
     assert.equal(isInspectorSectionEditing("create", "description", section), true);

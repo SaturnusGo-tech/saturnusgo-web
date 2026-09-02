@@ -1,8 +1,8 @@
 import {
   Archive, Check, Copy, Files, Link2, Maximize2, Minimize2,
-  Play, RotateCcw, SlidersHorizontal, X,
+  MoreHorizontal, Play, RotateCcw, X,
 } from "lucide-react";
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { buildCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
@@ -14,10 +14,7 @@ type Props = {
   testCase?: TestCaseSummary;
   creating: boolean;
   editorOpen: boolean;
-  submitting?: boolean;
   fullscreen: boolean;
-  metaEditButton: RefObject<HTMLButtonElement | null>;
-  onEditMetadata: () => void;
   onRunCase: () => void;
   onToggleFullscreen: () => void;
   onClone: () => void;
@@ -27,9 +24,23 @@ type Props = {
 
 export function CaseDetailHeaderActions(props: Props) {
   const [copied, setCopied] = useState<"key" | "link" | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRoot = useRef<HTMLDivElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const ru = props.locale === "ru";
   const item = props.testCase;
-  useEffect(() => setCopied(null), [item?.id]);
+  useEffect(() => {
+    setCopied(null);
+    setMenuOpen(false);
+  }, [item?.id]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!menuRoot.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, [menuOpen]);
 
   async function copy(value: string, kind: "key" | "link") {
     try {
@@ -79,12 +90,25 @@ export function CaseDetailHeaderActions(props: Props) {
       {!props.creating && <button type="button" disabled={props.editorOpen}
         className={inspector.iconButton} onClick={props.onRunCase}
         aria-label={ru ? "Запустить кейс" : "Run case"}><Play size={14} /></button>}
-      {!props.creating && <button ref={props.metaEditButton} type="button" disabled={props.submitting}
-        className={inspector.iconButton} onClick={props.onEditMetadata}
-        aria-label={ru ? "Изменить свойства" : "Edit properties"}><SlidersHorizontal size={14} /></button>}
-      {!props.creating && <button type="button" disabled={props.editorOpen}
-        className={inspector.iconButton} onClick={props.onClone}
-        aria-label={ru ? "Клонировать" : "Clone"}><Files size={14} /></button>}
+      {!props.creating && <div ref={menuRoot} className={inspector.headerActionMenuRoot}
+        onKeyDown={(event) => {
+          if (event.key !== "Escape" || !menuOpen) return;
+          event.preventDefault();
+          event.stopPropagation();
+          setMenuOpen(false);
+          menuButton.current?.focus();
+        }}>
+        <button ref={menuButton} type="button" disabled={props.editorOpen}
+          className={inspector.iconButton} aria-haspopup="menu" aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={ru ? "Другие действия" : "More actions"}><MoreHorizontal size={15} /></button>
+        {menuOpen && <div role="menu" className={inspector.headerActionMenu}>
+          <button type="button" role="menuitem" onClick={() => {
+            setMenuOpen(false);
+            props.onClone();
+          }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>
+        </div>}
+      </div>}
       {!props.creating && <button type="button" disabled={props.editorOpen}
         className={inspector.iconButton} onClick={props.onArchive}
         aria-label={item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}>

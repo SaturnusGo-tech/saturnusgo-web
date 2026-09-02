@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
+import { CaseMetadataControls } from "../detail/metadata/CaseMetadataControls";
 import { InspectorDetails } from "./details/InspectorDetails";
 import { useCaseAttachmentDraft } from "./attachments/CaseAttachmentDraftContext";
 import { CaseCreationSections } from "./creation/CaseCreationSections";
@@ -12,12 +13,10 @@ import type { CaseInspectorEditor, InspectorSection } from "./model";
 import { copyInspectorRevision, isInspectorSectionEditing, restoreInspectorSection } from "./model";
 import css from "./caseInspector.module.css";
 type Props = {
-  locale: TmsLocale;
-  revision: TestCaseRevision;
-  editor?: CaseInspectorEditor;
+  locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; editor?: CaseInspectorEditor;
   onRequestEdit: () => void;
 };
-export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }: Props) {
+export function CaseInspectorContent({ locale, revision, archived, editor, onRequestEdit }: Props) {
   const ru = locale === "ru";
   const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
@@ -128,6 +127,21 @@ export function CaseInspectorContent({ locale, revision, editor, onRequestEdit }
             {localizedComponentLabel(locale, value.component)
               || (ru ? "Не указана" : "Not specified")}
           </p>}
+    </InspectorSectionView>
+    <InspectorSectionView
+      title={ru ? "Свойства" : "Properties"}
+      editLabel={ru ? "Изменить свойства" : "Edit properties"}
+      {...controls("properties")}
+    >
+      <CaseMetadataControls
+        locale={locale}
+        revision={value}
+        archived={archived}
+        editing={sectionEditing("properties")}
+        autoFocus={!creating}
+        showLabels
+        onChange={editor?.onChange}
+      />
     </InspectorSectionView>
     <InspectorSectionView
       title={ru ? "Предусловия" : "Preconditions"}

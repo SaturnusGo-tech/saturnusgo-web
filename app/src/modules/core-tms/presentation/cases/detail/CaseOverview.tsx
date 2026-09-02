@@ -13,6 +13,7 @@ export function CaseOverview({
   testCaseId,
   languageTag,
   collaboration,
+  archived,
 }: {
   locale: TmsLocale;
   revision: TestCaseRevision;
@@ -21,11 +22,13 @@ export function CaseOverview({
   testCaseId?: string;
   languageTag: string;
   collaboration: CaseCollaborationViewModel;
+  archived?: boolean;
 }) {
   return <>
     <CaseInspectorContent
       locale={locale}
       revision={revision}
+      archived={archived}
       editor={editor}
       onRequestEdit={onRequestEdit}
     />

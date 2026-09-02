@@ -1,19 +1,21 @@
-.controls { display: flex; flex-wrap: wrap; gap: 5px; }
-.labelledControl { min-width: 0; display: grid; flex: 1 1 112px; gap: 4px; }
-.labelledControl > span { color: var(--cases-muted); font-size: 10px; font-weight: 500; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.readControls { align-items: end; }
+.labelledControl { min-width: 0; display: grid; flex: 1 1 124px; gap: 5px; }
+.labelledControl > span { color: var(--cases-muted); font-size: 11px; font-weight: 500; }
 .labelledControl .select { width: 100%; }
-.select { position: relative; min-width: 112px; }
+.labelledControl > :global(span[class*="chip"]) { min-height: 32px; justify-content: flex-start; padding-inline: 9px; font-size: 11px; }
+.select { position: relative; min-width: 124px; }
 .select:focus-within { z-index: 70; }
 .select:last-child { min-width: 104px; }
 
 .trigger {
   width: 100%;
-  height: 26px;
+  height: 34px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 13px;
   align-items: center;
   gap: 4px;
-  padding: 2px 6px 2px 8px;
+  padding: 3px 8px 3px 10px;
   color: var(--cases-text);
   background: var(--cases-control);
   border: 1px solid var(--cases-control-border);
@@ -31,7 +33,7 @@
   align-items: center;
   gap: 5px;
   overflow: hidden;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 16px;
   text-overflow: ellipsis;

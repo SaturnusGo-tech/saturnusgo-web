@@ -49,7 +49,7 @@ test("case Markdown inputs attach or paste private files from the conventional l
   assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
   assert.match(attachmentUi, /type="file" multiple/);
   assert.doesNotMatch(attachmentUi, /accept=/);
-  assert.match(source, /onPaste=\{\(event\)/);
+  assert.match(source, /onPasteCapture=\{\(event\)/);
   assert.match(source, /filesFromClipboard\(event\.clipboardData\)/);
   assert.match(source, /event\.preventDefault\(\);[\s\S]*addFiles\(files\)/);
   assert.match(content, /attachmentKey="description"/);
@@ -58,6 +58,16 @@ test("case Markdown inputs attach or paste private files from the conventional l
   assert.match(steps, /attachmentKey=\{`checklist:\$\{item\.id\}`\}/);
   assert.match(steps, /attachmentStepId=\{step\.id\}/);
   assert.match(comments, /allowAttachments=\{false\}/);
+});
+
+test("Markdown link editing uses a themed modal layer with clear fields", () => {
+  assert.match(initialized, /overlayContainer=\{overlayContainer \?\? undefined\}/);
+  assert.match(initialized, /createLink\.text[\s\S]*Текст ссылки/);
+  assert.match(initialized, /dialogControls\.save[\s\S]*Сохранить/);
+  assert.match(styles, /\.wysiwyg:has\(form\)/);
+  assert.match(styles, /place-items: center/);
+  assert.match(styles, /\[role="dialog"\][\s\S]*background: var\(--cases-deep\)/);
+  assert.match(styles, /\[role="dialog"\] input[\s\S]*min-height: 38px/);
 });
 
 test("Markdown inputs omit the disruptive block-type selector", () => {
@@ -69,6 +79,9 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.match(detailActions, /Копировать ID/);
   assert.match(detailActions, /Копировать ссылку/);
   assert.match(detailActions, /На весь экран/);
+  assert.match(detailActions, /MoreHorizontal/);
+  assert.match(detailActions, /Создать копию/);
+  assert.doesNotMatch(detailActions, /aria-label=\{ru \? "Клонировать"|SlidersHorizontal/);
   assert.doesNotMatch(detailPanel, /testCase\??\.folderPath/);
   assert.doesNotMatch(detailPanel, /className=\{inspector\.titleMark\}/);
   assert.match(comments, /!composerOpen[\s\S]*commentPrompt/);
@@ -76,6 +89,15 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.doesNotMatch(comments, /comments\.items\.length\}/);
   assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--cases-muted\) !important/);
   assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--cases-on-primary\)/);
+});
+
+test("case properties live in their own section before Preconditions", () => {
+  const properties = content.indexOf('title={ru ? "Свойства" : "Properties"}');
+  const preconditions = content.indexOf('title={ru ? "Предусловия" : "Preconditions"}');
+  assert.ok(properties > 0 && properties < preconditions);
+  assert.match(content, /controls\("properties"\)[\s\S]*<CaseMetadataControls/);
+  assert.match(creation, /number="3" title=\{ru \? "Свойства"/);
+  assert.match(creation, /number="4" title=\{ru \? "Условия и шаги"/);
 });
 
 test("fullscreen inspector content keeps the normal full-width layout", () => {

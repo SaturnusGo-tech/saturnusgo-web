@@ -65,6 +65,15 @@ const RU_TRANSLATIONS: Record<string, string> = {
   "toolbar.checkList": "Чек-лист",
   "toolbar.toggleGroup": "Списки",
   "toolbar.link": "Добавить ссылку",
+  "createLink.urlPlaceholder": "Вставьте адрес ссылки",
+  "createLink.text": "Текст ссылки",
+  "createLink.textTooltip": "Текст, который будет виден в документе",
+  "createLink.title": "Подсказка",
+  "createLink.titleTooltip": "Необязательная подсказка при наведении",
+  "createLink.saveTooltip": "Сохранить ссылку",
+  "createLink.cancelTooltip": "Отменить добавление ссылки",
+  "dialogControls.save": "Сохранить",
+  "dialogControls.cancel": "Отмена",
 };
 
 function editorTranslation(
@@ -82,6 +91,8 @@ function editorTranslation(
 
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
   const editorRef = useRef<MDXEditorMethods>(null);
+  const overlayAnchor = useRef<HTMLDivElement>(null);
+  const [overlayContainer, setOverlayContainer] = useState<HTMLElement | null>(null);
   const initialMarkdown = stripRawHtml(props.markdown);
   const lastEmitted = useRef(initialMarkdown);
   const [problem, setProblem] = useState("");
@@ -116,6 +127,12 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   }, [props.markdown, props.onChange]);
 
   useEffect(() => {
+    setOverlayContainer(overlayAnchor.current?.closest<HTMLElement>(
+      "[data-case-inspector-overlay-root]",
+    ) ?? document.body);
+  }, []);
+
+  useEffect(() => {
     const next = stripRawHtml(props.markdown);
     if (!editorRef.current || next === lastEmitted.current) return;
     lastEmitted.current = next;
@@ -123,8 +140,10 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   }, [props.markdown]);
 
   return <>
+    <div ref={overlayAnchor} className={css.editorOverlayHost} />
     <MDXEditor
       ref={editorRef}
+      overlayContainer={overlayContainer ?? undefined}
       markdown={initialMarkdown}
       className={`${css.wysiwyg} ${props.compact ? css.compact : ""}`}
       contentEditableClassName={css.editorContent}

@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { CaseMetadataControls } from "../../detail/metadata/CaseMetadataControls";
 import type { CaseInspectorEditor } from "../model";
 import { InspectorDetails } from "../details/InspectorDetails";
 import { MarkdownField } from "../markdown/MarkdownField";
@@ -51,7 +52,11 @@ export function CaseCreationSections({ locale, revision, editor }: Props) {
       </div>
     </CreationSection>
 
-    <CreationSection number="3" title={ru ? "Условия и шаги" : "Conditions and steps"} hint={ru ? "Подготовка и последовательность проверки" : "Setup and verification flow"} tone="lavender">
+    <CreationSection number="3" title={ru ? "Свойства" : "Properties"} hint={ru ? "Статус, приоритет, тип и оценка" : "Status, priority, type, and estimate"} tone="blue">
+      <CaseMetadataControls locale={locale} revision={revision} editing showLabels onChange={editor.onChange} />
+    </CreationSection>
+
+    <CreationSection number="4" title={ru ? "Условия и шаги" : "Conditions and steps"} hint={ru ? "Подготовка и последовательность проверки" : "Setup and verification flow"} tone="lavender">
       <div className={css.creationField}>
         <span>{ru ? "Предусловия" : "Preconditions"}</span>
         <MarkdownField attachmentKey="preconditions" value={revision.preconditions} label={ru ? "Предусловия" : "Preconditions"} onChange={(preconditions) => patch({ preconditions })} />
@@ -64,7 +69,7 @@ export function CaseCreationSections({ locale, revision, editor }: Props) {
 
     <details className={`${css.creationSection} ${css.creationOptional}`}>
       <summary>
-        <span className={css.creationNumber}>4</span>
+        <span className={css.creationNumber}>5</span>
         <span><strong>{ru ? "Дополнительно" : "Additional details"}</strong><small>{ru ? "Необязательно" : "Optional"}</small></span>
         <ChevronDown size={15} aria-hidden="true" />
       </summary>

@@ -4,7 +4,7 @@ import type { PendingCaseAttachment } from "../../../application/evidence/case/p
 import { revisionTagsAreValid } from "../../../helpers/cases/caseRevision";
 
 export type InspectorSection =
-  | "description" | "component" | "preconditions" | "details" | "steps";
+  | "description" | "component" | "properties" | "preconditions" | "details" | "steps";
 export type InspectorTabId = "overview" | "files" | "activity";
 export type InspectorTabKey = "ArrowLeft" | "ArrowRight" | "Home" | "End";
 export type InspectorRevisionProblem =
@@ -101,6 +101,15 @@ export function restoreInspectorSection(
 ): TestCaseRevision {
   if (section === "description") return { ...current, description: snapshot.description };
   if (section === "component") return { ...current, component: snapshot.component };
+  if (section === "properties") return {
+    ...current,
+    lifecycle: snapshot.lifecycle,
+    priority: snapshot.priority,
+    type: snapshot.type,
+    estimatedMinutes: snapshot.estimatedMinutes,
+    steps: snapshot.steps.map((step) => ({ ...step })),
+    checklist: snapshot.checklist.map((item) => ({ ...item })),
+  };
   if (section === "preconditions") return { ...current, preconditions: snapshot.preconditions };
   if (section === "details") return {
     ...current,

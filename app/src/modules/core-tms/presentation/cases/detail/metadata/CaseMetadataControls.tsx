@@ -35,12 +35,17 @@ export function CaseMetadataControls(props: Props) {
   const [pendingType, setPendingType] = useState<TestCaseRevision["type"] | null>(null);
   const ru = props.locale === "ru";
   if (!props.editing || !props.onChange) {
-    return <>
-      <LifecycleBadge locale={props.locale} lifecycle={props.revision.lifecycle} archived={props.archived} />
-      <PriorityBadge locale={props.locale} priority={props.revision.priority} />
-      <TypeBadge locale={props.locale} type={props.revision.type} />
-      <EstimateBadge locale={props.locale} minutes={props.revision.estimatedMinutes} />
-    </>;
+    const badges = [
+      [ru ? "Статус" : "Status", <LifecycleBadge key="lifecycle" locale={props.locale} lifecycle={props.revision.lifecycle} archived={props.archived} />],
+      [ru ? "Приоритет" : "Priority", <PriorityBadge key="priority" locale={props.locale} priority={props.revision.priority} />],
+      [ru ? "Тип" : "Type", <TypeBadge key="type" locale={props.locale} type={props.revision.type} />],
+      [ru ? "Оценка" : "Estimate", <EstimateBadge key="estimate" locale={props.locale} minutes={props.revision.estimatedMinutes} />],
+    ] as const;
+    return <div className={`${styles.controls} ${styles.readControls}`}>
+      {badges.map(([label, badge]) => props.showLabels
+        ? <div className={styles.labelledControl} key={label}><span>{label}</span>{badge}</div>
+        : badge)}
+    </div>;
   }
 
   const lifecycle: Array<MetadataOption<TestCaseRevision["lifecycle"]>> = [

@@ -9,7 +9,6 @@ import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttach
 import type { PendingCaseAttachment } from "../../../application/evidence/case/pendingCaseAttachment";
 import { CaseOverview } from "./CaseOverview";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
-import { CaseMetadataControls } from "./metadata/CaseMetadataControls";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
 import type { CaseCollaborationViewModel } from "../collaboration/model";
@@ -40,13 +39,12 @@ export type CaseDetailPanelProps = {
 export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const [tab, setTab] = useState<DetailTab>("overview");
   const [files, setFiles] = useState<PendingCaseAttachment[]>([]);
-  const [headerEditing, setHeaderEditing] = useState<"meta" | "title" | null>(null);
+  const [headerEditing, setHeaderEditing] = useState<"title" | null>(null);
   const formId = useId();
   const tabsId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
-  const metaEditButton = useRef<HTMLButtonElement>(null);
   const titleEditButton = useRef<HTMLButtonElement>(null);
-  const headerReturnFocus = useRef<"meta" | "title" | null>(null);
+  const headerReturnFocus = useRef<"title" | null>(null);
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
   const editorOpen = Boolean(props.editor);
@@ -68,14 +66,13 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     const returnTarget = headerReturnFocus.current;
     headerReturnFocus.current = null;
     const frame = requestAnimationFrame(() => {
-      const trigger = returnTarget === "meta" ? metaEditButton.current
-        : returnTarget === "title" ? titleEditButton.current : null;
+      const trigger = returnTarget === "title" ? titleEditButton.current : null;
       (trigger ?? panelRef.current)?.focus();
     });
     return () => cancelAnimationFrame(frame);
   }, [editorOpen]);
 
-  function beginHeaderEdit(section: "meta" | "title") {
+  function beginHeaderEdit(section: "title") {
     headerReturnFocus.current = section;
     setHeaderEditing(section);
     if (!props.editor) props.onEdit();
@@ -105,6 +102,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
 
   return <div
     ref={panelRef}
+    data-case-inspector-overlay-root
     tabIndex={-1}
     className={`${styles.detailPanelInner} ${inspector.shell} ${creating ? inspector.creatingShell : ""}`}
     onKeyDown={(event) => {
@@ -120,26 +118,14 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         testCase={props.testCase}
         creating={creating}
         editorOpen={editorOpen}
-        submitting={props.editor?.submitting}
         fullscreen={props.fullscreen}
-        metaEditButton={metaEditButton}
-        onEditMetadata={() => beginHeaderEdit("meta")}
         onRunCase={props.onRunCase}
         onToggleFullscreen={props.onToggleFullscreen}
         onClone={props.onClone}
         onArchive={props.onArchive}
         onClose={props.onClose}
       />
-      {(creating || headerEditing === "meta" || readyDefects > 0) && <div className={inspector.metaRow}>
-        {(creating || headerEditing === "meta") && <CaseMetadataControls
-            locale={props.locale}
-            revision={revision}
-            archived={Boolean(props.testCase?.archivedAt)}
-            editing={Boolean(props.editor)}
-            autoFocus={headerEditing === "meta"}
-            showLabels={creating}
-            onChange={props.editor?.onChange}
-          />}
+      {readyDefects > 0 && <div className={inspector.metaRow}>
         {readyDefects > 0 && <span className={inspector.retestBadge} role="status">{ru ? "Готово к тестированию" : "Ready for testing"} · {readyDefects}</span>}
       </div>}
       <div className={inspector.titleRow}>
@@ -153,7 +139,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     <CaseAttachmentDraftProvider locale={props.locale} enabled={Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} editor={props.editor} collaboration={props.collaboration} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={Boolean(props.testCase?.archivedAt)} editor={props.editor} collaboration={props.collaboration} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
       </div>
     </form>
     {creating && editorActions}
