@@ -4,18 +4,16 @@ import { LoaderCircle, Play, RefreshCw, Rows3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { DashboardAnalyticsQuery, DashboardDrill, DashboardDrillPage, DashboardDrillRow } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { localizedLabel } from "../../../localization/format/labels";
 import { Modal } from "../../common/modal/Modal";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import surface from "../dashboard.module.css";
 import { DashboardDrillFacets } from "./facets/DashboardDrillFacets";
 import { DashboardDrillTable } from "./table/DashboardDrillTable";
-import { activeDrillTab, dashboardFilterValues, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab, type DashboardLocalFilters } from "./dashboard-drill-navigation";
+import { activeDrillTab, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab, type DashboardLocalFilters } from "./dashboard-drill-navigation";
 
 const EMPTY_FILTERS: DashboardLocalFilters = {
   query: "", project: "", type: "", component: "", status: "", priority: "",
 };
-const MIX_TONES = ["mixTeal", "mixPlum", "mixSand", "mixOlive", "mixCoral", "mixSlate"];
-
 type Props = {
   query: DashboardAnalyticsQuery;
   origin: DashboardDrill;
@@ -34,7 +32,7 @@ type Props = {
 };
 
 export function DashboardDrillInspector(props: Props) {
-  const { locale, t } = useTmsLocale();
+  const { t } = useTmsLocale();
   const [tab, setTab] = useState<DashboardDrillTab>(() => activeDrillTab(props.selected.filter));
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [sort, setSort] = useState("recent");
@@ -52,19 +50,6 @@ export function DashboardDrillInspector(props: Props) {
     for (const row of props.page?.rows ?? []) counts.set(row.project, (counts.get(row.project) ?? 0) + 1);
     return [...counts].sort((left, right) => right[1] - left[1]);
   }, [props.page?.rows]);
-  const filterLabel = (key: string) => ({
-    type: t("dashboard.filter.type"), tag: t("dashboard.filter.tag"),
-    coverage: t("dashboard.filter.coverage"), status: t("dashboard.filter.status"),
-    outcome: t("dashboard.filter.outcome"), itemStatus: t("dashboard.filter.itemStatus"),
-    severity: t("dashboard.filter.severity"), component: t("dashboard.filter.component"),
-    untagged: t("dashboard.filter.untagged"), activeOnly: t("dashboard.filter.activeOnly"),
-    componentEmpty: t("dashboard.filter.componentEmpty"),
-  })[key] ?? key;
-  const context = dashboardFilterValues(props.origin).map(({ key, value }) => {
-    if (key === "tag") return `#${value}`;
-    if (["untagged", "activeOnly", "componentEmpty"].includes(key)) return filterLabel(key);
-    return `${filterLabel(key)}: ${localizedLabel(locale, value)}`;
-  });
   const tabs: Array<{ id: DashboardDrillTab; label: string; drill?: DashboardDrill | null }> = [
     { id: "overview", label: t("dashboard.overview") },
     { id: "test_case", label: t("dashboard.testCases"), drill: relatedDashboardDrill(props.origin, "test_case") },
@@ -78,11 +63,9 @@ export function DashboardDrillInspector(props: Props) {
   };
   const activeEntity = tab === "overview" ? activeDrillTab(props.selected.filter) : tab;
 
-  return <Modal sheet title={props.origin.label} subtitle={`${t("dashboard.analyticsTitle")} / ${t(`dashboard.tab.${activeDrillTab(props.origin.filter)}`)}`}
+  return <Modal sheet title={props.origin.label} subtitle={`${props.scopeLabel} · ${t(`dashboard.period.${props.query.period}`)}`}
     onClose={props.onClose} panelClassName={surface.drillSheet}>
     <div className={surface.drillSheetToolbar}>
-      <div className={surface.humanFilters}><span>{props.scopeLabel}</span><span>{t(`dashboard.period.${props.query.period}`)}</span>
-        {context.map((label) => <span key={label}>{label}</span>)}</div>
       <div className={surface.drillActions}>
         {activeEntity === "test_case" && (props.selected.projectId ?? props.query.projectId) && rows.length > 0 && <button type="button" onClick={() => props.onCreateRun(rows.map((row) => row.id))}><Play size={14} />{t("dashboard.createRunFromLoaded")}</button>}
         <button type="button" className={surface.drillPrimaryAction} onClick={() => props.onOpenEntity(activeEntity, props.selected)}>{t(`dashboard.open.${activeEntity}`)}</button>
@@ -96,17 +79,15 @@ export function DashboardDrillInspector(props: Props) {
     <div className={surface.drillSheetBody}>
       <DashboardDrillFacets rows={props.page?.rows ?? []} value={filters} onChange={setFilters} />
       <main className={surface.drillResults}>
-        <section className={surface.loadedDistribution} aria-label={t("dashboard.loadedDistribution")}>
-          <header><div><h3>{t("dashboard.loadedDistribution")}</h3><p>{t("dashboard.loadedDistributionHint")}</p></div><strong>{props.page?.total ?? props.page?.rows.length ?? 0}</strong></header>
-          <div className={surface.mixBar}>{projects.map(([name, count], index) => <i key={name} className={surface[MIX_TONES[index % MIX_TONES.length]]} style={{ flexGrow: count }} title={`${name}: ${count}`} />)}</div>
-          <div className={surface.mixLegend}>{projects.slice(0, 6).map(([name, count], index) => <span key={name}><i className={surface[MIX_TONES[index % MIX_TONES.length]]} />{name}<b>{count}</b></span>)}</div>
-        </section>
         {tab === "overview" ? <section className={surface.drillOverview}>
-          <div><span>{t("dashboard.loadedRecords")}</span><strong>{props.page?.rows.length ?? 0}</strong></div>
+          <div><span>{t("dashboard.loadedRecords")}</span><strong>{props.page?.total ?? 0}</strong></div>
           <div><span>{t("dashboard.visibleAfterRefine")}</span><strong>{rows.length}</strong></div>
           <div><span>{t("dashboard.projectsRepresented")}</span><strong>{projects.length}</strong></div>
         </section> : <>
-          <div className={surface.resultsToolbar}><span><Rows3 size={14} />{t("dashboard.visibleRecords", { count: rows.length })}</span><label>{t("dashboard.sort")}<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">{t("dashboard.sortRecent")}</option><option value="title">{t("dashboard.sortTitle")}</option><option value="status">{t("dashboard.sortStatus")}</option></select></label></div>
+          <div className={surface.resultsToolbar}><span><Rows3 size={14} />{t("dashboard.visibleRecords", { count: rows.length })}</span><label>{t("dashboard.sort")}
+            <AnimatedSelect compact className={surface.sortSelect} label={t("dashboard.sort")} value={sort} onChange={setSort}
+              options={[{ value: "recent", label: t("dashboard.sortRecent") }, { value: "title", label: t("dashboard.sortTitle") }, { value: "status", label: t("dashboard.sortStatus") }]} />
+          </label></div>
           {props.error ? <div className={surface.drillState} role="alert"><strong>{t("dashboard.drillError")}</strong><button type="button" onClick={props.onRetry}><RefreshCw size={14} />{t("dashboard.retry")}</button></div>
             : props.loading && !props.page ? <div className={surface.drillState} role="status"><LoaderCircle className={surface.spin} size={21} /><span>{t("dashboard.drillLoading")}</span></div>
               : <DashboardDrillTable rows={rows} onOpenRow={props.onOpenRow} />}

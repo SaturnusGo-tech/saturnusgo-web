@@ -5,6 +5,8 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import type { DashboardDrill, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
+import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
+import { OverflowMarquee } from "../common/OverflowMarquee";
 import surface from "../dashboard.module.css";
 
 const TYPE_COLORS = ["var(--dash-sand)", "var(--dash-olive)", "var(--dash-plum)"];
@@ -12,6 +14,9 @@ const DIMENSION_COLORS = [
   "var(--dash-teal)", "var(--dash-plum)", "var(--dash-sand)",
   "var(--dash-olive)", "var(--dash-coral)", "var(--dash-slate)",
 ];
+const compactAxisLabel = (value: string, limit = 16) => value.length > limit
+  ? `${value.slice(0, limit - 1)}…`
+  : value;
 
 export function DashboardBreakdowns({
   snapshot,
@@ -39,12 +44,12 @@ export function DashboardBreakdowns({
   return (
     <div className={surface.breakdownGrid}>
       <section className={surface.chartPanel}>
-        <header className={surface.panelHeading}><div><h2>{t("dashboard.byType")}</h2><p>{t("dashboard.byTypeHint")}</p></div></header>
+        <header className={surface.panelHeading}><div><h2>{t("dashboard.byType")}</h2></div></header>
         <div className={surface.donutWrap}>
           <div className={surface.donutChart} role="img" aria-label={t("dashboard.byType")}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Tooltip contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }} />
+                <Tooltip content={<DashboardChartTooltip />} />
                 <Pie data={types} dataKey="value" nameKey="label" innerRadius="60%" outerRadius="86%" paddingAngle={2} stroke="var(--paper)" strokeWidth={2} onClick={(_, index) => onOpenDrill(types[index].drill)} isAnimationActive={!reduceMotion}>
                   {types.map((item) => <Cell key={item.key} fill={item.color} cursor="pointer" />)}
                 </Pie>
@@ -63,15 +68,16 @@ export function DashboardBreakdowns({
       </section>
 
       <section className={surface.chartPanel}>
-        <header className={surface.panelHeading}><div><h2>{t("dashboard.byTag")}</h2><p>{t("dashboard.byTagHint")}</p></div></header>
+        <header className={surface.panelHeading}><div><h2>{t("dashboard.byTag")}</h2></div></header>
         {tags.length ? <>
           <div className={surface.tagChart} role="img" aria-label={t("dashboard.byTag")}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={tags} layout="vertical" margin={{ top: 8, right: 24, bottom: 2, left: 5 }}>
                 <CartesianGrid stroke="var(--chart-grid)" horizontal={false} />
                 <XAxis type="number" domain={[0, tagMax]} allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
-                <YAxis type="category" dataKey="label" width={82} axisLine={false} tickLine={false} tick={{ fill: "var(--ink)", fontSize: 10 }} />
-                <Tooltip cursor={{ fill: "var(--control-hover)" }} contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }} />
+                <YAxis type="category" dataKey="label" width={104} axisLine={false} tickLine={false}
+                  tickFormatter={(value) => compactAxisLabel(String(value))} tick={{ fill: "var(--ink)", fontSize: 10 }} />
+                <Tooltip cursor={{ fill: "var(--control-hover)" }} content={<DashboardChartTooltip />} />
                 <Bar dataKey="value" name={t("dashboard.testCases")} radius={[0, 2, 2, 0]} maxBarSize={11} cursor="pointer" onClick={(_, index) => onOpenDrill(tags[index].drill)} isAnimationActive={!reduceMotion}>
                   {tags.map((item, index) => <Cell key={item.key} fill={DIMENSION_COLORS[index % DIMENSION_COLORS.length]} />)}
                 </Bar>
@@ -79,7 +85,9 @@ export function DashboardBreakdowns({
             </ResponsiveContainer>
           </div>
           <div className={`${surface.chartControls} ${surface.compactControls}`}>
-            {tags.map((item) => <button type="button" key={item.key} onClick={() => onOpenDrill(item.drill)}>#{item.label}<strong>{item.value}</strong></button>)}
+            {tags.map((item) => <button type="button" key={item.key} onClick={() => onOpenDrill(item.drill)}>
+              <OverflowMarquee className={surface.overflowMarquee} text={`#${item.label}`} /><strong>{item.value}</strong>
+            </button>)}
           </div>
         </> : <p className={surface.chartEmpty}>{t("dashboard.noTags")}</p>}
       </section>
@@ -91,8 +99,9 @@ export function DashboardBreakdowns({
             <BarChart data={coverage} layout="vertical" margin={{ top: 8, right: 26, bottom: 2, left: 5 }}>
               <CartesianGrid stroke="var(--chart-grid)" horizontal={false} />
               <XAxis type="number" domain={[0, 100]} tickFormatter={(value: number) => `${value}%`} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
-              <YAxis type="category" dataKey="label" width={110} axisLine={false} tickLine={false} tick={{ fill: "var(--ink)", fontSize: 10 }} />
-              <Tooltip formatter={(value) => [`${value}%`, t("dashboard.coverage")]} contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }} />
+              <YAxis type="category" dataKey="label" width={110} axisLine={false} tickLine={false}
+                tickFormatter={(value) => compactAxisLabel(String(value), 18)} tick={{ fill: "var(--ink)", fontSize: 10 }} />
+              <Tooltip content={<DashboardChartTooltip formatValue={(value) => `${value}%`} />} />
               <Bar dataKey="value" radius={[0, 2, 2, 0]} maxBarSize={14} cursor="pointer" onClick={(_, index) => onOpenDrill(coverage[index].covered)} isAnimationActive={!reduceMotion}>
                 {coverage.map((item, index) => <Cell key={item.key} fill={DIMENSION_COLORS[index % DIMENSION_COLORS.length]} />)}
               </Bar>
@@ -104,7 +113,8 @@ export function DashboardBreakdowns({
             <div className={surface.coverageActions} key={item.key}>
               <button type="button" onClick={() => onOpenDrill(item.covered)}>
                 <i aria-hidden="true" style={{ background: DIMENSION_COLORS[index % DIMENSION_COLORS.length] }} />
-                <span>{item.label}<small>{t("dashboard.coveredOfTotal", { covered: item.count, total: item.total })}</small></span>
+                <span className={surface.coverageLabel}><OverflowMarquee className={surface.overflowMarquee} text={item.label} />
+                  <small>{t("dashboard.coveredOfTotal", { covered: item.count, total: item.total })}</small></span>
                 <strong>{item.value}%</strong>
               </button>
               <button type="button" className={surface.coverageGap} onClick={() => onOpenDrill(item.uncovered)}

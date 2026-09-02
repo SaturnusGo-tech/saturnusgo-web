@@ -22,7 +22,7 @@ export const enViewMessages = {
   "dashboard.ledgerTitle": "Quality Operations Ledger",
   "dashboard.ledgerDescription": "A precise view of product quality and test operations.",
   "dashboard.last30Days": "Last 30 days",
-  "dashboard.updatedAt": "Updated {date}",
+  "dashboard.updatedAt": "Data as of {date}",
   "dashboard.summaryAria": "Current project quality summary",
   "dashboard.runsStarted": "Runs started",
   "dashboard.failures": "Failures",

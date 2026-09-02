@@ -6,6 +6,8 @@ import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, 
 import type { DashboardDrill, DashboardRunOutcome, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
+import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
 import surface from "../dashboard.module.css";
 
 const COLORS = {
@@ -27,6 +29,14 @@ export function DashboardTrendChart({
   const dateLabel = (value: string) => new Intl.DateTimeFormat(languageTag, {
     day: "numeric", month: "short", timeZone: "UTC",
   }).format(new Date(`${value}T00:00:00.000Z`));
+  const bucketLabel = (start: string, end: string) => {
+    const first = new Date(start);
+    const last = new Date(Math.max(Date.parse(end) - 1, Date.parse(start)));
+    const format = new Intl.DateTimeFormat(languageTag, { day: "numeric", month: "short", timeZone: "UTC" });
+    return last.getTime() - first.getTime() < 36 * 60 * 60 * 1000
+      ? format.format(first)
+      : `${format.format(first)} — ${format.format(last)}`;
+  };
   const launched: DashboardDrill = {
     id: "runs:launched", label: t("dashboard.launchedRuns"),
     filter: { entity: "run", basis: "launched" },
@@ -53,8 +63,11 @@ export function DashboardTrendChart({
     return point ? { ...drill, id: `${drill.id}:${point.start}`,
       window: { from: point.start, to: point.end } } : drill;
   };
-  const selectedBucket = bucketIndex === "all" || snapshot.trend[Number(bucketIndex)]
-    ? bucketIndex : "all";
+  const bucketOptions = [{ value: "all", label: t("dashboard.wholePeriod") }, ...snapshot.trend
+    .map((point, index) => ({ point, index }))
+    .filter(({ point }) => point.launched + point.passed + point.failed + point.blocked + point.incomplete + point.not_started + point.aborted > 0)
+    .map(({ point, index }) => ({ value: String(index), label: bucketLabel(point.start, point.end) }))];
+  const selectedBucket = bucketOptions.some((option) => option.value === bucketIndex) ? bucketIndex : "all";
   const selected = (drill: DashboardDrill) => selectedBucket === "all"
     ? drill : inBucket(drill, Number(selectedBucket));
   const hasPassRate = snapshot.trend.some((point) => point.passRate !== null);
@@ -81,10 +94,8 @@ export function DashboardTrendChart({
           </button>
         ))}
         <label className={surface.bucketPicker}><span>{t("dashboard.bucket")}</span>
-          <select value={selectedBucket} onChange={(event) => setBucketIndex(event.target.value)}>
-            <option value="all">{t("dashboard.wholePeriod")}</option>
-            {snapshot.trend.map((point, index) => <option key={point.start} value={index}>{dateLabel(point.day)}</option>)}
-          </select>
+          <AnimatedSelect compact className={surface.bucketSelect} label={t("dashboard.bucket")}
+            value={selectedBucket} onChange={setBucketIndex} options={bucketOptions} />
         </label>
       </div>
       {hasFlow ? (
@@ -95,11 +106,8 @@ export function DashboardTrendChart({
               <XAxis dataKey="day" axisLine={false} tickLine={false} minTickGap={30} tickFormatter={dateLabel} tick={{ fill: "var(--muted)", fontSize: 10 }} />
               <YAxis yAxisId="count" allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
               {hasPassRate && <YAxis yAxisId="rate" orientation="right" domain={[0, 100]} axisLine={false} tickLine={false} tickFormatter={(value: number) => `${value}%`} tick={{ fill: "var(--muted)", fontSize: 10 }} />}
-              <Tooltip
-                labelFormatter={(value) => dateLabel(String(value))}
-                contentStyle={{ color: "var(--ink)", background: "var(--control)", border: "1px solid var(--line-strong)", borderRadius: 3, fontSize: 11 }}
-                labelStyle={{ color: "var(--ink)" }} itemStyle={{ color: "var(--ink)" }}
-              />
+              <Tooltip content={<DashboardChartTooltip formatLabel={(value) => dateLabel(String(value))}
+                formatValue={(value, entry) => entry.dataKey === "passRate" ? `${value}%` : String(value)} />} />
               <Bar yAxisId="count" dataKey="launched" name={t("dashboard.launched")} fill={COLORS.launched} radius={[2, 2, 0, 0]} maxBarSize={10} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(launched, index))} isAnimationActive={!reduceMotion} />
               <Bar yAxisId="count" dataKey="passed" name={localizedLabel(locale, "passed")} stackId="outcomes" fill={COLORS.passed} maxBarSize={18} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(outcomeDrill("passed"), index))} isAnimationActive={!reduceMotion} />
               <Bar yAxisId="count" dataKey="failed" name={localizedLabel(locale, "failed")} stackId="outcomes" fill={COLORS.failed} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(outcomeDrill("failed"), index))} isAnimationActive={!reduceMotion} />

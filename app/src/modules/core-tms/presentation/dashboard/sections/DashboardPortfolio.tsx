@@ -1,6 +1,7 @@
-import { AlertTriangle, ChevronRight, Info } from "lucide-react";
+import { AlertTriangle, ChevronRight, Info, ShieldAlert } from "lucide-react";
 import type { DashboardDrill, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { OverflowMarquee } from "../common/OverflowMarquee";
 import surface from "../dashboard.module.css";
 
 export function DashboardPortfolio({
@@ -32,7 +33,8 @@ export function DashboardPortfolio({
           {snapshot.hotspots.map((row) => (
             <div className={surface.hotspotRow} role="row" key={row.id}>
               <div role="cell"><button type="button" className={surface.hotspotName} onClick={() => onOpenDrill(row.drills.cases)}>
-                <span><strong>{row.label}</strong>{row.projectLabel && row.kind === "component" && <small>{row.projectLabel}</small>}</span><ChevronRight size={14} aria-hidden="true" />
+                <span><OverflowMarquee className={surface.overflowMarquee} text={row.label} />
+                  {row.projectLabel && row.kind === "component" && <small>{row.projectLabel}</small>}</span><ChevronRight size={14} aria-hidden="true" />
               </button></div>
               <div role="cell">{row.passRate !== null && row.drills.passed ? <button type="button" className={surface.riskCell} onClick={() => onOpenDrill(row.drills.passed!)} aria-label={`${t("dashboard.passRate")}: ${row.passRate}%`}>
                 <progress value={row.passRate} max={100} /><strong>{row.passRate}%</strong>
@@ -46,7 +48,9 @@ export function DashboardPortfolio({
                 : <span className={surface.signalUnavailable} title={t("dashboard.unavailable")}>—</span>}</div>
               <div role="cell" className={surface.defectSignals}>
                 {row.drills.defects && <button type="button" onClick={() => onOpenDrill(row.drills.defects!)} aria-label={`${t("dashboard.openDefects")}: ${row.openDefects}`}>{row.openDefects}</button>}
-                {row.drills.criticalDefects && <button type="button" className={surface.criticalSignal} onClick={() => onOpenDrill(row.drills.criticalDefects!)} aria-label={`${t("dashboard.criticalDefects")}: ${row.criticalDefects}`}>C {row.criticalDefects}</button>}
+                {row.drills.criticalDefects && <button type="button" className={surface.criticalSignal} onClick={() => onOpenDrill(row.drills.criticalDefects!)} aria-label={`${t("dashboard.criticalDefects")}: ${row.criticalDefects}`}>
+                  <ShieldAlert size={11} aria-hidden="true" /><span>{row.criticalDefects}</span>
+                </button>}
               </div>
             </div>
           ))}

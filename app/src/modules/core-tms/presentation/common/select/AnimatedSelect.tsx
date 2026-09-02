@@ -12,11 +12,15 @@ export function AnimatedSelect({
   value,
   options,
   onChange,
+  className,
+  compact = false,
 }: {
   label: string;
   value: string;
   options: readonly AnimatedSelectOption[];
   onChange: (value: string) => void;
+  className?: string;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
@@ -49,11 +53,12 @@ export function AnimatedSelect({
   }
 
   return (
-    <div className={styles.root} ref={rootRef}>
+    <div className={className ? `${styles.root} ${className}` : styles.root} ref={rootRef}>
       <button
         ref={triggerRef}
-        className={styles.trigger}
+        className={`${styles.trigger} ${compact ? styles.compactTrigger : ""}`}
         type="button"
+        title={selected?.label}
         aria-label={label}
         aria-haspopup="listbox"
         aria-expanded={open}

@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, Bug, FileCheck2, Link2, LoaderCircle, PlayCircle, Plus, RefreshCw } from "lucide-react";
+import { BadgeCheck, Bug, FileCheck2, Link2, LoaderCircle, PlayCircle, RefreshCw } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { Bootstrap } from "../../../../core/tms/contracts/legacy-contract";
@@ -9,6 +9,7 @@ import type { DashboardAnalyticsSource, DashboardDrill, DashboardDrillRow, Dashb
 import { createHttpDashboardAnalyticsSource } from "../../dashboards/source/http-dashboard-analytics-source";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import styles from "../../tms.module.css";
+import { AnimatedSelect } from "../common/select/AnimatedSelect";
 import { DashboardBreakdowns } from "./charts/DashboardBreakdowns";
 import { DashboardTrendChart } from "./charts/DashboardTrendChart";
 import { useDashboardAnalytics } from "./controller/useDashboardAnalytics";
@@ -29,7 +30,7 @@ type DashboardViewProps = {
   analyticsSource?: DashboardAnalyticsSource;
 };
 
-export function DashboardView({ data, projectId, onCreate, onOpenEntity, onOpenRow,
+export function DashboardView({ data, projectId, onOpenEntity, onOpenRow,
   onCreateRun, serverAnalytics = false, analyticsSource }: DashboardViewProps) {
   const { languageTag, t } = useTmsLocale();
   const http = useTmsHttpClient();
@@ -58,7 +59,7 @@ export function DashboardView({ data, projectId, onCreate, onOpenEntity, onOpenR
   }
 
   const updatedAt = new Intl.DateTimeFormat(languageTag, {
-    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
   }).format(new Date(snapshot.generatedAt));
   const linkCoverage = snapshot.metrics.currentDefects
     ? Math.round((snapshot.metrics.linkedDefects / snapshot.metrics.currentDefects) * 100)
@@ -78,17 +79,18 @@ export function DashboardView({ data, projectId, onCreate, onOpenEntity, onOpenR
     <div className={`${styles.pageScroll} ${surface.page}`} aria-busy={analytics.summaryLoading}>
       <header className={surface.header}>
         <div className={surface.titleRow}>
-          <div><span className={surface.eyebrow}>{t("dashboard.analyticsEyebrow")}</span><h1>{t("dashboard.analyticsTitle")}</h1><p>{t("dashboard.analyticsDescription")}</p></div>
-          <button className={styles.primaryButton} type="button" onClick={onCreate}><Plus size={16} />{t("dashboard.create")}</button>
+          <div><h1>{t("dashboard.analyticsTitle")}</h1><p>{t("dashboard.analyticsDescription")}</p></div>
         </div>
         <div className={surface.filterBar}>
-          <label><span>{t("dashboard.scope")}</span><select value={workspaceScope ? "workspace" : "project"} onChange={(event) => setWorkspaceScope(event.target.value === "workspace")}>
-            <option value="project">{t("dashboard.currentProject")}: {currentProject}</option>
-            <option value="workspace">{t("dashboard.workspaceScope")}</option>
-          </select></label>
-          <label><span>{t("dashboard.period")}</span><select value={period} onChange={(event) => setPeriod(event.target.value as DashboardPeriod)}>
-            <option value="7d">{t("dashboard.period7")}</option><option value="30d">{t("dashboard.period30")}</option><option value="90d">{t("dashboard.period90")}</option>
-          </select></label>
+          <label><span>{t("dashboard.scope")}</span><AnimatedSelect compact className={surface.scopeSelect}
+            label={t("dashboard.scope")} value={workspaceScope ? "workspace" : "project"}
+            onChange={(value) => setWorkspaceScope(value === "workspace")} options={[
+              { value: "project", label: currentProject },
+              { value: "workspace", label: t("dashboard.workspaceScope") },
+            ]} /></label>
+          <label><span>{t("dashboard.period")}</span><AnimatedSelect compact className={surface.periodSelect}
+            label={t("dashboard.period")} value={period} onChange={(value) => setPeriod(value as DashboardPeriod)}
+            options={[{ value: "7d", label: t("dashboard.period7") }, { value: "30d", label: t("dashboard.period30") }, { value: "90d", label: t("dashboard.period90") }]} /></label>
           {analytics.summaryError && <span className={surface.syncError} role="alert">{t("dashboard.staleAnalytics")}</span>}
           <small>{t("dashboard.updatedAt", { date: updatedAt })}</small>
           <button type="button" className={surface.refreshButton} onClick={analytics.refresh} aria-label={t("dashboard.refresh")} title={t("dashboard.refresh")}>

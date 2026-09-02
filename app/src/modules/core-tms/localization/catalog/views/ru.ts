@@ -24,7 +24,7 @@ export const ruViewMessages = {
   "dashboard.ledgerTitle": "Реестр качества",
   "dashboard.ledgerDescription": "Точная картина качества продукта и процессов тестирования.",
   "dashboard.last30Days": "Последние 30 дней",
-  "dashboard.updatedAt": "Обновлено {date}",
+  "dashboard.updatedAt": "Данные на {date}",
   "dashboard.summaryAria": "Сводка качества текущего проекта",
   "dashboard.runsStarted": "Запущено прогонов",
   "dashboard.failures": "Провалы",
