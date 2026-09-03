@@ -460,6 +460,21 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Scenario hierarchy hotfix and shared-step persistence — local pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_0UMccb/Screenshot 2026-09-03 at 11.51.33 PM.png` for the exact TestOps step geometry; `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-c22b1afc-ff8d-4f82-bcb9-c1c3c9c8ac77.png` and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-84a3835a-6ab8-4601-8713-f548079914cd.png` for the reported Falcon detail/list failures.
+- Combined review input: `.design-qa/scenario-hotfix-2026-09-04/scenario-hotfix-comparison.png` places the supplied TestOps hierarchy beside the real Falcon editor state containing one regular step with three technical substeps and one embedded shared step.
+- Hierarchy and rhythm: the top-level action starts after an 18px disclosure rail and 25px number rail. Technical `1.1`–`1.3` rows begin at the main action origin and place their text another 50px inward. Sibling steps use a 3px rhythm; the old horizontal separators are removed.
+- Disclosure: regular steps and shared-step blocks expose native chevron buttons with localized accessible names. Collapsing a regular step keeps the main action visible and hides technical substeps, expected result, test data, and attachments.
+- Evidence: saved image and video attachments expose a disclosure control. Expanded media renders in a bounded 190×118 preview; several files remain reachable in one horizontal scroll strip, while the filename still opens the signed inline resource.
+- Shared-step editor: the scenario canvas is aligned 28px from the left content edge rather than centered in a 920px paper. The title and scenario inputs suppress inherited blue focus outlines/shadows and use only the existing neutral active text rule.
+- Priority: the listing priority column grows from 112px to 132px so the saturated `Критический` pill and icon fit without losing the final letter.
+- P0 persistence root cause: migration 0019 allowed empty host action/result values for a live `sharedStepId` in HTTP and domain validation, but the original 0003 PostgreSQL checks still rejected those placeholders. Migration `0020_shared_step_placeholders.sql` makes both checks conditional on a non-null shared reference while preserving the strict non-empty rule for regular steps.
+- Local browser states: `.design-qa/scenario-hotfix-2026-09-04/scenario-hotfix-local.png`, `.design-qa/scenario-hotfix-2026-09-04/scenario-reference-state-local.png`, and `.design-qa/scenario-hotfix-2026-09-04/shared-step-hotfix-local.png` cover nested editing, embedded shared content, disclosure controls, semantic metadata, and the left-aligned shared-step editor.
+- Verification: frontend TypeScript, 304-file architecture, focused scenario 8/8, adapters/UI 175/175, attachments 4/4, and optimized 61-page build passed. Backend TypeScript, migration verification for 20 ordered migrations, focused PostgreSQL migration/staging/shared-reference tests 11/11, full suite 291/291, build, architecture, OpenAPI, and zero-warning lint passed.
+
+final result: passed locally; production rollout pending
+
 ## Scenario density and shared-step editor correction — final local pass
 
 - Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Z5DKpn/Screenshot 2026-09-03 at 8.28.56 PM.png` for the compact TestOps scenario hierarchy, plus the two user-reported Falcon failure states at `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_KBPqBk/Screenshot 2026-09-03 at 11.10.53 PM.png` and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_tvvGFS/Screenshot 2026-09-03 at 11.11.12 PM.png`.

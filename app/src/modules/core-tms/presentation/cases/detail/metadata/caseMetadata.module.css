@@ -99,6 +99,7 @@
 }
 
 .chip {
+  flex: 0 0 auto;
   max-width: 100%;
   min-height: 23px;
   display: inline-flex;

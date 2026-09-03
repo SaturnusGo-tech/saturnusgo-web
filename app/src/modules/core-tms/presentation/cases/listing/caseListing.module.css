@@ -192,7 +192,7 @@
 .statusColumn { width: 92px; }
 .titleColumn { width: 270px; }
 .functionColumn { width: 180px; }
-.priorityColumn { width: 112px; }
+.priorityColumn { width: 132px; }
 .estimateColumn { width: 90px; }
 .selectionCell { padding-inline: 0 !important; transition: padding 180ms cubic-bezier(.2, .72, .3, 1); }
 .selectionMode .selectionCell { padding-inline: 9px 4px !important; }

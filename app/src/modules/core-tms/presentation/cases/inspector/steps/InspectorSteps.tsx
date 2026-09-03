@@ -9,14 +9,13 @@ import type { SharedStep, SharedStepSummary } from "../../../../shared-steps/mod
 import { canRemoveInspectorRow } from "../model";
 import {
   ScenarioAttachmentControls,
-  SavedScenarioAttachments,
   useScenarioAttachments,
 } from "./support/ScenarioAttachments";
 import { ScenarioStepEditor } from "./editor/ScenarioStepEditor";
 import { StepActionMenu } from "./menu/StepActionMenu";
 import { SharedStepBlock } from "./shared/SharedStepBlock";
 import { ScenarioTextInput } from "./editor/ScenarioTextInput";
-import { scenarioLineLabel, splitScenarioAction } from "./support/scenarioLines";
+import { ScenarioStepView } from "./viewer/ScenarioStepView";
 import {
   duplicateStepAfter, emptyScenarioStep, insertStepAfter, sharedScenarioStep,
 } from "./stepOperations";
@@ -91,25 +90,7 @@ export function InspectorSteps({
           editing={false} ru={ru} sharedSteps={sharedSteps}
           canRemove={false} onAdd={() => undefined} onInsertShared={() => undefined}
           onDuplicate={() => undefined} onRemove={() => undefined} />
-        : <article className={css.viewGroup} key={step.id}>
-        <div className={css.viewLines}>
-          {splitScenarioAction(step.action)
-            .filter((line, lineIndex) => lineIndex === 0 || line.trim())
-            .map((line, lineIndex) => <div className={css.viewLine} key={`${step.id}-${lineIndex}`}>
-              <span>{scenarioLineLabel(index + 1, lineIndex)}</span>
-              <p>{line || (ru ? "Действие не указано" : "No action")}</p>
-            </div>)}
-        </div>
-        {step.expectedResult && <div className={css.expectedBlock}>
-          <span className={css.expectedLabel}>{ru ? "Ожидаемый результат" : "Expected result"}</span>
-          <p className={css.viewCopy}>{step.expectedResult}</p>
-        </div>}
-        {step.testData && <div className={css.viewData}>
-          <span>{ru ? "Тестовые данные" : "Test data"}</span>
-          <p>{step.testData}</p>
-        </div>}
-        <SavedScenarioAttachments ids={step.attachmentIds} />
-      </article>)}
+        : <ScenarioStepView key={step.id} step={step} order={index + 1} ru={ru} />)}
     </div>;
   }
 

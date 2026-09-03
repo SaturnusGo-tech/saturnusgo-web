@@ -59,6 +59,6 @@ export function ScenarioAttachmentControls(props: DraftAttachmentsProps) {
 export function SavedScenarioAttachments({ ids }: { ids?: string[] }) {
   if (!ids || ids.length === 0) return null;
   return <div className={css.savedAttachments}>
-    {ids.map((id) => <AttachmentLink key={id} attachmentId={id} />)}
+    {ids.map((id) => <AttachmentLink key={id} attachmentId={id} previewable />)}
   </div>;
 }

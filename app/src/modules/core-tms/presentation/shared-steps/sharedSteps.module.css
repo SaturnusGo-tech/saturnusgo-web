@@ -68,10 +68,11 @@
 .titleField { min-width: 0; display: grid; gap: 3px; }
 .titleField span { color: var(--ss-muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
 .titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--ss-text); background: transparent; border: 0; border-bottom: 1px solid transparent; outline: 0; font: inherit; font-size: 18px; font-weight: 620; }
-.titleField input:focus { border-bottom-color: var(--ss-primary); }
+.titleField input:focus,
+.titleField input:focus-visible { border-bottom-color: var(--ss-control-line); outline: 0 !important; box-shadow: none !important; }
 .editorActions { display: flex; align-items: center; gap: 8px; }
-.editorScroll { min-height: 0; overflow: auto; padding: 24px clamp(20px, 5vw, 72px) 60px; background: var(--ss-bg); }
-.paper { width: min(920px, 100%); margin: 0 auto; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.editorScroll { min-height: 0; overflow: auto; padding: 24px 28px 60px; background: var(--ss-bg); }
+.paper { width: min(920px, 100%); margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .scenarioHeading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .scenarioHeading h2 { margin: 0; font-size: 15px; font-weight: 650; }
 .scenarioHeading span { min-width: 20px; padding: 2px 6px; color: var(--ss-muted); background: var(--ss-hover); border-radius: 999px; font-size: 10px; text-align: center; }

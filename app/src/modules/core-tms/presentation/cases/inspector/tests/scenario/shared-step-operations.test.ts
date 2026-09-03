@@ -39,7 +39,9 @@ test("duplicating a shared procedure creates a new case-step identity", () => {
 test("shared-step editing stays dense and does not expose nested shared procedures", () => {
   assert.match(sharedEditor, /allowSharedSteps=\{false\}/);
   assert.match(menu, /allowSharedSteps &&/);
-  assert.match(scenarioCss, /padding: 1px 0 7px/);
+  assert.match(scenarioCss, /padding: 1px 0 3px/);
+  assert.match(scenarioCss, /\.nestedLine \{[^}]*margin-left: 43px/s);
+  assert.doesNotMatch(scenarioCss, /\.viewGroup \+ \.viewGroup \{[^}]*border-top/s);
   assert.doesNotMatch(scenarioCss, /\.stepFooter/);
 });
 

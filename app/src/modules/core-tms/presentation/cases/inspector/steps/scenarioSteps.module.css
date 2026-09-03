@@ -8,14 +8,14 @@
 .viewGroup {
   position: relative;
   min-width: 0;
-  padding: 1px 0 7px;
+  padding: 1px 0 3px;
 }
 
 .stepMenu {
   position: absolute;
   z-index: 12;
-  top: 4px;
-  left: 2px;
+  top: 1px;
+  right: 2px;
   opacity: 0;
   transition: opacity 120ms ease;
 }
@@ -27,8 +27,7 @@
 
 .stepGroup + .stepGroup,
 .viewGroup + .viewGroup {
-  padding-top: 7px;
-  border-top: 1px solid var(--cases-row-border);
+  padding-top: 3px;
 }
 
 .actionLines,
@@ -41,9 +40,37 @@
 .viewLine {
   min-width: 0;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
   align-items: start;
-  gap: 3px;
+  gap: 0;
+}
+
+.primaryLine {
+  grid-template-columns: 18px 25px minmax(0, 1fr);
+}
+
+.nestedLine {
+  grid-template-columns: 50px minmax(0, 1fr);
+  margin-left: 43px;
+}
+
+.collapseButton {
+  width: 18px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--cases-faint);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.collapseButton:hover,
+.collapseButton:focus-visible {
+  color: var(--cases-strong);
+  background: var(--cases-hover);
+  outline: 0;
 }
 
 .lineNumber,
@@ -58,6 +85,12 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
   user-select: none;
+}
+
+.nestedLine > .lineNumber,
+.nestedLine > span {
+  justify-content: flex-start;
+  padding-right: 8px;
 }
 
 .lineInput,
@@ -96,8 +129,8 @@
 .lineInput:focus,
 .expectedInput:focus,
 .dataInput:focus {
-  background: color-mix(in srgb, var(--cases-hover) 68%, transparent);
-  border-bottom-color: color-mix(in srgb, var(--cases-primary) 60%, var(--cases-border));
+  background: transparent;
+  border-bottom-color: var(--cases-control-border);
   box-shadow: none !important;
   outline: 0 !important;
 }
@@ -146,8 +179,8 @@
   min-width: 0;
   display: grid;
   gap: 1px;
-  margin: 3px 0 0 43px;
-  padding: 4px 0 4px 11px;
+  margin: 2px 0 0 43px;
+  padding: 3px 0 3px 11px;
   border-left: 2px solid #278c7b;
 }
 
@@ -276,12 +309,17 @@
 
 .savedAttachments {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 5px;
   margin: 4px 0 0 54px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
 }
 
 .savedAttachments > span {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -352,9 +390,13 @@
 }
 
 @container case-inspector (max-width: 500px) {
-  .actionLine,
-  .viewLine {
-    grid-template-columns: 35px minmax(0, 1fr);
+  .primaryLine {
+    grid-template-columns: 16px 22px minmax(0, 1fr);
+  }
+
+  .nestedLine {
+    grid-template-columns: 44px minmax(0, 1fr);
+    margin-left: 38px;
   }
 
   .actionAttachmentRow,

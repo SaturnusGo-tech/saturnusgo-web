@@ -1,6 +1,7 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { useState, type KeyboardEvent } from "react";
 import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import {
@@ -35,6 +36,7 @@ type Props = {
 };
 
 export function ScenarioStepEditor(props: Props) {
+  const [collapsed, setCollapsed] = useState(false);
   const lines = splitScenarioAction(props.step.action);
   const actionAttachments = useScenarioAttachments({
     fieldKey: `step:${props.step.id}:action`,
@@ -82,7 +84,17 @@ export function ScenarioStepEditor(props: Props) {
       onAdd={props.onAddAfter} onInsertShared={props.onInsertShared}
       onDuplicate={props.onDuplicate} onRemove={props.onRemove} /></div>
     <div className={css.actionLines}>
-      {lines.map((line, lineIndex) => <div className={css.actionLine} key={`${props.step.id}-${lineIndex}`}>
+      {(collapsed ? lines.slice(0, 1) : lines).map((line, lineIndex) => <div
+        className={`${css.actionLine} ${lineIndex === 0 ? css.primaryLine : css.nestedLine}`}
+        key={`${props.step.id}-${lineIndex}`}>
+        {lineIndex === 0 && <button type="button" className={css.collapseButton}
+          aria-expanded={!collapsed}
+          aria-label={collapsed
+            ? (props.ru ? `Развернуть шаг ${props.order}` : `Expand step ${props.order}`)
+            : (props.ru ? `Свернуть шаг ${props.order}` : `Collapse step ${props.order}`)}
+          onClick={() => setCollapsed((value) => !value)}>
+          {collapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
+        </button>}
         <span className={css.lineNumber}>{scenarioLineLabel(props.order, lineIndex)}</span>
         <ScenarioTextInput
           id={`scenario-${props.step.id}-${lineIndex}`}
@@ -98,12 +110,12 @@ export function ScenarioStepEditor(props: Props) {
           onPaste={actionAttachments.paste}
         />
       </div>)}
-      <div className={css.actionAttachmentRow}>
+      {!collapsed && <div className={css.actionAttachmentRow}>
         <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />
-      </div>
+      </div>}
     </div>
 
-    <div className={css.expectedBlock}>
+    {!collapsed && <div className={css.expectedBlock}>
       <span className={css.expectedLabel}>{props.ru ? "Ожидаемый результат" : "Expected result"}</span>
       <ScenarioTextInput
         id={`scenario-${props.step.id}-expected`}
@@ -115,9 +127,9 @@ export function ScenarioStepEditor(props: Props) {
         onPaste={expectedAttachments.paste}
       />
       <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} />
-    </div>
+    </div>}
 
-    {(props.step.testData || dataAttachments.pending.length > 0) && <div className={css.optionalData}>
+    {!collapsed && (props.step.testData || dataAttachments.pending.length > 0) && <div className={css.optionalData}>
       <ScenarioTextInput
         value={props.step.testData ?? ""}
         label={`${props.ru ? "Тестовые данные шага" : "Test data for step"} ${props.order}`}
