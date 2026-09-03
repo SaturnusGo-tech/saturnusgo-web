@@ -460,6 +460,18 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Shared-step insertion menu guide separation — final production pass
+
+- Source visual truth: `.design-qa/shared-step-menu-2026-09-04/production-before.png` (1280×720, density 1, Russian locale, dark theme, fullscreen case editor, bottom `Добавить шаг` menu open). The shared-step purple guide entered the menu's rounded left edge because both started on the same horizontal coordinate.
+- Implementation: `.design-qa/shared-step-menu-2026-09-04/production-after.png` (1280×720, density 1, identical route, viewport, theme, content, and interaction state). The add-trigger menu now starts 8px to the right of its anchor; measured production geometry places the shared guide at x=135 and the menu at x=137, fully outside the popup surface.
+- Full-view comparison: `.design-qa/shared-step-menu-2026-09-04/production-comparison.png` (2560×720) preserves both complete states side by side. Focused comparison: `.design-qa/shared-step-menu-2026-09-04/menu-focused-comparison.png` (800×285) makes the corrected guide, rounded menu edge, `Общий шаг` label, and `тест 4` row directly readable.
+- P2 comparison history: before the fix, the 3px shared-step rail reached into the popup corner and visually cut the shared-step insertion area. The fix adds a scoped horizontal offset only to `data-trigger="add"`; per-step action menus, popup width, vertical placement, and scenario geometry remain unchanged. Post-fix evidence shows the complete label and shared-step row unobstructed.
+- Typography and copy: existing menu font sizes, weights, truncation, Russian strings, and item hierarchy are unchanged. Spacing and layout: only the 8px popup offset changed; border radius, row rhythm, and touch targets are preserved. Colors and tokens: the existing opaque Falcon menu surface, purple shared-step rail, borders, and shadow remain unchanged. Image quality: no raster, logo, or media assets participate in this control state.
+- Interaction and accessibility: the trigger still exposes `aria-haspopup`, `aria-expanded`, and the menu relationship; opening the menu does not insert or modify a step. The exact production interaction was exercised without saving case data. The Browser reported zero console errors and zero warnings.
+- Verification: focused shared-step tests passed 7/7; the full TMS adapter/UI suite passed 175/175; TypeScript, 305-file architecture, `git diff --check`, optimized build 61/61, and Pages export 60/60 passed. Frontend source `a088cfd12dd33b943348fcb52e0c1cf5b397b7d0` is served by Pages commit `dcfcf1e2`.
+
+final result: passed
+
 ## Scenario media and bounded step actions — local release pass
 
 - Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-9a3fb18e-3ecc-4350-adc0-0d2b897453b3.png` (1646×1466 px) for the reported menu collision, plus the official Atlassian Confluence media-resize reference captured at `.design-qa/media-attachments-2026-09-04/source-atlassian-resize.png` (1280×720 px).
