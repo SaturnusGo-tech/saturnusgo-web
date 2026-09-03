@@ -64,32 +64,17 @@ export function CaseDetailHeaderActions(props: Props) {
     <div className={inspector.caseIdentity}>
       <span className={inspector.caseKey}>{props.creating
         ? (ru ? "Новый тест-кейс" : "New test case")
-        : item?.key}</span>
-      {!props.creating && item && <>
-        <button type="button" className={inspector.iconButton}
-          aria-label={copied === "key" ? (ru ? "ID скопирован" : "ID copied") : (ru ? "Копировать ID" : "Copy ID")}
-          onClick={() => { void copy(item.key, "key"); }}>
-          {copied === "key" ? <Check size={13} /> : <Copy size={13} />}
-        </button>
-        <button type="button" className={inspector.iconButton}
-          aria-label={copied === "link" ? (ru ? "Ссылка скопирована" : "Link copied") : (ru ? "Копировать ссылку" : "Copy link")}
-          onClick={() => { void copy(buildCaseDeepLink(window.location.href, {
-            caseId: item.id, projectId: item.projectId,
-          }), "link"); }}>
-          {copied === "link" ? <Check size={13} /> : <Link2 size={13} />}
-        </button>
-      </>}
-      <button type="button" className={inspector.iconButton}
-        onClick={props.onToggleFullscreen}
-        aria-label={props.fullscreen ? (ru ? "Выйти из полного экрана" : "Exit full screen") : (ru ? "На весь экран" : "Open full screen")}
-        aria-pressed={props.fullscreen}>
-        {props.fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-      </button>
+        : (ru ? "Карточка тест-кейса" : "Test case")}</span>
     </div>
     <div className={inspector.headerActions}>
       {!props.creating && <button type="button" disabled={props.editorOpen}
-        className={inspector.iconButton} onClick={props.onRunCase}
-        aria-label={ru ? "Запустить кейс" : "Run case"}><Play size={14} /></button>}
+        className={inspector.headerTextButton} onClick={props.onRunCase}>
+        <Play size={14} />{ru ? "Запустить" : "Run"}</button>}
+      {!props.creating && <button type="button" disabled={props.editorOpen}
+        className={inspector.headerTextButton} onClick={props.onArchive}>
+        {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
+        {item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}
+      </button>}
       {!props.creating && <div ref={menuRoot} className={inspector.headerActionMenuRoot}
         onKeyDown={(event) => {
           if (event.key !== "Escape" || !menuOpen) return;
@@ -103,17 +88,22 @@ export function CaseDetailHeaderActions(props: Props) {
           onClick={() => setMenuOpen((open) => !open)}
           aria-label={ru ? "Другие действия" : "More actions"}><MoreHorizontal size={15} /></button>
         {menuOpen && <div role="menu" className={inspector.headerActionMenu}>
+          {item && <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); void copy(item.key, "key"); }}>
+            {copied === "key" ? <Check size={14} /> : <Copy size={14} />}{ru ? "Копировать ID" : "Copy ID"}
+          </button>}
+          {item && <button type="button" role="menuitem" onClick={() => {
+            setMenuOpen(false);
+            void copy(buildCaseDeepLink(window.location.href, { caseId: item.id, projectId: item.projectId }), "link");
+          }}>{copied === "link" ? <Check size={14} /> : <Link2 size={14} />}{ru ? "Копировать ссылку" : "Copy link"}</button>}
           <button type="button" role="menuitem" onClick={() => {
             setMenuOpen(false);
             props.onClone();
           }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>
         </div>}
       </div>}
-      {!props.creating && <button type="button" disabled={props.editorOpen}
-        className={inspector.iconButton} onClick={props.onArchive}
-        aria-label={item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}>
-        {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
-      </button>}
+      <button type="button" className={inspector.iconButton} onClick={props.onToggleFullscreen}
+        aria-label={props.fullscreen ? (ru ? "Выйти из полного экрана" : "Exit full screen") : (ru ? "На весь экран" : "Open full screen")}
+        aria-pressed={props.fullscreen}>{props.fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}</button>
       {props.onClose && <button type="button" className={inspector.iconButton}
         onClick={props.onClose} aria-label={ru ? "Закрыть" : "Close"}><X size={15} /></button>}
     </div>

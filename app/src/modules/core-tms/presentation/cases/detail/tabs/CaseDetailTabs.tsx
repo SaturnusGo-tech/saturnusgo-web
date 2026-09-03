@@ -13,10 +13,12 @@ type Props = {
   active: InspectorTabId;
   tabsId: string;
   creating: boolean;
+  fileCount?: number;
+  activityCount?: number;
   onActive: (tab: InspectorTabId) => void;
 };
 
-export function CaseDetailTabs({ locale, active, tabsId, creating, onActive }: Props) {
+export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0, activityCount = 0, onActive }: Props) {
   const ru = locale === "ru";
   const labels: Record<InspectorTabId, string> = {
     overview: ru ? "Общее" : "General",
@@ -47,6 +49,8 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, onActive }: P
       aria-controls={`${tabsId}-panel`}
       className={active === tab ? styles.detailTabActive : ""}
       onClick={() => onActive(tab)}
-    >{labels[tab]}</button>)}
+    >{labels[tab]}{tab === "files" && fileCount > 0 && <span>{fileCount}</span>}
+      {tab === "activity" && activityCount > 0 && <span>{activityCount}</span>}
+    </button>)}
   </div>;
 }

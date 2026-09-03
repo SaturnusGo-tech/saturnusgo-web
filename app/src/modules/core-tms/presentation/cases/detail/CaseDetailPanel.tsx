@@ -51,6 +51,9 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const editorWasOpen = useRef(editorOpen);
   const revision = props.editor?.value ?? props.revision;
   const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
+  const formatDate = (value: string) => new Intl.DateTimeFormat(props.languageTag, {
+    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+  }).format(new Date(value));
   useEffect(() => {
     setTab("overview");
     setFiles([]);
@@ -130,11 +133,18 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>}
       <div className={inspector.titleRow}>
         {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}
-        {props.editor && (creating || headerEditing === "title") ? <input autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <h2>{revision.title}</h2>}
+        {props.editor && (creating || headerEditing === "title") ? <input autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
+          <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
+          {props.testCase && <p className={inspector.caseByline}>
+            <span>{ru ? "Создан" : "Created"} {formatDate(props.testCase.createdAt)}</span>
+            <span>{ru ? "Обновлён" : "Updated"} {formatDate(props.testCase.updatedAt)}</span>
+          </p>}
+        </div>}
         {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
       {!creating && editorActions}
-      {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating} onActive={setTab} />}
+      {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
+        fileCount={revision.attachmentIds.length} activityCount={props.activity.length} onActive={setTab} />}
     </header>
     <CaseAttachmentDraftProvider locale={props.locale} enabled={Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>

@@ -81,113 +81,45 @@ export function CaseInspectorContent({ locale, revision, archived, editor, onReq
     Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
   if (creating && editor) return <CaseCreationSections locale={locale} revision={value} editor={editor} />;
-  return <div className={css.content}>
+  return <div className={`${css.content} ${css.overviewLayout}`}>
     {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
-    <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
-      <MarkdownField
-        attachmentKey="description"
-        value={value.description}
-        label={ru ? "Описание" : "Description"}
-        autoFocus={!creating}
-        onChange={sectionEditing("description") && editor
-          ? (description) => patch({ description }) : undefined}
-        emptyLabel={ru ? "Описание не указано" : "No description"}
-      />
-    </InspectorSectionView>
-    <InspectorSectionView
-      title={ru ? "Функциональность" : "Functionality"}
-      {...controls("component")}
-    >
-      {sectionEditing("component") && editor
-        ? <div className={css.compactFields}>
-            <label>
-              <span>{ru ? "Компонент" : "Component"}</span>
-              <input
-                autoFocus={!creating}
-                list="case-inspector-components"
-                value={value.component}
-                onChange={(event) => patch({ component: event.target.value })}
-              />
-            </label>
-            <datalist id="case-inspector-components">
-              {editor.components.map((component) => (
-                <option key={component} value={component} />
-              ))}
-            </datalist>
-            <label>
-              <span>{ru ? "Папка" : "Folder"}</span>
-              <input
-                list="case-inspector-folders"
-                value={editor.folderPath}
-                onChange={(event) => editor.onFolderPath(normalizeFolder(event.target.value))}
-              />
-            </label>
-          </div>
-        : <p className={!value.component ? css.empty : ""}>
-            {localizedComponentLabel(locale, value.component)
-              || (ru ? "Не указана" : "Not specified")}
-          </p>}
-    </InspectorSectionView>
-    <InspectorSectionView
-      title={ru ? "Свойства" : "Properties"}
-      editLabel={ru ? "Изменить свойства" : "Edit properties"}
-      {...controls("properties")}
-    >
-      <CaseMetadataControls
-        locale={locale}
-        revision={value}
-        archived={archived}
-        editing={sectionEditing("properties")}
-        autoFocus={!creating}
-        showLabels
-        onChange={editor?.onChange}
-      />
-    </InspectorSectionView>
-    <InspectorSectionView
-      title={ru ? "Предусловия" : "Preconditions"}
-      editLabel={ru ? "Изменить условия" : "Edit conditions"}
-      {...controls("preconditions")}
-    >
-      <MarkdownField
-        attachmentKey="preconditions"
-        value={value.preconditions}
-        label={ru ? "Предусловия" : "Preconditions"}
-        autoFocus={!creating}
-        onChange={sectionEditing("preconditions") && editor
-          ? (preconditions) => patch({ preconditions }) : undefined}
-        emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"}
-      />
-    </InspectorSectionView>
-    <InspectorSectionView
-      title={ru ? "Данные выполнения" : "Execution details"}
-      {...controls("details")}
-    >
-      <InspectorDetails
-        revision={value}
-        editing={sectionEditing("details")}
-        autoFocus={!creating}
-        ru={ru}
-        onPatch={patch}
-      />
-    </InspectorSectionView>
-    <InspectorSectionView
-      title={value.type === "checklist"
-        ? (ru ? "Чек-лист" : "Checklist")
-        : value.type === "automated"
-          ? (ru ? "Шаги автотеста" : "Automated steps")
-          : (ru ? "Шаги" : "Steps")}
-      count={value.type === "checklist" ? value.checklist.length : value.steps.length}
-      editLabel={ru ? "Изменить шаги" : "Edit steps"}
-      {...controls("steps")}
-    >
-      <InspectorSteps
-        revision={value}
-        editing={sectionEditing("steps")}
-        autoFocus={!creating}
-        ru={ru}
-        onPatch={patch}
-      />
-    </InspectorSectionView>
+    <main className={css.primaryColumn}>
+      <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
+        <MarkdownField attachmentKey="description" value={value.description} label={ru ? "Описание" : "Description"}
+          autoFocus={!creating} onChange={sectionEditing("description") && editor ? (description) => patch({ description }) : undefined}
+          emptyLabel={ru ? "Описание не указано" : "No description"} />
+      </InspectorSectionView>
+      <InspectorSectionView title={ru ? "Предусловия" : "Preconditions"} editLabel={ru ? "Изменить условия" : "Edit conditions"} {...controls("preconditions")}>
+        <MarkdownField attachmentKey="preconditions" value={value.preconditions} label={ru ? "Предусловия" : "Preconditions"}
+          autoFocus={!creating} onChange={sectionEditing("preconditions") && editor ? (preconditions) => patch({ preconditions }) : undefined}
+          emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"} />
+      </InspectorSectionView>
+      <InspectorSectionView title={ru ? "Сценарий" : "Scenario"}
+        count={value.type === "checklist" ? value.checklist.length : value.steps.length}
+        editLabel={ru ? "Изменить сценарий" : "Edit scenario"} {...controls("steps")}>
+        <InspectorSteps revision={value} editing={sectionEditing("steps")} autoFocus={!creating} ru={ru} onPatch={patch} />
+      </InspectorSectionView>
+    </main>
+    <aside className={css.sideRail} aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
+      <InspectorSectionView title={ru ? "Расположение" : "Placement"} {...controls("component")}>
+        {sectionEditing("component") && editor ? <div className={css.compactFields}>
+          <label><span>{ru ? "Компонент" : "Component"}</span><input autoFocus={!creating} list="case-inspector-components"
+            value={value.component} onChange={(event) => patch({ component: event.target.value })} /></label>
+          <datalist id="case-inspector-components">{editor.components.map((component) => <option key={component} value={component} />)}</datalist>
+          <label><span>{ru ? "Папка" : "Folder"}</span><input list="case-inspector-folders" value={editor.folderPath}
+            onChange={(event) => editor.onFolderPath(normalizeFolder(event.target.value))} /></label>
+        </div> : <div className={css.railFacts}>
+          <span>{ru ? "Компонент" : "Component"}</span><strong>{localizedComponentLabel(locale, value.component) || (ru ? "Не указан" : "Not specified")}</strong>
+        </div>}
+      </InspectorSectionView>
+      <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} {...controls("properties")}>
+        <CaseMetadataControls locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
+          autoFocus={!creating} showLabels onChange={editor?.onChange} />
+      </InspectorSectionView>
+      <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} {...controls("details")}>
+        <InspectorDetails revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />
+      </InspectorSectionView>
+    </aside>
   </div>;
 }
 function normalizeFolder(value: string) { return value.startsWith("/") ? value : `/${value}`; }

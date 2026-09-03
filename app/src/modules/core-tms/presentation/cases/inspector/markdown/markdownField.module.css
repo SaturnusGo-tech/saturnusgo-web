@@ -61,7 +61,7 @@
 .wysiwyg :global(.mdxeditor-toolbar button:hover),
 .wysiwyg :global(.mdxeditor-toolbar button:focus-visible) { color: var(--cases-strong); background: var(--cases-hover); outline: 1px solid var(--cases-control-border); outline-offset: -1px; }
 .wysiwyg :global(.mdxeditor-root-contenteditable) { height: calc(100% - 31px); min-height: 0; overflow: auto; background: var(--cases-control); }
-.wysiwyg .editorContent { min-height: 100%; padding: 10px 11px; color: var(--cases-secondary-text); font: inherit; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.wysiwyg .editorContent { min-height: 100%; padding: 10px 11px; color: var(--cases-secondary-text); font: inherit; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
 .editorContent :is(p, ul, ol, blockquote, pre) { margin: 0 0 7px; }
 .editorContent :is(h1, h2, h3) { margin: 8px 0 5px; color: var(--cases-strong); font: inherit; font-size: 1em; font-weight: 600; line-height: 1.4; }
 .editorContent strong { color: var(--cases-strong); font-weight: 600; }
@@ -205,7 +205,7 @@
   color: var(--cases-secondary-text) !important;
   background: transparent !important;
   font-family: inherit !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   line-height: 1.55 !important;
 }
 
@@ -247,7 +247,7 @@
 .empty {
   margin: 0;
   color: var(--cases-faint);
-  font-size: 12px;
+  font-size: 13px;
   font-style: italic;
 }
 

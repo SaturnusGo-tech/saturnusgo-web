@@ -91,13 +91,11 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--cases-on-primary\)/);
 });
 
-test("case properties live in their own section before Preconditions", () => {
-  const properties = content.indexOf('title={ru ? "Свойства" : "Properties"}');
-  const preconditions = content.indexOf('title={ru ? "Предусловия" : "Preconditions"}');
-  assert.ok(properties > 0 && properties < preconditions);
+test("case content and properties use the TestOps-inspired two-column hierarchy", () => {
+  assert.match(content, /overviewLayout/);
+  assert.match(content, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
+  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Расположение[\s\S]*Свойства[\s\S]*Дополнительно/);
   assert.match(content, /controls\("properties"\)[\s\S]*<CaseMetadataControls/);
-  assert.match(creation, /number="3" title=\{ru \? "Свойства"/);
-  assert.match(creation, /number="4" title=\{ru \? "Условия и шаги"/);
 });
 
 test("fullscreen inspector content keeps the normal full-width layout", () => {
@@ -132,10 +130,12 @@ test("a handled select Escape cannot close its containing modal", () => {
   assert.match(modal, /if \(event\.defaultPrevented\) return/);
 });
 
-test("create mode uses guided sections and a stable bottom action bar", () => {
+test("create mode shares the same calm two-column hierarchy and stable action bar", () => {
   assert.match(content, /creating && editor[\s\S]*<CaseCreationSections/);
-  assert.match(creation, /number="1"[\s\S]*number="2"[\s\S]*number="3"/);
-  assert.match(creation, /<details[\s\S]*creationOptional/);
+  assert.match(creation, /css\.overviewLayout/);
+  assert.match(creation, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
+  assert.match(creation, /<aside className=\{css\.sideRail\}[\s\S]*Расположение[\s\S]*Свойства[\s\S]*Дополнительно/);
+  assert.doesNotMatch(creation, /number=|creationTone_|<details/);
   assert.match(creation, /<MarkdownField[\s\S]*revision\.description/);
   assert.match(creation, /<InspectorSteps revision=\{revision\} editing/);
   assert.ok(detailPanel.lastIndexOf("</form>") < detailPanel.lastIndexOf("{creating && editorActions}"));

@@ -1,9 +1,9 @@
-.controls { display: flex; flex-wrap: wrap; gap: 8px; }
-.readControls { align-items: end; }
-.labelledControl { min-width: 0; display: grid; flex: 1 1 124px; gap: 5px; }
+.controls { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.readControls { align-items: start; }
+.labelledControl { min-width: 0; display: grid; gap: 4px; }
 .labelledControl > span { color: var(--cases-muted); font-size: 11px; font-weight: 500; }
 .labelledControl .select { width: 100%; }
-.labelledControl > :global(span[class*="chip"]) { min-height: 32px; justify-content: flex-start; padding-inline: 9px; font-size: 11px; }
+.readControls .labelledControl > :global(span[class*="chip"]) { min-height: 20px; justify-content: flex-start; padding: 0; background: transparent; border-color: transparent; font-size: 11px; }
 .select { position: relative; min-width: 124px; }
 .select:focus-within { z-index: 70; }
 .select:last-child { min-width: 104px; }
@@ -24,7 +24,7 @@
   text-align: left;
 }
 .trigger:hover,
-.trigger[aria-expanded="true"] { border-color: var(--cases-primary); filter: brightness(.96); }
+.trigger[aria-expanded="true"] { border-color: var(--cases-primary); background: var(--cases-hover); }
 .select .trigger:focus-visible { outline: 1px solid var(--cases-primary); outline-offset: 1px; box-shadow: none; }
 .triggerLabel,
 .optionLabel {
@@ -136,6 +136,8 @@
 :global(.dark) .typeManual { color: #8ecbd1; background: rgb(54 132 140 / 16%); border-color: rgb(78 157 166 / 32%); }
 :global(.dark) .typeChecklist { color: #c1afe9; background: rgb(119 88 173 / 17%); border-color: rgb(145 113 199 / 34%); }
 :global(.dark) .typeAutomated { color: #e6bd7c; background: rgb(174 116 43 / 17%); border-color: rgb(201 145 73 / 34%); }
+.select .trigger { color: var(--cases-secondary-text); background: var(--cases-control); border-color: var(--cases-control-border); }
+.menu .optionLabel { color: inherit; background: transparent; border: 0; }
 
 .typeChangeDialog { width: min(420px, calc(100vw - 32px)); }
 .typeChangeWarning { display: flex; align-items: flex-start; gap: 10px; padding: 18px; color: var(--cases-text); }
@@ -148,6 +150,4 @@
   .menu { transition: none; }
 }
 
-@media (max-width: 520px) {
-  .controls { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
-}
+@media (max-width: 520px) { .controls { width: 100%; } }
