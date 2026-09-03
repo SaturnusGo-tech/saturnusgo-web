@@ -460,7 +460,7 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
-## Scenario hierarchy hotfix and shared-step persistence — local pass
+## Scenario hierarchy hotfix and shared-step persistence — final production pass
 
 - Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_0UMccb/Screenshot 2026-09-03 at 11.51.33 PM.png` for the exact TestOps step geometry; `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-c22b1afc-ff8d-4f82-bcb9-c1c3c9c8ac77.png` and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-84a3835a-6ab8-4601-8713-f548079914cd.png` for the reported Falcon detail/list failures.
 - Combined review input: `.design-qa/scenario-hotfix-2026-09-04/scenario-hotfix-comparison.png` places the supplied TestOps hierarchy beside the real Falcon editor state containing one regular step with three technical substeps and one embedded shared step.
@@ -472,8 +472,11 @@ final result: passed in production
 - P0 persistence root cause: migration 0019 allowed empty host action/result values for a live `sharedStepId` in HTTP and domain validation, but the original 0003 PostgreSQL checks still rejected those placeholders. Migration `0020_shared_step_placeholders.sql` makes both checks conditional on a non-null shared reference while preserving the strict non-empty rule for regular steps.
 - Local browser states: `.design-qa/scenario-hotfix-2026-09-04/scenario-hotfix-local.png`, `.design-qa/scenario-hotfix-2026-09-04/scenario-reference-state-local.png`, and `.design-qa/scenario-hotfix-2026-09-04/shared-step-hotfix-local.png` cover nested editing, embedded shared content, disclosure controls, semantic metadata, and the left-aligned shared-step editor.
 - Verification: frontend TypeScript, 304-file architecture, focused scenario 8/8, adapters/UI 175/175, attachments 4/4, and optimized 61-page build passed. Backend TypeScript, migration verification for 20 ordered migrations, focused PostgreSQL migration/staging/shared-reference tests 11/11, full suite 291/291, build, architecture, OpenAPI, and zero-warning lint passed.
+- Production rollout: frontend source `a5850b30ee5ccc29f8fc5078b6edb4e84a5cd81b` is served by Pages commit `550c3a44`. Backend source `a271aab` is running on Railway deployment `7608c13e-a16e-4bbc-9c83-2a7058610f43`; its health check passed and its pre-deploy migration job applied exactly one migration after `TMS_MIGRATION_TARGET` advanced to `0020`.
+- Physical database verification: both `test_case_revision_steps_action_check` and `test_case_revision_steps_expected_result_check` now explicitly accept an empty host placeholder only when `shared_step_id IS NOT NULL`. The exact failing PATCH shape is covered by the PostgreSQL integration regression without modifying the user's production case.
+- Connected UI verification: the signed-in production Browser rendered the full `Критический` pill, dense separator-free scenario, regular-step disclosure, left-aligned shared-step editor, and neutral focus line. `.design-qa/scenario-hotfix-2026-09-04/scenario-hotfix-production.png` and `.design-qa/scenario-hotfix-2026-09-04/shared-step-hotfix-production.png` retain the final states. A fresh production tab reported zero console errors and zero warnings.
 
-final result: passed locally; production rollout pending
+final result: passed in production
 
 ## Scenario density and shared-step editor correction — final local pass
 
