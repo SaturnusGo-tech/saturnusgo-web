@@ -765,7 +765,7 @@
   .detailResizeHandle { display: none; }
   .detailScrim {
     position: absolute;
-    z-index: 11;
+    z-index: 59;
     inset: 0;
     display: block;
     padding: 0;
@@ -776,7 +776,7 @@
   }
   .detailPanel {
     position: absolute;
-    z-index: 12;
+    z-index: 60;
     top: 0;
     right: 0;
     bottom: 0;
@@ -831,7 +831,7 @@
 
 .detailPanel.detailPanelFullscreen {
   position: absolute;
-  z-index: 40;
+  z-index: 60;
   inset: 0;
   animation: none;
   width: 100%;

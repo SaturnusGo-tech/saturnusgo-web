@@ -44,6 +44,24 @@ test("case type surfaces expose automated with a robot icon", () => {
   assert.match(popovers, /props\.filters\.type === value/);
 });
 
+test("case metadata uses semantic pills in the header, properties, and edit menus", () => {
+  const detail = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
+  const metadata = readFileSync(new URL("../../detail/metadata/CaseMetadataControls.tsx", import.meta.url), "utf8");
+  const metadataCss = readFileSync(new URL("../../detail/metadata/caseMetadata.module.css", import.meta.url), "utf8");
+  const casesCss = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
+
+  assert.match(detail, /<LifecycleBadge[\s\S]*<span>\{ru \? "Создан"/);
+  assert.match(metadata, /className=\{styles\.controlLabel\}/);
+  assert.match(metadataCss, /\.chip[\s\S]*border-radius: 999px/);
+  assert.match(metadataCss, /\.lifecycleReady \{ --metadata-fg: #fff; --metadata-bg: #13824a/);
+  assert.match(metadataCss, /\.lifecycleDeprecated \{ --metadata-fg: #352300; --metadata-bg: #f3a712/);
+  assert.match(metadataCss, /\.trigger[\s\S]*border-radius: 10px/);
+  assert.match(metadataCss, /\.menu[\s\S]*border-radius: 12px/);
+  assert.doesNotMatch(metadataCss, /\.readControls[^{]*\{[^}]*background:\s*transparent/);
+  assert.match(casesCss, /\.detailScrim[\s\S]*z-index: 59/);
+  assert.match(casesCss, /\.detailPanel \{[\s\S]*z-index: 60/);
+});
+
 test("formats aggregate estimates as readable hours", () => {
   assert.equal(formatCaseEstimate("ru", 45), "45 мин");
   assert.equal(formatCaseEstimate("ru", 2_662), "44 ч 22 мин");

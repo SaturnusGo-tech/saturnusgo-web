@@ -70,7 +70,7 @@ export function inspectorRevisionProblem(
   if (!revisionTagsAreValid(revision.tags)) return "tags";
   if (revision.type !== "checklist") {
     const complete = revision.steps.every((step) => (
-      step.action.trim() && step.expectedResult.trim()
+      step.sharedStepId || (step.action.trim() && step.expectedResult.trim())
     ));
     if (revision.type === "automated") {
       return revision.steps.length > 0 && complete ? null : "automatedSteps";

@@ -35,6 +35,8 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     onNewFolder={() => model.setDialog("folder")}
     detailLoadError={model.selectedCaseDetailError}
     onRetryDetail={model.retrySelectedCaseDetail}
+    sharedSteps={model.sharedSteps.items}
+    onResolveSharedStep={model.sharedSteps.resolve}
     editor={model.dialog === "case" ? {
       mode: model.editing ? "edit" : "create",
       value: model.caseDraft,

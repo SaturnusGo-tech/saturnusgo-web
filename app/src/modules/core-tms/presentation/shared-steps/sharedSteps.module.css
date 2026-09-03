@@ -1,0 +1,81 @@
+.view,
+.editor {
+  --ss-bg: #fff;
+  --ss-raised: #f7f8fa;
+  --ss-hover: #f0f1f3;
+  --ss-line: #d8dbe0;
+  --ss-control: #fff;
+  --ss-control-line: #bfc3ca;
+  --ss-text: #20242b;
+  --ss-muted: #747983;
+  --ss-primary: #3574f0;
+  --cases-bg: var(--ss-bg);
+  --cases-deep: var(--ss-bg);
+  --cases-raised: var(--ss-raised);
+  --cases-hover: var(--ss-hover);
+  --cases-border: var(--ss-line);
+  --cases-row-border: var(--ss-line);
+  --cases-control: var(--ss-control);
+  --cases-control-border: var(--ss-control-line);
+  --cases-text: var(--ss-text);
+  --cases-strong: var(--ss-text);
+  --cases-secondary-text: color-mix(in srgb, var(--ss-text) 82%, var(--ss-muted));
+  --cases-muted: var(--ss-muted);
+  --cases-faint: color-mix(in srgb, var(--ss-muted) 76%, transparent);
+  --cases-primary: var(--ss-primary);
+  --cases-on-primary: #fff;
+  width: 100%; height: 100%; min-width: 0; min-height: 0;
+  color: var(--ss-text); background: var(--ss-bg);
+}
+:global(.dark) .view,
+:global(.dark) .editor {
+  --ss-bg: #2d2b35; --ss-raised: #34323c; --ss-hover: #3b3943;
+  --ss-line: #4a4853; --ss-control: #302e38; --ss-control-line: #5a5763;
+  --ss-text: #f6f5f8; --ss-muted: #aaa7b2;
+}
+.view { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+.header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-bottom: 1px solid var(--ss-line); }
+.header h1 { margin: 0; font-size: 20px; font-weight: 650; line-height: 1.25; }
+.header p { margin: 3px 0 0; color: var(--ss-muted); font-size: 12px; }
+.primaryButton,
+.secondaryButton,
+.iconButton,
+.addButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 13px; border: 1px solid var(--ss-control-line); border-radius: 10px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
+.primaryButton { color: #fff !important; background: var(--ss-primary); border-color: var(--ss-primary); }
+.primaryButton:hover { background: #2865da; }
+.secondaryButton,.iconButton,.addButton { color: var(--ss-text); background: var(--ss-control); }
+.secondaryButton:hover,.iconButton:hover,.addButton:hover { background: var(--ss-hover); }
+.primaryButton:disabled,.secondaryButton:disabled { cursor: default; opacity: .48; }
+.toolbar { height: 52px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 20px; padding: 0 13px; color: var(--ss-muted); background: var(--ss-control); border: 1px solid var(--ss-control-line); border-radius: 12px; }
+.toolbar input { width: 100%; border: 0; outline: 0; color: var(--ss-text); background: transparent; font: inherit; font-size: 13px; }
+.list { min-height: 0; overflow: auto; padding: 0 20px 24px; }
+.row { width: 100%; min-height: 64px; display: grid; grid-template-columns: 36px minmax(180px, 1fr) 92px 112px 116px; align-items: center; gap: 10px; padding: 8px 14px; color: var(--ss-text); background: transparent; border: 0; border-bottom: 1px solid var(--ss-line); cursor: pointer; text-align: left; }
+.row:hover,.row:focus-visible { background: var(--ss-hover); outline: 0; }
+.rowIcon { width: 30px; height: 30px; display: grid; place-items: center; color: #7455c5; background: color-mix(in srgb, #7455c5 12%, transparent); border-radius: 9px; }
+.rowTitle,.rowMetric { min-width: 0; display: grid; gap: 2px; }
+.rowTitle strong { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.rowTitle small,.rowMetric small,.rowDate { color: var(--ss-muted); font-size: 10px; }
+.rowMetric b { font-size: 12px; font-weight: 600; }
+.rowDate { text-align: right; }
+.state,.empty { height: 100%; min-height: 320px; display: grid; place-content: center; justify-items: center; gap: 12px; color: var(--ss-muted); text-align: center; }
+.state strong,.empty strong { color: var(--ss-text); font-size: 14px; font-weight: 600; }
+.empty > span { width: 52px; height: 52px; display: grid; place-items: center; color: #7455c5; background: color-mix(in srgb, #7455c5 12%, transparent); border-radius: 16px; }
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.editor { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.editorHeader { min-height: 76px; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--ss-line); }
+.iconButton { width: 36px; padding: 0; }
+.titleField { min-width: 0; display: grid; gap: 3px; }
+.titleField span { color: var(--ss-muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--ss-text); background: transparent; border: 0; border-bottom: 1px solid transparent; outline: 0; font: inherit; font-size: 18px; font-weight: 620; }
+.titleField input:focus { border-bottom-color: var(--ss-primary); }
+.editorActions { display: flex; align-items: center; gap: 8px; }
+.editorScroll { min-height: 0; overflow: auto; padding: 24px clamp(20px, 5vw, 72px) 60px; background: var(--ss-bg); }
+.paper { width: min(920px, 100%); margin: 0 auto; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.scenarioHeading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.scenarioHeading h2 { margin: 0; font-size: 15px; font-weight: 650; }
+.scenarioHeading span { min-width: 20px; padding: 2px 6px; color: var(--ss-muted); background: var(--ss-hover); border-radius: 999px; font-size: 10px; text-align: center; }
+.sharedRail { padding-left: 8px; border-left: 3px solid #7952cf; }
+.addButton { margin: 2px 0 0 35px; background: transparent; border-color: transparent; }
+@media (max-width: 720px) { .row { grid-template-columns: 34px minmax(0, 1fr) 76px; }.rowMetric:nth-of-type(4),.rowDate { display: none; }.editorHeader { grid-template-columns: 36px minmax(0,1fr); }.editorActions { grid-column: 1/-1; justify-content: flex-end; }.editorScroll { padding: 18px 16px 42px; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

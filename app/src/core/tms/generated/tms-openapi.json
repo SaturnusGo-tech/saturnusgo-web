@@ -1666,6 +1666,89 @@
         }
       }
     },
+    "/projects/{projectId}/shared-steps": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "name": "projectId", "in": "path", "required": true,
+          "schema": { "$ref": "#/components/schemas/Identifier" } }
+      ],
+      "get": {
+        "tags": ["Shared steps"], "summary": "List reusable shared steps",
+        "operationId": "listSharedSteps", "x-tms-pagination": "cursor",
+        "parameters": [
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "name": "q", "in": "query", "required": false,
+            "schema": { "type": "string", "minLength": 1, "maxLength": 300 } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SharedStepListResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Shared steps"], "summary": "Create a reusable shared step",
+        "operationId": "createSharedStep", "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "required": true, "content": { "application/json": {
+          "schema": { "$ref": "#/components/schemas/SharedStepWriteRequest" } } } },
+        "responses": {
+          "201": { "$ref": "#/components/responses/SharedStepResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/projects/{projectId}/shared-steps/{sharedStepId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/XRequestId" },
+        { "name": "projectId", "in": "path", "required": true,
+          "schema": { "$ref": "#/components/schemas/Identifier" } },
+        { "name": "sharedStepId", "in": "path", "required": true,
+          "schema": { "$ref": "#/components/schemas/Identifier" } }
+      ],
+      "get": {
+        "tags": ["Shared steps"], "summary": "Get a reusable shared step",
+        "operationId": "getSharedStep",
+        "responses": {
+          "200": { "$ref": "#/components/responses/SharedStepResponse" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Shared steps"], "summary": "Create the next shared-step revision",
+        "operationId": "reviseSharedStep", "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/IfMatch" },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": {
+          "schema": { "$ref": "#/components/schemas/SharedStepWriteRequest" } } } },
+        "responses": {
+          "200": { "$ref": "#/components/responses/SharedStepResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
     "/dashboard-analytics/summary": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -2483,6 +2566,23 @@
           "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestCaseEnvelope" } } }
+      },
+      "SharedStepListResponse": {
+        "description": "A page of reusable shared-step summaries ordered by update time.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "X-Next-Cursor": { "$ref": "#/components/headers/XNextCursor" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SharedStepListEnvelope" } } }
+      },
+      "SharedStepResponse": {
+        "description": "Current shared-step revision.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SharedStepEnvelope" } } }
       },
       "TestCaseBulkMutationResponse": {
         "description": "All requested cases in request order, with changed and unchanged counts.",
@@ -3639,13 +3739,27 @@
           "action": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "expectedResult": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "testData": { "$ref": "#/components/schemas/LongText" },
-          "required": { "type": "boolean", "default": true }
+          "required": { "type": "boolean", "default": true },
+          "sharedStepId": { "oneOf": [
+            { "$ref": "#/components/schemas/Identifier" }, { "type": "null" }
+          ], "description": "Live reference to a project-scoped shared step. When present, the shared procedure is resolved by the server." }
+        }
+      },
+      "SharedStepSnapshot": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "title", "revision", "items"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "revision": { "type": "integer", "minimum": 1 },
+          "items": { "type": "array", "minItems": 1, "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/SharedStepItem" } }
         }
       },
       "TestStep": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "order", "action", "expectedResult", "required", "attachmentIds"],
+        "required": ["id", "order", "action", "expectedResult", "required", "attachmentIds", "sharedStepId", "sharedStep"],
         "properties": {
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1 },
@@ -3653,7 +3767,95 @@
           "expectedResult": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
           "testData": { "$ref": "#/components/schemas/LongText" },
           "required": { "type": "boolean" },
-          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } }
+          "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
+          "sharedStepId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }] },
+          "sharedStep": { "oneOf": [{ "$ref": "#/components/schemas/SharedStepSnapshot" }, { "type": "null" }] }
+        }
+      },
+      "SharedStepItemInput": {
+        "type": "object", "additionalProperties": false,
+        "required": ["action", "expectedResult"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "order": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "action": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
+          "expectedResult": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
+          "testData": { "$ref": "#/components/schemas/LongText" },
+          "required": { "type": "boolean", "default": true }
+        }
+      },
+      "SharedStepItem": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SharedStepItemInput" },
+          { "type": "object", "required": ["id", "order", "required", "attachmentIds"],
+            "properties": { "attachmentIds": { "type": "array", "maxItems": 100,
+              "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } } } }
+        ]
+      },
+      "SharedStepWriteRequest": {
+        "type": "object", "additionalProperties": false,
+        "required": ["title", "items"],
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "items": { "type": "array", "minItems": 1, "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/SharedStepItemInput" } },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" }
+        }
+      },
+      "SharedStepRevision": {
+        "type": "object", "additionalProperties": false,
+        "required": ["revision", "title", "items", "changeNote", "createdBy", "createdAt"],
+        "properties": {
+          "revision": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "items": { "type": "array", "minItems": 1, "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/SharedStepItem" } },
+          "changeNote": { "$ref": "#/components/schemas/ShortText" },
+          "createdBy": { "$ref": "#/components/schemas/Identifier" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "SharedStep": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "projectId", "currentRevision", "current", "revisionCount", "archivedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "currentRevision": { "type": "integer", "minimum": 1 },
+          "current": { "$ref": "#/components/schemas/SharedStepRevision" },
+          "revisionCount": { "type": "integer", "minimum": 1 },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "SharedStepSummary": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "projectId", "currentRevision", "title", "itemCount", "usageCount", "revisionCount", "archivedAt", "createdAt", "updatedAt", "etag"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identifier" },
+          "projectId": { "$ref": "#/components/schemas/Identifier" },
+          "currentRevision": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "itemCount": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "usageCount": { "type": "integer", "minimum": 0 },
+          "revisionCount": { "type": "integer", "minimum": 1 },
+          "archivedAt": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "$ref": "#/components/schemas/Timestamp" },
+          "updatedAt": { "$ref": "#/components/schemas/Timestamp" },
+          "etag": { "type": "string", "minLength": 1, "maxLength": 300 }
+        }
+      },
+      "SharedStepEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/SharedStep" } }
+      },
+      "SharedStepListEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data", "meta"],
+        "properties": {
+          "data": { "type": "array", "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/SharedStepSummary" } },
+          "meta": { "$ref": "#/components/schemas/PageMeta" }
         }
       },
       "ChecklistItemInput": {

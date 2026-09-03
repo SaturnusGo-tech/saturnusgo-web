@@ -1,6 +1,6 @@
 import {
   AlertTriangle, Ban, Bot, CheckCircle2, ChevronUp, ChevronsDown, ChevronsUp, CircleDashed,
-  Clock3, FileText, ListChecks, Minus,
+  Clock3, Hand, ListChecks, Minus,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -43,7 +43,7 @@ export function CaseMetadataControls(props: Props) {
     ] as const;
     return <div className={`${styles.controls} ${styles.readControls}`}>
       {badges.map(([label, badge]) => props.showLabels
-        ? <div className={styles.labelledControl} key={label}><span>{label}</span>{badge}</div>
+        ? <div className={styles.labelledControl} key={label}><span className={styles.controlLabel}>{label}</span>{badge}</div>
         : badge)}
     </div>;
   }
@@ -60,7 +60,7 @@ export function CaseMetadataControls(props: Props) {
     { value: "critical", label: localizedLabel(props.locale, "critical"), icon: <ChevronsUp size={12} />, tone: styles.priorityCritical },
   ];
   const type: Array<MetadataOption<TestCaseRevision["type"]>> = [
-    { value: "manual", label: localizedLabel(props.locale, "manual"), icon: <FileText size={11} />, tone: styles.typeManual },
+    { value: "manual", label: localizedLabel(props.locale, "manual"), icon: <Hand size={11} />, tone: styles.typeManual },
     { value: "checklist", label: localizedLabel(props.locale, "checklist"), icon: <ListChecks size={11} />, tone: styles.typeChecklist },
     { value: "automated", label: localizedLabel(props.locale, "automated"), icon: <Bot size={11} />, tone: styles.typeAutomated },
   ];
@@ -81,7 +81,7 @@ export function CaseMetadataControls(props: Props) {
     props.onChange?.({ ...props.revision, [key]: value });
   };
   const labelled = (label: string, control: ReactNode) => props.showLabels
-    ? <div className={styles.labelledControl}><span>{label}</span>{control}</div> : control;
+    ? <div className={styles.labelledControl}><span className={styles.controlLabel}>{label}</span>{control}</div> : control;
   const requestTypeChange = (type: TestCaseRevision["type"]) => {
     if (discardedProcedureCount(props.revision, type) > 0) setPendingType(type);
     else props.onChange?.(changeRevisionType(props.revision, type));

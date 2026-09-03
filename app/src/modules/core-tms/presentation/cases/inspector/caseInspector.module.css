@@ -22,7 +22,8 @@
 .titleCopy { min-width: 0; }
 .titleRow h2 { margin: 0; color: var(--cases-strong); font-size: clamp(20px, 3.1cqi, 27px); font-weight: 650; line-height: 1.25; letter-spacing: -.025em; }
 .titleKey { margin-left: 8px; color: var(--cases-muted); font-size: .74em; font-weight: 450; letter-spacing: 0; white-space: nowrap; }
-.caseByline { display: flex; flex-wrap: wrap; gap: 5px 14px; margin: 8px 0 0; color: var(--cases-muted); font-size: 12px; }
+.caseByline { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin: 8px 0 0; color: var(--cases-muted); font-size: 12px; }
+.caseByline > :global(span[class*="chip"]) { min-height: 23px; }
 .titleInput { width: 100%; min-height: 44px; padding: 8px 11px; color: var(--cases-strong); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 5px; font: inherit; font-size: 18px; font-weight: 600; outline: 0; }
 .titleInput:focus { border-color: var(--cases-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--cases-primary) 18%, transparent); }
 .tabs { overflow-x: auto; scrollbar-width: none; }

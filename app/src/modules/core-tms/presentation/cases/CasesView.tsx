@@ -164,6 +164,8 @@ export function CasesView(props: CasesViewProps) {
             activity={props.activity}
             collaboration={props.collaboration}
             onOpenDefect={props.onOpenDefect}
+            sharedSteps={props.sharedSteps}
+            onResolveSharedStep={props.onResolveSharedStep}
             selectedFolder={props.selectedFolder}
             onNew={view.createCase}
             onEdit={props.onEdit}

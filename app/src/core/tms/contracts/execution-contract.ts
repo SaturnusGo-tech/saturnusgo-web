@@ -8,6 +8,17 @@ export type TestStep = {
   testData?: string;
   required: boolean;
   attachmentIds?: string[];
+  sharedStepId?: string | null;
+  sharedStep?: SharedStepSnapshot | null;
+};
+
+export type SharedStepItem = Omit<TestStep, "sharedStepId" | "sharedStep">;
+
+export type SharedStepSnapshot = {
+  id: string;
+  title: string;
+  revision: number;
+  items: SharedStepItem[];
 };
 
 export type TestCaseRevision = {

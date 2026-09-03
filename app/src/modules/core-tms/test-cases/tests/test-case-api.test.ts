@@ -5,6 +5,7 @@ import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-con
 import { createTmsHttpClient, type TmsHttpClient, type TmsMutationOptions } from "../../../../core/tms/transport/http";
 import { createRunHistoryResource } from "../../state/run-history/run-history-resource";
 import { createTestCase, listTestCases } from "../data/test-case-api";
+import { mapTestCaseRevision } from "../data/test-case-mapper";
 
 type Api = components["schemas"];
 const time = "2026-08-28T00:00:00.000Z";
@@ -105,7 +106,7 @@ test("create serializes automated type while preserving normalized arbitrary tag
     },
   } as unknown as TmsHttpClient;
   const draft: TestCaseRevision = {
-    ...revision,
+    ...mapTestCaseRevision(revision),
     tags: [" Smoke ", "ci.backend", "", "smoke", "OWNER-team-a"],
   };
   const created = await createTestCase(http, {

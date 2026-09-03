@@ -35,6 +35,7 @@ export const ruShellMessages = {
   "nav.ariaLabel": "Разделы Falcon",
   "nav.dashboard": "Дашборд",
   "nav.cases": "Тест-кейсы",
+  "nav.sharedSteps": "Общие шаги",
   "nav.integrations": "Интеграционное тестирование",
   "nav.apiTesting": "API Testing",
   "nav.runs": "Тест-раны",

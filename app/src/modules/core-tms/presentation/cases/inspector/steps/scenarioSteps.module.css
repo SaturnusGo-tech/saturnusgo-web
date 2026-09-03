@@ -1,0 +1,373 @@
+.editor,
+.scenarioView {
+  display: grid;
+  gap: 0;
+}
+
+.stepGroup,
+.viewGroup {
+  position: relative;
+  min-width: 0;
+  padding: 1px 0 7px;
+}
+
+.stepMenu {
+  position: absolute;
+  z-index: 12;
+  top: 4px;
+  left: 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.stepGroup:hover .stepMenu,
+.stepGroup:focus-within .stepMenu {
+  opacity: 1;
+}
+
+.stepGroup + .stepGroup,
+.viewGroup + .viewGroup {
+  padding-top: 7px;
+  border-top: 1px solid var(--cases-row-border);
+}
+
+.actionLines,
+.viewLines {
+  display: grid;
+  gap: 1px;
+}
+
+.actionLine,
+.viewLine {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 3px;
+}
+
+.lineNumber,
+.viewLine > span {
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  color: var(--cases-faint);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  user-select: none;
+}
+
+.lineInput,
+.expectedInput,
+.dataInput {
+  width: 100%;
+  min-height: 26px;
+  overflow: hidden;
+  padding: 3px 6px 2px;
+  color: var(--cases-text);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  outline: 0;
+  resize: none;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  transition: border-color 130ms ease, background-color 130ms ease;
+}
+
+.lineInput::placeholder,
+.expectedInput::placeholder,
+.dataInput::placeholder {
+  color: var(--cases-faint);
+  opacity: .76;
+}
+
+.lineInput:hover,
+.expectedInput:hover,
+.dataInput:hover {
+  background: color-mix(in srgb, var(--cases-hover) 54%, transparent);
+}
+
+.lineInput:focus,
+.expectedInput:focus,
+.dataInput:focus {
+  background: color-mix(in srgb, var(--cases-hover) 68%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--cases-primary) 60%, var(--cases-border));
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.actionAttachmentRow {
+  margin: 0 0 0 43px;
+}
+
+.attachmentControls {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.attachmentControls > button {
+  width: 24px;
+  height: 24px;
+  opacity: .62;
+}
+
+.attachmentControls:hover > button,
+.attachmentControls > button:focus-visible {
+  opacity: 1;
+}
+
+.attachmentHint {
+  color: var(--cases-faint);
+  font-size: 10px;
+}
+
+.attachmentControls > div,
+.attachmentError {
+  grid-column: 1 / -1;
+}
+
+.attachmentError {
+  color: #b4494f;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.expectedBlock {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+  margin: 3px 0 0 43px;
+  padding: 4px 0 4px 11px;
+  border-left: 2px solid #278c7b;
+}
+
+.expectedLabel {
+  color: #237a6d;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+:global(.dark) .expectedLabel {
+  color: #69bdaf;
+}
+
+.expectedInput {
+  margin-left: -7px;
+}
+
+.optionalData {
+  display: grid;
+  margin: 2px 0 0 49px;
+}
+
+.dataInput {
+  color: var(--cases-secondary-text);
+  font-size: 12px;
+}
+
+.checklistRequired {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--cases-muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.checklistRequired input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.removeButton {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--cases-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.removeButton:hover:not(:disabled) {
+  color: #c3565d;
+  background: var(--cases-hover);
+}
+
+.removeButton:disabled {
+  cursor: default;
+  opacity: .25;
+}
+
+.addStepButton {
+  min-height: 32px;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1px 0 0 37px;
+  padding: 0 8px;
+  color: var(--cases-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.addStepMenu {
+  justify-self: start;
+  margin: 1px 0 0 37px;
+}
+
+.addStepButton:hover,
+.addStepButton:focus-visible {
+  color: var(--cases-strong);
+  background: var(--cases-hover);
+}
+
+.viewLine > p,
+.viewCopy,
+.viewData p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--cases-secondary-text);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.viewLine > p {
+  padding: 3px 6px 2px;
+}
+
+.viewCopy {
+  padding: 2px 0;
+}
+
+.viewData {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 0 54px;
+}
+
+.viewData > span {
+  color: var(--cases-muted);
+  font-size: 10px;
+}
+
+.savedAttachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 4px 0 0 54px;
+}
+
+.savedAttachments > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  background: var(--cases-control);
+  border-radius: 4px;
+}
+
+.savedAttachments button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  color: var(--cases-link);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+}
+
+.checklistView {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checklistView li,
+.checklistRow {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto auto;
+  align-items: start;
+  gap: 5px;
+  padding: 3px 0 9px;
+  border-bottom: 1px solid var(--cases-row-border);
+}
+
+.checklistView li > span {
+  padding-top: 6px;
+  color: var(--cases-faint);
+  font-size: 12px;
+  text-align: right;
+}
+
+.checklistView li > p {
+  margin: 0;
+  padding: 4px 7px;
+  color: var(--cases-secondary-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.checklistRequired {
+  min-height: 30px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineInput,
+  .expectedInput,
+  .dataInput {
+    transition: none;
+  }
+
+  .stepMenu { transition: none; }
+}
+
+@container case-inspector (max-width: 500px) {
+  .actionLine,
+  .viewLine {
+    grid-template-columns: 35px minmax(0, 1fr);
+  }
+
+  .actionAttachmentRow,
+  .expectedBlock {
+    margin-left: 38px;
+  }
+
+  .optionalData {
+    margin-left: 44px;
+  }
+
+  .savedAttachments,
+  .viewData {
+    margin-left: 54px;
+  }
+}

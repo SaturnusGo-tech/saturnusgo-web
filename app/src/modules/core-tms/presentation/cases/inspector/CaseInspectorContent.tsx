@@ -12,11 +12,16 @@ import { InspectorSteps } from "./steps/InspectorSteps";
 import type { CaseInspectorEditor, InspectorSection } from "./model";
 import { copyInspectorRevision, isInspectorSectionEditing, restoreInspectorSection } from "./model";
 import css from "./caseInspector.module.css";
+import type { SharedStep, SharedStepSummary } from "../../../shared-steps/model/shared-step";
 type Props = {
   locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; editor?: CaseInspectorEditor;
+  sharedSteps: readonly SharedStepSummary[];
+  onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   onRequestEdit: () => void;
 };
-export function CaseInspectorContent({ locale, revision, archived, editor, onRequestEdit }: Props) {
+export function CaseInspectorContent({
+  locale, revision, archived, editor, sharedSteps, onResolveSharedStep, onRequestEdit,
+}: Props) {
   const ru = locale === "ru";
   const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
@@ -80,7 +85,8 @@ export function CaseInspectorContent({ locale, revision, archived, editor, onReq
   const sectionEditing = (section: InspectorSection) => (
     Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
-  if (creating && editor) return <CaseCreationSections locale={locale} revision={value} editor={editor} />;
+  if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
+    editor={editor} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
   return <div className={`${css.content} ${css.overviewLayout}`}>
     {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
     <main className={css.primaryColumn}>
@@ -97,7 +103,8 @@ export function CaseInspectorContent({ locale, revision, archived, editor, onReq
       <InspectorSectionView title={ru ? "Сценарий" : "Scenario"}
         count={value.type === "checklist" ? value.checklist.length : value.steps.length}
         editLabel={ru ? "Изменить сценарий" : "Edit scenario"} {...controls("steps")}>
-        <InspectorSteps revision={value} editing={sectionEditing("steps")} autoFocus={!creating} ru={ru} onPatch={patch} />
+        <InspectorSteps revision={value} editing={sectionEditing("steps")} autoFocus={!creating}
+          ru={ru} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </InspectorSectionView>
     </main>
     <aside className={css.sideRail} aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>

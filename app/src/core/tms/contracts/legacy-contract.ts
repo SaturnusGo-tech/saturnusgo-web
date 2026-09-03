@@ -1,7 +1,7 @@
 import type { TestCaseRevision, TestRunSummary } from "./execution-contract";
 export type {
   ExecutionStatus, RunAttempt, RunAttemptSummary, RunItem, RunItemSummary, RunProgress,
-  StepResult, TestCaseRevision, TestRun, TestRunSummary, TestStep,
+  SharedStepItem, SharedStepSnapshot, StepResult, TestCaseRevision, TestRun, TestRunSummary, TestStep,
 } from "./execution-contract";
 
 export type Project = {

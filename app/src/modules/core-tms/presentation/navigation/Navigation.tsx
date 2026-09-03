@@ -8,6 +8,7 @@ import {
   Link2,
   ListChecks,
   Network,
+  Repeat2,
   PlayCircle,
   Settings,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const navigationItems: Array<{
 }> = [
   { id: "dashboard", labelKey: "nav.dashboard", icon: <LayoutDashboard size={20} /> },
   { id: "cases", labelKey: "nav.cases", icon: <FolderKanban size={20} /> },
+  { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Repeat2 size={20} /> },
   {
     id: "integrations",
     labelKey: "nav.integrations",

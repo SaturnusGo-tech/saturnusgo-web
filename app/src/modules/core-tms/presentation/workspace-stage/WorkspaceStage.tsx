@@ -11,6 +11,7 @@ import { ProjectOnboarding } from "../onboarding/ProjectOnboarding";
 import { ReportsView } from "../reports/ReportsView";
 import { RunsView } from "../runs/RunsView";
 import { SuitesView } from "../suites/SuitesView";
+import { SharedStepsView } from "../shared-steps/SharedStepsView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
 import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 
@@ -79,6 +80,9 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   }
   if (model.view === "cases") {
     return <WorkspaceCasesStage model={model} />;
+  }
+  if (model.view === "shared-steps") {
+    return <SharedStepsView resource={model.sharedSteps} />;
   }
   if (model.view === "integrations") {
     return (

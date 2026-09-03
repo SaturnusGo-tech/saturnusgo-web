@@ -460,6 +460,70 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Scenario density and shared-step editor correction — final local pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Z5DKpn/Screenshot 2026-09-03 at 8.28.56 PM.png` for the compact TestOps scenario hierarchy, plus the two user-reported Falcon failure states at `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_KBPqBk/Screenshot 2026-09-03 at 11.10.53 PM.png` and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_tvvGFS/Screenshot 2026-09-03 at 11.11.12 PM.png`.
+- Combined comparison input: `.design-qa/shared-steps/revised-case-reference-comparison.png` places the TestOps reference beside the corrected Falcon case document. `.design-qa/shared-steps/revised-shared-menu-comparison.png` places the reported shared-step editor failure beside the corrected editor and popup.
+- Density correction: scenario actions, technical substeps, expected results, shared references, attachments, and sibling steps now share a compact 3–7px vertical rhythm. Empty optional test-data controls are not rendered, and the visible `Обязательный шаг` checkbox/footer was removed while the existing persisted default remains intact.
+- Creation narrative: `Описание` and `Предусловия` render as quiet read-only sections by default. The Markdown editor mounts only after the pencil action; Apply closes the editor, while Cancel restores the value captured at activation.
+- Shared-step editor: the giant bordered paper/card was removed in favor of one continuous page surface. The action menu is fully opaque, isolated above the document, and limited to duplicate, delete, regular step, and step-with-expected-result actions.
+- Nesting rule: shared steps cannot insert another shared step. Case scenarios retain shared-step insertion, while the dedicated shared-step editor explicitly disables that action and its divider/group.
+- Visual evidence: `.design-qa/shared-steps/revised-create-menu.png`, `.design-qa/shared-steps/revised-shared-editor-menu.png`, `.design-qa/shared-steps/revised-shared-editor-dense.png`, `.design-qa/shared-steps/revised-shared-editor-two-steps.png`, and `.design-qa/shared-steps/revised-case-view-dense.png` cover create, edit, popup, multi-step, expected-result, and embedded shared-step states.
+- Browser verification: a clean navigation after the final hot-reload produced zero new errors or warnings. The corrected screens were inspected at the same 1688px desktop width used by the supplied shared-step failure screenshot.
+
+final result: passed locally
+
+## Shared steps and scenario actions — final local pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_uNZGxj/Screenshot 2026-09-03 at 9.18.17 PM.png` for the shared-step hierarchy and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-5cfa0e7e-2ed8-4271-b151-fb9738441f26.png` for the step action menu.
+- Complete comparison: `.design-qa/shared-steps/design-qa-comparison-scenario.png` places the 1182×1286 source beside the Falcon implementation captured at the same 1182×1286 viewport. Focused menu comparison: `.design-qa/shared-steps/design-qa-comparison-menu.png` uses the source's 1164×816 dimensions.
+- Composition: `Общие шаги` is a first-class global navigation destination with a quiet list/empty state, search, and one primary creation action. Its editor reuses the compact scenario language rather than introducing a second form system.
+- Scenario hierarchy: shared references remain live in case revisions, render as a restrained violet rail/surface, and contain their own numbered actions and teal expected-result rail. Run creation materializes those live items into the immutable run snapshot.
+- Step actions: every scenario row and shared reference exposes the same rounded keyboard-accessible popup for duplicate, delete, regular step, step with expected result, and shared-step insertion. The footer action opens upward inside the scroll owner so it is not clipped.
+- Metadata: read-only status, priority, and type remain compact semantic pills. Edit triggers and listbox options are neutral controls; the menu has rounded corners, selected state, Arrow/Home/End/Escape behavior, and focus return without embedding colored pills in every option.
+- Theme and density: light and dark editors were inspected. Typography follows the existing Falcon system stack, controls use the established compact scale, and the violet/teal accents preserve contrast without adding a second blue-heavy palette.
+- P1 fixed during QA: demo-created shared steps were listed after save but could not be resolved after leaving the list because only the summary survived. A resource cache now retains the complete revision for demo insertion; connected mode still refetches by id and ETag.
+- P2 comparison finding: the implementation has a narrower case document because Falcon retains its global navigation and project header, but the hierarchy, rails, numbering, popup geometry, and compact properties match the supplied reference without stretching or clipping.
+- Browser interactions: create shared step, save, reopen, insert between case steps, duplicate/delete menu visibility, edit/view properties, light/dark theme, and 1182×1286/1164×816 viewport states were exercised in the in-app Browser.
+- Verification: focused shared-step and scenario tests, the full frontend adapter/UI suite, TypeScript, architecture, optimized production build, backend test/build/architecture/OpenAPI/migration gates, and a clean post-restart browser console are required before release.
+
+final result: passed
+
+## Semantic test-case metadata pills — local final pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Z5DKpn/Screenshot 2026-09-03 at 8.28.56 PM.png` (2270×1458 px), supplied by the user for the compact TestOps title/byline and property hierarchy.
+- Implementation evidence: `.design-qa/metadata-pills-light-view-final.png` (731×623 px), `.design-qa/metadata-pills-ready-light.png` (731×623 px), `.design-qa/metadata-status-menu-dark.png` (731×623 px), and `.design-qa/metadata-pills-dark-view.png` (731×623 px). The in-app Browser viewport was 812×692 CSS px at DPR 2 and normalized its screenshots to the visible panel size.
+- Combined comparison: `.design-qa/metadata-pills-comparison-final.png` places a 1230×1050 source crop, normalized to 731×623, beside the final Falcon light-theme implementation. The source and implementation differ in responsive viewport width, so the comparison judges the requested title/byline, property hierarchy, semantic color, radius, and density rather than desktop column proportions.
+- State: Russian locale, development demo workspace, selected manual case. View mode verifies the Draft pill before `Создан`; edit mode verifies the custom lifecycle listbox; Ready was selected transiently to verify the same saturated green in the header and property control. Dark mode verifies the neutral Draft, saturated priority/type pills, and rounded status menu.
+- Typography: the existing Falcon sans stack and compact 11–12px metadata scale are preserved. Labels remain muted and medium weight; pill values use a 650 optical weight without leaking the label color into their foreground.
+- Spacing and layout rhythm: byline content is vertically centered with a 6×12px wrap gap. Read pills are 23–24px high with a full pill radius; edit triggers are 36px high with a 10px radius; menus use a 12px surface radius and 8px option radius.
+- Colors and tokens: Draft is neutral graphite, Ready is solid `#13824a`, Deprecated is warning `#f3a712`, priority uses gray/blue/orange/red, and type uses teal/violet/warm amber. Dark equivalents remain solid and saturated instead of returning to translucent pastel fills. Estimate stays intentionally neutral.
+- Image and icon fidelity: no photographic or branded asset is present in this metadata surface. Existing Lucide status, priority, type, estimate, and chevron icons are reused; manual type now uses the same hand icon in read and edit states.
+- Copy and content: lifecycle, priority, type, and estimate keep the existing localized labels. The header order is `status → created → updated`, matching the requested reading sequence.
+- Interaction and accessibility: custom buttons retain `aria-haspopup=listbox`, `aria-expanded`, selected option state, Arrow/Home/End/Escape behavior, and focus return. Opened the lifecycle editor in light and dark themes, selected Ready, closed without persisting the demo change, and confirmed no application console error.
+- P1 found on the first narrow capture: the list QL field used z-index 20 while the responsive case inspector used z-index 12, so the background query field crossed the title area. Fix: responsive scrim/inspector now use z-index 59/60, above every listing toolbar and popover. Post-fix evidence is `.design-qa/metadata-pills-light-view-final.png`; the query field no longer overlaps the card.
+- Verification: focused metadata/scenario tests passed 22/22; full TMS adapters/UI passed 175/175; TypeScript, 293-file TMS architecture, `git diff --check`, and the optimized 61-page production build passed. The temporary local visual-QA authentication bypass was fully reverted.
+
+final result: passed
+
+## Hierarchical test-case scenario editor — first local pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Z5DKpn/Screenshot 2026-09-03 at 8.28.56 PM.png` (2270×1458 px), supplied by the user as the TestOps hierarchy and density reference.
+- Implementation evidence: `.design-qa/scenario-editor-final.png` (1153×649 px), captured from the Falcon local route at a 1153×648 CSS viewport and DPR 2.2200000286102295. The browser normalizes screenshots to approximately CSS-pixel output; no density stretching was used.
+- State: Russian locale, light theme, development demo workspace, selected manual test case, Scenario section editing, with one main action, two technical substeps, expected result, and attachment affordances visible.
+- Full-view evidence: `.design-qa/scenario-editor-final.png` verifies the editor inside the real Falcon list/detail geometry. Focused comparison evidence: `.design-qa/scenario-editor-comparison.png` places the source Scenario crop and the implementation crop in one 1400×500 comparison input so hierarchy, typography, spacing, green result rail, and attachment placement remain legible.
+- Typography: the existing Falcon system sans stack is preserved at 13px/1.55 for scenario copy, with 11–12px muted numbering and labels. Weight and contrast match the existing inspector hierarchy; no decorative font or oversized form label was introduced.
+- Spacing and layout rhythm: the former stacked Markdown cards are replaced with a flat 44px number track, 30px auto-growing text rows, 1px interaction rules, and a 2px green expected-result rail. Top-level steps remain separated by one existing row token rather than nested rounded cards.
+- Colors and tokens: all text, hover, focus, border, and action colors use the existing Falcon case tokens. The expected-result accent reuses the established restrained teal; no new saturated panel color, gradient, or floating surface was introduced.
+- Image and icon fidelity: this editor contains no photographic or branded image asset. Attachment, add, required, and remove actions use the existing Lucide family and the production private-attachment UI; no custom SVG, CSS illustration, emoji, or placeholder art was added.
+- Copy and content: Russian labels are task-oriented (`Название шага`, `Технический подшаг`, `Ожидаемый результат`, `Добавить шаг`). Raw Markdown controls and technical storage language are absent from the scenario UI.
+- Interaction evidence: Enter created `1.1` and `1.2`; Backspace removed an empty `1.3`; Add Step created an editable top-level `2`; Remove Step restored the single-step state. Textareas grew with wrapped content, file-paste routing remained attached to action/result/data fields, and the Browser recorded zero console errors.
+- P2 found in the first capture: the global textarea focus rule painted a rectangular blue outline around the otherwise flat action line. Fix: the scenario-specific focus state now suppresses the inherited outline and shadow while retaining a tokenized bottom rule. Post-fix evidence is `.design-qa/scenario-editor-final.png` and the focused comparison.
+- Intentional first-iteration constraint: the current server contract owns attachments at the top-level test step, so action/result uploads render inside that scenario group after save rather than persisting an independent substep attachment owner. This preserves revision, run, and defect compatibility while shared steps and a deeper attachment schema remain deferred.
+- Verification: focused inspector tests 29/29, full TMS adapters/UI 174/174, TypeScript, 293-file TMS architecture, optimized production build 61/61, and `git diff --check` passed. The temporary local visual-QA authentication bypass was fully reverted.
+
+final result: passed
+
 ## Dashboard drill detail sheet — selected option 2
 
 - Selected source: `/Users/mercuryrucks/.codex/generated_images/01a0440e-06cc-7502-bcc3-ba6fb932d6c7/exec-83af33f1-5c73-45c6-a169-870a8b024e66.png` (1487×1058). The existing Falcon shell and analytics route remain unchanged; only the dashboard drill experience and supporting categorical palette were redesigned.

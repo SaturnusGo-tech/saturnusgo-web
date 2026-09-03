@@ -73,7 +73,7 @@ export function MetadataSelect<T extends string>({
       <button
         ref={triggerRef}
         type="button"
-        className={`${styles.trigger} ${selected?.tone ?? ""}`}
+        className={styles.trigger}
         aria-label={label}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -137,7 +137,7 @@ export function MetadataSelect<T extends string>({
               close();
             }}
           >
-            <span className={`${styles.optionLabel} ${option.tone}`}>{option.icon}{option.label}</span>
+            <span className={styles.optionLabel}>{option.icon}{option.label}</span>
             {option.value === value && <Check size={13} aria-hidden="true" />}
           </button>
         ))}

@@ -1106,6 +1106,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/shared-steps": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** List reusable shared steps */
+        get: operations["listSharedSteps"];
+        put?: never;
+        /** Create a reusable shared step */
+        post: operations["createSharedStep"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/shared-steps/{sharedStepId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                sharedStepId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Get a reusable shared step */
+        get: operations["getSharedStep"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Create the next shared-step revision */
+        patch: operations["reviseSharedStep"];
+        trace?: never;
+    };
     "/dashboard-analytics/summary": {
         parameters: {
             query?: never;
@@ -1889,6 +1936,14 @@ export interface components {
             testData?: components["schemas"]["LongText"];
             /** @default true */
             required: boolean;
+            /** @description Live reference to a project-scoped shared step. When present, the shared procedure is resolved by the server. */
+            sharedStepId?: components["schemas"]["Identifier"] | null;
+        };
+        SharedStepSnapshot: {
+            id: components["schemas"]["Identifier"];
+            title: string;
+            revision: number;
+            items: components["schemas"]["SharedStepItem"][];
         };
         TestStep: {
             id: components["schemas"]["Identifier"];
@@ -1898,6 +1953,65 @@ export interface components {
             testData?: components["schemas"]["LongText"];
             required: boolean;
             attachmentIds: components["schemas"]["Identifier"][];
+            sharedStepId: components["schemas"]["Identifier"] | null;
+            sharedStep: components["schemas"]["SharedStepSnapshot"] | null;
+        };
+        SharedStepItemInput: {
+            id?: components["schemas"]["Identifier"];
+            order?: number;
+            action: components["schemas"]["LongText"];
+            expectedResult: components["schemas"]["LongText"];
+            testData?: components["schemas"]["LongText"];
+            /** @default true */
+            required: boolean;
+        };
+        SharedStepItem: components["schemas"]["SharedStepItemInput"] & {
+            attachmentIds: components["schemas"]["Identifier"][];
+        };
+        SharedStepWriteRequest: {
+            title: string;
+            items: components["schemas"]["SharedStepItemInput"][];
+            changeNote?: components["schemas"]["ShortText"];
+        };
+        SharedStepRevision: {
+            revision: number;
+            title: string;
+            items: components["schemas"]["SharedStepItem"][];
+            changeNote: components["schemas"]["ShortText"];
+            createdBy: components["schemas"]["Identifier"];
+            createdAt: components["schemas"]["Timestamp"];
+        };
+        SharedStep: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            currentRevision: number;
+            current: components["schemas"]["SharedStepRevision"];
+            revisionCount: number;
+            /** Format: date-time */
+            archivedAt: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+        };
+        SharedStepSummary: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            currentRevision: number;
+            title: string;
+            itemCount: number;
+            usageCount: number;
+            revisionCount: number;
+            /** Format: date-time */
+            archivedAt: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            etag: string;
+        };
+        SharedStepEnvelope: {
+            data: components["schemas"]["SharedStep"];
+        };
+        SharedStepListEnvelope: {
+            data: components["schemas"]["SharedStepSummary"][];
+            meta: components["schemas"]["PageMeta"];
         };
         ChecklistItemInput: {
             id?: components["schemas"]["Identifier"];
@@ -3175,6 +3289,29 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["TestCaseEnvelope"];
+            };
+        };
+        /** @description A page of reusable shared-step summaries ordered by update time. */
+        SharedStepListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SharedStepListEnvelope"];
+            };
+        };
+        /** @description Current shared-step revision. */
+        SharedStepResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SharedStepEnvelope"];
             };
         };
         /** @description All requested cases in request order, with changed and unchanged counts. */
@@ -5643,6 +5780,119 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSharedSteps: {
+        parameters: {
+            query?: {
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                q?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["SharedStepListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createSharedStep: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SharedStepWriteRequest"];
+            };
+        };
+        responses: {
+            201: components["responses"]["SharedStepResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSharedStep: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                sharedStepId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["SharedStepResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reviseSharedStep: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                sharedStepId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SharedStepWriteRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["SharedStepResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
         };
     };

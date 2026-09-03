@@ -26,7 +26,8 @@ test("maps full case detail with case links and immutable current revision", () 
     revision: 3, title: "Sign in", description: "Account access", preconditions: "User exists",
     type: "automated", lifecycle: "ready", priority: "critical", component: "Auth",
     ownerIdentityId: null, tags: ["smoke", "ci.backend"], estimatedMinutes: 5, testData: "qa@example.test",
-    steps: [{ id: "step-1", order: 1, action: "Sign in", expectedResult: "Home opens", required: true, attachmentIds: ["att-step"] }],
+    steps: [{ id: "step-1", order: 1, action: "Sign in", expectedResult: "Home opens",
+      required: true, attachmentIds: ["att-step"], sharedStepId: null, sharedStep: null }],
     checklist: [], attachmentIds: ["att-revision"], changeNote: "Clarify result",
     createdBy: "identity-1", createdAt: timestamps.createdAt,
   };

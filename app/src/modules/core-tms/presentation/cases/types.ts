@@ -7,6 +7,7 @@ import type { CaseFilters } from "../../state/types/workspace";
 import type { CaseInspectorEditor } from "./inspector/model";
 import type { BulkCaseMutationResult } from "../../../../core/tms/contracts/test-cases/bulk-case-contract";
 import type { CaseCollaborationViewModel } from "./collaboration/model";
+import type { SharedStep, SharedStepSummary } from "../../shared-steps/model/shared-step";
 
 export type CasesViewProps = {
   query: string;
@@ -43,6 +44,8 @@ export type CasesViewProps = {
   onNewFolder: () => void;
   detailLoadError: boolean;
   onRetryDetail: () => void;
+  sharedSteps: readonly SharedStepSummary[];
+  onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   editor?: CaseInspectorEditor;
 };
 

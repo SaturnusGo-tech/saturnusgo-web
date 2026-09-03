@@ -33,6 +33,7 @@ export const enShellMessages = {
   "nav.ariaLabel": "Falcon sections",
   "nav.dashboard": "Dashboard",
   "nav.cases": "Test cases",
+  "nav.sharedSteps": "Shared steps",
   "nav.integrations": "Integration testing",
   "nav.apiTesting": "API Testing",
   "nav.runs": "Test runs",

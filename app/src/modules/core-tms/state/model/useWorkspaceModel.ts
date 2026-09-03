@@ -10,6 +10,7 @@ import { useCaseBulkActions } from "../case-bulk/useCaseBulkActions";
 import { useCaseCollaboration } from "../case-collaboration/useCaseCollaboration";
 import { useDefectNavigation } from "../defect-navigation/useDefectNavigation";
 import { useSelectedDefectResource } from "../defect-resource/useSelectedDefectResource";
+import { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
 
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
@@ -41,6 +42,7 @@ export function useWorkspaceModel() {
     state.connection === "connected", derived.project?.id ?? "", derived.projectDefects,
     defectNavigation.selectedDefectId,
   );
+  const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection);
   useEffect(() => {
     if (selectedDefectResource.status === "ready"
       && selectedDefectResource.data?.projectId === derived.project?.id) {
@@ -65,6 +67,7 @@ export function useWorkspaceModel() {
     ...defectNavigation,
     reportDefects,
     selectedDefectResource,
+    sharedSteps,
   };
 }
 

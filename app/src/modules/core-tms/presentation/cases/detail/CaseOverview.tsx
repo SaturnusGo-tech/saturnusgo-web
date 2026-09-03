@@ -4,6 +4,7 @@ import type { TmsLocale } from "../../../localization/model/locale";
 import { CaseInspectorContent } from "../inspector/CaseInspectorContent";
 import { CaseCommentsSection } from "../collaboration/comments/CaseCommentsTab";
 import type { CaseCollaborationViewModel } from "../collaboration/model";
+import type { SharedStep, SharedStepSummary } from "../../../shared-steps/model/shared-step";
 
 export function CaseOverview({
   locale,
@@ -14,6 +15,8 @@ export function CaseOverview({
   languageTag,
   collaboration,
   archived,
+  sharedSteps,
+  onResolveSharedStep,
 }: {
   locale: TmsLocale;
   revision: TestCaseRevision;
@@ -23,6 +26,8 @@ export function CaseOverview({
   languageTag: string;
   collaboration: CaseCollaborationViewModel;
   archived?: boolean;
+  sharedSteps: readonly SharedStepSummary[];
+  onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
 }) {
   return <>
     <CaseInspectorContent
@@ -30,6 +35,8 @@ export function CaseOverview({
       revision={revision}
       archived={archived}
       editor={editor}
+      sharedSteps={sharedSteps}
+      onResolveSharedStep={onResolveSharedStep}
       onRequestEdit={onRequestEdit}
     />
     {testCaseId && <CaseCommentsSection

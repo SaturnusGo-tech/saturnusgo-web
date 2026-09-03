@@ -16,6 +16,8 @@ const projectStyles = readFileSync(new URL("../../../dialogs/project/projectDial
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
+const scenarioStep = readFileSync(new URL("../steps/editor/ScenarioStepEditor.tsx", import.meta.url), "utf8");
+const scenarioInput = readFileSync(new URL("../steps/editor/ScenarioTextInput.tsx", import.meta.url), "utf8");
 const comments = readFileSync(new URL("../../collaboration/comments/CaseCommentsTab.tsx", import.meta.url), "utf8");
 const detailActions = readFileSync(new URL("../../detail/header/CaseDetailHeaderActions.tsx", import.meta.url), "utf8");
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
@@ -55,8 +57,8 @@ test("case Markdown inputs attach or paste private files from the conventional l
   assert.match(content, /attachmentKey="description"/);
   assert.match(content, /attachmentKey="preconditions"/);
   assert.match(details, /attachmentKey="test-data"/);
-  assert.match(steps, /attachmentKey=\{`checklist:\$\{item\.id\}`\}/);
-  assert.match(steps, /attachmentStepId=\{step\.id\}/);
+  assert.match(steps, /fieldKey=\{`checklist:\$\{props\.id\}`\}/);
+  assert.match(scenarioStep, /stepId=\{props\.step\.id\}/);
   assert.match(comments, /allowAttachments=\{false\}/);
 });
 
@@ -111,7 +113,8 @@ test("rich text is scoped to narrative test-case fields", () => {
   assert.match(content, /value=\{value\.description\}/);
   assert.match(content, /value=\{value\.preconditions\}/);
   assert.match(details, /value=\{revision\.testData\}/);
-  assert.match(steps, /value=\{step\.action\}/);
+  assert.doesNotMatch(steps, /MarkdownField/);
+  assert.match(steps, /<ScenarioStepEditor/);
   assert.doesNotMatch(content, /<MarkdownField[^>]+value=\{value\.component\}/s);
 });
 
@@ -119,10 +122,24 @@ test("section snapshots and rich field labels remain interaction-safe", () => {
   assert.match(content, /if \(snapshots\.current\[section\]\) return/);
   assert.match(section, /!props\.persistentEditing && !active/);
   assert.match(details, /className=\{`\$\{css\.wideField\} \$\{css\.markdownControl\}`\}/);
-  assert.match(steps, /className=\{css\.markdownControl\}/);
   const markdownInsideLabel = /<label[^>]*>(?:(?!<\/label>)[\s\S])*<MarkdownField/;
   assert.doesNotMatch(details, markdownInsideLabel);
-  assert.doesNotMatch(steps, markdownInsideLabel);
+  assert.doesNotMatch(scenarioStep, /MarkdownField/);
+});
+
+test("scenario editing is a clean hierarchical sheet instead of boxed Markdown fields", () => {
+  assert.match(scenarioStep, /scenarioLineLabel\(props\.order, lineIndex\)/);
+  assert.match(scenarioStep, /event\.key === "Enter"/);
+  assert.match(scenarioStep, /insertScenarioLine/);
+  assert.match(scenarioStep, /event\.key === "Backspace"/);
+  assert.match(scenarioStep, /removeScenarioLine/);
+  assert.match(scenarioStep, /Ожидаемый результат/);
+  assert.match(scenarioStep, /ScenarioAttachmentControls/);
+  assert.match(scenarioStep, /onPaste=\{actionAttachments\.paste\}/);
+  assert.doesNotMatch(scenarioStep, /Обязательный шаг|Required step/);
+  assert.match(scenarioInput, /rows=\{1\}/);
+  assert.match(scenarioInput, /node\.scrollHeight/);
+  assert.doesNotMatch(scenarioStep, /MarkdownField|MDXEditor/);
 });
 
 test("a handled select Escape cannot close its containing modal", () => {
@@ -136,7 +153,8 @@ test("create mode shares the same calm two-column hierarchy and stable action ba
   assert.match(creation, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
   assert.match(creation, /<aside className=\{css\.sideRail\}[\s\S]*Расположение[\s\S]*Свойства[\s\S]*Дополнительно/);
   assert.doesNotMatch(creation, /number=|creationTone_|<details/);
-  assert.match(creation, /<MarkdownField[\s\S]*revision\.description/);
+  assert.match(creation, /CreationNarrativeSection[\s\S]*section="description"/);
+  assert.match(creation, /onChange=\{editing \? onChange : undefined\}/);
   assert.match(creation, /<InspectorSteps revision=\{revision\} editing/);
   assert.ok(detailPanel.lastIndexOf("</form>") < detailPanel.lastIndexOf("{creating && editorActions}"));
   assert.match(detailPanel, /!creating && editorActions/);

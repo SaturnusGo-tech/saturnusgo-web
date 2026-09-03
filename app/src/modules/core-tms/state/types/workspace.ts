@@ -3,6 +3,7 @@ import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-con
 export type View =
   | "dashboard"
   | "cases"
+  | "shared-steps"
   | "integrations"
   | "api"
   | "suites"

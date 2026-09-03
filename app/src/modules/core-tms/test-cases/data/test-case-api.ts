@@ -37,8 +37,8 @@ function revisionWrite(revision: TestCaseRevision) {
     tags: normalizeRevisionTags(revision.tags),
     estimatedMinutes: revision.estimatedMinutes,
     testData: revision.testData,
-    steps: revision.steps.map(({ id, order, action, expectedResult, testData, required }) => (
-      { id, order, action, expectedResult, testData, required }
+    steps: revision.steps.map(({ id, order, action, expectedResult, testData, required, sharedStepId }) => (
+      { id, order, action, expectedResult, testData, required, sharedStepId: sharedStepId ?? null }
     )),
     checklist: revision.checklist.map(({ id, order, text, required }) => (
       { id, order, text, required }
