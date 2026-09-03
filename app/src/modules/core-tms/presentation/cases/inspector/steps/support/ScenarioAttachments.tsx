@@ -49,6 +49,7 @@ export function ScenarioAttachmentControls(props: DraftAttachmentsProps) {
       locale={locale}
       entries={attachments.pending}
       onRemove={attachments.remove}
+      presentation="media"
     />}
     {attachments.problem && <span className={css.attachmentError} role="alert">
       {attachments.problem}
@@ -59,6 +60,6 @@ export function ScenarioAttachmentControls(props: DraftAttachmentsProps) {
 export function SavedScenarioAttachments({ ids }: { ids?: string[] }) {
   if (!ids || ids.length === 0) return null;
   return <div className={css.savedAttachments}>
-    {ids.map((id) => <AttachmentLink key={id} attachmentId={id} previewable />)}
+    {ids.map((id) => <AttachmentLink key={id} attachmentId={id} presentation="media" />)}
   </div>;
 }

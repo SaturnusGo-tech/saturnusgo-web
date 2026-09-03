@@ -3,6 +3,7 @@
 import { FileText, Film, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PendingCaseAttachment } from "../../../../../application/evidence/case/pendingCaseAttachment";
+import { AttachmentMediaFrame } from "../../../../../attachments/presentation/link/AttachmentMediaFrame";
 import type { TmsLocale } from "../../../../../localization/model/locale";
 import css from "../markdownField.module.css";
 
@@ -33,9 +34,15 @@ export function MarkdownPendingAttachments(props: {
   locale: TmsLocale;
   entries: PendingCaseAttachment[];
   onRemove: (id: string) => void;
+  presentation?: "compact" | "media";
 }) {
   if (props.entries.length === 0) return null;
   const remove = props.locale === "ru" ? "Удалить" : "Remove";
+  if (props.presentation === "media") return <div className={css.pendingMediaGrid}
+    aria-label={props.locale === "ru" ? "Новые вложения" : "New attachments"}>
+    {props.entries.map((entry) => <PendingMediaAttachment key={entry.id} entry={entry}
+      locale={props.locale} onRemove={() => props.onRemove(entry.id)} />)}
+  </div>;
   return <div className={css.attachmentStrip} aria-label={props.locale === "ru" ? "Новые вложения" : "New attachments"}>
     {props.entries.map((entry) => <span className={css.attachmentChip} key={entry.id}>
       <AttachmentPreview file={entry.file} />
@@ -46,6 +53,39 @@ export function MarkdownPendingAttachments(props: {
       </button>
     </span>)}
   </div>;
+}
+
+function PendingMediaAttachment({ entry, locale, onRemove }: {
+  entry: PendingCaseAttachment;
+  locale: TmsLocale;
+  onRemove: () => void;
+}) {
+  const [source, setSource] = useState("");
+  const mediaType = entry.file.type.startsWith("image/")
+    ? "image"
+    : entry.file.type.startsWith("video/") ? "video" : null;
+  useEffect(() => {
+    if (!mediaType) return;
+    const url = URL.createObjectURL(entry.file);
+    setSource(url);
+    return () => URL.revokeObjectURL(url);
+  }, [entry.file, mediaType]);
+  if (!mediaType) return <span className={css.attachmentChip}>
+    <AttachmentPreview file={entry.file} />
+    <span><b>{entry.file.name}</b><small>{formatBytes(entry.file.size)}</small></span>
+    <button type="button" onClick={onRemove} aria-label={`${locale === "ru" ? "Удалить" : "Remove"} ${entry.file.name}`}>
+      <X size={13} />
+    </button>
+  </span>;
+  return <AttachmentMediaFrame
+    name={entry.file.name}
+    detail={formatBytes(entry.file.size)}
+    source={source}
+    mediaType={mediaType}
+    locale={locale}
+    onOpen={() => window.open(source, "_blank", "noopener,noreferrer")}
+    onRemove={onRemove}
+  />;
 }
 
 function AttachmentPreview({ file }: { file: File }) {

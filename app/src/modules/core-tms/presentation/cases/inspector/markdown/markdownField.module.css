@@ -80,6 +80,8 @@
 .attachmentButton:focus-visible { color: var(--cases-strong); background: var(--cases-hover); border-color: var(--cases-control-border); }
 .attachmentButton:disabled { cursor: default; opacity: .45; }
 .attachmentStrip { display: flex; gap: 5px; overflow-x: auto; padding: 6px 8px; background: var(--cases-raised); border-top: 1px solid var(--cases-border); scrollbar-width: thin; }
+.pendingMediaGrid { min-width: 0; display: grid; gap: 9px; padding: 5px 0 2px; }
+.pendingMediaGrid > figure { max-width: 100%; }
 .attachmentChip { min-width: 0; max-width: 210px; flex: 0 0 auto; display: grid; grid-template-columns: 24px minmax(0, 1fr) 22px; align-items: center; gap: 5px; padding: 3px 4px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 4px; }
 .attachmentChip > img { width: 24px; height: 24px; object-fit: cover; border-radius: 3px; }
 .attachmentChip > svg { justify-self: center; color: var(--cases-muted); }

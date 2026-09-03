@@ -720,6 +720,15 @@
 .stepsList p svg { flex: 0 0 auto; margin-top: 1px; color: #73bf91; }
 
 .contextList { padding-bottom: 22px; }
+.attachmentGallery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 24px;
+}
+.attachmentGallery > figure { flex: 0 0 auto; }
+.attachmentLinks { border-top: 1px solid var(--cases-row-border); }
 .runRecord,
 .activityRecord,
 .fileRecord {

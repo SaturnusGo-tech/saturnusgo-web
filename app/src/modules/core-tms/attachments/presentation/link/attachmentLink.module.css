@@ -1,36 +1,7 @@
 .attachment {
   display: inline-grid !important;
-  grid-template-columns: auto minmax(0, auto) auto;
+  grid-template-columns: minmax(0, auto) auto;
   align-items: center;
   padding: 0 !important;
   overflow: hidden;
-}
-
-.disclosure {
-  width: 22px;
-  height: 24px;
-  justify-content: center;
-  padding: 0 !important;
-  color: var(--cases-faint, currentColor) !important;
-}
-
-.preview {
-  grid-column: 1 / -1;
-  width: 190px;
-  height: 118px;
-  display: grid !important;
-  place-items: center;
-  overflow: hidden;
-  padding: 0 !important;
-  background: color-mix(in srgb, var(--cases-control, #fff) 88%, #000);
-  border: 1px solid var(--cases-control-border, #d7d9df);
-  border-radius: 8px;
-}
-
-.preview img,
-.preview video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
 }

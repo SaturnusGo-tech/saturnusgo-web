@@ -11,6 +11,11 @@ const menuCss = readFileSync(new URL("../../steps/menu/stepActionMenu.module.css
 const scenarioCss = readFileSync(new URL("../../steps/scenarioSteps.module.css", import.meta.url), "utf8");
 const sharedEditor = readFileSync(new URL("../../../../shared-steps/SharedStepEditor.tsx", import.meta.url), "utf8");
 const sharedCss = readFileSync(new URL("../../../../shared-steps/sharedSteps.module.css", import.meta.url), "utf8");
+const media = readFileSync(new URL("../../../../../attachments/presentation/link/AttachmentMediaFrame.tsx", import.meta.url), "utf8");
+const mediaCss = readFileSync(new URL("../../../../../attachments/presentation/link/attachmentMediaFrame.module.css", import.meta.url), "utf8");
+const attachmentLink = readFileSync(new URL("../../../../../attachments/presentation/link/AttachmentLink.tsx", import.meta.url), "utf8");
+const scenarioAttachments = readFileSync(new URL("../../steps/support/ScenarioAttachments.tsx", import.meta.url), "utf8");
+const contextTab = readFileSync(new URL("../../../detail/tabs/CaseContextTab.tsx", import.meta.url), "utf8");
 
 test("shared procedures are inserted as live references and ordered with regular steps", () => {
   const first = emptyScenarioStep(1);
@@ -49,4 +54,30 @@ test("shared-step canvas and action menu use opaque integrated surfaces", () => 
   assert.match(sharedCss, /--cases-bg: var\(--ss-bg\)/);
   assert.match(sharedCss, /\.paper \{[^}]*background: transparent;[^}]*border: 0;[^}]*box-shadow: none/s);
   assert.match(menuCss, /background: var\(--cases-bg, #fff\)/);
+});
+
+test("scenario and attachment tabs render image and video evidence as media", () => {
+  assert.match(attachmentLink, /presentation === "media" && \(isImage \|\| isVideo\)/);
+  assert.match(scenarioAttachments, /presentation="media"/);
+  assert.match(contextTab, /presentation="media" variant="gallery"/);
+  assert.match(media, /<img src=\{source\} alt=\{name\}/);
+  assert.match(media, /<video src=\{source\} controls/);
+  assert.match(mediaCss, /object-fit: contain/);
+});
+
+test("media evidence has smooth disclosure and proportional pointer resizing", () => {
+  assert.match(media, /startResize\("left", event\)/);
+  assert.match(media, /startResize\("right", event\)/);
+  assert.match(media, /aria-expanded=\{expanded\}/);
+  assert.match(mediaCss, /grid-template-rows 190ms/);
+  assert.match(mediaCss, /cursor: ew-resize/);
+  assert.match(mediaCss, /width: 100%;[\s\S]*height: auto/);
+});
+
+test("step action menu stays inside the scenario edge and flips vertically", () => {
+  assert.match(menu, /data-placement=\{placement\}/);
+  assert.match(menu, /spaceAbove/);
+  assert.match(menu, /spaceBelow/);
+  assert.match(menuCss, /\.menu\[data-trigger="icon"\] \{ right: 0; left: auto/);
+  assert.match(menuCss, /\.menu\[data-placement="top"\]/);
 });

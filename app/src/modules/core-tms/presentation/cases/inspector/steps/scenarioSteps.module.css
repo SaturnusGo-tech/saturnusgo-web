@@ -310,36 +310,16 @@
 .savedAttachments {
   display: flex;
   flex-wrap: nowrap;
-  gap: 5px;
-  margin: 4px 0 0 54px;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0 2px 43px;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
-  padding-bottom: 3px;
+  padding: 1px 2px 7px 0;
   scrollbar-width: thin;
 }
 
-.savedAttachments > span {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px 4px;
-  background: var(--cases-control);
-  border-radius: 4px;
-}
-
-.savedAttachments button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 4px;
-  color: var(--cases-link);
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  font: inherit;
-  font-size: 10px;
-}
+.savedAttachments > figure { flex: 0 0 auto; }
 
 .checklistView {
   display: grid;
@@ -410,6 +390,6 @@
 
   .savedAttachments,
   .viewData {
-    margin-left: 54px;
+    margin-left: 38px;
   }
 }

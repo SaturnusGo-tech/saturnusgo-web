@@ -3,7 +3,7 @@
 import {
   ClipboardCheck, Copy, MoreHorizontal, Plus, Repeat2, Trash2,
 } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import css from "./stepActionMenu.module.css";
 
@@ -24,7 +24,9 @@ export function StepActionMenu({
   onInsertShared, onDuplicate, onRemove,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [placement, setPlacement] = useState<"top" | "bottom">(trigger === "add" ? "top" : "bottom");
   const root = useRef<HTMLDivElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
   const menuId = useId();
   useEffect(() => {
     if (!open) return;
@@ -34,6 +36,27 @@ export function StepActionMenu({
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, [open]);
+  useLayoutEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const anchor = root.current?.getBoundingClientRect();
+      const popup = menu.current;
+      if (!anchor || !popup) return;
+      const popupHeight = Math.min(popup.scrollHeight, window.innerHeight * .7);
+      const spaceAbove = anchor.top - 10;
+      const spaceBelow = window.innerHeight - anchor.bottom - 10;
+      const preferred = trigger === "add" ? "top" : "bottom";
+      if (preferred === "top") setPlacement(spaceAbove >= popupHeight || spaceAbove >= spaceBelow ? "top" : "bottom");
+      else setPlacement(spaceBelow >= popupHeight || spaceBelow >= spaceAbove ? "bottom" : "top");
+    };
+    place();
+    window.addEventListener("resize", place);
+    document.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      document.removeEventListener("scroll", place, true);
+    };
+  }, [open, trigger]);
   const act = (action: () => void) => { action(); setOpen(false); };
   return <div className={css.root} ref={root}>
     <button type="button" className={trigger === "add" ? css.addTrigger : css.iconTrigger}
@@ -44,8 +67,8 @@ export function StepActionMenu({
       {trigger === "add" ? <><Plus size={15} />{ru ? "Добавить шаг" : "Add step"}</>
         : <MoreHorizontal size={16} />}
     </button>
-    <div id={menuId} className={css.menu} role="menu" data-open={open}
-      data-trigger={trigger} aria-hidden={!open}>
+    <div id={menuId} ref={menu} className={css.menu} role="menu" data-open={open}
+      data-trigger={trigger} data-placement={placement} aria-hidden={!open}>
       {(onDuplicate || onRemove) && <>
         {onDuplicate && <MenuButton icon={<Copy size={15} />} label={ru ? "Дублировать" : "Duplicate"}
           onClick={() => act(onDuplicate)} />}

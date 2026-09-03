@@ -1,5 +1,6 @@
-import { Paperclip, Upload, X } from "lucide-react";
+import { Upload } from "lucide-react";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { MarkdownPendingAttachments } from "../markdown/attachments/MarkdownAttachmentUi";
 import css from "../caseInspector.module.css";
 import { useCaseAttachmentDraft } from "./CaseAttachmentDraftContext";
 
@@ -11,6 +12,7 @@ export function InspectorPendingAttachments({ locale }: Props) {
   const draft = useCaseAttachmentDraft();
   if (!draft?.enabled) return null;
   const ru = locale === "ru";
+  const entries = draft.entries.filter((entry) => entry.fieldKey === "case-files");
   return <div className={css.attachmentPicker}>
     <label>
       <Upload size={16} />
@@ -24,12 +26,8 @@ export function InspectorPendingAttachments({ locale }: Props) {
         }}
       />
     </label>
-    {draft.entries.length > 0 && <div className={css.pendingFiles}>
-      {draft.entries.map((entry) => <span key={entry.id}>
-        <Paperclip size={13} /><b>{entry.file.name}</b>
-        <button type="button" aria-label={`${ru ? "Удалить" : "Remove"} ${entry.file.name}`} onClick={() => draft.remove(entry.id)}><X size={13} /></button>
-      </span>)}
-    </div>}
+    {entries.length > 0 && <MarkdownPendingAttachments locale={locale} entries={entries}
+      onRemove={draft.remove} presentation="media" />}
     {draft.problem?.fieldKey === "case-files" && <span role="alert">{draft.problem.message}</span>}
   </div>;
 }

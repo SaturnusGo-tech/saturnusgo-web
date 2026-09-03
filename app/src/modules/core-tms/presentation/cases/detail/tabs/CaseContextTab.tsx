@@ -52,14 +52,15 @@ export function CaseContextTab(props: Props) {
           text={ru ? "Нет файлов и ссылок" : "No files or links"}
         />
       : <>
-          {props.revision.attachmentIds.map((id) => (
-            <span className={styles.fileRecord} key={id}>
-              <Paperclip size={15} /><AttachmentLink attachmentId={id} />
-            </span>
-          ))}
-          {props.linkIds.map((id) => <span className={styles.fileRecord} key={id}>
-            <ExternalLink size={15} /><span>{id}</span>
-          </span>)}
+          {props.revision.attachmentIds.length > 0 && <div className={styles.attachmentGallery}>
+            {props.revision.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id}
+              presentation="media" variant="gallery" />)}
+          </div>}
+          {props.linkIds.length > 0 && <div className={styles.attachmentLinks}>
+            {props.linkIds.map((id) => <span className={styles.fileRecord} key={id}>
+              <ExternalLink size={15} /><span>{id}</span>
+            </span>)}
+          </div>}
         </>}
   </div>;
 }

@@ -460,6 +460,23 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Scenario media and bounded step actions — local release pass
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-9a3fb18e-3ecc-4350-adc0-0d2b897453b3.png` (1646×1466 px) for the reported menu collision, plus the official Atlassian Confluence media-resize reference captured at `.design-qa/media-attachments-2026-09-04/source-atlassian-resize.png` (1280×720 px).
+- Browser-rendered implementation: `.design-qa/media-attachments-2026-09-04/implementation-popup-and-media.png`, `.design-qa/media-attachments-2026-09-04/implementation-gallery-handles.png`, and `.design-qa/media-attachments-2026-09-04/implementation-attachments-gallery.png`, each captured from the real Falcon local workspace at a 1280×720 CSS viewport. Browser output was normalized to 1280×720 pixels; no density stretching was used.
+- Full comparisons: `.design-qa/media-attachments-2026-09-04/popup-comparison.png` and `.design-qa/media-attachments-2026-09-04/media-resize-comparison.png` place each source beside the matching implementation state. The reported source was aspect-preserved and centered on a 1280×720 comparison canvas.
+- State: Russian locale, light theme, fullscreen test-case document, scenario editing, one pending PNG in the first step, step action popup open, then the case-level Attachments tab with a separate pending PNG.
+- Typography and copy: the media header uses the existing Falcon 9–11px metadata scale and truncates long filenames. Storage terminology, MIME labels, and technical download rows are absent; only filename, file size, disclosure, full-size, and delete actions remain.
+- Spacing and layout: media is part of the document flow, bounded by its scenario or gallery container. The default widths are 430px in a step and 520px in the gallery, both clamped to the available parent width. Side handles update width in 24px keyboard increments or continuously by pointer while height remains automatic.
+- Colors and tokens: the frame, header, controls, focus state, border, and shadow use existing case-surface tokens in both themes. The implementation introduces no new saturated media chrome or decorative asset.
+- Image quality: PNG and video sources render directly with `object-fit: contain`, automatic height, and no crop or distortion. Hover/focus exposes two real resize handles; the comparison confirms the same proportional side-handle behavior as the Atlassian reference.
+- Interaction verification: file chooser upload, pending image preview, full-size action, delete action presence, left/right keyboard resize (430px → 478px), disclosure collapse/expand, case-level gallery rendering, fullscreen layout, and dynamic menu placement were exercised in the in-app Browser. The screenshot state remained inside the scenario column and no longer crossed into Properties.
+- P1 comparison history: the supplied Falcon state positioned the popup from the trigger's left edge, so it covered priority, type, estimate, and additional metadata. The icon menu now anchors from its right edge and measures available viewport space on open, resize, and scroll to choose top or bottom. Post-fix evidence is `implementation-popup-and-media.png`; the popup ends before the Properties rail.
+- P2 comparison history: attachment rows previously rendered as filename-first technical controls with a fixed 190×118 preview. They now render as the actual image/video by default in scenario and Attachments contexts, with smooth disclosure and proportional resizing. Post-fix evidence is `implementation-gallery-handles.png` and `implementation-attachments-gallery.png`.
+- Verification: focused scenario tests passed 11/11; full TMS adapters/UI passed 175/175; TypeScript, 305-file TMS architecture, `git diff --check`, and the optimized 61-page production build passed.
+
+final result: passed
+
 ## Scenario hierarchy hotfix and shared-step persistence — final production pass
 
 - Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_0UMccb/Screenshot 2026-09-03 at 11.51.33 PM.png` for the exact TestOps step geometry; `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-c22b1afc-ff8d-4f82-bcb9-c1c3c9c8ac77.png` and `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-84a3835a-6ab8-4601-8713-f548079914cd.png` for the reported Falcon detail/list failures.

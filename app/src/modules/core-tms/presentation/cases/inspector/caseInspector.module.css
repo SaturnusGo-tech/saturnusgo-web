@@ -86,9 +86,10 @@
 .editStep > button:disabled { cursor: not-allowed; opacity: .35; }
 .addButton { justify-self: start; margin-top: 2px; }
 
-.attachmentPicker { margin: 10px 24px 0; padding: 12px; color: var(--cases-muted); background: var(--cases-raised); border: 1px dashed var(--cases-control-border); border-radius: 5px; }
-.attachmentPicker label { display: flex; align-items: center; gap: 7px; cursor: pointer; }
-.attachmentPicker input { margin-left: auto; max-width: 220px; font-size: 11px; }
+.attachmentPicker { margin: 16px 24px 0; padding: 0; color: var(--cases-muted); }
+.attachmentPicker label { min-height: 34px; width: max-content; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 8px; cursor: pointer; font-size: 12px; }
+.attachmentPicker label:hover { color: var(--cases-strong); background: var(--cases-hover); }
+.attachmentPicker input { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .pendingFiles { display: grid; gap: 4px; margin-top: 8px; }
 .pendingFiles span { min-height: 30px; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 3px 6px; color: var(--cases-secondary-text); background: var(--cases-control); border-radius: 4px; font-size: 11px; }
 .pendingFiles span > b { overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
@@ -124,6 +125,5 @@
   .compactFields, .railFields { grid-template-columns: 1fr; }
   .wideField { grid-column: auto; }
   .caseByline { display: grid; gap: 3px; }
-  .attachmentPicker label { align-items: flex-start; flex-direction: column; }
-  .attachmentPicker input { margin-left: 0; max-width: 100%; }
+  .attachmentPicker label { align-items: center; flex-direction: row; }
 }
