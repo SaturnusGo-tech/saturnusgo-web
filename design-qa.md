@@ -474,8 +474,11 @@ final result: passed in production
 - P1 comparison history: the supplied Falcon state positioned the popup from the trigger's left edge, so it covered priority, type, estimate, and additional metadata. The icon menu now anchors from its right edge and measures available viewport space on open, resize, and scroll to choose top or bottom. Post-fix evidence is `implementation-popup-and-media.png`; the popup ends before the Properties rail.
 - P2 comparison history: attachment rows previously rendered as filename-first technical controls with a fixed 190×118 preview. They now render as the actual image/video by default in scenario and Attachments contexts, with smooth disclosure and proportional resizing. Post-fix evidence is `implementation-gallery-handles.png` and `implementation-attachments-gallery.png`.
 - Verification: focused scenario tests passed 11/11; full TMS adapters/UI passed 175/175; TypeScript, 305-file TMS architecture, `git diff --check`, and the optimized 61-page production build passed.
+- Production rollout: frontend source `d337949990a890570edb0e0c476946b4584dfada` is served by Pages commit `82953740`. The static export completed 60/60 routes.
+- Connected production evidence: `.design-qa/media-attachments-2026-09-04/production-popup-and-media.png` confirms the real pending image preview and an upward-opening step menu bounded by the scenario column; `.design-qa/media-attachments-2026-09-04/production-attachments-gallery.png` confirms actual media rendering in the case Attachments tab.
+- Production safety and runtime: both uploads were temporary pending files used only for interaction QA; editing was cancelled and no test-case data was persisted. The production Browser reported zero console errors and zero warnings after the complete interaction path.
 
-final result: passed
+final result: passed in production
 
 ## Scenario hierarchy hotfix and shared-step persistence — final production pass
 
