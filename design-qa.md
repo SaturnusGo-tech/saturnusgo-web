@@ -551,3 +551,15 @@ final result: passed
 - Final gate: TypeScript, 275-file architecture, focused dashboard 9/9, full TMS adapters/UI 159/159, `git diff --check`, optimized production build 61/61, and Pages export 60/60 passed after the correction. The signed-in production console remained clean.
 
 final result: passed in production
+
+## Scenario density and shared steps — final production pass
+
+- Release sources: backend `033c439943c2590a04f749b073e1f23b03dc1adc`; frontend `08d3d61b7db67449198a6c06f7ae058a86a3634d`; Pages publication `000553c1`.
+- Backend rollout used two compatible stages. Deployment `0cc8edf1-e599-47fb-82e9-bcca3802d1d6` installed the runtime while schema 0018 remained valid; deployment `7d6ef6fb-e893-4792-bca9-e781572b8336` then applied migration 0019 and became healthy. Its pre-deploy log recorded exactly one applied migration.
+- Connected API verification: authenticated production navigation issued `OPTIONS 204` and `GET 200` for `/api/v1/projects/project_59c48ce2121f461c8e604f35a9706aa3/shared-steps` on deployment `7d6ef6fb-e893-4792-bca9-e781572b8336`; the GET completed in 12 ms. `/api/v1/health` returned the expected `ok` envelope after both stages.
+- Production UI verification: the signed-in in-app Browser loaded the new `Общие шаги` destination, empty list state, continuous shared-step editor, dense scenario row, and opaque action menu. The menu exposed duplicate, delete, regular step, and step with expected result only; nested shared-step insertion and `Обязательный шаг` were absent.
+- Creation verification: a new test-case draft initially rendered `Описание` and `Предусловия` as quiet read-only sections. Activating `Изменить Описание` mounted the Markdown editor and attachment control; no editor existed before that explicit action.
+- Production visual evidence: `.design-qa/shared-steps/production-shared-editor-menu-1688x1170.png` and `.design-qa/shared-steps/production-create-description-editor-1688x1170.png`. The complete same-width reported-state/production comparison is `.design-qa/shared-steps/production-shared-menu-comparison.png`.
+- Final connected console check: zero errors and zero warnings were recorded throughout shared-step navigation, editor menu, test-case creation, and Markdown activation.
+
+final result: passed in production
