@@ -46,7 +46,9 @@ export function Modal({
   const subtitleId = useId();
   const [sheetCompact, setSheetCompact] = useState(false);
   const [dragProgress, setDragProgress] = useState<number | null>(null);
+  const dragActiveRef = useRef(false);
   const dragOriginRef = useRef(0);
+  const dragStartProgressRef = useRef(0);
   const dragProgressRef = useRef(0);
   closeRef.current = onClose;
 
@@ -55,26 +57,13 @@ export function Modal({
     const panel = panelRef.current;
     if (!panel || event.clientY - panel.getBoundingClientRect().top > 38) return;
     if ((event.target as Element).closest("button, a, input, textarea, select")) return;
+    dragActiveRef.current = true;
     dragOriginRef.current = event.clientY;
-    dragProgressRef.current = sheetCompact ? 1 : 0;
+    dragStartProgressRef.current = sheetCompact ? 1 : 0;
+    dragProgressRef.current = dragStartProgressRef.current;
     setDragProgress(dragProgressRef.current);
     panel.setPointerCapture(event.pointerId);
     event.preventDefault();
-  };
-
-  const moveSheetDrag = (event: ReactPointerEvent<HTMLElement>) => {
-    if (dragProgress === null) return;
-    const delta = event.clientY - dragOriginRef.current;
-    const progress = Math.max(0, Math.min(1, (sheetCompact ? 1 : 0) + delta / 180));
-    dragProgressRef.current = progress;
-    setDragProgress(progress);
-  };
-
-  const finishSheetDrag = (event: ReactPointerEvent<HTMLElement>) => {
-    if (dragProgress === null) return;
-    if (panelRef.current?.hasPointerCapture(event.pointerId)) panelRef.current.releasePointerCapture(event.pointerId);
-    setSheetCompact(dragProgressRef.current >= .5);
-    setDragProgress(null);
   };
 
   const adaptiveStyle = adaptiveSheet && dragProgress !== null ? {
@@ -83,6 +72,31 @@ export function Modal({
     "--sheet-radius": `${dragProgress * 18}px`,
     "--sheet-border": `${dragProgress}px`,
   } as CSSProperties : undefined;
+
+  useEffect(() => {
+    const moveSheetDrag = (event: PointerEvent) => {
+      if (!dragActiveRef.current) return;
+      const delta = event.clientY - dragOriginRef.current;
+      const progress = Math.max(0, Math.min(1, dragStartProgressRef.current + delta / 180));
+      dragProgressRef.current = progress;
+      setDragProgress(progress);
+    };
+    const finishSheetDrag = (event: PointerEvent) => {
+      if (!dragActiveRef.current) return;
+      dragActiveRef.current = false;
+      if (panelRef.current?.hasPointerCapture(event.pointerId)) panelRef.current.releasePointerCapture(event.pointerId);
+      setSheetCompact(dragProgressRef.current >= .5);
+      setDragProgress(null);
+    };
+    window.addEventListener("pointermove", moveSheetDrag);
+    window.addEventListener("pointerup", finishSheetDrag);
+    window.addEventListener("pointercancel", finishSheetDrag);
+    return () => {
+      window.removeEventListener("pointermove", moveSheetDrag);
+      window.removeEventListener("pointerup", finishSheetDrag);
+      window.removeEventListener("pointercancel", finishSheetDrag);
+    };
+  }, []);
 
   useEffect(() => {
     const bodyOverflow = document.body.style.overflow;
@@ -152,9 +166,6 @@ export function Modal({
         aria-describedby={subtitle ? subtitleId : undefined}
         tabIndex={-1}
         onPointerDown={beginSheetDrag}
-        onPointerMove={moveSheetDrag}
-        onPointerUp={finishSheetDrag}
-        onPointerCancel={finishSheetDrag}
       >
         <header>
           <div>
