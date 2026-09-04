@@ -9,5 +9,10 @@ const detail: Suite = { ...summary, caseIds: [], filter: { tags: ["negative"] },
 test("dynamic suites wait for the authoritative resolved count", () => {
   assert.equal(resolvedRunSuiteCount(summary, null), null);
   assert.equal(resolvedRunSuiteCount(summary, detail), 45);
-  assert.equal(resolvedRunSuiteCount({ ...summary, type: "static", caseCount: 12 }, null), 12);
+});
+
+test("static suites also use the authoritative resolved count", () => {
+  const staticSummary = { ...summary, type: "static" as const, caseCount: 12 };
+  assert.equal(resolvedRunSuiteCount(staticSummary, null), null);
+  assert.equal(resolvedRunSuiteCount(staticSummary, { ...detail, type: "static", resolvedCaseCount: 10 }), 10);
 });

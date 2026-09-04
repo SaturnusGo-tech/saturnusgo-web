@@ -5,7 +5,6 @@ import { getSuite } from "../../suites/data/suite-api";
 
 export function resolvedRunSuiteCount(summary: SuiteSummary | undefined, detail: Suite | null) {
   if (!summary) return null;
-  if (summary.type === "static") return summary.caseCount;
   return detail?.id === summary.id ? detail.resolvedCaseCount : null;
 }
 
@@ -14,8 +13,15 @@ export function useResolvedSuiteCount(http: TmsHttpClient, suite: SuiteSummary |
   const [error, setError] = useState("");
   useEffect(() => {
     setDetail(null); setError("");
-    if (!suite || suite.type !== "dynamic") return;
-    if (offline) { setError(errorMessage); return; }
+    if (!suite) return;
+    if (offline) {
+      if (suite.type === "dynamic") {
+        setError(errorMessage);
+        return;
+      }
+      setDetail({ ...suite, caseIds: [], filter: {}, resolvedCaseCount: suite.caseCount });
+      return;
+    }
     const controller = new AbortController();
     getSuite(http, suite.id, controller.signal).then((resource) => setDetail(resource.data)).catch((caught: unknown) => {
       if (!(caught instanceof DOMException && caught.name === "AbortError")) setError(errorMessage);
