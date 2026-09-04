@@ -93,6 +93,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   const editorRef = useRef<MDXEditorMethods>(null);
   const overlayAnchor = useRef<HTMLDivElement>(null);
   const [overlayContainer, setOverlayContainer] = useState<HTMLElement | null>(null);
+  const [editorPainted, setEditorPainted] = useState(false);
   const initialMarkdown = stripRawHtml(props.markdown);
   const lastEmitted = useRef(initialMarkdown);
   const [problem, setProblem] = useState("");
@@ -139,6 +140,35 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     editorRef.current.setMarkdown(next);
   }, [props.markdown]);
 
+  useEffect(() => {
+    if (editorPainted) return;
+    let animationFrame = 0;
+    let matchingFrames = 0;
+    const expected = stripRawHtml(props.markdown).trim();
+    const waitForPaint = () => {
+      const editor = editorRef.current;
+      const rendered = stripRawHtml(editor?.getMarkdown() ?? "").trim();
+      const hasRenderedContent = Boolean(editor) && rendered === expected;
+      matchingFrames = hasRenderedContent ? matchingFrames + 1 : 0;
+      if (matchingFrames >= 2) {
+        setEditorPainted(true);
+        return;
+      }
+      animationFrame = window.requestAnimationFrame(waitForPaint);
+    };
+    animationFrame = window.requestAnimationFrame(waitForPaint);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [editorPainted, props.markdown]);
+
+  useEffect(() => {
+    if (!editorPainted || !props.autoFocus) return;
+    editorRef.current?.focus(undefined, { defaultSelection: "rootStart", preventScroll: true });
+  }, [editorPainted, props.autoFocus]);
+
+  const loadingHeight = props.compact
+    ? (props.onAttachmentFiles ? css.editorLoadingCompactWithFooter : css.editorLoadingCompact)
+    : css.editorLoadingRegular;
+
   return <>
     <div ref={overlayAnchor} className={css.editorOverlayHost} />
     <MDXEditor
@@ -172,6 +202,17 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     />}
     {props.onAttachmentFiles && <div className={css.editorFooter}>
       <MarkdownAttachmentButton locale={props.locale} onFiles={props.onAttachmentFiles} />
+    </div>}
+    {!editorPainted && <div className={`${css.editorLoading} ${css.editorBootOverlay} ${loadingHeight}`}>
+      <textarea
+        className={css.editorLoadingInput}
+        aria-label={props.label}
+        value={props.markdown}
+        autoFocus={props.autoFocus}
+        placeholder={props.locale === "ru" ? "Введите текст…" : "Enter text…"}
+        spellCheck
+        onChange={(event) => props.onChange(event.target.value)}
+      />
     </div>}
     {problem && <span className={css.editorError} role="alert">{problem}</span>}
   </>;

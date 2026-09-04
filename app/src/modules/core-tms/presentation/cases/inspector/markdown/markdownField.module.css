@@ -1,4 +1,5 @@
 .field {
+  position: relative;
   width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -98,6 +99,7 @@
 .editorLoadingRegular { height: 164px; min-height: 148px; }
 .editorLoadingCompact { height: 138px; min-height: 122px; }
 .editorLoadingCompactWithFooter { height: 140px; min-height: 128px; }
+.editorBootOverlay { position: absolute; z-index: 3; inset: 0; }
 .editorLoadingInput {
   box-sizing: border-box;
   width: 100%;

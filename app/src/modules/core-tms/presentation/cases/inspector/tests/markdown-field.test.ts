@@ -31,6 +31,13 @@ test("markdown fields use a client-only WYSIWYG editor with an interactive loadi
   assert.match(source, /value=\{state\.value\}/);
   assert.match(source, /onChange=\{\(event\) => state\.onChange\(event\.target\.value\)\}/);
   assert.match(styles, /\.editorLoadingInput/);
+  assert.match(initialized, /const \[editorPainted, setEditorPainted\] = useState\(false\)/);
+  assert.match(initialized, /stripRawHtml\(editor\?\.getMarkdown\(\) \?\? ""\)\.trim\(\)/);
+  assert.match(initialized, /matchingFrames >= 2/);
+  assert.match(initialized, /!editorPainted && <div className=\{`\$\{css\.editorLoading\} \$\{css\.editorBootOverlay\}/);
+  assert.match(initialized, /value=\{props\.markdown\}/);
+  assert.match(initialized, /onChange=\{\(event\) => props\.onChange\(event\.target\.value\)\}/);
+  assert.match(styles, /\.editorBootOverlay \{ position: absolute; z-index: 3; inset: 0; \}/);
   assert.doesNotMatch(source, /editorLoading[^\n]*aria-hidden/);
   assert.match(initialized, /<MDXEditor/);
   assert.match(initialized, /BoldItalicUnderlineToggles options=\{\["Bold", "Italic"\]\}/);
