@@ -71,6 +71,7 @@
 .prioritySortButton { width: 100%; height: 37px; display: grid; place-items: center; padding: 0; color: var(--report-muted); background: transparent; border: 0; cursor: pointer; }
 .prioritySortButton:hover,
 .prioritySortButton[data-active="true"] { color: var(--report-strong); }
+.prioritySortButton:focus-visible { outline: 0; color: var(--report-strong); background: var(--report-hover); border-radius: 3px; box-shadow: none; }
 .prioritySortButton svg { transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
 .prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .table td { height: 60px; min-width: 0; padding: 8px 10px; overflow: hidden; color: var(--report-text); background: var(--report-bg); border-bottom: 1px solid var(--report-row-border); font-size: 12px; vertical-align: middle; text-overflow: ellipsis; white-space: nowrap; }

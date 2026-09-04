@@ -178,6 +178,7 @@
 .table th > .prioritySortButton { align-items: center; justify-content: center; color: var(--cases-muted); }
 .prioritySortButton svg { transition: color 140ms ease, transform 160ms cubic-bezier(.2, .72, .3, 1); }
 .prioritySortButton[data-active="true"] { color: var(--cases-strong); }
+.table th > .prioritySortButton:focus-visible { outline: 0; color: var(--cases-strong); background: var(--cases-hover); border-radius: 3px; box-shadow: none; }
 .prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .visuallyHidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .table tbody tr[data-case-row] { height: 46px; cursor: pointer; outline: 0; }

@@ -47,6 +47,7 @@
 .prioritySortButton { width: 100%; height: 31px; display: grid; place-items: center; padding: 0; color: var(--embedded-muted); background: transparent; border: 0; cursor: pointer; }
 .prioritySortButton:hover,
 .prioritySortButton[data-active="true"] { color: var(--embedded-strong); }
+.prioritySortButton:focus-visible { outline: 0; color: var(--embedded-strong); background: var(--embedded-hover); border-radius: 3px; box-shadow: none; }
 .prioritySortButton svg { transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
 .prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .visuallyHidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }

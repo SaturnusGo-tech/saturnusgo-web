@@ -64,6 +64,7 @@
 .prioritySortButton { width: 100%; height: 27px; display: grid; place-items: center; padding: 0; color: var(--runs-muted); background: transparent; border: 0; }
 .prioritySortButton:hover,
 .prioritySortButton[data-active="true"] { color: var(--runs-strong); }
+.navigator .prioritySortButton:focus-visible { outline: 0; color: var(--runs-strong); background: var(--runs-hover); border-radius: 3px; box-shadow: none; }
 .prioritySortButton svg { transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
 .prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .items { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-color: var(--runs-border-strong) transparent; }
