@@ -460,6 +460,23 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Shared-step number, attachment preview, and history count — production hotfix
+
+- Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Ib8dBJ/Screenshot 2026-09-04 at 2.48.40 AM.png` (1490×1440 px), preserved in the combined evidence as `.design-qa/2026-09-04-shared-step-evidence-hotfix/comparison-full.png`.
+- Implementation evidence: `.design-qa/2026-09-04-shared-step-evidence-hotfix/production-overview-collapsed.png`, `production-overview-expanded.png`, and `production-attachments-tab.png`, captured from the signed-in production route at a 1490×1440 CSS viewport in Russian dark mode. The implementation screenshots are 1490×1440 px at normalized browser capture density.
+- State: `HOST-TC-397`, Overview and Attachments tabs, shared step 2 expanded, saved step image collapsed by default and then expanded through its dedicated outer chevron.
+- Full-view comparison evidence: `.design-qa/2026-09-04-shared-step-evidence-hotfix/comparison-full.png` places the user-reported state and the live production implementation in one same-size input. Focused evidence: `.design-qa/2026-09-04-shared-step-evidence-hotfix/comparison-focused.png` keeps the attachment row, preview, shared-step rail, order number, and following scenario step readable in one comparison.
+- Typography: the existing Falcon text scale, weights, line heights, and muted metadata colors remain consistent. The attachment title and size stay on one compact row; no technical loading copy or fallback filename block is visible.
+- Spacing and layout rhythm: shared-step order `2` now owns a fixed gutter to the left of the purple rail and remains fully visible. The attachment chevron is outside the preview, the default state is one flat row, and expansion preserves the compact scenario rhythm instead of introducing the previous heavy container.
+- Colors and tokens: existing dark-theme semantic tokens are preserved for the purple shared-step rail, teal expected-result rail, muted attachment chrome, and focus states. No new hard-coded accent palette or elevated card treatment was introduced.
+- Image quality and asset fidelity: the saved image renders as the actual sharp production asset when expanded, supports the existing open-in-full-size action, and is not replaced with technical MIME text, a placeholder, CSS drawing, or duplicate preview shell.
+- Copy and content: `Вложения 1` and `История 4` are derived from the selected case. The former default `История 20` value is absent. The Attachments tab lists the same step-owned image and contains no attachment-loading label.
+- Interaction evidence: collapsed-by-default presentation, smooth explicit expansion, full-size action availability, Overview→Attachments navigation, and preserved attachment metadata were exercised in production. Reopening the Attachments tab displayed cached metadata without a user-visible reload state. The signed-in production console contained zero errors and zero warnings after these interactions.
+- Comparison history: the reported P1/P2 defects were the shared-step order hidden by its rail, saved step media not represented consistently across Overview and Attachments, a visually heavy/technical expanded file block, repeated attachment fetch/loading UI, and the hard-coded history count. The production pass shows the order number in its own gutter, one collapsible media component in both surfaces, a real image preview, cache-backed metadata/access reads, and current-case counts. No actionable P0/P1/P2 finding remains in the requested scope.
+- Verification: TypeScript, TMS architecture (306 files), focused attachment tests 6/6, full TMS adapter/UI tests 175/175, optimized production build, signed-in production interactions, and console checks passed.
+
+final result: passed
+
 ## Shared-step insertion menu guide separation — final production pass
 
 - Source visual truth: `.design-qa/shared-step-menu-2026-09-04/production-before.png` (1280×720, density 1, Russian locale, dark theme, fullscreen case editor, bottom `Добавить шаг` menu open). The shared-step purple guide entered the menu's rounded left edge because both started on the same horizontal coordinate.
