@@ -40,3 +40,38 @@
 - [x] source and implementation judged together in one normalized comparison image
 
 final result: passed
+
+---
+
+# Design QA — listing priority geometry and persistent dark navigation
+
+- source visual truth: `.design-audit/2026-09-04-listing-priority-status/01-before-new-feedback.png`
+- production screenshot: `.design-audit/2026-09-04-listing-priority-status/04-production-final-1280.png`
+- combined comparison: `.design-audit/2026-09-04-listing-priority-status/05-before-vs-production.png`
+- production URL: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`
+- viewport: 1280 × 720 CSS px for the final matching-state comparison
+- state: authenticated production, light theme, priority-sorted test-case listing with split detail
+
+## Findings
+
+- The global navigation stays dark in both application themes and uses the restrained existing cold charcoal gradient. The production computed background is `#252a36 → #282936 → #292731 → #25232c` and the foreground is `#e7e9ec`.
+- Priority markers and the sort chevron share the same horizontal center (`86.8 px`) in the production table.
+- The priority and case-type tracks are now distinct (`32 px` and `36 px`), giving the neutral hand/robot icon clear separation from the diamond or triangle.
+- The case ID track was reduced to `90 px` while status remains a fixed `92 px`, removing the oversized visual gap before the status pill.
+- The same priority/type spacing is applied to the reusable embedded case list, run navigator, and dashboard drill list.
+- Priority sorting was verified in production: the first activation places `Критический` first and the reverse direction places `Низкий` first.
+- No production console warnings or errors were recorded after deployment.
+
+## Verification
+
+- [x] `npm run test:tms-adapters` — 188/188 passed
+- [x] `npm run typecheck`
+- [x] `npm run build:once`
+- [x] production source SHA `a78e80a6`
+- [x] production Pages SHA `bd1ec046`
+- [x] persistent dark navigation verified in light theme
+- [x] priority/type spacing and ID/status density verified in production
+- [x] priority sort direction verified in production
+- [x] source and implementation judged together in one same-viewport comparison image
+
+final result: passed
