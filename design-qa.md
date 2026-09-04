@@ -1,75 +1,42 @@
-# Design QA — Falcon reports and defect detail
+# Design QA — report status and YouTrack link
 
-## Comparison target
-
-- Source visual truth: established Falcon test-case list and detail at `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/02-reference-test-cases-light.jpg`.
-- Final report list: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/07-production-final-reports-list-light.png`.
-- Final defect overview: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/08-production-final-defect-overview-light.png`.
-- Final expanded attachment: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/10-production-final-attachment-expanded-light.png`.
-- Full-view list comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/11-comparison-reference-and-reports-list.png`.
-- Full-view detail comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/12-comparison-reference-and-defect-detail.png`.
-- Responsive evidence: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/13-production-defect-attachments-820px.png`.
-- Production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3&release=72ae0a65`.
-
-## Viewport, density, and state
-
-- Desktop source and implementation captures: 1087 × 814 px, matching CSS viewport 1087 × 814 at device scale 1.
-- Combined comparison images: 2174 × 814 px; both halves retain the same 1087 × 814 crop without rescaling.
-- Responsive capture: 820 × 900 px at device scale 1; the temporary viewport override was reset after the test.
-- Theme: authenticated production, light mode, `Umbrella-Host`, report `HOST-BUG-021`.
-- States checked: report list, selected defect overview, attachment tab, expanded image, delayed attachment hydration, and narrow viewport.
+- source visual truth: `.design-audit/2026-09-04-report-status-links/02-reference-draft-pill.png`
+- implementation screenshot: `.design-audit/2026-09-04-report-status-links/03-local-after-dark.png`
+- full-view comparison: `.design-audit/2026-09-04-report-status-links/05-comparison-dark-full.png`
+- focused status comparison: `.design-audit/2026-09-04-report-status-links/06-comparison-status-focus.png`
+- viewport: 1087 × 814 CSS px, desktop, device scale factor 1
+- source pixels: 1087 × 814
+- implementation pixels: 1087 × 814
+- density normalization: none required; source and implementation were captured at the same viewport and density
+- state: dark theme, test-case Draft reference compared with an open bug-report detail; the local demo has no linked YouTrack issue, so the explicit empty state is visible beneath “Ссылка на задачу”
 
 ## Findings
 
-No actionable P0, P1, or P2 differences remain.
-
-- **Information architecture:** the report list now uses the same dense list-plus-inspector structure as test cases. Defect evidence is absent from rows and available only in the selected defect card.
-- **Typography:** Geist and the existing Falcon type tokens are preserved. Keys are quiet gray, titles carry the primary weight, supporting labels are smaller, and long report titles truncate without moving adjacent columns.
-- **Spacing and layout rhythm:** table rows, toolbar height, selected-row treatment, inspector header, tab strip, two-column overview, and section gaps follow the test-case reference. No redundant cards or large empty gutters were introduced.
-- **Colors and tokens:** status, severity, priority, expected-result, and actual-result states use saturated semantic tokens with readable foreground contrast in the light theme. Neutral metadata stays visually subordinate.
-- **Image quality:** the defect screenshot renders as the real private asset, keeps its aspect ratio, remains sharp, and expands inside a stable media surface. No placeholder, CSS recreation, or technical filename-only row replaces it.
-- **Copy and content:** report labels are domain-readable (`Описание`, `Фактический результат`, `Ожидаемый результат`, `Контекст выполнения`, `Свойства`, `Расположение`, `Метки`). Raw IDs remain only where they are operational evidence.
-- **Icons:** Lucide icons use one stroke family and align with existing Falcon actions. Severity uses the same filled visual signal as other operational lists.
-- **Interactions:** search, row selection, overview/attachment tabs, YouTrack link, test-run link, disclosure, full-size media action, and close action are present. The attachment tab now survives background defect hydration instead of reverting to overview.
-- **Responsiveness:** at 820 px the defect card becomes the primary readable surface; controls do not overlap, the attachment header remains on one hierarchy, and the expanded image stays within its content width.
-- **Accessibility:** headings, table semantics, tab navigation labels, link destinations, image alt text, expanded state, and named controls are exposed in the browser accessibility tree. Focus remains visible without the former aggressive double-blue outline.
-- **Runtime:** the final production journey produced zero console warnings or errors.
-
-## Full-view comparison evidence
-
-`11-comparison-reference-and-reports-list.png` shows that the final report list carries the same compact shell, hierarchy, row density, muted IDs, selected-row behavior, and semantic status treatment as the test-case reference.
-
-`12-comparison-reference-and-defect-detail.png` shows that the defect card uses the same inspector proportions, dominant title/key row, metadata line, tab strip, narrative column, and property rail while adapting content to a bug report.
+- No actionable P0, P1, or P2 differences remain for the requested status treatment.
+- Typography: the report status preserves the same compact weight, size, line height, and dashed-circle/icon rhythm as the Draft reference.
+- Spacing and layout: the pill height, horizontal padding, icon gap, metadata alignment, and header rhythm match the reference treatment. The new task-link section occupies the existing side-rail rhythm and does not introduce an extra card surface.
+- Colors and tokens: open defects now use the Draft neutral gray foreground/background/border tokens in both light and dark themes. Reopened defects retain the existing danger treatment because they represent a regression state.
+- Image quality: no new raster or decorative assets are involved. Existing Falcon and Lucide assets remain sharp and unchanged.
+- Copy and content: “Ссылка на задачу” is explicit and understandable; the unavailable state says that no YouTrack task has been created instead of exposing a technical null value.
+- Accessibility and interaction: the YouTrack link is a semantic anchor with an external-link icon and visible keyboard focus. The status remains readable without relying on color alone because it includes the dashed-circle icon and text label.
 
 ## Focused comparison evidence
 
-`10-production-final-attachment-expanded-light.png` verifies the media-specific requirement at readable scale: the disclosure sits outside the preview, filename and size stay compact, the actual screenshot is rendered, and resize/full-size actions remain available.
-
-`13-production-defect-attachments-820px.png` verifies the same state at the narrow desktop/tablet breakpoint. No additional crop was required because the relevant controls and the whole media width are legible in the captured viewport.
+The combined crop in `06-comparison-status-focus.png` puts the Draft source and Open implementation in one image. Both use the same neutral fill, border, rounded geometry, dashed-circle icon, compact text scale, and metadata baseline. No focused comparison beyond the status header was needed because the task-link section is a new functional addition rather than a copied visual target.
 
 ## Comparison history
 
-1. The initial report implementation matched the list/detail hierarchy, but the narrow toolbar hid metric labels and the attachment component inherited unresolved test-case CSS variables.
-2. Metric labels were restored at the target viewport and report-surface aliases were added for the shared attachment tokens. The next production capture rendered the list labels and the attachment figure.
-3. Production interaction QA found a P1 behavior issue: after opening `Вложения`, background defect hydration remounted the detail component and returned the user to `Общее`.
-4. The selected detail tab was lifted to the stable report workspace. A regression test now requires the tab state to live outside the refreshable defect resource.
-5. Post-fix production QA kept `Вложения` active for more than eight seconds through resource hydration, expanded the real screenshot, repeated the check at 820 px, and found no remaining P0/P1/P2 issue.
+- Initial production capture: `.design-audit/2026-09-04-report-status-links/01-before-open-status.png` showed open defects using the aggressive red danger token.
+- Fix: separated `open` from `reopened`, applied the established Draft neutral tokens, added `CircleDashed`, and moved the YouTrack destination into a labeled side-rail section above labels.
+- Post-fix evidence: `.design-audit/2026-09-04-report-status-links/03-local-after-dark.png`, `.design-audit/2026-09-04-report-status-links/04-local-after-light.png`, and the two combined comparisons show the corrected dark and light states.
 
-## Engineering verification
+## Implementation checklist
 
-- [x] `npm run typecheck`
-- [x] `npm run test:tms-adapters` — 186/186 passed
-- [x] focused report tests — 3/3 passed
-- [x] `npm run build`
-- [x] scoped Pages release from source `72ae0a65202b2bc61bc6cb92e1764b91c4f4f36f`
-- [x] production report list and defect overview
-- [x] production attachment hydration and expansion
-- [x] 1087 × 814 and 820 × 900 viewport checks
-- [x] production console — 0 errors and 0 warnings
-- [x] `git diff --check`
-
-## Follow-up polish
-
-- P3: no follow-up is required for this iteration. Future report filters can reuse the established test-case filter control without changing this hierarchy.
+- [x] Neutral Open status in report list, report header, and report properties
+- [x] Dashed-circle status icon
+- [x] Explicit YouTrack issue section above labels
+- [x] Empty YouTrack state without technical identifiers
+- [x] Existing Falcon and YouTrack links in test-case History preserved and covered by tests
+- [x] Typecheck, focused UI tests, and production build passed
 
 final result: passed

@@ -85,7 +85,8 @@
 
 .statusChip, .severityChip { width: max-content; min-height: 23px; display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border: 1px solid transparent; border-radius: 12px; font-size: 11px; font-weight: 650; line-height: 1.1; white-space: nowrap; }
 .statusChip > span:first-child { width: 7px; height: 7px; background: currentColor; border-radius: 50%; }
-.statusChip[data-status="open"], .statusChip[data-status="reopened"] { color: #fff; background: #d73948; border-color: #b92132; }
+.statusChip[data-status="open"] { color: #30343b; background: #dfe2e7; border-color: #b9bec7; }
+.statusChip[data-status="reopened"] { color: #fff; background: #d73948; border-color: #b92132; }
 .statusChip[data-status="triaged"] { color: #fff; background: #7657d8; border-color: #6042bf; }
 .statusChip[data-status="in_progress"] { color: #fff; background: #2872da; border-color: #185db8; }
 .statusChip[data-status="ready_for_retest"] { color: #17202b; background: #f2b931; border-color: #d69d14; }
@@ -138,6 +139,10 @@
 .contextList dd, .propertyList dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--report-text); font-size: 12px; font-weight: 500; line-height: 1.45; }
 .tagList { display: flex; flex-wrap: wrap; gap: 5px; }
 .tagList span { min-height: 22px; display: inline-flex; align-items: center; padding: 2px 7px; color: var(--report-text); background: var(--report-raised); border: 1px solid var(--report-border); border-radius: 11px; font-size: 10px; }
+.issueLink { width: max-content; max-width: 100%; display: inline-flex; align-items: center; gap: 7px; color: var(--report-primary); font-size: 12px; font-weight: 550; line-height: 1.4; text-decoration: none; }
+.issueLink:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.issueLink:focus-visible { border-radius: 4px; outline: 2px solid color-mix(in srgb, var(--report-primary) 45%, transparent); outline-offset: 3px; }
+.issueProvider { color: var(--report-muted); font-size: 11px; font-weight: 500; }
 .mutedText { margin: 0; color: var(--report-faint); font-size: 12px; line-height: 1.5; }
 .attachmentsPanel { padding: 24px; }
 .attachmentsPanel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--report-border); }
@@ -154,6 +159,7 @@
 .detailError button { min-height: 32px; margin-top: 8px; padding: 0 10px; color: var(--report-text); background: transparent; border: 1px solid var(--report-control-border); border-radius: 5px; cursor: pointer; }
 
 @keyframes reportInspectorIn { from { opacity: .55; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+:global(.dark) .statusChip[data-status="open"] { color: #f1f3f5; background: #4b5058; border-color: #6b717b; }
 @media (prefers-reduced-motion: reduce) { .detailPanel { animation: none; } }
 @media (max-width: 1180px) {
   .metrics span { padding-inline: 7px; }

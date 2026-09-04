@@ -165,6 +165,8 @@ export const ruViewMessages = {
   "reports.properties": "Свойства",
   "reports.location": "Расположение",
   "reports.integration": "Интеграция",
+  "reports.issueLink": "Ссылка на задачу",
+  "reports.noIssueLink": "Задача в YouTrack не создана.",
   "reports.evidenceHint": "Скриншоты, видео, документы и внешние ссылки из баг-репорта.",
   "hooks.loading": "Загрузка статуса YouTrack",
   "hooks.loadError": "Статус YouTrack недоступен.",

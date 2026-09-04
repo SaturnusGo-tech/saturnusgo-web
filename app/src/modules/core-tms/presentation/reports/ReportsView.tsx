@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Bug, CheckCircle2, Search } from "lucide-react";
+import { AlertTriangle, Bug, CheckCircle2, CircleDashed, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
@@ -86,7 +86,9 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
             </button></td>
             <td>{localizedComponentLabel(locale, defect.component) || "—"}</td>
             <td><span className={surface.statusChip} data-status={defect.status}>
-              {defect.status === "verified" || defect.status === "closed" ? <CheckCircle2 size={13} /> : <span aria-hidden="true" />}
+              {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" />
+                : defect.status === "verified" || defect.status === "closed" ? <CheckCircle2 size={13} aria-hidden="true" />
+                  : <span aria-hidden="true" />}
               {localizedLabel(locale, defect.status)}
             </span></td>
             <td>{defect.assigneeIdentityId || t("common.unassigned")}</td>

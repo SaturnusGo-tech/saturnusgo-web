@@ -163,6 +163,8 @@ export const enViewMessages = {
   "reports.properties": "Properties",
   "reports.location": "Location",
   "reports.integration": "Integration",
+  "reports.issueLink": "Issue link",
+  "reports.noIssueLink": "No YouTrack issue has been created.",
   "reports.evidenceHint": "Screenshots, videos, documents, and external links from this bug report.",
   "hooks.loading": "Loading YouTrack status",
   "hooks.loadError": "YouTrack status is unavailable.",

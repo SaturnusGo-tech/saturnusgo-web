@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ArrowLeft, ExternalLink as ExternalLinkIcon, Link2, Paperclip, PlayCircle, X,
+  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, PlayCircle, X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -32,9 +32,6 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
       <div className={surface.detailUtility}>
         <span className={surface.detailEyebrow}>{locale === "ru" ? "Карточка баг-репорта" : "Bug report"}</span>
         <div className={surface.detailActions}>
-          {defect.externalIssue && <a href={defect.externalIssue.url} target="_blank" rel="noreferrer">
-            {defect.externalIssue.key}<ExternalLinkIcon size={14} />
-          </a>}
           {defect.runId && <button type="button" onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
             <PlayCircle size={15} />{t("reports.openRun")}
           </button>}
@@ -45,7 +42,10 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
       <div className={surface.detailTitle}>
         <h1>{defect.title}<span>#{defect.key}</span></h1>
         <p>
-          <span className={surface.statusChip} data-status={defect.status}>{localizedLabel(locale, defect.status)}</span>
+          <span className={surface.statusChip} data-status={defect.status}>
+            {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : <span aria-hidden="true" />}
+            {localizedLabel(locale, defect.status)}
+          </span>
           <span>{t("reports.created")} <time dateTime={defect.createdAt}>{createdAt}</time></span>
         </p>
       </div>
@@ -78,7 +78,10 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
         <aside className={surface.sideRail} aria-label={t("reports.properties")}>
           <DetailSection title={t("reports.properties")}>
             <dl className={surface.propertyList}>
-              <div><dt>{t("reports.status")}</dt><dd><span className={surface.statusChip} data-status={defect.status}>{localizedLabel(locale, defect.status)}</span></dd></div>
+              <div><dt>{t("reports.status")}</dt><dd><span className={surface.statusChip} data-status={defect.status}>
+                {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : <span aria-hidden="true" />}
+                {localizedLabel(locale, defect.status)}
+              </span></dd></div>
               <div><dt>{t("reports.severity")}</dt><dd><span className={surface.severityChip} data-level={defect.severity}>{localizedLabel(locale, defect.severity)}</span></dd></div>
               <div><dt>{t("reports.priority")}</dt><dd><span className={surface.severityChip} data-level={defect.priority}>{localizedLabel(locale, defect.priority)}</span></dd></div>
               <div><dt>{t("reports.reproducibility")}</dt><dd>{defect.reproducibility || "—"}</dd></div>
@@ -90,6 +93,13 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
               <div><dt>{t("reports.assignee")}</dt><dd>{defect.assigneeIdentityId || t("common.unassigned")}</dd></div>
               <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? localizedLabel(locale, defect.integrationTarget) : "—"}</dd></div>
             </dl>
+          </DetailSection>
+          <DetailSection title={t("reports.issueLink")}>
+            {defect.externalIssue ? <a className={surface.issueLink} href={defect.externalIssue.url} target="_blank" rel="noreferrer">
+              <span className={surface.issueProvider}>YouTrack</span>
+              <strong>{defect.externalIssue.key}</strong>
+              <ExternalLinkIcon size={14} aria-hidden="true" />
+            </a> : <p className={surface.mutedText}>{t("reports.noIssueLink")}</p>}
           </DetailSection>
           <DetailSection title={t("reports.labels")}>
             {defect.labels.length > 0 ? <div className={surface.tagList}>{defect.labels.map((label) => <span key={label}>#{label}</span>)}</div> : <p className={surface.mutedText}>{t("reports.noLabels")}</p>}

@@ -21,7 +21,12 @@ test("bug report detail uses case-like sections and media-first attachments", ()
   assert.match(detail, /presentation="media" variant="gallery"/);
   assert.match(detail, /t\("reports\.actualResult"\)/);
   assert.match(detail, /t\("reports\.expectedResult"\)/);
-  assert.match(styles, /\.statusChip\[data-status="open"\][^}]*background: #d73948/s);
+  assert.match(detail, /t\("reports\.issueLink"\)/);
+  assert.match(detail, /defect\.externalIssue\.url/);
+  assert.match(detail, /defect\.externalIssue\.key/);
+  assert.match(list, /defect\.status === "open" \? <CircleDashed/);
+  assert.match(styles, /\.statusChip\[data-status="open"\][^}]*background: #dfe2e7/s);
+  assert.match(styles, /:global\(\.dark\) \.statusChip\[data-status="open"\][^}]*background: #4b5058/s);
 });
 
 test("the selected detail tab survives defect resource refreshes", () => {
