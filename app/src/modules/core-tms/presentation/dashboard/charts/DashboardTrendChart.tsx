@@ -12,7 +12,7 @@ import surface from "../dashboard.module.css";
 
 const COLORS = {
   launched: "var(--dash-blue)", passed: "var(--dash-success)", failed: "var(--dash-danger)",
-  blocked: "var(--dash-warning)", incomplete: "var(--dash-plum)", not_started: "var(--dash-slate)",
+  blocked: "var(--dash-warning)", incomplete: "var(--dash-violet)", not_started: "var(--dash-slate)",
   aborted: "var(--dash-aborted)",
 } as const;
 

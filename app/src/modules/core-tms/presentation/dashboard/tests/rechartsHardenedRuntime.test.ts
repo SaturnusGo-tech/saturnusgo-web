@@ -114,10 +114,14 @@ test("dashboard copy does not expose implementation details", () => {
 test("tag and coverage charts use a legible categorical palette in both themes", () => {
   assert.match(breakdowns, /DIMENSION_COLORS/);
   assert.match(breakdowns, /<Cell key=\{item\.key\} fill=\{DIMENSION_COLORS/);
-  for (const token of ["dash-teal", "dash-plum", "dash-sand", "dash-olive", "dash-coral"]) {
+  for (const token of ["dash-teal", "dash-violet", "dash-orange", "dash-cyan", "dash-rose"]) {
     assert.match(styles, new RegExp(`--${token}:`));
   }
   for (const token of ["dash-blue", "dash-success", "dash-danger", "dash-warning", "dash-aborted"]) {
     assert.match(styles, new RegExp(`--${token}:`));
+  }
+  assert.doesNotMatch(styles, /--dash-(plum|sand|olive|coral):/);
+  for (const cleanAccent of ["#146cff", "#00a982", "#7c3aed", "#f97316", "#e92d5d"]) {
+    assert.match(styles, new RegExp(cleanAccent));
   }
 });

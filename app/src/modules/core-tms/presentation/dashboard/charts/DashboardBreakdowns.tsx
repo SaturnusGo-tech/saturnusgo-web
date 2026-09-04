@@ -9,10 +9,10 @@ import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
 import { OverflowMarquee } from "../common/OverflowMarquee";
 import surface from "../dashboard.module.css";
 
-const TYPE_COLORS = ["var(--dash-sand)", "var(--dash-olive)", "var(--dash-plum)"];
+const TYPE_COLORS = ["var(--dash-orange)", "var(--dash-cyan)", "var(--dash-violet)"];
 const DIMENSION_COLORS = [
-  "var(--dash-teal)", "var(--dash-plum)", "var(--dash-sand)",
-  "var(--dash-olive)", "var(--dash-coral)", "var(--dash-slate)",
+  "var(--dash-teal)", "var(--dash-violet)", "var(--dash-orange)",
+  "var(--dash-cyan)", "var(--dash-rose)", "var(--dash-slate)",
 ];
 const compactAxisLabel = (value: string, limit = 16) => value.length > limit
   ? `${value.slice(0, limit - 1)}…`
