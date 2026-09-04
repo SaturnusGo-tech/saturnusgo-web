@@ -1,0 +1,115 @@
+.root {
+  --embedded-bg: var(--cases-bg, var(--paper));
+  --embedded-raised: var(--cases-raised, var(--control));
+  --embedded-hover: var(--cases-hover, var(--control-hover));
+  --embedded-selected: color-mix(in srgb, var(--action) 11%, var(--embedded-bg));
+  --embedded-border: var(--cases-border, var(--line));
+  --embedded-row-border: var(--cases-row-border, var(--line));
+  --embedded-text: var(--cases-text, var(--ink));
+  --embedded-strong: var(--cases-strong, var(--ink));
+  --embedded-muted: var(--cases-muted, var(--muted));
+  --embedded-icon: var(--cases-icon, var(--muted));
+  min-width: 0;
+  overflow: hidden;
+  color: var(--embedded-text);
+  background: var(--embedded-bg);
+  border: 1px solid var(--embedded-border);
+  border-radius: 8px;
+  container: embedded-case-list / inline-size;
+}
+
+.header,
+.row {
+  display: grid;
+  grid-template-columns: 26px 94px 94px minmax(220px, 1fr) minmax(120px, .58fr) 124px 72px;
+  align-items: center;
+}
+
+.root[data-selectable="true"] :is(.header, .row) {
+  grid-template-columns: 34px 26px 94px 94px minmax(220px, 1fr) minmax(120px, .58fr) 124px 72px;
+}
+
+.header {
+  min-height: 32px;
+  color: var(--embedded-muted);
+  background: var(--embedded-raised);
+  border-bottom: 1px solid var(--embedded-border);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.header > span,
+.row > * { min-width: 0; padding: 0 8px; }
+.typeHeading,
+.selectionHeading { padding: 0 !important; }
+
+.body {
+  max-height: var(--embedded-case-list-height, min(48vh, 520px));
+  overflow: auto;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--embedded-border) transparent;
+}
+
+.row {
+  width: 100%;
+  min-height: 46px;
+  color: var(--embedded-text);
+  background: var(--embedded-bg);
+  border: 0;
+  border-bottom: 1px solid var(--embedded-row-border);
+  cursor: default;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.row:last-child { border-bottom: 0; }
+.row[data-actionable="true"],
+label.row:not([data-disabled="true"]) { cursor: pointer; }
+.row[data-actionable="true"]:hover,
+label.row:not([data-disabled="true"]):hover { background: var(--embedded-hover); }
+.row[data-selected="true"] { background: var(--embedded-selected); box-shadow: inset 3px 0 0 var(--action); }
+.row:focus-visible { outline: 1px solid var(--action); outline-offset: -1px; }
+
+.selectionCell { display: grid; place-items: center; padding: 0 !important; }
+.selectionCell input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--action);
+  cursor: inherit;
+}
+
+.typeCell { display: grid; place-items: center; padding: 0 !important; color: var(--embedded-icon); }
+.key { overflow: hidden; color: var(--embedded-muted); font-size: 11px; font-variant-numeric: tabular-nums; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.status,
+.priority { overflow: hidden; }
+.title { display: -webkit-box; overflow: hidden; color: var(--embedded-strong); font-weight: 500; line-height: 1.32; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.component { overflow: hidden; color: var(--embedded-text); text-overflow: ellipsis; white-space: nowrap; }
+.estimate { color: var(--embedded-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.empty { min-height: 104px; display: grid; place-items: center; padding: 20px; color: var(--embedded-muted); font-size: 12px; text-align: center; }
+
+@container embedded-case-list (max-width: 760px) {
+  .header,
+  .row { grid-template-columns: 26px 82px 88px minmax(190px, 1fr) 118px; }
+  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 34px 26px 82px 88px minmax(190px, 1fr) 118px; }
+  .header > span:nth-last-child(3),
+  .header > span:last-child,
+  .component,
+  .estimate { display: none; }
+}
+
+@container embedded-case-list (max-width: 500px) {
+  .header,
+  .row { grid-template-columns: 24px 76px minmax(150px, 1fr) 112px; }
+  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 32px 24px 76px minmax(150px, 1fr) 112px; }
+  .header > span:nth-child(3),
+  .root[data-selectable="true"] .header > span:nth-child(4),
+  .status { display: none; }
+  .row { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row { transition: none; }
+}

@@ -117,6 +117,12 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
           model.setDialog("suite");
         }}
         onRun={(suiteId) => model.openRunDialog({ suiteId })}
+        onOpenCase={(testCase) => {
+          model.setQuery("");
+          model.setSelectedCaseId(testCase.id);
+          model.setSelectedFolder(testCase.folderPath);
+          model.setView("cases");
+        }}
       />
     );
   }

@@ -6,6 +6,7 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
+import { EmbeddedCaseList } from "../../cases/embedded/EmbeddedCaseList";
 import type { RunDialogCopy } from "../run/copy";
 import {
   activeRunFilterCount,
@@ -87,14 +88,15 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
       <span><button type="button" onClick={selectMatches} disabled={visibleCases.length === 0}>{copy.selectAllMatching}</button><button type="button" onClick={clearMatches} disabled={visibleCases.every((item) => !selected.has(item.id))}>{copy.clearMatching}</button></span>
     </div>
 
-    <div className={styles.caseList} role="group" aria-label={copy.searchAria}>
-      {visibleCases.map((item) => <label key={item.id} className={selected.has(item.id) ? styles.caseSelected : styles.caseRow}>
-        <input type="checkbox" checked={selected.has(item.id)} onChange={() => setCaseIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} />
-        <span><strong>{item.key}</strong><b>{item.title}</b><small>{item.folderPath} · {item.component ? localizedComponentLabel(locale, item.component) : "—"}</small></span>
-        <em>{copy[item.priority]}</em>
-      </label>)}
-      {visibleCases.length === 0 && <div className={styles.emptyCases}>{copy.noMatching}</div>}
-    </div>
+    <EmbeddedCaseList
+      cases={visibleCases}
+      locale={locale}
+      ariaLabel={copy.searchAria}
+      emptyLabel={copy.noMatching}
+      selectedIds={selected}
+      onToggle={(id) => setCaseIds((current) => current.includes(id) ? current.filter((currentId) => currentId !== id) : [...current, id])}
+      maxHeight="min(38vh, 390px)"
+    />
   </div>;
 }
 

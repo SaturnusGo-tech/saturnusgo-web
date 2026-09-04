@@ -49,6 +49,27 @@ test("resource hydration uses the branded loader instead of a false empty state"
   assert.match(runsSource, /testId="run-item-loading"/);
 });
 
+test("suite and run drawers share the production test-case list", () => {
+  const suiteDialogSource = readFileSync(
+    new URL("../../dialogs/suite/SuiteDialog.tsx", import.meta.url),
+    "utf8",
+  );
+  const runScopeSource = readFileSync(
+    new URL("../../dialogs/run-scope/RunScopeBuilder.tsx", import.meta.url),
+    "utf8",
+  );
+  const embeddedListSource = readFileSync(
+    new URL("../../cases/embedded/EmbeddedCaseList.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(suiteDialogSource, /<EmbeddedCaseList/);
+  assert.match(runScopeSource, /<EmbeddedCaseList/);
+  assert.match(embeddedListSource, /<LifecycleBadge/);
+  assert.match(embeddedListSource, /<PriorityBadge/);
+  assert.match(embeddedListSource, /<CaseTypeIcon/);
+});
+
 test("case detail hydration exposes a retryable failure state", () => {
   const resourceSource = readFileSync(
     new URL("../../../state/case-resource/useSelectedCaseResource.ts", import.meta.url),
