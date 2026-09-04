@@ -1,67 +1,75 @@
-# Design QA — Falcon test-suites and test-runs bugfix
+# Design QA — Falcon reports and defect detail
 
 ## Comparison target
 
-- Established Falcon test-case visual truth: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/01-reference-test-cases-dark.png`.
-- Suite list before/after, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/16-suites-before-after-light.jpg`.
-- Suite configuration before/after, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/17-suite-config-before-after-dark.jpg`.
-- Test-runs before/after, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/18-runs-before-after-light.jpg`.
-- Test-case reference versus final test-run, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/19-reference-cases-vs-runs-dark.jpg`.
-- Focused run-list comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/20-focused-run-list-before-after-light.jpg`.
-- Production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3&release=21ce78dc`.
+- Source visual truth: established Falcon test-case list and detail at `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/02-reference-test-cases-light.jpg`.
+- Final report list: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/07-production-final-reports-list-light.png`.
+- Final defect overview: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/08-production-final-defect-overview-light.png`.
+- Final expanded attachment: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/10-production-final-attachment-expanded-light.png`.
+- Full-view list comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/11-comparison-reference-and-reports-list.png`.
+- Full-view detail comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/12-comparison-reference-and-defect-detail.png`.
+- Responsive evidence: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-reports-redesign/13-production-defect-attachments-820px.png`.
+- Production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3&release=72ae0a65`.
 
-## Viewport and state
+## Viewport, density, and state
 
-- Stored source and implementation captures: 1280 × 720 px.
-- Combined full-view comparisons: 2560 × 720 px; focused run-list comparison: 1240 × 720 px.
-- Production state: authenticated `Umbrella-Host` workspace, suite `HOST-1 · Смоук релиза`, run `HOST-TR-23`, case `HOST-TC-118`.
-- Verified states: suite list, suite detail, suite configuration drawer, run list, selected run case, light theme, dark theme, keyboard focus treatment, and production console.
+- Desktop source and implementation captures: 1087 × 814 px, matching CSS viewport 1087 × 814 at device scale 1.
+- Combined comparison images: 2174 × 814 px; both halves retain the same 1087 × 814 crop without rescaling.
+- Responsive capture: 820 × 900 px at device scale 1; the temporary viewport override was reset after the test.
+- Theme: authenticated production, light mode, `Umbrella-Host`, report `HOST-BUG-021`.
+- States checked: report list, selected defect overview, attachment tab, expanded image, delayed attachment hydration, and narrow viewport.
 
 ## Findings
 
-No actionable P0, P1, or P2 visual or interaction differences remain.
+No actionable P0, P1, or P2 differences remain.
 
-- **Primary actions:** `Новый сьют` and `Запустить сьют` keep the Falcon action-blue background with white labels and white icons in both themes.
-- **Suite editor hierarchy:** the former all-open form is now an editorial document. The suite name is the dominant title; `Описание` and `Как собирать кейсы` are calm sections with pencil actions and reveal their controls only for editing.
-- **Case collection:** the shared case list remains inside suite configuration, with the same ID, lifecycle, title, component, priority, estimate, and type-icon language as the main test-case list.
-- **Run-list fidelity:** priority and test type occupy separate fixed columns. Priority uses filled semantic triangles; manual and automated types use their dedicated icons without collision.
-- **Status treatment:** run states use saturated, high-contrast pills. `Пройден`, failed, blocked, in-progress, skipped, and not-run states share one semantic palette across the navigator and run detail.
-- **Focus treatment:** blue square outlines were removed from suite controls, run controls, inputs, and the global shell. Keyboard focus remains visible as a restrained neutral inset line instead of a second blue border.
-- **Typography and density:** suite headings, editorial labels, run metadata, case titles, IDs, and table rows follow the established compact Falcon hierarchy. Long titles truncate inside their own column and do not push status or type controls.
-- **Theme parity:** light and dark production captures preserve the same hierarchy, semantic colors, and spacing; no theme-specific black-on-blue or gray-on-blue action label remains.
-- **Runtime:** no production console error was recorded in the verified journeys.
+- **Information architecture:** the report list now uses the same dense list-plus-inspector structure as test cases. Defect evidence is absent from rows and available only in the selected defect card.
+- **Typography:** Geist and the existing Falcon type tokens are preserved. Keys are quiet gray, titles carry the primary weight, supporting labels are smaller, and long report titles truncate without moving adjacent columns.
+- **Spacing and layout rhythm:** table rows, toolbar height, selected-row treatment, inspector header, tab strip, two-column overview, and section gaps follow the test-case reference. No redundant cards or large empty gutters were introduced.
+- **Colors and tokens:** status, severity, priority, expected-result, and actual-result states use saturated semantic tokens with readable foreground contrast in the light theme. Neutral metadata stays visually subordinate.
+- **Image quality:** the defect screenshot renders as the real private asset, keeps its aspect ratio, remains sharp, and expands inside a stable media surface. No placeholder, CSS recreation, or technical filename-only row replaces it.
+- **Copy and content:** report labels are domain-readable (`Описание`, `Фактический результат`, `Ожидаемый результат`, `Контекст выполнения`, `Свойства`, `Расположение`, `Метки`). Raw IDs remain only where they are operational evidence.
+- **Icons:** Lucide icons use one stroke family and align with existing Falcon actions. Severity uses the same filled visual signal as other operational lists.
+- **Interactions:** search, row selection, overview/attachment tabs, YouTrack link, test-run link, disclosure, full-size media action, and close action are present. The attachment tab now survives background defect hydration instead of reverting to overview.
+- **Responsiveness:** at 820 px the defect card becomes the primary readable surface; controls do not overlap, the attachment header remains on one hierarchy, and the expanded image stays within its content width.
+- **Accessibility:** headings, table semantics, tab navigation labels, link destinations, image alt text, expanded state, and named controls are exposed in the browser accessibility tree. Focus remains visible without the former aggressive double-blue outline.
+- **Runtime:** the final production journey produced zero console warnings or errors.
 
-## Visual comparison result
+## Full-view comparison evidence
 
-`16-suites-before-after-light.jpg` confirms the corrected white action labels while preserving the accepted suite-detail layout.
+`11-comparison-reference-and-reports-list.png` shows that the final report list carries the same compact shell, hierarchy, row density, muted IDs, selected-row behavior, and semantic status treatment as the test-case reference.
 
-`17-suite-config-before-after-dark.jpg` shows the material hierarchy change: the dense field matrix becomes a large editable title followed by pencil-controlled description and collection-method sections.
+`12-comparison-reference-and-defect-detail.png` shows that the defect card uses the same inspector proportions, dominant title/key row, metadata line, tab strip, narrative column, and property rail while adapting content to a bug report.
 
-`18-runs-before-after-light.jpg` and `20-focused-run-list-before-after-light.jpg` confirm separated icon columns, filled priority markers, brighter lifecycle pills, and the absence of blue square focus outlines.
+## Focused comparison evidence
 
-`19-reference-cases-vs-runs-dark.jpg` confirms that test cases and test runs now read as parts of the same Falcon system while retaining their different operational content.
+`10-production-final-attachment-expanded-light.png` verifies the media-specific requirement at readable scale: the disclosure sits outside the preview, filename and size stay compact, the actual screenshot is rendered, and resize/full-size actions remain available.
 
-## Iteration history
+`13-production-defect-attachments-820px.png` verifies the same state at the narrow desktop/tablet breakpoint. No additional crop was required because the relevant controls and the whole media width are legible in the captured viewport.
 
-1. Reproduced the incorrect primary-label contrast and the dense suite configuration form in production.
-2. Rebuilt suite configuration around the test-case editorial hierarchy and kept the reusable embedded case list.
-3. Split run-list priority and type into independent columns, replaced outline warning glyphs with filled triangles, and unified saturated execution states.
-4. Production QA found one remaining blue keyboard outline on the global navigation. It was replaced with a neutral inset focus treatment and published in a second scoped Pages release.
-5. Rechecked light and dark themes, computed action/icon colors, navigator geometry, focus styles, and the production console. The post-fix pass found no P0/P1/P2 issue.
+## Comparison history
+
+1. The initial report implementation matched the list/detail hierarchy, but the narrow toolbar hid metric labels and the attachment component inherited unresolved test-case CSS variables.
+2. Metric labels were restored at the target viewport and report-surface aliases were added for the shared attachment tokens. The next production capture rendered the list labels and the attachment figure.
+3. Production interaction QA found a P1 behavior issue: after opening `Вложения`, background defect hydration remounted the detail component and returned the user to `Общее`.
+4. The selected detail tab was lifted to the stable report workspace. A regression test now requires the tab state to live outside the refreshable defect resource.
+5. Post-fix production QA kept `Вложения` active for more than eight seconds through resource hydration, expanded the real screenshot, repeated the check at 820 px, and found no remaining P0/P1/P2 issue.
 
 ## Engineering verification
 
 - [x] `npm run typecheck`
-- [x] `npm run test:tms-adapters` — 183/183 passed
+- [x] `npm run test:tms-adapters` — 186/186 passed
+- [x] focused report tests — 3/3 passed
 - [x] `npm run build`
-- [x] scoped production static export and Pages publish from source `21ce78dcdf8b75102a506d31cc067be553dd3a80`
-- [x] production suite actions, suite configuration, run navigator, and run detail
-- [x] light and dark production renders
-- [x] production console — 0 errors
+- [x] scoped Pages release from source `72ae0a65202b2bc61bc6cb92e1764b91c4f4f36f`
+- [x] production report list and defect overview
+- [x] production attachment hydration and expansion
+- [x] 1087 × 814 and 820 × 900 viewport checks
+- [x] production console — 0 errors and 0 warnings
 - [x] `git diff --check`
 
 ## Follow-up polish
 
-- P3: no follow-up is required for this bugfix iteration. Additional suite actions can reuse the new editorial section pattern as they are introduced.
+- P3: no follow-up is required for this iteration. Future report filters can reuse the established test-case filter control without changing this hierarchy.
 
 final result: passed
