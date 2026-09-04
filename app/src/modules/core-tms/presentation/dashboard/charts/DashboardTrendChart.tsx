@@ -2,7 +2,7 @@
 
 import { useReducedMotion } from "framer-motion";
 import { useState } from "react";
-import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { DashboardDrill, DashboardRunOutcome, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
@@ -11,10 +11,14 @@ import { DashboardChartTooltip } from "../common/DashboardChartTooltip";
 import surface from "../dashboard.module.css";
 
 const COLORS = {
-  launched: "var(--chart-4)", passed: "var(--green)", failed: "var(--red)",
-  blocked: "var(--amber)", incomplete: "var(--chart-3)", not_started: "var(--line-strong)",
-  aborted: "var(--muted)", passRate: "var(--chart-1)",
+  launched: "var(--dash-blue)", passed: "var(--dash-success)", failed: "var(--dash-danger)",
+  blocked: "var(--dash-warning)", incomplete: "var(--dash-plum)", not_started: "var(--dash-slate)",
+  aborted: "var(--dash-aborted)",
 } as const;
+
+const rateBand = (value: number | null) => value === null
+  ? "empty"
+  : value >= 80 ? "good" : value >= 60 ? "warning" : "risk";
 
 export function DashboardTrendChart({
   snapshot,
@@ -76,10 +80,10 @@ export function DashboardTrendChart({
     ...(["passed", "failed", "blocked", "incomplete", "not_started", "aborted"] as const).map((key) => ({
       key, label: outcomeLabel(key), color: COLORS[key], drill: outcomeDrill(key),
     })),
-    ...(hasPassRate
-      ? [{ key: "passRate", label: t("dashboard.passRate"), color: COLORS.passRate, drill: passedItems }]
-      : []),
   ];
+  const selectedPassRate = selectedBucket === "all"
+    ? snapshot.metrics.passRate
+    : snapshot.trend[Number(selectedBucket)]?.passRate ?? null;
   const hasFlow = snapshot.trend.some((point) => point.launched + point.passed + point.failed + point.blocked + point.incomplete + point.not_started + point.aborted > 0);
 
   return (
@@ -87,16 +91,25 @@ export function DashboardTrendChart({
       <header className={surface.panelHeading}>
         <div><h2>{t("dashboard.runFlow")}</h2><p>{t("dashboard.runFlowHint")}</p></div>
       </header>
-      <div className={surface.chartControls} aria-label={t("dashboard.runFlowAria")}>
-        {controls.map((item) => (
-          <button key={item.key} type="button" onClick={() => onOpenDrill(selected(item.drill))}>
-            <i style={{ background: item.color }} aria-hidden="true" />{item.label}
-          </button>
-        ))}
-        <label className={surface.bucketPicker}><span>{t("dashboard.bucket")}</span>
-          <AnimatedSelect compact className={surface.bucketSelect} label={t("dashboard.bucket")}
-            value={selectedBucket} onChange={setBucketIndex} options={bucketOptions} />
-        </label>
+      <div className={surface.flowToolbar}>
+        <div className={surface.flowLegend} aria-label={t("dashboard.runFlowAria")}>
+          {controls.map((item) => (
+            <button key={item.key} type="button" onClick={() => onOpenDrill(selected(item.drill))}>
+              <i style={{ background: item.color }} aria-hidden="true" />{item.label}
+            </button>
+          ))}
+        </div>
+        <div className={surface.flowToolbarRight}>
+          {hasPassRate && <button type="button" className={surface.flowRate} data-band={rateBand(selectedPassRate)}
+            onClick={() => onOpenDrill(selected(passedItems))}
+            aria-label={`${t("dashboard.passRate")}: ${selectedPassRate ?? "—"}%`}>
+            <span>{t("dashboard.passRate")}</span><strong>{selectedPassRate === null ? "—" : `${selectedPassRate}%`}</strong>
+          </button>}
+          <label className={surface.bucketPicker}><span>{t("dashboard.bucket")}</span>
+            <AnimatedSelect compact className={surface.bucketSelect} label={t("dashboard.bucket")}
+              value={selectedBucket} onChange={setBucketIndex} options={bucketOptions} />
+          </label>
+        </div>
       </div>
       {hasFlow ? (
         <div className={surface.trendChart} role="img" aria-label={t("dashboard.runFlowAria")}>
@@ -105,7 +118,6 @@ export function DashboardTrendChart({
               <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
               <XAxis dataKey="day" axisLine={false} tickLine={false} minTickGap={30} tickFormatter={dateLabel} tick={{ fill: "var(--muted)", fontSize: 10 }} />
               <YAxis yAxisId="count" allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: "var(--muted)", fontSize: 10 }} />
-              {hasPassRate && <YAxis yAxisId="rate" orientation="right" domain={[0, 100]} axisLine={false} tickLine={false} tickFormatter={(value: number) => `${value}%`} tick={{ fill: "var(--muted)", fontSize: 10 }} />}
               <Tooltip content={<DashboardChartTooltip formatLabel={(value) => dateLabel(String(value))}
                 formatValue={(value, entry) => entry.dataKey === "passRate" ? `${value}%` : String(value)} />} />
               <Bar yAxisId="count" dataKey="launched" name={t("dashboard.launched")} fill={COLORS.launched} radius={[2, 2, 0, 0]} maxBarSize={10} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(launched, index))} isAnimationActive={!reduceMotion} />
@@ -115,7 +127,6 @@ export function DashboardTrendChart({
               <Bar yAxisId="count" dataKey="incomplete" name={outcomeLabel("incomplete")} stackId="outcomes" fill={COLORS.incomplete} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(outcomeDrill("incomplete"), index))} isAnimationActive={!reduceMotion} />
               <Bar yAxisId="count" dataKey="not_started" name={outcomeLabel("not_started")} stackId="outcomes" fill={COLORS.not_started} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(outcomeDrill("not_started"), index))} isAnimationActive={!reduceMotion} />
               <Bar yAxisId="count" dataKey="aborted" name={outcomeLabel("aborted")} stackId="outcomes" fill={COLORS.aborted} cursor="pointer" onClick={(_, index) => onOpenDrill(inBucket(outcomeDrill("aborted"), index))} isAnimationActive={!reduceMotion} />
-              {hasPassRate && <Line yAxisId="rate" dataKey="passRate" name={t("dashboard.passRate")} unit="%" type="monotone" connectNulls stroke={COLORS.passRate} strokeWidth={2} dot={false} cursor="pointer" onClick={() => onOpenDrill(selected(passedItems))} isAnimationActive={!reduceMotion} />}
             </ComposedChart>
           </ResponsiveContainer>
         </div>

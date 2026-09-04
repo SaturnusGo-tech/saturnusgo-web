@@ -4,6 +4,8 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { OverflowMarquee } from "../common/OverflowMarquee";
 import surface from "../dashboard.module.css";
 
+const rateBand = (value: number) => value >= 80 ? "good" : value >= 60 ? "warning" : "risk";
+
 export function DashboardPortfolio({
   snapshot,
   onOpenDrill,
@@ -36,10 +38,10 @@ export function DashboardPortfolio({
                 <span><OverflowMarquee className={surface.overflowMarquee} text={row.label} />
                   {row.projectLabel && row.kind === "component" && <small>{row.projectLabel}</small>}</span><ChevronRight size={14} aria-hidden="true" />
               </button></div>
-              <div role="cell">{row.passRate !== null && row.drills.passed ? <button type="button" className={surface.riskCell} onClick={() => onOpenDrill(row.drills.passed!)} aria-label={`${t("dashboard.passRate")}: ${row.passRate}%`}>
-                <progress value={row.passRate} max={100} /><strong>{row.passRate}%</strong>
+              <div role="cell">{row.passRate !== null && row.drills.passed ? <button type="button" className={surface.passRateScore} data-band={rateBand(row.passRate)} onClick={() => onOpenDrill(row.drills.passed!)} aria-label={`${t("dashboard.passRate")}: ${row.passRate}%`}>
+                <span aria-hidden="true" /><strong>{row.passRate}%</strong>
               </button> : <span className={surface.signalUnavailable}>—</span>}</div>
-              <div role="cell">{row.coverageRate !== null && row.drills.covered ? <button type="button" className={surface.riskCell} onClick={() => onOpenDrill(row.drills.covered!)} aria-label={`${t("dashboard.coverageRate")}: ${row.coverageRate}%`}>
+              <div role="cell">{row.coverageRate !== null && row.drills.covered ? <button type="button" className={surface.coverageCell} onClick={() => onOpenDrill(row.drills.covered!)} aria-label={`${t("dashboard.coverageRate")}: ${row.coverageRate}%`}>
                 <progress value={row.coverageRate} max={100} /><strong>{row.coverageRate}%</strong>
               </button> : <span className={surface.signalUnavailable}>—</span>}</div>
               <div role="cell">{row.drills.failures ? <button type="button" className={surface.signalCell} onClick={() => onOpenDrill(row.drills.failures!)}>{row.failedItems}</button>

@@ -70,6 +70,20 @@ test("narrow dashboard keeps every risk column in a horizontally scrollable surf
   assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.portfolioPanel\s*\{\s*overflow-x: auto;\s*\}/);
 });
 
+test("run flow keeps pass rate readable without drawing a misleading sparse line", () => {
+  assert.doesNotMatch(trend, /<Line\b/);
+  assert.match(trend, /className=\{surface\.flowRate\}/);
+  assert.match(trend, /selectedPassRate/);
+  assert.match(styles, /\.flowRate\s*\{/);
+});
+
+test("risk rows use one coverage bar and a distinct pass-rate score", () => {
+  assert.match(portfolio, /className=\{surface\.passRateScore\}/);
+  assert.match(portfolio, /className=\{surface\.coverageCell\}/);
+  assert.equal((portfolio.match(/<progress\b/g) ?? []).length, 1);
+  assert.match(styles, /\.coverageCell progress::-webkit-progress-value/);
+});
+
 test("analytics detail is a clean bottom sheet with working destinations", () => {
   assert.match(modal, /sheet \? styles\.modalBackdropSheet/);
   assert.match(modal, /sheet \? styles\.modalSheet/);
@@ -97,10 +111,13 @@ test("dashboard copy does not expose implementation details", () => {
   }
 });
 
-test("tag and coverage charts use a restrained categorical palette", () => {
+test("tag and coverage charts use a legible categorical palette in both themes", () => {
   assert.match(breakdowns, /DIMENSION_COLORS/);
   assert.match(breakdowns, /<Cell key=\{item\.key\} fill=\{DIMENSION_COLORS/);
   for (const token of ["dash-teal", "dash-plum", "dash-sand", "dash-olive", "dash-coral"]) {
+    assert.match(styles, new RegExp(`--${token}:`));
+  }
+  for (const token of ["dash-blue", "dash-success", "dash-danger", "dash-warning", "dash-aborted"]) {
     assert.match(styles, new RegExp(`--${token}:`));
   }
 });
