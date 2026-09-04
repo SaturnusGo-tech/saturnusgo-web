@@ -18,7 +18,7 @@
   font-size: 12px;
   line-height: 1.45;
 }
-.repro:focus { border-color: var(--action); box-shadow: 0 0 0 2px rgb(53 116 240 / 25%); outline: 0; }
+.repro:focus { border-color: color-mix(in srgb, currentColor 38%, var(--line)); box-shadow: none; outline: 0; }
 .snapshot { min-height: 38px; display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 11px; }
 .snapshot span { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .snapshot strong { color: var(--ink); font-size: 11px; font-weight: 600; }

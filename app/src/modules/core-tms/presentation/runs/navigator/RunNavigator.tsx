@@ -195,6 +195,7 @@ export function RunNavigator({
           </div>
           <div className={styles.itemColumns} role="row" aria-hidden="true">
             <span />
+            <span />
             <span>ID</span>
             <span>{locale === "ru" ? "Тест-кейс" : "Test case"}</span>
             <span>{t("runs.status")}</span>
@@ -211,10 +212,10 @@ export function RunNavigator({
                 aria-current={item.id === selectedItemId ? "true" : undefined}
                 onClick={() => onSelectItem(item.id)}
               >
-                <span className={styles.itemSignals} role="cell">
+                <span className={styles.prioritySignal} role="cell">
                   {testCase && <AlertTriangle className={styles[`priority_${testCase.priority}`]} size={13} aria-label={localizedLabel(locale, testCase.priority)} />}
-                  {testCase && <CaseTypeIcon locale={locale} type={testCase.type} />}
                 </span>
+                <span className={styles.typeSignal} role="cell">{testCase && <CaseTypeIcon locale={locale} type={testCase.type} />}</span>
                 <strong className={styles.itemKey} role="cell">{item.caseKey}</strong>
                 <span className={styles.itemText} role="cell">
                   <strong>{testCase?.title ?? item.caseKey}</strong>

@@ -32,12 +32,18 @@
 .secondaryButton { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; border: 1px solid var(--suite-border-strong); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; white-space: nowrap; }
 .createButton,
 .primaryButton { color: #fff; background: var(--action); border-color: var(--action); }
+.createButton.createButton,
+.primaryButton.primaryButton,
+.createButton.createButton :is(span, svg),
+.primaryButton.primaryButton :is(span, svg) { color: #fff !important; }
+.createButton.createButton,
+.primaryButton.primaryButton { -webkit-text-fill-color: #fff; }
 .createButton:hover,
 .primaryButton:hover { filter: brightness(.94); }
 .secondaryButton { color: var(--suite-text); background: var(--suite-bg); }
 .secondaryButton:hover { background: var(--suite-hover); }
 .search { min-height: 34px; display: flex; align-items: center; gap: 7px; margin: 8px 10px; padding: 0 9px; color: var(--suite-muted); background: var(--suite-bg); border: 1px solid var(--suite-border-strong); border-radius: 6px; }
-.search:focus-within { border-color: var(--action); }
+.search:focus-within { border-color: color-mix(in srgb, var(--suite-text) 38%, var(--suite-border)); }
 .search input { width: 100%; min-width: 0; color: var(--suite-text); background: transparent; border: 0; outline: 0; font-size: 12px; }
 .search input::placeholder { color: var(--suite-muted); }
 .list { min-height: 0; flex: 1; overflow: auto; scrollbar-color: var(--suite-border-strong) transparent; }
@@ -79,6 +85,8 @@
 .blank strong { color: var(--suite-text); font-size: 16px; }
 .blank span { max-width: 360px; font-size: 12px; }
 .blank button { margin-top: 8px; }
+.workspace :is(button, input):focus-visible { outline: 0 !important; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--suite-text) 24%, transparent) !important; }
+.workspace .search input:focus-visible { box-shadow: none !important; }
 :global(.dark) .typeBadge { color: #fff; background: #565d69; border-color: #737b88; }
 :global(.dark) .typeBadge[data-type="dynamic"] { background: #6d45b4; border-color: #9069d2; }
 @container suites-workspace (max-width: 980px) {

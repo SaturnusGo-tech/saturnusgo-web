@@ -42,3 +42,13 @@ test("run execution follows the test-case list and detail hierarchy", () => {
   assert.match(executionHeader, /Кейс \$\{itemIndex \+ 1\} из \$\{itemCount\}/);
   assert.match(runStyles, /\.overviewLayout\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(178px, 31%\);/s);
 });
+
+test("run listing shares filled priority signals, separated type columns, and saturated statuses", () => {
+  assert.match(view, /className=\{styles\.prioritySignal\}/);
+  assert.match(view, /className=\{styles\.typeSignal\}/);
+  assert.match(styles, /\.prioritySignal svg\s*\{[^}]*fill: currentColor;[^}]*stroke-width: 0;/s);
+  assert.match(styles, /grid-template-columns: 30px 30px 92px minmax\(0, 1fr\) 102px/);
+  assert.match(styles, /\.execution_passed\s*\{[^}]*background: #14864f;/s);
+  assert.match(styles, /\.navigator button:focus-visible[^}]*outline: 0;/s);
+  assert.doesNotMatch(runStyles, /focus-visible\s*\{[^}]*outline: 2px solid var\(--runs-primary\)/s);
+});
