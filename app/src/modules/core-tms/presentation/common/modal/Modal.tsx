@@ -77,7 +77,10 @@ export function Modal({
     const moveSheetDrag = (event: PointerEvent) => {
       if (!dragActiveRef.current) return;
       const delta = event.clientY - dragOriginRef.current;
-      const progress = Math.max(0, Math.min(1, dragStartProgressRef.current + delta / 180));
+      const dragRange = dragStartProgressRef.current === 1
+        ? Math.max(56, window.innerHeight * .08)
+        : 180;
+      const progress = Math.max(0, Math.min(1, dragStartProgressRef.current + delta / dragRange));
       dragProgressRef.current = progress;
       setDragProgress(progress);
     };
