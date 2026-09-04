@@ -90,7 +90,31 @@
 .attachmentChip small { color: var(--cases-faint); font-size: 9px; }
 .attachmentChip button { width: 22px; height: 22px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
 .attachmentChip button:hover { color: #d35f65; background: var(--cases-hover); }
-.editorLoading { min-height: 132px; background: var(--cases-control); }
+.editorLoading {
+  width: 100%;
+  display: flex;
+  background: var(--cases-control);
+}
+.editorLoadingRegular { height: 164px; min-height: 148px; }
+.editorLoadingCompact { height: 138px; min-height: 122px; }
+.editorLoadingCompactWithFooter { height: 140px; min-height: 128px; }
+.editorLoadingInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  resize: none;
+  padding: 10px 11px;
+  color: var(--cases-secondary-text);
+  background: var(--cases-control);
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.editorLoadingInput::placeholder { color: var(--cases-faint); }
+.editorLoadingInput:focus { outline: 0; box-shadow: none; }
 
 .editorOverlayHost { width: 0; height: 0; overflow: hidden; }
 :global(.mdxeditor-popup-container).wysiwyg {

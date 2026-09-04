@@ -23,8 +23,15 @@ const detailActions = readFileSync(new URL("../../detail/header/CaseDetailHeader
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
 const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.meta.url), "utf8");
 
-test("markdown fields use a client-only WYSIWYG editor without a raw source pane", () => {
+test("markdown fields use a client-only WYSIWYG editor with an interactive loading fallback", () => {
   assert.match(source, /dynamic\([\s\S]*ssr: false/);
+  assert.match(source, /loading: \(\) => <MarkdownEditorLoadingFallback/);
+  assert.match(source, /void loadMarkdownEditor\(\)/);
+  assert.match(source, /className=\{css\.editorLoadingInput\}/);
+  assert.match(source, /value=\{state\.value\}/);
+  assert.match(source, /onChange=\{\(event\) => state\.onChange\(event\.target\.value\)\}/);
+  assert.match(styles, /\.editorLoadingInput/);
+  assert.doesNotMatch(source, /editorLoading[^\n]*aria-hidden/);
   assert.match(initialized, /<MDXEditor/);
   assert.match(initialized, /BoldItalicUnderlineToggles options=\{\["Bold", "Italic"\]\}/);
   assert.match(initialized, /<ListsToggle \/>/);

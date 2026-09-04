@@ -2,7 +2,7 @@
 
 import MDEditor from "@uiw/react-md-editor/nohighlight";
 import dynamic from "next/dynamic";
-import { useCallback } from "react";
+import { createContext, useCallback, useContext, useEffect } from "react";
 import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
 import { filesFromClipboard } from "../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -22,9 +22,44 @@ type Props = {
 };
 
 const WysiwygMarkdownEditor = dynamic(
-  () => import("./InitializedMarkdownEditor"),
-  { ssr: false, loading: () => <div className={css.editorLoading} aria-hidden="true" /> },
+  loadMarkdownEditor,
+  { ssr: false, loading: () => <MarkdownEditorLoadingFallback /> },
 );
+
+type LoadingEditorState = {
+  value: string;
+  label: string;
+  locale: "en" | "ru";
+  compact: boolean;
+  withAttachments: boolean;
+  autoFocus: boolean;
+  onChange: (value: string) => void;
+};
+
+const LoadingEditorContext = createContext<LoadingEditorState | null>(null);
+
+function loadMarkdownEditor() {
+  return import("./InitializedMarkdownEditor");
+}
+
+function MarkdownEditorLoadingFallback() {
+  const state = useContext(LoadingEditorContext);
+  if (!state) return null;
+  const height = state.compact
+    ? (state.withAttachments ? css.editorLoadingCompactWithFooter : css.editorLoadingCompact)
+    : css.editorLoadingRegular;
+  return <div className={`${css.editorLoading} ${height}`}>
+    <textarea
+      className={css.editorLoadingInput}
+      aria-label={state.label}
+      value={state.value}
+      autoFocus={state.autoFocus}
+      placeholder={state.locale === "ru" ? "Введите текст…" : "Enter text…"}
+      spellCheck
+      onChange={(event) => state.onChange(event.target.value)}
+    />
+  </div>;
+}
 
 function isSafeUrl(url: string) {
   const value = url.trim();
@@ -46,6 +81,9 @@ export function MarkdownField(props: Props) {
       props.attachmentKey, files, props.attachmentStepId,
     );
   }, [addFilesToDraft, props.attachmentKey, props.attachmentStepId]);
+  useEffect(() => {
+    void loadMarkdownEditor();
+  }, []);
   if (!props.onChange) {
     if (!props.value.trim()) {
       return <p className={css.empty}>{props.emptyLabel}</p>;
@@ -75,18 +113,28 @@ export function MarkdownField(props: Props) {
       event.preventDefault();
       addFiles(files);
     }}>
-    <WysiwygMarkdownEditor
-      markdown={props.value}
-      label={props.label}
-      locale={locale}
-      compact={props.compact}
-      autoFocus={props.autoFocus}
-      validateUrl={isSafeUrl}
-      onChange={props.onChange}
-      pendingAttachments={pending}
-      onAttachmentFiles={addFiles}
-      onRemoveAttachment={attachmentEnabled ? attachments?.remove : undefined}
-    />
+    <LoadingEditorContext.Provider value={{
+      value: props.value,
+      label: props.label,
+      locale,
+      compact: Boolean(props.compact),
+      withAttachments: Boolean(addFiles),
+      autoFocus: Boolean(props.autoFocus),
+      onChange: props.onChange,
+    }}>
+      <WysiwygMarkdownEditor
+        markdown={props.value}
+        label={props.label}
+        locale={locale}
+        compact={props.compact}
+        autoFocus={props.autoFocus}
+        validateUrl={isSafeUrl}
+        onChange={props.onChange}
+        pendingAttachments={pending}
+        onAttachmentFiles={addFiles}
+        onRemoveAttachment={attachmentEnabled ? attachments?.remove : undefined}
+      />
+    </LoadingEditorContext.Provider>
     {attachmentEnabled && attachmentProblem && <span className={css.attachmentError} role="alert">
       {attachmentProblem}
     </span>}
