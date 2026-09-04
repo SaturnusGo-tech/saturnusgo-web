@@ -2565,7 +2565,7 @@
 .modalSheet > header h2 { order: 2; margin-top: 5px; font-size: clamp(21px, 2vw, 28px); }
 .modalSheet > header p { order: 1; margin: 0; color: var(--muted); font-size: 11px; }
 
-.modalSheetAdaptive {
+.modalSheet.modalSheetAdaptive {
   --sheet-gutter: 0px;
   --sheet-height-offset: 0dvh;
   --sheet-radius: 0px;
@@ -2579,13 +2579,13 @@
   transition: width 320ms cubic-bezier(.2, .78, .28, 1), height 320ms cubic-bezier(.2, .78, .28, 1), border-radius 320ms cubic-bezier(.2, .78, .28, 1), border-width 320ms cubic-bezier(.2, .78, .28, 1);
 }
 
-.modalSheetAdaptive[data-sheet-state="compact"] {
+.modalSheet.modalSheetAdaptive[data-sheet-state="compact"] {
   --sheet-gutter: 48px;
   --sheet-height-offset: 8dvh;
   --sheet-radius: 18px;
   --sheet-border: 1px;
 }
-.modalSheetAdaptive[data-sheet-dragging="true"] { transition: none; }
+.modalSheet.modalSheetAdaptive[data-sheet-dragging="true"] { transition: none; }
 .modalSheetAdaptive::before { cursor: ns-resize; }
 .modalSheetAdaptive > header { cursor: ns-resize; user-select: none; }
 .modalSheetAdaptive > header :is(button, a, input, textarea, select) { cursor: pointer; }
