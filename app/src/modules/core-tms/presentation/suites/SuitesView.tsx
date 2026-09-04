@@ -45,7 +45,7 @@ export function SuitesView({ suites, cases, selected, selectedDetail, onSelect, 
             <button className={view.suiteRow} data-selected={suite.id === selectedSuite?.id} key={suite.id} onClick={() => onSelect(suite.id)}>
               <span className={view.suiteIcon} data-type={suite.type}><ListChecks size={14} /></span>
               <span className={view.suiteCopy}><strong>{suite.name}</strong><small>{suite.key} · {suite.type === "dynamic" ? (ru ? "По тегам" : "By tags") : (ru ? "Фиксированный" : "Fixed")}</small></span>
-              <span className={view.caseCount}>{suite.type === "dynamic" ? (ru ? "Авто" : "Auto") : detail?.id === suite.id ? detail.resolvedCaseCount : suite.caseCount}</span>
+              <span className={view.caseCount}>{suite.type === "dynamic" ? (ru ? "Авто" : "Auto") : selectedSuite?.id === suite.id && detail ? suiteCases.length : suite.caseCount}</span>
             </button>
           ))}
           {visibleSuites.length === 0 && <div className={view.emptyList}><span>{t("suite.notFound")}</span><button className={styles.textButton} onClick={onCreate}><Plus size={14} />{t("suite.new")}</button></div>}

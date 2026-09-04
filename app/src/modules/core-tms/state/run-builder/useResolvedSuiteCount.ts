@@ -8,12 +8,16 @@ export function resolvedRunSuiteCount(summary: SuiteSummary | undefined, detail:
   return detail?.id === summary.id ? detail.resolvedCaseCount : null;
 }
 
-export function useResolvedSuiteCount(http: TmsHttpClient, suite: SuiteSummary | undefined, offline: boolean, errorMessage: string) {
+export function useResolvedSuiteCount(http: TmsHttpClient, suite: SuiteSummary | undefined, offline: boolean, errorMessage: string, knownDetail?: Suite | null) {
   const [detail, setDetail] = useState<Suite | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
     setDetail(null); setError("");
     if (!suite) return;
+    if (knownDetail?.id === suite.id) {
+      setDetail(knownDetail);
+      return;
+    }
     if (offline) {
       if (suite.type === "dynamic") {
         setError(errorMessage);
@@ -27,6 +31,6 @@ export function useResolvedSuiteCount(http: TmsHttpClient, suite: SuiteSummary |
       if (!(caught instanceof DOMException && caught.name === "AbortError")) setError(errorMessage);
     });
     return () => controller.abort();
-  }, [errorMessage, http, offline, suite?.id, suite?.type]);
+  }, [errorMessage, http, knownDetail, offline, suite?.id, suite?.type]);
   return { count: resolvedRunSuiteCount(suite, detail), error };
 }

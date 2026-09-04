@@ -46,6 +46,7 @@ export function WorkspaceExecutionDialogs({
         project={model.project}
         selectedSuiteId={model.runPresetSuiteId}
         presetCaseIds={model.runPresetCaseIds}
+        selectedSuiteDetail={model.selectedSuiteDetail}
         offline={model.connection === "demo"}
         onClose={() => {
           model.setRunPresetCaseIds([]);

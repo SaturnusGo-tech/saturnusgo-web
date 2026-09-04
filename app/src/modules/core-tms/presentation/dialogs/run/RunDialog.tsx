@@ -1,7 +1,7 @@
 import { Check, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import type { Bootstrap, Project, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import type { Bootstrap, Project, Suite, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../../core/tms/idempotency/pending-operation";
 import { createRun } from "../../../application/runs/createRun";
@@ -19,6 +19,7 @@ import styles from "./RunDialog.module.css";
 
 type Props = {
   data: Bootstrap; project: Project; selectedSuiteId: string; presetCaseIds: string[];
+  selectedSuiteDetail?: Suite | null;
   offline: boolean; onClose: () => void; onCreated: (run: TestRunSummary) => void;
 };
 
@@ -26,7 +27,7 @@ const runTypeLabel = (copy: RunDialogCopy, type: TestRunSummary["type"]) => ({
   smoke: copy.smoke, regression: copy.regression, acceptance: copy.acceptance, ad_hoc: copy.adHoc,
 })[type];
 
-export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offline, onClose, onCreated }: Props) {
+export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, selectedSuiteDetail, offline, onClose, onCreated }: Props) {
   const http = useTmsHttpClient();
   const { locale } = useTmsLocale();
   const copy = getRunDialogCopy(locale);
@@ -55,7 +56,8 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
   const environmentField = useRef<HTMLLabelElement>(null);
   const focusEnvironmentOnMount = useRef(!builderOpen);
   const selectedSuite = suites.find((item) => item.id === suiteId);
-  const { count: suiteCount, error: suiteError } = useResolvedSuiteCount(http, selectedSuite, offline, copy.suiteResolveError);
+  const knownSuiteDetail = selectedSuiteDetail?.id === selectedSuite?.id ? selectedSuiteDetail : null;
+  const { count: suiteCount, error: suiteError } = useResolvedSuiteCount(http, selectedSuite, offline, copy.suiteResolveError, knownSuiteDetail);
   const selectedCases = cases.filter((item) => caseIds.includes(item.id));
   const selectionCount = selectedSuite ? suiteCount ?? 0 : caseIds.length;
   const hasSelection = selectionCount > 0;
@@ -101,7 +103,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, offli
     {!builderOpen && fastCase && presetCase && <div className={styles.scopeSummary}><Check size={17} /><span><small>{copy.currentCase}</small><strong>{presetCase.key} · {presetCase.title}</strong><em>{countLabel(caseIds.length)}</em></span></div>}
     {!builderOpen && initialSuite && <SuiteSummary suite={initialSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} />}
     {builderOpen && <>
-      <label className={styles.sourceField}><span>{copy.source}</span><AnimatedSelect label={copy.source} value={suiteId} onChange={changeSuite} options={[{ value: "", label: copy.customSelection }, ...suites.map((suite) => ({ value: suite.id, label: `${suite.name} · ${suite.type === "dynamic" ? copy.dynamicSuite : countLabel(suite.caseCount)}` }))]} /></label>
+      <label className={styles.sourceField}><span>{copy.source}</span><AnimatedSelect label={copy.source} value={suiteId} onChange={changeSuite} options={[{ value: "", label: copy.customSelection }, ...suites.map((suite) => ({ value: suite.id, label: `${suite.name} · ${suite.type === "dynamic" ? copy.dynamicSuite : copy.staticSuite}` }))]} /></label>
       {selectedSuite ? <SuiteSummary suite={selectedSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} /> : <RunScopeBuilder cases={cases} caseIds={caseIds} setCaseIds={setCaseIds} copy={copy} />}
     </>}
     {selectedCases.length > 0 && !fastCase && !selectedSuite && <p className={styles.selectedPreview}>{selectedCases.slice(0, 4).map((item) => item.key).join(", ")}{selectedCases.length > 4 ? ` +${selectedCases.length - 4}` : ""}</p>}
