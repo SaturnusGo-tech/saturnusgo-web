@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
-import { useEffect, useId, useRef } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import styles from "../../../tms.module.css";
 
@@ -21,6 +21,7 @@ export function Modal({
   wide = false,
   drawer = false,
   sheet = false,
+  adaptiveSheet = false,
   panelClassName = "",
 }: {
   title: string;
@@ -30,6 +31,7 @@ export function Modal({
   wide?: boolean;
   drawer?: boolean;
   sheet?: boolean;
+  adaptiveSheet?: boolean;
   panelClassName?: string;
 }) {
   const { t } = useTmsLocale();
@@ -42,7 +44,45 @@ export function Modal({
   );
   const titleId = useId();
   const subtitleId = useId();
+  const [sheetCompact, setSheetCompact] = useState(false);
+  const [dragProgress, setDragProgress] = useState<number | null>(null);
+  const dragOriginRef = useRef(0);
+  const dragProgressRef = useRef(0);
   closeRef.current = onClose;
+
+  const beginSheetDrag = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!sheet || !adaptiveSheet || event.button !== 0) return;
+    const panel = panelRef.current;
+    if (!panel || event.clientY - panel.getBoundingClientRect().top > 38) return;
+    if ((event.target as Element).closest("button, a, input, textarea, select")) return;
+    dragOriginRef.current = event.clientY;
+    dragProgressRef.current = sheetCompact ? 1 : 0;
+    setDragProgress(dragProgressRef.current);
+    panel.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const moveSheetDrag = (event: ReactPointerEvent<HTMLElement>) => {
+    if (dragProgress === null) return;
+    const delta = event.clientY - dragOriginRef.current;
+    const progress = Math.max(0, Math.min(1, (sheetCompact ? 1 : 0) + delta / 180));
+    dragProgressRef.current = progress;
+    setDragProgress(progress);
+  };
+
+  const finishSheetDrag = (event: ReactPointerEvent<HTMLElement>) => {
+    if (dragProgress === null) return;
+    if (panelRef.current?.hasPointerCapture(event.pointerId)) panelRef.current.releasePointerCapture(event.pointerId);
+    setSheetCompact(dragProgressRef.current >= .5);
+    setDragProgress(null);
+  };
+
+  const adaptiveStyle = adaptiveSheet && dragProgress !== null ? {
+    "--sheet-gutter": `${dragProgress * 48}px`,
+    "--sheet-height-offset": `${dragProgress * 8}dvh`,
+    "--sheet-radius": `${dragProgress * 18}px`,
+    "--sheet-border": `${dragProgress}px`,
+  } as CSSProperties : undefined;
 
   useEffect(() => {
     const bodyOverflow = document.body.style.overflow;
@@ -102,12 +142,19 @@ export function Modal({
     >
       <section
         ref={panelRef}
-        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""} ${sheet ? styles.modalSheet : ""} ${panelClassName}`}
+        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${drawer ? styles.modalDrawer : ""} ${sheet ? styles.modalSheet : ""} ${adaptiveSheet ? styles.modalSheetAdaptive : ""} ${panelClassName}`}
+        data-sheet-state={adaptiveSheet ? (sheetCompact ? "compact" : "full") : undefined}
+        data-sheet-dragging={dragProgress !== null || undefined}
+        style={adaptiveStyle}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={subtitle ? subtitleId : undefined}
         tabIndex={-1}
+        onPointerDown={beginSheetDrag}
+        onPointerMove={moveSheetDrag}
+        onPointerUp={finishSheetDrag}
+        onPointerCancel={finishSheetDrag}
       >
         <header>
           <div>

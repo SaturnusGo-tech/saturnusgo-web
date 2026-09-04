@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, Play, RefreshCw, Rows3 } from "lucide-react";
+import { ArrowUpRight, LoaderCircle, RefreshCw, Rows3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { DashboardAnalyticsQuery, DashboardDrill, DashboardDrillPage, DashboardDrillRow } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -12,7 +12,7 @@ import { DashboardDrillTable } from "./table/DashboardDrillTable";
 import { activeDrillTab, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab, type DashboardLocalFilters } from "./dashboard-drill-navigation";
 
 const EMPTY_FILTERS: DashboardLocalFilters = {
-  query: "", project: "", type: "", component: "", status: "", priority: "",
+  query: "", project: [], type: [], component: [], status: [], priority: [],
 };
 type Props = {
   query: DashboardAnalyticsQuery;
@@ -23,7 +23,7 @@ type Props = {
   error: boolean;
   scopeLabel: string;
   onSelectDrill: (drill: DashboardDrill) => void;
-  onOpenEntity: (tab: Exclude<DashboardDrillTab, "overview">, drill: DashboardDrill) => void;
+  onOpenEntity: (tab: DashboardDrillTab, drill: DashboardDrill) => void;
   onOpenRow: (row: DashboardDrillRow) => void;
   onCreateRun: (caseIds: string[]) => void;
   onClose: () => void;
@@ -45,54 +45,39 @@ export function DashboardDrillInspector(props: Props) {
       : sort === "status" ? (left.status ?? "").localeCompare(right.status ?? "")
         : Date.parse(right.occurredAt ?? "") - Date.parse(left.occurredAt ?? ""));
   }, [filters, props.page?.rows, sort]);
-  const projects = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const row of props.page?.rows ?? []) counts.set(row.project, (counts.get(row.project) ?? 0) + 1);
-    return [...counts].sort((left, right) => right[1] - left[1]);
-  }, [props.page?.rows]);
-  const tabs: Array<{ id: DashboardDrillTab; label: string; drill?: DashboardDrill | null }> = [
-    { id: "overview", label: t("dashboard.overview") },
+  const tabs: Array<{ id: DashboardDrillTab; label: string; drill: DashboardDrill | null }> = [
     { id: "test_case", label: t("dashboard.testCases"), drill: relatedDashboardDrill(props.origin, "test_case") },
     { id: "run", label: t("dashboard.runs"), drill: relatedDashboardDrill(props.origin, "run") },
     { id: "defect", label: t("dashboard.defects"), drill: relatedDashboardDrill(props.origin, "defect") },
   ];
   const selectTab = (next: typeof tabs[number]) => {
-    if (next.id !== "overview" && !next.drill) return;
+    if (!next.drill) return;
     setTab(next.id);
     if (next.drill && next.drill.id !== props.selected.id) props.onSelectDrill(next.drill);
   };
-  const activeEntity = tab === "overview" ? activeDrillTab(props.selected.filter) : tab;
 
-  return <Modal sheet title={props.origin.label} subtitle={`${props.scopeLabel} · ${t(`dashboard.period.${props.query.period}`)}`}
+  return <Modal sheet adaptiveSheet title={props.origin.label} subtitle={`${props.scopeLabel} · ${t(`dashboard.period.${props.query.period}`)}`}
     onClose={props.onClose} panelClassName={surface.drillSheet}>
-    <div className={surface.drillSheetToolbar}>
-      <div className={surface.drillActions}>
-        {activeEntity === "test_case" && (props.selected.projectId ?? props.query.projectId) && rows.length > 0 && <button type="button" onClick={() => props.onCreateRun(rows.map((row) => row.id))}><Play size={14} />{t("dashboard.createRunFromLoaded")}</button>}
-        <button type="button" className={surface.drillPrimaryAction} onClick={() => props.onOpenEntity(activeEntity, props.selected)}>{t(`dashboard.open.${activeEntity}`)}</button>
-      </div>
-    </div>
     <nav className={surface.drillTabs} aria-label={t("dashboard.detailSections")}>
       {tabs.map((item) => <button type="button" key={item.id} aria-current={tab === item.id ? "page" : undefined}
-        disabled={item.id !== "overview" && !item.drill} title={!item.drill && item.id !== "overview" ? t("dashboard.relatedUnavailable") : undefined}
-        onClick={() => selectTab(item)}>{item.label}{tab === item.id && item.id !== "overview" && props.page?.total !== undefined ? ` ${props.page.total}` : ""}</button>)}
+        disabled={!item.drill} title={!item.drill ? t("dashboard.relatedUnavailable") : undefined}
+        onClick={() => selectTab(item)}>{item.label}{tab === item.id && props.page?.total !== undefined && <span>{props.page.total}</span>}</button>)}
     </nav>
     <div className={surface.drillSheetBody}>
       <DashboardDrillFacets rows={props.page?.rows ?? []} value={filters} onChange={setFilters} />
       <main className={surface.drillResults}>
-        {tab === "overview" ? <section className={surface.drillOverview}>
-          <div><span>{t("dashboard.loadedRecords")}</span><strong>{props.page?.total ?? 0}</strong></div>
-          <div><span>{t("dashboard.visibleAfterRefine")}</span><strong>{rows.length}</strong></div>
-          <div><span>{t("dashboard.projectsRepresented")}</span><strong>{projects.length}</strong></div>
-        </section> : <>
-          <div className={surface.resultsToolbar}><span><Rows3 size={14} />{t("dashboard.visibleRecords", { count: rows.length })}</span><label>{t("dashboard.sort")}
+          <div className={surface.resultsToolbar}><span><Rows3 size={14} />{t("dashboard.visibleRecords", { count: rows.length })}</span><div>
+            <label>{t("dashboard.sort")}
             <AnimatedSelect compact className={surface.sortSelect} label={t("dashboard.sort")} value={sort} onChange={setSort}
-              options={[{ value: "recent", label: t("dashboard.sortRecent") }, { value: "title", label: t("dashboard.sortTitle") }, { value: "status", label: t("dashboard.sortStatus") }]} />
-          </label></div>
+              options={[{ value: "recent", label: t("dashboard.sortRecent") }, { value: "title", label: t("dashboard.sortTitle") }, { value: "status", label: t("dashboard.sortStatus") }]} /></label>
+            <button type="button" className={surface.drillSectionLink} onClick={() => props.onOpenEntity(tab, props.selected)}>
+              {t("dashboard.openSection")}<ArrowUpRight size={14} />
+            </button>
+          </div></div>
           {props.error ? <div className={surface.drillState} role="alert"><strong>{t("dashboard.drillError")}</strong><button type="button" onClick={props.onRetry}><RefreshCw size={14} />{t("dashboard.retry")}</button></div>
             : props.loading && !props.page ? <div className={surface.drillState} role="status"><LoaderCircle className={surface.spin} size={21} /><span>{t("dashboard.drillLoading")}</span></div>
               : <DashboardDrillTable rows={rows} onOpenRow={props.onOpenRow} />}
           {props.page?.nextCursor && !props.error && <button type="button" className={surface.loadMore} onClick={props.onLoadMore} disabled={props.loading}>{props.loading && <LoaderCircle className={surface.spin} size={14} />}{t("dashboard.loadMore")}</button>}
-        </>}
       </main>
     </div>
   </Modal>;

@@ -166,6 +166,7 @@ test("dashboard detail keeps human context and only enables truthful related tab
   const rows = [{ id: "one", entity: "test_case" as const, projectId: "alpha", key: "A-1",
     title: "Checkout payment", project: "Alpha", detail: "#smoke", component: "Checkout",
     type: "automated", status: "ready", links: [] }];
-  assert.equal(filterDashboardRows(rows, { query: "payment", project: "", type: "automated", component: "Checkout", status: "ready", priority: "" }).length, 1);
-  assert.equal(filterDashboardRows(rows, { query: "", project: "Beta", type: "", component: "", status: "", priority: "" }).length, 0);
+  assert.equal(filterDashboardRows(rows, { query: "payment", project: [], type: ["automated"], component: ["Checkout"], status: ["ready"], priority: [] }).length, 1);
+  assert.equal(filterDashboardRows(rows, { query: "", project: ["Beta"], type: [], component: [], status: [], priority: [] }).length, 0);
+  assert.equal(filterDashboardRows(rows, { query: "", project: [], type: [], component: ["Checkout", "Identity"], status: [], priority: [] }).length, 1);
 });

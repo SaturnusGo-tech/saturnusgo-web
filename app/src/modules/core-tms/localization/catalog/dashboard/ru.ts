@@ -91,6 +91,7 @@ export const ruDashboardMessages = {
   "dashboard.open.test_case": "Открыть в тест-кейсах",
   "dashboard.open.run": "Открыть в ранах",
   "dashboard.open.defect": "Открыть в дефектах",
+  "dashboard.openSection": "Перейти в раздел",
   "dashboard.createRunFromLoaded": "Создать ран",
   "dashboard.refineList": "Фильтры",
   "dashboard.searchRecords": "Поиск",

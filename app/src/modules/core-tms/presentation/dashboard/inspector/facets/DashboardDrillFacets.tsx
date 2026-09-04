@@ -26,21 +26,29 @@ export function DashboardDrillFacets({ rows, value, onChange }: {
     project: t("dashboard.project"), type: t("dashboard.type"), component: t("dashboard.component"),
     status: t("dashboard.status"), priority: t("dashboard.priority"),
   }[key]);
+  const selectedCount = Object.entries(value).reduce((total, [key, selected]) =>
+    key === "query" ? total : total + (selected as string[]).length, 0);
+  const toggle = (key: FacetKey, option: string) => {
+    const selected = value[key];
+    onChange({
+      ...value,
+      [key]: selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option],
+    });
+  };
   return <aside className={surface.drillFacets} aria-label={t("dashboard.refineList")}>
-    <h3><SlidersHorizontal size={14} />{t("dashboard.refineList")}</h3>
+    <h3><SlidersHorizontal size={14} />{t("dashboard.refineList")}{selectedCount > 0 && <span>{selectedCount}</span>}</h3>
     <label className={surface.drillSearch}><span>{t("dashboard.searchRecords")}</span><div><Search size={14} /><input type="search" value={value.query}
       onChange={(event) => onChange({ ...value, query: event.target.value })} placeholder={t("dashboard.searchPlaceholder")} /></div></label>
     {(["type", "project", "component", "status", "priority"] as const).map((key) => {
       const options = facetValues(rows, key);
       if (!options.length) return null;
       return <fieldset key={key}><legend>{label(key)}</legend>{options.slice(0, 8).map(([option, count]) => <label key={option}>
-        <input type="checkbox" checked={value[key] === option} onChange={() => onChange({
-          ...value, [key]: value[key] === option ? "" : option,
-        })} /><span>{key === "project" || key === "component" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
+        <input type="checkbox" checked={value[key].includes(option)} onChange={() => toggle(key, option)} />
+        <span>{key === "project" || key === "component" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
       </label>)}</fieldset>;
     })}
-    {Object.values(value).some(Boolean) && <button type="button" onClick={() => onChange({
-      query: "", project: "", type: "", component: "", status: "", priority: "",
+    {(Boolean(value.query) || selectedCount > 0) && <button type="button" onClick={() => onChange({
+      query: "", project: [], type: [], component: [], status: [], priority: [],
     })}>{locale === "ru" ? "Сбросить уточнения" : "Reset refinements"}</button>}
   </aside>;
 }

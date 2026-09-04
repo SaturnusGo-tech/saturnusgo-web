@@ -23,7 +23,7 @@ type DashboardViewProps = {
   data: Bootstrap;
   projectId: string;
   onCreate: () => void;
-  onOpenEntity: (tab: Exclude<DashboardDrillTab, "overview">, drill: DashboardDrill) => void;
+  onOpenEntity: (tab: DashboardDrillTab, drill: DashboardDrill) => void;
   onOpenRow: (row: DashboardDrillRow) => void;
   onCreateRun: (caseIds: string[]) => void;
   serverAnalytics?: boolean;

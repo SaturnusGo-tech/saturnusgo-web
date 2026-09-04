@@ -84,17 +84,19 @@ test("risk rows use one coverage bar and a distinct pass-rate score", () => {
   assert.match(styles, /\.coverageCell progress::-webkit-progress-value/);
 });
 
-test("analytics detail is a clean bottom sheet with working destinations", () => {
+test("analytics detail is an adaptive sheet with focused entity tabs", () => {
   assert.match(modal, /sheet \? styles\.modalBackdropSheet/);
   assert.match(modal, /sheet \? styles\.modalSheet/);
-  assert.match(inspector, /<Modal sheet/);
+  assert.match(inspector, /<Modal sheet adaptiveSheet/);
   assert.doesNotMatch(inspector, /workspaceId|projectId\}|exactFilters|server filters/i);
   assert.doesNotMatch(inspector, /humanFilters|loadedDistribution|dashboardFilterValues/);
-  assert.match(inspector, /onOpenEntity\(activeEntity, props\.selected\)/);
+  assert.match(inspector, /onOpenEntity\(tab, props\.selected\)/);
   assert.match(inspector, /relatedDashboardDrill/);
+  assert.doesNotMatch(inspector, /id: "overview"|drillOverview|createRunFromLoaded/);
   assert.match(inspector, /<AnimatedSelect/);
-  assert.match(styles, /\.drillSheetBody\s*\{[^}]*grid-template-columns: 250px minmax\(0, 1fr\)/s);
-  assert.match(styles, /\.drillTable\s*\{[^}]*min-width: 980px/s);
+  assert.match(styles, /\.drillSheetBody\s*\{[^}]*grid-template-columns: 268px minmax\(0, 1fr\)/s);
+  assert.match(styles, /\.drillTable\s*\{[^}]*min-width: 1000px/s);
+  assert.match(modal, /data-sheet-state/);
 });
 
 test("dashboard uses custom menus and theme-safe chart tooltips", () => {

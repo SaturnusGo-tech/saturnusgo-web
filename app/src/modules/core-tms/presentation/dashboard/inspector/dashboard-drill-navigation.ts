@@ -2,9 +2,9 @@ import type {
   DashboardDrill, DashboardDrillFilter, DashboardDrillRow,
 } from "../../../dashboards/model/dashboard-analytics";
 
-export type DashboardDrillTab = "overview" | "test_case" | "run" | "defect";
+export type DashboardDrillTab = "test_case" | "run" | "defect";
 
-export const activeDrillTab = (filter: DashboardDrillFilter): Exclude<DashboardDrillTab, "overview"> =>
+export const activeDrillTab = (filter: DashboardDrillFilter): DashboardDrillTab =>
   filter.entity === "run_item" ? "run" : filter.entity;
 
 const componentScope = (filter: DashboardDrillFilter) => ({
@@ -17,7 +17,7 @@ const caseOnlyScope = (filter: DashboardDrillFilter) => filter.entity === "test_
 
 export function relatedDashboardDrill(
   origin: DashboardDrill,
-  tab: Exclude<DashboardDrillTab, "overview">,
+  tab: DashboardDrillTab,
 ): DashboardDrill | null {
   const filter = origin.filter;
   if (activeDrillTab(filter) === tab) return origin;
@@ -58,7 +58,12 @@ export function dashboardFilterValues(drill: DashboardDrill) {
 }
 
 export type DashboardLocalFilters = {
-  query: string; project: string; type: string; component: string; status: string; priority: string;
+  query: string;
+  project: string[];
+  type: string[];
+  component: string[];
+  status: string[];
+  priority: string[];
 };
 
 export function filterDashboardRows(rows: DashboardDrillRow[], filters: DashboardLocalFilters) {
@@ -66,8 +71,10 @@ export function filterDashboardRows(rows: DashboardDrillRow[], filters: Dashboar
   return rows.filter((row) => {
     const haystack = [row.key, row.title, row.project, row.component, row.detail, ...(row.tags ?? [])]
       .filter(Boolean).join(" ").toLocaleLowerCase();
-    return (!query || haystack.includes(query)) && (!filters.project || row.project === filters.project) &&
-      (!filters.type || row.type === filters.type) && (!filters.component || row.component === filters.component) &&
-      (!filters.status || row.status === filters.status) && (!filters.priority || row.priority === filters.priority);
+    return (!query || haystack.includes(query)) && (!filters.project.length || filters.project.includes(row.project)) &&
+      (!filters.type.length || Boolean(row.type && filters.type.includes(row.type))) &&
+      (!filters.component.length || Boolean(row.component && filters.component.includes(row.component))) &&
+      (!filters.status.length || Boolean(row.status && filters.status.includes(row.status))) &&
+      (!filters.priority.length || Boolean(row.priority && filters.priority.includes(row.priority)));
   });
 }

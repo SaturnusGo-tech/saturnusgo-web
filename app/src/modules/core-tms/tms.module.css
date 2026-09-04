@@ -2524,6 +2524,8 @@
   backdrop-filter: blur(2px);
 }
 
+.modalBackdropSheet:has(.modalSheetAdaptive) { padding: 0; }
+
 .modalSheet {
   position: relative;
   width: min(1460px, 100%);
@@ -2562,6 +2564,31 @@
 .modalSheet > header > div { display: flex; flex-direction: column; }
 .modalSheet > header h2 { order: 2; margin-top: 5px; font-size: clamp(21px, 2vw, 28px); }
 .modalSheet > header p { order: 1; margin: 0; color: var(--muted); font-size: 11px; }
+
+.modalSheetAdaptive {
+  --sheet-gutter: 0px;
+  --sheet-height-offset: 0dvh;
+  --sheet-radius: 0px;
+  --sheet-border: 0px;
+  width: calc(100% - var(--sheet-gutter));
+  height: calc(100dvh - var(--sheet-height-offset));
+  max-height: 100dvh;
+  border-width: var(--sheet-border);
+  border-bottom-width: 0;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  transition: width 320ms cubic-bezier(.2, .78, .28, 1), height 320ms cubic-bezier(.2, .78, .28, 1), border-radius 320ms cubic-bezier(.2, .78, .28, 1), border-width 320ms cubic-bezier(.2, .78, .28, 1);
+}
+
+.modalSheetAdaptive[data-sheet-state="compact"] {
+  --sheet-gutter: 48px;
+  --sheet-height-offset: 8dvh;
+  --sheet-radius: 18px;
+  --sheet-border: 1px;
+}
+.modalSheetAdaptive[data-sheet-dragging="true"] { transition: none; }
+.modalSheetAdaptive::before { cursor: ns-resize; }
+.modalSheetAdaptive > header { cursor: ns-resize; user-select: none; }
+.modalSheetAdaptive > header :is(button, a, input, textarea, select) { cursor: pointer; }
 
 @keyframes tms-sheet-in {
   from { opacity: .72; transform: translateY(44px); }
@@ -2879,6 +2906,7 @@
     border: 0;
     border-radius: 0;
   }
+  .modalSheetAdaptive { width: 100%; height: 100dvh; border: 0; border-radius: 0; }
   .modalSheet > header { min-height: 92px; padding-inline: 18px; }
   .modalDrawer {
     width: 100%;

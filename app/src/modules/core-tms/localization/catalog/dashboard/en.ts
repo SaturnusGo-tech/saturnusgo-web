@@ -91,6 +91,7 @@ export const enDashboardMessages = {
   "dashboard.open.test_case": "Open in test cases",
   "dashboard.open.run": "Open in runs",
   "dashboard.open.defect": "Open in defects",
+  "dashboard.openSection": "Go to section",
   "dashboard.createRunFromLoaded": "Create run",
   "dashboard.refineList": "Filters",
   "dashboard.searchRecords": "Search",
