@@ -64,6 +64,20 @@ test("supports descending priority sorting", () => {
   assert.deepEqual(sorted.map((row) => row.testCase.priority), ["critical", "high", "low"]);
 });
 
+test("case listings keep priority as one sortable signal instead of a duplicate pill column", () => {
+  const table = readFileSync(new URL("../../list/CasesTable.tsx", import.meta.url), "utf8");
+  const signal = readFileSync(new URL("../../list/PrioritySignal.tsx", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../../list/prioritySignal.module.css", import.meta.url), "utf8");
+  assert.match(table, /className=\{styles\.prioritySortButton\}/);
+  assert.match(table, /<PrioritySignal priority=\{item\.priority\}/);
+  assert.doesNotMatch(table, /<PriorityBadge/);
+  assert.equal((table.match(/key: "priority"/g) ?? []).length, 1);
+  assert.match(signal, /priority === "low" \? Diamond : Triangle/);
+  assert.match(signal, /fill=\{filled \? "currentColor" : "none"\}/);
+  assert.match(styles, /\.signal\[data-priority="high"\] \{ color: #e58b18; \}/);
+  assert.match(styles, /\.signal\[data-priority="critical"\] \{ color: #e3404b; \}/);
+});
+
 test("parses quoted QL values, aliases, and exclusions", () => {
   assert.deepEqual(parseCaseQlQuery('status:ready lifecycle:draft component:"Web client" -tag:flaky'), [
     { field: "lifecycle", value: "ready", exclude: false },

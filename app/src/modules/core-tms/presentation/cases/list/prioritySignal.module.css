@@ -1,0 +1,14 @@
+.signal {
+  display: block;
+  flex: 0 0 auto;
+  color: var(--priority-signal-neutral, #747982);
+}
+
+.signal[data-priority="high"] { color: #e58b18; }
+.signal[data-priority="critical"] { color: #e3404b; }
+
+:global(.dark) .signal[data-priority="low"],
+:global(.dark) .signal[data-priority="medium"] { color: var(--priority-signal-neutral-dark, #aba8b2); }
+
+:global(.dark) .signal[data-priority="high"] { color: #f0a437; }
+:global(.dark) .signal[data-priority="critical"] { color: #ef5964; }

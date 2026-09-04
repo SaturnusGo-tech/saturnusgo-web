@@ -326,35 +326,30 @@
 .drillTableViewport { min-height: 0; flex: 1 1 auto; overflow: auto; }
 .drillTable { width: 100%; min-width: 1000px; border-collapse: collapse; table-layout: fixed; }
 .drillTable th { position: sticky; z-index: 1; top: 0; height: 29px; padding: 0 10px; color: var(--muted); background: color-mix(in srgb, var(--control) 64%, var(--paper)); border-bottom: 1px solid var(--line); font-size: 9px; font-weight: 650; text-align: left; }
-.drillTable th:nth-child(1) { width: 68px; }.drillTable th:nth-child(2) { width: 112px; }.drillTable th:nth-child(3) { width: 112px; }.drillTable th:nth-child(4) { width: auto; }.drillTable th:nth-child(5) { width: 16%; }.drillTable th:nth-child(6) { width: 112px; }.drillTable th:nth-child(7) { width: 116px; }.drillTable th:nth-child(8) { width: 64px; }
+.drillTable th:nth-child(1) { width: 68px; }.drillTable th:nth-child(2) { width: 112px; }.drillTable th:nth-child(3) { width: 112px; }.drillTable th:nth-child(4) { width: auto; }.drillTable th:nth-child(5) { width: 16%; }.drillTable th:nth-child(6) { width: 116px; }.drillTable th:nth-child(7) { width: 64px; }
 .drillTable td { min-width: 0; height: 48px; padding: 6px 10px; overflow: hidden; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 11px; vertical-align: middle; white-space: nowrap; }
 .drillTable tr:hover td { background: var(--control-hover); }
 .recordSignals { display: flex; align-items: center; gap: 9px; }
-.prioritySignal { flex: 0 0 auto; color: var(--dash-slate); stroke-width: 1.5; }
-.prioritySignal[data-priority="medium"] { color: var(--dash-blue); }
-.prioritySignal[data-priority="high"] { color: var(--dash-orange); }
-.prioritySignal[data-priority="critical"] { color: var(--dash-danger); }
 .entityIcon { width: 18px; height: 22px; display: grid; place-items: center; flex: 0 0 auto; color: var(--muted); }
-.entityIcon[data-type="automated"] { color: var(--dash-violet); }
-.entityIcon[data-type="manual"] { color: var(--dash-teal); }
-.entityIcon[data-type="checklist"] { color: var(--dash-cyan); }
+.entityIcon[data-type="automated"], .entityIcon[data-type="manual"], .entityIcon[data-type="checklist"] { color: var(--muted); }
 .entityIcon[data-type="defect"] { color: var(--dash-rose); }
 .entityIcon[data-type="run"], .entityIcon[data-type="run_item"] { color: var(--dash-blue); }
 .drillKey { overflow: hidden; color: var(--muted) !important; font-size: 10px !important; font-weight: 590; text-overflow: ellipsis; }
 .drillRecordButton { width: 100%; display: grid; gap: 2px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
 .drillRecordButton strong { overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 590; text-overflow: ellipsis; white-space: nowrap; }
 .drillRecordButton span { overflow: hidden; color: var(--muted); font-size: 9px; font-weight: 450; text-overflow: ellipsis; white-space: nowrap; }
-.drillStatus, .drillPriority { min-height: 21px; display: inline-flex; max-width: 100%; align-items: center; gap: 5px; overflow: hidden; padding: 0 7px; color: var(--muted); background: var(--control); border: 1px solid var(--line-strong); border-radius: 999px; font-size: 9px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.drillStatus { min-height: 21px; display: inline-flex; max-width: 100%; align-items: center; gap: 5px; overflow: hidden; padding: 0 7px; color: var(--muted); background: var(--control); border: 1px solid var(--line-strong); border-radius: 999px; font-size: 9px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .drillStatus i { width: 6px; height: 6px; flex: 0 0 auto; background: currentColor; border-radius: 50%; }
-.drillStatus[data-status="passed"], .drillStatus[data-status="ready"], .drillStatus[data-status="completed"], .drillStatus[data-status="verified"] { color: #fff; background: #0b8f4d; border-color: #08743f; }
+.drillStatus[data-status="passed"], .drillStatus[data-status="ready"], .drillStatus[data-status="completed"], .drillStatus[data-status="verified"] { color: #fff; background: #197a50; border-color: #12663f; }
 .drillStatus[data-status="failed"], .drillStatus[data-status="reopened"] { color: #fff; background: #d92d4f; border-color: #bd1f3d; }
 .drillStatus[data-status="blocked"], .drillStatus[data-status="in_progress"] { color: #fff; background: #d77600; border-color: #b86400; }
-.drillStatus[data-status="active"] { color: #fff; background: #1769d2; border-color: #1259b4; }
 .drillStatus[data-status="open"], .drillStatus[data-status="draft"], .drillStatus[data-status="not_run"] { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
-.drillPriority[data-priority="medium"] { color: #fff; background: #216dde; border-color: #165abf; }
-.drillPriority[data-priority="high"] { color: #fff; background: #d76d00; border-color: #b75b00; }
-.drillPriority[data-priority="critical"] { color: #fff; background: #ca3044; border-color: #ae2335; }
-.drillPriority[data-priority="low"] { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
+.drillStatus[data-status="active"] { color: #fff; background: #626872; border-color: #505661; }
+:global(.dark) .drillStatus[data-status="active"] { color: #fff; background: #555a64; border-color: #737985; }
+.prioritySortButton { width: 100%; height: 28px; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; border: 0; cursor: pointer; }
+.prioritySortButton:hover, .prioritySortButton[data-active="true"] { color: var(--ink); }
+.prioritySortButton svg { transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
+.prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .rowActions { display: flex; align-items: center; justify-content: flex-end; gap: 3px; }
 .rowActions button, .rowActions a { width: 28px; height: 28px; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; border: 0; border-radius: 7px; cursor: pointer; }
 .rowActions :is(button, a):hover { color: var(--action); background: var(--control); }

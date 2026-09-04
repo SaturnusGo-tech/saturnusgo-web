@@ -1,8 +1,10 @@
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
-import type { CSSProperties } from "react";
-import { localizedComponentLabel } from "../../../localization/format/labels";
+import { ChevronDown } from "lucide-react";
+import { useMemo, useState, type CSSProperties } from "react";
+import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
-import { CaseTypeIcon, LifecycleBadge, PriorityBadge } from "../list/CaseBadges";
+import { CaseTypeIcon, LifecycleBadge } from "../list/CaseBadges";
+import { PrioritySignal, prioritySignalRank } from "../list/PrioritySignal";
 import styles from "./embeddedCaseList.module.css";
 
 type Props = {
@@ -30,16 +32,31 @@ export function EmbeddedCaseList({
 }: Props) {
   const ru = locale === "ru";
   const selectable = Boolean(selectedIds && onToggle);
+  const [prioritySort, setPrioritySort] = useState<"asc" | "desc" | null>(null);
+  const visibleCases = useMemo(() => {
+    if (!prioritySort) return cases;
+    const direction = prioritySort === "asc" ? 1 : -1;
+    return [...cases].sort((left, right) => (
+      (prioritySignalRank[left.priority] - prioritySignalRank[right.priority]) * direction
+      || left.key.localeCompare(right.key, locale, { numeric: true, sensitivity: "base" })
+    ));
+  }, [cases, locale, prioritySort]);
   const columns = (
     <>
       {selectable && <span className={styles.selectionHeading} aria-hidden="true" />}
+      <span className={styles.priorityHeading} aria-sort={prioritySort === "asc" ? "ascending" : prioritySort === "desc" ? "descending" : "none"}>
+        <button type="button" className={styles.prioritySortButton} onClick={() => setPrioritySort((current) => current === "desc" ? "asc" : "desc")}
+          aria-label={ru ? "Сортировать по приоритету" : "Sort by priority"} title={ru ? "Сортировать по приоритету" : "Sort by priority"}
+          data-active={Boolean(prioritySort) || undefined} data-direction={prioritySort ?? undefined}>
+          <ChevronDown size={14} /><span className={styles.visuallyHidden}>{ru ? "Приоритет" : "Priority"}</span>
+        </button>
+      </span>
       <span className={styles.typeHeading} aria-hidden="true" />
       <span>{ru ? "ID" : "ID"}</span>
-      <span>{ru ? "Статус" : "Status"}</span>
+      <span className={styles.statusHeading}>{ru ? "Статус" : "Status"}</span>
       <span>{ru ? "Тест-кейс" : "Test case"}</span>
-      <span>{ru ? "Функциональность" : "Functionality"}</span>
-      <span>{ru ? "Приоритет" : "Priority"}</span>
-      <span>{ru ? "Оценка" : "Estimate"}</span>
+      <span className={styles.componentHeading}>{ru ? "Функциональность" : "Functionality"}</span>
+      <span className={styles.estimateHeading}>{ru ? "Оценка" : "Estimate"}</span>
     </>
   );
 
@@ -49,10 +66,10 @@ export function EmbeddedCaseList({
       data-selectable={selectable || undefined}
       style={maxHeight ? { "--embedded-case-list-height": maxHeight } as CSSProperties : undefined}
     >
-      <div className={styles.header} aria-hidden="true">{columns}</div>
+      <div className={styles.header}>{columns}</div>
       <div className={styles.body} role="group" aria-label={ariaLabel}>
         {cases.length === 0 && <div className={styles.empty}>{emptyLabel}</div>}
-        {cases.map((item) => {
+        {visibleCases.map((item) => {
           const checked = selectedIds?.has(item.id) ?? false;
           const content = (
             <>
@@ -68,12 +85,12 @@ export function EmbeddedCaseList({
                   />
                 </span>
               )}
+              <span className={styles.priorityCell}><PrioritySignal priority={item.priority} label={localizedLabel(locale, item.priority)} size={14} /></span>
               <span className={styles.typeCell}><CaseTypeIcon locale={locale} type={item.type} /></span>
               <strong className={styles.key} title={item.key}>{item.key}</strong>
               <span className={styles.status}><LifecycleBadge locale={locale} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></span>
               <span className={styles.title} title={item.title}>{item.title}</span>
               <span className={styles.component} title={localizedComponentLabel(locale, item.component)}>{localizedComponentLabel(locale, item.component) || "—"}</span>
-              <span className={styles.priority}><PriorityBadge locale={locale} priority={item.priority} /></span>
               <span className={styles.estimate}>{item.estimatedMinutes === null ? "—" : `${item.estimatedMinutes} ${ru ? "мин" : "min"}`}</span>
             </>
           );

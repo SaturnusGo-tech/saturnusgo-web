@@ -9,6 +9,7 @@ const styles = readFileSync(fileURLToPath(new URL("../navigator/run-navigator.mo
 const executionHeader = readFileSync(fileURLToPath(new URL("../header/RunExecutionHeader.tsx", import.meta.url)), "utf8");
 const runsView = readFileSync(fileURLToPath(new URL("../RunsView.tsx", import.meta.url)), "utf8");
 const runStyles = readFileSync(fileURLToPath(new URL("../runs.module.css", import.meta.url)), "utf8");
+const prioritySignal = readFileSync(fileURLToPath(new URL("../../cases/list/PrioritySignal.tsx", import.meta.url)), "utf8");
 
 test("run picker keeps long names compact and calmly reveals their full text", () => {
   assert.match(view, /className=\{styles\.pickerTriggerText\}/);
@@ -43,12 +44,18 @@ test("run execution follows the test-case list and detail hierarchy", () => {
   assert.match(runStyles, /\.overviewLayout\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(178px, 31%\);/s);
 });
 
-test("run listing shares filled priority signals, separated type columns, and saturated statuses", () => {
+test("run listing shares semantic priority signals, neutral type icons, and calm not-run status", () => {
   assert.match(view, /className=\{styles\.prioritySignal\}/);
   assert.match(view, /className=\{styles\.typeSignal\}/);
-  assert.match(styles, /\.prioritySignal svg\s*\{[^}]*fill: currentColor;[^}]*stroke-width: 0;/s);
+  assert.match(view, /<PrioritySignal priority=\{testCase\.priority\}/);
+  assert.match(view, /className=\{styles\.prioritySortButton\}/);
+  assert.match(prioritySignal, /priority === "low" \? Diamond : Triangle/);
+  assert.match(prioritySignal, /priority === "high" \|\| priority === "critical"/);
   assert.match(styles, /grid-template-columns: 30px 30px 92px minmax\(0, 1fr\) 102px/);
   assert.match(styles, /\.execution_passed\s*\{[^}]*background: #14864f;/s);
+  assert.match(styles, /\.execution_not_run\s*\{[^}]*background: #e1e4e8;/s);
+  assert.match(view, /item\.status === "not_run" \? <CircleDashed/);
+  assert.match(styles, /\.typeSignal\s*\{ color: var\(--runs-muted\); \}/);
   assert.match(styles, /\.navigator button:focus-visible[^}]*outline: 0;/s);
   assert.doesNotMatch(runStyles, /focus-visible\s*\{[^}]*outline: 2px solid var\(--runs-primary\)/s);
 });

@@ -112,7 +112,7 @@ export function useCasesViewController(
   function toggleSort(key: CaseSortKey) {
     setSort((current) => current.key === key
       ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
-      : { key, direction: "asc" });
+      : { key, direction: key === "priority" ? "desc" : "asc" });
   }
   function selectRow(row: CaseListRow) {
     if (props.editor) return;

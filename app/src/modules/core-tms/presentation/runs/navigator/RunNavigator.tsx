@@ -1,9 +1,10 @@
-import { AlertTriangle, Archive, Check, ChevronDown, Plus, RotateCcw, Search } from "lucide-react";
+import { Archive, Check, ChevronDown, CircleDashed, Plus, RotateCcw, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
 import { CaseTypeIcon } from "../../cases/list/CaseBadges";
+import { PrioritySignal, prioritySignalRank } from "../../cases/list/PrioritySignal";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
 import { RunNameMarquee } from "./RunNameMarquee";
@@ -33,6 +34,7 @@ export function RunNavigator({
   const { locale, t } = useTmsLocale();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [prioritySort, setPrioritySort] = useState<"asc" | "desc" | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
   const pickerTriggerRef = useRef<HTMLButtonElement>(null);
   const caseById = useMemo(() => new Map(cases.map((item) => [item.id, item])), [cases]);
@@ -42,11 +44,21 @@ export function RunNavigator({
   const emptyLabel = mode === "archived" ? t("runs.noArchived") : t("runs.noActive");
   const selectedPickerIndex = Math.max(0, visibleRuns.findIndex((run) => run.id === selectedRun?.id));
   const normalizedQuery = query.trim().toLocaleLowerCase(locale === "ru" ? "ru-RU" : "en-US");
-  const visibleItems = normalizedQuery ? items.filter((item) => {
+  const filteredItems = normalizedQuery ? items.filter((item) => {
     const testCase = caseById.get(item.caseId);
     return [item.caseKey, testCase?.title, testCase?.component]
       .some((value) => value?.toLocaleLowerCase(locale === "ru" ? "ru-RU" : "en-US").includes(normalizedQuery));
   }) : items;
+  const visibleItems = useMemo(() => {
+    if (!prioritySort) return filteredItems;
+    const direction = prioritySort === "asc" ? 1 : -1;
+    return [...filteredItems].sort((left, right) => {
+      const leftPriority = caseById.get(left.caseId)?.priority ?? "low";
+      const rightPriority = caseById.get(right.caseId)?.priority ?? "low";
+      return (prioritySignalRank[leftPriority] - prioritySignalRank[rightPriority]) * direction
+        || left.caseKey.localeCompare(right.caseKey, locale === "ru" ? "ru-RU" : "en-US", { numeric: true, sensitivity: "base" });
+    });
+  }, [caseById, filteredItems, locale, prioritySort]);
 
   function pickerOptions() { return Array.from(pickerRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ?? []); }
   function openPickerAt(index: number) {
@@ -193,8 +205,12 @@ export function RunNavigator({
               <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={locale === "ru" ? "Поиск кейсов в ране" : "Search cases in run"} placeholder={locale === "ru" ? "Поиск по названию или ID" : "Search title or ID"} />
             </label>
           </div>
-          <div className={styles.itemColumns} role="row" aria-hidden="true">
-            <span />
+          <div className={styles.itemColumns} role="row">
+            <span><button type="button" className={styles.prioritySortButton}
+              onClick={() => setPrioritySort((current) => current === "desc" ? "asc" : "desc")}
+              aria-label={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
+              title={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
+              data-active={Boolean(prioritySort) || undefined} data-direction={prioritySort ?? undefined}><ChevronDown size={14} /></button></span>
             <span />
             <span>ID</span>
             <span>{locale === "ru" ? "Тест-кейс" : "Test case"}</span>
@@ -213,7 +229,7 @@ export function RunNavigator({
                 onClick={() => onSelectItem(item.id)}
               >
                 <span className={styles.prioritySignal} role="cell">
-                  {testCase && <AlertTriangle className={styles[`priority_${testCase.priority}`]} size={13} aria-label={localizedLabel(locale, testCase.priority)} />}
+                  {testCase && <PrioritySignal priority={testCase.priority} label={localizedLabel(locale, testCase.priority)} size={14} />}
                 </span>
                 <span className={styles.typeSignal} role="cell">{testCase && <CaseTypeIcon locale={locale} type={testCase.type} />}</span>
                 <strong className={styles.itemKey} role="cell">{item.caseKey}</strong>
@@ -221,7 +237,7 @@ export function RunNavigator({
                   <strong>{testCase?.title ?? item.caseKey}</strong>
                   <small>{testCase?.component || t("cases.revision", { revision: item.revision })}</small>
                 </span>
-                <span className={`${styles.executionBadge} ${styles[`execution_${item.status}`]}`} role="cell">{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
+                <span className={`${styles.executionBadge} ${styles[`execution_${item.status}`]}`} role="cell">{item.status === "not_run" ? <CircleDashed size={16} /> : statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
               </button>
             )})}
             {visibleItems.length === 0 && <div className={styles.itemsEmpty}><Search size={18} /><span>{locale === "ru" ? "Кейсы не найдены" : "No cases found"}</span></div>}

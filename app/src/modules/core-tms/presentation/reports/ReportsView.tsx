@@ -1,11 +1,12 @@
 "use client";
 
-import { AlertTriangle, Bug, CheckCircle2, CircleDashed, Search } from "lucide-react";
+import { Bug, CheckCircle2, ChevronDown, CircleDashed, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
+import { PrioritySignal, prioritySignalRank } from "../cases/list/PrioritySignal";
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import surface from "./reports.module.css";
 
@@ -24,15 +25,21 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
   const { locale, t } = useTmsLocale();
   const [query, setQuery] = useState("");
   const [detailTab, setDetailTab] = useState<DetailTab>("overview");
+  const [severitySort, setSeveritySort] = useState<"asc" | "desc" | null>(null);
   const selectedDefect = defects.find((item) => item.id === selectedDefectId);
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
   const visibleDefects = useMemo(() => {
-    if (!normalizedQuery) return defects;
-    return defects.filter((defect) => [
+    const filtered = !normalizedQuery ? defects : defects.filter((defect) => [
       defect.key, defect.title, defect.description, defect.component,
       defect.assigneeIdentityId ?? "", ...defect.labels,
     ].some((value) => value.toLocaleLowerCase(locale).includes(normalizedQuery)));
-  }, [defects, locale, normalizedQuery]);
+    if (!severitySort) return filtered;
+    const direction = severitySort === "asc" ? 1 : -1;
+    return [...filtered].sort((left, right) => (
+      (prioritySignalRank[left.severity] - prioritySignalRank[right.severity]) * direction
+      || left.key.localeCompare(right.key, locale, { numeric: true, sensitivity: "base" })
+    ));
+  }, [defects, locale, normalizedQuery, severitySort]);
   const open = defects.filter((item) => !["closed", "verified"].includes(item.status)).length;
   const critical = defects.filter((item) => item.severity === "critical").length;
   const completed = runs.filter((item) => item.status === "completed").length;
@@ -64,7 +71,13 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
       <div className={surface.tableViewport}>
         <table className={surface.table}>
           <thead><tr>
-            <th aria-label={t("reports.severity")} />
+            <th aria-sort={severitySort === "asc" ? "ascending" : severitySort === "desc" ? "descending" : "none"}>
+              <button type="button" className={surface.prioritySortButton}
+                onClick={() => setSeveritySort((current) => current === "desc" ? "asc" : "desc")}
+                aria-label={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
+                title={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
+                data-active={Boolean(severitySort) || undefined} data-direction={severitySort ?? undefined}><ChevronDown size={14} /></button>
+            </th>
             <th scope="col">{t("reports.key")}</th>
             <th scope="col">{t("reports.summary")}</th>
             <th scope="col">{t("reports.component")}</th>
@@ -74,8 +87,8 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
           <tbody>{visibleDefects.length === 0 ? <tr><td colSpan={6}>
             <div className={surface.empty}><Bug size={20} /><span><strong>{t("reports.empty")}</strong><small>{normalizedQuery ? t("reports.emptySearch") : t("reports.emptyHint")}</small></span></div>
           </td></tr> : visibleDefects.map((defect) => <tr key={defect.id} data-selected={defect.id === selectedDefectId || undefined}>
-            <td><span className={surface.severityMark} data-level={defect.severity} title={localizedLabel(locale, defect.severity)}>
-              <AlertTriangle size={14} fill="currentColor" />
+            <td><span className={surface.severityMark} title={localizedLabel(locale, defect.severity)}>
+              <PrioritySignal priority={defect.severity} label={localizedLabel(locale, defect.severity)} size={14} />
             </span></td>
             <td><button className={surface.rowButton} type="button" onClick={() => selectDefect(defect.id)}>
               <span className={surface.key}>{defect.key}</span>

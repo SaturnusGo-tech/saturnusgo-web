@@ -66,7 +66,9 @@ test("suite and run drawers share the production test-case list", () => {
   assert.match(suiteDialogSource, /<EmbeddedCaseList/);
   assert.match(runScopeSource, /<EmbeddedCaseList/);
   assert.match(embeddedListSource, /<LifecycleBadge/);
-  assert.match(embeddedListSource, /<PriorityBadge/);
+  assert.match(embeddedListSource, /<PrioritySignal/);
+  assert.match(embeddedListSource, /prioritySortButton/);
+  assert.doesNotMatch(embeddedListSource, /<PriorityBadge/);
   assert.match(embeddedListSource, /<CaseTypeIcon/);
 });
 

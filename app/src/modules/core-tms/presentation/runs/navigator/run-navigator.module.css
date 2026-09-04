@@ -60,17 +60,18 @@
 .itemColumns, .item, .itemActive { display: grid; grid-template-columns: 30px 30px 92px minmax(0, 1fr) 102px; align-items: center; }
 .itemColumns { min-height: 27px; padding: 0 8px; color: var(--runs-muted); background: var(--runs-bg); border-bottom: 1px solid var(--runs-border); font-size: 10px; font-weight: 600; }
 .itemColumns > span { padding: 0 6px; }
+.itemColumns > span:first-child { height: 27px; display: grid; place-items: center; padding: 0; }
+.prioritySortButton { width: 100%; height: 27px; display: grid; place-items: center; padding: 0; color: var(--runs-muted); background: transparent; border: 0; }
+.prioritySortButton:hover,
+.prioritySortButton[data-active="true"] { color: var(--runs-strong); }
+.prioritySortButton svg { transition: transform 160ms cubic-bezier(.2, .72, .3, 1); }
+.prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
 .items { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-color: var(--runs-border-strong) transparent; }
 .item, .itemActive { width: 100%; min-height: 48px; padding: 0 8px; color: var(--runs-secondary); background: var(--runs-bg); border: 0; border-bottom: 1px solid var(--runs-row-border); text-align: left; }
 .item:hover { background: var(--runs-hover); }
 .itemActive { background: var(--runs-selection); box-shadow: inset 3px 0 var(--runs-primary); }
 .prioritySignal, .typeSignal { display: grid; place-items: center; color: var(--runs-muted); }
-.prioritySignal svg { fill: currentColor; stroke-width: 0; }
 .typeSignal { color: var(--runs-muted); }
-.priority_low { color: var(--runs-muted); }
-.priority_medium { color: #4d82e8; }
-.priority_high { color: #e49a2f; }
-.priority_critical { color: #e2535d; }
 .itemKey { min-width: 0; padding: 0 6px; overflow: hidden; color: var(--runs-muted); font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .itemText { min-width: 0; display: grid; padding: 5px 8px 5px 6px; }
 .itemText strong, .itemText small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -82,13 +83,13 @@
 .execution_failed { background: #c72f3f; border-color: #a92331; }
 .execution_blocked { background: #d36b00; border-color: #ae5700; }
 .execution_in_progress { background: #2f6fde; border-color: #245cc0; }
-.execution_not_run { background: #66707d; border-color: #505966; }
+.execution_not_run { color: #30343b; background: #e1e4e8; border-color: #bcc2ca; }
 .execution_skipped { background: #7545bd; border-color: #5e339f; }
 :global(.dark) .execution_passed { color: #fff; background: #13834d; border-color: #2aa668; }
 :global(.dark) .execution_failed { color: #fff; background: #bd3040; border-color: #e45563; }
 :global(.dark) .execution_blocked { color: #fff; background: #c76500; border-color: #e58a2b; }
 :global(.dark) .execution_in_progress { color: #fff; background: #336fd0; border-color: #5b8ce7; }
-:global(.dark) .execution_not_run { color: #fff; background: #626b77; border-color: #858d98; }
+:global(.dark) .execution_not_run { color: #f1f3f5; background: #4b5058; border-color: #6b717b; }
 :global(.dark) .execution_skipped { color: #fff; background: #7042b5; border-color: #976de0; }
 .itemsEmpty { min-height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: var(--runs-muted); font-size: 12px; }
 .emptyHistory { padding: 26px 18px; color: var(--runs-muted); text-align: center; }
@@ -107,7 +108,7 @@
 @keyframes run-picker-enter { from { opacity: 0; transform: translateY(-5px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes run-name-pan { 0%, 14% { transform: translateX(0); } 86%, 100% { transform: translateX(calc(-1 * var(--run-name-distance))); } }
 @media (prefers-reduced-motion: reduce) {
-  .pickerTrigger > svg, .progressTrack > span { transition: none; }
+  .pickerTrigger > svg, .progressTrack > span, .prioritySortButton svg { transition: none; }
   .pickerMenu { animation: none; }
   .runNameAlways[data-overflow="true"], .pickerOption:hover .runNameOnInteraction[data-overflow="true"], .pickerOption:focus-visible .runNameOnInteraction[data-overflow="true"], .pickerOptionActive:hover .runNameOnInteraction[data-overflow="true"], .pickerOptionActive:focus-visible .runNameOnInteraction[data-overflow="true"] { animation: none; }
 }

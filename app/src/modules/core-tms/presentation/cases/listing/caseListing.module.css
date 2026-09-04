@@ -175,6 +175,11 @@
 .table th { position: sticky; z-index: 5; top: 0; height: 32px; padding: 0 8px; color: var(--cases-muted); background: var(--cases-bg); border-bottom: 1px solid var(--cases-border); font-size: 10px; font-weight: 600; text-align: left; }
 .table th > button { width: 100%; height: 31px; display: flex; align-items: center; gap: 4px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
 .table th > button:hover { color: var(--cases-strong); }
+.table th > .prioritySortButton { align-items: center; justify-content: center; color: var(--cases-muted); }
+.prioritySortButton svg { transition: color 140ms ease, transform 160ms cubic-bezier(.2, .72, .3, 1); }
+.prioritySortButton[data-active="true"] { color: var(--cases-strong); }
+.prioritySortButton[data-direction="asc"] svg { transform: rotate(180deg); }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .table tbody tr[data-case-row] { height: 46px; cursor: pointer; outline: 0; }
 .table tbody tr[data-case-row][data-interaction-locked="true"] { cursor: not-allowed; }
 .table td { height: 46px; padding: 0 8px; overflow: hidden; color: var(--cases-secondary-text); border-bottom: 1px solid var(--cases-row-border); font-size: 12px; font-weight: 400; vertical-align: middle; }
@@ -192,17 +197,13 @@
 .statusColumn { width: 92px; }
 .titleColumn { width: 270px; }
 .functionColumn { width: 180px; }
-.priorityColumn { width: 132px; }
 .estimateColumn { width: 90px; }
 .selectionCell { padding-inline: 0 !important; transition: padding 180ms cubic-bezier(.2, .72, .3, 1); }
 .selectionMode .selectionCell { padding-inline: 9px 4px !important; }
 .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
 .selectionMode th:first-child button { animation: selectionControlIn 180ms cubic-bezier(.2, .72, .3, 1) both; }
-.flagCell { padding-right: 0 !important; text-align: right; }
-.priorityFlag_critical { color: #ef4d55; fill: currentColor; }
-.priorityFlag_high { color: #e9a23b; fill: currentColor; }
-.priorityFlag_medium { color: #558bea; fill: currentColor; }
-.priorityFlag_low { color: #4c9b69; fill: currentColor; }
+.flagCell { padding-inline: 7px 0 !important; }
+.flagCell > svg { margin-inline: auto 0; }
 .typeCell { padding-inline: 5px !important; color: var(--cases-icon) !important; text-align: center; }
 .keyCell { overflow: hidden; color: var(--cases-muted) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
 .keyCell strong { font-size: 11px; font-weight: 500; letter-spacing: .01em; }

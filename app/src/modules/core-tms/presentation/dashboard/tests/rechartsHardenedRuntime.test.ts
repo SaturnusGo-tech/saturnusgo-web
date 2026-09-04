@@ -13,6 +13,7 @@ const breakdowns = readFileSync(new URL("../charts/DashboardBreakdowns.tsx", imp
 const dashboard = readFileSync(new URL("../DashboardView.tsx", import.meta.url), "utf8");
 const trend = readFileSync(new URL("../charts/DashboardTrendChart.tsx", import.meta.url), "utf8");
 const tooltip = readFileSync(new URL("../common/DashboardChartTooltip.tsx", import.meta.url), "utf8");
+const drillTable = readFileSync(new URL("../inspector/table/DashboardDrillTable.tsx", import.meta.url), "utf8");
 
 test("Recharts scales render with frozen runtime intrinsics", () => {
   const script = String.raw`
@@ -97,6 +98,17 @@ test("analytics detail is an adaptive sheet with focused entity tabs", () => {
   assert.match(styles, /\.drillSheetBody\s*\{[^}]*grid-template-columns: 268px minmax\(0, 1fr\)/s);
   assert.match(styles, /\.drillTable\s*\{[^}]*min-width: 1000px/s);
   assert.match(modal, /data-sheet-state/);
+});
+
+test("analytics listings use one sortable priority signal and calm active statuses", () => {
+  assert.match(drillTable, /<PrioritySignal priority=\{row\.priority\}/);
+  assert.match(drillTable, /className=\{surface\.prioritySortButton\}/);
+  assert.doesNotMatch(drillTable, /drillPriority/);
+  assert.match(inspector, /priority_desc/);
+  assert.match(inspector, /prioritySignalRank/);
+  assert.match(drillTable, /"not_run", "active"/);
+  assert.match(styles, /\.drillStatus\[data-status="active"\][^}]*background: #626872/s);
+  assert.match(styles, /\.entityIcon\[data-type="automated"\], \.entityIcon\[data-type="manual"\]/);
 });
 
 test("dashboard uses custom menus and theme-safe chart tooltips", () => {
