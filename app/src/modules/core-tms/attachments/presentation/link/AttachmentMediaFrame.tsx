@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ChevronDown, ChevronRight, ExternalLink, GripVertical, Trash2,
+  ChevronDown, ChevronRight, ExternalLink, FileText, GripVertical, Paperclip, Trash2,
 } from "lucide-react";
 import {
   useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent,
@@ -12,7 +12,7 @@ type Props = {
   name: string;
   detail?: string;
   source: string;
-  mediaType: "image" | "video";
+  mediaType: "image" | "video" | "pdf" | "file";
   locale: "en" | "ru";
   variant?: "scenario" | "gallery";
   defaultExpanded?: boolean;
@@ -20,13 +20,14 @@ type Props = {
   removing?: boolean;
   onOpen?: () => void;
   onRemove?: () => void;
+  onExpandedChange?: (expanded: boolean) => void;
 };
 
 const MIN_WIDTH = 220;
 
 export function AttachmentMediaFrame({
-  name, detail, source, mediaType, locale, variant = "scenario", defaultExpanded = true,
-  loading = false, removing = false, onOpen, onRemove,
+  name, detail, source, mediaType, locale, variant = "scenario", defaultExpanded = false,
+  loading = false, removing = false, onOpen, onRemove, onExpandedChange,
 }: Props) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [width, setWidth] = useState(variant === "gallery" ? 520 : 430);
@@ -71,16 +72,27 @@ export function AttachmentMediaFrame({
     resizeBy(direction * (side === "right" ? 24 : -24));
   }
 
+  function toggleExpanded() {
+    setExpanded((current) => {
+      const next = !current;
+      onExpandedChange?.(next);
+      return next;
+    });
+  }
+
   const style = { "--attachment-media-width": `${width}px` } as CSSProperties;
   return <figure ref={frameRef} className={css.frame} style={style}
     data-variant={variant} data-collapsed={!expanded || undefined} data-resizing={resizing || undefined}>
     <figcaption className={css.header}>
-      <button type="button" className={css.disclosure} onClick={() => setExpanded((value) => !value)}
+      <button type="button" className={css.disclosure} onClick={toggleExpanded}
         aria-expanded={expanded} aria-label={expanded
           ? (ru ? "Скрыть вложение" : "Collapse attachment")
           : (ru ? "Показать вложение" : "Expand attachment")}>
         {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
       </button>
+      <span className={css.kindIcon} aria-hidden="true">
+        {mediaType === "file" ? <FileText size={15} /> : <Paperclip size={15} />}
+      </span>
       <span className={css.identity} title={name}>
         <b>{name}</b>{detail && <small>{detail}</small>}
       </span>
@@ -99,12 +111,17 @@ export function AttachmentMediaFrame({
     <div className={css.collapse} aria-hidden={!expanded}>
       <div className={css.collapseInner}>
         <div className={css.mediaBody}>
-          {source
-            ? mediaType === "image"
-              ? <img src={source} alt={name} />
-              : <video src={source} controls preload="metadata" aria-label={name} />
-            : <span className={css.loading}>{ru ? "Загрузка превью…" : "Loading preview…"}</span>}
-          <button type="button" className={`${css.resizeHandle} ${css.leftHandle}`}
+          {source && mediaType === "image" && <img src={source} alt={name} />}
+          {source && mediaType === "video" && <video src={source} controls preload="metadata" aria-label={name} />}
+          {source && mediaType === "pdf" && <iframe src={`${source}#toolbar=0&navpanes=0`}
+            title={name} loading="lazy" />}
+          {!source && mediaType !== "file" && <span className={css.skeleton}
+            aria-label={ru ? "Подготовка вложения" : "Preparing attachment"} />}
+          {mediaType === "file" && <button type="button" className={css.fileOpen}
+            onClick={onOpen} disabled={loading}>
+            <FileText size={18} />{ru ? "Открыть файл" : "Open file"}
+          </button>}
+          {mediaType !== "file" && <><button type="button" className={`${css.resizeHandle} ${css.leftHandle}`}
             aria-label={ru ? "Изменить размер слева" : "Resize from left"}
             onPointerDown={(event) => startResize("left", event)}
             onKeyDown={(event) => resizeWithKeyboard(event, "left")}>
@@ -115,7 +132,7 @@ export function AttachmentMediaFrame({
             onPointerDown={(event) => startResize("right", event)}
             onKeyDown={(event) => resizeWithKeyboard(event, "right")}>
             <GripVertical size={16} />
-          </button>
+          </button></>}
         </div>
       </div>
     </div>

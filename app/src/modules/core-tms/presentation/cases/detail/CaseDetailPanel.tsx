@@ -2,7 +2,10 @@ import { ListChecks, Pencil } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../localization/model/locale";
-import { editorSessionClosed, inspectorRevisionProblem, type CaseInspectorEditor } from "../inspector/model";
+import {
+  caseRevisionAttachmentIds, editorSessionClosed, inspectorRevisionProblem,
+  type CaseInspectorEditor,
+} from "../inspector/model";
 import inspector from "../inspector/caseInspector.module.css";
 import { InspectorPendingAttachments } from "../inspector/attachments/InspectorPendingAttachments";
 import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttachmentDraftContext";
@@ -11,7 +14,7 @@ import { CaseOverview } from "./CaseOverview";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
-import type { CaseCollaborationViewModel } from "../collaboration/model";
+import { caseActivityForKey, type CaseCollaborationViewModel } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
 import styles from "../cases.module.css";
 import { LifecycleBadge } from "../list/CaseBadges";
@@ -93,6 +96,8 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
 
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
   if (!revision) return null;
+  const attachmentIds = caseRevisionAttachmentIds(revision);
+  const caseActivity = creating ? [] : caseActivityForKey(props.activity, props.testCase?.key);
   const activeTab: DetailTab = creating ? "overview" : tab;
   const problem = props.editor ? inspectorRevisionProblem(revision, props.editor.folderPath) : null;
   const problemMessage = problem === "title" ? (ru ? "Укажите название" : "Add a title")
@@ -149,12 +154,12 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>
       {!creating && editorActions}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
-        fileCount={revision.attachmentIds.length} activityCount={props.activity.length} onActive={setTab} />}
+        fileCount={attachmentIds.length} activityCount={caseActivity.length} onActive={setTab} />}
     </header>
     <CaseAttachmentDraftProvider locale={props.locale} enabled={Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={Boolean(props.testCase?.archivedAt)} editor={props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} linkIds={props.linkIds} activity={props.activity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={Boolean(props.testCase?.archivedAt)} editor={props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} attachmentIds={attachmentIds} linkIds={props.linkIds} activity={caseActivity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
       </div>
     </form>
     {creating && editorActions}

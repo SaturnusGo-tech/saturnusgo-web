@@ -31,6 +31,16 @@ export function inspectorTabsForMode(creating: boolean): InspectorTabId[] {
 
 export function canRemoveInspectorRow(count: number) { return count > 1; }
 
+export function caseRevisionAttachmentIds(revision: TestCaseRevision) {
+  return Array.from(new Set([
+    ...revision.attachmentIds,
+    ...revision.steps.flatMap((step) => step.attachmentIds ?? []),
+    ...revision.steps.flatMap((step) => (
+      step.sharedStep?.items.flatMap((item) => item.attachmentIds ?? []) ?? []
+    )),
+  ]));
+}
+
 export type CaseInspectorEditor = {
   mode: "edit" | "create";
   value: TestCaseRevision;

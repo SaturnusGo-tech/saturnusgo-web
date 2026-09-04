@@ -6,13 +6,16 @@ import { useCaseAttachmentDraft } from "./CaseAttachmentDraftContext";
 
 type Props = {
   locale: TmsLocale;
+  includeStepFiles?: boolean;
 };
 
-export function InspectorPendingAttachments({ locale }: Props) {
+export function InspectorPendingAttachments({ locale, includeStepFiles = false }: Props) {
   const draft = useCaseAttachmentDraft();
   if (!draft?.enabled) return null;
   const ru = locale === "ru";
-  const entries = draft.entries.filter((entry) => entry.fieldKey === "case-files");
+  const entries = includeStepFiles
+    ? draft.entries
+    : draft.entries.filter((entry) => entry.fieldKey === "case-files");
   return <div className={css.attachmentPicker}>
     <label>
       <Upload size={16} />

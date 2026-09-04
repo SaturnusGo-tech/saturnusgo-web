@@ -20,6 +20,7 @@ type Props = {
   languageTag: string;
   testCase?: TestCaseSummary;
   revision: TestCaseRevision;
+  attachmentIds: string[];
   linkIds: string[];
   activity: Activity[];
   collaboration: CaseCollaborationViewModel;
@@ -41,19 +42,19 @@ export function CaseContextTab(props: Props) {
       onRunCase={props.onRunCase}
     />;
   }
-  const empty = props.revision.attachmentIds.length === 0
+  const empty = props.attachmentIds.length === 0
     && props.linkIds.length === 0
     && (pending?.entries.length ?? 0) === 0;
   return <div className={styles.contextList}>
-    {pending?.enabled && <InspectorPendingAttachments locale={props.locale} />}
+    {pending?.enabled && <InspectorPendingAttachments locale={props.locale} includeStepFiles />}
     {empty
       ? <TabEmpty
           icon={<Paperclip size={22} />}
           text={ru ? "Нет файлов и ссылок" : "No files or links"}
         />
       : <>
-          {props.revision.attachmentIds.length > 0 && <div className={styles.attachmentGallery}>
-            {props.revision.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id}
+          {props.attachmentIds.length > 0 && <div className={styles.attachmentGallery}>
+            {props.attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id}
               presentation="media" variant="gallery" />)}
           </div>}
           {props.linkIds.length > 0 && <div className={styles.attachmentLinks}>

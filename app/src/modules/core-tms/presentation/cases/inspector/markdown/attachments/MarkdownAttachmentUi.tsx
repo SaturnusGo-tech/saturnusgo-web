@@ -63,27 +63,21 @@ function PendingMediaAttachment({ entry, locale, onRemove }: {
   const [source, setSource] = useState("");
   const mediaType = entry.file.type.startsWith("image/")
     ? "image"
-    : entry.file.type.startsWith("video/") ? "video" : null;
+    : entry.file.type.startsWith("video/")
+      ? "video"
+      : entry.file.type === "application/pdf" ? "pdf" : "file";
   useEffect(() => {
-    if (!mediaType) return;
     const url = URL.createObjectURL(entry.file);
     setSource(url);
     return () => URL.revokeObjectURL(url);
-  }, [entry.file, mediaType]);
-  if (!mediaType) return <span className={css.attachmentChip}>
-    <AttachmentPreview file={entry.file} />
-    <span><b>{entry.file.name}</b><small>{formatBytes(entry.file.size)}</small></span>
-    <button type="button" onClick={onRemove} aria-label={`${locale === "ru" ? "Удалить" : "Remove"} ${entry.file.name}`}>
-      <X size={13} />
-    </button>
-  </span>;
+  }, [entry.file]);
   return <AttachmentMediaFrame
     name={entry.file.name}
     detail={formatBytes(entry.file.size)}
-    source={source}
+    source={mediaType === "file" ? "" : source}
     mediaType={mediaType}
     locale={locale}
-    onOpen={() => window.open(source, "_blank", "noopener,noreferrer")}
+    onOpen={() => { if (source) window.open(source, "_blank", "noopener,noreferrer"); }}
     onRemove={onRemove}
   />;
 }

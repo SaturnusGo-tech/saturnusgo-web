@@ -1,16 +1,19 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import type { TestCaseRevision } from "../../../../../../../core/tms/contracts/legacy-contract";
 
 import {
   duplicateStepAfter, emptyScenarioStep, insertStepAfter, sharedScenarioStep,
 } from "../../steps/stepOperations";
+import { caseRevisionAttachmentIds } from "../../model";
 
 const menu = readFileSync(new URL("../../steps/menu/StepActionMenu.tsx", import.meta.url), "utf8");
 const menuCss = readFileSync(new URL("../../steps/menu/stepActionMenu.module.css", import.meta.url), "utf8");
 const scenarioCss = readFileSync(new URL("../../steps/scenarioSteps.module.css", import.meta.url), "utf8");
 const sharedEditor = readFileSync(new URL("../../../../shared-steps/SharedStepEditor.tsx", import.meta.url), "utf8");
 const sharedCss = readFileSync(new URL("../../../../shared-steps/sharedSteps.module.css", import.meta.url), "utf8");
+const sharedBlockCss = readFileSync(new URL("../../steps/shared/sharedStepBlock.module.css", import.meta.url), "utf8");
 const media = readFileSync(new URL("../../../../../attachments/presentation/link/AttachmentMediaFrame.tsx", import.meta.url), "utf8");
 const mediaCss = readFileSync(new URL("../../../../../attachments/presentation/link/attachmentMediaFrame.module.css", import.meta.url), "utf8");
 const attachmentLink = readFileSync(new URL("../../../../../attachments/presentation/link/AttachmentLink.tsx", import.meta.url), "utf8");
@@ -41,6 +44,17 @@ test("duplicating a shared procedure creates a new case-step identity", () => {
   assert.notEqual(result[0]?.sharedStep?.items, result[1]?.sharedStep?.items);
 });
 
+test("attachment inventory includes case, step, and shared-step evidence once", () => {
+  const shared = sharedScenarioStep(1, { id: "shared-auth", title: "Авторизация", revision: 1,
+    items: [{ id: "item-1", order: 1, action: "Войти", expectedResult: "Открыто",
+      testData: "", required: true, attachmentIds: ["attachment-shared"] }] });
+  const revision = { attachmentIds: ["attachment-case"],
+    steps: [{ ...shared, attachmentIds: ["attachment-step"] }] } as TestCaseRevision;
+  assert.deepEqual(caseRevisionAttachmentIds(revision), [
+    "attachment-case", "attachment-step", "attachment-shared",
+  ]);
+});
+
 test("shared-step editing stays dense and does not expose nested shared procedures", () => {
   assert.match(sharedEditor, /allowSharedSteps=\{false\}/);
   assert.match(menu, /allowSharedSteps &&/);
@@ -48,6 +62,7 @@ test("shared-step editing stays dense and does not expose nested shared procedur
   assert.match(scenarioCss, /\.nestedLine \{[^}]*margin-left: 43px/s);
   assert.doesNotMatch(scenarioCss, /\.viewGroup \+ \.viewGroup \{[^}]*border-top/s);
   assert.doesNotMatch(scenarioCss, /\.stepFooter/);
+  assert.match(sharedBlockCss, /\.order \{[^}]*padding-right: 6px/s);
 });
 
 test("shared-step canvas and action menu use opaque integrated surfaces", () => {
@@ -57,12 +72,14 @@ test("shared-step canvas and action menu use opaque integrated surfaces", () => 
   assert.match(menuCss, /\.menu\[data-trigger="add"\] \{ left: 8px; \}/);
 });
 
-test("scenario and attachment tabs render image and video evidence as media", () => {
-  assert.match(attachmentLink, /presentation === "media" && \(isImage \|\| isVideo\)/);
+test("scenario and attachment tabs render every case, step, and PDF attachment", () => {
+  assert.match(attachmentLink, /presentation === "media"/);
+  assert.match(attachmentLink, /isPdf \? "pdf" : "file"/);
   assert.match(scenarioAttachments, /presentation="media"/);
   assert.match(contextTab, /presentation="media" variant="gallery"/);
   assert.match(media, /<img src=\{source\} alt=\{name\}/);
   assert.match(media, /<video src=\{source\} controls/);
+  assert.match(media, /<iframe src=\{`\$\{source\}#toolbar=0&navpanes=0`\}/);
   assert.match(mediaCss, /object-fit: contain/);
 });
 
@@ -70,7 +87,10 @@ test("media evidence has smooth disclosure and proportional pointer resizing", (
   assert.match(media, /startResize\("left", event\)/);
   assert.match(media, /startResize\("right", event\)/);
   assert.match(media, /aria-expanded=\{expanded\}/);
+  assert.match(media, /defaultExpanded = false/);
   assert.match(mediaCss, /grid-template-rows 190ms/);
+  assert.match(mediaCss, /attachmentShimmer/);
+  assert.doesNotMatch(media, /Загрузка превью/);
   assert.match(mediaCss, /cursor: ew-resize/);
   assert.match(mediaCss, /width: 100%;[\s\S]*height: auto/);
 });

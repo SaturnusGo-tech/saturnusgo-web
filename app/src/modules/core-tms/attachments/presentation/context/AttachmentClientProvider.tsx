@@ -3,9 +3,14 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { PrivateAttachmentClient } from "../../application/private-attachment-client";
+import {
+  createAttachmentReadCache,
+  type AttachmentReadCache,
+} from "../../application/read-cache/attachment-read-cache";
 
 type AttachmentContext = {
   readonly client: PrivateAttachmentClient;
+  readonly readCache: AttachmentReadCache;
   readonly hiddenIds: ReadonlySet<string>;
   hide(attachmentId: string): void;
 };
@@ -19,11 +24,13 @@ export function AttachmentClientProvider({
   readonly children: ReactNode;
 }) {
   const [hiddenIds, setHiddenIds] = useState<ReadonlySet<string>>(new Set());
+  const readCache = useMemo(() => createAttachmentReadCache(client), [client]);
   const value = useMemo<AttachmentContext>(() => ({
     client,
+    readCache,
     hiddenIds,
     hide: (attachmentId) => setHiddenIds((current) => new Set(current).add(attachmentId)),
-  }), [client, hiddenIds]);
+  }), [client, hiddenIds, readCache]);
   return (
     <AttachmentClientContext.Provider value={value}>
       {children}
@@ -38,6 +45,10 @@ export function useAttachmentClient(): PrivateAttachmentClient {
 
 export function useAttachmentVisibility() {
   return useAttachmentContext();
+}
+
+export function useAttachmentReadCache() {
+  return useAttachmentContext().readCache;
 }
 
 function useAttachmentContext(): AttachmentContext {

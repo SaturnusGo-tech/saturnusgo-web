@@ -5,3 +5,14 @@
   padding: 0 !important;
   overflow: hidden;
 }
+
+.retry { min-height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 8px; color: var(--cases-secondary-text); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
+.retry:hover,.retry:focus-visible { color: var(--cases-strong); background: var(--cases-hover); outline: 0; }
+.mediaSkeleton,.linkSkeleton { min-width: 0; display: grid; grid-template-columns: 24px minmax(110px, 1fr); align-items: center; gap: 7px; margin: 0; padding: 2px 0; background: transparent; }
+.mediaSkeleton { width: min(430px, 100%); min-height: 28px; }
+.linkSkeleton { width: 190px; }
+.mediaSkeleton span,.linkSkeleton span { display: block; background: linear-gradient(100deg, var(--cases-raised) 28%, var(--cases-hover) 44%, var(--cases-raised) 60%); background-size: 240% 100%; border-radius: 6px; animation: attachmentLinkShimmer 1.25s ease-in-out infinite; }
+.mediaSkeleton span:first-child,.linkSkeleton span:first-child { width: 22px; height: 22px; }
+.mediaSkeleton span:last-child,.linkSkeleton span:last-child { width: 62%; height: 10px; }
+@keyframes attachmentLinkShimmer { to { background-position-x: -180%; } }
+@media (prefers-reduced-motion: reduce) { .mediaSkeleton span,.linkSkeleton span { animation: none; } }

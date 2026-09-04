@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { AttachmentTransportPort } from "../application/attachment-transport-port";
-import { createPrivateAttachmentClient } from "../application/private-attachment-client";
+import {
+  createPrivateAttachmentClient, type PrivateAttachmentClient,
+} from "../application/private-attachment-client";
+import { createAttachmentReadCache } from "../application/read-cache/attachment-read-cache";
 
 const digest = "a".repeat(64);
 
@@ -89,4 +92,68 @@ test("an expired upload intent stops before the private PUT", async () => {
     return true;
   });
   assert.equal(putCalled, false);
+});
+
+test("read cache reuses ready metadata and refreshes expiring signed access", async () => {
+  let metadataReads = 0;
+  let accessReads = 0;
+  let now = Date.parse("2026-09-04T00:00:00.000Z");
+  const client = {
+    async getMetadata() {
+      metadataReads += 1;
+      return { metadata: {
+        id: "att-1", projectId: "project-1",
+        owner: { kind: "run" as const, runId: "run-1" }, kind: "screenshot" as const,
+        originalFilename: "proof.png", mimeType: "image/png" as const,
+        trustedExtension: "png", byteSize: 12, sha256: null, status: "ready" as const,
+        createdAt: "2026-09-04T00:00:00.000Z", updatedAt: "2026-09-04T00:00:00.000Z",
+      }, etag: '"attachment:att-1:1"' };
+    },
+    async createAccess() {
+      accessReads += 1;
+      return { attachmentId: "att-1", method: "GET" as const,
+        url: `https://r2.example.test/read/${accessReads}`, headers: {},
+        expiresAt: new Date(now + 60_000).toISOString() };
+    },
+    async upload() { throw new Error("unused"); },
+    async remove() { throw new Error("unused"); },
+  } satisfies PrivateAttachmentClient;
+  const cache = createAttachmentReadCache(client, () => now);
+
+  await Promise.all([cache.getMetadata("att-1"), cache.getMetadata("att-1")]);
+  await cache.getMetadata("att-1");
+  assert.equal(metadataReads, 1);
+  const first = await cache.createAccess({ attachmentId: "att-1" });
+  const second = await cache.createAccess({ attachmentId: "att-1" });
+  assert.equal(first.url, second.url);
+  assert.equal(accessReads, 1);
+  now += 31_000;
+  const refreshed = await cache.createAccess({ attachmentId: "att-1" });
+  assert.notEqual(refreshed.url, first.url);
+  assert.equal(accessReads, 2);
+});
+
+test("read cache does not pin pending metadata", async () => {
+  let reads = 0;
+  const client = {
+    async getMetadata() {
+      reads += 1;
+      return { metadata: {
+        id: "att-1", projectId: "project-1",
+        owner: { kind: "run" as const, runId: "run-1" }, kind: "file" as const,
+        originalFilename: "proof.pdf", mimeType: "application/pdf" as const,
+        trustedExtension: "pdf", byteSize: 12, sha256: null,
+        status: (reads === 1 ? "pending" : "ready") as "pending" | "ready",
+        createdAt: "2026-09-04T00:00:00.000Z", updatedAt: "2026-09-04T00:00:00.000Z",
+      }, etag: `"attachment:att-1:${reads}"` };
+    },
+    async createAccess() { throw new Error("unused"); },
+    async upload() { throw new Error("unused"); },
+    async remove() { throw new Error("unused"); },
+  } satisfies PrivateAttachmentClient;
+  const cache = createAttachmentReadCache(client);
+
+  assert.equal((await cache.getMetadata("att-1")).metadata.status, "pending");
+  assert.equal((await cache.getMetadata("att-1")).metadata.status, "ready");
+  assert.equal(reads, 2);
 });
