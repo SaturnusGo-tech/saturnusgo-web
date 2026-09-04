@@ -23,3 +23,10 @@ test("bug report detail uses case-like sections and media-first attachments", ()
   assert.match(detail, /t\("reports\.expectedResult"\)/);
   assert.match(styles, /\.statusChip\[data-status="open"\][^}]*background: #d73948/s);
 });
+
+test("the selected detail tab survives defect resource refreshes", () => {
+  assert.match(list, /const \[detailTab, setDetailTab\] = useState<DetailTab>\("overview"\)/);
+  assert.match(list, /tab=\{detailTab\}/);
+  assert.match(list, /onTabChange=\{setDetailTab\}/);
+  assert.doesNotMatch(detail, /useState<DetailTab>/);
+});

@@ -6,7 +6,7 @@ import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/
 import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
-import { DefectReportDetail } from "./detail/DefectReportDetail";
+import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import surface from "./reports.module.css";
 
 export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDefect,
@@ -23,6 +23,7 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
 }) {
   const { locale, t } = useTmsLocale();
   const [query, setQuery] = useState("");
+  const [detailTab, setDetailTab] = useState<DetailTab>("overview");
   const selectedDefect = defects.find((item) => item.id === selectedDefectId);
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
   const visibleDefects = useMemo(() => {
@@ -35,6 +36,11 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
   const open = defects.filter((item) => !["closed", "verified"].includes(item.status)).length;
   const critical = defects.filter((item) => item.severity === "critical").length;
   const completed = runs.filter((item) => item.status === "completed").length;
+
+  function selectDefect(defectId: string | null) {
+    if (defectId !== selectedDefectId) setDetailTab("overview");
+    onSelectDefect(defectId);
+  }
 
   return <div className={surface.workspace} data-testid="reports-view" data-detail-open={Boolean(selectedDefectId) || undefined}>
     <section className={surface.listPane} aria-label={t("reports.title")}>
@@ -71,10 +77,10 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
             <td><span className={surface.severityMark} data-level={defect.severity} title={localizedLabel(locale, defect.severity)}>
               <AlertTriangle size={14} fill="currentColor" />
             </span></td>
-            <td><button className={surface.rowButton} type="button" onClick={() => onSelectDefect(defect.id)}>
+            <td><button className={surface.rowButton} type="button" onClick={() => selectDefect(defect.id)}>
               <span className={surface.key}>{defect.key}</span>
             </button></td>
-            <td><button className={surface.rowButton} type="button" onClick={() => onSelectDefect(defect.id)}>
+            <td><button className={surface.rowButton} type="button" onClick={() => selectDefect(defect.id)}>
               <strong className={surface.title}>{defect.title}</strong>
               {defect.labels.length > 0 && <small className={surface.labels}>{defect.labels.slice(0, 3).join(", ")}</small>}
             </button></td>
@@ -95,7 +101,9 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
             defect={selectedDefect}
             run={runs.find((item) => item.id === selectedDefect.runId)}
             links={links.filter((link) => link.owner.kind === "defect" && link.owner.defectId === selectedDefect.id)}
-            onBack={() => onSelectDefect(null)}
+            tab={detailTab}
+            onTabChange={setDetailTab}
+            onBack={() => selectDefect(null)}
             onOpenRun={onOpenRun}
           />
         : selectedDefectStatus === "error"

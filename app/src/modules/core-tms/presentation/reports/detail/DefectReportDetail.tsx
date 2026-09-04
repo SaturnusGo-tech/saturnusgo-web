@@ -3,24 +3,25 @@
 import {
   ArrowLeft, ExternalLink as ExternalLinkIcon, Link2, Paperclip, PlayCircle, X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import surface from "../reports.module.css";
 
-type DetailTab = "overview" | "attachments";
+export type DetailTab = "overview" | "attachments";
 
-export function DefectReportDetail({ defect, run, links, onBack, onOpenRun }: {
+export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBack, onOpenRun }: {
   defect: Defect;
   run?: TestRunSummary;
   links: ExternalLink[];
+  tab: DetailTab;
+  onTabChange: (tab: DetailTab) => void;
   onBack: () => void;
   onOpenRun: (runId: string, runItemId: string | null) => void;
 }) {
   const { locale, languageTag, t } = useTmsLocale();
-  const [tab, setTab] = useState<DetailTab>("overview");
   const createdAt = new Intl.DateTimeFormat(languageTag, {
     day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   }).format(new Date(defect.createdAt));
@@ -49,8 +50,8 @@ export function DefectReportDetail({ defect, run, links, onBack, onOpenRun }: {
         </p>
       </div>
       <nav className={surface.tabs} aria-label={locale === "ru" ? "Разделы баг-репорта" : "Bug report sections"}>
-        <button type="button" data-active={tab === "overview" || undefined} onClick={() => setTab("overview")}>{t("reports.overview")}</button>
-        <button type="button" data-active={tab === "attachments" || undefined} onClick={() => setTab("attachments")}>{t("reports.attachments")} {evidenceCount > 0 && <span>{evidenceCount}</span>}</button>
+        <button type="button" data-active={tab === "overview" || undefined} onClick={() => onTabChange("overview")}>{t("reports.overview")}</button>
+        <button type="button" data-active={tab === "attachments" || undefined} onClick={() => onTabChange("attachments")}>{t("reports.attachments")} {evidenceCount > 0 && <span>{evidenceCount}</span>}</button>
       </nav>
     </header>
 
