@@ -30,3 +30,26 @@ Accessibility risk: the information remains available in text, but the visual hi
 ## Evidence limits
 
 The initial audit is scoped to the connected desktop dashboard. Keyboard behavior is unchanged by this color-only correction; screenshots cannot establish complete color-vision accessibility.
+
+## Step 3 — light theme after correction
+
+Evidence: `03-light-after.png` and `04-light-after-lower.png`.
+
+Health: healthy. The operational series now use clean cobalt, emerald, violet, orange, cyan, and rose on neutral white surfaces. Success, failure, warning, launched, incomplete, and categorical series are immediately distinguishable without coloring entire cards.
+
+The lower dashboard confirms that the former olive, sand, muted coral, and gray-blue marks no longer survive in type, tag, or product-coverage charts.
+
+## Step 4 — dark theme after correction
+
+Evidence: `05-dark-after.png` and `06-dark-after-lower.png`.
+
+Health: healthy. The dark theme uses lighter high-chroma counterparts rather than reusing dim light-theme values. Small chart marks remain legible on charcoal while neutral cards and typography keep the page from becoming a rainbow.
+
+## Final verification
+
+- Same-state light comparison: `07-light-comparison.png` (1280×720 before and after).
+- Cross-theme lower-dashboard comparison: `08-theme-comparison-lower.png` (1087×814 light and dark).
+- Production console: zero errors and zero warnings after switching themes and scrolling through the dashboard.
+- Residual limitation: dark-theme after capture uses the user's later 1087×814 browser size, so it is assessed as a theme/responsiveness check rather than a pixel-for-pixel comparison against the 1280×720 dark before capture.
+
+Final health: healthy in production.

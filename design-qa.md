@@ -460,6 +460,23 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Dashboard vivid semantic palette — final production pass
+
+- Source visual truth: the user's explicit request for clean, bright operational colors without a rainbow, grounded by the connected pre-fix captures `.design-audit/2026-09-04-dashboard-vivid-palette/01-dark-before.png` and `.design-audit/2026-09-04-dashboard-vivid-palette/02-light-before.png` (both 1280×720).
+- Implementation evidence: `.design-audit/2026-09-04-dashboard-vivid-palette/03-light-after.png` (1280×720), `04-light-after-lower.png`, `05-dark-after.png`, and `06-dark-after-lower.png` (1087×814). The production route is Russian, Umbrella-Host scope, 30-day period, with the dashboard fully loaded.
+- Full-view comparison: `.design-audit/2026-09-04-dashboard-vivid-palette/07-light-comparison.png` places the exact 1280×720 light before and after states together. Focused categorical/theme comparison: `08-theme-comparison-lower.png` places the 1087×814 light and dark lower-dashboard states together so type, tag, and product-coverage marks remain readable.
+- Density normalization: the exact light comparison uses equal pixel dimensions and the Browser's normalized CSS-pixel capture. The later dark capture reflects the user's resized 1087×814 browser and is treated as a responsive/theme verification rather than a pixel-fidelity comparison to the earlier 1280×720 dark capture.
+- Fonts and typography: no font family, weight, size, line-height, wrapping, or truncation changed. The established Falcon hierarchy remains stable in both themes.
+- Spacing and layout rhythm: card geometry, grid tracks, chart plotting areas, radii, borders, and vertical rhythm are unchanged. The 1087px capture confirms the dashboard reflows without overlap or clipped controls.
+- Colors and visual tokens: earthy plum/sand/olive/coral values were replaced with clean cobalt, emerald, violet, orange, cyan, rose, and a cool secondary. Semantic mapping is stable: emerald success, rose failure, orange warning, cobalt launched/in-progress. Dark mode uses higher-luminance counterparts. Color is confined to chart marks, compact status tints, and icons, so the neutral canvas prevents rainbow noise.
+- Image quality and asset fidelity: this color-only surface contains no changed photographic, branded, or generated image assets. Existing Falcon and Lucide assets remain sharp and untouched.
+- Copy and content: no app copy or dynamic data changed. Series labels and values continue to provide non-color identification.
+- Interaction and accessibility: light/dark switching and dashboard scrolling were exercised on the signed-in production route. Labels preserve meaning without color alone, small tints gained stronger borders/backgrounds, and the production console reported zero errors and zero warnings.
+- Comparison history: P2 before — low-chroma dusty category marks converged visually, and sand/olive read as brown/khaki on light surfaces. Fix — replaced the palette and strengthened only compact tints/borders. Post-fix evidence — `07-light-comparison.png` and `08-theme-comparison-lower.png`; no actionable P0/P1/P2 issue remains.
+- Verification: focused dashboard tests 9/9, TMS adapters/UI 177/177, TypeScript, 306-file architecture, optimized 61-route build, and Pages 60-route export passed. Frontend source `41adca27f59110da4e268b72ef6857d489fb3617` is served by Pages commit `7596fd2d`.
+
+final result: passed
+
 ## Dashboard color, Run Flow, and risk-signal correction — production pass
 
 - Source visual truth: `.design-audit/2026-09-04-dashboard-colors-flow/01-dashboard-dark-before.png` and `.design-audit/2026-09-04-dashboard-colors-flow/02-dashboard-light-before.png`, each 1280×720 px at a 1280×720 CSS viewport and density 1. These are the exact production states identified by the user: washed semantic colors, a sparse pass-rate spike, and visually duplicated progress bars.
