@@ -1,67 +1,67 @@
-# Design QA — Falcon test-suites redesign
+# Design QA — Falcon test-suites and test-runs bugfix
 
 ## Comparison target
 
-- Baseline suite list and detail: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/01-before-suite-screen.png`.
-- Baseline suite case picker: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/03-before-suite-case-picker.png`.
-- Established Falcon visual truth: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/04-reference-case-screen.png`.
-- Final production detail, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/19-production-suite-screen-light-final.png`.
-- Final production editor, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/20-production-suite-config-light-final.png`.
-- Final production detail, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/21-production-suite-screen-dark-final.png`.
-- Final production editor, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/22-production-suite-config-dark-final.png`.
-- Combined reference comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/23-reference-vs-suite-final.png`.
-- Combined editor comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-test-suites-redesign/24-before-vs-config-final.png`.
-- Production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`.
+- Established Falcon test-case visual truth: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/01-reference-test-cases-dark.png`.
+- Suite list before/after, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/16-suites-before-after-light.jpg`.
+- Suite configuration before/after, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/17-suite-config-before-after-dark.jpg`.
+- Test-runs before/after, light theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/18-runs-before-after-light.jpg`.
+- Test-case reference versus final test-run, dark theme: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/19-reference-cases-vs-runs-dark.jpg`.
+- Focused run-list comparison: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/.tms-release-candidate.IJ0rMm/.design-audit/2026-09-04-suite-run-bugfix/20-focused-run-list-before-after-light.jpg`.
+- Production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3&release=21ce78dc`.
 
 ## Viewport and state
 
-- Browser viewport reported by the app session: 1087 × 814 CSS px at DPR 2.
-- Stored browser captures: 1280 × 720 px after the in-app browser's capture normalization. Source and implementation captures use the same normalized dimensions.
-- Combined comparisons: 2624 × 720 px, with a 16 px neutral gutter.
-- Production state: authenticated `Umbrella-Host` workspace, suite `HOST-1 · Смоук релиза`, one currently available fixed case.
-- Verified states: suite selected, empty suite search, suite editor open, exact-case mode, dynamic-tag mode, run confirmation open, case navigation, light theme, and dark theme.
+- Stored source and implementation captures: 1280 × 720 px.
+- Combined full-view comparisons: 2560 × 720 px; focused run-list comparison: 1240 × 720 px.
+- Production state: authenticated `Umbrella-Host` workspace, suite `HOST-1 · Смоук релиза`, run `HOST-TR-23`, case `HOST-TC-118`.
+- Verified states: suite list, suite detail, suite configuration drawer, run list, selected run case, light theme, dark theme, keyboard focus treatment, and production console.
 
 ## Findings
 
 No actionable P0, P1, or P2 visual or interaction differences remain.
 
-- **Typography:** the list rail, detail title, metadata, section headings, property labels, table headers, and case rows now reuse the compact Falcon hierarchy established by the test-case screen. Weights stay restrained and long case titles truncate without colliding with adjacent columns.
-- **Spacing and layout rhythm:** the old developer table and narrow nested forms were replaced by a stable split workspace, compact suite rows, a calm document surface, and an edge-to-edge right drawer. The editor uses one continuous layout instead of stacked square cards.
-- **Colors and tokens:** selected rows, borders, surfaces, text, buttons, lifecycle pills, and priority pills inherit the same theme variables as the reference test-case experience. Both production themes preserve contrast and semantic meaning.
-- **Imagery and assets:** no new decorative imagery was required. The existing Falcon mark and Lucide icon family are preserved; no emoji, placeholder art, or hand-drawn SVG was introduced.
-- **Copy and content:** suite name, key, type, dates, description, filter mode, tags, available case count, component, priority, and estimate come from real production data. Internal IDs are not exposed as explanatory UI.
-- **Case-list fidelity:** one reusable `EmbeddedCaseList` now renders case rows in suite detail, suite configuration, and the run-scope picker. It carries the same ID, lifecycle, title, component, priority, estimate, and type-icon language as the primary test-case listing.
-- **Interactions:** suite search shows a real empty state; configure opens the drawer; exact-case checkboxes update the selected count; dynamic mode reveals required tags; cancel leaves production data unchanged; the suite case opens its main test-case card; launching the suite opens the run confirmation.
-- **Count consistency:** QA found a stale summary count that displayed two cases while only one case was available. The list rail and run confirmation now consume the already hydrated suite detail, so all visible counts consistently show one available case.
-- **Responsive and accessibility:** the embedded list uses container-aware column reduction, horizontal containment, named landmarks, labelled inputs, pressed states, accessible row controls, and semantic text in addition to color. Focus rings remain visible in both themes.
-- **Runtime:** no runtime error surfaced during the verified browser journeys. The production build completed successfully; the only build warning is the pre-existing unrelated methodology stylesheet `align-items: end` compatibility warning.
+- **Primary actions:** `Новый сьют` and `Запустить сьют` keep the Falcon action-blue background with white labels and white icons in both themes.
+- **Suite editor hierarchy:** the former all-open form is now an editorial document. The suite name is the dominant title; `Описание` and `Как собирать кейсы` are calm sections with pencil actions and reveal their controls only for editing.
+- **Case collection:** the shared case list remains inside suite configuration, with the same ID, lifecycle, title, component, priority, estimate, and type-icon language as the main test-case list.
+- **Run-list fidelity:** priority and test type occupy separate fixed columns. Priority uses filled semantic triangles; manual and automated types use their dedicated icons without collision.
+- **Status treatment:** run states use saturated, high-contrast pills. `Пройден`, failed, blocked, in-progress, skipped, and not-run states share one semantic palette across the navigator and run detail.
+- **Focus treatment:** blue square outlines were removed from suite controls, run controls, inputs, and the global shell. Keyboard focus remains visible as a restrained neutral inset line instead of a second blue border.
+- **Typography and density:** suite headings, editorial labels, run metadata, case titles, IDs, and table rows follow the established compact Falcon hierarchy. Long titles truncate inside their own column and do not push status or type controls.
+- **Theme parity:** light and dark production captures preserve the same hierarchy, semantic colors, and spacing; no theme-specific black-on-blue or gray-on-blue action label remains.
+- **Runtime:** no production console error was recorded in the verified journeys.
 
 ## Visual comparison result
 
-`23-reference-vs-suite-final.png` places the established test-case screen and final test-suite screen in one image. The global chrome, rail density, selected-row treatment, title scale, metadata rhythm, separators, semantic pills, and document spacing read as one Falcon system. Suite-specific scope information is an intentional product difference.
+`16-suites-before-after-light.jpg` confirms the corrected white action labels while preserving the accepted suite-detail layout.
 
-`24-before-vs-config-final.png` compares the previous configuration experience with the final drawer. The final version has a clearer title hierarchy, a stable two-column basic-information row, an explicit exact/dynamic mode choice, and the same complete case-list component used elsewhere.
+`17-suite-config-before-after-dark.jpg` shows the material hierarchy change: the dense field matrix becomes a large editable title followed by pencil-controlled description and collection-method sections.
+
+`18-runs-before-after-light.jpg` and `20-focused-run-list-before-after-light.jpg` confirm separated icon columns, filled priority markers, brighter lifecycle pills, and the absence of blue square focus outlines.
+
+`19-reference-cases-vs-runs-dark.jpg` confirms that test cases and test runs now read as parts of the same Falcon system while retaining their different operational content.
 
 ## Iteration history
 
-1. Initial implementation replaced the dev suite list/detail and introduced the shared embedded case list.
-2. Local visual QA found a duplicate nested border around the editor search field. Selector specificity, minimum height, and border ownership were corrected, then rechecked in light and dark themes.
-3. Production QA found a stale suite summary count. The rail and run flow were changed to reuse the hydrated suite detail; the final production check now shows `1` in the rail, `1 кейс` in the card, and `Запустить ран · 1` in the launch dialog.
-4. Final combined comparisons found no remaining P0/P1/P2 issue.
+1. Reproduced the incorrect primary-label contrast and the dense suite configuration form in production.
+2. Rebuilt suite configuration around the test-case editorial hierarchy and kept the reusable embedded case list.
+3. Split run-list priority and type into independent columns, replaced outline warning glyphs with filled triangles, and unified saturated execution states.
+4. Production QA found one remaining blue keyboard outline on the global navigation. It was replaced with a neutral inset focus treatment and published in a second scoped Pages release.
+5. Rechecked light and dark themes, computed action/icon colors, navigator geometry, focus styles, and the production console. The post-fix pass found no P0/P1/P2 issue.
 
 ## Engineering verification
 
 - [x] `npm run typecheck`
-- [x] `npm run test:tms-adapters` — 180/180 passed
-- [x] `npm run build:once`
-- [x] production static export and Pages publish
-- [x] production navigation, search, selection, mode switch, case open, and run dialog
+- [x] `npm run test:tms-adapters` — 183/183 passed
+- [x] `npm run build`
+- [x] scoped production static export and Pages publish from source `21ce78dcdf8b75102a506d31cc067be553dd3a80`
+- [x] production suite actions, suite configuration, run navigator, and run detail
 - [x] light and dark production renders
+- [x] production console — 0 errors
 - [x] `git diff --check`
-- [x] architecture check reports only three pre-existing unrelated files over the 200-line policy; the new suite files introduce no architecture violation
 
 ## Follow-up polish
 
-- P3: if a dedicated tablet visual reference is supplied later, the current container breakpoints can be tuned against that exact target; no tablet-specific mismatch is known in this iteration.
+- P3: no follow-up is required for this bugfix iteration. Additional suite actions can reuse the new editorial section pattern as they are introduced.
 
 final result: passed
