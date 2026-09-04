@@ -35,3 +35,24 @@ Accessibility risk: the chart legend uses text plus swatches, which is a strengt
 ## Evidence limits
 
 This audit covers the rendered 1280×720 dashboard and visible semantics. Responsive reflow, keyboard interaction, motion reduction, and final post-fix behavior require implementation testing.
+
+## Step 3 — light theme after correction
+
+Evidence: `03-dashboard-light-after.png` and `11-dashboard-light-lower-after.png`.
+
+Health after fix: healthy. Neutral surfaces remain quiet while run outcomes, tags, product coverage, metric icons, and defect lifecycle states use distinct semantic colors with stronger contrast. The palette is varied without turning the dashboard into a decorative rainbow.
+
+## Step 4 — dark theme after correction
+
+Evidence: `04-dashboard-dark-after.png` and `06-dashboard-dark-lower-after.png`.
+
+Health after fix: healthy. The same semantic mapping remains legible on charcoal surfaces; teal, plum, amber, coral, slate, success, warning, and danger marks no longer collapse into one pale blue/green family.
+
+## Final behavior verification
+
+- `Run Flow` now plots only run counts and outcomes. Pass rate is a compact KPI beside the date filter, and selecting `30 авг.` changed it from the period value `80%` to the truthful empty value `—`.
+- `Где проседаем` uses a semantic pass-rate score and exactly one native progress bar per populated row, reserved for coverage. The connected `Local Protection` row measured one `<progress>` element.
+- Complete before/after comparisons are `07-comparison-light.png` and `08-comparison-dark.png`; focused primary-region comparisons are `09-comparison-light-focused.png` and `10-comparison-dark-focused.png`.
+- Signed-in production console: zero errors and zero warnings.
+
+Final health: healthy in production.

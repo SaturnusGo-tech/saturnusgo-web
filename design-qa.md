@@ -460,6 +460,25 @@ final result: blocked — in-app Browser localhost policy
 
 final result: passed in production
 
+## Dashboard color, Run Flow, and risk-signal correction — production pass
+
+- Source visual truth: `.design-audit/2026-09-04-dashboard-colors-flow/01-dashboard-dark-before.png` and `.design-audit/2026-09-04-dashboard-colors-flow/02-dashboard-light-before.png`, each 1280×720 px at a 1280×720 CSS viewport and density 1. These are the exact production states identified by the user: washed semantic colors, a sparse pass-rate spike, and visually duplicated progress bars.
+- Browser-rendered implementation: `.design-audit/2026-09-04-dashboard-colors-flow/03-dashboard-light-after.png` and `.design-audit/2026-09-04-dashboard-colors-flow/04-dashboard-dark-after.png`, captured from the signed-in production project at the same viewport, locale, scope, 30-day period, and density. Lower-dashboard palette evidence is `06-dashboard-dark-lower-after.png` and `11-dashboard-light-lower-after.png`.
+- Full-view comparison evidence: `.design-audit/2026-09-04-dashboard-colors-flow/07-comparison-light.png` and `.design-audit/2026-09-04-dashboard-colors-flow/08-comparison-dark.png` place the exact before and after frames side by side at 2560×720 px. Focused region evidence: `09-comparison-light-focused.png` and `10-comparison-dark-focused.png` compare the Run Flow and risk table at readable density.
+- State: Russian locale, Umbrella-Host project, 30-day dashboard, both light and dark themes. The final Browser state was returned to the user's dark theme.
+- Fonts and typography: the existing Falcon system sans stack, compact dashboard scale, weights, line heights, truncation, and hierarchy remain unchanged. The redesign removes the competing 0–100% chart axis and turns pass rate into one clearly labelled, tabular KPI.
+- Spacing and layout rhythm: the two-column primary grid, card geometry, table density, radii, and existing page rhythm remain stable. The new KPI and date selector share one bounded toolbar and do not reduce the plot or collide with the risk table.
+- Colors and visual tokens: light and dark modes now have separate dashboard-local semantic tokens for blue, teal/success, coral/danger, amber/warning, plum, olive, and slate. Marks keep text labels and values, so color is never the only carrier of meaning.
+- Image quality and asset fidelity: no photographic or generated imagery participates in this dashboard. Existing Falcon logo and Lucide icon assets are unchanged; chart marks remain native Recharts output rather than replacement CSS art.
+- Copy and content: existing Russian product language is preserved. `Поток ранов`, `Процент прохождения`, `Успех`, and `Покрытие` make the two risk signals explicit instead of presenting two unlabeled bars.
+- Interaction and accessibility: the run-outcome legend remains keyboard-operable; the date listbox was opened in production and `30 авг.` selected, changing the displayed pass rate from `80%` to `—` for a day without completed runs. The `Local Protection` row exposes one pass-rate score and exactly one progressbar for `77.8%` coverage. Complete accessible names remain present for all signals.
+- Comparison history: the first audit found three actionable P2 defects: one pale cross-theme chart palette, the sparse pass-rate line dominating the chart as a vertical spike, and pass/coverage bars visually merging in risk rows. The fix introduced theme-specific semantic tokens, removed the percentage line and secondary axis, added a period-aware KPI, and retained a progress bar only for coverage. The post-fix combined evidence shows no remaining P0/P1/P2 mismatch in the requested desktop scope.
+- Primary interactions tested: dashboard navigation, light/dark theme switching, Run Flow date-listbox selection and reset, risk-row progressbar count, upper and lower dashboard rendering. The signed-in production console contained zero errors and zero warnings.
+- Verification: focused dashboard tests passed 10/10; full TMS adapter/UI tests passed 177/177; TypeScript, 306-file TMS architecture, optimized production build, Pages export, and production asset propagation passed.
+- Residual test gap: this visual comparison is scoped to the user's 1280×720 desktop dashboard. Existing responsive CSS rules and test gates passed, but a same-target mobile screenshot was not part of this correction.
+
+final result: passed
+
 ## Shared-step number, attachment preview, and history count — production hotfix
 
 - Source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_Ib8dBJ/Screenshot 2026-09-04 at 2.48.40 AM.png` (1490×1440 px), preserved in the combined evidence as `.design-qa/2026-09-04-shared-step-evidence-hotfix/comparison-full.png`.
