@@ -21,12 +21,12 @@
 .header,
 .row {
   display: grid;
-  grid-template-columns: 28px 26px 94px 94px minmax(220px, 1fr) minmax(120px, .58fr) 72px;
+  grid-template-columns: 32px 36px 90px 94px minmax(220px, 1fr) minmax(120px, .58fr) 72px;
   align-items: center;
 }
 
 .root[data-selectable="true"] :is(.header, .row) {
-  grid-template-columns: 34px 28px 26px 94px 94px minmax(220px, 1fr) minmax(120px, .58fr) 72px;
+  grid-template-columns: 34px 32px 36px 90px 94px minmax(220px, 1fr) minmax(120px, .58fr) 72px;
 }
 
 .header {
@@ -101,8 +101,8 @@ label.row:not([data-disabled="true"]):hover { background: var(--embedded-hover);
 
 @container embedded-case-list (max-width: 760px) {
   .header,
-  .row { grid-template-columns: 28px 26px 82px 88px minmax(190px, 1fr); }
-  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 34px 28px 26px 82px 88px minmax(190px, 1fr); }
+  .row { grid-template-columns: 32px 36px 82px 88px minmax(190px, 1fr); }
+  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 34px 32px 36px 82px 88px minmax(190px, 1fr); }
   .componentHeading,
   .estimateHeading,
   .component,
@@ -111,8 +111,8 @@ label.row:not([data-disabled="true"]):hover { background: var(--embedded-hover);
 
 @container embedded-case-list (max-width: 500px) {
   .header,
-  .row { grid-template-columns: 26px 24px 76px minmax(150px, 1fr); }
-  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 32px 26px 24px 76px minmax(150px, 1fr); }
+  .row { grid-template-columns: 30px 34px 76px minmax(150px, 1fr); }
+  .root[data-selectable="true"] :is(.header, .row) { grid-template-columns: 32px 30px 34px 76px minmax(150px, 1fr); }
   .statusHeading,
   .status { display: none; }
   .row { min-height: 44px; }

@@ -57,7 +57,7 @@
 .itemsToolbar input { width: 100%; min-width: 0; height: 29px; padding: 0; color: var(--runs-text); background: transparent; border: 0; outline: 0; font-size: 12px; }
 .itemsToolbar input::placeholder { color: var(--runs-faint); }
 
-.itemColumns, .item, .itemActive { display: grid; grid-template-columns: 30px 30px 92px minmax(0, 1fr) 102px; align-items: center; }
+.itemColumns, .item, .itemActive { display: grid; grid-template-columns: 32px 36px 88px minmax(0, 1fr) 102px; align-items: center; }
 .itemColumns { min-height: 27px; padding: 0 8px; color: var(--runs-muted); background: var(--runs-bg); border-bottom: 1px solid var(--runs-border); font-size: 10px; font-weight: 600; }
 .itemColumns > span { padding: 0 6px; }
 .itemColumns > span:first-child { height: 27px; display: grid; place-items: center; padding: 0; }
@@ -98,7 +98,7 @@
 .emptyHistory p { margin: 6px 0 0; font-size: 12px; line-height: 1.5; }
 
 @container runs-shell (max-width: 960px) {
-  .itemColumns, .item, .itemActive { grid-template-columns: 28px 28px 78px minmax(0, 1fr); }
+  .itemColumns, .item, .itemActive { grid-template-columns: 30px 34px 78px minmax(0, 1fr); }
   .itemColumns > span:last-child, .item > .executionBadge, .itemActive > .executionBadge { display: none; }
   .itemsToolbar { grid-template-columns: 1fr; gap: 5px; padding-block: 6px; }
   .itemsToolbar > div { display: none; }

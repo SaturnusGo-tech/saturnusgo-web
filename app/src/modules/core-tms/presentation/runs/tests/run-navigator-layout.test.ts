@@ -51,7 +51,7 @@ test("run listing shares semantic priority signals, neutral type icons, and calm
   assert.match(view, /className=\{styles\.prioritySortButton\}/);
   assert.match(prioritySignal, /priority === "low" \? Diamond : Triangle/);
   assert.match(prioritySignal, /priority === "high" \|\| priority === "critical"/);
-  assert.match(styles, /grid-template-columns: 30px 30px 92px minmax\(0, 1fr\) 102px/);
+  assert.match(styles, /grid-template-columns: 32px 36px 88px minmax\(0, 1fr\) 102px/);
   assert.match(styles, /\.execution_passed\s*\{[^}]*background: #14864f;/s);
   assert.match(styles, /\.execution_not_run\s*\{[^}]*background: #e1e4e8;/s);
   assert.match(view, /item\.status === "not_run" \? <CircleDashed/);

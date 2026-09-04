@@ -192,9 +192,9 @@
 
 .selectionColumn { width: 0; transition: width 180ms cubic-bezier(.2, .72, .3, 1); }
 .selectionMode .selectionColumn { width: 34px; }
-.flagColumn { width: 28px; }
-.typeColumn { width: 30px; }
-.keyColumn { width: 112px; }
+.flagColumn { width: 32px; padding-inline: 0 !important; }
+.typeColumn { width: 36px; padding-inline: 0 !important; }
+.keyColumn { width: 90px; }
 .statusColumn { width: 92px; }
 .titleColumn { width: 270px; }
 .functionColumn { width: 180px; }
@@ -203,9 +203,9 @@
 .selectionMode .selectionCell { padding-inline: 9px 4px !important; }
 .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
 .selectionMode th:first-child button { animation: selectionControlIn 180ms cubic-bezier(.2, .72, .3, 1) both; }
-.flagCell { padding-inline: 7px 0 !important; }
-.flagCell > svg { margin-inline: auto 0; }
-.typeCell { padding-inline: 5px !important; color: var(--cases-icon) !important; text-align: center; }
+.flagCell { padding-inline: 0 !important; text-align: center; }
+.flagCell > svg { margin-inline: auto; }
+.typeCell { padding-inline: 0 !important; color: var(--cases-icon) !important; text-align: center; }
 .keyCell { overflow: hidden; color: var(--cases-muted) !important; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
 .keyCell strong { font-size: 11px; font-weight: 500; letter-spacing: .01em; }
 .titleCell { min-width: 0; }

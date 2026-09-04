@@ -25,7 +25,6 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /siteName: "Falcon"/);
   assert.match(activeSources, /https:\/\/tms\.saturnusgo\.com\/testcases\/umbrella-home\/work\//);
   assert.match(activeSources, /assets\/falcon\/falcon-mark-on-dark\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-mark-on-light\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-dark\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-light\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-loader-on-dark\.png/);
@@ -33,7 +32,8 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /prefers-color-scheme: light/);
   assert.match(activeSources, /prefers-color-scheme: dark/);
   assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);
-  assert.match(shellSource, /radial-gradient\(circle at 12% 8%, rgb\(53 116 240 \/ 14%\)/);
+  assert.match(shellSource, /\.navigation\s*\{[\s\S]*?--sidebar-text: #e7e9ec;[\s\S]*?background: linear-gradient\(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%\)/);
+  assert.match(shellSource, /\.tessiqMark\s*\{[\s\S]*?falcon-mark-on-dark\.png/);
   assert.match(shellSource, /:global\(\.dark\) \.navigation\s*\{[\s\S]*?background: linear-gradient/);
   assert.match(shellSource, /background: linear-gradient\(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%\)/);
   assert.doesNotMatch(activeSources, /workspaceLoaderPulse/);

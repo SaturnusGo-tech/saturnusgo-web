@@ -68,6 +68,7 @@ test("case listings keep priority as one sortable signal instead of a duplicate 
   const table = readFileSync(new URL("../../list/CasesTable.tsx", import.meta.url), "utf8");
   const signal = readFileSync(new URL("../../list/PrioritySignal.tsx", import.meta.url), "utf8");
   const styles = readFileSync(new URL("../../list/prioritySignal.module.css", import.meta.url), "utf8");
+  const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css", import.meta.url), "utf8");
   assert.match(table, /className=\{styles\.prioritySortButton\}/);
   assert.match(table, /<PrioritySignal priority=\{item\.priority\}/);
   assert.doesNotMatch(table, /<PriorityBadge/);
@@ -76,6 +77,10 @@ test("case listings keep priority as one sortable signal instead of a duplicate 
   assert.match(signal, /fill=\{filled \? "currentColor" : "none"\}/);
   assert.match(styles, /\.signal\[data-priority="high"\] \{ color: #e58b18; \}/);
   assert.match(styles, /\.signal\[data-priority="critical"\] \{ color: #e3404b; \}/);
+  assert.match(listingStyles, /\.flagColumn \{ width: 32px; padding-inline: 0 !important; \}/);
+  assert.match(listingStyles, /\.typeColumn \{ width: 36px; padding-inline: 0 !important; \}/);
+  assert.match(listingStyles, /\.keyColumn \{ width: 90px; \}/);
+  assert.match(listingStyles, /\.flagCell > svg \{ margin-inline: auto; \}/);
 });
 
 test("parses quoted QL values, aliases, and exclusions", () => {

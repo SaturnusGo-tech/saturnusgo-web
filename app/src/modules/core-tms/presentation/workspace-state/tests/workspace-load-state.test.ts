@@ -62,6 +62,10 @@ test("suite and run drawers share the production test-case list", () => {
     new URL("../../cases/embedded/EmbeddedCaseList.tsx", import.meta.url),
     "utf8",
   );
+  const embeddedListStyles = readFileSync(
+    new URL("../../cases/embedded/embeddedCaseList.module.css", import.meta.url),
+    "utf8",
+  );
 
   assert.match(suiteDialogSource, /<EmbeddedCaseList/);
   assert.match(runScopeSource, /<EmbeddedCaseList/);
@@ -70,6 +74,7 @@ test("suite and run drawers share the production test-case list", () => {
   assert.match(embeddedListSource, /prioritySortButton/);
   assert.doesNotMatch(embeddedListSource, /<PriorityBadge/);
   assert.match(embeddedListSource, /<CaseTypeIcon/);
+  assert.match(embeddedListStyles, /grid-template-columns: 32px 36px 90px 94px minmax\(220px, 1fr\)/);
 });
 
 test("case detail hydration exposes a retryable failure state", () => {

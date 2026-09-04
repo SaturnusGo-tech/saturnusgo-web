@@ -326,10 +326,10 @@
 .drillTableViewport { min-height: 0; flex: 1 1 auto; overflow: auto; }
 .drillTable { width: 100%; min-width: 1000px; border-collapse: collapse; table-layout: fixed; }
 .drillTable th { position: sticky; z-index: 1; top: 0; height: 29px; padding: 0 10px; color: var(--muted); background: color-mix(in srgb, var(--control) 64%, var(--paper)); border-bottom: 1px solid var(--line); font-size: 9px; font-weight: 650; text-align: left; }
-.drillTable th:nth-child(1) { width: 68px; }.drillTable th:nth-child(2) { width: 112px; }.drillTable th:nth-child(3) { width: 112px; }.drillTable th:nth-child(4) { width: auto; }.drillTable th:nth-child(5) { width: 16%; }.drillTable th:nth-child(6) { width: 116px; }.drillTable th:nth-child(7) { width: 64px; }
+.drillTable th:nth-child(1) { width: 72px; }.drillTable th:nth-child(2) { width: 112px; }.drillTable th:nth-child(3) { width: 112px; }.drillTable th:nth-child(4) { width: auto; }.drillTable th:nth-child(5) { width: 16%; }.drillTable th:nth-child(6) { width: 116px; }.drillTable th:nth-child(7) { width: 64px; }
 .drillTable td { min-width: 0; height: 48px; padding: 6px 10px; overflow: hidden; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 11px; vertical-align: middle; white-space: nowrap; }
 .drillTable tr:hover td { background: var(--control-hover); }
-.recordSignals { display: flex; align-items: center; gap: 9px; }
+.recordSignals { display: flex; align-items: center; gap: 12px; }
 .entityIcon { width: 18px; height: 22px; display: grid; place-items: center; flex: 0 0 auto; color: var(--muted); }
 .entityIcon[data-type="automated"], .entityIcon[data-type="manual"], .entityIcon[data-type="checklist"] { color: var(--muted); }
 .entityIcon[data-type="defect"] { color: var(--dash-rose); }
