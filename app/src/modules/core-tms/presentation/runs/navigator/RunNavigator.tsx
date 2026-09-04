@@ -1,7 +1,9 @@
-import { Archive, Check, ChevronDown, ChevronRight, Plus, RotateCcw } from "lucide-react";
+import { AlertTriangle, Archive, Check, ChevronDown, Plus, RotateCcw, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { localizedLabel } from "../../../localization/format/labels";
+import { CaseTypeIcon } from "../../cases/list/CaseBadges";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
 import { RunNameMarquee } from "./RunNameMarquee";
@@ -30,14 +32,21 @@ export function RunNavigator({
 }: RunNavigatorProps) {
   const { locale, t } = useTmsLocale();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const pickerRef = useRef<HTMLDivElement>(null);
   const pickerTriggerRef = useRef<HTMLButtonElement>(null);
-  const titles = useMemo(() => new Map(cases.map((item) => [item.id, item.title])), [cases]);
+  const caseById = useMemo(() => new Map(cases.map((item) => [item.id, item])), [cases]);
   const activeCount = runs.filter((run) => !run.archivedAt).length;
   const archivedCount = runs.length - activeCount;
   const visibleRuns = runs.filter((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
   const emptyLabel = mode === "archived" ? t("runs.noArchived") : t("runs.noActive");
   const selectedPickerIndex = Math.max(0, visibleRuns.findIndex((run) => run.id === selectedRun?.id));
+  const normalizedQuery = query.trim().toLocaleLowerCase(locale === "ru" ? "ru-RU" : "en-US");
+  const visibleItems = normalizedQuery ? items.filter((item) => {
+    const testCase = caseById.get(item.caseId);
+    return [item.caseKey, testCase?.title, testCase?.component]
+      .some((value) => value?.toLocaleLowerCase(locale === "ru" ? "ru-RU" : "en-US").includes(normalizedQuery));
+  }) : items;
 
   function pickerOptions() { return Array.from(pickerRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ?? []); }
   function openPickerAt(index: number) {
@@ -156,10 +165,13 @@ export function RunNavigator({
         <>
           <header className={styles.summary}>
             <div className={styles.summaryMeta}>
-              <span>{selectedRun.key}</span>
+              <strong>{selectedRun.key}</strong>
               <span>{selectedRun.progress.executed} / {selectedRun.itemCount}</span>
             </div>
-            <p>{selectedRun.environment.name} · {selectedRun.build}</p>
+            <div className={styles.progressTrack} aria-label={t("runs.percentComplete", { percent: selectedRun.progress.percent })}>
+              <span style={{ width: `${selectedRun.progress.percent}%` }} />
+            </div>
+            <p><span>{selectedRun.environment.name}</span><span>{selectedRun.build}</span></p>
             {selectedRun.archivedAt ? (
               <div className={styles.archivedActions}>
                 <span><Archive size={14} /> {t("runs.archivedOn", {
@@ -174,23 +186,44 @@ export function RunNavigator({
             ) : null}
           </header>
 
-          <div className={styles.items}>
-            {items.map((item, index) => (
+          <div className={styles.itemsToolbar}>
+            <div><strong>{locale === "ru" ? "Тест-кейсы" : "Test cases"}</strong><span>{items.length}</span></div>
+            <label>
+              <Search size={14} aria-hidden="true" />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={locale === "ru" ? "Поиск кейсов в ране" : "Search cases in run"} placeholder={locale === "ru" ? "Поиск по названию или ID" : "Search title or ID"} />
+            </label>
+          </div>
+          <div className={styles.itemColumns} role="row" aria-hidden="true">
+            <span />
+            <span>ID</span>
+            <span>{locale === "ru" ? "Тест-кейс" : "Test case"}</span>
+            <span>{t("runs.status")}</span>
+          </div>
+          <div className={styles.items} role="table" aria-label={locale === "ru" ? "Тест-кейсы выбранного рана" : "Selected run test cases"}>
+            {visibleItems.map((item, index) => {
+              const testCase = caseById.get(item.caseId);
+              return (
               <button
                 className={item.id === selectedItemId ? styles.itemActive : styles.item}
                 key={item.id}
                 type="button"
+                role="row"
                 aria-current={item.id === selectedItemId ? "true" : undefined}
                 onClick={() => onSelectItem(item.id)}
               >
-                <span className={styles.itemStatus}>{statusIcon[item.status]}</span>
-                <span className={styles.itemText}>
-                  <small>{index + 1} · {item.caseKey} · {t("cases.revision", { revision: item.revision })}</small>
-                  <strong>{titles.get(item.caseId) ?? item.caseKey}</strong>
+                <span className={styles.itemSignals} role="cell">
+                  {testCase && <AlertTriangle className={styles[`priority_${testCase.priority}`]} size={13} aria-label={localizedLabel(locale, testCase.priority)} />}
+                  {testCase && <CaseTypeIcon locale={locale} type={testCase.type} />}
                 </span>
-                <ChevronRight size={14} />
+                <strong className={styles.itemKey} role="cell">{item.caseKey}</strong>
+                <span className={styles.itemText} role="cell">
+                  <strong>{testCase?.title ?? item.caseKey}</strong>
+                  <small>{testCase?.component || t("cases.revision", { revision: item.revision })}</small>
+                </span>
+                <span className={`${styles.executionBadge} ${styles[`execution_${item.status}`]}`} role="cell">{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
               </button>
-            ))}
+            )})}
+            {visibleItems.length === 0 && <div className={styles.itemsEmpty}><Search size={18} /><span>{locale === "ru" ? "Кейсы не найдены" : "No cases found"}</span></div>}
           </div>
         </>
       )}

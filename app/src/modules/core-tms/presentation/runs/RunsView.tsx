@@ -14,6 +14,7 @@ import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
+import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
@@ -137,28 +138,61 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
   return <div className={runStyles.shell} data-testid="runs-view">
     {runNavigator}
     <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
-      <RunExecutionHeader run={selectedRun} item={selectedItem} canArchive={canArchive} archivePending={archivePending} onArchive={onArchive} />
-      <div className={runStyles.meta}><span><strong>{t("runs.environment")}</strong>{selectedRun.environment.name}</span><span><strong>{t("runs.build")}</strong>{selectedRun.build}</span><span><strong>{t("runs.estimate")}</strong>{selectedItem.snapshot.estimatedMinutes ?? "—"} {locale === "ru" ? "мин" : "min"}</span></div>
-      <div className={runStyles.precondition}><strong>{t("runs.preconditions")}</strong><p>{selectedItem.snapshot.preconditions}</p></div>
-      <div className={runStyles.steps} role="table" aria-label={selectedItem.snapshot.title}>
-        <div className={runStyles.stepHead} role="row">{[t("runs.number"), t("runs.action"), t("runs.expected"), t("runs.actual"), t("runs.status")].map((label) => <span role="columnheader" key={label}>{label}</span>)}</div>
-        {executionEntries.map((step, index) => {
-          const result = attempt.stepResults.find((item) => item.stepId === step.id);
-          const status = result?.status ?? "not_run";
-          return <article className={`${runStyles.step} ${runStyles[`step_${status}`]}`} key={step.id} role="row" aria-rowindex={index + 2}>
-            <div className={runStyles.stepNumber} role="cell">{step.order}</div>
-            <div className={runStyles.stepAction} role="cell"><small className={runStyles.stepCellLabel}>{t("runs.action")}</small><span>{step.action}</span></div>
-            <div className={runStyles.stepExpected} role="cell"><small className={runStyles.stepCellLabel}>{t("runs.expected")}</small><span>{step.expectedResult}</span></div>
-            <div className={runStyles.stepActual} role="cell"><small className={runStyles.stepCellLabel}>{t("runs.actual")}</small>{status === "failed" && runWritable ? <textarea aria-label={`${t("runs.actual")}: ${step.order}`} value={result?.actualResult ?? ""} onChange={(event) => onStepActual(step.id, event.target.value)} placeholder={t("runs.actualPlaceholder")} /> : <span>{status === "passed" ? result?.actualResult || step.expectedResult : result?.actualResult || "—"}</span>}</div>
-            <div className={runStyles.stepStatus} role="cell">
-              <span className={`${runStyles.status} ${runStyles[`status_${status}`]}`}>{statusIcon[status]} {localizedLabel(locale, status)}</span>
-              {runWritable && <div className={runStyles.stepActions}><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} className={status === "passed" ? runStyles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} className={status === "failed" ? runStyles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} className={status === "blocked" ? runStyles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
-            </div>
-          </article>;
-        })}
+      <RunExecutionHeader run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive} archivePending={archivePending} onArchive={onArchive} />
+      <div className={runStyles.detailContent}>
+        <div className={runStyles.overviewLayout}>
+          <div className={runStyles.primaryColumn}>
+            <section className={runStyles.contentSection}>
+              <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
+              <p>{selectedItem.snapshot.description || (locale === "ru" ? "Описание не указано." : "No description.")}</p>
+            </section>
+            <section className={runStyles.contentSection}>
+              <header><h2>{t("runs.preconditions")}</h2></header>
+              <p>{selectedItem.snapshot.preconditions || (locale === "ru" ? "Предусловия не указаны." : "No preconditions.")}</p>
+            </section>
+            <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`}>
+              <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span></header>
+              <div className={runStyles.steps} role="table" aria-label={selectedItem.snapshot.title}>
+                {executionEntries.map((step, index) => {
+                  const result = attempt.stepResults.find((item) => item.stepId === step.id);
+                  const status = result?.status ?? "not_run";
+                  return <article className={`${runStyles.step} ${runStyles[`step_${status}`]}`} key={step.id} role="row" aria-rowindex={index + 1}>
+                    <div className={runStyles.stepTop}>
+                      <span className={runStyles.stepNumber} role="cell">{step.order}</span>
+                      <div className={runStyles.stepAction} role="cell"><span>{step.action}</span></div>
+                      <span className={`${runStyles.executionBadge} ${runStyles[`execution_${status}`]}`}>{statusIcon[status]}{localizedLabel(locale, status)}</span>
+                    </div>
+                    <div className={runStyles.stepExpected} role="cell"><small>{t("runs.expected")}</small><span>{step.expectedResult || "—"}</span></div>
+                    <div className={runStyles.stepActual} role="cell"><small>{t("runs.actual")}</small>{status === "failed" && runWritable ? <textarea aria-label={`${t("runs.actual")}: ${step.order}`} value={result?.actualResult ?? ""} onChange={(event) => onStepActual(step.id, event.target.value)} placeholder={t("runs.actualPlaceholder")} /> : <span>{status === "passed" ? result?.actualResult || step.expectedResult : result?.actualResult || "—"}</span>}</div>
+                    {runWritable && <div className={runStyles.stepActions} role="cell"><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} className={status === "passed" ? runStyles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} className={status === "failed" ? runStyles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} className={status === "blocked" ? runStyles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
+                  </article>;
+                })}
+              </div>
+            </section>
+          </div>
+          <aside className={runStyles.sideRail}>
+            <section className={runStyles.railSection}>
+              <header><h2>{locale === "ru" ? "Свойства" : "Properties"}</h2></header>
+              <div className={runStyles.propertyList}>
+                <div><span>{t("runs.status")}</span><span className={`${runStyles.executionBadge} ${runStyles[`execution_${selectedItem.status}`]}`}>{statusIcon[selectedItem.status]}{localizedLabel(locale, selectedItem.status)}</span></div>
+                <div><span>{locale === "ru" ? "Приоритет" : "Priority"}</span><PriorityBadge locale={locale} priority={selectedItem.snapshot.priority} /></div>
+                <div><span>{locale === "ru" ? "Тип" : "Type"}</span><TypeBadge locale={locale} type={selectedItem.snapshot.type} /></div>
+                <div><span>{t("runs.estimate")}</span><EstimateBadge locale={locale} minutes={selectedItem.snapshot.estimatedMinutes} /></div>
+              </div>
+            </section>
+            <section className={runStyles.railSection}>
+              <header><h2>{locale === "ru" ? "Контекст рана" : "Run context"}</h2></header>
+              <dl className={runStyles.runFacts}>
+                <div><dt>{t("runs.environment")}</dt><dd>{selectedRun.environment.name}</dd></div>
+                <div><dt>{t("runs.build")}</dt><dd>{selectedRun.build}</dd></div>
+                <div><dt>{locale === "ru" ? "Прогресс" : "Progress"}</dt><dd>{selectedRun.progress.executed} / {selectedRun.itemCount} · {selectedRun.progress.percent}%</dd></div>
+              </dl>
+            </section>
+          </aside>
+        </div>
+        {attachmentIds.length > 0 && <section className={runStyles.evidence}><strong>{t("runs.evidence")}</strong><div className={`${styles.attachmentGrid} ${runStyles.evidenceGrid}`}>{attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</div></section>}
+        {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}
       </div>
-      {attachmentIds.length > 0 && <section className={runStyles.evidence}><strong>{t("runs.evidence")}</strong><div className={`${styles.attachmentGrid} ${runStyles.evidenceGrid}`}>{attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</div></section>}
-      {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}
     </section>
     {runWritable && <footer className={runStyles.footer}>
       <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{t("runs.previous")}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{t("runs.next")}</span><ChevronRight size={16} /></button></div>
