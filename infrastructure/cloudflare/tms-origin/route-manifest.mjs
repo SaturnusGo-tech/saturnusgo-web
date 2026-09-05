@@ -25,6 +25,7 @@ export const requiredPublicAssets = Object.freeze([
   "/falcon/falcon-mark-light.png",
   "/falcon/landing/analytics-dashboard.jpg",
   "/falcon/landing/analytics-dashboard-mobile.jpg",
+  "/falcon/landing/cinematic-ambient.webp",
   "/falcon/landing/case-defect-link.jpg",
   "/falcon/landing/case-defect-link-mobile.jpg",
   "/falcon/landing/case-repository.jpg",

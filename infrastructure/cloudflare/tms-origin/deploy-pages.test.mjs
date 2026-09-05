@@ -108,6 +108,9 @@ if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.pn
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/landing/analytics-dashboard.jpg", "analytics\\n");
 write("out/falcon/landing/analytics-dashboard-mobile.jpg", "analytics mobile\\n");
+if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
+  write("out/falcon/landing/cinematic-ambient.webp", "cinematic ambient\\n");
+}
 write("out/falcon/landing/case-defect-link.jpg", "defect link\\n");
 write("out/falcon/landing/case-defect-link-mobile.jpg", "defect link mobile\\n");
 write("out/falcon/landing/case-repository.jpg", "case repository\\n");
@@ -178,6 +181,10 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
   );
   assert.equal(readFileSync(join(fixture.pages, "falcon/landing/hero.webp"), "utf8"), "falcon hero\n");
   assert.equal(
+    readFileSync(join(fixture.pages, "falcon/landing/cinematic-ambient.webp"), "utf8"),
+    "cinematic ambient\n",
+  );
+  assert.equal(
     readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
     "CURRENT TMS\n",
   );
@@ -214,6 +221,16 @@ test("fails closed when a manifest-required public asset is absent", (context) =
 
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*falcon-mark-dark\.png/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
+});
+
+test("fails closed when the cinematic landing asset is absent", (context) => {
+  const fixture = createFixture(context);
+  const pagesHeadBefore = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_CINEMATIC_ASSET: "1" });
+
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*cinematic-ambient\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
 });
 

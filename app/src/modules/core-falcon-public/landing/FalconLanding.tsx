@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
+import { FalconHeroCinema } from "./FalconHeroCinema";
 import styles from "./landing.module.css";
 
 export function FalconLanding() {
@@ -9,86 +10,64 @@ export function FalconLanding() {
     <div className={styles.page}>
       <FalconHeader />
       <main>
-        <section className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <h1>Тест-кейсы, прогоны и дефекты с общей историей</h1>
-            <p className={styles.heroLead}>
-              Falcon сохраняет ревизию кейса, окружение и сборку каждого запуска. Дефект остаётся связан с исходным шагом.
-            </p>
-            <div className={styles.heroActions}>
-              <Link className={styles.primaryButtonLarge} href="/signup/">
-                Попробовать <ArrowRight size={18} aria-hidden="true" />
-              </Link>
+        <FalconHeroCinema />
+
+        <section className={`${styles.editorialScene} ${styles.caseScene}`} id="platform">
+          <div className={styles.editorialInner}>
+            <div className={styles.editorialCopy}>
+              <SectionIntro
+                label="Тест-кейсы"
+                title="Сценарий читается с первого взгляда"
+                text="Сразу видно, что сделать, что проверить и какие материалы приложены. Изменение общего шага обновит все сценарии, где он используется."
+              />
             </div>
-          </div>
-          <ProductFrame
-            src="/falcon/landing/run-detail.jpg"
-            alt="Активный тест-ран со списком кейсов и сценарием"
-            width={2560}
-            height={1440}
-            mobileSrc="/falcon/landing/run-detail-mobile.jpg"
-            mobileWidth={780}
-            mobileHeight={1400}
-            priority
-            className={styles.heroProduct}
-          />
-        </section>
-
-        <section className={styles.storySection} id="platform">
-          <div className={styles.storyCopy}>
-            <SectionIntro
-              label="Тест-кейсы"
-              title="Сценарий, ожидаемый результат и файлы"
-              text="Основные шаги, подшаги и ожидаемый результат собраны в одной вертикали. Файлы остаются рядом с тем шагом, к которому относятся."
+            <ProductFrame
+              src="/falcon/landing/case-repository.jpg"
+              alt="Репозиторий тест-кейсов Falcon с открытой карточкой"
+              width={2174}
+              height={1628}
+              mobileSrc="/falcon/landing/case-repository-mobile.jpg"
+              mobileWidth={780}
+              mobileHeight={1400}
+              className={styles.caseProduct}
             />
-            <p className={styles.storyNote}>
-              Ручные сценарии, чек-листы и автоматизированные кейсы хранятся рядом. Общие шаги обновляются во всех связанных сценариях.
-            </p>
-          </div>
-          <ProductFrame
-            src="/falcon/landing/case-repository.jpg"
-            alt="Production-репозиторий тест-кейсов Falcon с открытой карточкой"
-            width={2174}
-            height={1628}
-            mobileSrc="/falcon/landing/case-repository-mobile.jpg"
-            mobileWidth={780}
-            mobileHeight={1400}
-          />
-        </section>
-
-        <section className={`${styles.storySection} ${styles.storyReverse}`} id="automation">
-          <ProductFrame
-            src="/falcon/landing/run-builder.jpg"
-            alt="Production-конструктор тест-рана с выбором кейсов"
-            width={2560}
-            height={1440}
-            mobileSrc="/falcon/landing/run-builder-mobile.jpg"
-            mobileWidth={780}
-            mobileHeight={1400}
-          />
-          <div className={styles.storyCopy}>
-            <SectionIntro
-              label="Запуски"
-              title="Ревизия кейса фиксируется при запуске"
-              text="Соберите точный список кейсов или динамический сьют по тегам. При запуске Falcon сохраняет ревизии кейсов, окружение и сборку."
-            />
-            <dl className={styles.runFacts}>
-              <Detail title="Состав">Конкретные кейсы или правила отбора по тегам.</Detail>
-              <Detail title="Результат">Статус шага, фактический результат и вложения.</Detail>
-            </dl>
           </div>
         </section>
 
-        <section className={styles.defectSection} id="defects">
-          <div className={styles.defectLayout}>
-            <SectionIntro
-              label="Дефекты"
-              title="Баг-репорт хранит исходный шаг"
-              text="Ожидаемый и фактический результат, вложения, запуск и задача YouTrack доступны из карточки дефекта."
+        <section className={`${styles.editorialScene} ${styles.runScene}`} id="automation">
+          <div className={styles.editorialInner}>
+            <div className={styles.editorialCopy}>
+              <SectionIntro
+                label="Запуски"
+                title="Ревизия фиксируется в момент запуска"
+                text="Откройте старый прогон — Falcon покажет сценарий таким, каким он был в момент запуска, вместе с окружением и сборкой."
+              />
+            </div>
+            <ProductFrame
+              src="/falcon/landing/run-builder.jpg"
+              alt="Конструктор тест-рана Falcon с выбором кейсов"
+              width={2560}
+              height={1440}
+              mobileSrc="/falcon/landing/run-builder-mobile.jpg"
+              mobileWidth={780}
+              mobileHeight={1400}
+              className={styles.runProduct}
             />
+          </div>
+        </section>
+
+        <section className={`${styles.editorialScene} ${styles.defectScene}`} id="defects">
+          <div className={styles.editorialInner}>
+            <div className={styles.editorialCopy}>
+              <SectionIntro
+                label="Дефекты"
+                title="Дефект начинается с исходного шага"
+                text="Создайте дефект прямо из шага. Falcon перенесёт результаты и вложения, а ссылка на задачу в YouTrack останется рядом с исходным запуском."
+              />
+            </div>
             <ProductFrame
               src="/falcon/landing/case-defect-link.jpg"
-              alt="Production-карточка баг-репорта Falcon рядом со списком дефектов"
+              alt="Карточка баг-репорта Falcon рядом со списком дефектов"
               width={2560}
               height={1440}
               mobileSrc="/falcon/landing/case-defect-link-mobile.jpg"
@@ -99,44 +78,42 @@ export function FalconLanding() {
           </div>
         </section>
 
-        <section className={styles.integrations} id="integrations">
-          <div className={styles.integrationsIntro}>
-            <p>Интеграции</p>
-            <h2>YouTrack и REST API</h2>
-          </div>
-          <div className={styles.integrationCopy}>
-            <p>Создавайте задачи YouTrack из дефекта Falcon. Для импорта, экспорта и автоматизации доступен REST API.</p>
-            <span>YouTrack&nbsp;&nbsp;·&nbsp;&nbsp;REST API&nbsp;&nbsp;·&nbsp;&nbsp;JSON</span>
-          </div>
+        <section className={styles.integrationStatement} id="integrations">
+          <p className={styles.sectionLabel}>Интеграции</p>
+          <h2>
+            Дефект уходит в YouTrack. <span>Контекст остаётся в Falcon.</span>
+          </h2>
+          <p>Импорт, экспорт и автоматизация доступны через REST API.</p>
         </section>
 
-        <section className={styles.analyticsSection} id="analytics">
-          <SectionIntro
-            label="Дашборды"
-            title="Из метрики — к кейсам, прогонам и дефектам"
-            text="Выберите период и область. Любой показатель открывает отфильтрованные кейсы, прогоны или дефекты."
-            centered
-          />
-          <ProductFrame
-            src="/falcon/landing/analytics-dashboard.jpg"
-            alt="Production-дашборд качества Falcon по проекту Umbrella-Host"
-            width={2560}
-            height={1440}
-            mobileSrc="/falcon/landing/analytics-dashboard-mobile.jpg"
-            mobileWidth={780}
-            mobileHeight={1400}
-            className={styles.analyticsProduct}
-          />
+        <section className={`${styles.editorialScene} ${styles.analyticsScene}`} id="analytics">
+          <div className={styles.editorialInner}>
+            <div className={styles.editorialCopy}>
+              <SectionIntro
+                label="Аналитика"
+                title="Метрика ведёт к причине"
+                text="За каждой метрикой — конкретные кейсы, прогоны и дефекты, которые на неё повлияли."
+              />
+            </div>
+            <ProductFrame
+              src="/falcon/landing/analytics-dashboard.jpg"
+              alt="Дашборд качества Falcon по проекту Umbrella-Host"
+              width={2560}
+              height={1440}
+              mobileSrc="/falcon/landing/analytics-dashboard-mobile.jpg"
+              mobileWidth={780}
+              mobileHeight={1400}
+              className={styles.analyticsProduct}
+            />
+          </div>
         </section>
       </main>
 
       <footer className={styles.footer} id="security">
         <div className={styles.footerCta}>
+          <h2>Перенесите первый сценарий в Falcon</h2>
           <div>
-            <h2>Создайте рабочее пространство Falcon</h2>
-          </div>
-          <div>
-            <p>Falcon создаст первый проект и окружение. Кейсы, прогоны и вложения останутся внутри вашего пространства.</p>
+            <p>Создайте отдельное пространство для команды и начните с одного проекта.</p>
             <Link className={styles.lightButton} href="/signup/">
               Попробовать <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -144,8 +121,10 @@ export function FalconLanding() {
         </div>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
-          <p>Тест-кейсы, запуски, дефекты и аналитика.</p>
-          <div><Link href="/signup/">Создать пространство</Link><Link href="/cloud-login/">Вход в облако</Link></div>
+          <div>
+            <Link href="/signup/">Создать пространство</Link>
+            <Link href="/cloud-login/">Вход в облако</Link>
+          </div>
           <span>© {new Date().getFullYear()} Falcon</span>
         </div>
       </footer>
@@ -193,17 +172,12 @@ function SectionIntro(props: {
   readonly label: string;
   readonly title: string;
   readonly text: string;
-  readonly centered?: boolean;
 }) {
   return (
-    <div className={`${styles.sectionIntro} ${props.centered ? styles.sectionIntroCentered : ""}`}>
+    <div className={styles.sectionIntro}>
       <p className={styles.sectionLabel}>{props.label}</p>
       <h2>{props.title}</h2>
       <p className={styles.sectionLead}>{props.text}</p>
     </div>
   );
-}
-
-function Detail({ title, children }: { readonly title: string; readonly children: string }) {
-  return <div><dt>{title}</dt><dd>{children}</dd></div>;
 }

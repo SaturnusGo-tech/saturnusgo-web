@@ -41,8 +41,6 @@
 
 final result: passed
 
----
-
 # Design QA — Falcon public landing, production-data pass
 
 - source visual truth: `https://qatools.ru/`
@@ -156,5 +154,45 @@ final result: passed
 - [x] same-viewport reference comparison and desktop/mobile visual inspection
 - [x] responsive menu, registration choices, cloud login, and geometry checked in the in-app browser
 - [x] full repository production static export — 62/62 pages after adding the required Suspense boundaries to legacy investor and career routes
+
+final result: passed
+
+---
+
+# Design QA — Falcon cinematic landing, selected variant 1
+
+- selected visual target: `.design-audit/2026-09-05-falcon-scroll-motion/11-selected-cinematic-run.png`
+- normalized reference: `.design-audit/2026-09-05-falcon-scroll-motion/14-reference-1440.png`
+- final implementation state: `.design-audit/2026-09-05-falcon-scroll-motion/21-implementation-final-ghost-1440.png`
+- combined reference/implementation board: `.design-audit/2026-09-05-falcon-scroll-motion/22-reference-vs-final-ghost.png`
+- final mobile state: `.design-audit/2026-09-05-falcon-scroll-motion/20-mobile-final-320.png`
+- chapter contact sheet: `.design-audit/2026-09-05-falcon-scroll-motion/28-page-contact-sheet.png`
+- viewports: 1440 × 1024 and 320 × 760 CSS px
+
+## Findings
+
+- The selected dark cinematic direction is implemented with a sticky scroll sequence: the opening promise recedes with controlled blur, the run-context statement resolves into focus, and the current production run screen rises into the viewport with scale and perspective depth.
+- The header now contains only Falcon, `Войти`, and `Попробовать`; the temporary product-category navigation is removed.
+- All product chapters use current authenticated production screenshots and a restrained editorial rhythm instead of numbered feature tiles, pills, repeated cards, or generic marketing blocks.
+- The generated ambient image is served as a 2560 × 1440 WebP asset and is covered by the fail-closed Pages release manifest.
+- The same-viewport comparison was judged as one image. Hero centerline, background depth, statement hierarchy, product reveal, and fold composition match the selected variant without copying another product's identity.
+- The outgoing hero remains as a subtle blurred depth layer. The scroll cue disappears before the screenshot reaches it.
+- At 320 px the brand and both auth actions remain visible, the hero becomes a readable static sequence, and document/body widths stay exactly 320 px without horizontal overflow.
+- Keyboard focus cannot enter the visually hidden opening CTA. Focus treatment is high-contrast, semantic hero phases use one `h1` followed by an `h2`, and reduced-motion mode disables both motion transforms and global smooth scrolling.
+- Three independent final reviews found no remaining P0, P1, or P2 issues in visual matching, runtime/accessibility, or product copy.
+
+## Verification
+
+- [x] selected reference and final implementation inspected together at 1440 × 1024
+- [x] desktop hero, all product chapters, integration statement, footer CTA, and 320 px layout inspected in the in-app browser
+- [x] hidden/visible CTA tab order and scroll-cue opacity verified at runtime
+- [x] one `h1`, semantic hero `h2`, direct auth links, and zero horizontal overflow verified in rendered DOM
+- [x] `npm run typecheck`
+- [x] `npm run test:tms-auth` — 38/38 passed
+- [x] `npm run test:tms-worker` — 28/28 passed
+- [x] `npm run test:tms-attachments` — 6/6 passed
+- [x] `npm run test:tms-adapters` — 188/188 passed
+- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
+- [x] `git diff --check`
 
 final result: passed

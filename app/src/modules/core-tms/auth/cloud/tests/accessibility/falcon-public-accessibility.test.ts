@@ -16,17 +16,19 @@ test("Falcon public routes keep their Russian document language", () => {
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon mobile navigation retains modal keyboard and background isolation", () => {
+test("Falcon public header keeps direct auth actions without feature navigation", () => {
   const source = readFileSync(resolve(
     root,
     "app/src/modules/core-falcon-public/landing/FalconHeader.tsx",
   ), "utf8");
 
-  assert.match(source, /role=\{open \? "dialog" : undefined\}/);
-  assert.match(source, /aria-modal=\{open \? "true" : undefined\}/);
-  assert.match(source, /element\.inert = true/);
-  assert.match(source, /event\.key !== "Tab"/);
-  assert.match(source, /menuButtonRef\.current \?\? previouslyFocused/);
+  assert.match(source, /<FalconBrand inverse \/>/);
+  assert.match(source, /href=\{TMS_ADMIN_LOGIN_PATH\}>Войти<\/Link>/);
+  assert.match(source, /href="\/signup\/">Попробовать<\/Link>/);
+  assert.doesNotMatch(source, /const navigation/);
+  assert.doesNotMatch(source, /falcon-mobile-menu/);
+  assert.doesNotMatch(source, /aria-modal/);
+  assert.doesNotMatch(source, />Кейсы<|>Прогоны<|>Дефекты<|>Аналитика</);
 });
 
 test("Falcon auth controls use a solid high-contrast focus indicator", () => {
