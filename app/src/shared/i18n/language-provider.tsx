@@ -10,7 +10,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 
+import { htmlLanguageForPath } from "../_components/route-flags";
 import { dictionaries, type Dictionary } from "./dictionaries";
 import {
   DEFAULT_LOCALE,
@@ -113,6 +115,7 @@ function persistLocale(locale: Locale) {
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const hasLoadedStoredLocale = useRef(false);
   const [locale, setLocaleState] = useState<Locale>(() => readStoredLocale());
+  const pathname = usePathname();
 
   useEffect(() => {
     hasLoadedStoredLocale.current = true;
@@ -120,9 +123,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = LOCALE_META[locale].htmlLang;
+    document.documentElement.lang = htmlLanguageForPath(pathname, LOCALE_META[locale].htmlLang);
     document.documentElement.dataset.locale = locale;
+  }, [locale, pathname]);
 
+  useEffect(() => {
     if (!hasLoadedStoredLocale.current) {
       return;
     }

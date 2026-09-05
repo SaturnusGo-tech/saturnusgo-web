@@ -6,7 +6,7 @@ import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/
 import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
-import { PrioritySignal, prioritySignalRank } from "../cases/list/PrioritySignal";
+import { PrioritySignal, prioritySignalRank } from "../cases/list/priority/PrioritySignal";
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import surface from "./reports.module.css";
 

@@ -14,6 +14,7 @@ import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
+import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
@@ -57,28 +58,10 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
     if (selectedRun) setListMode(selectedRun.archivedAt ? "archived" : "active");
   }, [selectedRun?.archivedAt, selectedRun?.id]);
   const runWritable = Boolean(selectedRun && !selectedRun.archivedAt && selectedRun.status === "active");
-  useEffect(() => {
-    if (!selectedRun || !selectedItem) return;
-    function handleShortcut(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
-      const index = items.findIndex((item) => item.id === selectedItem!.id);
-      const activeAttempt = selectedItem!.attempts.find((item) => item.attemptNo === selectedItem!.activeAttemptNo) ?? selectedItem!.attempts[0];
-      const requiredPassed = executableSteps(selectedItem!.snapshot).filter((step) => step.required).every((step) => activeAttempt.stepResults.find((result) => result.stepId === step.id)?.status === "passed");
-      const hasProcedure = executableSteps(selectedItem!.snapshot).length > 0;
-      const hasFailure = selectedItem!.status === "failed" || activeAttempt.stepResults.some((result) => result.status === "failed");
-      const key = event.key.toLowerCase();
-      if ((event.metaKey || event.ctrlKey) && event.key === "[") { event.preventDefault(); const previous = items[index - 1]; if (previous) onSelectItem(previous.id); }
-      else if ((event.metaKey || event.ctrlKey) && event.key === "]") { event.preventDefault(); const next = items[index + 1]; if (next) onSelectItem(next.id); }
-      else if (key === "b" && runWritable) { event.preventDefault(); onItemStatus("blocked"); }
-      else if (key === "f" && runWritable) { event.preventDefault(); onItemStatus("failed"); }
-      else if (key === "p" && runWritable && requiredPassed) { event.preventDefault(); onItemStatus("passed"); }
-      else if (key === "e" && runWritable) { event.preventDefault(); document.getElementById(`run-evidence-${selectedItem!.id}`)?.click(); }
-      else if (key === "r" && runWritable && hasFailure && hasProcedure) { event.preventDefault(); setReporting(true); }
-    }
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
-  }, [items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun]);
+  useRunKeyboardShortcuts({
+    items, selectedItem, selectedRun, runWritable, onItemStatus, onSelectItem,
+    setReporting,
+  });
   async function addEvidence(files: File[]) {
     if (!selectedRun || !selectedItem || files.length === 0) return;
     setEvidenceError("");

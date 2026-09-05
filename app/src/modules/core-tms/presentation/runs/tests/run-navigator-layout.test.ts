@@ -4,17 +4,18 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const view = readFileSync(fileURLToPath(new URL("../navigator/RunNavigator.tsx", import.meta.url)), "utf8");
+const picker = readFileSync(fileURLToPath(new URL("../navigator/picker/RunPicker.tsx", import.meta.url)), "utf8");
 const marquee = readFileSync(fileURLToPath(new URL("../navigator/RunNameMarquee.tsx", import.meta.url)), "utf8");
 const styles = readFileSync(fileURLToPath(new URL("../navigator/run-navigator.module.css", import.meta.url)), "utf8");
 const executionHeader = readFileSync(fileURLToPath(new URL("../header/RunExecutionHeader.tsx", import.meta.url)), "utf8");
 const runsView = readFileSync(fileURLToPath(new URL("../RunsView.tsx", import.meta.url)), "utf8");
 const runStyles = readFileSync(fileURLToPath(new URL("../runs.module.css", import.meta.url)), "utf8");
-const prioritySignal = readFileSync(fileURLToPath(new URL("../../cases/list/PrioritySignal.tsx", import.meta.url)), "utf8");
+const prioritySignal = readFileSync(fileURLToPath(new URL("../../cases/list/priority/PrioritySignal.tsx", import.meta.url)), "utf8");
 
 test("run picker keeps long names compact and calmly reveals their full text", () => {
-  assert.match(view, /className=\{styles\.pickerTriggerText\}/);
-  assert.match(view, /<RunNameMarquee name=\{selectedRun\?\.name \?\? emptyLabel\} motion="always" \/>/);
-  assert.match(view, /<RunNameMarquee name=\{run\.name\} motion="interaction" \/>/);
+  assert.match(picker, /className=\{styles\.pickerTriggerText\}/);
+  assert.match(picker, /<RunNameMarquee name=\{props\.selectedRun\?\.name \?\? props\.emptyLabel\} motion="always" \/>/);
+  assert.match(picker, /<RunNameMarquee name=\{run\.name\} motion="interaction" \/>/);
   assert.doesNotMatch(view, /<small>\{selectedRun\.key\}<\/small>/);
   assert.match(marquee, /title=\{name\}/);
   assert.match(marquee, /content\.scrollWidth - viewport\.clientWidth/);

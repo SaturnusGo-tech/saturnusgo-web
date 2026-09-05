@@ -5,7 +5,8 @@ import { calculateFileSha256 } from "./infrastructure/digest/file-sha256";
 
 export interface AttachmentClientConfiguration {
   readonly apiBase: string;
-  readonly accessToken: AccessTokenProvider;
+  readonly accessToken?: AccessTokenProvider;
+  readonly credentials?: RequestCredentials;
   readonly fetch?: typeof fetch;
 }
 

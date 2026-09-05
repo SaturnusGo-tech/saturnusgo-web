@@ -5,7 +5,7 @@ import type { TmsLocale } from "../../../localization/model/locale";
 import { groupCaseRows, visibleCaseTabStop, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
 import type { CaseListRow, CaseSort, CaseSortKey } from "../types";
 import { CaseTypeIcon, LifecycleBadge } from "./CaseBadges";
-import { PrioritySignal } from "./PrioritySignal";
+import { PrioritySignal } from "./priority/PrioritySignal";
 import { CaseSelectionCheckbox } from "../bulk/checkbox/CaseSelectionCheckbox";
 import { CaseSelectionHeader } from "../bulk/checkbox/CaseSelectionHeader";
 import { selectionCoverage, type SelectionCoverage } from "../bulk/selection/caseSelection";

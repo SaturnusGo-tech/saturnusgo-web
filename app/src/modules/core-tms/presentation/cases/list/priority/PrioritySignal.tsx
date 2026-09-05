@@ -1,6 +1,6 @@
 import { Diamond, Triangle } from "lucide-react";
 
-import styles from "./prioritySignal.module.css";
+import styles from "../prioritySignal.module.css";
 
 export type PrioritySignalLevel = "low" | "medium" | "high" | "critical";
 

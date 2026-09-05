@@ -75,3 +75,52 @@ final result: passed
 - [x] source and implementation judged together in one same-viewport comparison image
 
 final result: passed
+
+---
+
+# Design QA — Falcon public onboarding
+
+- source visual truth: `/tmp/qatools-reference-home-viewport.png` and `/tmp/qatools-reference-home-full.png`
+- same-viewport implementation: `.design-qa/falcon-public-reference-viewport-1280x720.png`
+- combined reference/implementation board: `.design-qa/falcon-comparison-1280x720.png` (2560 × 720; source left, Falcon right)
+- desktop implementation: `.design-qa/falcon-public-hero-1440x900.png`
+- mobile implementation: `.design-qa/falcon-public-mobile-390x844.png`
+- mobile navigation: `.design-qa/falcon-public-mobile-menu-390x844.png`
+- personal registration: `.design-qa/falcon-signup-1440x900.png` and `.design-qa/falcon-signup-mobile-390x844.png`
+- organization wait-state: `.design-qa/falcon-signup-organization-1440x900.png`
+- returning-user login: `.design-qa/falcon-cloud-login-1440x900.png`
+- integrations section: `.design-qa/falcon-public-integrations-1280x720.png`
+- viewports: 1280 × 720, 1440 × 900, and 390 × 844 CSS px
+- states: landing, responsive menu, personal registration, staged organization path, cloud login
+
+## Comparison
+
+- The landing preserves the reference's compact header, centered hero, paired calls to action, real product preview at the fold, alternating feature narratives, final CTA, and dense footer.
+- QAtools branding, copy, purple/blue gradients, and reference imagery are intentionally replaced with Falcon's own warm monochrome identity and real Falcon product screenshots.
+- The hero and product preview retain the reference's information hierarchy at the same 1280 × 720 viewport without cloning copyrighted text or assets.
+- The combined 2560 × 720 board was inspected as one image: header height, hero centerline, CTA grouping, fold position, and product-preview footprint align closely; Falcon's warmer neutral surface and black primary action are intentional identity changes.
+- The public routes render through a dedicated Falcon server layout. No legacy SaturnusGo header, footer, background, or unrelated navigation is present in their server HTML.
+- Personal registration and cloud login use the same visual system as the landing. The organization choice is clearly marked as forthcoming and cannot create a fake workspace.
+
+## Findings
+
+- No actionable P0, P1, or P2 visual defects remain in the requested landing and onboarding surfaces.
+- Desktop and mobile pages have no horizontal overflow. The mobile menu fills the viewport, scrolls when needed, exposes dialog semantics, and closes with Escape.
+- Inputs use visible monochrome focus treatment without browser-blue outlines; labels, consent links, password visibility controls, loading, errors, and success feedback remain keyboard accessible.
+- Admin OAuth and cloud account entry remain visibly distinct. Explicit admin entry and OAuth callback parameters bypass cloud-session probing; cloud probe failures render a recoverable retry state instead of silently redirecting users.
+- Registration enforces the current server contract: a 12–128-character password, explicit consent, `termsAccepted: true`, cookie credentials, and a payload-stable idempotency key.
+- Fresh in-app-browser verification confirmed `/`, `/signup/`, `/cloud-login/`, the disabled organization state, and the existing Auth0 consent handoff from `?auth=admin`.
+
+## Verification
+
+- [x] `npm run typecheck`
+- [x] `npm run test:tms-auth` — 34/34 passed
+- [x] `npm run test:tms-attachments` — 6/6 passed
+- [x] `git diff --check`
+- [x] clean server HTML for `/`, `/signup/`, and `/cloud-login/` with zero legacy navigation links
+- [x] legacy `/features/` route still renders its original shell
+- [x] same-viewport reference comparison and desktop/mobile visual inspection
+- [x] responsive menu, registration choices, cloud login, and geometry checked in the in-app browser
+- [x] full repository production static export — 62/62 pages after adding the required Suspense boundaries to legacy investor and career routes
+
+final result: passed

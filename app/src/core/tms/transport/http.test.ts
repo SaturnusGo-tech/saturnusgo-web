@@ -32,6 +32,22 @@ test("adds bearer authorization to reads and mutations without ambient credentia
   }
 });
 
+test("uses the HttpOnly cloud session without adding an authorization header", async () => {
+  let request: RequestInit | undefined;
+  const client = createTmsHttpClient({
+    apiBase: "https://api.example.test/api/v1",
+    production: true,
+    credentials: "include",
+    fetch: (async (_resource, init = {}) => {
+      request = init;
+      return new Response(JSON.stringify({ data: { id: "cloud-result" } }), { status: 200 });
+    }) as typeof fetch,
+  });
+  assert.deepEqual(await client.get("/bootstrap"), { data: { id: "cloud-result" } });
+  assert.equal(request?.credentials, "include");
+  assert.equal(new Headers(request?.headers).has("authorization"), false);
+});
+
 test("preserves cancellation and never starts an unauthorized request", async () => {
   const controller = new AbortController();
   const reason = new DOMException("Navigation cancelled", "AbortError");

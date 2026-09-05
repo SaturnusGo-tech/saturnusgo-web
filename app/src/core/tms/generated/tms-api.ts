@@ -13,11 +13,94 @@ export interface paths {
         };
         /**
          * Report API readiness
-         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is compatible with the running artifact. Stage A accepts 0017 through 0018 with both new feature flags disabled; Stage B requires exactly 0018.
+         * @description Returns ok only when PostgreSQL is reachable and its migration ledger is exactly compatible with this artifact. Cloud authentication is always registered, so this release requires physical schema 0021 even when independent feature flags are disabled.
          */
         get: operations["getHealth"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cloud-auth/register": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register an isolated personal Falcon tenant
+         * @description Creates one local cloud identity, an unverified profile, a personal workspace, owner membership, default project and environment, and an opaque cookie session atomically. Explicit acceptance of the current server-controlled terms version is required and recorded. No email or phone verification is claimed. Replays require the same email-scoped key, canonical non-secret payload, matching profile, and valid password. Tenant resources converge idempotently; each successful credential-validated replay rotates to a fresh opaque cookie session without persisting a raw token.
+         */
+        post: operations["registerCloudAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cloud-auth/login": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start a local cloud session */
+        post: operations["loginCloudAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cloud-auth/session": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspect the optional local cloud session */
+        get: operations["getCloudSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cloud-auth/logout": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke the local cloud session */
+        post: operations["logoutCloudAccount"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1430,6 +1513,68 @@ export interface components {
         Identifier: string;
         /** Format: date-time */
         Timestamp: string;
+        CloudRegistrationRequest: {
+            givenName: string;
+            familyName: string;
+            /** Format: email */
+            email: string;
+            phone: string;
+            password: string;
+            /**
+             * @description Explicit acceptance of the current Falcon terms version. The server records its own immutable version and timestamp.
+             * @constant
+             */
+            termsAccepted: true;
+        };
+        CloudLoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        CloudAuthenticatedSession: {
+            /** @constant */
+            authenticated: true;
+            identity: {
+                id: components["schemas"]["Identifier"];
+                givenName: string;
+                familyName: string;
+                /** Format: email */
+                email: string;
+                phone: string;
+                /** @constant */
+                emailVerificationStatus: "unverified";
+                /** @constant */
+                phoneVerificationStatus: "unverified";
+            };
+            workspace: {
+                id: components["schemas"]["Identifier"];
+                name: string;
+                slug: string;
+            };
+            membership: {
+                /** @constant */
+                role: "workspace_admin";
+            };
+            defaultProject: {
+                id: components["schemas"]["Identifier"];
+                name: string;
+                slug: string;
+            };
+            defaultEnvironment: {
+                id: components["schemas"]["Identifier"];
+                name: string;
+            };
+        };
+        CloudAnonymousSession: {
+            /** @constant */
+            authenticated: false;
+        };
+        CloudAuthenticatedSessionEnvelope: {
+            data: components["schemas"]["CloudAuthenticatedSession"];
+        };
+        CloudSessionEnvelope: {
+            data: components["schemas"]["CloudAuthenticatedSession"] | components["schemas"]["CloudAnonymousSession"];
+        };
         ShortText: string;
         LongText: string;
         StringMap: {
@@ -1820,7 +1965,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "INTERNAL_ERROR";
+        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "QUOTA_EXCEEDED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "INTEGRATION_DISABLED" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "INTERNAL_ERROR";
         ValidationIssue: {
             field: string;
             code: string;
@@ -3190,6 +3335,41 @@ export interface components {
         };
     };
     responses: {
+        /** @description Personal tenant and local cloud session created or safely replayed. */
+        CloudRegistrationResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                /** @description Opaque HttpOnly cloud session cookie. */
+                "Set-Cookie"?: string;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CloudAuthenticatedSessionEnvelope"];
+            };
+        };
+        /** @description Current authenticated cloud account, or an explicit anonymous state. */
+        CloudSessionResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                /** @description Present when a new session was issued. */
+                "Set-Cookie"?: string;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CloudSessionEnvelope"];
+            };
+        };
+        /** @description Session revoked and cookie expired. */
+        CloudLogoutResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                /** @description Expires the cloud session cookie. */
+                "Set-Cookie"?: string;
+                [name: string]: unknown;
+            };
+            content?: never;
+        };
         /** @description Service is ready to accept requests. */
         HealthResponse: {
             headers: {
@@ -3744,6 +3924,17 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
+        /** @description The authentication attempt budget was exhausted. */
+        TooManyRequests: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
         /** @description The upload intent expired and cannot be finalized. */
         Gone: {
             headers: {
@@ -4004,6 +4195,16 @@ export interface components {
                 "application/json": components["schemas"]["DashboardCreateRequest"];
             };
         };
+        CloudRegistration: {
+            content: {
+                "application/json": components["schemas"]["CloudRegistrationRequest"];
+            };
+        };
+        CloudLogin: {
+            content: {
+                "application/json": components["schemas"]["CloudLoginRequest"];
+            };
+        };
         DashboardPatch: {
             content: {
                 "application/merge-patch+json": components["schemas"]["DashboardPatchRequest"];
@@ -4038,6 +4239,82 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["HealthResponse"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    registerCloudAccount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["CloudRegistration"];
+        responses: {
+            200: components["responses"]["CloudRegistrationResponse"];
+            201: components["responses"]["CloudRegistrationResponse"];
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    loginCloudAccount: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["CloudLogin"];
+        responses: {
+            200: components["responses"]["CloudSessionResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCloudSession: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CloudSessionResponse"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    logoutCloudAccount: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: components["responses"]["CloudLogoutResponse"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };

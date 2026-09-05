@@ -7,7 +7,8 @@ export type AccessTokenProvider = (signal?: AbortSignal) => Promise<string>;
 
 export interface AttachmentApiConfiguration {
   readonly apiBase: string;
-  readonly accessToken: AccessTokenProvider;
+  readonly accessToken?: AccessTokenProvider;
+  readonly credentials?: RequestCredentials;
   readonly fetch?: typeof fetch;
 }
 
@@ -54,7 +55,7 @@ export function createAttachmentApi(configuration: AttachmentApiConfiguration) {
   const fetcher = configuration.fetch ?? fetch;
   async function token(signal?: AbortSignal): Promise<string> {
     try {
-      const value = await configuration.accessToken(signal);
+      const value = await configuration.accessToken!(signal);
       if (!/^\S{1,8192}$/.test(value)) throw new Error("invalid bearer token");
       return value;
     } catch (error) {
@@ -66,9 +67,13 @@ export function createAttachmentApi(configuration: AttachmentApiConfiguration) {
   return async function request<T>(path: string, init: RequestInit): Promise<{ data: T; response: Response }> {
     const signal = init.signal ?? undefined;
     const headers = new Headers(init.headers);
-    headers.set("Authorization", `Bearer ${await token(signal)}`);
+    const credentials = configuration.credentials ?? "omit";
+    if (configuration.accessToken) headers.set("Authorization", `Bearer ${await token(signal)}`);
+    else if (credentials !== "include") {
+      throw new AttachmentClientError("AUTHENTICATION_REQUIRED", "TMS session is unavailable.");
+    }
     const response = await fetcher(`${base}${path}`, {
-      ...init, headers, cache: "no-store", credentials: "omit", redirect: "error",
+      ...init, headers, cache: "no-store", credentials, redirect: "error",
     });
     if (!response.ok) throw await apiError(response);
     return { data: responseData<T>(await response.json()), response };

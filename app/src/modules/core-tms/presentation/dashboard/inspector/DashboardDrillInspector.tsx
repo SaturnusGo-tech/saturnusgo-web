@@ -9,7 +9,7 @@ import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import surface from "../dashboard.module.css";
 import { DashboardDrillFacets } from "./facets/DashboardDrillFacets";
 import { DashboardDrillTable } from "./table/DashboardDrillTable";
-import { isPrioritySignalLevel, prioritySignalRank } from "../../cases/list/PrioritySignal";
+import { isPrioritySignalLevel, prioritySignalRank } from "../../cases/list/priority/PrioritySignal";
 import { activeDrillTab, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab, type DashboardLocalFilters } from "./dashboard-drill-navigation";
 
 const EMPTY_FILTERS: DashboardLocalFilters = {

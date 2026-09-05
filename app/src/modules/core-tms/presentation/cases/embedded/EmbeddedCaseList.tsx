@@ -4,7 +4,7 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { CaseTypeIcon, LifecycleBadge } from "../list/CaseBadges";
-import { PrioritySignal, prioritySignalRank } from "../list/PrioritySignal";
+import { PrioritySignal, prioritySignalRank } from "../list/priority/PrioritySignal";
 import styles from "./embeddedCaseList.module.css";
 
 type Props = {

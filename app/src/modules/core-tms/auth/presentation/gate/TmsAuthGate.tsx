@@ -10,12 +10,16 @@ import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticated
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
 import {
   claimTmsInteractiveLogin,
+  clearTmsLogoutIntent,
   consumeTmsLogoutIntent,
+  rememberTmsLogoutIntent,
   resolveTmsAuthEntryStage,
   restoredDuringTmsLogin,
+  tmsAdminLogoutReturnTo,
   tmsReturnPathFromLocation,
   tmsSignedOutDestination,
 } from "../../navigation/tms-auth-route";
+import { TmsSessionProvider } from "../session/TmsSessionContext";
 import { TmsAuthState } from "../state/TmsAuthState";
 
 export function TmsAuthGate({
@@ -42,6 +46,23 @@ export function TmsAuthGate({
     () => createAuthenticatedTmsHttpClient({ apiBase, accessToken }),
     [accessToken, apiBase],
   );
+  const sessionIdentity = useMemo(() => ({
+    kind: "admin" as const,
+    label: auth.user?.name ?? auth.user?.email ?? "Falcon admin",
+    signOut: async () => {
+      // Keep the explicit admin selector through the Auth0 round trip. Without it,
+      // a simultaneous cloud cookie could capture the return before the logout
+      // intent is consumed by this gate.
+      const returnTo = tmsAdminLogoutReturnTo(window.location.origin);
+      try { rememberTmsLogoutIntent(window.sessionStorage); } catch {}
+      try {
+        await auth.logout({ logoutParams: { returnTo } });
+      } catch (error) {
+        try { clearTmsLogoutIntent(window.sessionStorage); } catch {}
+        throw error;
+      }
+    },
+  }), [auth.logout, auth.user?.email, auth.user?.name]);
   const login = useCallback(() => {
     setActionFailed(false);
     loginStarted.current = true;
@@ -91,10 +112,12 @@ export function TmsAuthGate({
     return <TmsAuthState kind="error" onAction={login} />;
   }
   return (
-    <TmsHttpClientProvider client={httpClient}>
-      <AttachmentClientProvider client={attachmentClient}>
-        {children}
-      </AttachmentClientProvider>
-    </TmsHttpClientProvider>
+    <TmsSessionProvider value={sessionIdentity}>
+      <TmsHttpClientProvider client={httpClient}>
+        <AttachmentClientProvider client={attachmentClient}>
+          {children}
+        </AttachmentClientProvider>
+      </TmsHttpClientProvider>
+    </TmsSessionProvider>
   );
 }

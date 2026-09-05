@@ -32,7 +32,8 @@ export interface TmsHttpClient {
 
 export interface TmsHttpClientConfiguration {
   readonly apiBase: string;
-  readonly accessToken: TmsAccessTokenProvider;
+  readonly accessToken?: TmsAccessTokenProvider;
+  readonly credentials?: RequestCredentials;
   readonly fetch?: typeof fetch;
   readonly production?: boolean;
 }
@@ -103,6 +104,7 @@ export function createTmsHttpClient(
     configuration.production ?? process.env.NODE_ENV === "production",
   );
   const fetcher = configuration.fetch ?? fetch;
+  const credentials = configuration.credentials ?? "omit";
 
   async function payload<T>(response: Response): Promise<T> {
     if (response.status === 204) return undefined as T;
@@ -110,15 +112,20 @@ export function createTmsHttpClient(
   }
 
   async function request(path: string, init: RequestInit, signal?: AbortSignal): Promise<Response> {
-    const token = await bearer(configuration.accessToken, signal);
     const headers = new Headers(init.headers);
-    headers.set("Authorization", `Bearer ${token}`);
+    if (configuration.accessToken) {
+      headers.set("Authorization", `Bearer ${await bearer(configuration.accessToken, signal)}`);
+    } else if (credentials !== "include") {
+      throw new TmsApiError(
+        "TMS authentication is required.", 401, null, "AUTHENTICATION_REQUIRED",
+      );
+    }
     const response = await fetcher(`${apiBase}${path}`, {
       ...init,
       headers,
       signal,
       cache: "no-store",
-      credentials: "omit",
+      credentials,
       redirect: "error",
     });
     if (!response.ok) {

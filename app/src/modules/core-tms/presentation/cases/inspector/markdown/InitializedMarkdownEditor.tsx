@@ -25,6 +25,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
+import { markdownEditorTranslation } from "./translations/markdownEditorTranslation";
 import css from "./markdownField.module.css";
 
 export type InitializedMarkdownEditorProps = {
@@ -45,48 +46,6 @@ export function stripRawHtml(markdown: string) {
     .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*?)?\s*\/?>/g, "")
     .replace(/<(?:!DOCTYPE|\?xml)[^>]*>/gi, "");
-}
-
-const RU_TRANSLATIONS: Record<string, string> = {
-  "toolbar.bold": "Жирный",
-  "toolbar.removeBold": "Убрать жирный",
-  "toolbar.italic": "Курсив",
-  "toolbar.removeItalic": "Убрать курсив",
-  "toolbar.strikethrough": "Зачёркнутый",
-  "toolbar.removeStrikethrough": "Убрать зачёркивание",
-  "toolbar.code": "Код",
-  "toolbar.removeCode": "Убрать код",
-  "toolbar.inlineCode": "Код",
-  "toolbar.removeInlineCode": "Убрать код",
-  "toolbar.undo": "Отменить",
-  "toolbar.redo": "Повторить",
-  "toolbar.bulletedList": "Маркированный список",
-  "toolbar.numberedList": "Нумерованный список",
-  "toolbar.checkList": "Чек-лист",
-  "toolbar.toggleGroup": "Списки",
-  "toolbar.link": "Добавить ссылку",
-  "createLink.urlPlaceholder": "Вставьте адрес ссылки",
-  "createLink.text": "Текст ссылки",
-  "createLink.textTooltip": "Текст, который будет виден в документе",
-  "createLink.title": "Подсказка",
-  "createLink.titleTooltip": "Необязательная подсказка при наведении",
-  "createLink.saveTooltip": "Сохранить ссылку",
-  "createLink.cancelTooltip": "Отменить добавление ссылки",
-  "dialogControls.save": "Сохранить",
-  "dialogControls.cancel": "Отмена",
-};
-
-function editorTranslation(
-  locale: TmsLocale,
-  key: string,
-  fallback: string,
-  interpolations: Record<string, unknown> = {},
-) {
-  const template = locale === "ru" ? (RU_TRANSLATIONS[key] ?? fallback) : fallback;
-  return Object.entries(interpolations).reduce(
-    (value, [name, replacement]) => value.replaceAll(`{{${name}}}`, String(replacement)),
-    template,
-  );
 }
 
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
@@ -184,7 +143,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       plugins={plugins}
       translation={(key, fallback, interpolations) => key === "contentArea.editableMarkdown"
         ? props.label
-        : editorTranslation(props.locale, key, fallback, interpolations)}
+        : markdownEditorTranslation(props.locale, key, fallback, interpolations)}
       onError={() => setProblem(props.locale === "ru"
         ? "Часть форматирования не поддерживается. Удалите HTML-разметку."
         : "Some formatting is unsupported. Remove raw HTML markup.")}

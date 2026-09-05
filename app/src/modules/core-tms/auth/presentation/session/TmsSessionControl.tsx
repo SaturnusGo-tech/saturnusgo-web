@@ -1,14 +1,9 @@
 "use client";
 
-import { useAuth0 } from "@auth0/auth0-react";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import {
-  clearTmsLogoutIntent,
-  rememberTmsLogoutIntent,
-  TMS_AUTH_ROUTE_PATH,
-} from "../../navigation/tms-auth-route";
+import { useTmsSession } from "./TmsSessionContext";
 import styles from "../../../tms.module.css";
 
 function initials(value: string): string {
@@ -18,26 +13,13 @@ function initials(value: string): string {
 }
 
 export function TmsSessionControl() {
-  const { logout, user } = useAuth0();
+  const session = useTmsSession();
   const { t } = useTmsLocale();
   const [failed, setFailed] = useState(false);
-  const label = user?.name ?? user?.email ?? t("auth.account");
+  const label = session.label || t("auth.account");
   const signOut = () => {
     setFailed(false);
-    const returnTo = new URL(TMS_AUTH_ROUTE_PATH, window.location.origin).href;
-    try {
-      rememberTmsLogoutIntent(window.sessionStorage);
-    } catch {
-      // Logout still clears Auth0 even when session storage is unavailable.
-    }
-    void logout({ logoutParams: { returnTo } }).catch(() => {
-      try {
-        clearTmsLogoutIntent(window.sessionStorage);
-      } catch {
-        // There is no marker to clean up when session storage is unavailable.
-      }
-      setFailed(true);
-    });
+    void session.signOut().catch(() => setFailed(true));
   };
   return (
     <div className={styles.authSession}>

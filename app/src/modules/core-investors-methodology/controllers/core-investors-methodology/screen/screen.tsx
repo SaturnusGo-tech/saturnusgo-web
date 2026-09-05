@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MethodologyClient from "../../../ui/methodology-client";
 
 export const metadata = {
@@ -13,5 +14,7 @@ export default function Page({
 }) {
   const h =
     searchParams?.h === "5" ? "5" : searchParams?.h === "10" ? "10" : "3";
-  return <MethodologyClient initialH={h} />;
+  return <Suspense fallback={null}>
+    <MethodologyClient initialH={h} />
+  </Suspense>;
 }

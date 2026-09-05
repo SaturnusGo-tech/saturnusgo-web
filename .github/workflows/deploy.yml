@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -34,6 +34,9 @@ jobs:
 
       - name: Check TMS architecture
         run: npm run architecture:tms
+
+      - name: Test TMS Worker release controls
+        run: npm run test:tms-worker
 
       - name: Validate TMS production API boundary
         run: |

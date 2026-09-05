@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { JOBS, JOB_MAP, type Job }  from "../../../../../shared/lib/jobs";
 import JobDetailClient from "./JobDetailClient";
 
@@ -16,5 +17,7 @@ export default function Page({ params }: { params: { id: string } }) {
   if (!job) return notFound();
 
   // Передаём статический снэпшот (клиент может дообновить из query/localStorage)
-  return <JobDetailClient id={params.id} initialJob={job} />;
+  return <Suspense fallback={null}>
+    <JobDetailClient id={params.id} initialJob={job} />
+  </Suspense>;
 }

@@ -19,7 +19,8 @@ type AccessEnvelopeDto = components["schemas"]["AttachmentAccessEnvelope"];
 export type { AccessTokenProvider } from "./http/attachment-api";
 export interface AttachmentHttpTransportConfiguration {
   readonly apiBase: string;
-  readonly accessToken: AccessTokenProvider;
+  readonly accessToken?: AccessTokenProvider;
+  readonly credentials?: RequestCredentials;
   readonly fetch?: typeof fetch;
 }
 

@@ -2,7 +2,7 @@ import { Bot, Bug, ChevronDown, ChevronRight, CircleDashed, ClipboardCheck, Exte
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../../localization/format/labels";
-import { isPrioritySignalLevel, PrioritySignal } from "../../../cases/list/PrioritySignal";
+import { isPrioritySignalLevel, PrioritySignal } from "../../../cases/list/priority/PrioritySignal";
 import surface from "../../dashboard.module.css";
 
 const icon = (row: DashboardDrillRow) => {

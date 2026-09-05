@@ -7,6 +7,8 @@ import {
   resolveTmsAuthEntryStage,
   restoredDuringTmsLogin,
   safeTmsReturnPath,
+  shouldUseAdminAuth,
+  tmsAdminLogoutReturnTo,
   tmsReturnPathFromLocation,
   tmsSignedOutDestination,
   TMS_AUTH_ROUTE_PATH,
@@ -115,7 +117,7 @@ test("leaves the protected production host after an explicit logout", () => {
       hostname: "tms.saturnusgo.com",
       origin: "https://tms.saturnusgo.com",
     }),
-    "https://www.saturnusgo.com/",
+    "https://tms.saturnusgo.com/",
   );
   assert.equal(
     tmsSignedOutDestination({
@@ -126,6 +128,15 @@ test("leaves the protected production host after an explicit logout", () => {
   );
 });
 
+test("keeps a dual-session Auth0 logout on the admin gate until its intent is consumed", () => {
+  const returnTo = tmsAdminLogoutReturnTo("https://tms.saturnusgo.com");
+  assert.equal(
+    returnTo,
+    "https://tms.saturnusgo.com/testcases/umbrella-home/work/?auth=admin",
+  );
+  assert.equal(shouldUseAdminAuth(new URL(returnTo).search), true);
+});
+
 test("keeps Auth0 redirects inside the stable lowercase TMS route", () => {
   assert.equal(safeTmsReturnPath(TMS_AUTH_ROUTE_PATH), TMS_AUTH_ROUTE_PATH);
   assert.equal(
@@ -134,11 +145,25 @@ test("keeps Auth0 redirects inside the stable lowercase TMS route", () => {
   );
 });
 
+test("forces the admin provider for explicit entry and every Auth0 callback shape", () => {
+  assert.equal(shouldUseAdminAuth("?auth=admin"), true);
+  assert.equal(shouldUseAdminAuth("?code=authorization-code&state=opaque"), true);
+  assert.equal(shouldUseAdminAuth("?error=access_denied&error_description=cancelled"), true);
+  assert.equal(shouldUseAdminAuth("?workspaceId=workspace-1&projectId=project-1"), false);
+});
+
+test("allows only the two public Falcon auth return routes", () => {
+  assert.equal(safeTmsReturnPath("/signup/"), "/signup/");
+  assert.equal(safeTmsReturnPath("/cloud-login/"), "/cloud-login/");
+  assert.equal(safeTmsReturnPath("/pricing/"), TMS_AUTH_ROUTE_PATH);
+});
+
 test("rejects external, mixed-case, and malformed return targets", () => {
   for (const candidate of [
     "https://attacker.example/testcases/umbrella-home/work/",
     "//attacker.example/testcases/umbrella-home/work/",
     "/testcases/UmbrellaHome/Work/",
+    "/testcases/umbrella-home/work/unapproved-child",
     "/testcases/umbrella-home/work/\\attacker.example",
     null,
   ]) {

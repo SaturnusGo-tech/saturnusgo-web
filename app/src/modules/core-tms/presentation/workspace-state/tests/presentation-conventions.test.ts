@@ -63,3 +63,24 @@ test("Falcon production assets are square RGBA PNGs with transparency", () => {
     assert.equal(asset[25], 6);
   });
 });
+
+test("suite configuration follows the editable test-case document hierarchy", () => {
+  const dialog = source("app/src/modules/core-tms/presentation/dialogs/suite/SuiteDialog.tsx");
+  const styles = source("app/src/modules/core-tms/presentation/dialogs/suite/suite-dialog.module.css");
+  assert.match(dialog, /type EditableSection = "name" \| "description" \| "mode" \| null/);
+  assert.match(dialog, /className=\{dialog\.hero\}/);
+  assert.match(dialog, /<EditButton section="name"/);
+  assert.match(dialog, /<EditButton section="description"/);
+  assert.match(dialog, /<EditButton section="mode"/);
+  assert.match(dialog, /<EmbeddedCaseList/);
+  assert.match(styles, /\.titleLine h1\s*\{[^}]*font-size: clamp\(25px, 3vw, 34px\)/s);
+  assert.match(styles, /\.editorialSection\s*\{[^}]*border-bottom:/s);
+});
+
+test("suite primary actions keep white labels and neutral focus treatment", () => {
+  const styles = source("app/src/modules/core-tms/presentation/dialogs/suite/suite-dialog.module.css");
+  const suites = source("app/src/modules/core-tms/presentation/suites/suites.module.css");
+  assert.match(suites, /\.createButton\.createButton[\s\S]*color: #fff !important/);
+  assert.match(suites, /\.workspace :is\(button, input\):focus-visible\s*\{[^}]*outline: 0 !important/s);
+  assert.doesNotMatch(styles, /focus[^}]*border-color: var\(--action\)/s);
+});

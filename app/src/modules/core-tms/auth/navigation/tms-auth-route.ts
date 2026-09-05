@@ -1,6 +1,7 @@
 export const TMS_AUTH_ROUTE_PATH = "/testcases/umbrella-home/work/";
+export const TMS_ADMIN_LOGIN_PATH = `${TMS_AUTH_ROUTE_PATH}?auth=admin`;
 export const TMS_AUTH_LOGOUT_INTENT_KEY = "tms.auth.explicit-logout.v1";
-export const TMS_AUTH_PRODUCTION_SIGNED_OUT_URL = "https://www.saturnusgo.com/";
+export const TMS_AUTH_PRODUCTION_SIGNED_OUT_URL = "https://tms.saturnusgo.com/";
 
 const authCallbackParameters = [
   "code",
@@ -9,6 +10,18 @@ const authCallbackParameters = [
   "error_description",
   "error_uri",
 ] as const;
+
+export function shouldUseAdminAuth(search: string): boolean {
+  const parameters = new URLSearchParams(search);
+  return parameters.get("auth") === "admin"
+    || parameters.has("code")
+    || parameters.has("state")
+    || parameters.has("error");
+}
+
+export function tmsAdminLogoutReturnTo(origin: string): string {
+  return new URL(TMS_ADMIN_LOGIN_PATH, origin).href;
+}
 
 export type TmsLogoutIntentStatus = "checking" | "absent" | "present";
 
@@ -92,13 +105,17 @@ export function clearTmsLogoutIntent(
 }
 
 export function safeTmsReturnPath(candidate: unknown): string {
-  if (
-    typeof candidate === "string" &&
-    candidate.startsWith(TMS_AUTH_ROUTE_PATH) &&
-    !candidate.startsWith("//") &&
-    !candidate.includes("\\")
-  ) {
-    return candidate;
+  if (candidate === "/signup/" || candidate === "/cloud-login/") return candidate;
+  if (typeof candidate !== "string" || candidate.startsWith("//") || candidate.includes("\\")) {
+    return TMS_AUTH_ROUTE_PATH;
   }
+  try {
+    const parsed = new URL(candidate, "https://tms.saturnusgo.com");
+    if (
+      parsed.origin === "https://tms.saturnusgo.com"
+      && parsed.pathname === TMS_AUTH_ROUTE_PATH
+      && candidate.startsWith("/")
+    ) return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {}
   return TMS_AUTH_ROUTE_PATH;
 }

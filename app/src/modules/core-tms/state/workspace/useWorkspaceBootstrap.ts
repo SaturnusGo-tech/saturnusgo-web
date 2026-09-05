@@ -66,10 +66,12 @@ export function useWorkspaceBootstrap() {
     setConnection("loading");
     setFailure(null);
     const linkedProjectId = readCaseDeepLink(window.location.href).projectId;
+    const linkedWorkspaceId = new URL(window.location.href).searchParams.get("workspaceId")?.trim()
+      || undefined;
     const preferredProjectId = linkedProjectId
       ?? window.localStorage.getItem("tms.project.v1")
       ?? undefined;
-    loadWorkspace(http, preferredProjectId, controller.signal)
+    loadWorkspace(http, preferredProjectId, controller.signal, linkedWorkspaceId)
       .then((payload) => {
         if (controller.signal.aborted || requestId !== activeRequest.current) return;
         setData(payload);

@@ -1,0 +1,16 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  font-size: 22px;
+  font-weight: 760;
+  letter-spacing: -.045em;
+  text-decoration: none;
+}
+
+.mark {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}

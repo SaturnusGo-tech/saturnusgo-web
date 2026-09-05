@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.8",
+    "version": "1.0.0-checkpoint.9",
     "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -15,10 +15,14 @@
   "security": [
     {
       "bearerAuth": []
+    },
+    {
+      "cloudSession": []
     }
   ],
   "tags": [
     { "name": "Health" },
+    { "name": "Cloud auth" },
     { "name": "Workspaces" },
     { "name": "Projects" },
     { "name": "Environments" },
@@ -39,11 +43,80 @@
       "get": {
         "tags": ["Health"],
         "summary": "Report API readiness",
-        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is compatible with the running artifact. Stage A accepts 0017 through 0018 with both new feature flags disabled; Stage B requires exactly 0018.",
+        "description": "Returns ok only when PostgreSQL is reachable and its migration ledger is exactly compatible with this artifact. Cloud authentication is always registered, so this release requires physical schema 0021 even when independent feature flags are disabled.",
         "operationId": "getHealth",
         "security": [],
         "responses": {
           "200": { "$ref": "#/components/responses/HealthResponse" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/cloud-auth/register": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Cloud auth"],
+        "summary": "Register an isolated personal Falcon tenant",
+        "description": "Creates one local cloud identity, an unverified profile, a personal workspace, owner membership, default project and environment, and an opaque cookie session atomically. Explicit acceptance of the current server-controlled terms version is required and recorded. No email or phone verification is claimed. Replays require the same email-scoped key, canonical non-secret payload, matching profile, and valid password. Tenant resources converge idempotently; each successful credential-validated replay rotates to a fresh opaque cookie session without persisting a raw token.",
+        "operationId": "registerCloudAccount",
+        "security": [],
+        "x-tms-idempotency": "required",
+        "parameters": [{ "$ref": "#/components/parameters/IdempotencyKey" }],
+        "requestBody": { "$ref": "#/components/requestBodies/CloudRegistration" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/CloudRegistrationResponse" },
+          "201": { "$ref": "#/components/responses/CloudRegistrationResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/cloud-auth/login": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Cloud auth"],
+        "summary": "Start a local cloud session",
+        "operationId": "loginCloudAccount",
+        "security": [],
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": { "$ref": "#/components/requestBodies/CloudLogin" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/CloudSessionResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/cloud-auth/session": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Cloud auth"],
+        "summary": "Inspect the optional local cloud session",
+        "operationId": "getCloudSession",
+        "security": [],
+        "responses": {
+          "200": { "$ref": "#/components/responses/CloudSessionResponse" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/cloud-auth/logout": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Cloud auth"],
+        "summary": "Revoke the local cloud session",
+        "operationId": "logoutCloudAccount",
+        "security": [],
+        "x-tms-idempotency": "not-applicable",
+        "responses": {
+          "204": { "$ref": "#/components/responses/CloudLogoutResponse" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
@@ -2159,6 +2232,12 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "description": "Production access token. The prototype x-actor header is not authentication and is not part of this contract."
+      },
+      "cloudSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_cloud_session",
+        "description": "Opaque host-only HttpOnly Secure SameSite=Lax session. Cookie-authenticated mutations additionally require an exact configured Origin."
       }
     },
     "parameters": {
@@ -2489,12 +2568,44 @@
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardCreateRequest" } } }
       },
+      "CloudRegistration": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CloudRegistrationRequest" } } }
+      },
+      "CloudLogin": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CloudLoginRequest" } } }
+      },
       "DashboardPatch": {
         "required": true,
         "content": { "application/merge-patch+json": { "schema": { "$ref": "#/components/schemas/DashboardPatchRequest" } } }
       }
     },
     "responses": {
+      "CloudRegistrationResponse": {
+        "description": "Personal tenant and local cloud session created or safely replayed.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Idempotency-Replayed": { "$ref": "#/components/headers/IdempotencyReplayed" },
+          "Set-Cookie": { "schema": { "type": "string" }, "description": "Opaque HttpOnly cloud session cookie." }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CloudAuthenticatedSessionEnvelope" } } }
+      },
+      "CloudSessionResponse": {
+        "description": "Current authenticated cloud account, or an explicit anonymous state.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Set-Cookie": { "schema": { "type": "string" }, "description": "Present when a new session was issued." }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CloudSessionEnvelope" } } }
+      },
+      "CloudLogoutResponse": {
+        "description": "Session revoked and cookie expired.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Set-Cookie": { "schema": { "type": "string" }, "description": "Expires the cloud session cookie." }
+        }
+      },
       "HealthResponse": {
         "description": "Service is ready to accept requests.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
@@ -2879,6 +2990,14 @@
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
       },
+      "TooManyRequests": {
+        "description": "The authentication attempt budget was exhausted.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "Retry-After": { "schema": { "type": "integer", "minimum": 1 } }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
       "Gone": {
         "description": "The upload intent expired and cannot be finalized.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
@@ -2932,6 +3051,86 @@
         "description": "Opaque identifier; clients must not parse prefixes or embed business meaning."
       },
       "Timestamp": { "type": "string", "format": "date-time" },
+      "CloudRegistrationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["givenName", "familyName", "email", "phone", "password", "termsAccepted"],
+        "properties": {
+          "givenName": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "familyName": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "email": { "type": "string", "format": "email", "maxLength": 320 },
+          "phone": { "type": "string", "pattern": "^\\+[1-9][0-9]{7,14}$" },
+          "password": { "type": "string", "minLength": 12, "maxLength": 128, "writeOnly": true },
+          "termsAccepted": { "type": "boolean", "const": true,
+            "description": "Explicit acceptance of the current Falcon terms version. The server records its own immutable version and timestamp." }
+        }
+      },
+      "CloudLoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email", "maxLength": 320 },
+          "password": { "type": "string", "minLength": 12, "maxLength": 128, "writeOnly": true }
+        }
+      },
+      "CloudAuthenticatedSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["authenticated", "identity", "workspace", "membership", "defaultProject", "defaultEnvironment"],
+        "properties": {
+          "authenticated": { "type": "boolean", "const": true },
+          "identity": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "givenName", "familyName", "email", "phone", "emailVerificationStatus", "phoneVerificationStatus"],
+            "properties": {
+              "id": { "$ref": "#/components/schemas/Identifier" },
+              "givenName": { "type": "string", "minLength": 1, "maxLength": 100 },
+              "familyName": { "type": "string", "minLength": 1, "maxLength": 100 },
+              "email": { "type": "string", "format": "email", "maxLength": 320 },
+              "phone": { "type": "string", "pattern": "^\\+[1-9][0-9]{7,14}$" },
+              "emailVerificationStatus": { "type": "string", "const": "unverified" },
+              "phoneVerificationStatus": { "type": "string", "const": "unverified" }
+            }
+          },
+          "workspace": {
+            "type": "object", "additionalProperties": false, "required": ["id", "name", "slug"],
+            "properties": { "id": { "$ref": "#/components/schemas/Identifier" },
+              "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }
+          },
+          "membership": {
+            "type": "object", "additionalProperties": false, "required": ["role"],
+            "properties": { "role": { "type": "string", "const": "workspace_admin" } }
+          },
+          "defaultProject": {
+            "type": "object", "additionalProperties": false, "required": ["id", "name", "slug"],
+            "properties": { "id": { "$ref": "#/components/schemas/Identifier" },
+              "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }
+          },
+          "defaultEnvironment": {
+            "type": "object", "additionalProperties": false, "required": ["id", "name"],
+            "properties": { "id": { "$ref": "#/components/schemas/Identifier" },
+              "name": { "type": "string", "minLength": 1, "maxLength": 200 } }
+          }
+        }
+      },
+      "CloudAnonymousSession": {
+        "type": "object", "additionalProperties": false, "required": ["authenticated"],
+        "properties": { "authenticated": { "type": "boolean", "const": false } }
+      },
+      "CloudAuthenticatedSessionEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/CloudAuthenticatedSession" } }
+      },
+      "CloudSessionEnvelope": {
+        "type": "object", "additionalProperties": false, "required": ["data"],
+        "properties": { "data": { "oneOf": [
+          { "$ref": "#/components/schemas/CloudAuthenticatedSession" },
+          { "$ref": "#/components/schemas/CloudAnonymousSession" }
+        ] } }
+      },
       "ShortText": { "type": "string", "maxLength": 500 },
       "LongText": { "type": "string", "maxLength": 20000 },
       "StringMap": {
@@ -3527,6 +3726,7 @@
           "PRECONDITION_REQUIRED",
           "PRECONDITION_FAILED",
           "IDEMPOTENCY_KEY_REUSED",
+          "QUOTA_EXCEEDED",
           "RETEST_EVIDENCE_REQUIRED",
           "RETEST_CASE_MISMATCH",
           "RETEST_STEP_MISMATCH",
@@ -3534,6 +3734,14 @@
           "YOUTRACK_NOT_READY_FOR_TEST",
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
+          "INTEGRATION_DISABLED",
+          "CLOUD_AUTH_ACCOUNT_CONFLICT",
+          "CLOUD_AUTH_AUTHENTICATION_FAILED",
+          "CLOUD_AUTH_IDEMPOTENCY_CONFLICT",
+          "CLOUD_AUTH_ORIGIN_DENIED",
+          "CLOUD_AUTH_RATE_LIMITED",
+          "CLOUD_AUTH_SESSION_INVALID",
+          "CLOUD_AUTH_PERSISTENCE_FAILED",
           "UPLOAD_INTENT_EXPIRED",
           "ATTACHMENT_DIGEST_MISMATCH",
           "PAYLOAD_TOO_LARGE",

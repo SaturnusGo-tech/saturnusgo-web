@@ -49,6 +49,27 @@ html[data-tms="1"] .bg-par {
   display: none !important;
 }
 
+/* Falcon public routes provide their own product shell. */
+html[data-falcon-public="1"] {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  scroll-padding-top: 74px;
+}
+
+html[data-falcon-public="1"] body {
+  min-height: 100dvh;
+  background: #fffefa;
+}
+
+html[data-falcon-public="1"] #app-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 !important;
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+
 /* ================================
    GLOBALS
    ================================ */

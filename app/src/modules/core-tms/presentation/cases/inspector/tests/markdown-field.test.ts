@@ -4,6 +4,7 @@ import test from "node:test";
 
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
+const translations = readFileSync(new URL("../markdown/translations/markdownEditorTranslation.ts", import.meta.url), "utf8");
 const attachmentUi = readFileSync(new URL("../markdown/attachments/MarkdownAttachmentUi.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
 const layoutStyles = readFileSync(new URL("../../cases.module.css", import.meta.url), "utf8");
@@ -78,8 +79,8 @@ test("case Markdown inputs attach or paste private files from the conventional l
 
 test("Markdown link editing uses a themed modal layer with clear fields", () => {
   assert.match(initialized, /overlayContainer=\{overlayContainer \?\? undefined\}/);
-  assert.match(initialized, /createLink\.text[\s\S]*Текст ссылки/);
-  assert.match(initialized, /dialogControls\.save[\s\S]*Сохранить/);
+  assert.match(translations, /createLink\.text[\s\S]*Текст ссылки/);
+  assert.match(translations, /dialogControls\.save[\s\S]*Сохранить/);
   assert.match(styles, /\.wysiwyg:has\(form\)/);
   assert.match(styles, /place-items: center/);
   assert.match(styles, /\[role="dialog"\][\s\S]*background: var\(--cases-deep\)/);

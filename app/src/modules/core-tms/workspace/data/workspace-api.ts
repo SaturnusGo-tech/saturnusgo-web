@@ -46,9 +46,13 @@ export async function loadWorkspace(
   http: TmsHttpClient,
   preferredProjectId?: string,
   signal?: AbortSignal,
+  workspaceId?: string,
 ): Promise<Bootstrap> {
+  const parameters = new URLSearchParams({ recentLimit: "20" });
+  if (workspaceId) parameters.set("workspaceId", workspaceId);
+  if (preferredProjectId) parameters.set("projectId", preferredProjectId);
   const envelope = await http.get<Api["WorkspaceBootstrapEnvelope"]>(
-    "/bootstrap?recentLimit=20", signal,
+    `/bootstrap?${parameters.toString()}`, signal,
   );
   const summary = envelope.data;
   const projects = summary.projects.map(mapProject);
