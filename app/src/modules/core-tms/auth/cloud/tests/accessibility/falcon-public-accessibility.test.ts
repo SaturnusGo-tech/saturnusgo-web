@@ -33,7 +33,7 @@ test("Falcon public header keeps direct auth actions without feature navigation"
   assert.doesNotMatch(source, /falcon-mobile-menu/);
   assert.doesNotMatch(source, /aria-modal/);
   assert.doesNotMatch(source, />Кейсы<|>Прогоны<|>Дефекты<|>Аналитика</);
-  assert.match(styles, /\.headerInner\s*\{[^}]*width: calc\(100% - 48px\)/s);
+  assert.match(styles, /\.headerInner\s*\{[^}]*width: 100%;[^}]*padding: 0 24px 0 12px/s);
   assert.match(styles, /\.primaryButton\s*\{[^}]*border-radius: 999px/s);
 });
 

@@ -89,7 +89,7 @@ final result: passed
 - The hero contains only the product promise and supporting sentence; its former registration button is removed.
 - The shorter hero copy group is optically centered lower in the viewport without changing the existing scroll animation.
 - Falcon, `Войти`, and `Создать аккаунт` fit without wrapping or horizontal overflow at both desktop and 320 px widths.
-- The header no longer stops at a 1380 px content cap: registration actions align 24 px from the right edge on wide screens and 10 px from it at 320 px. The registration control uses a full pill radius.
+- The header no longer stops at a 1380 px content cap: registration actions align 24 px from the right edge on wide screens while the Falcon brand aligns 12 px from the left. At 320 px those insets contract to 10 px and 6 px. The registration control uses a full pill radius.
 
 ## Verification
 
