@@ -10,7 +10,6 @@ export function FalconHeader() {
         <FalconBrand inverse />
         <div className={styles.headerActions}>
           <Link className={styles.loginButton} href={TMS_ADMIN_LOGIN_PATH}>Войти</Link>
-          <Link className={styles.primaryButton} href="/signup/">Создать аккаунт</Link>
         </div>
       </div>
     </header>

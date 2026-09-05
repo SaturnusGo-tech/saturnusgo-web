@@ -79,6 +79,28 @@ final result: passed
 
 final result: passed
 
+---
+
+# Design QA — Falcon hero CTA deduplication
+
+## Findings
+
+- The first viewport now exposes one registration action: `Создать аккаунт` in the hero.
+- The fixed header contains only the Falcon home link and the returning-user action `Войти`.
+- Removing the duplicate header button restores a clear action hierarchy without changing registration or admin-login routes.
+- The header remains visually balanced at the verified desktop viewport and introduces no empty placeholder or dead CSS selector.
+
+## Verification
+
+- [x] final hero and header inspected together in the in-app browser
+- [x] rendered banner contains no `/signup/` link
+- [x] hero registration link still points to `/signup/`
+- [x] `npm run typecheck`
+- [x] `npm run test:tms-auth` — 39/39 passed
+- [x] `git diff --check`
+
+final result: passed
+
 # Design QA — Falcon public landing, production-data pass
 
 - source visual truth: `https://qatools.ru/`
