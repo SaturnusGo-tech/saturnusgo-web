@@ -8,10 +8,10 @@ import { FalconBrand } from "../shared/FalconBrand";
 import styles from "./landing.module.css";
 
 const navigation = [
-  { href: "#platform", label: "Платформа" },
-  { href: "#automation", label: "Автоматизация" },
+  { href: "#platform", label: "Кейсы" },
+  { href: "#automation", label: "Прогоны" },
+  { href: "#defects", label: "Дефекты" },
   { href: "#analytics", label: "Аналитика" },
-  { href: "#security", label: "Безопасность" },
 ];
 
 export function FalconHeader() {
@@ -35,9 +35,12 @@ export function FalconHeader() {
     document.body.style.overflow = "hidden";
     backgroundElements.forEach((element) => { element.inert = true; });
 
-    const focusableElements = () => Array.from(menuRef.current?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ) ?? []).filter((element) => !element.hasAttribute("disabled"));
+    const focusableElements = () => [
+      menuButtonRef.current,
+      ...Array.from(menuRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ?? []),
+    ].filter((element): element is HTMLElement => Boolean(element && !element.hasAttribute("disabled")));
     const focusFrame = window.requestAnimationFrame(() => {
       const first = focusableElements()[0];
       (first ?? menuRef.current)?.focus();
@@ -58,7 +61,9 @@ export function FalconHeader() {
       }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (!menuRef.current?.contains(document.activeElement)) {
+      const activeElementIsInMenu = menuRef.current?.contains(document.activeElement)
+        || document.activeElement === menuButtonRef.current;
+      if (!activeElementIsInMenu) {
         event.preventDefault();
         (event.shiftKey ? last : first).focus();
       } else if (event.shiftKey && document.activeElement === first) {
@@ -80,7 +85,13 @@ export function FalconHeader() {
   }, [open]);
 
   return (
-    <header ref={headerRef} className={styles.header}>
+    <header
+      ref={headerRef}
+      className={styles.header}
+      role={open ? "dialog" : undefined}
+      aria-modal={open ? "true" : undefined}
+      aria-label={open ? "Навигация Falcon" : undefined}
+    >
       <div className={styles.headerInner}>
         <FalconBrand />
         <nav className={styles.desktopNav} aria-label="Основная навигация">
@@ -107,9 +118,6 @@ export function FalconHeader() {
           ref={menuRef}
           id="falcon-mobile-menu"
           className={styles.mobileMenu}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Навигация Falcon"
           tabIndex={-1}
         >
           <nav aria-label="Мобильная навигация">

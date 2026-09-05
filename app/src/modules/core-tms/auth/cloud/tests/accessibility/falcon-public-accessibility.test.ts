@@ -22,7 +22,8 @@ test("Falcon mobile navigation retains modal keyboard and background isolation",
     "app/src/modules/core-falcon-public/landing/FalconHeader.tsx",
   ), "utf8");
 
-  assert.match(source, /aria-modal="true"/);
+  assert.match(source, /role=\{open \? "dialog" : undefined\}/);
+  assert.match(source, /aria-modal=\{open \? "true" : undefined\}/);
   assert.match(source, /element\.inert = true/);
   assert.match(source, /event\.key !== "Tab"/);
   assert.match(source, /menuButtonRef\.current \?\? previouslyFocused/);

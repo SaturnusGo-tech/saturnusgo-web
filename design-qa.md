@@ -43,6 +43,40 @@ final result: passed
 
 ---
 
+# Design QA — Falcon public landing, production-data pass
+
+- source visual truth: `https://qatools.ru/`
+- production-data sources: authenticated Falcon production workspace `Umbrella-Host` on `https://tms.saturnusgo.com/`
+- reference screenshot: `.design-audit/2026-09-05-falcon-landing-redesign/48-reference-hero-1440x1000.png`
+- implementation screenshot: `.design-audit/2026-09-05-falcon-landing-redesign/35-fresh-prod-hero.png`
+- combined comparison: `.design-audit/2026-09-05-falcon-landing-redesign/49-reference-vs-prod-hero-1440x1000.png`
+- desktop sections: `.design-audit/2026-09-05-falcon-landing-redesign/37-platform-prod.png` through `40-analytics-prod.png`
+- mobile sections: `.design-audit/2026-09-05-falcon-landing-redesign/42-mobile-hero-prod.png` through `46-mobile-analytics-prod.png`
+- viewports: 1440 × 1000 and 390 × 844 CSS px
+
+## Findings
+
+- The landing now follows the reference's compact navigation, centered product-first hero, alternating editorial feature sections, restrained monochrome palette, and full-width closing CTA without copying TestOps branding or copy.
+- Numbered `01–05` tiles, decorative pill copy, repeated cards, redundant captions, and other generic landing-page chrome are removed.
+- Every visible Falcon product image was recaptured from the authenticated production account on 5 September 2026. No localhost, demo workspace, or stale imported screenshot remains in the rendered landing.
+- Desktop and mobile use purpose-captured, 2× processed assets for the run detail, case repository, run builder, defect card, and analytics dashboard. A responsive `picture` selects exactly one source per viewport; declared dimensions match the generated files and avoid layout shift.
+- The 1440 × 1000 reference/implementation board was judged as one image. Header height, hero centerline, CTA hierarchy, product-preview scale, and fold position align; Falcon's monochrome surface and black action are intentional identity choices.
+- Desktop feature sections keep one clear narrative and one product surface per section. Mobile sections preserve readable headings and show the corresponding responsive production UI without horizontal overflow.
+
+## Verification
+
+- [x] same-viewport reference comparison at 1440 × 1000
+- [x] desktop hero and every feature section inspected with production images loaded
+- [x] mobile hero, cases, runs, defects, and analytics inspected at 390 × 844
+- [x] tablet navigation and full-screen menu inspected at 900 × 800; Escape closes and dialog semantics contain the menu toggle
+- [x] mobile and desktop source selection verified independently with no duplicate screenshot request
+- [x] authenticated production source verified as `Umbrella-Host`, 398 test cases, 24 runs, and 23 linked defects
+- [x] no numbered feature blocks or old screenshot paths remain in the landing component
+
+final result: passed
+
+---
+
 # Design QA — listing priority geometry and persistent dark navigation
 
 - source visual truth: `.design-audit/2026-09-04-listing-priority-status/01-before-new-feedback.png`

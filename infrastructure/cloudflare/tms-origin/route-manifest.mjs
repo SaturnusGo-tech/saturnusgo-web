@@ -23,10 +23,16 @@ export const publicAssetPrefixes = Object.freeze([
 export const requiredPublicAssets = Object.freeze([
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
-  "/falcon/landing/analytics-dashboard.png",
-  "/falcon/landing/run-execution.png",
-  "/falcon/landing/test-case-workspace.png",
-  "/falcon/landing/test-suite-detail.jpg",
+  "/falcon/landing/analytics-dashboard.jpg",
+  "/falcon/landing/analytics-dashboard-mobile.jpg",
+  "/falcon/landing/case-defect-link.jpg",
+  "/falcon/landing/case-defect-link-mobile.jpg",
+  "/falcon/landing/case-repository.jpg",
+  "/falcon/landing/case-repository-mobile.jpg",
+  "/falcon/landing/run-builder.jpg",
+  "/falcon/landing/run-builder-mobile.jpg",
+  "/falcon/landing/run-detail.jpg",
+  "/falcon/landing/run-detail-mobile.jpg",
 ]);
 
 export const publicMetadataFiles = Object.freeze([

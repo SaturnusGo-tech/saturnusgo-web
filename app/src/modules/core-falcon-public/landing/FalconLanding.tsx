@@ -1,20 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
-import {
-  Activity, ArrowRight, Bot, Boxes, Braces, Bug, Check, Gauge, GitBranch,
-  LayoutDashboard, LockKeyhole, Play, ShieldCheck, UsersRound, Workflow,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
 import styles from "./landing.module.css";
-
-const capabilities = ["Ручные кейсы", "Автотесты", "Раны", "Дефекты", "API", "Аналитика"];
-const automationCards = [
-  [GitBranch, "Единый поток", "Результаты CI, ручные проверки и дефекты остаются в одном контексте."],
-  [Bot, "Автотесты рядом", "Импортируйте автоматизированные сценарии и отслеживайте их вместе с ручными."],
-  [Activity, "История без разрывов", "Каждый запуск сохраняет ревизию, окружение, сборку и фактический результат."],
-  [LockKeyhole, "Приватные вложения", "Скриншоты, видео и файлы доступны только участникам рабочего пространства."],
-] as const;
 
 export function FalconLanding() {
   return (
@@ -23,133 +11,199 @@ export function FalconLanding() {
       <main>
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>ПЛАТФОРМА УПРАВЛЕНИЯ КАЧЕСТВОМ</p>
-            <h1>Управляйте качеством продукта в одном контуре</h1>
+            <h1>Тест-кейсы, прогоны и дефекты с общей историей</h1>
             <p className={styles.heroLead}>
-              Falcon связывает тест-кейсы, запуски, дефекты и аналитику — без разрывов между QA, продуктом и разработкой.
+              Falcon сохраняет ревизию кейса, окружение и сборку каждого запуска. Дефект остаётся связан с исходным шагом.
             </p>
             <div className={styles.heroActions}>
               <Link className={styles.primaryButtonLarge} href="/signup/">
-                Создать пространство <ArrowRight size={18} />
+                Попробовать <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <a className={styles.secondaryButtonLarge} href="#platform">Посмотреть платформу</a>
             </div>
-            <p className={styles.heroNote}><Check size={15} /> Без карты и подтверждения по телефону на старте</p>
           </div>
           <ProductFrame
-            src="/falcon/landing/test-case-workspace.png"
-            alt="Рабочее пространство тест-кейсов Falcon"
+            src="/falcon/landing/run-detail.jpg"
+            alt="Активный тест-ран со списком кейсов и сценарием"
+            width={2560}
+            height={1440}
+            mobileSrc="/falcon/landing/run-detail-mobile.jpg"
+            mobileWidth={780}
+            mobileHeight={1400}
             priority
             className={styles.heroProduct}
           />
         </section>
 
-        <section className={styles.trustStrip} aria-label="Возможности Falcon">
-          <p>Одна система для всего процесса тестирования</p>
-          <div>{capabilities.map((item) => <span key={item}>{item}</span>)}</div>
-        </section>
-
-        <section className={styles.section} id="automation">
-          <SectionIntro
-            eyebrow="АВТОМАТИЗАЦИЯ"
-            title="Запускайте проверки и сохраняйте весь контекст"
-            text="От ревизии кейса до фактического результата — Falcon удерживает данные запуска в понятной структуре, которую удобно читать всей команде."
+        <section className={styles.storySection} id="platform">
+          <div className={styles.storyCopy}>
+            <SectionIntro
+              label="Тест-кейсы"
+              title="Сценарий, ожидаемый результат и файлы"
+              text="Основные шаги, подшаги и ожидаемый результат собраны в одной вертикали. Файлы остаются рядом с тем шагом, к которому относятся."
+            />
+            <p className={styles.storyNote}>
+              Ручные сценарии, чек-листы и автоматизированные кейсы хранятся рядом. Общие шаги обновляются во всех связанных сценариях.
+            </p>
+          </div>
+          <ProductFrame
+            src="/falcon/landing/case-repository.jpg"
+            alt="Production-репозиторий тест-кейсов Falcon с открытой карточкой"
+            width={2174}
+            height={1628}
+            mobileSrc="/falcon/landing/case-repository-mobile.jpg"
+            mobileWidth={780}
+            mobileHeight={1400}
           />
-          <div className={styles.featureStage}>
-            <div className={styles.featureGrid}>
-              {automationCards.map(([Icon, title, text]) => (
-                <article key={title}><Icon size={20} /><h3>{title}</h3><p>{text}</p></article>
-              ))}
-            </div>
-            <ProductFrame src="/falcon/landing/run-execution.png" alt="Выполнение тест-рана в Falcon" />
-          </div>
         </section>
 
-        <section className={styles.darkSection} id="security">
-          <div className={styles.darkSectionInner}>
-            <div>
-              <p className={styles.darkEyebrow}>РАБОЧИЕ ПРОСТРАНСТВА</p>
-              <h2>Данные каждой команды отделены по умолчанию</h2>
-              <p>Проекты, участники, кейсы и вложения живут внутри своего пространства. Доступ проверяется для каждого действия.</p>
-            </div>
-            <div className={styles.securityFacts}>
-              <span><ShieldCheck size={22} /> Ролевой доступ</span>
-              <span><UsersRound size={22} /> Изолированные команды</span>
-              <span><Boxes size={22} /> Проекты внутри пространства</span>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.integrationsSection}>
-          <SectionIntro
-            eyebrow="ИНТЕГРАЦИИ"
-            title="Falcon встраивается в ваш процесс"
-            text="Подключайте источники результатов и системы разработки, не меняя привычный поток команды."
+        <section className={`${styles.storySection} ${styles.storyReverse}`} id="automation">
+          <ProductFrame
+            src="/falcon/landing/run-builder.jpg"
+            alt="Production-конструктор тест-рана с выбором кейсов"
+            width={2560}
+            height={1440}
+            mobileSrc="/falcon/landing/run-builder-mobile.jpg"
+            mobileWidth={780}
+            mobileHeight={1400}
           />
-          <div className={styles.integrationGrid}>
-            <Feature icon={Bug} title="YouTrack" text="Связывайте дефекты с задачами и возвращайтесь к исходному тест-кейсу в один переход." />
-            <Feature icon={Workflow} title="CI/CD" text="Передавайте результаты автоматизированных прогонов вместе со сборкой и окружением." />
-            <Feature icon={Braces} title="REST API" text="Автоматизируйте создание, запуск и синхронизацию сущностей через единый API." />
+          <div className={styles.storyCopy}>
+            <SectionIntro
+              label="Запуски"
+              title="Ревизия кейса фиксируется при запуске"
+              text="Соберите точный список кейсов или динамический сьют по тегам. При запуске Falcon сохраняет ревизии кейсов, окружение и сборку."
+            />
+            <dl className={styles.runFacts}>
+              <Detail title="Состав">Конкретные кейсы или правила отбора по тегам.</Detail>
+              <Detail title="Результат">Статус шага, фактический результат и вложения.</Detail>
+            </dl>
           </div>
         </section>
 
-        <section className={styles.section} id="platform">
+        <section className={styles.defectSection} id="defects">
+          <div className={styles.defectLayout}>
+            <SectionIntro
+              label="Дефекты"
+              title="Баг-репорт хранит исходный шаг"
+              text="Ожидаемый и фактический результат, вложения, запуск и задача YouTrack доступны из карточки дефекта."
+            />
+            <ProductFrame
+              src="/falcon/landing/case-defect-link.jpg"
+              alt="Production-карточка баг-репорта Falcon рядом со списком дефектов"
+              width={2560}
+              height={1440}
+              mobileSrc="/falcon/landing/case-defect-link-mobile.jpg"
+              mobileWidth={780}
+              mobileHeight={1400}
+              className={styles.defectProduct}
+            />
+          </div>
+        </section>
+
+        <section className={styles.integrations} id="integrations">
+          <div className={styles.integrationsIntro}>
+            <p>Интеграции</p>
+            <h2>YouTrack и REST API</h2>
+          </div>
+          <div className={styles.integrationCopy}>
+            <p>Создавайте задачи YouTrack из дефекта Falcon. Для импорта, экспорта и автоматизации доступен REST API.</p>
+            <span>YouTrack&nbsp;&nbsp;·&nbsp;&nbsp;REST API&nbsp;&nbsp;·&nbsp;&nbsp;JSON</span>
+          </div>
+        </section>
+
+        <section className={styles.analyticsSection} id="analytics">
           <SectionIntro
-            eyebrow="РУЧНОЕ ТЕСТИРОВАНИЕ"
-            title="Сценарии, которые приятно создавать и проходить"
-            text="Структурируйте шаги и ожидаемые результаты, прикрепляйте доказательства, переиспользуйте общие шаги и храните историю изменений."
+            label="Дашборды"
+            title="Из метрики — к кейсам, прогонам и дефектам"
+            text="Выберите период и область. Любой показатель открывает отфильтрованные кейсы, прогоны или дефекты."
+            centered
           />
-          <div className={styles.splitFeature}>
-            <ProductFrame src="/falcon/landing/test-suite-detail.jpg" alt="Карточка тест-сьюта Falcon" />
-            <div className={styles.featureList}>
-              <Feature icon={Play} title="Раны без лишних переходов" text="Окружение, сборка и результат всегда находятся рядом со сценарием." />
-              <Feature icon={Boxes} title="Переиспользуемые шаги" text="Обновляйте общий сценарий один раз — изменения применятся в связанных кейсах." />
-              <Feature icon={Gauge} title="Приоритет виден сразу" text="Компактные сигналы помогают быстро собирать критичный регресс." />
-            </div>
-          </div>
-        </section>
-
-        <section className={`${styles.section} ${styles.analyticsSection}`} id="analytics">
-          <SectionIntro
-            eyebrow="АНАЛИТИКА"
-            title="Понимайте, где продукт проседает"
-            text="Сравнивайте покрытие, провалы, блокеры и дефекты по продуктам и компонентам. Из любого показателя можно перейти к исходным данным."
+          <ProductFrame
+            src="/falcon/landing/analytics-dashboard.jpg"
+            alt="Production-дашборд качества Falcon по проекту Umbrella-Host"
+            width={2560}
+            height={1440}
+            mobileSrc="/falcon/landing/analytics-dashboard-mobile.jpg"
+            mobileWidth={780}
+            mobileHeight={1400}
+            className={styles.analyticsProduct}
           />
-          <ProductFrame src="/falcon/landing/analytics-dashboard.png" alt="Дашборд качества Falcon" />
-          <div className={styles.metricRow}>
-            <div><strong>30 дней</strong><span>единый период аналитики</span></div>
-            <div><strong>4 среза</strong><span>продукт, компонент, тег и тип</span></div>
-            <div><strong>1 клик</strong><span>от метрики до исходной записи</span></div>
-          </div>
-        </section>
-
-        <section className={styles.finalCta}>
-          <Image src="/falcon/falcon-mark-light.png" alt="" width={108} height={108} />
-          <p className={styles.darkEyebrow}>FALCON CLOUD</p>
-          <h2>Создайте первое рабочее пространство</h2>
-          <p>Начните с личного пространства, добавьте проект и перенесите процесс тестирования в Falcon.</p>
-          <Link className={styles.lightButton} href="/signup/">Попробовать Falcon <ArrowRight size={18} /></Link>
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <FalconBrand inverse />
-        <p>Система управления качеством продукта.</p>
-        <div><Link href="/signup/">Создать пространство</Link><Link href="/cloud-login/">Вход в облако</Link></div>
-        <span>© {new Date().getFullYear()} Falcon</span>
+      <footer className={styles.footer} id="security">
+        <div className={styles.footerCta}>
+          <div>
+            <h2>Создайте рабочее пространство Falcon</h2>
+          </div>
+          <div>
+            <p>Falcon создаст первый проект и окружение. Кейсы, прогоны и вложения останутся внутри вашего пространства.</p>
+            <Link className={styles.lightButton} href="/signup/">
+              Попробовать <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+        <div className={styles.footerMeta}>
+          <FalconBrand inverse />
+          <p>Тест-кейсы, запуски, дефекты и аналитика.</p>
+          <div><Link href="/signup/">Создать пространство</Link><Link href="/cloud-login/">Вход в облако</Link></div>
+          <span>© {new Date().getFullYear()} Falcon</span>
+        </div>
       </footer>
     </div>
   );
 }
 
-function ProductFrame(props: { readonly src: string; readonly alt: string; readonly priority?: boolean; readonly className?: string }) {
-  return <figure className={`${styles.productFrame} ${props.className ?? ""}`}><Image src={props.src} alt={props.alt} width={1488} height={1058} priority={props.priority} /></figure>;
+function ProductFrame(props: {
+  readonly src: string;
+  readonly alt: string;
+  readonly width: number;
+  readonly height: number;
+  readonly priority?: boolean;
+  readonly className?: string;
+  readonly mobileSrc?: string;
+  readonly mobileWidth?: number;
+  readonly mobileHeight?: number;
+}) {
+  return (
+    <figure className={`${styles.productFrame} ${props.className ?? ""}`}>
+      <picture>
+        {props.mobileSrc && props.mobileWidth && props.mobileHeight && (
+          <source
+            media="(max-width: 780px)"
+            srcSet={props.mobileSrc}
+            width={props.mobileWidth}
+            height={props.mobileHeight}
+          />
+        )}
+        <img
+          src={props.src}
+          alt={props.alt}
+          width={props.width}
+          height={props.height}
+          loading={props.priority ? "eager" : "lazy"}
+          fetchPriority={props.priority ? "high" : "auto"}
+          decoding="async"
+        />
+      </picture>
+    </figure>
+  );
 }
 
-function SectionIntro(props: { readonly eyebrow: string; readonly title: string; readonly text: string }) {
-  return <div className={styles.sectionIntro}><p className={styles.eyebrow}>{props.eyebrow}</p><h2>{props.title}</h2><p>{props.text}</p></div>;
+function SectionIntro(props: {
+  readonly label: string;
+  readonly title: string;
+  readonly text: string;
+  readonly centered?: boolean;
+}) {
+  return (
+    <div className={`${styles.sectionIntro} ${props.centered ? styles.sectionIntroCentered : ""}`}>
+      <p className={styles.sectionLabel}>{props.label}</p>
+      <h2>{props.title}</h2>
+      <p className={styles.sectionLead}>{props.text}</p>
+    </div>
+  );
 }
 
-function Feature({ icon: Icon, title, text }: { readonly icon: typeof LayoutDashboard; readonly title: string; readonly text: string }) {
-  return <article><Icon size={21} /><div><h3>{title}</h3><p>{text}</p></div></article>;
+function Detail({ title, children }: { readonly title: string; readonly children: string }) {
+  return <div><dt>{title}</dt><dd>{children}</dd></div>;
 }
