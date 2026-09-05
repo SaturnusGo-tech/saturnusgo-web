@@ -21,6 +21,10 @@ test("Falcon public header keeps direct auth actions without feature navigation"
     root,
     "app/src/modules/core-falcon-public/landing/FalconHeader.tsx",
   ), "utf8");
+  const styles = readFileSync(resolve(
+    root,
+    "app/src/modules/core-falcon-public/landing/landing.module.css",
+  ), "utf8");
 
   assert.match(source, /<FalconBrand inverse \/>/);
   assert.match(source, /href=\{TMS_ADMIN_LOGIN_PATH\}>Войти<\/Link>/);
@@ -29,6 +33,8 @@ test("Falcon public header keeps direct auth actions without feature navigation"
   assert.doesNotMatch(source, /falcon-mobile-menu/);
   assert.doesNotMatch(source, /aria-modal/);
   assert.doesNotMatch(source, />Кейсы<|>Прогоны<|>Дефекты<|>Аналитика</);
+  assert.match(styles, /\.headerInner\s*\{[^}]*width: calc\(100% - 48px\)/s);
+  assert.match(styles, /\.primaryButton\s*\{[^}]*border-radius: 999px/s);
 });
 
 test("Falcon landing uses plain product labels and marks future integrations honestly", () => {

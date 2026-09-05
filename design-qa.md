@@ -89,12 +89,14 @@ final result: passed
 - The hero contains only the product promise and supporting sentence; its former registration button is removed.
 - The shorter hero copy group is optically centered lower in the viewport without changing the existing scroll animation.
 - Falcon, `Войти`, and `Создать аккаунт` fit without wrapping or horizontal overflow at both desktop and 320 px widths.
+- The header no longer stops at a 1380 px content cap: registration actions align 24 px from the right edge on wide screens and 10 px from it at 320 px. The registration control uses a full pill radius.
 
 ## Verification
 
 - [x] final hero and header inspected together at desktop and 320 px widths in the in-app browser
 - [x] rendered banner contains the only first-viewport `/signup/` link
 - [x] rendered hero contains no registration control
+- [x] 1920 px header geometry verified with a 24 px right inset; 320 px geometry verified with no wrapping or overflow
 - [x] `npm run typecheck`
 - [x] `npm run test:tms-auth` — 39/39 passed
 - [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
