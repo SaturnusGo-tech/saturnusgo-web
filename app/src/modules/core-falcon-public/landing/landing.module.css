@@ -67,7 +67,7 @@
   color: #fff;
 }
 
-.primaryButtonLarge,
+.primaryButton,
 .lightButton {
   display: inline-flex;
   align-items: center;
@@ -79,12 +79,26 @@
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), background 180ms ease;
 }
 
-.primaryButtonLarge:hover,
+.primaryButton {
+  min-height: 44px;
+  padding: 0 20px;
+  color: #111310;
+  background: #f8f8f5;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.primaryButton:hover,
 .lightButton:hover {
   transform: translateY(-2px);
 }
 
-.primaryButtonLarge:focus-visible,
+.primaryButton:hover {
+  background: #fff;
+}
+
+.primaryButton:focus-visible,
 .lightButton:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px #080908, 0 0 0 5px #f8f8f5;
@@ -125,14 +139,11 @@
   position: absolute;
   z-index: 3;
   left: 50%;
+  top: calc(50svh + 24px);
   width: min(1040px, calc(100% - 48px));
-  translate: -50% 0;
+  translate: -50% -50%;
   text-align: center;
   will-change: transform, opacity, filter;
-}
-
-.heroPrelude {
-  top: clamp(128px, 16svh, 178px);
 }
 
 .heroPrelude h1 {
@@ -153,20 +164,6 @@
   line-height: 1.5;
   letter-spacing: -0.02em;
   text-wrap: balance;
-}
-
-.primaryButtonLarge {
-  min-height: 52px;
-  margin-top: 32px;
-  padding: 0 24px;
-  color: #10120f;
-  background: #f8f8f5;
-  border: 1px solid rgba(255, 255, 255, 0.92);
-  font-size: 15px;
-}
-
-.primaryButtonLarge:hover {
-  background: #fff;
 }
 
 .heroProductStage {
@@ -661,6 +658,13 @@
     font-size: 13px;
   }
 
+  .primaryButton {
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
   .heroCinema {
     height: auto;
   }
@@ -699,10 +703,6 @@
 
   .heroLead {
     font-size: 16px;
-  }
-
-  .primaryButtonLarge {
-    width: min(360px, 100%);
   }
 
   .heroProductStage {

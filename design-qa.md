@@ -81,22 +81,23 @@ final result: passed
 
 ---
 
-# Design QA — Falcon hero CTA deduplication
+# Design QA — Falcon registration CTA placement
 
 ## Findings
 
-- The first viewport now exposes one registration action: `Создать аккаунт` in the hero.
-- The fixed header contains only the Falcon home link and the returning-user action `Войти`.
-- Removing the duplicate header button restores a clear action hierarchy without changing registration or admin-login routes.
-- The header remains visually balanced at the verified desktop viewport and introduces no empty placeholder or dead CSS selector.
+- The first viewport exposes one registration action: `Создать аккаунт` in the fixed header.
+- The hero contains only the product promise and supporting sentence; its former registration button is removed.
+- The shorter hero copy group is optically centered lower in the viewport without changing the existing scroll animation.
+- Falcon, `Войти`, and `Создать аккаунт` fit without wrapping or horizontal overflow at both desktop and 320 px widths.
 
 ## Verification
 
-- [x] final hero and header inspected together in the in-app browser
-- [x] rendered banner contains no `/signup/` link
-- [x] hero registration link still points to `/signup/`
+- [x] final hero and header inspected together at desktop and 320 px widths in the in-app browser
+- [x] rendered banner contains the only first-viewport `/signup/` link
+- [x] rendered hero contains no registration control
 - [x] `npm run typecheck`
 - [x] `npm run test:tms-auth` — 39/39 passed
+- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
 - [x] `git diff --check`
 
 final result: passed
@@ -232,13 +233,13 @@ final result: passed
 ## Findings
 
 - The selected dark cinematic direction is implemented with a sticky scroll sequence: the opening promise recedes with controlled blur, the run-context statement resolves into focus, and the current production run screen rises into the viewport with scale and perspective depth.
-- The header now contains only Falcon, `Войти`, and `Попробовать`; the temporary product-category navigation is removed.
+- The header now contains only Falcon, `Войти`, and `Создать аккаунт`; the temporary product-category navigation is removed.
 - All product chapters use current authenticated production screenshots and a restrained editorial rhythm instead of numbered feature tiles, pills, repeated cards, or generic marketing blocks.
 - The generated ambient image is served as a 2560 × 1440 WebP asset and is covered by the fail-closed Pages release manifest.
 - The same-viewport comparison was judged as one image. Hero centerline, background depth, statement hierarchy, product reveal, and fold composition match the selected variant without copying another product's identity.
 - The outgoing hero remains as a subtle blurred depth layer. The scroll cue disappears before the screenshot reaches it.
 - At 320 px the brand and both auth actions remain visible, the hero becomes a readable static sequence, and document/body widths stay exactly 320 px without horizontal overflow.
-- Keyboard focus cannot enter the visually hidden opening CTA. Focus treatment is high-contrast, semantic hero phases use one `h1` followed by an `h2`, and reduced-motion mode disables both motion transforms and global smooth scrolling.
+- The opening copy is removed from the accessibility tree when it becomes visually hidden. Focus treatment is high-contrast, semantic hero phases use one `h1` followed by an `h2`, and reduced-motion mode disables both motion transforms and global smooth scrolling.
 - Three independent final reviews found no remaining P0, P1, or P2 issues in visual matching, runtime/accessibility, or product copy.
 
 ## Verification

@@ -16,7 +16,7 @@ test("Falcon public routes keep their Russian document language", () => {
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon public header keeps login without duplicating the hero signup action", () => {
+test("Falcon public header keeps direct auth actions without feature navigation", () => {
   const source = readFileSync(resolve(
     root,
     "app/src/modules/core-falcon-public/landing/FalconHeader.tsx",
@@ -24,7 +24,7 @@ test("Falcon public header keeps login without duplicating the hero signup actio
 
   assert.match(source, /<FalconBrand inverse \/>/);
   assert.match(source, /href=\{TMS_ADMIN_LOGIN_PATH\}>Войти<\/Link>/);
-  assert.doesNotMatch(source, /href="\/signup\/"/);
+  assert.match(source, /href="\/signup\/">Создать аккаунт<\/Link>/);
   assert.doesNotMatch(source, /const navigation/);
   assert.doesNotMatch(source, /falcon-mobile-menu/);
   assert.doesNotMatch(source, /aria-modal/);
@@ -47,6 +47,8 @@ test("Falcon landing uses plain product labels and marks future integrations hon
 
   assert.match(hero, /Система управления ручным тестированием/);
   assert.match(hero, /Создавайте тест-кейсы, проводите тест-раны, регистрируйте дефекты/);
+  assert.doesNotMatch(hero, /href="\/signup\/"/);
+  assert.doesNotMatch(hero, /Создать аккаунт/);
   for (const title of [
     "Создавайте тест-кейсы и обновляйте сценарии",
     "Собирайте тест-раны и фиксируйте результаты",

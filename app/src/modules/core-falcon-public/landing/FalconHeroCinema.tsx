@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import {
   motion,
   useMotionValueEvent,
@@ -65,13 +63,6 @@ export function FalconHeroCinema() {
           <p className={styles.heroLead}>
             Создавайте тест-кейсы, проводите тест-раны, регистрируйте дефекты и анализируйте результаты тестирования.
           </p>
-          <Link
-            className={styles.primaryButtonLarge}
-            href="/signup/"
-            tabIndex={introInteractive ? undefined : -1}
-          >
-            Создать аккаунт <ArrowRight size={18} aria-hidden="true" />
-          </Link>
         </motion.div>
 
         <motion.figure
