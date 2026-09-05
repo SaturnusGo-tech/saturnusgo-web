@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
+import { FalconIntegrations } from "./FalconIntegrations";
 import styles from "./landing.module.css";
 
 export function FalconLanding() {
@@ -17,13 +18,13 @@ export function FalconLanding() {
             <div className={styles.editorialCopy}>
               <SectionIntro
                 label="Тест-кейсы"
-                title="Сценарий читается с первого взгляда"
-                text="Сразу видно, что сделать, что проверить и какие материалы приложены. Изменение общего шага обновит все сценарии, где он используется."
+                title="Создавайте тест-кейсы и обновляйте сценарии"
+                text="Добавляйте описание, предусловия, сценарий, общие шаги, теги и вложения. Указывайте статус, приоритет, тип и оценку времени."
               />
             </div>
             <ProductFrame
               src="/falcon/landing/case-repository.jpg"
-              alt="Репозиторий тест-кейсов Falcon с открытой карточкой"
+              alt="Список тест-кейсов и открытая карточка выбранного кейса"
               width={2174}
               height={1628}
               mobileSrc="/falcon/landing/case-repository-mobile.jpg"
@@ -38,14 +39,14 @@ export function FalconLanding() {
           <div className={styles.editorialInner}>
             <div className={styles.editorialCopy}>
               <SectionIntro
-                label="Запуски"
-                title="Ревизия фиксируется в момент запуска"
-                text="Откройте старый прогон — Falcon покажет сценарий таким, каким он был в момент запуска, вместе с окружением и сборкой."
+                label="Тест-раны"
+                title="Собирайте тест-раны и фиксируйте результаты"
+                text="Выбирайте нужные тест-кейсы, окружение и сборку. Во время прогона отмечайте результат каждого кейса."
               />
             </div>
             <ProductFrame
               src="/falcon/landing/run-builder.jpg"
-              alt="Конструктор тест-рана Falcon с выбором кейсов"
+              alt="Форма создания прогона с выбором тест-кейсов"
               width={2560}
               height={1440}
               mobileSrc="/falcon/landing/run-builder-mobile.jpg"
@@ -61,13 +62,13 @@ export function FalconLanding() {
             <div className={styles.editorialCopy}>
               <SectionIntro
                 label="Дефекты"
-                title="Дефект начинается с исходного шага"
-                text="Создайте дефект прямо из шага. Falcon перенесёт результаты и вложения, а ссылка на задачу в YouTrack останется рядом с исходным запуском."
+                title="Регистрируйте дефекты во время тестирования"
+                text="Создавайте баг-репорт из тест-рана, добавляйте описание и вложения. В карточке дефекта доступны связанные тест-кейс и тест-ран."
               />
             </div>
             <ProductFrame
               src="/falcon/landing/case-defect-link.jpg"
-              alt="Карточка баг-репорта Falcon рядом со списком дефектов"
+              alt="Список дефектов и открытая карточка баг-репорта"
               width={2560}
               height={1440}
               mobileSrc="/falcon/landing/case-defect-link-mobile.jpg"
@@ -78,26 +79,20 @@ export function FalconLanding() {
           </div>
         </section>
 
-        <section className={styles.integrationStatement} id="integrations">
-          <p className={styles.sectionLabel}>Интеграции</p>
-          <h2>
-            Дефект уходит в YouTrack. <span>Контекст остаётся в Falcon.</span>
-          </h2>
-          <p>Импорт, экспорт и автоматизация доступны через REST API.</p>
-        </section>
+        <FalconIntegrations />
 
         <section className={`${styles.editorialScene} ${styles.analyticsScene}`} id="analytics">
           <div className={styles.editorialInner}>
             <div className={styles.editorialCopy}>
               <SectionIntro
                 label="Аналитика"
-                title="Метрика ведёт к причине"
-                text="За каждой метрикой — конкретные кейсы, прогоны и дефекты, которые на неё повлияли."
+                title="Отслеживайте состояние тестирования на дашборде"
+                text="Смотрите результаты тест-ранов, покрытие, дефекты и показатели по компонентам. Применяйте фильтры по проекту и периоду."
               />
             </div>
             <ProductFrame
               src="/falcon/landing/analytics-dashboard.jpg"
-              alt="Дашборд качества Falcon по проекту Umbrella-Host"
+              alt="Дашборд проекта с показателями тестирования"
               width={2560}
               height={1440}
               mobileSrc="/falcon/landing/analytics-dashboard-mobile.jpg"
@@ -111,19 +106,19 @@ export function FalconLanding() {
 
       <footer className={styles.footer} id="security">
         <div className={styles.footerCta}>
-          <h2>Перенесите первый сценарий в Falcon</h2>
+          <h2>Создайте рабочее пространство</h2>
           <div>
-            <p>Создайте отдельное пространство для команды и начните с одного проекта.</p>
+            <p>После регистрации добавьте первый проект и тест-кейсы.</p>
             <Link className={styles.lightButton} href="/signup/">
-              Попробовать <ArrowRight size={18} aria-hidden="true" />
+              Создать аккаунт <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
         </div>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
           <div>
-            <Link href="/signup/">Создать пространство</Link>
-            <Link href="/cloud-login/">Вход в облако</Link>
+            <Link href="/signup/">Создать аккаунт</Link>
+            <Link href="/cloud-login/">Войти в пространство</Link>
           </div>
           <span>© {new Date().getFullYear()} Falcon</span>
         </div>

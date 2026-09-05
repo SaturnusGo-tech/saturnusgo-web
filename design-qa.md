@@ -41,6 +41,44 @@
 
 final result: passed
 
+---
+
+# Design QA — Falcon landing copy and integrations
+
+- editorial reference: `.design-audit/2026-09-05-falcon-copy-integrations/15-qatools-reference-top.png`
+- final Falcon hero: `.design-audit/2026-09-05-falcon-copy-integrations/12-final-copy-desktop-top.png`
+- same-viewport comparison: `.design-audit/2026-09-05-falcon-copy-integrations/16-reference-vs-falcon.png`
+- test-case chapter: `.design-audit/2026-09-05-falcon-copy-integrations/13-final-copy-testcases.png`
+- integrations directory: `.design-audit/2026-09-05-falcon-copy-integrations/14-final-integrations-desktop.png`
+- viewport: 1440 × 1000 CSS px
+
+## Findings
+
+- The reference and Falcon hero were inspected together at the same viewport. Falcon now follows the reference's direct editorial pattern: a literal product category, one factual capability sentence, and one clear account action.
+- Rejected slogan-like copy, numbered feature blocks, unsupported promises, and technical explanations aimed at implementers are absent from the rendered landing.
+- Each product chapter uses a concrete action heading and names only capabilities present in Falcon: test cases, test runs, defects, attachments, shared steps, and dashboard filters.
+- Planned integrations are clearly labelled as future work. Eleven services are grouped by use case, followed by REST API and webhooks for internal systems.
+- Brand marks use the official YouTrack source asset or packaged icon-library marks. No handwritten logo approximations are present.
+- The integrations section remains an editorial directory rather than a grid of interchangeable cards or pills.
+- A fresh browser load produced no console errors or warnings.
+- An independent copy review found no remaining high-priority AI-like language after the final literal rewrites.
+
+## Verification
+
+- [x] source reference and Falcon implementation inspected in one same-viewport comparison image
+- [x] hero, test-case chapter, and integrations section inspected in the in-app browser
+- [x] rendered heading hierarchy, copy, links, integration names, and future-work disclosure verified from the live DOM
+- [x] stale-copy regression test covers every phrase explicitly rejected by the user
+- [x] `npm run typecheck`
+- [x] `npm run test:tms-auth` — 39/39 passed
+- [x] `npm run test:tms-worker` — 28/28 passed
+- [x] `npm run test:tms-attachments` — 6/6 passed
+- [x] `npm run test:tms-adapters` — 188/188 passed
+- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
+- [x] `git diff --check`
+
+final result: passed
+
 # Design QA — Falcon public landing, production-data pass
 
 - source visual truth: `https://qatools.ru/`
