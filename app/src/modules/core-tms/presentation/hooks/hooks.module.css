@@ -549,12 +549,22 @@
 @keyframes hooksSpin { to { transform: rotate(1turn); } }
 @keyframes hooksSkeleton { to { background-position: -120% 0; } }
 
+@media (max-width: 1320px) {
+  .settingsLayout { grid-template-columns: minmax(0, 1fr); }
+  .settingsAside {
+    position: static;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .settingsAside > section { border-right: 1px solid var(--line); border-bottom: 0; }
+}
+
 @media (max-width: 980px) {
   .catalog { padding-inline: 24px; }
   .integrationGroup { grid-template-columns: 170px minmax(0, 1fr); gap: 20px; }
-  .settingsLayout { grid-template-columns: minmax(0, 1fr); }
-  .settingsAside { position: static; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 0; }
-  .settingsAside > section { border-right: 1px solid var(--line); border-bottom: 0; }
   .settingsSection { grid-template-columns: 180px minmax(0, 1fr); gap: 28px; }
 }
 
