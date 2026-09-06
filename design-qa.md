@@ -259,3 +259,36 @@ final result: passed
 - [x] `git diff --check`
 
 final result: passed
+
+---
+
+# Design QA — workspace integrations and YouTrack
+
+- production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`
+- release source SHA: `5a0276ee7c158e256bd9ff319bfbe09f303b0160`
+- production viewport: 1087 × 814 CSS px
+- states: integration catalog, persisted YouTrack configuration, live connection check, laptop-width responsive layout
+
+## Findings
+
+- The Hooks screen exposes one integration catalog grouped by work type. YouTrack is interactive; Jira, Linear, Trello, GitHub, GitLab, Jenkins, TeamCity, Slack, and Confluence are visibly unavailable rather than presenting non-functional controls.
+- YouTrack opens in a dedicated configuration screen with the saved service root, a non-readable token field, Android/iOS/backend project routing, ready-for-test stages, the accepted stage, synchronization totals, and connection metadata.
+- A live production connection check returned three projects: `Umbrella-Android`, `Umbrella-Ios`, and `Umbrella-Backend`. Existing project mappings remained selected after project discovery.
+- The saved configuration is workspace-scoped and reports `Рабочее пространство` as its source. The persistent token is never returned to the browser.
+- At 1087 px the routing table remains fully readable. Synchronization and connection-state summaries move below the form, avoiding the previous horizontal clipping at laptop widths.
+- The catalog and settings reuse Falcon navigation, typography, neutral surfaces, restrained status color, spacing, and rounded controls instead of introducing a separate visual system.
+
+## Verification
+
+- [x] production manifest resolves to source SHA `5a0276ee7c158e256bd9ff319bfbe09f303b0160`
+- [x] production backend health check passes after migration `0022`
+- [x] live YouTrack connection check — 3/3 projects discovered
+- [x] persisted Android, iOS, and Backend routes verified in production
+- [x] laptop-width catalog, form, routing table, workflow controls, and summary layout inspected in the in-app browser
+- [x] `npm run test:tms-adapters` — 195/195 passed
+- [x] `npm run typecheck`
+- [x] architecture checks — 334 files passed
+- [x] `npm run build:once` — 62/62 static pages
+- [x] `git diff --check`
+
+final result: passed
