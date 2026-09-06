@@ -64,7 +64,7 @@ export type CaseLinkedDefect = {
     lastSyncedAt: string | null;
   };
   youTrackCreation: null | {
-    target: "android" | "ios" | "backend";
+    target: NonNullable<Defect["integrationTarget"]>;
     status: "pending" | "published" | "failed" | "uncertain";
     lastErrorCode: string | null;
   };

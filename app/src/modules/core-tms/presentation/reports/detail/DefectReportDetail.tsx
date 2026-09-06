@@ -91,7 +91,7 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
             <dl className={surface.propertyList}>
               <div><dt>{t("reports.component")}</dt><dd>{localizedComponentLabel(locale, defect.component) || "—"}</dd></div>
               <div><dt>{t("reports.assignee")}</dt><dd>{defect.assigneeIdentityId || t("common.unassigned")}</dd></div>
-              <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? localizedLabel(locale, defect.integrationTarget) : "—"}</dd></div>
+              <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? "YouTrack" : "—"}</dd></div>
             </dl>
           </DetailSection>
           <DetailSection title={t("reports.issueLink")}>

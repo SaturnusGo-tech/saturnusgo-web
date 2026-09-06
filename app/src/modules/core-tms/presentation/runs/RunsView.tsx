@@ -19,6 +19,7 @@ import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadge
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
+  workspaceId: string;
   offline: boolean;
   runs: TestRunSummary[];
   cases: TestCaseSummary[];
@@ -40,7 +41,7 @@ type RunsViewProps = {
   onDefectCreated: (defect: Defect) => void;
 };
 
-export function RunsView({ offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onItemStatus, onComplete, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
+export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onItemStatus, onComplete, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const attachments = useAttachmentClient();
   const [listMode, setListMode] = useState<RunListMode>("active");
@@ -174,7 +175,7 @@ export function RunsView({ offline, runs, cases, selectedRun, items, selectedIte
           </aside>
         </div>
         {attachmentIds.length > 0 && <section className={runStyles.evidence}><strong>{t("runs.evidence")}</strong><div className={`${styles.attachmentGrid} ${runStyles.evidenceGrid}`}>{attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</div></section>}
-        {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}
+        {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} workspaceId={workspaceId} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}
       </div>
     </section>
     {runWritable && <footer className={runStyles.footer}>

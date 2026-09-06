@@ -15,7 +15,7 @@ import surface from "./hooks.module.css";
 import { hooksCopy } from "./shared/hooks-copy";
 import { YouTrackSettings } from "./youtrack/YouTrackSettings";
 
-export function HooksView({ workspaceId }: { workspaceId: string }) {
+export function HooksView({ workspaceId, canManage }: { workspaceId: string; canManage: boolean }) {
   const http = useTmsHttpClient();
   const { locale, languageTag } = useTmsLocale();
   const russian = locale === "ru";
@@ -54,6 +54,7 @@ export function HooksView({ workspaceId }: { workspaceId: string }) {
       status={status}
       languageTag={languageTag}
       russian={russian}
+      canManage={canManage}
       onBack={() => setScreen("catalog")}
       onStatusChange={refresh}
     />;

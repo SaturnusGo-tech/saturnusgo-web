@@ -144,6 +144,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "runs") {
     return (
       <RunsView
+        workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
         runs={model.projectRuns}
         cases={model.projectCases}
@@ -175,7 +176,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} />;
+  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id}
+    canManage={model.canManageIntegrations} />;
   return (
     <ReportsView
       defects={model.reportDefects}

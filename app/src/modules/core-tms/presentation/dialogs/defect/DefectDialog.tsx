@@ -1,6 +1,6 @@
 import { Bug, Image as ImageIcon, Paperclip, X } from "lucide-react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type {
   Defect,
@@ -14,7 +14,9 @@ import { useAttachmentClient } from "../../../attachments/presentation/context/A
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
-import { defectClientLabels, initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { defectClientLabels, inferLegacyDefectIntegrationTarget, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { useYouTrackRouteOptions } from "../../../defects/presentation/use-youtrack-route-options";
+import { defectRouteChoices } from "../../../defects/presentation/defect-route-choices";
 import { FormError } from "../../common/error/FormError";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
@@ -22,22 +24,19 @@ import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { getDefectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 import surface from "../drawer-surfaces.module.css";
-
 type DefectDialogProps = {
-  projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
+  workspaceId: string; projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
   offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
 };
-
-export function DefectDialog({ projectId, run, item, components, offline, onClose,
+export function DefectDialog({ workspaceId, projectId, run, item, components, offline, onClose,
   onCreated }: DefectDialogProps) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
+  const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const occurrence = run && item ? { run, item } : null;
-  const attempt =
-    item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ??
-    item?.attempts[0];
+  const attempt = item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item?.attempts[0];
   const failedStep = item
     ? executableSteps(item.snapshot, locale).find(
         (step) =>
@@ -67,16 +66,29 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
   const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
-  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>(() =>
-    initialDefectIntegrationChoice(item?.snapshot.tags ?? [], item?.snapshot.component ?? ""));
-  const routing = resolveDefectIntegrationChoice(integrationChoice);
+  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>("");
+  const { configurationVersion, enabled, options: youTrackOptions, status: youTrackStatus } = youTrack;
+  useEffect(() => {
+    if (configurationVersion !== 1 || !enabled || integrationChoice) return;
+    const suggested = inferLegacyDefectIntegrationTarget(
+      item?.snapshot.tags ?? [], item?.snapshot.component ?? component,
+    );
+    if (suggested && youTrackOptions.some((option) => option.value === suggested)) setIntegrationChoice(suggested);
+  }, [component, configurationVersion, enabled, integrationChoice, item, youTrackOptions]);
+  const automaticRouting = offline || (youTrackStatus === "ready" && (configurationVersion === 2 || !enabled));
+  const routing = resolveDefectIntegrationChoice(integrationChoice, automaticRouting);
+  const routeOptions = offline ? [{ value: "", label: copy.tmsOnly }]
+    : youTrackStatus === "loading" ? [{ value: "", label: copy.youTrackLoading }]
+    : youTrackStatus === "error" ? [{ value: "", label: copy.youTrackUnavailable }]
+    : defectRouteChoices(youTrack, copy);
+  const routingMessage = youTrackStatus === "error" ? copy.youTrackUnavailable
+    : youTrackStatus === "loading" ? copy.youTrackLoading : copy.youTrackRequired;
   const [filesRef] = useAutoAnimate<HTMLDivElement>({ duration: 160 });
   const [files, setFiles] = useState<File[]>([]);
   const [link, setLink] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [operationKey] = useState(() => crypto.randomUUID());
-
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
@@ -111,7 +123,6 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
       setSubmitting(false);
     }
   }
-
   return (
     <Modal
       title={copy.title}
@@ -136,11 +147,8 @@ export function DefectDialog({ projectId, run, item, components, offline, onClos
           <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.youTrackTarget}</span>
             <AnimatedSelect label={copy.youTrackTarget} value={integrationChoice}
               onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)}
-              options={[{ value: "", label: copy.youTrackPlaceholder }, { value: "tms", label: copy.tmsOnly },
-                { value: "android", label: copy.youTrackAndroid },
-                { value: "ios", label: copy.youTrackIos },
-                { value: "backend", label: copy.youTrackBackend }]} />
-            {!routing.resolved && <small className={styles.fieldValidation} role="alert">{copy.youTrackRequired}</small>}
+              options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
+            {!routing.resolved && <small className={styles.fieldValidation} role="status">{routingMessage}</small>}
           </div>
           <div className={styles.formField}><span>{copy.severity}</span>
             <AnimatedSelect label={copy.severity} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[

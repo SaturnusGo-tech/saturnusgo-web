@@ -154,7 +154,8 @@ export function youTrackTargetLabel(locale: TmsLocale, target: string) {
     Staging: ["Staging", "Тестовое окружение"],
     Done: ["Done", "Готово"],
   };
-  return labels[target]?.[locale === "ru" ? 1 : 0] ?? target;
+  return labels[target]?.[locale === "ru" ? 1 : 0]
+    ?? (locale === "ru" ? "настроенный статус" : "the configured status");
 }
 
 export function youTrackCreationLabel(
@@ -162,22 +163,20 @@ export function youTrackCreationLabel(
   creation: NonNullable<CaseLinkedDefect["youTrackCreation"]>,
 ) {
   const ru = locale === "ru";
-  const target = creation.target === "backend" ? (ru ? "бэкенд" : "backend")
-    : creation.target === "android" ? "Android" : "iOS";
   const code = creation.lastErrorCode
     ? `${ru ? " Код" : " Code"}: ${creation.lastErrorCode}.` : "";
   if (creation.status === "pending") return (ru
-    ? `Создание задачи YouTrack (${target}) поставлено в очередь.`
-    : `YouTrack issue creation (${target}) is queued.`) + code;
+    ? "Создание задачи YouTrack поставлено в очередь."
+    : "YouTrack issue creation is queued.") + code;
   if (creation.status === "published") return (ru
-    ? `Запрос на создание задачи YouTrack (${target}) отправлен; ссылка ещё не получена.`
-    : `The YouTrack issue creation request (${target}) was sent; the link is not available yet.`) + code;
+    ? "Запрос на создание задачи YouTrack отправлен; ссылка ещё не получена."
+    : "The YouTrack issue creation request was sent; the link is not available yet.") + code;
   if (creation.status === "failed") return (ru
-    ? `Не удалось создать задачу YouTrack (${target}). Повторите интеграцию или обратитесь к администратору.`
-    : `Could not create the YouTrack issue (${target}). Retry the integration or contact an administrator.`) + code;
+    ? "Не удалось создать задачу YouTrack. Повторите интеграцию или обратитесь к администратору."
+    : "Could not create the YouTrack issue. Retry the integration or contact an administrator.") + code;
   return (ru
-    ? `YouTrack не подтвердил результат создания задачи (${target}). Обновите данные или обратитесь к администратору.`
-    : `YouTrack did not confirm the issue creation result (${target}). Refresh the data or contact an administrator.`) + code;
+    ? "YouTrack не подтвердил результат создания задачи. Обновите данные или обратитесь к администратору."
+    : "YouTrack did not confirm the issue creation result. Refresh the data or contact an administrator.") + code;
 }
 
 export function supersededTransitionLabel(locale: TmsLocale, terminal: boolean) {

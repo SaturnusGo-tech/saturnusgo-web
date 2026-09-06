@@ -4,6 +4,9 @@ import type {
   YouTrackConfiguration,
   YouTrackConfigurationInput,
   YouTrackConnectionTest,
+  YouTrackDiscovery,
+  YouTrackDisconnectResult,
+  YouTrackWebhookSetup,
 } from "../model/youtrack-settings";
 
 export type YouTrackIntegrationStatus = components["schemas"]["YouTrackIntegrationStatus"];
@@ -48,6 +51,21 @@ export async function testYouTrackConnection(
   );
 }
 
+export async function discoverYouTrack(
+  http: TmsHttpClient,
+  workspaceId: string,
+  input: Readonly<{ baseUrl: string; apiToken?: string; projectIds?: readonly string[] }>,
+  signal?: AbortSignal,
+): Promise<YouTrackDiscovery> {
+  const query = new URLSearchParams({ workspaceId });
+  return await http.mutate<YouTrackDiscovery>(
+    `/integrations/youtrack/discovery?${query.toString()}`,
+    "POST",
+    input,
+    signal,
+  );
+}
+
 export async function saveYouTrackConfiguration(
   http: TmsHttpClient,
   workspaceId: string,
@@ -62,4 +80,32 @@ export async function saveYouTrackConfiguration(
     input,
     { ifMatch: etag, signal },
   );
+}
+
+export async function disconnectYouTrack(
+  http: TmsHttpClient,
+  workspaceId: string,
+  etag: string,
+  signal?: AbortSignal,
+): Promise<TmsResource<YouTrackDisconnectResult>> {
+  const query = new URLSearchParams({ workspaceId });
+  return await http.mutateResource<YouTrackDisconnectResult>(
+    `/integrations/youtrack/disconnect?${query.toString()}`,
+    "POST",
+    { mode: "detachExisting" },
+    { ifMatch: etag, signal },
+  );
+}
+
+export async function getYouTrackWebhookSetup(
+  http: TmsHttpClient,
+  workspaceId: string,
+  signal?: AbortSignal,
+): Promise<YouTrackWebhookSetup> {
+  const query = new URLSearchParams({ workspaceId });
+  const envelope = await http.get<components["schemas"]["YouTrackWebhookSetupEnvelope"]>(
+    `/integrations/youtrack/webhook-setup?${query.toString()}`,
+    signal,
+  );
+  return envelope.data;
 }

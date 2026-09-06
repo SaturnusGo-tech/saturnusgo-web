@@ -68,6 +68,7 @@ export function useWorkspaceModel() {
     reportDefects,
     selectedDefectResource,
     sharedSteps,
+    canManageIntegrations: capabilities.includes("integration:manage"),
   };
 }
 

@@ -74,6 +74,7 @@ export function WorkspaceExecutionDialogs({
   if (model.dialog === "defect" && model.project) {
     return (
       <DefectDialog
+        workspaceId={model.data.workspace.id}
         projectId={model.project.id}
         run={model.selectedRun}
         item={model.selectedRunItem}

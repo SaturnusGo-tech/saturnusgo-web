@@ -1,12 +1,14 @@
 import { Bug, Paperclip, RefreshCw, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type { Defect, RunItem, TestRunSummary, TestStep } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
 import { describeDefectCreateError } from "../../../application/defects/describeDefectCreateError";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../../attachments/presentation/context/AttachmentClientProvider";
-import { defectClientLabels, initialDefectIntegrationChoice, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { defectClientLabels, inferLegacyDefectIntegrationTarget, resolveDefectIntegrationChoice, type DefectIntegrationChoice } from "../../../defects/model/integration-target";
+import { useYouTrackRouteOptions } from "../../../defects/presentation/use-youtrack-route-options";
+import { defectRouteChoices } from "../../../defects/presentation/defect-route-choices";
 import { executableSteps } from "../../../helpers/cases/caseRevision";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel } from "../../../localization/format/labels";
@@ -20,6 +22,7 @@ import surface from "../../dialogs/drawer-surfaces.module.css";
 import styles from "./inline-defect.module.css";
 
 type Props = {
+  workspaceId: string;
   projectId: string;
   run: TestRunSummary;
   item: RunItem;
@@ -30,11 +33,12 @@ type Props = {
   onCreated: (defect: Defect) => void;
 };
 
-export function InlineDefectComposer({ projectId, run, item, step, components, offline, onClose, onCreated }: Props) {
+export function InlineDefectComposer({ workspaceId, projectId, run, item, step, components, offline, onClose, onCreated }: Props) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
+  const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;
   const failedResult = attempt.stepResults.find((entry) => entry.stepId === step.id);
@@ -45,8 +49,22 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [priority, setPriority] = useState<Defect["priority"]>("high");
   const [component, setComponent] = useState(componentOptions[0]);
-  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>(() => initialDefectIntegrationChoice(item.snapshot.tags, item.snapshot.component));
-  const routing = resolveDefectIntegrationChoice(integrationChoice);
+  const [integrationChoice, setIntegrationChoice] = useState<DefectIntegrationChoice>("");
+  const { configurationVersion, enabled, options: youTrackOptions, status: youTrackStatus } = youTrack;
+  useEffect(() => {
+    if (configurationVersion !== 1 || !enabled || integrationChoice) return;
+    const suggested = inferLegacyDefectIntegrationTarget(item.snapshot.tags, item.snapshot.component);
+    if (suggested && youTrackOptions.some((option) => option.value === suggested)) setIntegrationChoice(suggested);
+  }, [configurationVersion, enabled, integrationChoice, item, youTrackOptions]);
+  const routing = resolveDefectIntegrationChoice(
+    integrationChoice, offline || (youTrackStatus === "ready" && (configurationVersion === 2 || !enabled)),
+  );
+  const routeOptions = offline ? [{ value: "", label: copy.tmsOnly }]
+    : youTrackStatus === "loading" ? [{ value: "", label: copy.youTrackLoading }]
+    : youTrackStatus === "error" ? [{ value: "", label: copy.youTrackUnavailable }]
+    : defectRouteChoices(youTrack, copy);
+  const routingMessage = youTrackStatus === "error" ? copy.youTrackUnavailable
+    : youTrackStatus === "loading" ? copy.youTrackLoading : copy.youTrackRequired;
   const [description, setDescription] = useState(t("inlineDefect.descriptionDefault", { action: step.action }));
   const [repro, setRepro] = useState(`${executableSteps(item.snapshot).map((entry, index) => `${index + 1}. ${entry.action}.`).join("\n")}\n\n${t("inlineDefect.actualPrefix")}: ${observed}`);
   const [link, setLink] = useState(/^https:\/\//i.test(run.environment.baseUrl) ? run.environment.baseUrl : "");
@@ -88,7 +106,7 @@ export function InlineDefectComposer({ projectId, run, item, step, components, o
             <Field label={t("inlineDefect.severity")}><AnimatedSelect label={t("inlineDefect.severity")} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[{ value: "critical", label: t("severity.critical") }, { value: "high", label: t("severity.major") }, { value: "medium", label: t("severity.minor") }, { value: "low", label: t("severity.low") }]} /></Field>
             <Field label={t("inlineDefect.priority")}><AnimatedSelect label={t("inlineDefect.priority")} value={priority} onChange={(value) => setPriority(value as Defect["priority"])} options={[{ value: "critical", label: t("inlineDefect.priorityUrgent") }, { value: "high", label: t("priority.high") }, { value: "medium", label: t("priority.medium") }, { value: "low", label: t("priority.low") }]} /></Field>
             <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={componentChoices} /></Field>
-            <Field label={copy.youTrackTarget} wide><AnimatedSelect label={copy.youTrackTarget} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={[{ value: "", label: copy.youTrackPlaceholder }, { value: "tms", label: copy.tmsOnly }, { value: "android", label: copy.youTrackAndroid }, { value: "ios", label: copy.youTrackIos }, { value: "backend", label: copy.youTrackBackend }]} />{!routing.resolved && <small className={shared.fieldValidation} role="alert">{copy.youTrackRequired}</small>}</Field>
+            <Field label={copy.youTrackTarget} wide><AnimatedSelect label={copy.youTrackTarget} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
             <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
           </div>
         </section>

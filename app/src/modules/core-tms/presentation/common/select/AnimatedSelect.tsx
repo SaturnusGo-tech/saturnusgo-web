@@ -14,6 +14,7 @@ export function AnimatedSelect({
   onChange,
   className,
   compact = false,
+  disabled = false,
 }: {
   label: string;
   value: string;
@@ -21,6 +22,7 @@ export function AnimatedSelect({
   onChange: (value: string) => void;
   className?: string;
   compact?: boolean;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
@@ -58,12 +60,13 @@ export function AnimatedSelect({
         ref={triggerRef}
         className={`${styles.trigger} ${compact ? styles.compactTrigger : ""}`}
         type="button"
+        disabled={disabled}
         title={selected?.label}
-        aria-label={label}
+        aria-label={`${label}: ${selected?.label ?? "—"}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={menuId}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => { if (!disabled) setOpen((current) => !current); }}
         onKeyDown={(event) => {
           if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();
