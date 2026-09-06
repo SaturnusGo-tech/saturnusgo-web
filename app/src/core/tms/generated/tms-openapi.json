@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.9",
+    "version": "1.0.0-checkpoint.10",
     "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -2152,6 +2152,71 @@
         }
       }
     },
+    "/integrations/youtrack/configuration": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Read safe workspace YouTrack configuration",
+        "description": "Tenant defaults are intentionally unconfigured and disclose no deployment-wide YouTrack base URL, project targets, workflow mapping, or credential presence.",
+        "operationId": "getYouTrackConfiguration",
+        "parameters": [{ "$ref": "#/components/parameters/WorkspaceIdQueryRequired" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/YouTrackConfigurationResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Integrations"],
+        "summary": "Replace mutable workspace YouTrack configuration",
+        "description": "PATCH has replace semantics: every mutable non-secret field is required and replaces the stored value. A tenant's first configuration requires apiToken. Existing workspace credentials may be preserved only on their exact service root. Legacy non-tenant workspaces materialize the runtime credential into their first persisted configuration.",
+        "operationId": "replaceYouTrackConfiguration",
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
+          { "$ref": "#/components/parameters/IfMatch" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/YouTrackConfigurationReplace" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/YouTrackConfigurationResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "412": { "$ref": "#/components/responses/PreconditionFailed" },
+          "422": { "$ref": "#/components/responses/UnprocessableEntity" },
+          "428": { "$ref": "#/components/responses/PreconditionRequired" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
+    "/integrations/youtrack/connection-test": {
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "post": {
+        "tags": ["Integrations"],
+        "summary": "Test a YouTrack connection and discover accessible projects",
+        "description": "Uses an explicitly supplied token, or an existing workspace token only when baseUrl is unchanged. Tenant initialization never falls back to deployment-wide credentials and therefore requires apiToken.",
+        "operationId": "testYouTrackConnection",
+        "x-tms-idempotency": "not-applicable",
+        "parameters": [{ "$ref": "#/components/parameters/WorkspaceIdQueryRequired" }],
+        "requestBody": { "$ref": "#/components/requestBodies/YouTrackConnectionTest" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/YouTrackConnectionTestResponse" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/UnprocessableEntity" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
     "/integrations/youtrack/status": {
       "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
@@ -2164,6 +2229,7 @@
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
@@ -2544,6 +2610,15 @@
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DefectFixConfirmationRequest" } } }
       },
+      "YouTrackConnectionTest": {
+        "required": true,
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackConnectionTestRequest" } } }
+      },
+      "YouTrackConfigurationReplace": {
+        "required": true,
+        "description": "Complete replacement of mutable non-secret configuration fields. A tenant's first configuration requires apiToken; an existing workspace credential may be preserved only on the same exact service root.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackConfigurationReplaceRequest" } } }
+      },
       "YouTrackWebhook": {
         "required": true,
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackWebhookRequest" } } }
@@ -2906,6 +2981,19 @@
         },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ActivityListEnvelope" } } }
       },
+      "YouTrackConfigurationResponse": {
+        "description": "Safe workspace YouTrack configuration. The API token is never returned.",
+        "headers": {
+          "X-Request-Id": { "$ref": "#/components/headers/XRequestId" },
+          "ETag": { "$ref": "#/components/headers/ETag" }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackConfigurationEnvelope" } } }
+      },
+      "YouTrackConnectionTestResponse": {
+        "description": "Bounded accessible YouTrack projects without credentials.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackConnectionTestEnvelope" } } }
+      },
       "YouTrackIntegrationStatusResponse": {
         "description": "Bounded workspace-scoped YouTrack synchronization status without credentials.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
@@ -2967,6 +3055,11 @@
       },
       "BadRequest": {
         "description": "The request is malformed or fails safe field validation.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "UnprocessableEntity": {
+        "description": "The bounded request is valid but its credentials, upstream response, or selected project mapping cannot be accepted.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
       },
@@ -3038,6 +3131,11 @@
       },
       "InternalError": {
         "description": "Unexpected server error; internal details are never exposed.",
+        "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "BadGateway": {
+        "description": "The bounded upstream operation is temporarily unavailable.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
       }
@@ -5049,6 +5147,179 @@
           "lastSyncedAt": { "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }] }
         }
       },
+      "YouTrackStage": {
+        "type": "string",
+        "enum": ["Backlog", "Develop", "Review", "Test", "Acceptance", "Staging", "Done"]
+      },
+      "YouTrackAcceptedStage": {
+        "type": "string",
+        "enum": ["Acceptance", "Staging", "Done"]
+      },
+      "YouTrackBaseUrl": {
+        "type": "string",
+        "format": "uri",
+        "maxLength": 2048,
+        "pattern": "^https://",
+        "description": "Exact HTTPS YouTrack service root without credentials, query, or fragment."
+      },
+      "YouTrackApiToken": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 2048,
+        "writeOnly": true,
+        "description": "Write-only permanent token. It is encrypted at rest and never returned."
+      },
+      "YouTrackProjectId": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 128,
+        "pattern": "^[0-9]+-[0-9]+$"
+      },
+      "YouTrackShortName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+      },
+      "YouTrackReadyForTestStatuses": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 7,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "enum": ["Backlog", "Develop", "Review", "Test", "Acceptance", "Staging", "Done"]
+        }
+      },
+      "YouTrackConfigurationTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "shortName"],
+        "properties": {
+          "projectId": { "$ref": "#/components/schemas/YouTrackProjectId" },
+          "shortName": { "$ref": "#/components/schemas/YouTrackShortName" }
+        }
+      },
+      "YouTrackConfigurationTargets": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["android", "ios", "backend"],
+        "properties": {
+          "android": { "$ref": "#/components/schemas/YouTrackConfigurationTarget" },
+          "ios": { "$ref": "#/components/schemas/YouTrackConfigurationTarget" },
+          "backend": { "$ref": "#/components/schemas/YouTrackConfigurationTarget" }
+        }
+      },
+      "YouTrackSafeConfigurationTargets": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["android", "ios", "backend"],
+        "properties": {
+          "android": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackConfigurationTarget" }, { "type": "null" }] },
+          "ios": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackConfigurationTarget" }, { "type": "null" }] },
+          "backend": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackConfigurationTarget" }, { "type": "null" }] }
+        }
+      },
+      "YouTrackConnection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "checkedAt", "lastErrorCode"],
+        "properties": {
+          "status": { "type": "string", "enum": ["unconfigured", "connected", "failed"] },
+          "checkedAt": { "oneOf": [{ "$ref": "#/components/schemas/Timestamp" }, { "type": "null" }] },
+          "lastErrorCode": {
+            "oneOf": [
+              { "type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[A-Z][A-Z0-9_]*$" },
+              { "type": "null" }
+            ]
+          }
+        }
+      },
+      "YouTrackConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Safe workspace configuration projection. It never contains apiToken.",
+        "required": ["workspaceId", "source", "enabled", "baseUrl", "tokenConfigured", "targets", "readyForTestStatuses", "acceptedStage", "connection", "rowVersion"],
+        "properties": {
+          "workspaceId": { "$ref": "#/components/schemas/Identifier" },
+          "source": { "type": "string", "enum": ["workspace", "runtime", "tenant_default"] },
+          "enabled": { "type": "boolean" },
+          "baseUrl": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackBaseUrl" }, { "type": "null" }] },
+          "tokenConfigured": { "type": "boolean" },
+          "targets": { "$ref": "#/components/schemas/YouTrackSafeConfigurationTargets" },
+          "readyForTestStatuses": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 7,
+            "uniqueItems": true,
+            "items": { "$ref": "#/components/schemas/YouTrackStage" }
+          },
+          "acceptedStage": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackAcceptedStage" }, { "type": "null" }] },
+          "connection": { "$ref": "#/components/schemas/YouTrackConnection" },
+          "rowVersion": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+        }
+      },
+      "YouTrackConfigurationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/YouTrackConfiguration" } }
+      },
+      "YouTrackConnectionTestRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "apiToken may be omitted only when the workspace already owns a token for the exact same baseUrl, or for an eligible legacy non-tenant workspace.",
+        "required": ["baseUrl"],
+        "properties": {
+          "baseUrl": { "$ref": "#/components/schemas/YouTrackBaseUrl" },
+          "apiToken": { "$ref": "#/components/schemas/YouTrackApiToken" }
+        }
+      },
+      "YouTrackConfigurationReplaceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Full replacement of mutable non-secret fields. Tenant initialization requires apiToken; omission only preserves an existing workspace credential on the same exact service root.",
+        "required": ["enabled", "baseUrl", "targets", "readyForTestStatuses", "acceptedStage"],
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "baseUrl": { "$ref": "#/components/schemas/YouTrackBaseUrl" },
+          "apiToken": { "$ref": "#/components/schemas/YouTrackApiToken" },
+          "targets": { "$ref": "#/components/schemas/YouTrackConfigurationTargets" },
+          "readyForTestStatuses": { "$ref": "#/components/schemas/YouTrackReadyForTestStatuses" },
+          "acceptedStage": { "$ref": "#/components/schemas/YouTrackAcceptedStage" }
+        }
+      },
+      "YouTrackProject": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "shortName"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/YouTrackProjectId" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "shortName": { "$ref": "#/components/schemas/YouTrackShortName" }
+        }
+      },
+      "YouTrackConnectionTestResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["baseUrl", "projects"],
+        "properties": {
+          "baseUrl": { "$ref": "#/components/schemas/YouTrackBaseUrl" },
+          "projects": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": { "$ref": "#/components/schemas/YouTrackProject" }
+          }
+        }
+      },
+      "YouTrackConnectionTestEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data"],
+        "properties": { "data": { "$ref": "#/components/schemas/YouTrackConnectionTestResult" } }
+      },
       "YouTrackWorkflow": {
         "type": "object",
         "additionalProperties": false,
@@ -5056,12 +5327,15 @@
         "properties": {
           "readyForTestStatuses": {
             "type": "array",
-            "minItems": 3,
-            "maxItems": 3,
+            "minItems": 0,
+            "maxItems": 7,
             "uniqueItems": true,
-            "items": { "type": "string", "enum": ["Test", "Acceptance", "Staging"] }
+            "items": {
+              "type": "string",
+              "enum": ["Backlog", "Develop", "Review", "Test", "Acceptance", "Staging", "Done"]
+            }
           },
-          "acceptedStatus": { "type": "string", "enum": ["Acceptance", "Staging", "Done"] }
+          "acceptedStatus": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackAcceptedStage" }, { "type": "null" }] }
         }
       },
       "YouTrackIntegrationStatus": {
@@ -5070,15 +5344,15 @@
         "required": ["provider", "baseUrl", "targets", "workflow", "linked", "pending", "failed", "lastSyncedAt"],
         "properties": {
           "provider": { "const": "youtrack" },
-          "baseUrl": { "type": "string", "format": "uri", "maxLength": 2048 },
+          "baseUrl": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackBaseUrl" }, { "type": "null" }] },
           "targets": {
             "type": "object",
             "additionalProperties": false,
             "required": ["android", "ios", "backend"],
             "properties": {
-              "android": { "$ref": "#/components/schemas/YouTrackTarget" },
-              "ios": { "$ref": "#/components/schemas/YouTrackTarget" },
-              "backend": { "$ref": "#/components/schemas/YouTrackTarget" }
+              "android": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackTarget" }, { "type": "null" }] },
+              "ios": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackTarget" }, { "type": "null" }] },
+              "backend": { "oneOf": [{ "$ref": "#/components/schemas/YouTrackTarget" }, { "type": "null" }] }
             }
           },
           "workflow": { "$ref": "#/components/schemas/YouTrackWorkflow" },

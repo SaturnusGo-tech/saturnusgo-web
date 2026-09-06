@@ -1,5 +1,10 @@
 import type { components } from "../../../../core/tms/generated/tms-api";
-import type { TmsHttpClient } from "../../../../core/tms/transport/http";
+import type { TmsHttpClient, TmsResource } from "../../../../core/tms/transport/http";
+import type {
+  YouTrackConfiguration,
+  YouTrackConfigurationInput,
+  YouTrackConnectionTest,
+} from "../model/youtrack-settings";
 
 export type YouTrackIntegrationStatus = components["schemas"]["YouTrackIntegrationStatus"];
 
@@ -14,4 +19,47 @@ export async function getYouTrackIntegrationStatus(
     signal,
   );
   return envelope.data;
+}
+
+export async function getYouTrackConfiguration(
+  http: TmsHttpClient,
+  workspaceId: string,
+  signal?: AbortSignal,
+): Promise<TmsResource<YouTrackConfiguration>> {
+  const query = new URLSearchParams({ workspaceId });
+  return await http.getResource<YouTrackConfiguration>(
+    `/integrations/youtrack/configuration?${query.toString()}`,
+    signal,
+  );
+}
+
+export async function testYouTrackConnection(
+  http: TmsHttpClient,
+  workspaceId: string,
+  input: Readonly<{ baseUrl: string; apiToken?: string }>,
+  signal?: AbortSignal,
+): Promise<YouTrackConnectionTest> {
+  const query = new URLSearchParams({ workspaceId });
+  return await http.mutate<YouTrackConnectionTest>(
+    `/integrations/youtrack/connection-test?${query.toString()}`,
+    "POST",
+    input,
+    signal,
+  );
+}
+
+export async function saveYouTrackConfiguration(
+  http: TmsHttpClient,
+  workspaceId: string,
+  input: YouTrackConfigurationInput,
+  etag: string,
+  signal?: AbortSignal,
+): Promise<TmsResource<YouTrackConfiguration>> {
+  const query = new URLSearchParams({ workspaceId });
+  return await http.mutateResource<YouTrackConfiguration>(
+    `/integrations/youtrack/configuration?${query.toString()}`,
+    "PATCH",
+    input,
+    { ifMatch: etag, signal },
+  );
 }

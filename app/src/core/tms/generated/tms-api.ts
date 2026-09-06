@@ -1445,6 +1445,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/integrations/youtrack/configuration": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read safe workspace YouTrack configuration
+         * @description Tenant defaults are intentionally unconfigured and disclose no deployment-wide YouTrack base URL, project targets, workflow mapping, or credential presence.
+         */
+        get: operations["getYouTrackConfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Replace mutable workspace YouTrack configuration
+         * @description PATCH has replace semantics: every mutable non-secret field is required and replaces the stored value. A tenant's first configuration requires apiToken. Existing workspace credentials may be preserved only on their exact service root. Legacy non-tenant workspaces materialize the runtime credential into their first persisted configuration.
+         */
+        patch: operations["replaceYouTrackConfiguration"];
+        trace?: never;
+    };
+    "/integrations/youtrack/connection-test": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test a YouTrack connection and discover accessible projects
+         * @description Uses an explicitly supplied token, or an existing workspace token only when baseUrl is unchanged. Tenant initialization never falls back to deployment-wide credentials and therefore requires apiToken.
+         */
+        post: operations["testYouTrackConnection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/integrations/youtrack/status": {
         parameters: {
             query?: never;
@@ -2763,20 +2813,95 @@ export interface components {
             readyForTest: boolean;
             lastSyncedAt: components["schemas"]["Timestamp"] | null;
         };
-        YouTrackWorkflow: {
-            readyForTestStatuses: ("Test" | "Acceptance" | "Staging")[];
+        /** @enum {string} */
+        YouTrackStage: "Backlog" | "Develop" | "Review" | "Test" | "Acceptance" | "Staging" | "Done";
+        /** @enum {string} */
+        YouTrackAcceptedStage: "Acceptance" | "Staging" | "Done";
+        /**
+         * Format: uri
+         * @description Exact HTTPS YouTrack service root without credentials, query, or fragment.
+         */
+        YouTrackBaseUrl: string;
+        /** @description Write-only permanent token. It is encrypted at rest and never returned. */
+        YouTrackApiToken: string;
+        YouTrackProjectId: string;
+        YouTrackShortName: string;
+        YouTrackReadyForTestStatuses: ("Backlog" | "Develop" | "Review" | "Test" | "Acceptance" | "Staging" | "Done")[];
+        YouTrackConfigurationTarget: {
+            projectId: components["schemas"]["YouTrackProjectId"];
+            shortName: components["schemas"]["YouTrackShortName"];
+        };
+        YouTrackConfigurationTargets: {
+            android: components["schemas"]["YouTrackConfigurationTarget"];
+            ios: components["schemas"]["YouTrackConfigurationTarget"];
+            backend: components["schemas"]["YouTrackConfigurationTarget"];
+        };
+        YouTrackSafeConfigurationTargets: {
+            android: components["schemas"]["YouTrackConfigurationTarget"] | null;
+            ios: components["schemas"]["YouTrackConfigurationTarget"] | null;
+            backend: components["schemas"]["YouTrackConfigurationTarget"] | null;
+        };
+        YouTrackConnection: {
             /** @enum {string} */
-            acceptedStatus: "Acceptance" | "Staging" | "Done";
+            status: "unconfigured" | "connected" | "failed";
+            checkedAt: components["schemas"]["Timestamp"] | null;
+            lastErrorCode: string | null;
+        };
+        /** @description Safe workspace configuration projection. It never contains apiToken. */
+        YouTrackConfiguration: {
+            workspaceId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            source: "workspace" | "runtime" | "tenant_default";
+            enabled: boolean;
+            baseUrl: components["schemas"]["YouTrackBaseUrl"] | null;
+            tokenConfigured: boolean;
+            targets: components["schemas"]["YouTrackSafeConfigurationTargets"];
+            readyForTestStatuses: components["schemas"]["YouTrackStage"][];
+            acceptedStage: components["schemas"]["YouTrackAcceptedStage"] | null;
+            connection: components["schemas"]["YouTrackConnection"];
+            rowVersion: number;
+        };
+        YouTrackConfigurationEnvelope: {
+            data: components["schemas"]["YouTrackConfiguration"];
+        };
+        /** @description apiToken may be omitted only when the workspace already owns a token for the exact same baseUrl, or for an eligible legacy non-tenant workspace. */
+        YouTrackConnectionTestRequest: {
+            baseUrl: components["schemas"]["YouTrackBaseUrl"];
+            apiToken?: components["schemas"]["YouTrackApiToken"];
+        };
+        /** @description Full replacement of mutable non-secret fields. Tenant initialization requires apiToken; omission only preserves an existing workspace credential on the same exact service root. */
+        YouTrackConfigurationReplaceRequest: {
+            enabled: boolean;
+            baseUrl: components["schemas"]["YouTrackBaseUrl"];
+            apiToken?: components["schemas"]["YouTrackApiToken"];
+            targets: components["schemas"]["YouTrackConfigurationTargets"];
+            readyForTestStatuses: components["schemas"]["YouTrackReadyForTestStatuses"];
+            acceptedStage: components["schemas"]["YouTrackAcceptedStage"];
+        };
+        YouTrackProject: {
+            id: components["schemas"]["YouTrackProjectId"];
+            name: string;
+            shortName: components["schemas"]["YouTrackShortName"];
+        };
+        YouTrackConnectionTestResult: {
+            baseUrl: components["schemas"]["YouTrackBaseUrl"];
+            projects: components["schemas"]["YouTrackProject"][];
+        };
+        YouTrackConnectionTestEnvelope: {
+            data: components["schemas"]["YouTrackConnectionTestResult"];
+        };
+        YouTrackWorkflow: {
+            readyForTestStatuses: ("Backlog" | "Develop" | "Review" | "Test" | "Acceptance" | "Staging" | "Done")[];
+            acceptedStatus: components["schemas"]["YouTrackAcceptedStage"] | null;
         };
         YouTrackIntegrationStatus: {
             /** @constant */
             provider: "youtrack";
-            /** Format: uri */
-            baseUrl: string;
+            baseUrl: components["schemas"]["YouTrackBaseUrl"] | null;
             targets: {
-                android: components["schemas"]["YouTrackTarget"];
-                ios: components["schemas"]["YouTrackTarget"];
-                backend: components["schemas"]["YouTrackTarget"];
+                android: components["schemas"]["YouTrackTarget"] | null;
+                ios: components["schemas"]["YouTrackTarget"] | null;
+                backend: components["schemas"]["YouTrackTarget"] | null;
             };
             workflow: components["schemas"]["YouTrackWorkflow"];
             linked: number;
@@ -3787,6 +3912,27 @@ export interface components {
                 "application/json": components["schemas"]["ActivityListEnvelope"];
             };
         };
+        /** @description Safe workspace YouTrack configuration. The API token is never returned. */
+        YouTrackConfigurationResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["YouTrackConfigurationEnvelope"];
+            };
+        };
+        /** @description Bounded accessible YouTrack projects without credentials. */
+        YouTrackConnectionTestResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["YouTrackConnectionTestEnvelope"];
+            };
+        };
         /** @description Bounded workspace-scoped YouTrack synchronization status without credentials. */
         YouTrackIntegrationStatusResponse: {
             headers: {
@@ -3876,6 +4022,16 @@ export interface components {
         };
         /** @description The request is malformed or fails safe field validation. */
         BadRequest: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description The bounded request is valid but its credentials, upstream response, or selected project mapping cannot be accepted. */
+        UnprocessableEntity: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
                 [name: string]: unknown;
@@ -4008,6 +4164,16 @@ export interface components {
         };
         /** @description Unexpected server error; internal details are never exposed. */
         InternalError: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description The bounded upstream operation is temporarily unavailable. */
+        BadGateway: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
                 [name: string]: unknown;
@@ -4163,6 +4329,17 @@ export interface components {
         DefectFixConfirmation: {
             content: {
                 "application/json": components["schemas"]["DefectFixConfirmationRequest"];
+            };
+        };
+        YouTrackConnectionTest: {
+            content: {
+                "application/json": components["schemas"]["YouTrackConnectionTestRequest"];
+            };
+        };
+        /** @description Complete replacement of mutable non-secret configuration fields. A tenant's first configuration requires apiToken; an existing workspace credential may be preserved only on the same exact service root. */
+        YouTrackConfigurationReplace: {
+            content: {
+                "application/json": components["schemas"]["YouTrackConfigurationReplaceRequest"];
             };
         };
         YouTrackWebhook: {
@@ -6531,6 +6708,83 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    getYouTrackConfiguration: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["YouTrackConfigurationResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    replaceYouTrackConfiguration: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["YouTrackConfigurationReplace"];
+        responses: {
+            200: components["responses"]["YouTrackConfigurationResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    testYouTrackConnection: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["YouTrackConnectionTest"];
+        responses: {
+            200: components["responses"]["YouTrackConnectionTestResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["UnprocessableEntity"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
     getYouTrackIntegrationStatus: {
         parameters: {
             query: {
@@ -6550,6 +6804,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
