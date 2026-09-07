@@ -37,7 +37,10 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
       <div className={styles.content}>
         <div className={styles.breadcrumb}>{project}<ChevronRight size={13} />{copy.name}<ChevronRight size={13} />{tabs.find((item) => item.id === tab)?.label}</div>
         <header className={styles.hero}><span className={styles.eyebrow}>{provider === "trello" ? "FALCON BOARD" : provider === "linear" ? "WORKSPACE / INTEGRATIONS" : "FALCON + " + copy.name.toUpperCase()}</span>
-          <h1>{copy.heading}</h1><p>{copy.purpose}</p></header>
+          <h1>{copy.heading}</h1><p>{provider === "github" && tab === "impact"
+            ? (ru ? "Успешная сборка открывает черновик состава проверки. QA проверяет причины выбора и подтверждает тесты перед запуском."
+              : "A successful build opens a draft verification scope. QA reviews the selection evidence and approves the tests before starting.")
+            : copy.purpose}</p></header>
         {children}
       </div>
     </div>

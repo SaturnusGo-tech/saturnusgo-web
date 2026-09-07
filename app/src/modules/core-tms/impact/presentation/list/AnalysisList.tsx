@@ -14,7 +14,10 @@ export function AnalysisList({ scope, ru, enabled, onSelect }: {
     {state.loading && <p role="status">{ru ? "Загружаем анализы…" : "Loading analyses…"}</p>}
     {state.ready && state.items.length === 0 && <p className={css.empty}>{ru ? "Анализов пока нет. Настройте репозитории: следующие подходящие события GitHub появятся здесь, в том числе без выбранных тестов." : "No analyses yet. Configure repositories to receive matching GitHub events here, including proposals with no selected tests."}</p>}
     <ol className={css.list}>{state.items.map((item) => <li className={css.row} key={item.id}>
-      <div className={css.rowHeading}><strong>{item.change.repository}</strong><span className={css.badge} data-warning={item.status === "failed" || undefined}>{impactLabel(item.status, ru)}</span></div>
+      <div className={css.rowHeading}><strong>{item.change.repository}</strong><div className={css.actions}>
+        <span className={css.badge} data-warning={item.status === "failed" || undefined}>{ru ? "Анализ: " : "Analysis: "}{impactLabel(item.status, ru)}</span>
+        <span className={css.badge} data-warning={item.buildStatus === "failed" || item.buildStatus === "cancelled" || undefined}>{impactLabel(`build_${item.buildStatus}`, ru)}</span>
+      </div></div>
       <div className={css.meta}><span>{item.change.branch}</span><code>{item.change.sha.slice(0, 12)}</code>
         {item.change.prNumber && <span>PR #{item.change.prNumber}</span>}<span>{new Date(item.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB")}</span></div>
       <p className={css.muted}>{item.result?.summary || (ru ? "Результат анализа ещё не получен." : "Analysis results are not available yet.")}</p>
