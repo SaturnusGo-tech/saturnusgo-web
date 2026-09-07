@@ -1,4 +1,4 @@
-import { Copy, Trash2, X } from "lucide-react";
+import { Copy, Play, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -15,9 +15,10 @@ type Props = {
   itemIndex: number;
   itemCount: number;
   onArchive: (run: TestRunSummary) => void;
+  canStart: boolean; startPending: boolean; onStart: () => void;
 };
 
-export function RunExecutionHeader({ run, item, canArchive, archivePending, itemIndex, itemCount, onArchive }: Props) {
+export function RunExecutionHeader({ run, item, canArchive, archivePending, itemIndex, itemCount, onArchive, canStart, startPending, onStart }: Props) {
   const { locale, t } = useTmsLocale();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -52,6 +53,7 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
       <div className={runStyles.utilityRow}>
         <div className={runStyles.runContext}><strong>{run.key}</strong><span>{locale === "ru" ? `Кейс ${itemIndex + 1} из ${itemCount}` : `Case ${itemIndex + 1} of ${itemCount}`}</span></div>
         <div className={runStyles.headerActions} ref={actionsRef}>
+          {canStart && <button type="button" className={styles.primaryButton} disabled={startPending || archivePending} onClick={onStart} data-testid="start-existing-run"><Play size={16} />{startPending ? (locale === "ru" ? "Запускаем…" : "Starting…") : (locale === "ru" ? "Начать прогон" : "Start run")}</button>}
           <button className={`${styles.iconButton} ${runStyles.headerIconButton}`} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>
           {canArchive && !run.archivedAt && (
             <button ref={archiveButtonRef} className={`${styles.iconButton} ${runStyles.headerIconButton} ${runStyles.archiveButton}`} aria-label={t("runs.removeFromList")} title={t("runs.removeFromList")} aria-expanded={confirmOpen} onClick={() => setConfirmOpen((current) => !current)}><Trash2 size={17} /></button>

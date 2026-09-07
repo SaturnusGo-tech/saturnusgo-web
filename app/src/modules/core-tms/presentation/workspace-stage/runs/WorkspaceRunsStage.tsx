@@ -27,8 +27,14 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         onCreate={() => model.openRunDialog()}
         onStepStatus={model.setStepStatus}
         onStepActual={model.updateStepActualResult}
+        onSaveStepActual={model.setStepStatus}
         onItemStatus={model.setItemStatus}
         onComplete={model.completeRun}
+        canExecute={model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:execute")}
+        canStart={model.canStartRun}
+        startPending={model.startPending}
+        startError={model.startError}
+        onStart={model.startSelectedRun}
         canArchive={model.canArchiveRun}
         archivePending={model.archivePending}
         onArchive={model.archiveSelectedRun}

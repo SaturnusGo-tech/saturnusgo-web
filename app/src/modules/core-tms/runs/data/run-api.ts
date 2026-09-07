@@ -186,7 +186,7 @@ export async function updateRunStep(
   if (!resource.etag) throw new Error("Run step mutation ETag is required.");
   const mutation = resource.data;
   if (mutation.runId !== runId || mutation.runItemId !== itemId ||
-      mutation.result.stepId !== stepId) {
+      mutation.result.stepId !== stepId || mutation.attemptNo !== currentItem.activeAttemptNo) {
     throw new Error("Run step mutation response does not match the requested resource.");
   }
   const data = structuredClone(currentItem);
