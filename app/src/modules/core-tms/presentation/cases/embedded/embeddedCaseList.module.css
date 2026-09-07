@@ -18,6 +18,19 @@
   container: embedded-case-list / inline-size;
 }
 
+:global(.dark) .root {
+  --embedded-bg: var(--tms-bg-panel);
+  --embedded-raised: var(--tms-bg-elevated);
+  --embedded-hover: var(--tms-bg-hover);
+  --embedded-selected: var(--tms-bg-selected);
+  --embedded-border: var(--tms-border);
+  --embedded-row-border: var(--tms-border);
+  --embedded-text: var(--tms-text);
+  --embedded-strong: var(--tms-text-strong);
+  --embedded-muted: var(--tms-text-muted);
+  --embedded-icon: var(--tms-text-secondary);
+}
+
 .header,
 .row {
   display: grid;

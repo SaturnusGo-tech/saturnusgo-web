@@ -186,6 +186,7 @@
 .table td { height: 46px; padding: 0 8px; overflow: hidden; color: var(--cases-secondary-text); border-bottom: 1px solid var(--cases-row-border); font-size: 12px; font-weight: 400; vertical-align: middle; }
 .table tbody tr[data-case-row]:hover td { background: var(--cases-hover); }
 .table tbody tr[data-case-row][data-bulk-selected="true"] td { background: color-mix(in srgb, var(--cases-primary) 12%, var(--cases-bg)); }
+:global(.dark) .table tbody tr[data-case-row][data-bulk-selected="true"] td { background: var(--tms-bg-selected); }
 .table .selectedRow td { background: var(--cases-hover-strong); }
 .table .selectedRow td:first-child { box-shadow: inset 2px 0 0 var(--cases-primary); }
 .table tbody tr[data-case-row]:focus-visible td { box-shadow: inset 0 0 0 1px var(--cases-primary); }

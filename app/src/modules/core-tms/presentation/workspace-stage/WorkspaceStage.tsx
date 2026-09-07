@@ -2,6 +2,7 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import type { DashboardDrill, DashboardDrillRow } from "../../dashboards/model/dashboard-analytics";
 import { buildDefectDeepLink } from "../../defects/navigation/defect-deep-link";
+import { buildWorkspaceDeepLink } from "../../state/navigation/workspace-deep-link";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
 import { DashboardView } from "../dashboard/DashboardView";
@@ -31,6 +32,15 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     } else model.setView(entity === "run" ? "runs" : "reports");
   }
   async function openDashboardRow(row: DashboardDrillRow) {
+    if (row.entity === "run" || row.entity === "run_item") {
+      const runId = row.runId ?? row.id;
+      const runItemId = row.runItemId ?? null;
+      if (row.projectId === model.project?.id) model.openRun(runId, runItemId);
+      else window.location.assign(buildWorkspaceDeepLink(window.location.href, {
+        workspaceId: model.data.workspace.id, projectId: row.projectId, view: "runs", runId, runItemId,
+      }));
+      return;
+    }
     if (row.entity === "defect" && row.projectId !== model.project?.id) {
       window.location.assign(buildDefectDeepLink(window.location.href, {
         projectId: row.projectId, defectId: row.id,
@@ -41,10 +51,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     if (row.entity === "test_case") {
       model.setCaseFilters({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
-    } else if (row.entity === "run" || row.entity === "run_item") {
-      model.setSelectedRunId(row.runId ?? row.id);
-      model.setSelectedRunItemId(row.runItemId ?? null);
-      model.setView("runs");
     } else model.openDefect(row.id);
   }
   if (model.connection === "loading" || model.connection === "error") {

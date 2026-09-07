@@ -54,7 +54,7 @@
 :global(.dark) .form { color: var(--ink); }
 :global(.dark) .section { border-color: var(--line) !important; }
 :global(.dark) .form :is(input, select, textarea) { color: var(--ink) !important; background: var(--control) !important; border-color: var(--line-strong) !important; }
-:global(.dark) .form :is(input, select, textarea):hover { border-color: #60717c !important; }
+:global(.dark) .form :is(input, select, textarea):hover { border-color: var(--tms-border-strong) !important; }
 :global(.dark) .form :is(input, select, textarea):focus { border-color: var(--teal) !important; box-shadow: 0 0 0 2px rgb(122 208 190 / 16%) !important; }
 :global(.dark) .modeField,
 :global(.dark) .modeButton,
@@ -118,8 +118,8 @@
 :global(.dark) .modeButton,
 :global(.dark) .search { color: var(--ink); background: var(--control) !important; }
 :global(.dark) .modeButton:hover { background: var(--control-hover) !important; }
-:global(.dark) .modeButton[data-selected="true"] { background: rgb(53 116 240 / 22%) !important; box-shadow: inset 0 -2px 0 var(--action); }
+:global(.dark) .modeButton[data-selected="true"] { background: var(--tms-bg-selected) !important; box-shadow: inset 0 -2px 0 var(--action); }
 :global(.dark) .modeButton[data-selected="true"] strong,
 :global(.dark) .scopeToggle,
 :global(.dark) .pickerActions button { color: #99bbff; }
-:global(.dark) .scopeToggle:hover { background: rgb(53 116 240 / 22%); }
+:global(.dark) .scopeToggle:hover { background: var(--tms-bg-selected); }

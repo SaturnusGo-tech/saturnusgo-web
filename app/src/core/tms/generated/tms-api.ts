@@ -4,6 +4,52 @@
  */
 
 export interface paths {
+    "/workspaces/{workspaceId}/dashboard-analytics/workbench": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the current testing workbench and matching freshness records
+         * @description Requires report:read in the workspace. Includes only active authorized projects, including when projectId is explicit. Active runs and item counts exclude archived and terminal runs; item status is the current attempt status. Open defects exclude archived, verified and closed defects and include ready_for_retest. Defect context is the latest occurrence matching environmentId and exact buildReference, across active or historical source runs; unlinked defects are included only without context filters. Run environment labels come from immutable run snapshots. Outdated item revisions compare the immutable selected revision with the current case revision and are informational, including already passed items in still-active runs; no historical result is invalidated or changed. Blank build references are missing. Filters apply only to this endpoint and never change period analytics. Context choices use the authorized project scope independently of selected environment/build, capped at100 each. Lists are ordered oldest first by startedAt or updatedAt then stable IDs and have full totals; limit applies separately to each list. Unknown build references return empty results; nonexistent or out-of-scope project/environment returns404. At most1000 projects are projected; statement work is timeout bounded and failures never return partial counts.
+         */
+        get: operations["getDashboardWorkbench"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/dashboard-analytics/workbench/records": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Page through exact matching current workbench records
+         * @description Uses exactly the summary workbench authorization, predicates and environment/build context filters. All matching records are reachable through keyset pagination. Run lists sort by startedAt then id; item lists by updatedAt then runId then id; defect lists by updatedAt then id, ascending. The opaque cursor retains database timestamp precision and is bound to workspace, project, kind and both context filters. It must be reused unchanged; switching filters requires starting a fresh list. Each page is a new coherent current-state read, not an immutable snapshot across requests: concurrent lifecycle changes may change totals or move records between pages. Keyset bookmarks remain usable if the previous record leaves the matching set. Clients merge rows by scoped record identity and can refresh to obtain a new current view. No historical results are modified. total is the full matching count, not the page size. Items use the corresponding run, defect or item schema selected by kind.
+         */
+        get: operations["listDashboardWorkbenchRecords"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1945,6 +1991,178 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        DashboardWorkbenchRun: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            projectName: string;
+            id: components["schemas"]["Identifier"];
+            key: string;
+            name: string;
+            /** @constant */
+            status: "active";
+            environmentId: components["schemas"]["Identifier"];
+            environmentName: string;
+            buildReference: string;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            progress: components["schemas"]["DashboardAnalyticsRunProgress"];
+        };
+        DashboardWorkbenchItem: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            projectName: string;
+            id: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            runKey: string;
+            runName: string;
+            testCaseId: components["schemas"]["Identifier"];
+            caseKey: string;
+            title: string;
+            /** @enum {string} */
+            status: "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
+            attemptNo: number;
+            snapshotRevisionNo: number;
+            currentRevisionNo: number;
+            environmentId: components["schemas"]["Identifier"];
+            environmentName: string;
+            buildReference: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        DashboardWorkbenchDefect: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            projectName: string;
+            id: components["schemas"]["Identifier"];
+            key: string;
+            title: string;
+            /** @enum {string} */
+            status: "open" | "triaged" | "in_progress" | "ready_for_retest" | "reopened";
+            /** @enum {string} */
+            severity: "low" | "medium" | "high" | "critical";
+            /** @enum {string} */
+            priority: "low" | "medium" | "high" | "critical";
+            /** Format: date-time */
+            updatedAt: string;
+            occurrence: components["schemas"]["DashboardAnalyticsDefectOccurrence"] | null;
+            environmentId: components["schemas"]["Identifier"] | null;
+            environmentName: string | null;
+            buildReference: string | null;
+        };
+        DashboardWorkbenchEnvironment: {
+            projectId: components["schemas"]["Identifier"];
+            projectName: string;
+            id: components["schemas"]["Identifier"];
+            name: string;
+        };
+        /** @description Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set. */
+        DashboardWorkbenchRuns: {
+            items: components["schemas"]["DashboardWorkbenchRun"][];
+            total: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        /** @description Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set. */
+        DashboardWorkbenchItems: {
+            items: components["schemas"]["DashboardWorkbenchItem"][];
+            total: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        /** @description Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set. */
+        DashboardWorkbenchDefects: {
+            items: components["schemas"]["DashboardWorkbenchDefect"][];
+            total: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        /** @description Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set. */
+        DashboardWorkbenchEnvironments: {
+            items: components["schemas"]["DashboardWorkbenchEnvironment"][];
+            total: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        /** @description Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set. */
+        DashboardWorkbenchBuildReferences: {
+            items: string[];
+            total: components["schemas"]["AnalyticsCount"];
+            truncated: boolean;
+        };
+        DashboardWorkbench: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            /** Format: date-time */
+            generatedAt: string;
+            /** Format: date-time */
+            asOf: string;
+            filters: {
+                environmentId: components["schemas"]["Identifier"] | null;
+                buildReference: string | null;
+            };
+            basis: {
+                /** @constant */
+                scope: "active_projects_current_state";
+                /** @constant */
+                runs: "active_nonarchived_runs";
+                /** @constant */
+                defects: "nonarchived_not_verified_or_closed";
+                /** @constant */
+                context: "run_environment_and_build_defect_matching_occurrence";
+                /** @constant */
+                freshness: "snapshot_revision_differs_from_current_informational";
+            };
+            counts: {
+                activeRuns: components["schemas"]["AnalyticsCount"];
+                readyForRetest: components["schemas"]["AnalyticsCount"];
+                blockedActiveItems: components["schemas"]["AnalyticsCount"];
+                openDefects: components["schemas"]["AnalyticsCount"];
+            };
+            freshness: {
+                notRunActiveItems: components["schemas"]["AnalyticsCount"];
+                inProgressActiveItems: components["schemas"]["AnalyticsCount"];
+                outdatedActiveItems: components["schemas"]["AnalyticsCount"];
+                activeRunsWithoutBuild: components["schemas"]["AnalyticsCount"];
+            };
+            activeRuns: components["schemas"]["DashboardWorkbenchRuns"];
+            readyForRetest: components["schemas"]["DashboardWorkbenchDefects"];
+            openDefects: components["schemas"]["DashboardWorkbenchDefects"];
+            blockedItems: components["schemas"]["DashboardWorkbenchItems"];
+            notRunItems: components["schemas"]["DashboardWorkbenchItems"];
+            inProgressItems: components["schemas"]["DashboardWorkbenchItems"];
+            outdatedItems: components["schemas"]["DashboardWorkbenchItems"];
+            runsWithoutBuild: components["schemas"]["DashboardWorkbenchRuns"];
+            contextChoices: {
+                environments: components["schemas"]["DashboardWorkbenchEnvironments"];
+                buildReferences: components["schemas"]["DashboardWorkbenchBuildReferences"];
+            };
+        };
+        DashboardWorkbenchEnvelope: {
+            data: components["schemas"]["DashboardWorkbench"];
+        };
+        /** @enum {string} */
+        DashboardWorkbenchRecordKind: "activeRuns" | "readyForRetest" | "openDefects" | "blockedItems" | "notRunItems" | "inProgressItems" | "outdatedItems" | "runsWithoutBuild";
+        DashboardWorkbenchRecordPage: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"] | null;
+            /** Format: date-time */
+            generatedAt: string;
+            /** Format: date-time */
+            asOf: string;
+            filters: {
+                environmentId: components["schemas"]["Identifier"] | null;
+                buildReference: string | null;
+            };
+            kind: components["schemas"]["DashboardWorkbenchRecordKind"];
+            items: (components["schemas"]["DashboardWorkbenchRun"] | components["schemas"]["DashboardWorkbenchItem"] | components["schemas"]["DashboardWorkbenchDefect"])[];
+            total: components["schemas"]["AnalyticsCount"];
+        };
+        DashboardWorkbenchRecordPageEnvelope: {
+            data: components["schemas"]["DashboardWorkbenchRecordPage"];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
+        };
         /** @description Opaque identifier; clients must not parse prefixes or embed business meaning. */
         Identifier: string;
         /** Format: date-time */
@@ -4181,6 +4399,28 @@ export interface components {
         };
     };
     responses: {
+        /** @description Current authorized workbench facts and bounded matching records. */
+        DashboardWorkbenchResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardWorkbenchEnvelope"];
+            };
+        };
+        /** @description A bounded page of records matching the same current workbench predicates. */
+        DashboardWorkbenchRecordPageResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                /** @description Opaque cursor for the next matching live page. Omitted on the last page. */
+                "X-Next-Cursor"?: string;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DashboardWorkbenchRecordPageEnvelope"];
+            };
+        };
         /** @description Personal tenant and local cloud session created or safely replayed. */
         CloudRegistrationResponse: {
             headers: {
@@ -5307,6 +5547,66 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getDashboardWorkbench: {
+        parameters: {
+            query?: {
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                environmentId?: components["schemas"]["Identifier"];
+                buildReference?: string;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardWorkbenchResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["AnalyticsLimitExceeded"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
+    listDashboardWorkbenchRecords: {
+        parameters: {
+            query: {
+                projectId?: components["parameters"]["ProjectIdQuery"];
+                environmentId?: components["schemas"]["Identifier"];
+                buildReference?: string;
+                limit?: number;
+                kind: components["schemas"]["DashboardWorkbenchRecordKind"];
+                cursor?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DashboardWorkbenchRecordPageResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["AnalyticsLimitExceeded"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["AnalyticsUnavailable"];
+        };
+    };
     getHealth: {
         parameters: {
             query?: never;

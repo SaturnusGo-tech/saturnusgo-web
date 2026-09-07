@@ -34,7 +34,9 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);
   assert.match(shellSource, /\.navigation\s*\{[\s\S]*?--sidebar-text: #e7e9ec;[\s\S]*?background: linear-gradient\(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%\)/);
   assert.match(shellSource, /\.tessiqMark\s*\{[\s\S]*?falcon-mark-on-dark\.png/);
-  assert.match(shellSource, /:global\(\.dark\) \.navigation\s*\{[\s\S]*?background: linear-gradient/);
+  const darkNavigation = shellSource.match(/:global\(\.dark\) \.navigation\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(darkNavigation, /--sidebar-text: var\(--tms-text\)/);
+  assert.match(darkNavigation, /background: var\(--tms-bg-sidebar\)/);
   assert.match(shellSource, /background: linear-gradient\(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%\)/);
   assert.doesNotMatch(activeSources, /workspaceLoaderPulse/);
   assert.doesNotMatch(activeSources, /TESSIQ|assets\/tessiq\//);

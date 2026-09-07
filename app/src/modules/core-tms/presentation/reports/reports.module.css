@@ -10,6 +10,7 @@
   --report-text: #1f2329;
   --report-strong: #111318;
   --report-primary: #3574f0;
+  --report-selection: color-mix(in srgb, var(--report-primary) 12%, var(--report-bg));
   --report-on-primary: #fff;
   --cases-bg: var(--report-bg);
   --cases-deep: var(--report-raised);
@@ -28,16 +29,17 @@
   color-scheme: light; position: relative;
 }
 :global(.dark) .workspace {
-  --report-bg: #2d2b35;
-  --report-raised: #34323c;
-  --report-hover: #383641;
-  --report-border: #4a4853;
-  --report-row-border: #3d3b46;
-  --report-control-border: #57545f;
-  --report-muted: #aaa7b2;
-  --report-faint: #8d8995;
-  --report-text: #f5f4f7;
-  --report-strong: #fff;
+  --report-bg: var(--tms-bg-panel);
+  --report-raised: var(--tms-bg-elevated);
+  --report-hover: var(--tms-bg-hover);
+  --report-border: var(--tms-border);
+  --report-row-border: var(--tms-border);
+  --report-control-border: var(--tms-border-strong);
+  --report-muted: var(--tms-text-muted);
+  --report-faint: var(--tms-text-faint);
+  --report-text: var(--tms-text);
+  --report-strong: var(--tms-text-strong);
+  --report-selection: var(--tms-bg-selected);
   color-scheme: dark;
 }
 .workspace *, .workspace *::before, .workspace *::after { box-sizing: border-box; }
@@ -77,7 +79,7 @@
 .table td { height: 60px; min-width: 0; padding: 8px 10px; overflow: hidden; color: var(--report-text); background: var(--report-bg); border-bottom: 1px solid var(--report-row-border); font-size: 12px; vertical-align: middle; text-overflow: ellipsis; white-space: nowrap; }
 .table td:first-child { padding: 0 5px 0 12px; }
 .table tr:hover td { background: var(--report-hover); }
-.table tr[data-selected] td { background: color-mix(in srgb, var(--report-primary) 12%, var(--report-bg)); }
+.table tr[data-selected] td { background: var(--report-selection); }
 .rowButton { width: 100%; min-width: 0; display: grid; gap: 2px; padding: 0; color: inherit; background: transparent; border: 0; cursor: pointer; text-align: left; }
 .rowButton:focus-visible { border-radius: 3px; outline: 1px solid var(--report-control-border); outline-offset: 2px; }
 .key { color: var(--report-muted); font-weight: 500; }

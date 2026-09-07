@@ -164,6 +164,9 @@
   min-width: 0 !important;
   transform: none !important;
 }
+:global(.dark) :global(.mdxeditor-popup-container).wysiwyg:has(form) {
+  background: color-mix(in srgb, var(--tms-bg-sidebar) 46%, transparent);
+}
 :global(.mdxeditor-popup-container).wysiwyg :global([role="dialog"]) {
   box-sizing: border-box;
   width: 100%;

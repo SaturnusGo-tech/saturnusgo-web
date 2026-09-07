@@ -72,6 +72,9 @@
 }
 .mediaBody > img,
 .mediaBody > video { height: auto; }
+:global(.dark) .mediaBody > img,
+:global(.dark) .mediaBody > video,
+:global(.dark) .mediaBody > iframe { background: var(--tms-bg-panel); }
 .mediaBody > iframe { height: min(52vw, 520px); min-height: 320px; }
 .skeleton { width: 100%; min-height: 172px; overflow: hidden; background: linear-gradient(100deg, var(--cases-raised) 28%, var(--cases-hover) 44%, var(--cases-raised) 60%); background-size: 240% 100%; border-radius: 9px; animation: attachmentShimmer 1.25s ease-in-out infinite; }
 .fileOpen { min-height: 42px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 8px; cursor: pointer; }

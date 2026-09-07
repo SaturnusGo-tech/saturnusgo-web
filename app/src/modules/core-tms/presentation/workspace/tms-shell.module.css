@@ -32,6 +32,10 @@
   background: var(--paper);
 }
 
+.shell:has([data-dashboard-workspace]) .stage {
+  height: 100%;
+}
+
 .header {
   position: relative;
   z-index: 60;
@@ -232,34 +236,34 @@
 }
 
 :global(.dark) .navigation {
-  --sidebar-border: #43454a;
-  --sidebar-divider: rgb(78 81 87 / 72%);
-  --sidebar-toggle-divider: rgb(78 81 87 / 65%);
-  --sidebar-text: #e7e9ec;
-  --sidebar-soft: #dde0e4;
-  --sidebar-strong: #ffffff;
-  --sidebar-muted: #aeb7c8;
-  --sidebar-brand-button: #f2f3f5;
-  --sidebar-wordmark: #f5f6f7;
-  --sidebar-active-ink: #ffffff;
-  --sidebar-active-icon: #f0f2f5;
-  --sidebar-toggle: #c9cdd3;
-  --sidebar-hover: rgb(255 255 255 / 8%);
-  --sidebar-active: rgb(81 95 104 / 50%);
-  --sidebar-create: rgb(255 255 255 / 10%);
-  --sidebar-create-hover: rgb(255 255 255 / 15%);
-  --sidebar-scrollbar: #4b4e54;
-  --sidebar-menu-bg: #2b2d30;
-  --sidebar-menu-hover: #393b40;
-  --sidebar-menu-border: #4e5157;
-  --sidebar-menu-text: #e8eaed;
-  --sidebar-menu-icon: #aab4c7;
-  --sidebar-menu-strong: #f2f3f5;
-  --sidebar-menu-muted: #9da1a8;
+  --sidebar-border: var(--tms-border);
+  --sidebar-divider: var(--tms-border);
+  --sidebar-toggle-divider: var(--tms-border);
+  --sidebar-text: var(--tms-text);
+  --sidebar-soft: var(--tms-text-secondary);
+  --sidebar-strong: var(--tms-text-strong);
+  --sidebar-muted: var(--tms-text-muted);
+  --sidebar-brand-button: var(--tms-text-strong);
+  --sidebar-wordmark: var(--tms-text);
+  --sidebar-active-ink: var(--tms-text);
+  --sidebar-active-icon: var(--tms-text-secondary);
+  --sidebar-toggle: var(--tms-text-muted);
+  --sidebar-hover: var(--tms-bg-panel);
+  --sidebar-active: var(--tms-bg-elevated);
+  --sidebar-create: var(--tms-bg-panel);
+  --sidebar-create-hover: var(--tms-bg-hover);
+  --sidebar-scrollbar: var(--tms-border-strong);
+  --sidebar-menu-bg: var(--tms-bg-elevated);
+  --sidebar-menu-hover: var(--tms-bg-hover);
+  --sidebar-menu-border: var(--tms-border-strong);
+  --sidebar-menu-text: var(--tms-text);
+  --sidebar-menu-icon: var(--tms-text-secondary);
+  --sidebar-menu-strong: var(--tms-text-strong);
+  --sidebar-menu-muted: var(--tms-text-muted);
   --sidebar-menu-shadow: 0 12px 32px rgb(0 0 0 / 42%);
   --sidebar-focus: #6b9cff;
-  --sidebar-dot-border: #25282d;
-  background: linear-gradient(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%);
+  --sidebar-dot-border: var(--tms-bg-sidebar);
+  background: var(--tms-bg-sidebar);
 }
 
 .navigationCollapsed {
@@ -749,4 +753,46 @@
   .navigationCreateMenu {
     animation: none;
   }
+}
+
+/* The light dashboard keeps its selected reference palette. Dark uses global Falcon tokens. */
+.shell.shell:has([data-dashboard-workspace]) {
+  font-family: var(--font-geist-sans), Inter, system-ui, sans-serif;
+}
+:global(:root:not(.dark)) .shell.shell:has([data-dashboard-workspace]) {
+  --ink: #252529;
+  --muted: #686870;
+  --paper: #ffffff;
+  --line: #e5e5e9;
+  --line-strong: #d5d5db;
+  --control: #f5f5f7;
+  --control-hover: #eeeef1;
+  --action: #555eaa;
+}
+:global(:root:not(.dark)) .shell:has([data-dashboard-workspace]) .navigation {
+  --sidebar-border: #e5e5e9;
+  --sidebar-divider: #e5e5e9;
+  --sidebar-toggle-divider: #e5e5e9;
+  --sidebar-text: #333338;
+  --sidebar-soft: #55555d;
+  --sidebar-strong: #202025;
+  --sidebar-muted: #73737c;
+  --sidebar-wordmark: #252529;
+  --sidebar-active-ink: #252529;
+  --sidebar-active-icon: #484852;
+  --sidebar-toggle: #686870;
+  --sidebar-hover: #f0f0f3;
+  --sidebar-active: #eaeaee;
+  --sidebar-create: #ededf0;
+  --sidebar-create-hover: #e3e3e8;
+  background: #fafafa;
+}
+:global(:root:not(.dark)) .shell:has([data-dashboard-workspace]) .tessiqMark {
+  background-image: url("../../assets/falcon/falcon-mark-on-light.png");
+}
+:global(.dark) .shell .header {
+  background: var(--tms-bg-canvas);
+}
+:global(.dark) .shell .tessiqMark {
+  background-image: url("../../assets/falcon/falcon-mark-on-dark.png");
 }

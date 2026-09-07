@@ -33,8 +33,9 @@ export function useDashboardAnalytics(
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [drill, setDrill] = useState<DrillState>(EMPTY_DRILL);
   const drillController = useRef<AbortController | null>(null);
-  const queryKey = `${query.workspaceId}:${query.projectId ?? "workspace"}:${query.period}`;
+  const queryKey = JSON.stringify([query.workspaceId, query.projectId ?? null, query.period]);
   const previousQuery = useRef(queryKey);
+  const ownsVisibleState = previousQuery.current === queryKey;
 
   useEffect(() => () => drillController.current?.abort(), []);
 
@@ -49,6 +50,7 @@ export function useDashboardAnalytics(
     setSummaryLoading(true);
     setSummaryError(false);
     void source.summary(query, controller.signal).then((next) => {
+      if (controller.signal.aborted) return;
       setSnapshot(next);
       setSummaryLoading(false);
     }).catch((error: unknown) => {
@@ -69,15 +71,18 @@ export function useDashboardAnalytics(
       selected, page: cursor ? current.page : null, loading: true, error: false,
     }));
     void source.drill({ query, drill: selected, cursor, limit: 25 }, controller.signal)
-      .then((page) => setDrill((current) => {
-        if (current.selected?.id !== selected.id) return current;
-        return {
-          origin: current.origin ?? selected, selected, loading: false, error: false,
-          page: cursor && current.page
-            ? { ...page, rows: [...current.page.rows, ...page.rows] }
-            : page,
-        };
-      }))
+      .then((page) => {
+        if (controller.signal.aborted || drillController.current !== controller) return;
+        setDrill((current) => {
+          if (controller.signal.aborted || drillController.current !== controller || current.selected?.id !== selected.id) return current;
+          return {
+            origin: current.origin ?? selected, selected, loading: false, error: false,
+            page: cursor && current.page
+              ? { ...page, rows: [...current.page.rows, ...page.rows] }
+              : page,
+          };
+        });
+      })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setDrill((current) => current.selected?.id === selected.id
@@ -104,11 +109,11 @@ export function useDashboardAnalytics(
   }, [drill, loadDrill]);
 
   return {
-    snapshot,
-    summaryLoading,
-    summaryError,
+    snapshot: ownsVisibleState ? snapshot : null,
+    summaryLoading: !ownsVisibleState || summaryLoading,
+    summaryError: ownsVisibleState && summaryError,
     refresh: () => setRefreshVersion((value) => value + 1),
-    drill,
+    drill: ownsVisibleState ? drill : EMPTY_DRILL,
     openDrill,
     selectRelatedDrill,
     closeDrill: () => {

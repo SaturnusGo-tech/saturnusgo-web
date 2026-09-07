@@ -49,6 +49,24 @@ html[data-tms="1"] .bg-par {
   display: none !important;
 }
 
+/* Canonical Falcon dark roles. Feature and auth surfaces alias these tokens. */
+.dark {
+  --tms-bg-canvas: #111113;
+  --tms-bg-panel: #1a1a1d;
+  --tms-bg-sidebar: #0d0d0f;
+  --tms-bg-elevated: #222225;
+  --tms-bg-hover: #2b2b30;
+  --tms-bg-selected: #29292f;
+  --tms-bg-scrim: rgb(0 0 0 / 64%);
+  --tms-border: #2b2b30;
+  --tms-border-strong: #39393f;
+  --tms-text: #ededf0;
+  --tms-text-secondary: #b9b9c2;
+  --tms-text-muted: #a1a1aa;
+  --tms-text-faint: #94949e;
+  --tms-text-strong: #f5f5f7;
+}
+
 /* Falcon public routes provide their own product shell. */
 html[data-falcon-public="1"] {
   position: relative;
@@ -61,6 +79,9 @@ html[data-falcon-public="1"] body {
   min-height: 100dvh;
   background: #fffefa;
 }
+
+html.dark[data-falcon-public="1"] { color-scheme: dark; }
+html.dark[data-falcon-public="1"] body { background: var(--tms-bg-canvas); }
 
 html[data-falcon-public="1"] #app-main {
   width: 100%;
