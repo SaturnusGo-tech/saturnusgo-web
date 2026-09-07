@@ -1,6 +1,7 @@
 import {
   ChevronsLeft,
   ChevronsRight,
+  CircleHelp,
   Code2,
   FileBarChart,
   FolderKanban,
@@ -38,6 +39,7 @@ const navigationItems: Array<{
   { id: "hooks", labelKey: "nav.hooks", icon: <Link2 size={20} /> },
   { id: "reports", labelKey: "nav.reports", icon: <FileBarChart size={20} /> },
   { id: "config", labelKey: "nav.config", icon: <Settings size={20} /> },
+  { id: "help", labelKey: "nav.help", icon: <CircleHelp size={20} /> },
 ];
 
 export function Navigation({
@@ -84,7 +86,7 @@ export function Navigation({
       <div className={shellStyles.navigationItems}>
         {navigationItems.map((item) => {
           const label = t(item.labelKey);
-          const active = !disabled && view === item.id;
+          const active = (!disabled || item.id === "help") && view === item.id;
           const runActive = item.id === "runs" && activeRunCount > 0;
           const accessibleLabel = runActive
             ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}`
@@ -98,7 +100,7 @@ export function Navigation({
                 active ? shellStyles.navigationItemActive : ""
               }`}
               onClick={() => onChange(item.id)}
-              disabled={disabled}
+              disabled={disabled && item.id !== "help"}
               aria-label={accessibleLabel}
               aria-current={active ? "page" : undefined}
               title={collapsed ? label : undefined}
@@ -117,9 +119,11 @@ export function Navigation({
       <NavigationUtilityMenu
         disabled={disabled}
         settingsActive={!disabled && view === "config"}
+        helpActive={view === "help"}
         onCreateCase={onCreateCase}
         onCreateDefect={onCreateDefect}
         onOpenSettings={() => onChange("config")}
+        onOpenHelp={() => onChange("help")}
       />
 
       <button

@@ -22,6 +22,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   workspaceId: string; projectId: string; view: View; runId: string | null; runItemId?: string | null;
 }) {
   const url = new URL(href); const integration = url.searchParams.get("integration");
+  const article = url.searchParams.get("article"); const section = url.hash;
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
   const sameScope = ["workspaceId", "projectId"].every((key) => {
     const previous = url.searchParams.get(key);
@@ -30,6 +31,10 @@ export function buildWorkspaceDeepLink(href: string, input: {
   url.search = ""; url.hash = "";
   url.searchParams.set("workspaceId", input.workspaceId); url.searchParams.set("projectId", input.projectId);
   url.searchParams.set("view", input.view);
+  if (input.view === "help") {
+    if (article && /^[a-z][a-z0-9-]{0,63}$/.test(article)) url.searchParams.set("article", article);
+    if (/^#[a-z][a-z0-9-]{0,63}$/.test(section)) url.hash = section;
+  }
   if (input.view === "runs" && input.runId) url.searchParams.set("runId", input.runId);
   if (input.view === "runs" && input.runId && input.runItemId) url.searchParams.set("runItemId", input.runItemId);
   if (input.view === "reports" && sameScope && defectId) url.searchParams.set("defectId", defectId);

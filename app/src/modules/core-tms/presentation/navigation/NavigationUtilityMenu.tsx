@@ -6,15 +6,19 @@ import shellStyles from "../workspace/tms-shell.module.css";
 export function NavigationUtilityMenu({
   disabled,
   settingsActive,
+  helpActive,
   onCreateCase,
   onCreateDefect,
   onOpenSettings,
+  onOpenHelp,
 }: {
   disabled: boolean;
   settingsActive: boolean;
+  helpActive: boolean;
   onCreateCase: () => void;
   onCreateDefect: () => void;
   onOpenSettings: () => void;
+  onOpenHelp: () => void;
 }) {
   const { t } = useTmsLocale();
   const [open, setOpen] = useState(false);
@@ -101,7 +105,8 @@ export function NavigationUtilityMenu({
         <span className={shellStyles.navigationIcon} aria-hidden="true"><Settings size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.config")}</span>
       </button>
-      <button type="button" className={shellStyles.navigationUtilityButton} data-placeholder="true">
+      <button type="button" className={`${shellStyles.navigationUtilityButton} ${helpActive ? shellStyles.navigationUtilityButtonActive : ""}`}
+        onClick={onOpenHelp} aria-current={helpActive ? "page" : undefined} title={t("nav.help")} data-testid="nav-help-utility">
         <span className={shellStyles.navigationIcon} aria-hidden="true"><CircleHelp size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.help")}</span>
       </button>

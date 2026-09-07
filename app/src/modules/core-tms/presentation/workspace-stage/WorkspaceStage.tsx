@@ -1,4 +1,5 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { DocumentationEntry } from "../../documentation/presentation/DocumentationEntry";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import type { DashboardDrill, DashboardDrillRow } from "../../dashboards/model/dashboard-analytics";
 import { buildDefectDeepLink } from "../../defects/navigation/defect-deep-link";
@@ -53,6 +54,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
     } else model.openDefect(row.id);
   }
+  if (model.view === "help") return <DocumentationEntry />;
   if (model.connection === "loading" || model.connection === "error") {
     return (
       <WorkspaceLoadState
