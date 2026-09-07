@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useCaseActions } from "../case-actions/useCaseActions";
 import { useRunActions } from "../run-actions/useRunActions";
 import { useRunArchive } from "../run-archive/useRunArchive";
+import { useRunStart } from "../run-start/useRunStart";
 import { useWorkspaceActions } from "../workspace-actions/useWorkspaceActions";
 import { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import { useWorkspaceResourceActions } from "../workspace-resources/useWorkspaceResourceActions";
@@ -25,6 +26,7 @@ export function useWorkspaceModel() {
   const cases = useCaseActions(state, derived, workspace.notify);
   const runs = useRunActions(state, derived, workspace.notify);
   const runArchive = useRunArchive(state, derived, workspace.notify);
+  const runStart = useRunStart(state, derived);
   const caseBulk = useCaseBulkActions(state, derived, workspace.notify);
   const capabilities = state.data.meta.authorization.capabilities;
   const caseCollaboration = useCaseCollaboration({
@@ -66,6 +68,7 @@ export function useWorkspaceModel() {
     ...cases,
     ...runs,
     ...runArchive,
+    ...runStart,
     ...caseBulk,
     caseCollaboration,
     ...defectNavigation,
