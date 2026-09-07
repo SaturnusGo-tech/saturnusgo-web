@@ -18,7 +18,7 @@ import surface from "./hooks.module.css";
 import { hooksCopy } from "./shared/hooks-copy";
 import { YouTrackSettings } from "./youtrack/YouTrackSettings";
 
-export function HooksView({ workspaceId, projectId, canManage }: { workspaceId: string; projectId: string; canManage: boolean }) {
+export function HooksView({ workspaceId, projectId, canManage, capabilities, connected }: { workspaceId: string; projectId: string; canManage: boolean; capabilities: readonly string[]; connected: boolean }) {
   const http = useTmsHttpClient();
   const { locale, languageTag } = useTmsLocale();
   const russian = locale === "ru";
@@ -35,6 +35,7 @@ export function HooksView({ workspaceId, projectId, canManage }: { workspaceId: 
   const open = (target: "catalog" | "youtrack" | Provider) => {
     setScreen(target);
     const url = new URL(window.location.href);
+    url.searchParams.delete("analysisId"); url.searchParams.delete("impact");
     if (target === "catalog") url.searchParams.delete("integration"); else url.searchParams.set("integration", target);
     window.history.replaceState(window.history.state, "", url);
   };
@@ -62,7 +63,7 @@ export function HooksView({ workspaceId, projectId, canManage }: { workspaceId: 
   }, [http, workspaceId, reload]);
 
   if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
-    workspaceId={workspaceId} projectId={projectId} provider={screen} ru={russian} canManage={canManage}
+    workspaceId={workspaceId} projectId={projectId} provider={screen} ru={russian} canManage={canManage} capabilities={capabilities} connected={connected}
     onBack={() => open("catalog")} onSaved={refresh} />;
   if (screen === "youtrack") {
     return <YouTrackSettings

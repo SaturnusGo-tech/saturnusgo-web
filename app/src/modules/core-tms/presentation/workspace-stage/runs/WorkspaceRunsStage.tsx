@@ -1,8 +1,14 @@
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { RunsView } from "../../runs/RunsView";
+import { useImpactList } from "../../../impact/application/list/useImpactList";
+import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
 export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   const { t, locale } = useTmsLocale();
+  const impactScope = { workspaceId: model.data.workspace.id, projectId: model.project?.id ?? "" };
+  const impactEnabled = model.connection === "connected" && Boolean(model.selectedRun)
+    && model.data.meta.authorization.capabilities.includes("integration:read");
+  const impact = useImpactList(impactScope, impactEnabled, locale === "ru", model.selectedRun?.id);
   if (model.runResourceError) return <div role="alert">
     <p>{locale === "ru" ? "Не удалось открыть выбранный прогон. Проверьте доступ и повторите загрузку." : "The selected run could not be opened. Check access and retry."}</p>
     <button type="button" onClick={model.retryRunResource}>{locale === "ru" ? "Повторить" : "Retry"}</button>
@@ -10,6 +16,9 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   if (model.runResourceLoading && !model.selectedRun) return <p role="status">
     {locale === "ru" ? "Загружаем выбранный прогон…" : "Loading the selected run…"}</p>;
   return (
+    <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+      {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
+      <div style={{ flex: 1, minHeight: 0 }}>
       <RunsView
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
@@ -31,7 +40,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         onItemStatus={model.setItemStatus}
         onComplete={model.completeRun}
         canExecute={model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:execute")}
-        canStart={model.canStartRun}
+        canStart={model.canStartRun && (!impactEnabled || (impact.ready && !impact.error && impact.items.every((item) => item.approved)))}
         startPending={model.startPending}
         startError={model.startError}
         onStart={model.startSelectedRun}
@@ -47,5 +56,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
           model.notify(t("actions.defectCreated", { key: defect.key }));
         }}
       />
+      </div>
+    </div>
   );
 }

@@ -4,7 +4,7 @@ import { IntegrationBrand } from "../../../presentation/hooks/shared/brand/Integ
 import type { Provider } from "../../model/connector-types";
 import { providerCopy } from "../../localization/connector-copy";
 import styles from "../styles/connector.module.css";
-export type ConnectorTab = "connection" | "automation" | "activity";
+export type ConnectorTab = "connection" | "automation" | "activity" | "impact";
 export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, enabled, children }: {
   provider: Provider; ru: boolean; tab: ConnectorTab; onTab: (tab: ConnectorTab) => void;
   onBack: () => void; project: string; enabled: boolean; children: ReactNode;
@@ -14,6 +14,7 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
     { id: "connection" as const, icon: Settings2, label: ru ? "Подключение" : "Connection" },
     { id: "automation" as const, icon: Zap, label: ru ? "Автоматизация" : "Automation" },
     { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" },
+    ...(provider === "github" ? [{ id: "impact" as const, icon: GitBranch, label: "Impact Analysis" }] : []),
   ];
   return <main className={styles.root} data-provider={provider} data-integration-workspace data-testid={`connector-${provider}`}>
     <header className={styles.topbar}>
@@ -36,7 +37,10 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
       <div className={styles.content}>
         <div className={styles.breadcrumb}>{project}<ChevronRight size={13} />{copy.name}<ChevronRight size={13} />{tabs.find((item) => item.id === tab)?.label}</div>
         <header className={styles.hero}><span className={styles.eyebrow}>{provider === "trello" ? "FALCON BOARD" : provider === "linear" ? "WORKSPACE / INTEGRATIONS" : "FALCON + " + copy.name.toUpperCase()}</span>
-          <h1>{copy.heading}</h1><p>{copy.purpose}</p></header>
+          <h1>{copy.heading}</h1><p>{provider === "github" && tab === "impact"
+            ? (ru ? "Успешная сборка открывает черновик состава проверки. QA проверяет причины выбора и подтверждает тесты перед запуском."
+              : "A successful build opens a draft verification scope. QA reviews the selection evidence and approves the tests before starting.")
+            : copy.purpose}</p></header>
         {children}
       </div>
     </div>
