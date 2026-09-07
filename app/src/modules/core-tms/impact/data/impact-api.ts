@@ -3,7 +3,8 @@ import type { TmsHttpClient, TmsMutationOptions } from "../../../../core/tms/tra
 import type { ImpactAnalysis, ImpactCommand, ImpactRepository, ImpactScope, RepositoryInput } from "../model/impact-types";
 import { scopedAnalysis, scopedRepositories } from "./impact-scope";
 type Api = components["schemas"];
-const path = (scope: ImpactScope, suffix: string) => `/impact/${suffix}?${new URLSearchParams(scope)}`;
+const queryScope = (scope: ImpactScope) => ({ workspaceId: scope.workspaceId, projectId: scope.projectId });
+const path = (scope: ImpactScope, suffix: string) => `/impact/${suffix}?${new URLSearchParams(queryScope(scope))}`;
 export function impactApi(http: TmsHttpClient) {
   return {
     list: async (scope: ImpactScope, signal: AbortSignal, before?: string, runId?: string) => {
@@ -23,7 +24,7 @@ export function impactApi(http: TmsHttpClient) {
     saveRepository: (scope: ImpactScope, id: string, input: RepositoryInput, options: TmsMutationOptions) =>
       http.mutateResource<ImpactRepository>(path(scope, `repositories/${encodeURIComponent(id)}`), "PATCH", input, options),
     history: (scope: ImpactScope, id: string, signal: AbortSignal, cursor?: string) =>
-      http.get<Api["ActivityListEnvelope"]>(`/activity?${new URLSearchParams({ ...scope, entityType: "impact_analysis", entityId: id, limit: "20", ...(cursor ? { cursor } : {}) })}`, signal),
+      http.get<Api["ActivityListEnvelope"]>(`/activity?${new URLSearchParams({ ...queryScope(scope), entityType: "impact_analysis", entityId: id, limit: "20", ...(cursor ? { cursor } : {}) })}`, signal),
     cases: (scope: ImpactScope, query: string, signal: AbortSignal, cursor?: string) =>
       http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${new URLSearchParams({ projectId: scope.projectId, limit: "50", lifecycle: "ready", ...(query ? { search: query } : {}), ...(cursor ? { cursor } : {}) })}`, signal),
   };

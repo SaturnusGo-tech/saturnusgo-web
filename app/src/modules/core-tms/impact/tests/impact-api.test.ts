@@ -80,3 +80,32 @@ test("completed analysis keeps refreshing until pending CI finishes and independ
   assert.equal(shouldRefreshImpact(analysis({ status: "failed", buildStatus: "failed" })), false);
   assert.equal(shouldRefreshImpact(analysis({ gapActions: [{ gapId: "gap", status: "generating", reason: "", testCaseId: null, errorCode: null }] })), true);
 });
+
+test("full analysis objects project only scope fields into every Impact API query", async () => {
+  const requests: URL[] = [];
+  const api = impactApi(createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async (input, init) => {
+    const url = new URL(String(input)); requests.push(url);
+    const item = { ...repository, ...scope, id: "repository_qa", rowVersion: 1 };
+    const data = url.pathname.endsWith("/activity") || url.pathname.endsWith("/test-cases") ? []
+      : url.pathname.endsWith("/repositories") ? [item]
+        : url.pathname.endsWith("/repository_qa") ? item
+          : url.pathname.endsWith("/analyses") ? [analysis()] : analysis();
+    assert.ok(init);
+    return new Response(JSON.stringify({ data, nextCursor: null, meta: { nextCursor: null } }));
+  } }));
+  const fullScope = analysis(); const signal = new AbortController().signal;
+  await api.list(fullScope, signal);
+  await api.detail(fullScope, "analysis_qa", signal);
+  await api.command(fullScope, "analysis_qa", { action: "approve", body: {} }, { ifMatch: "v7", idempotencyKey: "scope-key" });
+  await api.repositories(fullScope, signal);
+  await api.saveRepository(fullScope, "repository_qa", repository, { ifMatch: "v0" });
+  for (const request of requests) assert.deepEqual(Object.fromEntries(request.searchParams), scope);
+  await api.history(fullScope, "analysis_qa", signal, "audit_before");
+  assert.deepEqual(Object.fromEntries(requests[5].searchParams), {
+    ...scope, entityType: "impact_analysis", entityId: "analysis_qa", limit: "20", cursor: "audit_before",
+  });
+  await api.cases(fullScope, "payments", signal, "case_before");
+  assert.deepEqual(Object.fromEntries(requests[6].searchParams), {
+    projectId: scope.projectId, limit: "50", lifecycle: "ready", search: "payments", cursor: "case_before",
+  });
+});
