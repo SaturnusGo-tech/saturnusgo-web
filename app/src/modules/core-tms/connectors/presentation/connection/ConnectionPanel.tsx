@@ -60,8 +60,8 @@ export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pend
           <small>{ru ? "Для получения адреса сохраните подключение; секрет подписи можно добавить следующим шагом." :
             "Save the connection to get its URL; the signing secret can be added in the next step."}</small>}
         <a href={copy.docs} target="_blank" rel="noreferrer">{ru ? "Настроить вебхук в сервисе" : "Set up the service webhook"}<ExternalLink size={13} /></a>
-      </> : <><p>{provider === "slack" ? (ru ? "Уведомления содержат фактический результат и прямую ссылку на запись Falcon. Упоминания пользователей не разворачиваются." :
-        "Notifications contain actual results and a direct Falcon link. User mentions are not expanded.") : (ru ? "Каждый завершённый прогон получает свою страницу под выбранной родительской страницей. Повторная доставка обновляет существующий отчёт." :
+      </> : <><p>{provider === "slack" ? (ru ? "Уведомления содержат доступные результаты и ссылку на прогон, дефект или исходное событие. Упоминания пользователей не разворачиваются." :
+        "Notifications contain available results and a link to the run, defect or source event. User mentions are not expanded.") : (ru ? "Каждый завершённый прогон получает свою страницу под выбранной родительской страницей. Повторная доставка обновляет существующий отчёт." :
           "Each completed run gets a page under the selected parent. Redelivery updates the existing report.")}</p>
         <a href={copy.docs} target="_blank" rel="noreferrer">{ru ? "Права и настройка" : "Permissions and setup"}<ExternalLink size={13} /></a></>}
     </section>
