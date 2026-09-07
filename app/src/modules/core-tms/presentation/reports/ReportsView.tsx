@@ -10,8 +10,9 @@ import { PrioritySignal, prioritySignalRank } from "../cases/list/priority/Prior
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import surface from "./reports.module.css";
 
-export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDefect,
+export function ReportsView({ workspaceId, defects, runs, links, selectedDefectId, onSelectDefect,
   selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun }: {
+  workspaceId?: string;
   defects: Defect[];
   runs: TestRunSummary[];
   links: ExternalLink[];
@@ -113,7 +114,7 @@ export function ReportsView({ defects, runs, links, selectedDefectId, onSelectDe
     {selectedDefectId && <aside className={surface.detailPanel} aria-label={locale === "ru" ? "Баг-репорт" : "Bug report"}>
       {selectedDefect
         ? <DefectReportDetail
-            defect={selectedDefect}
+            workspaceId={workspaceId} defect={selectedDefect}
             run={runs.find((item) => item.id === selectedDefect.runId)}
             links={links.filter((link) => link.owner.kind === "defect" && link.owner.defectId === selectedDefect.id)}
             tab={detailTab}

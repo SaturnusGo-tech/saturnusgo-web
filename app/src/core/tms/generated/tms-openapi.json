@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.10",
+    "version": "1.0.0-checkpoint.11",
     "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -1434,7 +1434,7 @@
       "post": {
         "tags": ["Defects"],
         "summary": "Confirm a fix from exact successful post-ready retest evidence",
-        "description": "Requires a linked YouTrack issue, ready_for_retest lifecycle, the same immutable case snapshot, and a passed exact step when the report is step-scoped. Writes verification, transition, audit, and YouTrack outbox atomically.",
+        "description": "Requires ready_for_retest and a passed retest started after readiness, matching the selected occurrence's immutable case and exact step when step-scoped. Atomically writes verification, transition and audit, including configured service integration fanout. YouTrack-routed defects additionally require their synchronized issue and verified workflow guard and enqueue a YouTrack transition; other defects return youTrackTransition=null.",
         "operationId": "confirmDefectFix",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -2201,7 +2201,7 @@
       "post": {
         "tags": ["Integrations"],
         "summary": "Disconnect a workspace from its current YouTrack configuration",
-        "description": "With mode detachExisting, explicitly detaches current Falcon issue links, records an audit event for every detached link, cancels safe pending YouTrack delivery jobs, disables the configuration, increments connectionRevision, and returns the new representation. Remote YouTrack issues are never deleted. The operation refuses to run with RECONFIGURATION_BUSY while a delivery is publishing or issue creation has an uncertain upstream result.",
+        "description": "With mode detachExisting, explicitly detaches current Falcon issue links, records an audit event for every detached link, cancels safe pending YouTrack delivery jobs, disables the configuration, increments connectionRevision, and returns the new representation. Remote YouTrack issues are never deleted. The operation refuses to run with RECONFIGURATION_BUSY only while a delivery is actively publishing. Dead uncertain creates stay recorded in the old generation and do not block disconnect.",
         "operationId": "disconnectYouTrackConfiguration",
         "x-tms-idempotency": "not-applicable",
         "x-tms-concurrency": "required",
@@ -2363,6 +2363,1220 @@
           "403": { "$ref": "#/components/responses/Forbidden" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
+      }
+    },
+    "/integrations/connectors": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listConnectors",
+        "summary": "List safe connections in a workspace",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/catalog": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getConnectorCatalog",
+        "summary": "List active local project, suite and environment options",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorCatalogResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/{provider}/configuration": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getConnectorConfiguration",
+        "summary": "Read project integration configuration",
+        "description": "Returns data=null with a version-zero ETag until configured.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorConfigurationResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "replaceConnectorConfiguration",
+        "summary": "Verify and replace integration configuration",
+        "description": "Real provider access and destination checks precede activation. The remote resource binding is immutable. Pending work is cancelled on pause; active deliveries must finish before configuration can change. Secrets omitted from the request are preserved.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorConfigurationResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorConfigurationRequest"
+              }
+            }
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/integrations/connectors/{provider}/discovery": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "discoverConnectorResources",
+        "summary": "Verify credentials and discover real service resources",
+        "description": "Performs read-only provider calls. Does not save credentials or create an external object.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorDiscoveryResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorConfigurationRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/integrations/connectors/{provider}/deliveries": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listConnectorDeliveries",
+        "summary": "Read delivery history",
+        "description": "Returns up to 50 rows ordered by createdAt DESC, id DESC. Pass nextCursor as before. Cursors are scoped to the selected connection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorDeliveryListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/confluence/reports/{runId}/republish": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "republishConfluenceRunReport",
+        "summary": "Republish a completed run report to its linked Confluence page",
+        "description": "Requires integration:manage, an enabled Confluence connection subscribed to run.complete, a completed nonarchived run and its existing linked page. If-Match is the current connection ETag. A new idempotency key records an audited durable delivery and updates the same page to its next version; the same canonical request replays its delivery ID without another audit or delivery. Pending, processing, failed or uncertain report deliveries block another request with REPORT_DELIVERY_BUSY. This operation never changes run execution history or retries other providers.",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/RunIdPath"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/ConfluenceReportRepublishResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/{provider}/deliveries/{deliveryId}/retry": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "retryConnectorDelivery",
+        "summary": "Retry a failed delivery",
+        "description": "Only failed deliveries are retryable. Concurrent retry attempts cannot enqueue a duplicate. Uncertain creates require explicit reconciliation.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "name": "deliveryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorAcceptedResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/integrations/connectors/{provider}/deliveries/{deliveryId}/reconcile": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "reconcileConnectorDelivery",
+        "summary": "Link an observed external record after an uncertain create",
+        "description": "Fetches the supplied external record and verifies its remote project, board, team, channel or space. Atomically stores the link, completes the uncertain delivery and appends an audit event. Never creates another external record.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "name": "deliveryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorAcceptedResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorReconcileRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/integrations/connectors/{provider}/links": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listConnectorLinks",
+        "summary": "List the 50 most recently updated external links",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorLinkListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/{provider}/webhook-setup": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getConnectorWebhookSetup",
+        "summary": "Read the exact callback URL",
+        "description": "Jira: X-Hub-Signature sha256. GitHub: X-Hub-Signature-256. Trello: X-Trello-Webhook SHA1 over raw bytes plus this exact URL. Linear: Linear-Signature SHA256 and timestamp freshness. The configured flag means a signing secret exists; it does not claim webhook registration at the external service.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorWebhookSetupResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/{provider}/webhooks": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "receiveConnectorWebhook",
+        "summary": "Receive a signed service event",
+        "description": "Maximum raw JSON body 2 MiB. Provider signature required; bearer/cookie authentication is not used. Delivery deduplicates stable provider event identity. Signed payload is reduced to the minimum durable processing data.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "name": "connectionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          },
+          "202": {
+            "$ref": "#/components/responses/ConnectorAcceptedResponse"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/connectors/trello/webhooks": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "head": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "verifyTrelloConnectorWebhook",
+        "summary": "Answer Trello callback verification",
+        "description": "The connection must exist, be enabled and have a signing secret. No body is returned.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "connectionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valid callback",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "security": []
+      }
+    },
+    "/integrations/connectors/targets/{targetId}/links": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listConnectorTargetLinks",
+        "summary": "List external links for a Falcon record",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "targetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorLinkListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/integrations/connectors/{provider}/disconnect": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "disconnectConnector",
+        "summary": "Disconnect the current integration binding",
+        "description": "Archives the connection, cancels pending deliveries and preserves historical external links. Active deliveries must finish first. A subsequent save may bind a different remote resource. Does not revoke credentials at the provider. Returns a version-zero ETag.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorProvider"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConnectorDisconnectResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
       }
     }
   },
@@ -3096,7 +4310,7 @@
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackDisconnectEnvelope" } } }
       },
       "YouTrackConfigurationConflict": {
-        "description": "CONFIGURATION_IN_USE rejects an unsafe in-place service-root or project-binding change. RECONFIGURATION_BUSY rejects disconnect while a delivery is publishing or an upstream issue-create outcome is uncertain.",
+        "description": "CONFIGURATION_IN_USE rejects an unsafe in-place service-root or project-binding change. RECONFIGURATION_BUSY rejects disconnect while a delivery is actively publishing.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/YouTrackConfigurationConflictEnvelope" } } }
       },
@@ -3267,6 +4481,180 @@
         "description": "The bounded upstream operation is temporarily unavailable.",
         "headers": { "X-Request-Id": { "$ref": "#/components/headers/XRequestId" } },
         "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "ConnectorUnavailable": {
+        "description": "Credential encryption is unavailable. Configure the deployment key before enabling connections.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorConfigurationResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorConfigurationEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorListResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorListEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorDiscoveryResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorDiscoveryEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorCatalogResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorCatalogEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorDeliveryListResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorDeliveryListEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorLinkListResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorLinkListEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorWebhookSetupResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorWebhookSetupEnvelope"
+            }
+          }
+        }
+      },
+      "ConfluenceReportRepublishResponse": {
+        "description": "Report publication durably accepted; delivery may complete asynchronously.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConfluenceReportRepublishEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorAcceptedResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorAcceptedEnvelope"
+            }
+          }
+        }
+      },
+      "ConnectorDisconnectResponse": {
+        "description": "Successful integration operation.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ConnectorDisconnectEnvelope"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -3947,43 +5335,100 @@
       "ErrorCode": {
         "type": "string",
         "enum": [
+          "ANALYTICS_SCOPE_TOO_LARGE",
+          "ANALYTICS_TEMPORARILY_UNAVAILABLE",
+          "ANALYTICS_WINDOW_TOO_LARGE",
+          "ATTACHMENT_DIGEST_MISMATCH",
           "AUTHENTICATION_REQUIRED",
-          "FORBIDDEN",
-          "VALIDATION_ERROR",
           "BAD_REQUEST",
-          "NOT_FOUND",
-          "CONFLICT",
-          "INVALID_TRANSITION",
-          "PRECONDITION_REQUIRED",
-          "PRECONDITION_FAILED",
-          "IDEMPOTENCY_KEY_REUSED",
-          "QUOTA_EXCEEDED",
-          "RETEST_EVIDENCE_REQUIRED",
-          "RETEST_CASE_MISMATCH",
-          "RETEST_STEP_MISMATCH",
-          "YOUTRACK_LINK_REQUIRED",
-          "YOUTRACK_NOT_READY_FOR_TEST",
-          "YOUTRACK_SYNC_CONFLICT",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
-          "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
-          "YOUTRACK_CONFIGURATION_CHANGED",
-          "INTEGRATION_DISABLED",
+          "BOT_CHANNEL_MEMBERSHIP_REQUIRED",
+          "CATALOG_LIMIT_EXCEEDED",
+          "CHANGED_PATHS_LIMIT_EXCEEDED",
           "CLOUD_AUTH_ACCOUNT_CONFLICT",
           "CLOUD_AUTH_AUTHENTICATION_FAILED",
           "CLOUD_AUTH_IDEMPOTENCY_CONFLICT",
           "CLOUD_AUTH_ORIGIN_DENIED",
+          "CLOUD_AUTH_PERSISTENCE_FAILED",
           "CLOUD_AUTH_RATE_LIMITED",
           "CLOUD_AUTH_SESSION_INVALID",
-          "CLOUD_AUTH_PERSISTENCE_FAILED",
-          "UPLOAD_INTENT_EXPIRED",
-          "ATTACHMENT_DIGEST_MISMATCH",
+          "CONFLICT",
+          "CONNECTION_BINDING_IMMUTABLE",
+          "CONNECTION_BUSY",
+          "CONNECTION_LIMIT_EXCEEDED",
+          "CONNECTION_NOT_FOUND",
+          "CREDENTIALS_REQUIRED",
+          "CREDENTIALS_UNAVAILABLE",
+          "DEFECT_ALREADY_ROUTED",
+          "DEFECT_NOT_FOUND",
+          "DELIVERY_NOT_RECONCILABLE",
+          "DELIVERY_NOT_RETRYABLE",
+          "DELIVERY_OUTCOME_UNKNOWN",
+          "DESTINATION_NOT_ACCESSIBLE",
+          "DISCOVERY_LIMIT_EXCEEDED",
+          "DUPLICATE_RULE",
+          "ENCRYPTION_KEY_REQUIRED",
+          "ENVIRONMENT_NOT_FOUND",
+          "EVENT_DISABLED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_KEY_REUSED",
+          "INTEGRATION_ACTOR_UNAVAILABLE",
+          "INTEGRATION_DISABLED",
+          "INTERNAL_ERROR",
+          "INVALID_CHANNEL",
+          "INVALID_COMMIT",
+          "INVALID_EVENT",
+          "INVALID_GITHUB_EVENT",
+          "INVALID_MESSAGE_ID",
+          "INVALID_PATH_PREFIX",
+          "INVALID_PULL_REQUEST",
+          "INVALID_REPOSITORY",
+          "INVALID_SERVICE_URL",
+          "INVALID_TRANSITION",
+          "INVALID_WEBHOOK_PAYLOAD",
+          "LEASE_LOST",
+          "LINK_CONFLICT",
+          "NOT_FOUND",
+          "NO_MATCHING_TESTS",
+          "PATH_FILTER_REQUIRES_PR_OR_PUSH",
           "PAYLOAD_TOO_LARGE",
+          "PRECONDITION_FAILED",
+          "PRECONDITION_REQUIRED",
+          "PROCESSING_FAILED",
+          "PROJECT_NOT_FOUND",
+          "QUOTA_EXCEEDED",
+          "REMOTE_ARCHIVED",
+          "REMOTE_NOT_FOUND",
+          "REMOTE_SCOPE_MISMATCH",
+          "REMOTE_TRANSITION_UNAVAILABLE",
+          "RETEST_CASE_MISMATCH",
+          "RETEST_EVIDENCE_REQUIRED",
+          "RETEST_STEP_MISMATCH",
+          "RULE_EVENT_DISABLED",
+          "RUN_ITEM_NOT_FOUND",
+          "RUN_NOT_COMPLETED",
+          "RUN_NOT_FOUND",
+          "RUN_RULE_REQUIRED",
+          "SIGNING_SECRET_REQUIRED",
+          "STATUS_NOT_ACCESSIBLE",
+          "SUITE_NOT_FOUND",
+          "UNLINKED_REMOTE_ISSUE",
           "UNSUPPORTED_MEDIA_TYPE",
-          "ANALYTICS_WINDOW_TOO_LARGE",
-          "ANALYTICS_SCOPE_TOO_LARGE",
-          "ANALYTICS_TEMPORARILY_UNAVAILABLE",
-          "INTERNAL_ERROR"
+          "UNSUPPORTED_OPERATION",
+          "UPLOAD_INTENT_EXPIRED",
+          "UPSTREAM_ACCESS_DENIED",
+          "UPSTREAM_INVALID_RESPONSE",
+          "UPSTREAM_RATE_LIMITED",
+          "UPSTREAM_REJECTED",
+          "UPSTREAM_UNAVAILABLE",
+          "VALIDATION_ERROR",
+          "WEBHOOK_UNAUTHORIZED",
+          "YOUTRACK_CONFIGURATION_CHANGED",
+          "YOUTRACK_LINK_REQUIRED",
+          "YOUTRACK_NOT_READY_FOR_TEST",
+          "YOUTRACK_SYNC_CONFLICT",
+          "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
+          "YOUTRACK_WEBHOOK_UNAUTHORIZED",
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
         ]
       },
       "ValidationIssue": {
@@ -5259,7 +6704,7 @@
         "properties": {
           "defect": { "$ref": "#/components/schemas/Defect" },
           "verification": { "$ref": "#/components/schemas/DefectFixVerification" },
-          "youTrackTransition": { "$ref": "#/components/schemas/DefectFixYouTrackTransition" }
+          "youTrackTransition": { "oneOf": [{ "$ref": "#/components/schemas/DefectFixYouTrackTransition" }, { "type": "null" }] }
         }
       },
       "DefectFixConfirmationEnvelope": {
@@ -6570,6 +8015,725 @@
                 }
               }
             }
+          }
+        }
+      },
+      "ConnectorProvider": {
+        "type": "string",
+        "enum": [
+          "jira",
+          "trello",
+          "linear",
+          "github",
+          "slack",
+          "confluence"
+        ]
+      },
+      "ConnectorEvent": {
+        "type": "string",
+        "enum": [
+          "defect.created",
+          "defect.updated",
+          "defect.status_changed",
+          "defect.fix_confirmed",
+          "run.created",
+          "run.start",
+          "run.complete",
+          "run.abort",
+          "pull_request",
+          "push",
+          "release",
+          "workflow_failed",
+          "github.release",
+          "github.workflow_failed"
+        ]
+      },
+      "ConnectorRunRule": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "event",
+          "suiteId",
+          "environmentId",
+          "branches",
+          "pathPrefixes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "pull_request",
+              "push",
+              "release",
+              "workflow_failed"
+            ]
+          },
+          "suiteId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "environmentId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "branches": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            }
+          },
+          "pathPrefixes": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            }
+          }
+        }
+      },
+      "ConnectorSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "baseUrl",
+          "remoteId",
+          "destinationId",
+          "events",
+          "inboundReadyStatuses",
+          "outboundStatuses",
+          "rules"
+        ],
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "remoteId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "destinationId": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "events": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorEvent"
+            }
+          },
+          "inboundReadyStatuses": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            }
+          },
+          "outboundStatuses": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "open": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "triaged": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "in_progress": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "ready_for_retest": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "verified": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "closed": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "reopened": {
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          },
+          "rules": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRunRule"
+            }
+          }
+        }
+      },
+      "ConnectorSecrets": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "apiToken": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "writeOnly": true
+          },
+          "email": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "writeOnly": true,
+            "format": "email"
+          },
+          "apiKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "writeOnly": true
+          },
+          "signingSecret": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 512,
+            "writeOnly": true
+          }
+        },
+        "description": "Only submitted credentials are replaced. Secrets are encrypted at rest and are never returned. A missing field preserves its existing value."
+      },
+      "ConnectorConfigurationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled",
+          "settings",
+          "secrets"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ConnectorSettings"
+          },
+          "secrets": {
+            "$ref": "#/components/schemas/ConnectorSecrets"
+          }
+        }
+      },
+      "ConnectorConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "id",
+          "provider",
+          "enabled",
+          "settings",
+          "rowVersion",
+          "checkedAt",
+          "credentialsConfigured",
+          "webhookConfigured"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/ConnectorProvider"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ConnectorSettings"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "checkedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Last successful provider access check; null if saved paused before verification."
+          },
+          "credentialsConfigured": {
+            "type": "boolean"
+          },
+          "webhookConfigured": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConnectorRemoteOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "parentId": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      },
+      "ConnectorDiscovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "account",
+          "resources",
+          "destinations",
+          "statuses"
+        ],
+        "properties": {
+          "account": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "resources": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          },
+          "destinations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          },
+          "statuses": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          }
+        }
+      },
+      "ConnectorCatalog": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projects",
+          "suites",
+          "environments"
+        ],
+        "properties": {
+          "projects": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          },
+          "suites": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          },
+          "environments": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRemoteOption"
+            }
+          }
+        }
+      },
+      "ConnectorDelivery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "event",
+          "targetId",
+          "direction",
+          "status",
+          "attempts",
+          "errorCode",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "event": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "targetId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "inbound",
+              "outbound"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "delivered",
+              "failed",
+              "uncertain",
+              "cancelled",
+              "ignored"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "errorCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ConnectorLink": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "connectionId",
+          "targetType",
+          "targetId",
+          "remoteId",
+          "remoteKey",
+          "url",
+          "remoteStatus",
+          "remoteUpdatedAt",
+          "metadata"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "connectionId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "defect",
+              "run"
+            ]
+          },
+          "targetId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "remoteId": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "remoteKey": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "remoteStatus": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "remoteUpdatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          }
+        }
+      },
+      "ConnectorWebhookSetup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "configured"
+        ],
+        "properties": {
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configured": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConnectorAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accepted"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "description": "False when the signed event was already accepted or did not match a configured event."
+          }
+        }
+      },
+      "ConnectorReconcileRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "remoteId"
+        ],
+        "properties": {
+          "remoteId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        }
+      },
+      "ConnectorConfigurationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConnectorConfiguration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ConnectorListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 600,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorConfiguration"
+            }
+          }
+        }
+      },
+      "ConnectorDiscoveryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConnectorDiscovery"
+          }
+        }
+      },
+      "ConnectorCatalogEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConnectorCatalog"
+          }
+        }
+      },
+      "ConnectorDeliveryListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "nextCursor"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorDelivery"
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ConnectorLinkListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/ConnectorLink"
+            }
+          }
+        }
+      },
+      "ConnectorWebhookSetupEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConnectorWebhookSetup"
+          }
+        }
+      },
+      "ConfluenceReportRepublishEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "accepted",
+              "deliveryId"
+            ],
+            "properties": {
+              "accepted": {
+                "type": "boolean",
+                "const": true
+              },
+              "deliveryId": {
+                "$ref": "#/components/schemas/Identifier"
+              }
+            }
+          }
+        }
+      },
+      "ConnectorAcceptedEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConnectorAccepted"
+          }
+        }
+      },
+      "ConnectorDisconnectEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "null"
           }
         }
       }

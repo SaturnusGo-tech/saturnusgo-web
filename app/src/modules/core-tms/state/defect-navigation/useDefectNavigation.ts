@@ -1,20 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { buildDefectDeepLink, readDefectDeepLink } from "../../defects/navigation/defect-deep-link";
+import { readWorkspaceDeepLink } from "../navigation/workspace-deep-link";
 import type { View } from "../types/workspace";
 
 export function useDefectNavigation(
   projectId: string,
   setView: (view: View) => void,
+  canWriteNavigation: () => boolean,
 ) {
   const [selectedDefectId, setSelectedDefectId] = useState<string | null>(null);
-  const initialized = useRef(false);
+  const initializedProject = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!projectId) return;
-    if (!initialized.current) {
-      initialized.current = true;
+    if (!projectId || initializedProject.current === projectId || !canWriteNavigation()) return;
+    const firstProject = initializedProject.current === null;
+    initializedProject.current = projectId;
+    if (firstProject) {
       const linked = readDefectDeepLink(window.location.href);
-      if ((!linked.projectId || linked.projectId === projectId) && linked.defectId) {
+      if (readWorkspaceDeepLink(window.location.href).view === "reports"
+        && (!linked.projectId || linked.projectId === projectId) && linked.defectId) {
         setSelectedDefectId(linked.defectId);
         if (linked.projectId) {
           const next = buildDefectDeepLink(window.location.href, {
@@ -30,7 +34,7 @@ export function useDefectNavigation(
       if (next !== window.location.href) window.history.replaceState(null, "", next);
     }
     setSelectedDefectId(null);
-  }, [projectId, setView]);
+  }, [projectId, setView, canWriteNavigation]);
 
   function selectDefect(defectId: string | null) {
     setSelectedDefectId(defectId);
@@ -50,9 +54,10 @@ export function useDefectNavigation(
     });
     if (next !== window.location.href) window.history.replaceState(null, "", next);
   }, [projectId, selectedDefectId]);
+  const clearDefectSelection = useCallback(() => setSelectedDefectId(null), []);
 
   return {
     selectedDefectId, setSelectedDefectId: selectDefect, openDefect,
-    canonicalizeSelectedDefect,
+    canonicalizeSelectedDefect, clearDefectSelection,
   };
 }

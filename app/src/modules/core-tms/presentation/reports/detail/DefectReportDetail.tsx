@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import { ConnectorTargetLinks } from "../../../connectors/presentation/links/ConnectorTargetLinks";
 import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
@@ -12,7 +13,8 @@ import surface from "../reports.module.css";
 
 export type DetailTab = "overview" | "attachments";
 
-export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBack, onOpenRun }: {
+export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun }: {
+  workspaceId?: string;
   defect: Defect;
   run?: TestRunSummary;
   links: ExternalLink[];
@@ -91,16 +93,18 @@ export function DefectReportDetail({ defect, run, links, tab, onTabChange, onBac
             <dl className={surface.propertyList}>
               <div><dt>{t("reports.component")}</dt><dd>{localizedComponentLabel(locale, defect.component) || "—"}</dd></div>
               <div><dt>{t("reports.assignee")}</dt><dd>{defect.assigneeIdentityId || t("common.unassigned")}</dd></div>
-              <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? "YouTrack" : "—"}</dd></div>
+              <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? "YouTrack" :
+                locale === "ru" ? "Интеграции проекта" : "Project integrations"}</dd></div>
             </dl>
           </DetailSection>
-          <DetailSection title={t("reports.issueLink")}>
+          {(defect.integrationTarget || defect.externalIssue) && <DetailSection title={t("reports.issueLink")}>
             {defect.externalIssue ? <a className={surface.issueLink} href={defect.externalIssue.url} target="_blank" rel="noreferrer">
               <span className={surface.issueProvider}>YouTrack</span>
               <strong>{defect.externalIssue.key}</strong>
               <ExternalLinkIcon size={14} aria-hidden="true" />
             </a> : <p className={surface.mutedText}>{t("reports.noIssueLink")}</p>}
-          </DetailSection>
+          </DetailSection>}
+          {workspaceId && <ConnectorTargetLinks workspaceId={workspaceId} projectId={defect.projectId} targetId={defect.id} />}
           <DetailSection title={t("reports.labels")}>
             {defect.labels.length > 0 ? <div className={surface.tagList}>{defect.labels.map((label) => <span key={label}>#{label}</span>)}</div> : <p className={surface.mutedText}>{t("reports.noLabels")}</p>}
           </DetailSection>

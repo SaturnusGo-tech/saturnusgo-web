@@ -1,0 +1,7 @@
+.section { display: flex; align-items: center; gap: 24px; padding: 22px 0 32px; margin-top: 20px; border-top: 1px solid var(--c-line); }
+.section h2 { font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+.section p { max-width: 680px; color: var(--c-muted); font-size: 11px; margin: 0; line-height: 1.6; }
+.section button { flex: 0 0 auto; color: var(--c-ink); border: 1px solid var(--c-line); border-radius: var(--c-radius); background: var(--c-soft); padding: 8px 12px; font-size: 11px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions button:first-child { color: #b42318; background: #fff1f0; border-color: #ffccc7; }
+@media(max-width: 800px) { .section { align-items: flex-start; flex-direction: column; gap: 12px; } }

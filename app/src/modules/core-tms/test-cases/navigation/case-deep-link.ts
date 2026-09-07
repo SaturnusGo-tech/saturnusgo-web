@@ -16,10 +16,11 @@ export function readCaseDeepLink(href: string): CaseDeepLink {
 
 export function buildCaseDeepLink(
   href: string,
-  input: { caseId: string; projectId: string },
+  input: { caseId: string; projectId: string; workspaceId?: string },
   options: { preserveDefectSelection?: boolean } = {},
 ) {
   const url = new URL(href);
+  const workspaceId = input.workspaceId ?? url.searchParams.get("workspaceId");
   const defectId = options.preserveDefectSelection
     ? url.searchParams.get("defectId") : null;
   const legacyDefectId = options.preserveDefectSelection
@@ -28,6 +29,7 @@ export function buildCaseDeepLink(
     && url.searchParams.get("view") === "reports");
   url.hash = "";
   url.search = "";
+  if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
   url.searchParams.set(PROJECT_ID_PARAM, input.projectId);
   url.searchParams.set(CASE_ID_PARAM, input.caseId);
   if (defectId) url.searchParams.set("defectId", defectId);

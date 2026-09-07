@@ -52,10 +52,8 @@ export function useWorkspaceDerived(
   );
   const activeProjectRuns = projectRuns.filter(isAuthoritativelyActiveRun);
   const selectedRun =
-    state.data.runs.find((item) => item.id === state.selectedRunId) ??
-    activeProjectRuns[0] ??
-    projectRuns.find((item) => !item.archivedAt) ??
-    null;
+    state.selectedRunId ? projectRuns.find((item) => item.id === state.selectedRunId) ?? null
+      : activeProjectRuns[0] ?? projectRuns.find((item) => !item.archivedAt) ?? null;
   const selectedRunItem = state.selectedRunItemDetail?.id === state.selectedRunItemId
     ? state.selectedRunItemDetail
     : null;

@@ -59,7 +59,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const routing = resolveDefectIntegrationChoice(
     integrationChoice, offline || (youTrackStatus === "ready" && (configurationVersion === 2 || !enabled)),
   );
-  const routeOptions = offline ? [{ value: "", label: copy.tmsOnly }]
+  const routeOptions = offline ? [{ value: "", label: copy.projectIntegrations }]
     : youTrackStatus === "loading" ? [{ value: "", label: copy.youTrackLoading }]
     : youTrackStatus === "error" ? [{ value: "", label: copy.youTrackUnavailable }]
     : defectRouteChoices(youTrack, copy);
@@ -106,7 +106,8 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
             <Field label={t("inlineDefect.severity")}><AnimatedSelect label={t("inlineDefect.severity")} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[{ value: "critical", label: t("severity.critical") }, { value: "high", label: t("severity.major") }, { value: "medium", label: t("severity.minor") }, { value: "low", label: t("severity.low") }]} /></Field>
             <Field label={t("inlineDefect.priority")}><AnimatedSelect label={t("inlineDefect.priority")} value={priority} onChange={(value) => setPriority(value as Defect["priority"])} options={[{ value: "critical", label: t("inlineDefect.priorityUrgent") }, { value: "high", label: t("priority.high") }, { value: "medium", label: t("priority.medium") }, { value: "low", label: t("priority.low") }]} /></Field>
             <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={componentChoices} /></Field>
-            <Field label={copy.youTrackTarget} wide><AnimatedSelect label={copy.youTrackTarget} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
+            <Field label={copy.routingLabel} wide><AnimatedSelect label={copy.routingLabel} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
+              {!offline && <small>{copy.routingHint}</small>}{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
             <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
           </div>
         </section>

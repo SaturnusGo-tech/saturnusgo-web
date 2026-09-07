@@ -10,6 +10,7 @@ import { useCaseBulkActions } from "../case-bulk/useCaseBulkActions";
 import { useCaseCollaboration } from "../case-collaboration/useCaseCollaboration";
 import { useDefectNavigation } from "../defect-navigation/useDefectNavigation";
 import { useSelectedDefectResource } from "../defect-resource/useSelectedDefectResource";
+import { useRunNavigation } from "../run-navigation/useRunNavigation";
 import { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
 
 export function useWorkspaceModel() {
@@ -36,19 +37,22 @@ export function useWorkspaceModel() {
       && capabilities.includes("run:execute"),
   });
   const defectNavigation = useDefectNavigation(
-    derived.project?.id ?? "", state.setView,
+    state.projectId, state.setView, state.canWriteNavigation,
   );
+  const openRun = useRunNavigation({ workspaceId: state.data.workspace.id, projectId: state.projectId,
+    setSelectedRunId: state.setSelectedRunId, setSelectedRunItemId: state.setSelectedRunItemId,
+    setView: state.setView, clearDefectSelection: defectNavigation.clearDefectSelection });
   const selectedDefectResource = useSelectedDefectResource(
     state.connection === "connected", derived.project?.id ?? "", derived.projectDefects,
     defectNavigation.selectedDefectId,
   );
   const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection);
   useEffect(() => {
-    if (selectedDefectResource.status === "ready"
+    if (state.canWriteNavigation() && state.view === "reports" && selectedDefectResource.status === "ready"
       && selectedDefectResource.data?.projectId === derived.project?.id) {
       defectNavigation.canonicalizeSelectedDefect();
     }
-  }, [defectNavigation.canonicalizeSelectedDefect, derived.project?.id,
+  }, [state.view, state.canWriteNavigation, defectNavigation.canonicalizeSelectedDefect, derived.project?.id,
     selectedDefectResource.data?.projectId, selectedDefectResource.status]);
   const selectedDefect = selectedDefectResource.data;
   const reportDefects = selectedDefect
@@ -65,6 +69,7 @@ export function useWorkspaceModel() {
     ...caseBulk,
     caseCollaboration,
     ...defectNavigation,
+    openRun,
     reportDefects,
     selectedDefectResource,
     sharedSteps,

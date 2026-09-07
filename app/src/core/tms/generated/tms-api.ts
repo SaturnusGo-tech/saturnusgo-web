@@ -968,7 +968,7 @@ export interface paths {
         put?: never;
         /**
          * Confirm a fix from exact successful post-ready retest evidence
-         * @description Requires a linked YouTrack issue, ready_for_retest lifecycle, the same immutable case snapshot, and a passed exact step when the report is step-scoped. Writes verification, transition, audit, and YouTrack outbox atomically.
+         * @description Requires ready_for_retest and a passed retest started after readiness, matching the selected occurrence's immutable case and exact step when step-scoped. Atomically writes verification, transition and audit, including configured service integration fanout. YouTrack-routed defects additionally require their synchronized issue and verified workflow guard and enqueue a YouTrack transition; other defects return youTrackTransition=null.
          */
         post: operations["confirmDefectFix"];
         delete?: never;
@@ -1486,7 +1486,7 @@ export interface paths {
         put?: never;
         /**
          * Disconnect a workspace from its current YouTrack configuration
-         * @description With mode detachExisting, explicitly detaches current Falcon issue links, records an audit event for every detached link, cancels safe pending YouTrack delivery jobs, disables the configuration, increments connectionRevision, and returns the new representation. Remote YouTrack issues are never deleted. The operation refuses to run with RECONFIGURATION_BUSY while a delivery is publishing or issue creation has an uncertain upstream result.
+         * @description With mode detachExisting, explicitly detaches current Falcon issue links, records an audit event for every detached link, cancels safe pending YouTrack delivery jobs, disables the configuration, increments connectionRevision, and returns the new representation. Remote YouTrack issues are never deleted. The operation refuses to run with RECONFIGURATION_BUSY only while a delivery is actively publishing. Dead uncertain creates stay recorded in the old generation and do not block disconnect.
          */
         post: operations["disconnectYouTrackConfiguration"];
         delete?: never;
@@ -1621,6 +1621,320 @@ export interface paths {
         get: operations["listActivity"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** List safe connections in a workspace */
+        get: operations["listConnectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/catalog": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** List active local project, suite and environment options */
+        get: operations["getConnectorCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/configuration": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read project integration configuration
+         * @description Returns data=null with a version-zero ETag until configured.
+         */
+        get: operations["getConnectorConfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Verify and replace integration configuration
+         * @description Real provider access and destination checks precede activation. The remote resource binding is immutable. Pending work is cancelled on pause; active deliveries must finish before configuration can change. Secrets omitted from the request are preserved.
+         */
+        patch: operations["replaceConnectorConfiguration"];
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/discovery": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify credentials and discover real service resources
+         * @description Performs read-only provider calls. Does not save credentials or create an external object.
+         */
+        post: operations["discoverConnectorResources"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read delivery history
+         * @description Returns up to 50 rows ordered by createdAt DESC, id DESC. Pass nextCursor as before. Cursors are scoped to the selected connection.
+         */
+        get: operations["listConnectorDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/confluence/reports/{runId}/republish": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Republish a completed run report to its linked Confluence page
+         * @description Requires integration:manage, an enabled Confluence connection subscribed to run.complete, a completed nonarchived run and its existing linked page. If-Match is the current connection ETag. A new idempotency key records an audited durable delivery and updates the same page to its next version; the same canonical request replays its delivery ID without another audit or delivery. Pending, processing, failed or uncertain report deliveries block another request with REPORT_DELIVERY_BUSY. This operation never changes run execution history or retries other providers.
+         */
+        post: operations["republishConfluenceRunReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/deliveries/{deliveryId}/retry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry a failed delivery
+         * @description Only failed deliveries are retryable. Concurrent retry attempts cannot enqueue a duplicate. Uncertain creates require explicit reconciliation.
+         */
+        post: operations["retryConnectorDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/deliveries/{deliveryId}/reconcile": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Link an observed external record after an uncertain create
+         * @description Fetches the supplied external record and verifies its remote project, board, team, channel or space. Atomically stores the link, completes the uncertain delivery and appends an audit event. Never creates another external record.
+         */
+        post: operations["reconcileConnectorDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/links": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** List the 50 most recently updated external links */
+        get: operations["listConnectorLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/webhook-setup": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the exact callback URL
+         * @description Jira: X-Hub-Signature sha256. GitHub: X-Hub-Signature-256. Trello: X-Trello-Webhook SHA1 over raw bytes plus this exact URL. Linear: Linear-Signature SHA256 and timestamp freshness. The configured flag means a signing secret exists; it does not claim webhook registration at the external service.
+         */
+        get: operations["getConnectorWebhookSetup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/webhooks": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive a signed service event
+         * @description Maximum raw JSON body 2 MiB. Provider signature required; bearer/cookie authentication is not used. Delivery deduplicates stable provider event identity. Signed payload is reduced to the minimum durable processing data.
+         */
+        post: operations["receiveConnectorWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/trello/webhooks": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        /**
+         * Answer Trello callback verification
+         * @description The connection must exist, be enabled and have a signing secret. No body is returned.
+         */
+        head: operations["verifyTrelloConnectorWebhook"];
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/targets/{targetId}/links": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** List external links for a Falcon record */
+        get: operations["listConnectorTargetLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/connectors/{provider}/disconnect": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Disconnect the current integration binding
+         * @description Archives the connection, cancels pending deliveries and preserves historical external links. Active deliveries must finish first. A subsequent save may bind a different remote resource. Does not revoke credentials at the provider. Returns a version-zero ETag.
+         */
+        post: operations["disconnectConnector"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2087,7 +2401,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "AUTHENTICATION_REQUIRED" | "FORBIDDEN" | "VALIDATION_ERROR" | "BAD_REQUEST" | "NOT_FOUND" | "CONFLICT" | "INVALID_TRANSITION" | "PRECONDITION_REQUIRED" | "PRECONDITION_FAILED" | "IDEMPOTENCY_KEY_REUSED" | "QUOTA_EXCEEDED" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_CASE_MISMATCH" | "RETEST_STEP_MISMATCH" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_CONFIGURATION_CHANGED" | "INTEGRATION_DISABLED" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "UPLOAD_INTENT_EXPIRED" | "ATTACHMENT_DIGEST_MISMATCH" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "INTERNAL_ERROR";
+        ErrorCode: "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "IDEMPOTENCY_KEY_REUSED" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "LEASE_LOST" | "LINK_CONFLICT" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SIGNING_SECRET_REQUIRED" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
         ValidationIssue: {
             field: string;
             code: string;
@@ -2864,7 +3178,7 @@ export interface components {
         DefectFixConfirmation: {
             defect: components["schemas"]["Defect"];
             verification: components["schemas"]["DefectFixVerification"];
-            youTrackTransition: components["schemas"]["DefectFixYouTrackTransition"];
+            youTrackTransition: components["schemas"]["DefectFixYouTrackTransition"] | null;
         };
         DefectFixConfirmationEnvelope: {
             data: components["schemas"]["DefectFixConfirmation"];
@@ -3712,6 +4026,159 @@ export interface components {
                 };
             };
         };
+        /** @enum {string} */
+        ConnectorProvider: "jira" | "trello" | "linear" | "github" | "slack" | "confluence";
+        /** @enum {string} */
+        ConnectorEvent: "defect.created" | "defect.updated" | "defect.status_changed" | "defect.fix_confirmed" | "run.created" | "run.start" | "run.complete" | "run.abort" | "pull_request" | "push" | "release" | "workflow_failed" | "github.release" | "github.workflow_failed";
+        ConnectorRunRule: {
+            id: string;
+            /** @enum {string} */
+            event: "pull_request" | "push" | "release" | "workflow_failed";
+            suiteId: components["schemas"]["Identifier"];
+            environmentId: components["schemas"]["Identifier"];
+            branches: string[];
+            pathPrefixes: string[];
+        };
+        ConnectorSettings: {
+            baseUrl: string;
+            remoteId: string;
+            destinationId: string;
+            events: components["schemas"]["ConnectorEvent"][];
+            inboundReadyStatuses: string[];
+            outboundStatuses: {
+                open?: string;
+                triaged?: string;
+                in_progress?: string;
+                ready_for_retest?: string;
+                verified?: string;
+                closed?: string;
+                reopened?: string;
+            };
+            rules: components["schemas"]["ConnectorRunRule"][];
+        };
+        /** @description Only submitted credentials are replaced. Secrets are encrypted at rest and are never returned. A missing field preserves its existing value. */
+        ConnectorSecrets: {
+            apiToken?: string;
+            /** Format: email */
+            email?: string;
+            apiKey?: string;
+            signingSecret?: string;
+        };
+        ConnectorConfigurationRequest: {
+            enabled: boolean;
+            settings: components["schemas"]["ConnectorSettings"];
+            secrets: components["schemas"]["ConnectorSecrets"];
+        };
+        ConnectorConfiguration: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            id: components["schemas"]["Identifier"];
+            provider: components["schemas"]["ConnectorProvider"];
+            enabled: boolean;
+            settings: components["schemas"]["ConnectorSettings"];
+            rowVersion: number;
+            /**
+             * Format: date-time
+             * @description Last successful provider access check; null if saved paused before verification.
+             */
+            checkedAt: string | null;
+            credentialsConfigured: boolean;
+            webhookConfigured: boolean;
+        };
+        ConnectorRemoteOption: {
+            id: string;
+            name: string;
+            parentId?: string;
+        };
+        ConnectorDiscovery: {
+            account: string;
+            resources: components["schemas"]["ConnectorRemoteOption"][];
+            destinations: components["schemas"]["ConnectorRemoteOption"][];
+            statuses: components["schemas"]["ConnectorRemoteOption"][];
+        };
+        ConnectorCatalog: {
+            projects: components["schemas"]["ConnectorRemoteOption"][];
+            suites: components["schemas"]["ConnectorRemoteOption"][];
+            environments: components["schemas"]["ConnectorRemoteOption"][];
+        };
+        ConnectorDelivery: {
+            id: components["schemas"]["Identifier"];
+            event: string;
+            targetId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            direction: "inbound" | "outbound";
+            /** @enum {string} */
+            status: "pending" | "processing" | "delivered" | "failed" | "uncertain" | "cancelled" | "ignored";
+            attempts: number;
+            errorCode: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ConnectorLink: {
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            connectionId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            targetType: "defect" | "run";
+            targetId: components["schemas"]["Identifier"];
+            remoteId: string;
+            remoteKey: string;
+            /** Format: uri */
+            url: string;
+            remoteStatus: string;
+            remoteUpdatedAt: string | null;
+            metadata: {
+                [key: string]: string;
+            };
+        };
+        ConnectorWebhookSetup: {
+            url: string | null;
+            configured: boolean;
+        };
+        ConnectorAccepted: {
+            /** @description False when the signed event was already accepted or did not match a configured event. */
+            accepted: boolean;
+        };
+        ConnectorReconcileRequest: {
+            remoteId: string;
+        };
+        ConnectorConfigurationEnvelope: {
+            data: components["schemas"]["ConnectorConfiguration"] | null;
+        };
+        ConnectorListEnvelope: {
+            data: components["schemas"]["ConnectorConfiguration"][];
+        };
+        ConnectorDiscoveryEnvelope: {
+            data: components["schemas"]["ConnectorDiscovery"];
+        };
+        ConnectorCatalogEnvelope: {
+            data: components["schemas"]["ConnectorCatalog"];
+        };
+        ConnectorDeliveryListEnvelope: {
+            data: components["schemas"]["ConnectorDelivery"][];
+            nextCursor: components["schemas"]["Identifier"] | null;
+        };
+        ConnectorLinkListEnvelope: {
+            data: components["schemas"]["ConnectorLink"][];
+        };
+        ConnectorWebhookSetupEnvelope: {
+            data: components["schemas"]["ConnectorWebhookSetup"];
+        };
+        ConfluenceReportRepublishEnvelope: {
+            data: {
+                /** @constant */
+                accepted: true;
+                deliveryId: components["schemas"]["Identifier"];
+            };
+        };
+        ConnectorAcceptedEnvelope: {
+            data: components["schemas"]["ConnectorAccepted"];
+        };
+        ConnectorDisconnectEnvelope: {
+            data: null;
+        };
     };
     responses: {
         /** @description Personal tenant and local cloud session created or safely replayed. */
@@ -4188,7 +4655,7 @@ export interface components {
                 "application/json": components["schemas"]["YouTrackDisconnectEnvelope"];
             };
         };
-        /** @description CONFIGURATION_IN_USE rejects an unsafe in-place service-root or project-binding change. RECONFIGURATION_BUSY rejects disconnect while a delivery is publishing or an upstream issue-create outcome is uncertain. */
+        /** @description CONFIGURATION_IN_USE rejects an unsafe in-place service-root or project-binding change. RECONFIGURATION_BUSY rejects disconnect while a delivery is actively publishing. */
         YouTrackConfigurationConflict: {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
@@ -4486,6 +4953,119 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description Credential encryption is unavailable. Configure the deployment key before enabling connections. */
+        ConnectorUnavailable: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorConfigurationResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorConfigurationEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorListEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorDiscoveryResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorDiscoveryEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorCatalogResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorCatalogEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorDeliveryListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorDeliveryListEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorLinkListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorLinkListEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorWebhookSetupResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorWebhookSetupEnvelope"];
+            };
+        };
+        /** @description Report publication durably accepted; delivery may complete asynchronously. */
+        ConfluenceReportRepublishResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConfluenceReportRepublishEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorAcceptedResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorAcceptedEnvelope"];
+            };
+        };
+        /** @description Successful integration operation. */
+        ConnectorDisconnectResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ConnectorDisconnectEnvelope"];
             };
         };
     };
@@ -7268,6 +7848,533 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    listConnectors: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    getConnectorCatalog: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorCatalogResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    getConnectorConfiguration: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorConfigurationResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    replaceConnectorConfiguration: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorConfigurationRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["ConnectorConfigurationResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    discoverConnectorResources: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorConfigurationRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["ConnectorDiscoveryResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    listConnectorDeliveries: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+                before?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorDeliveryListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    republishConfluenceRunReport: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: components["responses"]["ConfluenceReportRepublishResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    retryConnectorDelivery: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+                deliveryId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorAcceptedResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    reconcileConnectorDelivery: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+                deliveryId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorReconcileRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["ConnectorAcceptedResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    listConnectorLinks: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorLinkListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    getConnectorWebhookSetup: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorWebhookSetupResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    receiveConnectorWebhook: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+                connectionId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            202: components["responses"]["ConnectorAcceptedResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    verifyTrelloConnectorWebhook: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+                connectionId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Valid callback */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    listConnectorTargetLinks: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                targetId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorLinkListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    disconnectConnector: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                provider: components["schemas"]["ConnectorProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["ConnectorDisconnectResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
         };
     };
 }

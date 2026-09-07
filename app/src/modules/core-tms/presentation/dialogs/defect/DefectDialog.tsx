@@ -1,7 +1,6 @@
 import { Bug, Image as ImageIcon, Paperclip, X } from "lucide-react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type {
   Defect,
   RunItem,
@@ -77,7 +76,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   }, [component, configurationVersion, enabled, integrationChoice, item, youTrackOptions]);
   const automaticRouting = offline || (youTrackStatus === "ready" && (configurationVersion === 2 || !enabled));
   const routing = resolveDefectIntegrationChoice(integrationChoice, automaticRouting);
-  const routeOptions = offline ? [{ value: "", label: copy.tmsOnly }]
+  const routeOptions = offline ? [{ value: "", label: copy.projectIntegrations }]
     : youTrackStatus === "loading" ? [{ value: "", label: copy.youTrackLoading }]
     : youTrackStatus === "error" ? [{ value: "", label: copy.youTrackUnavailable }]
     : defectRouteChoices(youTrack, copy);
@@ -144,10 +143,11 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
           <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.component}</span>
             <AnimatedSelect label={copy.component} value={component} onChange={setComponent} options={localizedComponentOptions} />
           </div>
-          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.youTrackTarget}</span>
-            <AnimatedSelect label={copy.youTrackTarget} value={integrationChoice}
+          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.routingLabel}</span>
+            <AnimatedSelect label={copy.routingLabel} value={integrationChoice}
               onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)}
               options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
+            {!offline && <small>{copy.routingHint}</small>}
             {!routing.resolved && <small className={styles.fieldValidation} role="status">{routingMessage}</small>}
           </div>
           <div className={styles.formField}><span>{copy.severity}</span>

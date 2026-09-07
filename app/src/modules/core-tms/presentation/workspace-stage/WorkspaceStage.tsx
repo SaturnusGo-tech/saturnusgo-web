@@ -9,7 +9,7 @@ import { HooksView } from "../hooks/HooksView";
 import { IntegrationsView } from "../integrations/IntegrationsView";
 import { ProjectOnboarding } from "../onboarding/ProjectOnboarding";
 import { ReportsView } from "../reports/ReportsView";
-import { RunsView } from "../runs/RunsView";
+import { WorkspaceRunsStage } from "./runs/WorkspaceRunsStage";
 import { SuitesView } from "../suites/SuitesView";
 import { SharedStepsView } from "../shared-steps/SharedStepsView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
@@ -141,45 +141,11 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (model.view === "runs") {
-    return (
-      <RunsView
-        workspaceId={model.data.workspace.id}
-        offline={model.connection === "demo"}
-        runs={model.projectRuns}
-        cases={model.projectCases}
-        selectedRun={model.selectedRun}
-        items={model.runItems}
-        selectedItem={model.selectedRunItem}
-        progress={model.executionProgress}
-        onSelectRun={(id) => {
-          model.setSelectedRunId(id);
-          model.setSelectedRunItemId(null);
-        }}
-        onSelectItem={model.setSelectedRunItemId}
-        onCreate={() => model.openRunDialog()}
-        onStepStatus={model.setStepStatus}
-        onStepActual={model.updateStepActualResult}
-        onItemStatus={model.setItemStatus}
-        onComplete={model.completeRun}
-        canArchive={model.canArchiveRun}
-        archivePending={model.archivePending}
-        onArchive={model.archiveSelectedRun}
-        onRestore={model.restoreSelectedRun}
-        onDefectCreated={(defect) => {
-          model.setData((current) => ({
-            ...current,
-            defects: [...current.defects, defect],
-          }));
-          model.notify(t("actions.defectCreated", { key: defect.key }));
-        }}
-      />
-    );
-  }
-  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id}
+  if (model.view === "runs") return <WorkspaceRunsStage model={model} />;
+  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} projectId={model.project.id}
     canManage={model.canManageIntegrations} />;
   return (
-    <ReportsView
+    <ReportsView workspaceId={model.data.workspace.id}
       defects={model.reportDefects}
       runs={model.projectRuns}
       links={model.projectLinks}
@@ -188,12 +154,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       selectedDefectStatus={model.selectedDefectResource.status}
       onRetrySelectedDefect={model.selectedDefectResource.retry}
       onNew={() => model.setDialog("defect")}
-      onOpenRun={(runId, runItemId) => {
-        model.setSelectedDefectId(null);
-        model.setSelectedRunId(runId);
-        model.setSelectedRunItemId(runItemId);
-        model.setView("runs");
-      }}
+      onOpenRun={model.openRun}
     />
   );
 }

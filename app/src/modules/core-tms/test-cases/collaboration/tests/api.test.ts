@@ -68,6 +68,7 @@ test("case collaboration adapters keep tenant scope and mutation guards", async 
   assert.equal(comments.items[0]?.author.displayName, "Ada QA");
   assert.equal(created.body, "Retest on iOS 26");
   assert.equal(defects.items[0]?.eligibleRetest?.runId, "run-2");
+  assert.ok(confirmed.data.youTrackTransition);
   assert.equal(confirmed.data.youTrackTransition.status, "pending");
   assert.equal(new URL(requests[0]!.url).searchParams.get("projectId"), "project-1");
   assert.equal(new Headers(requests[1]!.init?.headers).get("idempotency-key"), "comment-operation-1");

@@ -2,6 +2,7 @@ import { ChevronRight, RefreshCw } from "lucide-react";
 
 import type { YouTrackIntegrationStatus } from "../../../application/integrations/getYouTrackIntegrationStatus";
 import type { YouTrackConfiguration } from "../../../youtrack/model/youtrack-settings";
+import { isProvider, type Connection, type Provider } from "../../../connectors/model/connector-types";
 import surface from "../hooks.module.css";
 import { IntegrationStatusBadge, type IntegrationUiStatus } from "../shared/IntegrationStatusBadge";
 import type { HooksCopy } from "../shared/hooks-copy";
@@ -18,9 +19,13 @@ export function IntegrationCatalog({
   status,
   statusFailed,
   onRefresh,
-  onOpenYouTrack,
+  onOpenYouTrack, connections, connectorState, projectId, onOpenConnector,
 }: {
   russian: boolean;
+  connections: readonly Connection[];
+  connectorState: "loading" | "ready" | "error";
+  projectId: string;
+  onOpenConnector: (provider: Provider) => void;
   copy: HooksCopy;
   configuration: YouTrackConfiguration | null;
   status: YouTrackIntegrationStatus | null;
@@ -60,8 +65,9 @@ export function IntegrationCatalog({
                   russian={russian}
                   status={entry.id === "youtrack"
                     ? catalogIntegrationStatus(configuration, status, statusFailed)
-                    : "planned"}
-                  onOpen={entry.id === "youtrack" ? onOpenYouTrack : undefined}
+                    : isProvider(entry.id) ? connectorState === "loading" ? "checking" : connectorState === "error" ? "attention" :
+                      connections.some((c) => c.provider === entry.id && c.projectId === projectId && c.enabled) ? "connected" : "available" : "planned"}
+                  onOpen={entry.id === "youtrack" ? onOpenYouTrack : isProvider(entry.id) ? () => onOpenConnector(entry.id as Provider) : undefined}
                   copy={copy}
                 />
               ))}

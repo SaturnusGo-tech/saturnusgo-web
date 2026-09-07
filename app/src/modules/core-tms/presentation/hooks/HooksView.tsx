@@ -10,21 +10,34 @@ import {
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { YouTrackConfiguration } from "../../youtrack/model/youtrack-settings";
+import { ConnectorSettings } from "../../connectors/presentation/ConnectorSettings";
+import { useConnectorCatalog } from "../../connectors/application/catalog/useConnectorCatalog";
+import { isProvider, type Provider } from "../../connectors/model/connector-types";
 import { IntegrationCatalog } from "./catalog/IntegrationCatalog";
 import surface from "./hooks.module.css";
 import { hooksCopy } from "./shared/hooks-copy";
 import { YouTrackSettings } from "./youtrack/YouTrackSettings";
 
-export function HooksView({ workspaceId, canManage }: { workspaceId: string; canManage: boolean }) {
+export function HooksView({ workspaceId, projectId, canManage }: { workspaceId: string; projectId: string; canManage: boolean }) {
   const http = useTmsHttpClient();
   const { locale, languageTag } = useTmsLocale();
   const russian = locale === "ru";
-  const [screen, setScreen] = useState<"catalog" | "youtrack">("catalog");
+  const [screen, setScreen] = useState<"catalog" | "youtrack" | Provider>(() => {
+    const selected = typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("integration");
+    return selected && (isProvider(selected) || selected === "youtrack") ? selected : "catalog";
+  });
   const [status, setStatus] = useState<YouTrackIntegrationStatus | null>(null);
   const [configuration, setConfiguration] = useState<YouTrackConfiguration | null>(null);
   const [statusFailed, setStatusFailed] = useState(false);
   const [configurationFailed, setConfigurationFailed] = useState(false);
   const [reload, setReload] = useState(0);
+  const connectors = useConnectorCatalog(workspaceId, reload);
+  const open = (target: "catalog" | "youtrack" | Provider) => {
+    setScreen(target);
+    const url = new URL(window.location.href);
+    if (target === "catalog") url.searchParams.delete("integration"); else url.searchParams.set("integration", target);
+    window.history.replaceState(window.history.state, "", url);
+  };
   const refresh = useCallback(() => setReload((value) => value + 1), []);
 
   useEffect(() => {
@@ -48,6 +61,9 @@ export function HooksView({ workspaceId, canManage }: { workspaceId: string; can
     return () => controller.abort();
   }, [http, workspaceId, reload]);
 
+  if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
+    workspaceId={workspaceId} projectId={projectId} provider={screen} ru={russian} canManage={canManage}
+    onBack={() => open("catalog")} onSaved={refresh} />;
   if (screen === "youtrack") {
     return <YouTrackSettings
       workspaceId={workspaceId}
@@ -55,7 +71,7 @@ export function HooksView({ workspaceId, canManage }: { workspaceId: string; can
       languageTag={languageTag}
       russian={russian}
       canManage={canManage}
-      onBack={() => setScreen("catalog")}
+      onBack={() => open("catalog")}
       onStatusChange={refresh}
     />;
   }
@@ -66,9 +82,11 @@ export function HooksView({ workspaceId, canManage }: { workspaceId: string; can
         copy={hooksCopy(russian)}
         configuration={configuration}
         status={status}
-        statusFailed={statusFailed || configurationFailed}
+        statusFailed={statusFailed || configurationFailed || connectors.state === "error"}
+        connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
+        onOpenConnector={open}
         onRefresh={refresh}
-        onOpenYouTrack={() => setScreen("youtrack")}
+        onOpenYouTrack={() => open("youtrack")}
       />
     </div>
   );
