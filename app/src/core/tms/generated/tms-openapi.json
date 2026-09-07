@@ -3762,6 +3762,959 @@
         "x-tms-concurrency": "required",
         "x-tms-idempotency": "not-applicable"
       }
+    },
+    "/impact/repositories": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "listImpactRepositories",
+        "summary": "listImpactRepositories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactRepositoryListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        }
+      }
+    },
+    "/impact/repositories/{repositoryId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "saveImpactRepository",
+        "summary": "saveImpactRepository",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactRepositoryEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactRepositoryWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impact/analyses": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "listImpactAnalyses",
+        "summary": "listImpactAnalyses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "runId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "getImpactAnalysis",
+        "summary": "getImpactAnalysis",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}/scope": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "reviewImpactScope",
+        "summary": "reviewImpactScope",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactScopeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}/approve": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "approveImpactScope",
+        "summary": "approveImpactScope",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}/retry": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "retryImpactAnalysis",
+        "summary": "retryImpactAnalysis",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}/gaps/{gapId}/generate": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "generateImpactGapDraft",
+        "summary": "generateImpactGapDraft",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "gapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactGapGenerateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impact/analyses/{analysisId}/gaps/{gapId}/acknowledge": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Impact Analysis"
+        ],
+        "operationId": "acknowledgeImpactGap",
+        "summary": "acknowledgeImpactGap",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "gapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Impact analysis response. ETag includes current resource version.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalysisEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          }
+        },
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactGapAcknowledgeRequest"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6423,7 +7376,48 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
+          "ACTOR_UNAVAILABLE",
+          "AI_ANALYSIS_RETRY",
+          "AI_AUTHENTICATION_FAILED",
+          "AI_CONTEXT_BUDGET_EXCEEDED",
+          "AI_DUPLICATE_CASE_ID",
+          "AI_INVALID_JSON",
+          "AI_NOT_CONFIGURED",
+          "AI_OUTPUT_TRUNCATED",
+          "AI_PAID_MODEL_DISABLED",
+          "AI_PROVIDER_QUOTA_EXHAUSTED",
+          "AI_PROVIDER_REQUEST_REJECTED",
+          "AI_PROVIDER_RESPONSE_INVALID",
+          "AI_PROVIDER_RESPONSE_TOO_LARGE",
+          "AI_PROVIDER_UNAVAILABLE",
+          "AI_RATE_LIMITED",
+          "AI_REQUEST_BUDGET_EXCEEDED",
+          "AI_SCHEMA_INVALID",
+          "AI_UNKNOWN_CASE_ID",
+          "AI_UNKNOWN_CHANGED_FILE",
+          "AMBIGUOUS_WORKFLOW_NAME",
+          "ANALYSIS_BUSY",
+          "ANALYSIS_NOT_FOUND",
+          "ANALYSIS_RUN_CONFLICT",
+          "BUILD_CONTEXT_MISMATCH",
+          "BUILD_NOT_SUCCESSFUL",
+          "CHANGE_CONTEXT_MISMATCH",
+          "COMMAND_IN_PROGRESS",
+          "EMPTY_SCOPE",
+          "GAP_GENERATING",
+          "GAP_NOT_FOUND",
+          "GENERATION_FAILED",
+          "GITHUB_CONNECTION_REQUIRED",
+          "IMPACT_PROCESSING_FAILED",
+          "INVALID_CHANGED_FILE",
+          "INVALID_WORKFLOW_ID",
+          "REPOSITORY_BINDING_IMMUTABLE",
+          "REPOSITORY_LIMIT_EXCEEDED",
+          "SCOPE_NOT_REVIEWABLE",
+          "WORKFLOW_ID_MISMATCH",
+          "WORKFLOW_LIMIT_EXCEEDED",
+          "WORKFLOW_NOT_FOUND"
         ]
       },
       "ValidationIssue": {
@@ -7327,7 +8321,7 @@
           "suiteResolutionId": { "oneOf": [{ "$ref": "#/components/schemas/Identifier" }, { "type": "null" }], "description": "Immutable suite resolution used for reproducibility; null for explicit caseIds." },
           "build": { "$ref": "#/components/schemas/ShortText" },
           "configuration": { "$ref": "#/components/schemas/StringMap" },
-          "itemCount": { "type": "integer", "minimum": 1 },
+          "itemCount": { "type": "integer", "minimum": 0, "description": "Included immutable case snapshots. An impact draft may be empty while QA reviews its scope; approval and start require at least one case." },
           "progress": { "$ref": "#/components/schemas/RunProgress" },
           "attachmentIds": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" }, "description": "Ready private attachments owned by this run." },
           "createdBy": { "$ref": "#/components/schemas/ActorRef" },
@@ -9731,6 +10725,1040 @@
             "type": "null"
           }
         }
+      },
+      "ImpactMapping": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "area": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "backend",
+                "ios",
+                "android",
+                "api",
+                "web",
+                "shared"
+              ]
+            },
+            "maxItems": 6
+          },
+          "pathPrefixes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "maxItems": 100
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "maxItems": 100
+          },
+          "folderPrefixes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          },
+          "endpoints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "id",
+          "area",
+          "platforms",
+          "pathPrefixes",
+          "components",
+          "tags",
+          "folderPrefixes",
+          "endpoints"
+        ]
+      },
+      "ImpactRepositoryWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connectionId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "repository": {
+            "type": "string",
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "ios",
+              "android",
+              "api",
+              "web",
+              "shared"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "environmentId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxItems": 50
+          },
+          "workflows": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxItems": 20,
+            "minItems": 1
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactMapping"
+            },
+            "maxItems": 100
+          },
+          "sensitivePaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "connectionId",
+          "repository",
+          "platform",
+          "enabled",
+          "environmentId",
+          "branches",
+          "workflows",
+          "mappings",
+          "sensitivePaths"
+        ]
+      },
+      "ImpactRepository": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connectionId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "repository": {
+            "type": "string",
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "ios",
+              "android",
+              "api",
+              "web",
+              "shared"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "environmentId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxItems": 50
+          },
+          "workflows": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxItems": 20,
+            "minItems": 1
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactMapping"
+            },
+            "maxItems": 100
+          },
+          "sensitivePaths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "workflowIds": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Workflow IDs resolved from the authenticated GitHub workflow catalog."
+          }
+        },
+        "required": [
+          "connectionId",
+          "repository",
+          "platform",
+          "enabled",
+          "environmentId",
+          "branches",
+          "workflows",
+          "mappings",
+          "sensitivePaths",
+          "id",
+          "workspaceId",
+          "projectId",
+          "rowVersion"
+        ]
+      },
+      "ImpactChangedFile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "previousPath": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "patch": {
+            "type": "string",
+            "maxLength": 24000
+          }
+        },
+        "required": [
+          "path",
+          "status"
+        ]
+      },
+      "ImpactChangeContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "repository": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "ios",
+              "android",
+              "api",
+              "web",
+              "shared"
+            ]
+          },
+          "sha": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "baseSha": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "branch": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "prNumber": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "author": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "sourceUrl": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "workflowId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "workflowName": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "workflowRunId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "workflowAttempt": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "buildStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "success",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "buildUrl": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactChangedFile"
+            },
+            "maxItems": 300
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "repository",
+          "platform",
+          "sha",
+          "baseSha",
+          "branch",
+          "prNumber",
+          "author",
+          "sourceUrl",
+          "workflowId",
+          "workflowName",
+          "workflowRunId",
+          "workflowAttempt",
+          "buildStatus",
+          "buildUrl",
+          "files",
+          "truncated"
+        ]
+      },
+      "ImpactArea": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "area": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "ios",
+              "android",
+              "api",
+              "web",
+              "shared"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "maxItems": 20
+          },
+          "changedFiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "area",
+          "platform",
+          "confidence",
+          "reasons",
+          "changedFiles"
+        ]
+      },
+      "ImpactSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "testCaseId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "changedFiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "testCaseId",
+          "confidence",
+          "reason",
+          "changedFiles"
+        ]
+      },
+      "ImpactCoverageGap": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "area": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "ios",
+              "android",
+              "api",
+              "web",
+              "shared"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "changedFiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          },
+          "suggestedTestCases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "id",
+          "area",
+          "platform",
+          "reason",
+          "changedFiles",
+          "suggestedTestCases"
+        ]
+      },
+      "ImpactAiMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "unavailable",
+              "failed",
+              "disabled"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "promptVersion": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "schemaVersion": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "inputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latencyMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "candidateCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "errorCode": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "retryAfterMs": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status",
+          "provider",
+          "model",
+          "promptVersion",
+          "schemaVersion",
+          "inputTokens",
+          "outputTokens",
+          "cost",
+          "latencyMs",
+          "candidateCount"
+        ]
+      },
+      "ImpactResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "type": "string",
+            "maxLength": 8000
+          },
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "impactedAreas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactArea"
+            },
+            "maxItems": 100
+          },
+          "selectedTestCases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactSelection"
+            },
+            "maxItems": 200
+          },
+          "coverageGaps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactCoverageGap"
+            },
+            "maxItems": 100
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "maxItems": 100
+          },
+          "ai": {
+            "$ref": "#/components/schemas/ImpactAiMetadata"
+          }
+        },
+        "required": [
+          "summary",
+          "riskLevel",
+          "impactedAreas",
+          "selectedTestCases",
+          "coverageGaps",
+          "notes",
+          "ai"
+        ]
+      },
+      "ImpactGapAction": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gapId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "acknowledged",
+              "generating",
+              "generated",
+              "failed"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "testCaseId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errorCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "gapId",
+          "status",
+          "reason",
+          "testCaseId",
+          "errorCode"
+        ]
+      },
+      "ImpactReviewItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "testCaseId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "falcon",
+              "manual"
+            ]
+          },
+          "included": {
+            "type": "boolean"
+          },
+          "testCaseKey": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "testCaseId",
+          "origin",
+          "included"
+        ]
+      },
+      "ImpactBuild": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "runId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "success",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "name",
+          "runId",
+          "attempt",
+          "status",
+          "url"
+        ]
+      },
+      "ImpactAnalysis": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "change": {
+            "$ref": "#/components/schemas/ImpactChangeContext"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ImpactResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "complete",
+              "failed"
+            ]
+          },
+          "buildStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "success",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactBuild"
+            },
+            "maxItems": 20
+          },
+          "runId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactReviewItem"
+            },
+            "maxItems": 10000
+          },
+          "approved": {
+            "type": "boolean"
+          },
+          "canApprove": {
+            "type": "boolean"
+          },
+          "gapActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactGapAction"
+            },
+            "maxItems": 100
+          },
+          "errorCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canEditScope": {
+            "type": "boolean"
+          },
+          "approvalBlockedReasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "projectId",
+          "repositoryId",
+          "change",
+          "result",
+          "status",
+          "buildStatus",
+          "builds",
+          "runId",
+          "scope",
+          "approved",
+          "canApprove",
+          "gapActions",
+          "errorCode",
+          "rowVersion",
+          "createdAt",
+          "updatedAt",
+          "canEditScope",
+          "approvalBlockedReasons"
+        ]
+      },
+      "ImpactScopeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "caseIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "maxItems": 10000,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "caseIds"
+        ]
+      },
+      "ImpactGapGenerateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "ai",
+              "manual"
+            ],
+            "default": "ai"
+          }
+        },
+        "required": []
+      },
+      "ImpactGapAcknowledgeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "ImpactAnalysisEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ImpactAnalysis"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ImpactAnalysisListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactAnalysis"
+            },
+            "maxItems": 30
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
+      "ImpactRepositoryListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactRepository"
+            },
+            "maxItems": 100
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ImpactRepositoryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ImpactRepository"
+          }
+        },
+        "required": [
+          "data"
+        ]
       }
     }
   }

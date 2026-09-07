@@ -151,7 +151,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   }
   if (model.view === "runs") return <WorkspaceRunsStage model={model} />;
   if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} projectId={model.project.id}
-    canManage={model.canManageIntegrations} />;
+    canManage={model.canManageIntegrations} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   return (
     <ReportsView workspaceId={model.data.workspace.id}
       defects={model.reportDefects}

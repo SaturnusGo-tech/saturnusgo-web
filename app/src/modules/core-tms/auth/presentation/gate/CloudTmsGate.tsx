@@ -29,6 +29,7 @@ export function CloudTmsGate({
   );
   const sessionIdentity = useMemo(() => ({
     kind: "cloud" as const,
+    subject: `cloud:${session.identity.id}`,
     label: `${session.identity.givenName} ${session.identity.familyName}`.trim()
       || session.identity.email,
     signOut: async () => {

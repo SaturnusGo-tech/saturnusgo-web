@@ -4,7 +4,7 @@ import { IntegrationBrand } from "../../../presentation/hooks/shared/brand/Integ
 import type { Provider } from "../../model/connector-types";
 import { providerCopy } from "../../localization/connector-copy";
 import styles from "../styles/connector.module.css";
-export type ConnectorTab = "connection" | "automation" | "activity";
+export type ConnectorTab = "connection" | "automation" | "activity" | "impact";
 export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, enabled, children }: {
   provider: Provider; ru: boolean; tab: ConnectorTab; onTab: (tab: ConnectorTab) => void;
   onBack: () => void; project: string; enabled: boolean; children: ReactNode;
@@ -14,6 +14,7 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
     { id: "connection" as const, icon: Settings2, label: ru ? "Подключение" : "Connection" },
     { id: "automation" as const, icon: Zap, label: ru ? "Автоматизация" : "Automation" },
     { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" },
+    ...(provider === "github" ? [{ id: "impact" as const, icon: GitBranch, label: "Impact Analysis" }] : []),
   ];
   return <main className={styles.root} data-provider={provider} data-integration-workspace data-testid={`connector-${provider}`}>
     <header className={styles.topbar}>

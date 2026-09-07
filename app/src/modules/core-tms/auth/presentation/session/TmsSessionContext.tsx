@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 export interface TmsSessionIdentity {
   readonly kind: "admin" | "cloud";
   readonly label: string;
+  readonly subject: string | null;
   readonly signOut: () => Promise<void>;
 }
 

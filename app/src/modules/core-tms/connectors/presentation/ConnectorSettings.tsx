@@ -9,15 +9,25 @@ import { AutomationPanel } from "./automation/AutomationPanel";
 import { DisconnectPanel } from "./lifecycle/DisconnectPanel";
 import { ActivityPanel } from "./activity/ActivityPanel";
 import styles from "./styles/connector.module.css";
-export function ConnectorSettings({ workspaceId, projectId, provider, ru, canManage, onBack, onSaved }: {
+import { ImpactWorkspace } from "../../impact/presentation/ImpactWorkspace";
+import { impactPermissions } from "../../impact/model/impact-types";
+export function ConnectorSettings({ workspaceId, projectId, provider, ru, canManage, capabilities, connected, onBack, onSaved }: {
   workspaceId: string; projectId: string; provider: Provider; ru: boolean; canManage: boolean;
+  capabilities: readonly string[]; connected: boolean;
   onBack: () => void; onSaved: () => void;
 }) {
-  const [tab, setTab] = useState<ConnectorTab>("connection");
+  const [tab, setTab] = useState<ConnectorTab>(() => provider === "github" && typeof window !== "undefined"
+    && (new URLSearchParams(window.location.search).has("analysisId") || new URLSearchParams(window.location.search).get("impact") === "1") ? "impact" : "connection");
+  const selectTab = (next: ConnectorTab) => {
+    const url = new URL(window.location.href);
+    if (next === "impact") url.searchParams.set("impact", "1");
+    else { url.searchParams.delete("impact"); url.searchParams.delete("analysisId"); }
+    window.history.replaceState(window.history.state, "", url); setTab(next);
+  };
   const state = useConnector({ workspaceId, projectId }, provider, ru, onSaved, tab === "activity");
   const project = state.snapshot?.catalog.projects.find((p) => p.id === projectId)?.name ?? projectId;
   const snapshot = state.snapshot;
-  return <ConnectorChrome provider={provider} ru={ru} project={project} tab={tab} onTab={setTab} onBack={onBack}
+  return <ConnectorChrome provider={provider} ru={ru} project={project} tab={tab} onTab={selectTab} onBack={onBack}
     enabled={Boolean(snapshot?.connection?.enabled)}>
     {state.error && <div className={styles.error} role="alert"><p>{state.error}</p>
       <button type="button" className={styles.secondary} onClick={() => void (tab === "activity" && snapshot && !state.configurationReloadRequired ? state.refreshActivity() : state.load())}
@@ -26,7 +36,9 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
     {!snapshot && state.pending && <div className={styles.loading} role="status"><LoaderCircle size={22} />{ru ? "Загружаем настройки…" : "Loading settings…"}</div>}
     {snapshot && <>
       {!canManage && <p className={styles.notice}>{ru ? "Режим просмотра. Управление доступно администратору или QA-менеджеру." : "Read-only. An administrator or QA manager can manage this integration."}</p>}
-      {tab === "activity" ? <ActivityPanel snapshot={snapshot} ru={ru} canManage={canManage} pending={state.pending}
+      {tab === "impact" && provider === "github" ? <ImpactWorkspace scope={{ workspaceId, projectId }} ru={ru}
+        permissions={impactPermissions(capabilities, connected)} catalog={snapshot.catalog} connectionId={snapshot.connection?.id ?? null} />
+        : tab === "activity" ? <ActivityPanel snapshot={snapshot} ru={ru} canManage={canManage} pending={state.pending}
         refreshFailed={state.activityFailed} onRecover={(id, remote) => void state.recover(id, remote)}
         onMore={() => void state.more()} onRefresh={() => void state.refreshActivity()} onRepublish={(id) => void state.republish(id)} /> :
         <form onSubmit={(event) => { event.preventDefault(); void state.save(); }}>

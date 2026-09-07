@@ -1987,6 +1987,186 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/impact/repositories": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** listImpactRepositories */
+        get: operations["listImpactRepositories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/repositories/{repositoryId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** saveImpactRepository */
+        patch: operations["saveImpactRepository"];
+        trace?: never;
+    };
+    "/impact/analyses": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** listImpactAnalyses */
+        get: operations["listImpactAnalyses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** getImpactAnalysis */
+        get: operations["getImpactAnalysis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}/scope": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** reviewImpactScope */
+        post: operations["reviewImpactScope"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}/approve": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** approveImpactScope */
+        post: operations["approveImpactScope"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}/retry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** retryImpactAnalysis */
+        post: operations["retryImpactAnalysis"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}/gaps/{gapId}/generate": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** generateImpactGapDraft */
+        post: operations["generateImpactGapDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/impact/analyses/{analysisId}/gaps/{gapId}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** acknowledgeImpactGap */
+        post: operations["acknowledgeImpactGap"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2619,7 +2799,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "IDEMPOTENCY_KEY_REUSED" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "LEASE_LOST" | "LINK_CONFLICT" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SIGNING_SECRET_REQUIRED" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
+        ErrorCode: "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "IDEMPOTENCY_KEY_REUSED" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "LEASE_LOST" | "LINK_CONFLICT" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SIGNING_SECRET_REQUIRED" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DUPLICATE_CASE_ID" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CHANGE_CONTEXT_MISMATCH" | "COMMAND_IN_PROGRESS" | "EMPTY_SCOPE" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IMPACT_PROCESSING_FAILED" | "INVALID_CHANGED_FILE" | "INVALID_WORKFLOW_ID" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "SCOPE_NOT_REVIEWABLE" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND";
         ValidationIssue: {
             field: string;
             code: string;
@@ -3167,6 +3347,7 @@ export interface components {
             suiteResolutionId: components["schemas"]["Identifier"] | null;
             build: components["schemas"]["ShortText"];
             configuration: components["schemas"]["StringMap"];
+            /** @description Included immutable case snapshots. An impact draft may be empty while QA reviews its scope; approval and start require at least one case. */
             itemCount: number;
             progress: components["schemas"]["RunProgress"];
             /** @description Ready private attachments owned by this run. */
@@ -4396,6 +4577,199 @@ export interface components {
         };
         ConnectorDisconnectEnvelope: {
             data: null;
+        };
+        ImpactMapping: {
+            id: components["schemas"]["Identifier"];
+            area: string;
+            platforms: ("backend" | "ios" | "android" | "api" | "web" | "shared")[];
+            pathPrefixes: string[];
+            components: string[];
+            tags: string[];
+            folderPrefixes: string[];
+            endpoints: string[];
+        };
+        ImpactRepositoryWriteRequest: {
+            connectionId: components["schemas"]["Identifier"];
+            repository: string;
+            /** @enum {string} */
+            platform: "backend" | "ios" | "android" | "api" | "web" | "shared";
+            enabled: boolean;
+            environmentId: components["schemas"]["Identifier"];
+            branches: string[];
+            workflows: string[];
+            mappings: components["schemas"]["ImpactMapping"][];
+            sensitivePaths: string[];
+        };
+        ImpactRepository: {
+            connectionId: components["schemas"]["Identifier"];
+            repository: string;
+            /** @enum {string} */
+            platform: "backend" | "ios" | "android" | "api" | "web" | "shared";
+            enabled: boolean;
+            environmentId: components["schemas"]["Identifier"];
+            branches: string[];
+            workflows: string[];
+            mappings: components["schemas"]["ImpactMapping"][];
+            sensitivePaths: string[];
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            rowVersion: number;
+            /** @description Workflow IDs resolved from the authenticated GitHub workflow catalog. */
+            workflowIds?: {
+                [key: string]: string;
+            };
+        };
+        ImpactChangedFile: {
+            path: string;
+            previousPath?: string;
+            status: string;
+            patch?: string;
+        };
+        ImpactChangeContext: {
+            repository: string;
+            /** @enum {string} */
+            platform: "backend" | "ios" | "android" | "api" | "web" | "shared";
+            sha: string;
+            baseSha: string;
+            branch: string;
+            prNumber: number | null;
+            author: string;
+            sourceUrl: string;
+            workflowId: string;
+            workflowName: string;
+            workflowRunId: string;
+            workflowAttempt: number;
+            /** @enum {string} */
+            buildStatus: "pending" | "success" | "failed" | "cancelled";
+            buildUrl: string;
+            files: components["schemas"]["ImpactChangedFile"][];
+            truncated: boolean;
+        };
+        ImpactArea: {
+            area: string;
+            /** @enum {string} */
+            platform: "backend" | "ios" | "android" | "api" | "web" | "shared";
+            confidence: number;
+            reasons: string[];
+            changedFiles: string[];
+        };
+        ImpactSelection: {
+            testCaseId: components["schemas"]["Identifier"];
+            confidence: number;
+            reason: string;
+            changedFiles: string[];
+        };
+        ImpactCoverageGap: {
+            id: components["schemas"]["Identifier"];
+            area: string;
+            /** @enum {string} */
+            platform: "backend" | "ios" | "android" | "api" | "web" | "shared";
+            reason: string;
+            changedFiles: string[];
+            suggestedTestCases: string[];
+        };
+        ImpactAiMetadata: {
+            /** @enum {string} */
+            status: "complete" | "unavailable" | "failed" | "disabled";
+            provider: string;
+            model: string;
+            promptVersion: string;
+            schemaVersion: string;
+            inputTokens: number;
+            outputTokens: number;
+            cost: number | null;
+            latencyMs: number;
+            candidateCount: number;
+            errorCode?: string;
+            retryAfterMs?: number;
+        };
+        ImpactResult: {
+            summary: string;
+            /** @enum {string} */
+            riskLevel: "low" | "medium" | "high" | "critical";
+            impactedAreas: components["schemas"]["ImpactArea"][];
+            selectedTestCases: components["schemas"]["ImpactSelection"][];
+            coverageGaps: components["schemas"]["ImpactCoverageGap"][];
+            notes: string[];
+            ai: components["schemas"]["ImpactAiMetadata"];
+        };
+        ImpactGapAction: {
+            gapId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            status: "acknowledged" | "generating" | "generated" | "failed";
+            reason: string;
+            testCaseId: components["schemas"]["Identifier"] | null;
+            errorCode: string | null;
+        };
+        ImpactReviewItem: {
+            testCaseId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            origin: "falcon" | "manual";
+            included: boolean;
+            testCaseKey?: string;
+            title?: string;
+            revision?: number;
+        };
+        ImpactBuild: {
+            name: string;
+            runId: string;
+            attempt: number;
+            /** @enum {string} */
+            status: "pending" | "success" | "failed" | "cancelled";
+            url: string;
+        };
+        ImpactAnalysis: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            repositoryId: components["schemas"]["Identifier"];
+            change: components["schemas"]["ImpactChangeContext"];
+            result: components["schemas"]["ImpactResult"] | null;
+            /** @enum {string} */
+            status: "pending" | "processing" | "complete" | "failed";
+            /** @enum {string} */
+            buildStatus: "pending" | "success" | "failed" | "cancelled";
+            builds: components["schemas"]["ImpactBuild"][];
+            runId: components["schemas"]["Identifier"] | null;
+            scope: components["schemas"]["ImpactReviewItem"][];
+            approved: boolean;
+            canApprove: boolean;
+            gapActions: components["schemas"]["ImpactGapAction"][];
+            errorCode: string | null;
+            rowVersion: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            canEditScope: boolean;
+            approvalBlockedReasons: string[];
+        };
+        ImpactScopeRequest: {
+            caseIds: components["schemas"]["Identifier"][];
+        };
+        ImpactGapGenerateRequest: {
+            /**
+             * @default ai
+             * @enum {string}
+             */
+            mode: "ai" | "manual";
+        };
+        ImpactGapAcknowledgeRequest: {
+            reason: string;
+        };
+        ImpactAnalysisEnvelope: {
+            data: components["schemas"]["ImpactAnalysis"];
+        };
+        ImpactAnalysisListEnvelope: {
+            data: components["schemas"]["ImpactAnalysis"][];
+            nextCursor: components["schemas"]["Identifier"] | null;
+        };
+        ImpactRepositoryListEnvelope: {
+            data: components["schemas"]["ImpactRepository"][];
+        };
+        ImpactRepositoryEnvelope: {
+            data: components["schemas"]["ImpactRepository"];
         };
     };
     responses: {
@@ -8675,6 +9049,444 @@ export interface operations {
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    listImpactRepositories: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactRepositoryListEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    saveImpactRepository: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                repositoryId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImpactRepositoryWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactRepositoryEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    listImpactAnalyses: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                before?: components["schemas"]["Identifier"];
+                runId?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisListEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    getImpactAnalysis: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    reviewImpactScope: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImpactScopeRequest"];
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    "Idempotency-Replayed"?: "true" | "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    approveImpactScope: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    "Idempotency-Replayed"?: "true" | "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    retryImpactAnalysis: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            202: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    "Idempotency-Replayed"?: "true" | "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    generateImpactGapDraft: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+                gapId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImpactGapGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            202: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    "Idempotency-Replayed"?: "true" | "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+        };
+    };
+    acknowledgeImpactGap: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                analysisId: components["schemas"]["Identifier"];
+                gapId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImpactGapAcknowledgeRequest"];
+            };
+        };
+        responses: {
+            /** @description Impact analysis response. ETag includes current resource version. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "X-Request-Id"?: string;
+                    "Idempotency-Replayed"?: "true" | "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpactAnalysisEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
         };
     };
 }

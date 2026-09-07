@@ -48,6 +48,7 @@ export function TmsAuthGate({
   );
   const sessionIdentity = useMemo(() => ({
     kind: "admin" as const,
+    subject: auth.user?.sub ? `admin:${auth.user.sub}` : null,
     label: auth.user?.name ?? auth.user?.email ?? "Falcon admin",
     signOut: async () => {
       // Keep the explicit admin selector through the Auth0 round trip. Without it,
@@ -62,7 +63,7 @@ export function TmsAuthGate({
         throw error;
       }
     },
-  }), [auth.logout, auth.user?.email, auth.user?.name]);
+  }), [auth.logout, auth.user?.email, auth.user?.name, auth.user?.sub]);
   const login = useCallback(() => {
     setActionFailed(false);
     loginStarted.current = true;
