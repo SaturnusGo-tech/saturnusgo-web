@@ -41,21 +41,21 @@
 }
 
 :global(.dark) .shell {
-  --runs-bg: #2d2b35;
-  --runs-deep: #25232c;
-  --runs-raised: #34323c;
-  --runs-control: #302e38;
-  --runs-hover: #383641;
-  --runs-border: #4a4853;
-  --runs-row-border: #3d3b46;
-  --runs-border-strong: #57545f;
-  --runs-text: #f5f4f7;
-  --runs-strong: #fff;
-  --runs-secondary: #dedce3;
-  --runs-muted: #aaa7b2;
-  --runs-faint: #8d8995;
+  --runs-bg: var(--tms-bg-panel);
+  --runs-deep: var(--tms-bg-canvas);
+  --runs-raised: var(--tms-bg-elevated);
+  --runs-control: var(--tms-bg-elevated);
+  --runs-hover: var(--tms-bg-hover);
+  --runs-border: var(--tms-border);
+  --runs-row-border: var(--tms-border);
+  --runs-border-strong: var(--tms-border-strong);
+  --runs-text: var(--tms-text);
+  --runs-strong: var(--tms-text-strong);
+  --runs-secondary: var(--tms-text-secondary);
+  --runs-muted: var(--tms-text-muted);
+  --runs-faint: var(--tms-text-faint);
   --runs-link: #9abaff;
-  --runs-selection: rgb(53 116 240 / 22%);
+  --runs-selection: var(--tms-bg-selected);
   --runs-success: #8ed2a8;
   --runs-success-soft: rgb(68 154 102 / 22%);
   --runs-danger: #f09a9f;

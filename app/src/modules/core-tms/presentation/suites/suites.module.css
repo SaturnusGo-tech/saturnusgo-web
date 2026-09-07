@@ -6,6 +6,7 @@
   --suite-border-strong: var(--line-strong);
   --suite-text: var(--ink);
   --suite-muted: var(--muted);
+  --suite-selection: color-mix(in srgb, var(--action) 10%, var(--suite-bg));
   height: 100%;
   min-width: 0;
   min-height: 0;
@@ -16,6 +17,8 @@
   background: var(--suite-bg);
   container: suites-workspace / inline-size;
 }
+
+:global(.dark) .workspace { --suite-selection: var(--tms-bg-selected); }
 
 .workspace *,
 .workspace *::before,
@@ -49,7 +52,7 @@
 .list { min-height: 0; flex: 1; overflow: auto; scrollbar-color: var(--suite-border-strong) transparent; }
 .suiteRow { width: 100%; min-height: 58px; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 10px 7px 12px; color: var(--suite-text); background: transparent; border: 0; border-bottom: 1px solid var(--suite-border); cursor: pointer; text-align: left; transition: background-color 140ms ease, box-shadow 140ms ease; }
 .suiteRow:hover { background: var(--suite-hover); }
-.suiteRow[data-selected="true"] { background: color-mix(in srgb, var(--action) 10%, var(--suite-bg)); box-shadow: inset 3px 0 0 var(--action); }
+.suiteRow[data-selected="true"] { background: var(--suite-selection); box-shadow: inset 3px 0 0 var(--action); }
 .suiteIcon { width: 26px; height: 26px; display: grid; place-items: center; color: var(--suite-muted); background: var(--suite-raised); border: 1px solid var(--suite-border); border-radius: 6px; }
 .suiteIcon[data-type="dynamic"] { color: #744bc4; background: color-mix(in srgb, #744bc4 10%, var(--suite-bg)); border-color: color-mix(in srgb, #744bc4 35%, var(--suite-border)); }
 .suiteCopy { min-width: 0; display: grid; gap: 2px; }

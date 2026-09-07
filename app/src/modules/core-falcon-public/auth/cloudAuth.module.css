@@ -178,3 +178,23 @@
 @media (prefers-reduced-motion: reduce) {
   .page *, .page *::before, .page *::after { transition: none !important; animation-duration: .01ms !important; }
 }
+
+/* Auth shares Falcon's dark roles while preserving its light composition. */
+:global(.dark) .page { color: var(--tms-text); background: var(--tms-bg-canvas); color-scheme: dark; }
+:global(.dark) .page :focus-visible, :global(.dark) .page .password:focus-within, :global(.dark) .page .field > input:focus, :global(.dark) .consent input:focus-visible + span:not(.consentText) { outline-color: var(--tms-text-strong); }
+:global(.dark) .header img { filter: invert(1); }
+:global(.dark) .shell { background: var(--tms-bg-panel); border-color: var(--tms-border); box-shadow: 0 22px 70px rgb(0 0 0 / 18%); }
+:global(.dark) .contextPanel { color: var(--tms-text-strong); background: var(--tms-bg-sidebar); }
+:global(.dark) :is(.contextPanel li, .adminEntry) { border-color: var(--tms-border); }
+:global(.dark) :is(.header > a:last-child, .contextPanel li, .contextPanel li svg, .field > span, .consent, .adminEntry a) { color: var(--tms-text-secondary); }
+:global(.dark) :is(.eyebrow, .step, .contextPanel > div > p:last-child, .formLead, .accountType button, .accountType small, .passwordHint, .password button, .switchMode, .adminEntry span) { color: var(--tms-text-muted); }
+:global(.dark) .field input::placeholder { color: var(--tms-text-muted); }
+:global(.dark) :is(.header > a:last-child:hover, .contextPanel li strong, .password button:hover, .consentText a, .switchMode a, .adminEntry a:hover) { color: var(--tms-text-strong); }
+:global(.dark) :is(.accountType, .field > input, .password, .organizationNotice) { color: var(--tms-text); background: var(--tms-bg-elevated); border-color: var(--tms-border-strong); }
+:global(.dark) :is(.accountType button[data-active="true"], .consent > span:not(.consentText)) { color: var(--tms-text); background: var(--tms-bg-selected); border-color: var(--tms-border-strong); box-shadow: none; }
+:global(.dark) .password input { color: var(--tms-text); }
+:global(.dark) :is(.field > input:hover, .password:hover) { border-color: var(--tms-text-faint); }
+:global(.dark) :is(.field > input:focus, .password:focus-within) { background: var(--tms-bg-panel); border-color: var(--tms-text-strong); }
+:global(.dark) :is(.submit, .consent input:checked + span:not(.consentText)) { color: var(--tms-bg-canvas); background: var(--tms-text-strong); border-color: var(--tms-text-strong); }
+:global(.dark) .submit:hover:not(:disabled) { background: var(--tms-text-secondary); border-color: var(--tms-text-secondary); }
+:global(.dark) .error { color: #ffb4ad; background: color-mix(in srgb, #db5c5c 12%, var(--tms-bg-panel)); border-color: color-mix(in srgb, #db5c5c 42%, var(--tms-border)); }

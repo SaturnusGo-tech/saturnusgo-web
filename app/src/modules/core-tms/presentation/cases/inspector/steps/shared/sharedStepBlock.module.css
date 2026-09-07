@@ -6,6 +6,8 @@
 .mark { width: 22px; height: 22px; display: grid; place-items: center; margin-left: 4px; background: color-mix(in srgb, #7654c5 12%, transparent); border-radius: 7px; }
 .header strong { min-width: 0; overflow: hidden; padding-left: 4px; font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 :global(.dark) .header { color: #b99bea; }
+:global(.dark) .block { background: var(--tms-bg-panel); }
+:global(.dark) .mark { background: var(--tms-bg-elevated); }
 .items { display: grid; }
 .item { min-width: 0; padding: 1px 0 2px; }
 .item + .item { padding-top: 2px; }

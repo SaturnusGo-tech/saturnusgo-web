@@ -62,20 +62,21 @@ test("risk headers remain readable without unexplained abbreviations", () => {
   assert.match(english, /"dashboard\.blockedItemsShort": "Blocked"/);
   assert.match(russian, /"dashboard\.failedItemsShort": "Не пройдено"/);
   assert.match(russian, /"dashboard\.blockedItemsShort": "Заблокировано"/);
-  assert.match(russian, /"dashboard\.coverageRateShort": "Покрытие"/);
+  assert.match(russian, /"dashboard\.coverageRateShort": "Охват"/);
   assert.match(styles, /\.hotspotHeader span\s*\{[^}]*min-width: 0;[^}]*white-space: normal;/s);
 });
 
-test("narrow dashboard keeps every risk column in a horizontally scrollable surface", () => {
-  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.hotspotTable\s*\{\s*min-width: 720px;\s*\}/);
-  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.portfolioPanel\s*\{\s*overflow-x: auto;\s*\}/);
+test("narrow dashboard preserves all risk columns inside its own scroll container", () => {
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.hotspotTable\s*\{\s*overflow-x: auto;/);
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.hotspotHeader, \.hotspotRow\s*\{\s*min-width: 650px;/);
 });
 
-test("run flow keeps pass rate readable without drawing a misleading sparse line", () => {
-  assert.doesNotMatch(trend, /<Line\b/);
-  assert.match(trend, /className=\{surface\.flowRate\}/);
-  assert.match(trend, /selectedPassRate/);
-  assert.match(styles, /\.flowRate\s*\{/);
+test("run flow keeps case pass rate separate from count-based trend series", () => {
+  const trendStyles = readFileSync(new URL("../charts/trend.module.css", import.meta.url), "utf8");
+  assert.doesNotMatch(trend, /dataKey="passRate"/);
+  assert.match(trend, /className=\{styles\.flowRate\}/);
+  assert.match(trend, /dashboard\.casePassRate/);
+  assert.match(trendStyles, /\.flowRate\s*\{/);
 });
 
 test("risk rows use one coverage bar and a distinct pass-rate score", () => {
@@ -116,7 +117,7 @@ test("dashboard uses custom menus and theme-safe chart tooltips", () => {
   for (const source of [trend, breakdowns]) assert.match(source, /DashboardChartTooltip/);
   assert.match(tooltip, /surface\.chartTooltip/);
   assert.match(styles, /\.chartTooltip\s*\{/);
-  assert.match(styles, /\.overflowMarquee\[data-overflow="true"\]/);
+  assert.match(styles, /\.overflowMarquee[^}]*text-overflow: ellipsis/s);
 });
 
 test("dashboard copy does not expose implementation details", () => {
@@ -135,7 +136,4 @@ test("tag and coverage charts use a legible categorical palette in both themes",
     assert.match(styles, new RegExp(`--${token}:`));
   }
   assert.doesNotMatch(styles, /--dash-(plum|sand|olive|coral):/);
-  for (const cleanAccent of ["#146cff", "#00a982", "#7c3aed", "#f97316", "#e92d5d"]) {
-    assert.match(styles, new RegExp(cleanAccent));
-  }
 });

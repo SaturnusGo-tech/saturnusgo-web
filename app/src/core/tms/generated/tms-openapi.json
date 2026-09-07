@@ -39,6 +39,190 @@
     { "name": "Integrations" }
   ],
   "paths": {
+    "/workspaces/{workspaceId}/dashboard-analytics/workbench": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "getDashboardWorkbench",
+        "summary": "Read the current testing workbench and matching freshness records",
+        "description": "Requires report:read in the workspace. Includes only active authorized projects, including when projectId is explicit. Active runs and item counts exclude archived and terminal runs; item status is the current attempt status. Open defects exclude archived, verified and closed defects and include ready_for_retest. Defect context is the latest occurrence matching environmentId and exact buildReference, across active or historical source runs; unlinked defects are included only without context filters. Run environment labels come from immutable run snapshots. Outdated item revisions compare the immutable selected revision with the current case revision and are informational, including already passed items in still-active runs; no historical result is invalidated or changed. Blank build references are missing. Filters apply only to this endpoint and never change period analytics. Context choices use the authorized project scope independently of selected environment/build, capped at100 each. Lists are ordered oldest first by startedAt or updatedAt then stable IDs and have full totals; limit applies separately to each list. Unknown build references return empty results; nonexistent or out-of-scope project/environment returns404. At most1000 projects are projected; statement work is timeout bounded and failures never return partial counts.",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQuery"
+          },
+          {
+            "name": "environmentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "buildReference",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DashboardWorkbenchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/AnalyticsLimitExceeded"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/dashboard-analytics/workbench/records": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "listDashboardWorkbenchRecords",
+        "summary": "Page through exact matching current workbench records",
+        "description": "Uses exactly the summary workbench authorization, predicates and environment/build context filters. All matching records are reachable through keyset pagination. Run lists sort by startedAt then id; item lists by updatedAt then runId then id; defect lists by updatedAt then id, ascending. The opaque cursor retains database timestamp precision and is bound to workspace, project, kind and both context filters. It must be reused unchanged; switching filters requires starting a fresh list. Each page is a new coherent current-state read, not an immutable snapshot across requests: concurrent lifecycle changes may change totals or move records between pages. Keyset bookmarks remain usable if the previous record leaves the matching set. Clients merge rows by scoped record identity and can refresh to obtain a new current view. No historical results are modified. total is the full matching count, not the page size. Items use the corresponding run, defect or item schema selected by kind.",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQuery"
+          },
+          {
+            "name": "environmentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "buildReference",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DashboardWorkbenchRecordKind"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DashboardWorkbenchRecordPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/AnalyticsLimitExceeded"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": ["Health"],
@@ -3969,6 +4153,43 @@
       }
     },
     "responses": {
+      "DashboardWorkbenchResponse": {
+        "description": "Current authorized workbench facts and bounded matching records.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DashboardWorkbenchEnvelope"
+            }
+          }
+        }
+      },
+      "DashboardWorkbenchRecordPageResponse": {
+        "description": "A bounded page of records matching the same current workbench predicates.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "description": "Opaque cursor for the next matching live page. Omitted on the last page.",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DashboardWorkbenchRecordPageEnvelope"
+            }
+          }
+        }
+      },
       "CloudRegistrationResponse": {
         "description": "Personal tenant and local cloud session created or safely replayed.",
         "headers": {
@@ -4658,6 +4879,780 @@
       }
     },
     "schemas": {
+      "DashboardWorkbenchRun": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "projectName",
+          "id",
+          "key",
+          "name",
+          "status",
+          "environmentId",
+          "environmentName",
+          "buildReference",
+          "startedAt",
+          "updatedAt",
+          "progress"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "const": "active"
+          },
+          "environmentId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "environmentName": {
+            "type": "string"
+          },
+          "buildReference": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/DashboardAnalyticsRunProgress"
+          }
+        }
+      },
+      "DashboardWorkbenchItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "projectName",
+          "id",
+          "runId",
+          "runKey",
+          "runName",
+          "testCaseId",
+          "caseKey",
+          "title",
+          "status",
+          "attemptNo",
+          "snapshotRevisionNo",
+          "currentRevisionNo",
+          "environmentId",
+          "environmentName",
+          "buildReference",
+          "updatedAt"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "runKey": {
+            "type": "string"
+          },
+          "runName": {
+            "type": "string"
+          },
+          "testCaseId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "caseKey": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_run",
+              "in_progress",
+              "passed",
+              "failed",
+              "blocked",
+              "skipped"
+            ]
+          },
+          "attemptNo": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "snapshotRevisionNo": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "currentRevisionNo": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "environmentId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "environmentName": {
+            "type": "string"
+          },
+          "buildReference": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DashboardWorkbenchDefect": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "projectName",
+          "id",
+          "key",
+          "title",
+          "status",
+          "severity",
+          "priority",
+          "updatedAt",
+          "occurrence",
+          "environmentId",
+          "environmentName",
+          "buildReference"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "triaged",
+              "in_progress",
+              "ready_for_retest",
+              "reopened"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "occurrence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardAnalyticsDefectOccurrence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environmentId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environmentName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "buildReference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "DashboardWorkbenchEnvironment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "projectName",
+          "id",
+          "name"
+        ],
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "DashboardWorkbenchRuns": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "truncated"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkbenchRun"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "description": "Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set."
+      },
+      "DashboardWorkbenchItems": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "truncated"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkbenchItem"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "description": "Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set."
+      },
+      "DashboardWorkbenchDefects": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "truncated"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkbenchDefect"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "description": "Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set."
+      },
+      "DashboardWorkbenchEnvironments": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "truncated"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkbenchEnvironment"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "description": "Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set."
+      },
+      "DashboardWorkbenchBuildReferences": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "truncated"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "description": "Complete matching total with a deterministic bounded list; truncated is true when total exceeds returned items. No cursor is implied. Narrow project, environment or build filters for a smaller result set."
+      },
+      "DashboardWorkbench": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "generatedAt",
+          "asOf",
+          "filters",
+          "basis",
+          "counts",
+          "freshness",
+          "activeRuns",
+          "readyForRetest",
+          "openDefects",
+          "blockedItems",
+          "notRunItems",
+          "inProgressItems",
+          "outdatedItems",
+          "runsWithoutBuild",
+          "contextChoices"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "environmentId",
+              "buildReference"
+            ],
+            "properties": {
+              "environmentId": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "buildReference": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "basis": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope",
+              "runs",
+              "defects",
+              "context",
+              "freshness"
+            ],
+            "properties": {
+              "scope": {
+                "const": "active_projects_current_state"
+              },
+              "runs": {
+                "const": "active_nonarchived_runs"
+              },
+              "defects": {
+                "const": "nonarchived_not_verified_or_closed"
+              },
+              "context": {
+                "const": "run_environment_and_build_defect_matching_occurrence"
+              },
+              "freshness": {
+                "const": "snapshot_revision_differs_from_current_informational"
+              }
+            }
+          },
+          "counts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "activeRuns",
+              "readyForRetest",
+              "blockedActiveItems",
+              "openDefects"
+            ],
+            "properties": {
+              "activeRuns": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "readyForRetest": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "blockedActiveItems": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "openDefects": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              }
+            }
+          },
+          "freshness": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "notRunActiveItems",
+              "inProgressActiveItems",
+              "outdatedActiveItems",
+              "activeRunsWithoutBuild"
+            ],
+            "properties": {
+              "notRunActiveItems": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "inProgressActiveItems": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "outdatedActiveItems": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              },
+              "activeRunsWithoutBuild": {
+                "$ref": "#/components/schemas/AnalyticsCount"
+              }
+            }
+          },
+          "activeRuns": {
+            "$ref": "#/components/schemas/DashboardWorkbenchRuns"
+          },
+          "readyForRetest": {
+            "$ref": "#/components/schemas/DashboardWorkbenchDefects"
+          },
+          "openDefects": {
+            "$ref": "#/components/schemas/DashboardWorkbenchDefects"
+          },
+          "blockedItems": {
+            "$ref": "#/components/schemas/DashboardWorkbenchItems"
+          },
+          "notRunItems": {
+            "$ref": "#/components/schemas/DashboardWorkbenchItems"
+          },
+          "inProgressItems": {
+            "$ref": "#/components/schemas/DashboardWorkbenchItems"
+          },
+          "outdatedItems": {
+            "$ref": "#/components/schemas/DashboardWorkbenchItems"
+          },
+          "runsWithoutBuild": {
+            "$ref": "#/components/schemas/DashboardWorkbenchRuns"
+          },
+          "contextChoices": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "environments",
+              "buildReferences"
+            ],
+            "properties": {
+              "environments": {
+                "$ref": "#/components/schemas/DashboardWorkbenchEnvironments"
+              },
+              "buildReferences": {
+                "$ref": "#/components/schemas/DashboardWorkbenchBuildReferences"
+              }
+            }
+          }
+        }
+      },
+      "DashboardWorkbenchEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardWorkbench"
+          }
+        }
+      },
+      "DashboardWorkbenchRecordKind": {
+        "type": "string",
+        "enum": [
+          "activeRuns",
+          "readyForRetest",
+          "openDefects",
+          "blockedItems",
+          "notRunItems",
+          "inProgressItems",
+          "outdatedItems",
+          "runsWithoutBuild"
+        ]
+      },
+      "DashboardWorkbenchRecordPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "projectId",
+          "generatedAt",
+          "asOf",
+          "filters",
+          "kind",
+          "items",
+          "total"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "environmentId",
+              "buildReference"
+            ],
+            "properties": {
+              "environmentId": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "buildReference": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DashboardWorkbenchRecordKind"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DashboardWorkbenchRun"
+                },
+                {
+                  "$ref": "#/components/schemas/DashboardWorkbenchItem"
+                },
+                {
+                  "$ref": "#/components/schemas/DashboardWorkbenchDefect"
+                }
+              ]
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/AnalyticsCount"
+          }
+        }
+      },
+      "DashboardWorkbenchRecordPageEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardWorkbenchRecordPage"
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "limit",
+              "hasMore",
+              "nextCursor"
+            ],
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "hasMore": {
+                "type": "boolean"
+              },
+              "nextCursor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 2048
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
       "Identifier": {
         "type": "string",
         "minLength": 1,

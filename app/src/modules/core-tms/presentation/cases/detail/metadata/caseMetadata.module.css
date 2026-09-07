@@ -149,7 +149,7 @@
 :global(.dark) .typeManual { --metadata-fg: #fff; --metadata-bg: #126a70; --metadata-border: #3c969c; }
 :global(.dark) .typeChecklist { --metadata-fg: #fff; --metadata-bg: #6048a8; --metadata-border: #8971cb; }
 :global(.dark) .typeAutomated { --metadata-fg: #fff; --metadata-bg: #855014; --metadata-border: #b97b37; }
-:global(.dark) .estimate { --metadata-fg: #f0f2f4; --metadata-bg: #464b53; --metadata-border: #696f79; }
+:global(.dark) .estimate { --metadata-fg: var(--tms-text-secondary); --metadata-bg: var(--tms-bg-elevated); --metadata-border: var(--tms-border-strong); }
 
 .typeChangeDialog { width: min(420px, calc(100vw - 32px)); border-radius: 14px; }
 .typeChangeWarning { display: flex; align-items: flex-start; gap: 10px; padding: 18px; color: var(--cases-text); }

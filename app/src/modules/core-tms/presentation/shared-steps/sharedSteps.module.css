@@ -29,9 +29,14 @@
 }
 :global(.dark) .view,
 :global(.dark) .editor {
-  --ss-bg: #2d2b35; --ss-raised: #34323c; --ss-hover: #3b3943;
-  --ss-line: #4a4853; --ss-control: #302e38; --ss-control-line: #5a5763;
-  --ss-text: #f6f5f8; --ss-muted: #aaa7b2;
+  --ss-bg: var(--tms-bg-canvas); --ss-raised: var(--tms-bg-panel); --ss-hover: var(--tms-bg-hover);
+  --ss-line: var(--tms-border); --ss-control: var(--tms-bg-elevated); --ss-control-line: var(--tms-border-strong);
+  --ss-text: var(--tms-text); --ss-muted: var(--tms-text-muted);
+  --cases-deep: var(--tms-bg-elevated);
+  --cases-hover-strong: var(--tms-bg-selected);
+  --cases-strong: var(--tms-text-strong);
+  --cases-secondary-text: var(--tms-text-secondary);
+  --cases-faint: var(--tms-text-faint);
 }
 .view { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
 .header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-bottom: 1px solid var(--ss-line); }

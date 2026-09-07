@@ -326,6 +326,7 @@
 }
 
 :global(.dark) .form { color: var(--ink); }
+:global(.dark) .footerWarning { color: var(--red); }
 :global(.dark) .section,
 :global(.dark) .filterGrid,
 :global(.dark) .scopeSummary,
@@ -368,17 +369,17 @@
 }
 
 :global(.dark) .runPanel {
-  --builder-bg: #2d2b35;
-  --builder-control: #302e38;
-  --builder-hover: #34323c;
-  --builder-border: #4a4853;
-  --builder-border-strong: #57545f;
-  --builder-text: #ffffff;
-  --builder-muted: #9da0a8;
+  --builder-bg: var(--tms-bg-panel);
+  --builder-control: var(--tms-bg-elevated);
+  --builder-hover: var(--tms-bg-hover);
+  --builder-border: var(--tms-border);
+  --builder-border-strong: var(--tms-border-strong);
+  --builder-text: var(--tms-text);
+  --builder-muted: var(--tms-text-muted);
   --builder-link: #99bbff;
   --builder-primary: #3574f0;
   --builder-primary-hover: #467ff2;
-  --builder-selection: rgb(53 116 240 / 22%);
+  --builder-selection: var(--tms-bg-selected);
   color-scheme: dark;
 }
 

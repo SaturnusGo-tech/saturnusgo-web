@@ -1,4 +1,4 @@
-import { ArrowRight, Bug, Link2 } from "lucide-react";
+import { Bug, Link2 } from "lucide-react";
 import type { DashboardDrill, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
@@ -28,13 +28,12 @@ export function DashboardOperations({
       </header>
       {active ? (
         <div className={surface.lifecycleFlow}>
-          {snapshot.defects.map((item, index) => {
+          {snapshot.defects.map((item) => {
             const label = localizedLabel(locale, item.key);
             return <div className={surface.lifecycleStep} key={item.key}>
               <button type="button" className={surface[`defect_${item.key}`]} onClick={() => onOpenDrill({ ...item.drill, label })}>
                 <span><Bug size={14} />{label}</span><strong>{item.value}</strong>
               </button>
-              {index < snapshot.defects.length - 1 && <ArrowRight size={14} aria-hidden="true" />}
             </div>;
           })}
         </div>

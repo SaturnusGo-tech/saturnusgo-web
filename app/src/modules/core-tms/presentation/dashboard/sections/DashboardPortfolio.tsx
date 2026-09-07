@@ -1,10 +1,8 @@
-import { AlertTriangle, ChevronRight, Info, ShieldAlert } from "lucide-react";
+import { Layers, ChevronRight, Info, ShieldAlert } from "lucide-react";
 import type { DashboardDrill, DashboardSnapshot } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { OverflowMarquee } from "../common/OverflowMarquee";
 import surface from "../dashboard.module.css";
 
-const rateBand = (value: number) => value >= 80 ? "good" : value >= 60 ? "warning" : "risk";
 
 export function DashboardPortfolio({
   snapshot,
@@ -20,7 +18,7 @@ export function DashboardPortfolio({
     <section className={`${surface.operationsPanel} ${surface.portfolioPanel}`}>
       <header className={surface.panelHeading}>
         <div><h2>{t("dashboard.riskHotspots")}</h2><p>{t("dashboard.riskHint")}</p></div>
-        <AlertTriangle size={17} aria-hidden="true" />
+        <Layers size={17} aria-hidden="true" />
       </header>
       {snapshot.hotspots.length ? (
         <div className={surface.hotspotTable} role="table" aria-label={t("dashboard.riskHotspots")}>
@@ -35,11 +33,11 @@ export function DashboardPortfolio({
           {snapshot.hotspots.map((row) => (
             <div className={surface.hotspotRow} role="row" key={row.id}>
               <div role="cell"><button type="button" className={surface.hotspotName} onClick={() => onOpenDrill(row.drills.cases)}>
-                <span><OverflowMarquee className={surface.overflowMarquee} text={row.label} />
+                <span><strong title={row.label}>{row.label}</strong>
                   {row.projectLabel && row.kind === "component" && <small>{row.projectLabel}</small>}</span><ChevronRight size={14} aria-hidden="true" />
               </button></div>
-              <div role="cell">{row.passRate !== null && row.drills.passed ? <button type="button" className={surface.passRateScore} data-band={rateBand(row.passRate)} onClick={() => onOpenDrill(row.drills.passed!)} aria-label={`${t("dashboard.passRate")}: ${row.passRate}%`}>
-                <span aria-hidden="true" /><strong>{row.passRate}%</strong>
+              <div role="cell">{row.passRate !== null && row.drills.passed ? <button type="button" className={surface.passRateScore} onClick={() => onOpenDrill(row.drills.passed!)} aria-label={`${t("dashboard.passRate")}: ${row.passRate}%`}>
+                <strong>{row.passRate}%</strong>
               </button> : <span className={surface.signalUnavailable}>—</span>}</div>
               <div role="cell">{row.coverageRate !== null && row.drills.covered ? <button type="button" className={surface.coverageCell} onClick={() => onOpenDrill(row.drills.covered!)} aria-label={`${t("dashboard.coverageRate")}: ${row.coverageRate}%`}>
                 <progress value={row.coverageRate} max={100} /><strong>{row.coverageRate}%</strong>
@@ -50,7 +48,7 @@ export function DashboardPortfolio({
                 : <span className={surface.signalUnavailable} title={t("dashboard.unavailable")}>—</span>}</div>
               <div role="cell" className={surface.defectSignals}>
                 {row.drills.defects && <button type="button" onClick={() => onOpenDrill(row.drills.defects!)} aria-label={`${t("dashboard.openDefects")}: ${row.openDefects}`}>{row.openDefects}</button>}
-                {row.drills.criticalDefects && <button type="button" className={surface.criticalSignal} onClick={() => onOpenDrill(row.drills.criticalDefects!)} aria-label={`${t("dashboard.criticalDefects")}: ${row.criticalDefects}`}>
+                {(row.criticalDefects ?? 0) > 0 && row.drills.criticalDefects && <button type="button" className={surface.criticalSignal} onClick={() => onOpenDrill(row.drills.criticalDefects!)} aria-label={`${t("dashboard.criticalDefects")}: ${row.criticalDefects}`}>
                   <ShieldAlert size={11} aria-hidden="true" /><span>{row.criticalDefects}</span>
                 </button>}
               </div>
@@ -58,6 +56,7 @@ export function DashboardPortfolio({
           ))}
         </div>
       ) : <p className={surface.panelEmpty}>{t("dashboard.noHotspots")}</p>}
+      {snapshot.dataNotes.includes("risk-truncated") && <p className={surface.dataNote}><Info size={14} />{t("dashboard.riskLimited", { count: snapshot.hotspots.length })}</p>}
       {snapshot.dataNotes.includes("component-run-attribution-unavailable") && (
         <p className={surface.dataNote}><Info size={14} />{t("dashboard.componentAttributionNote")}</p>
       )}
