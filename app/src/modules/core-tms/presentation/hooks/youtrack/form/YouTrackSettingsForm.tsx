@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { YouTrackNavigation, type YouTrackTab } from "../navigation/YouTrackNavigation";
+import identity from "../youtrack.module.css";
 import type { HooksCopy } from "../../shared/hooks-copy";
 import surface from "../../hooks.module.css";
 import type { YouTrackSettingsState } from "../state/use-youtrack-settings";
@@ -7,16 +10,20 @@ import { WorkflowSection } from "../sections/workflow/WorkflowSection";
 import { WebhookSection } from "../sections/webhook/WebhookSection";
 import type { useYouTrackWebhookSetup } from "../state/webhook/use-youtrack-webhook-setup";
 
-export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChangeConnection }: {
+export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChangeConnection, russian }: {
+  russian: boolean;
   copy: HooksCopy;
   state: YouTrackSettingsState;
   webhook: ReturnType<typeof useYouTrackWebhookSetup>;
   canManage: boolean;
   onChangeConnection: () => void;
 }) {
+  const [tab, setTab] = useState<YouTrackTab>("connection");
   if (!state.configuration || !state.draft) return null;
   return (
-    <main className={surface.settingsMain}>
+    <div className={identity.layout}>
+      <YouTrackNavigation tab={tab} onTab={setTab} copy={copy} canManage={canManage} russian={russian} />
+      <main className={surface.settingsMain} key={tab}>
       {state.notice ? (
         <div className={surface.settingsNotice} data-tone={state.notice.tone} role="status">
           {state.notice.text}
@@ -26,7 +33,7 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
         <strong>{copy.readOnly}</strong> {copy.readOnlyHint}
       </div> : null}
       <fieldset className={surface.settingsFields} disabled={!canManage}>
-      <ConnectionSection
+      {tab === "connection" && <ConnectionSection
         copy={copy}
         draft={state.draft}
         tokenConfigured={state.configuration.tokenConfigured}
@@ -38,24 +45,25 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
         onConnect={() => void state.connect()}
         canDisconnect={state.configuration.source === "workspace" && state.configuration.tokenConfigured}
         onChangeConnection={onChangeConnection}
-      />
-      <RoutingSection
+      />}
+      {tab === "projects" && <RoutingSection
         copy={copy}
         draft={state.draft}
         projects={state.selectedProjects}
         loadingProjectId={state.loadingProjectId}
         onUpdate={state.updateDraft}
         onSelectProject={(routeId, projectId) => void state.selectRouteProject(routeId, projectId)}
-      />
-      <WorkflowSection
+      />}
+      {tab === "workflow" && <WorkflowSection
         copy={copy}
         draft={state.draft}
         projects={state.selectedProjects}
         loadingProjectId={state.loadingProjectId}
         onUpdate={state.updateDraft}
-      />
-      {canManage ? <WebhookSection copy={copy} setup={webhook.setup} status={webhook.status} /> : null}
+      />}
+      {canManage && tab === "webhook" ? <WebhookSection copy={copy} setup={webhook.setup} status={webhook.status} /> : null}
       </fieldset>
     </main>
+    </div>
   );
 }

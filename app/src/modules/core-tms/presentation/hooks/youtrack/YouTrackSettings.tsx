@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import type { YouTrackIntegrationStatus } from "../../../application/integrations/getYouTrackIntegrationStatus";
 import surface from "../hooks.module.css";
+import identity from "./youtrack.module.css";
 import type { IntegrationUiStatus } from "../shared/IntegrationStatusBadge";
 import { hooksCopy } from "../shared/hooks-copy";
 import {
@@ -42,20 +43,20 @@ export function YouTrackSettings({
     : state.configuration?.connection.status === "failed" ? "attention" : "available";
 
   if (state.loading) {
-    return <div className={surface.root}>
-      <YouTrackSettingsHeader onBack={onBack} copy={copy} status="checking" />
+    return <div className={`${surface.root} ${identity.root}`} data-integration-workspace>
+      <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="checking" />
       <YouTrackSettingsSkeleton copy={copy} />
     </div>;
   }
   if (state.loadFailed || !state.configuration || !state.draft) {
-    return <div className={surface.root}>
-      <YouTrackSettingsHeader onBack={onBack} copy={copy} status="attention" />
+    return <div className={`${surface.root} ${identity.root}`} data-integration-workspace>
+      <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="attention" />
       <YouTrackSettingsFailure copy={copy} onRetry={state.retry} />
     </div>;
   }
   return (
-    <div className={surface.root} data-testid="youtrack-settings">
-      <YouTrackSettingsHeader
+    <div className={`${surface.root} ${identity.root}`} data-integration-workspace data-testid="youtrack-settings">
+      <YouTrackSettingsHeader russian={russian}
         onBack={onBack}
         copy={copy}
         status={uiStatus}
@@ -65,7 +66,7 @@ export function YouTrackSettings({
         action={state.action}
         onSave={canManage ? () => void state.save() : undefined}
       />
-      <YouTrackSettingsForm copy={copy} state={state} webhook={webhook} canManage={canManage}
+      <YouTrackSettingsForm russian={russian} copy={copy} state={state} webhook={webhook} canManage={canManage}
         onChangeConnection={() => setDisconnectOpen(true)} />
       {canManage && disconnectOpen ? <DisconnectYouTrackDialog copy={copy} busy={state.action === "disconnecting"}
         onClose={() => setDisconnectOpen(false)} onConfirm={() => {

@@ -70,6 +70,7 @@ export const ruHooksCopy = {
   matcherPlaceholder: "например, Web client",
   sendTo: "Проект назначения",
   workflow: "Статусы",
+  workflowEmpty: "Сначала подключите YouTrack и выберите проект в разделе «Проекты и правила». Здесь появятся его статусы и сопоставления с этапами Falcon.",
   workflowHint: "Значения загружены из YouTrack отдельно для каждого проекта.",
   loadingProject: "Загружаем поля проекта…",
   stateField: "Поле статуса",

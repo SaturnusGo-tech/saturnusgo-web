@@ -76,13 +76,13 @@ export function HooksView({ workspaceId, projectId, canManage }: { workspaceId: 
     />;
   }
   return (
-    <div className={surface.root} data-testid="hooks-view">
+    <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
       <IntegrationCatalog
         russian={russian}
         copy={hooksCopy(russian)}
         configuration={configuration}
         status={status}
-        statusFailed={statusFailed || configurationFailed || connectors.state === "error"}
+        statusFailed={statusFailed || configurationFailed}
         connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
         onOpenConnector={open}
         onRefresh={refresh}

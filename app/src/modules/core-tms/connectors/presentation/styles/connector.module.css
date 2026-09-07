@@ -26,7 +26,7 @@
 .back { display: inline-flex; align-items: center; gap: 7px; padding: 5px 0; border: 0; background: transparent;
   color: var(--c-muted) !important; font-size: 12px !important; }
 .brand { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 650; letter-spacing: -.5px; }
-.brand svg { width: 22px; height: 22px; color: var(--c-accent); }
+.brand svg, .brand img { width: 22px; height: 22px; color: var(--c-accent); }
 .scope { margin-left: auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 220px; color: var(--c-muted); }
 .badge { padding: 3px 9px; background: var(--c-soft); color: var(--c-muted); border-radius: 4px;
   white-space: nowrap; font-size: 11px; font-weight: 600; }
@@ -35,7 +35,7 @@
 .layout { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: calc(100% - 57px); }
 .sidebar { background: var(--c-side); color: var(--c-side-ink); border-right: 1px solid var(--c-line); padding: 26px 14px; }
 .sideHeading { display: flex; gap: 9px; align-items: center; margin: 0 10px 28px; font-size: 14px; }
-.sideHeading > svg { width: 22px; height: 22px; }
+.sideHeading > svg, .sideHeading > img { width: 22px; height: 22px; }
 .sidebar > small { display: block; font-size: 10px; font-weight: 650; letter-spacing: 1px; margin: 0 10px 10px; opacity: .6; }
 :global(.dark) .sidebar > small { color: var(--c-muted); opacity: 1; }
 .sidebar nav { display: grid; gap: 4px; }
@@ -150,7 +150,7 @@
 :global(.dark) .root[data-provider="linear"] { --c-accent: #989fff; }
 .root[data-provider="linear"] .topbar { min-height: 46px; padding-top: 6px; padding-bottom: 6px; }
 .root[data-provider="linear"] .brand { font-size: 15px; }
-.root[data-provider="linear"] .brand svg { width: 18px; height: 18px; color: var(--c-ink); }
+.root[data-provider="linear"] .brand svg, .brand img { width: 18px; height: 18px; color: var(--c-ink); }
 .root[data-provider="linear"] .content { max-width: 1120px; padding: 30px 48px 0; }
 .root[data-provider="linear"] .hero { margin-bottom: 40px; }
 .root[data-provider="linear"] .hero h1 { font-size: 25px; }
@@ -183,7 +183,7 @@
 .root[data-provider="github"] { --c-ink: #1f2328; --c-muted: #59636e; --c-line: #d1d9e0; --c-accent: #1f883d; --c-highlight: #dafbe1; --c-side: #f6f8fa; --c-radius: 6px; }
 :global(.dark) .root[data-provider="github"] { --c-accent: #3fb950; }
 .root[data-provider="github"] .layout { display: block; }
-.root[data-provider="github"] .brand svg { color: var(--c-ink); }
+.root[data-provider="github"] .brand svg, .brand img { color: var(--c-ink); }
 .root[data-provider="github"] .sidebar { padding: 0 28px; border-right: 0; border-bottom: 1px solid var(--c-line); }
 .root[data-provider="github"] .sideHeading, .root[data-provider="github"] .sidebar > small, .root[data-provider="github"] .sidebar > a { display: none; }
 .root[data-provider="github"] .sidebar nav { display: flex; gap: 18px; }

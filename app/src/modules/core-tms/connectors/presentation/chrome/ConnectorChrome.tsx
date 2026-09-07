@@ -1,33 +1,31 @@
 import type { ReactNode } from "react";
 import { ArrowLeft, BookOpen, GitBranch, Hash, Settings2, Activity, Zap, ChevronRight } from "lucide-react";
-import { FaJira, FaTrello, FaGithub, FaSlack, FaConfluence } from "react-icons/fa6";
-import { SiLinear } from "react-icons/si";
+import { IntegrationBrand } from "../../../presentation/hooks/shared/brand/IntegrationBrand";
 import type { Provider } from "../../model/connector-types";
 import { providerCopy } from "../../localization/connector-copy";
 import styles from "../styles/connector.module.css";
 export type ConnectorTab = "connection" | "automation" | "activity";
-const icons = { jira: FaJira, trello: FaTrello, linear: SiLinear, github: FaGithub, slack: FaSlack, confluence: FaConfluence };
 export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, enabled, children }: {
   provider: Provider; ru: boolean; tab: ConnectorTab; onTab: (tab: ConnectorTab) => void;
   onBack: () => void; project: string; enabled: boolean; children: ReactNode;
 }) {
-  const Icon = icons[provider]; const copy = providerCopy(provider, ru);
+  const logo = <IntegrationBrand provider={provider} />; const copy = providerCopy(provider, ru);
   const tabs = [
     { id: "connection" as const, icon: Settings2, label: ru ? "Подключение" : "Connection" },
     { id: "automation" as const, icon: Zap, label: ru ? "Автоматизация" : "Automation" },
     { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" },
   ];
-  return <main className={styles.root} data-provider={provider} data-testid={`connector-${provider}`}>
+  return <main className={styles.root} data-provider={provider} data-integration-workspace data-testid={`connector-${provider}`}>
     <header className={styles.topbar}>
       <button type="button" className={styles.back} onClick={onBack}><ArrowLeft size={16} />{ru ? "Интеграции" : "Integrations"}</button>
-      <span className={styles.brand}><Icon />{copy.name}</span>
+      <span className={styles.brand}>{logo}{copy.name}</span>
       <span className={styles.scope}>{project}</span>
       <span className={styles.badge} data-active={enabled}>{enabled ? (ru ? "Включено" : "Enabled") : (ru ? "Не активно" : "Inactive")}</span>
     </header>
     {provider === "github" && <div className={styles.repoHeader}><GitBranch size={18} /><strong>{project}</strong><span>/</span><span>Falcon QA</span><span className={styles.repoLabel}>Integration</span></div>}
     <div className={styles.layout}>
       <aside className={styles.sidebar}>
-        <div className={styles.sideHeading}>{provider === "slack" ? <Hash size={18} /> : <Icon />}<strong>{provider === "linear" ? project : copy.name}</strong></div>
+        <div className={styles.sideHeading}>{provider === "slack" ? <Hash size={18} /> : logo}<strong>{provider === "linear" ? project : copy.name}</strong></div>
         <small>{provider === "jira" ? "PROJECT SETTINGS" : provider === "confluence" ? "SPACE TOOLS" : "FALCON"}</small>
         <nav aria-label={ru ? "Разделы интеграции" : "Integration sections"}>
           {tabs.map((item) => <button type="button" key={item.id} aria-current={tab === item.id ? "page" : undefined}

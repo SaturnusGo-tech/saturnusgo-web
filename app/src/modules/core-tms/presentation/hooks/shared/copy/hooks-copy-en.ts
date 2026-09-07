@@ -70,6 +70,7 @@ export const enHooksCopy = {
   matcherPlaceholder: "for example, Web client",
   sendTo: "Destination project",
   workflow: "Statuses",
+  workflowEmpty: "Connect YouTrack and select a project under Projects & rules. Its statuses and mappings to Falcon stages will appear here.",
   workflowHint: "Values are loaded from YouTrack separately for each project.",
   loadingProject: "Loading project fields…",
   stateField: "State field",
