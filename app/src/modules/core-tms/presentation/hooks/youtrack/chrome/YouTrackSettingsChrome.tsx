@@ -1,70 +1,38 @@
-import { ArrowLeft, ExternalLink, Save } from "lucide-react";
-
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import type { YouTrackIntegrationStatus } from "../../../../application/integrations/getYouTrackIntegrationStatus";
-import surface from "../../hooks.module.css";
 import { IntegrationStatusBadge, type IntegrationUiStatus } from "../../shared/IntegrationStatusBadge";
+import { IntegrationThemeToggle } from "../../shared/theme/IntegrationThemeToggle";
 import type { HooksCopy } from "../../shared/hooks-copy";
+import styles from "../youtrack.module.css";
 
-export function YouTrackSettingsHeader({
-  onBack,
-  copy,
-  status,
-  integrationStatus,
-  languageTag,
-  baseUrl,
-  action = "idle",
-  onSave,
-}: {
-  onBack: () => void;
-  copy: HooksCopy;
-  status: IntegrationUiStatus;
-  integrationStatus?: YouTrackIntegrationStatus | null;
-  languageTag?: "en-US" | "ru-RU";
-  baseUrl?: string;
-  action?: "idle" | "connecting" | "saving" | "disconnecting";
-  onSave?: () => void;
+export function YouTrackSettingsHeader({ onBack, copy, status, integrationStatus, languageTag,
+  baseUrl, action = "idle", onSave, russian }: {
+  onBack: () => void; copy: HooksCopy; status: IntegrationUiStatus;
+  integrationStatus?: YouTrackIntegrationStatus | null; languageTag?: "en-US" | "ru-RU";
+  baseUrl?: string; action?: "idle" | "connecting" | "saving" | "disconnecting"; onSave?: () => void; russian: boolean;
 }) {
   const failed = integrationStatus?.failed ?? 0;
-  return (
-    <header className={surface.settingsHeader}>
-      <button type="button" className={surface.backButton} onClick={onBack} aria-label={copy.back}>
-        <ArrowLeft size={18} aria-hidden="true" />
-      </button>
-      <span className={surface.providerLogo} aria-hidden="true">
-        <img src="/falcon/integrations/youtrack.svg" alt="" />
-      </span>
-      <div className={surface.settingsTitle}>
-        <span>{copy.integrations}</span>
-        <div><h1>YouTrack</h1><IntegrationStatusBadge status={status} copy={copy} /></div>
-        {integrationStatus ? (
-          <p>
-            {copy.syncSummary(
-              integrationStatus.linked,
-              formatDate(integrationStatus.lastSyncedAt ?? null, languageTag, copy.never),
-            )}
-            {failed > 0 ? <strong>{copy.syncErrors(failed)}</strong> : null}
-          </p>
-        ) : null}
+  return <header className={styles.header}>
+    <div className={styles.breadcrumb}>
+      <button type="button" onClick={onBack} aria-label={copy.back}><ArrowLeft size={15} aria-hidden="true" />{copy.integrations}</button>
+      <span>/</span><span>YouTrack</span>
+      <IntegrationThemeToggle russian={russian} className={styles.themeButton} />
+    </div>
+    <div className={styles.titleRow}>
+      <img className={styles.logo} src="/falcon/integrations/youtrack.svg" alt="" />
+      <div className={styles.title}><h1>YouTrack <IntegrationStatusBadge status={status} copy={copy} /></h1>
+        <p>{russian ? "Дефекты и рабочие процессы" : "Defects and workflows"}</p></div>
+      <div className={styles.actions}>
+        {baseUrl && <a href={baseUrl} target="_blank" rel="noreferrer">{copy.openYouTrack}<ExternalLink size={14} /></a>}
+        {onSave && <button type="button" onClick={onSave} disabled={action !== "idle"}>{action === "saving" ? copy.saving : copy.save}</button>}
       </div>
-      {onSave ? <div className={surface.headerActions}>
-        {baseUrl ? (
-          <a className={surface.secondaryButton} href={baseUrl} target="_blank" rel="noreferrer">
-            {copy.openYouTrack}<ExternalLink size={15} aria-hidden="true" />
-          </a>
-        ) : null}
-        <button type="button" className={surface.primaryButton} onClick={onSave} disabled={action !== "idle"}>
-          <Save size={15} aria-hidden="true" />
-          {action === "saving" ? copy.saving : copy.save}
-        </button>
-      </div> : null}
-    </header>
-  );
+    </div>
+    {integrationStatus && <div className={styles.syncLine}>
+      <span>{copy.syncSummary(integrationStatus.linked, formatDate(integrationStatus.lastSyncedAt ?? null, languageTag, copy.never))}</span>
+      {failed > 0 && <strong>{copy.syncErrors(failed)}</strong>}
+    </div>}
+  </header>;
 }
-
 function formatDate(value: string | null, languageTag = "ru-RU", empty: string) {
-  if (!value) return empty;
-  return new Intl.DateTimeFormat(languageTag, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return value ? new Intl.DateTimeFormat(languageTag, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : empty;
 }

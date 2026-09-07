@@ -404,7 +404,7 @@
   background: transparent;
 }
 
-.navigationItem[data-testid="nav-config"] {
+.navigationItem:is([data-testid="nav-config"], [data-testid="nav-help"]) {
   display: none;
 }
 
@@ -735,7 +735,7 @@
     display: none;
   }
 
-  .navigationItem[data-testid="nav-config"] {
+  .navigationItem:is([data-testid="nav-config"], [data-testid="nav-help"]) {
     display: flex;
   }
 }
@@ -756,10 +756,10 @@
 }
 
 /* The light dashboard keeps its selected reference palette. Dark uses global Falcon tokens. */
-.shell.shell:has([data-dashboard-workspace]) {
+.shell.shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) {
   font-family: var(--font-geist-sans), Inter, system-ui, sans-serif;
 }
-:global(:root:not(.dark)) .shell.shell:has([data-dashboard-workspace]) {
+:global(:root:not(.dark)) .shell.shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) {
   --ink: #252529;
   --muted: #686870;
   --paper: #ffffff;
@@ -769,7 +769,7 @@
   --control-hover: #eeeef1;
   --action: #555eaa;
 }
-:global(:root:not(.dark)) .shell:has([data-dashboard-workspace]) .navigation {
+:global(:root:not(.dark)) .shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) .navigation {
   --sidebar-border: #e5e5e9;
   --sidebar-divider: #e5e5e9;
   --sidebar-toggle-divider: #e5e5e9;
@@ -787,7 +787,7 @@
   --sidebar-create-hover: #e3e3e8;
   background: #fafafa;
 }
-:global(:root:not(.dark)) .shell:has([data-dashboard-workspace]) .tessiqMark {
+:global(:root:not(.dark)) .shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) .tessiqMark {
   background-image: url("../../assets/falcon/falcon-mark-on-light.png");
 }
 :global(.dark) .shell .header {

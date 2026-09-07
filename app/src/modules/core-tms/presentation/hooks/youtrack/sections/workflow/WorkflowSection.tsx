@@ -25,6 +25,9 @@ export function WorkflowSection({ copy, draft, projects, loadingProjectId, onUpd
 }) {
   return (
     <SettingsSection title={copy.workflow} description={copy.workflowHint}>
+      {!draft.routes.some((route) => route.enabled && route.project.id) && <p className={surface.webhookEmpty}>
+        {copy.workflowEmpty}
+      </p>}
       <div className={surface.workflowRoutes}>
         {draft.routes.filter((route) => route.enabled && route.project.id).map((route) => (
           <RouteWorkflow key={route.id} copy={copy} route={route}

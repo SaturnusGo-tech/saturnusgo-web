@@ -1,0 +1,46 @@
+/* YouTrack/Ring UI controls: https://github.com/JetBrains/ring-ui/blob/master/design-tokens.json */
+.root { --ink: #27282e; --muted: #6c707e; --paper: #fff; --control: #fff; --control-hover: #f7f8fa; --line: #e5e7eb; --line-strong: #b8bcc5; --action: #3369d6; --action-foreground: #fff; --teal: #3369d6; --yt-side: #f7f8fa; --yt-selection: #edf3ff; --yt-link: #315fbd; --green: #2b7b50; --green-soft: #e6f7e9; --red: #cc3645; --red-soft: #fff2f3; display: flex; flex-direction: column; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; color-scheme: light; }
+:global(.dark) .root { --ink: #e8e8e9; --muted: #9da0a8; --paper: #1e1f22; --control: #1e1f22; --control-hover: #2b2d30; --line: #36383d; --line-strong: #565a63; --action: #366acf; --action-foreground: #fff; --teal: #548af7; --yt-side: #242528; --yt-selection: #2e436e; --yt-link: #7ba7fa; --green: #83bb96; --green-soft: #233b2b; --red: #ef929a; --red-soft: #44292e; color-scheme: dark; }
+.header { background: var(--paper); border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.breadcrumb { display: flex; align-items: center; gap: 12px; padding: 12px 28px 8px; color: var(--muted); font-size: 12px; }
+.breadcrumb > button:first-child { display: flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--yt-link); cursor: pointer; }
+.themeButton { display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; color: var(--muted); background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
+.themeButton:hover { background: var(--control-hover); color: var(--ink); }
+.titleRow { display: flex; align-items: center; gap: 14px; padding: 5px 28px 18px; }
+.logo { width: 40px; height: 40px; border-radius: 6px; flex-shrink: 0; }
+.title { min-width: 0; }
+.title h1 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0; color: var(--ink); font-size: 23px; font-weight: 600; letter-spacing: -.5px; }
+.title h1 > span { background: transparent; border: 0; padding: 0; font-size: 11px; font-weight: 400; }
+.title p { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
+.actions { display: flex; align-items: center; gap: 18px; margin-left: auto; }
+.actions a { display: flex; align-items: center; gap: 6px; color: var(--yt-link); text-decoration: none; font-size: 12px; }
+.actions a:hover { text-decoration: underline; }
+.actions button { color: var(--action-foreground); background: var(--action); border: 1px solid var(--action); border-radius: 4px; padding: 6px 15px; font-size: 13px; cursor: pointer; }
+.actions button:hover { filter: brightness(1.08); }
+.syncLine { display: flex; gap: 12px; padding: 0 28px 13px 82px; color: var(--muted); font-size: 11px; }
+.syncLine strong { color: var(--red); font-weight: 500; }
+.layout { display: flex; flex: 1; min-height: 0; }
+.sidebar { flex: 0 0 224px; display: flex; flex-direction: column; padding: 26px 12px 20px; background: var(--yt-side); border-right: 1px solid var(--line); }
+.sideTitle { padding: 0 12px 16px; color: var(--muted); font-size: 10px; font-weight: 550; letter-spacing: .025em; }
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+.sidebar nav button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 0; border-radius: 4px; color: var(--ink); background: transparent; font-size: 13px; cursor: pointer; text-align: left; }
+.sidebar nav svg { color: var(--muted); flex-shrink: 0; }
+.sidebar nav button:hover { background: var(--control-hover); }
+.sidebar nav button[aria-current="page"] { color: var(--ink); background: var(--yt-selection); font-weight: 500; }
+.sidebar nav button[aria-current="page"] svg { color: var(--yt-link); }
+.helpLink { display: flex; align-items: center; gap: 8px; margin: 30px 12px 20px; color: var(--yt-link); font-size: 11px; text-decoration: none; }
+.helpLink:hover { text-decoration: underline; }
+.sideFoot { margin: auto 12px 0; padding-top: 25px; color: var(--muted); font-size: 11px; }
+.sideFoot span { padding: 0 7px; opacity: .6; }
+@media (max-width: 850px) { .sidebar { flex-basis: 190px; padding-inline: 8px; } .sidebar nav button { font-size: 12px; } }
+@media (max-width: 680px) {
+  .root { overflow: auto; } .layout { flex-direction: column; min-height: auto; }
+  .sidebar { flex: none; padding: 0 14px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .sideTitle, .sideFoot, .helpLink { display: none; } .sidebar nav { flex-direction: row; overflow-x: auto; gap: 16px; }
+  .sidebar nav button { flex-shrink: 0; padding: 13px 0; border-radius: 0; border-bottom: 2px solid transparent; font-size: 12px; }
+  .sidebar nav button[aria-current="page"] { background: transparent; border-bottom-color: var(--action); }
+  .sidebar nav svg { display: none; } .breadcrumb { padding: 9px 18px 5px; } .titleRow { padding: 7px 18px 15px; gap: 10px; flex-wrap: wrap; }
+  .title h1 { font-size: 21px; gap: 8px; } .title p { font-size: 11px; }
+  .actions { gap: 10px; } .actions a { font-size: 11px; } .syncLine { padding: 0 18px 15px; flex-wrap: wrap; }
+}
+@media (max-width: 430px) { .actions { width: 100%; margin-top: 7px; } .actions button { margin-left: auto; } }
