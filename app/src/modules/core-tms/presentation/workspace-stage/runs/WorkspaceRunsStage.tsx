@@ -3,7 +3,6 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { RunsView } from "../../runs/RunsView";
 import { useImpactList } from "../../../impact/application/list/useImpactList";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
-import { RunVerificationPanel } from "../../../runs/verification/presentation/run/RunVerificationPanel";
 export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   const { t, locale } = useTmsLocale();
   const impactScope = { workspaceId: model.data.workspace.id, projectId: model.project?.id ?? "" };
@@ -21,11 +20,6 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
       <div style={{ flex: 1, minHeight: 0 }}>
       <RunsView
-        verificationContext={model.selectedRun?.configuration.fixVerificationScope && <RunVerificationPanel
-        key={model.selectedRun.id} runId={model.selectedRun.id}
-        caseId={model.selectedRunItem?.caseId ?? null} caseKey={model.selectedRunItem?.caseKey ?? null}
-        enabled={model.verification.enabled && Boolean(model.selectedRunItem)} ru={locale === "ru"} onOpenDefect={model.openDefect}
-      />}
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
         runs={model.projectRuns}

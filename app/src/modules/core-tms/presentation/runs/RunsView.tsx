@@ -1,5 +1,5 @@
 import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, Play, PlayCircle, X, XCircle } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
 import { StepActualEditor } from "./actual/StepActualEditor";
@@ -21,7 +21,6 @@ import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadge
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
-  verificationContext?: ReactNode;
   workspaceId: string;
   offline: boolean;
   runs: TestRunSummary[];
@@ -46,7 +45,7 @@ type RunsViewProps = {
   onDefectCreated: (defect: Defect) => void;
 };
 
-export function RunsView({ verificationContext, workspaceId, offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onComplete, canExecute, canStart, startPending, startError, onStart, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
+export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onComplete, canExecute, canStart, startPending, startError, onStart, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const attachments = useAttachmentClient();
   const [listMode, setListMode] = useState<RunListMode>("active");
@@ -135,7 +134,6 @@ export function RunsView({ verificationContext, workspaceId, offline, runs, case
       <RunExecutionHeader run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive} archivePending={archivePending} onArchive={onArchive} canStart={canStart} startPending={startPending} onStart={onStart} />
       {startError && <FormError message={startError} />}
       <div className={runStyles.detailContent}>
-        {verificationContext}
         <div className={runStyles.overviewLayout}>
           <div className={runStyles.primaryColumn}>
             <section className={runStyles.contentSection}>

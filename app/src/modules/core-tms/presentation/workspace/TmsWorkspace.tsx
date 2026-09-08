@@ -11,6 +11,7 @@ import { WorkspaceDialogs } from "../workspace-dialogs/WorkspaceDialogs";
 import { WorkspaceStage } from "../workspace-stage/WorkspaceStage";
 import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
+import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
 
 function LocalizedWorkspace() {
@@ -84,6 +85,7 @@ function LocalizedWorkspace() {
           </div>
         </main>
       </div>
+      <VerificationQueueControl state={model.verification} />
       {model.notice && (
         <div className={styles.toast} role="status" aria-live="polite">
           <CheckCircle2 size={17} />
