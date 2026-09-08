@@ -145,7 +145,7 @@ export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClo
           </div>
           {showCases && <div className={dialog.picker}>
             <div className={dialog.pickerToolbar}>
-              <label className={dialog.search}><Search size={15} /><input aria-label={copy.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} /></label>
+              <label className={dialog.search} data-input-shell><Search size={15} /><input aria-label={copy.searchAria} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} /></label>
               {type === "static" && <div className={dialog.pickerActions}><button type="button" onClick={() => setCaseIds(Array.from(new Set([...caseIds, ...visibleCases.map((item) => item.id)])))}>{copy.selectVisible}</button><button type="button" onClick={() => setCaseIds((current) => current.filter((id) => !visibleCases.some((item) => item.id === id)))}>{copy.clearVisible}</button></div>}
             </div>
             <EmbeddedCaseList cases={previewCases} locale={locale} ariaLabel={copy.searchAria} emptyLabel={copy.noMatching} selectedIds={selectedIds} selectionDisabled={type === "dynamic"} onToggle={(id) => setCaseIds((current) => current.includes(id) ? current.filter((currentId) => currentId !== id) : [...current, id])} maxHeight="min(47vh, 510px)" />

@@ -39,7 +39,7 @@ export function SuitesView({ suites, cases, selected, selectedDetail, onSelect, 
           <div><h2>{t("suite.title")}</h2><p>{formatCount(locale, suites.length, ["suite", "suites"], ["сьют", "сьюта", "сьютов"])}</p></div>
           <button className={view.createButton} onClick={onCreate} data-testid="new-suite"><Plus size={14} /><span>{ru ? "Новый сьют" : "New suite"}</span></button>
         </div>
-        <label className={view.search}><Search size={15} /><input aria-label={t("suite.searchAria")} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("suite.searchPlaceholder")} /></label>
+        <label className={view.search} data-input-shell><Search size={15} /><input aria-label={t("suite.searchAria")} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("suite.searchPlaceholder")} /></label>
         <div className={view.list}>
           {visibleSuites.map((suite) => (
             <button className={view.suiteRow} data-selected={suite.id === selectedSuite?.id} key={suite.id} onClick={() => onSelect(suite.id)}>

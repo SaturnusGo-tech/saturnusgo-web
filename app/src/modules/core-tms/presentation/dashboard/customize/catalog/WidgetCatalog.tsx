@@ -61,7 +61,7 @@ export function WidgetCatalog({ dashboardName, projectName, selected, onAdd, onB
     <header className={styles.heading}>
       <div><h1 id={titleId} ref={heading} tabIndex={-1}>{t("dashboardLayout.catalog")}</h1>
         <p>{copy.count(widgetCatalog.length)}</p></div>
-      <label className={styles.search}>
+      <label className={styles.search} data-input-shell>
         <Search size={17} aria-hidden="true" />
         <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
           placeholder={t("dashboardLayout.search")} aria-label={t("dashboardLayout.search")} />

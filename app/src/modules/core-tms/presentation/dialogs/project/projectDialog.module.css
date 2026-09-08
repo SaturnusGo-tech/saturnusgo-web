@@ -1,44 +1,37 @@
-.panel { width: min(560px, 100%); }
-.panel > header { min-height: 66px; padding: 13px 18px; }
-.panel > header h2 { font-size: 18px; }
-.panel > header p { font-size: 12px; }
-.form { display: grid; gap: 11px; padding: 14px 16px 0 !important; }
-.section,
-.optional { overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
-.section > header,
-.optional > summary { min-height: 48px; display: flex; align-items: center; gap: 9px; padding: 8px 11px; list-style: none; }
-.section > header > span,
-.optional > summary > span { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; color: var(--muted); background: color-mix(in srgb, var(--paper) 72%, #8daee2); border: 1px solid color-mix(in srgb, var(--line) 70%, #6f8fbe); border-radius: 50%; font-size: 10px; font-weight: 750; }
-.section > header > div,
-.optional > summary > div { min-width: 0; display: grid; gap: 1px; }
-.section strong,
-.optional strong { color: var(--ink); font-size: 12px; }
-.section small,
-.optional small { color: var(--muted); font-size: 10px; font-weight: 450; }
-.identitySection > header { background: color-mix(in srgb, var(--paper) 91%, #91b5e8); }
-.setupSection > header { background: color-mix(in srgb, var(--paper) 91%, #93c6aa); }
-.optional > summary { cursor: pointer; background: color-mix(in srgb, var(--paper) 91%, #b3a8d4); }
-.optional > summary::-webkit-details-marker { display: none; }
-.optional > summary > svg { margin-left: auto; color: var(--muted); transition: transform 140ms ease; }
-.optional[open] > summary > svg { transform: rotate(180deg); }
-.sectionBody { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; padding: 12px; border-top: 1px solid var(--line); }
-.sectionBody label { min-width: 0; display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 600; }
-.sectionBody input,
-.sectionBody textarea { width: 100%; min-width: 0; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 6px; outline: 0; font: inherit; font-size: 12px; }
-.sectionBody input { height: 36px; padding: 0 9px; }
-.sectionBody textarea { min-height: 76px; padding: 9px; resize: vertical; line-height: 1.45; }
-.sectionBody :is(input, textarea):focus { border-color: #4e78b7; box-shadow: 0 0 0 1px rgb(78 120 183 / 18%); }
-.wide { grid-column: 1 / -1; }
-.actions { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 9px; margin: 2px -16px 0; padding: 10px 16px; background: var(--paper); border-top: 1px solid var(--line); }
-.actions button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 13px; color: var(--ink); background: transparent; border: 1px solid var(--line-strong); border-radius: 6px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
+.panel { width: min(560px, calc(100vw - 32px)); }
+.panel > .form { padding: 0; overflow: hidden; min-height: 0; display: flex; flex-direction: column; }
+.body { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 0 24px 26px; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.intro { margin: 0 0 2px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.identityFields { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 16px; }
+.editFields { display: grid; }
+.field { display: grid; align-content: start; min-width: 0; gap: 9px; }
+.field > span { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 12px; font-weight: 500; }
+.field small { color: var(--muted); font-size: 11px; font-weight: 400; }
+.field input, .field textarea { width: 100%; min-width: 0; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 9px; outline: 0; font-family: inherit; font-size: 13px; font-weight: 400; transition: border-color 140ms ease, box-shadow 140ms ease; }
+.field input { min-height: 42px; }
+.field textarea { min-height: 102px; max-height: 220px; resize: vertical; line-height: 1.65; }
+.field input:hover, .field textarea:hover { border-color: var(--tms-focus-border); }
+.field input:disabled, .field textarea:disabled { opacity: .65; }
+.projectKey { display: flex; align-items: flex-start; gap: 10px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); }
+.projectKey > svg { margin-top: 2px; }
+.projectKey > span { display: grid; gap: 6px; flex: 1; font-size: 12px; }
+.projectKey small { color: var(--muted); font-size: 11px; line-height: 1.6; }
+.projectKey code { padding: 4px 7px; color: var(--ink); background: var(--control-hover); border-radius: 5px; font-size: 11px; user-select: all; }
+.hint { margin: -12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.hint code { color: var(--ink); white-space: nowrap; }
+.environment { display: grid; gap: 20px; border-top: 1px solid var(--line); padding-top: 22px; }
+.environment header { display: flex; align-items: flex-start; gap: 10px; color: var(--muted); }
+.environment header > svg { margin-top: 2px; }
+.environment h3 { margin: 0; color: var(--ink); font-size: 13px; font-weight: 550; }
+.environment p { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.environmentFields { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 16px; }
+.actions { flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 24px; background: var(--paper); border-top: 1px solid var(--line); }
+.actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 13px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
 .actions button:hover { background: var(--control-hover); }
-.actions .primary { min-width: 132px; color: #fff; background: var(--action); border-color: var(--action); }
-.actions .primary:hover { background: var(--yt-primary-hover); border-color: var(--yt-primary-hover); }
-.actions button:disabled { cursor: not-allowed; opacity: .55; }
-:global(.dark) .panel .sectionBody :is(input, textarea) { background: var(--control); }
-@media (prefers-reduced-motion: reduce) { .optional > summary > svg { transition: none; } }
-@media (max-width: 560px) {
-  .panel { width: 100%; }
-  .sectionBody { grid-template-columns: 1fr; }
-  .wide { grid-column: auto; }
-}
+.actions .primary { color: #fff; background: var(--action); border-color: var(--action); }
+.actions .primary:hover { background: var(--yt-primary-hover, var(--action)); border-color: var(--yt-primary-hover, var(--action)); }
+.actions button:disabled { cursor: default; opacity: .5; }
+.spin { animation: project-saving 800ms linear infinite; }
+@keyframes project-saving { to { transform: rotate(360deg); } }
+@media (max-width: 520px) { .panel { width: calc(100vw - 24px); } .body { padding-inline: 18px; } .identityFields, .environmentFields { grid-template-columns: 1fr; gap: 18px; } .actions { padding-inline: 18px; } }
+@media (prefers-reduced-motion: reduce) { .field input, .field textarea { transition: none; } .spin { animation: none; } }

@@ -12,8 +12,6 @@ const listingStyles = readFileSync(new URL("../../listing/caseListing.module.css
 const content = readFileSync(new URL("../CaseInspectorContent.tsx", import.meta.url), "utf8");
 const creation = readFileSync(new URL("../creation/CaseCreationSections.tsx", import.meta.url), "utf8");
 const detailPanel = readFileSync(new URL("../../detail/CaseDetailPanel.tsx", import.meta.url), "utf8");
-const projectDialog = readFileSync(new URL("../../../dialogs/project/ProjectDialog.tsx", import.meta.url), "utf8");
-const projectStyles = readFileSync(new URL("../../../dialogs/project/projectDialog.module.css", import.meta.url), "utf8");
 const details = readFileSync(new URL("../details/InspectorDetails.tsx", import.meta.url), "utf8");
 const section = readFileSync(new URL("../section/InspectorSectionView.tsx", import.meta.url), "utf8");
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
@@ -174,13 +172,4 @@ test("create mode shares the same calm two-column hierarchy and stable action ba
   assert.ok(detailPanel.lastIndexOf("</form>") < detailPanel.lastIndexOf("{creating && editorActions}"));
   assert.match(detailPanel, /!creating && editorActions/);
   assert.match(detailPanel, /!creating && <CaseDetailTabs/);
-});
-
-test("project dialog shares the guided form language without a detached footer", () => {
-  assert.match(projectDialog, /panelClassName=\{styles\.panel\}/);
-  assert.match(projectDialog, /identitySection/);
-  assert.match(projectDialog, /setupSection/);
-  assert.match(projectDialog, /<details className=\{styles\.optional\}/);
-  assert.doesNotMatch(projectDialog, /snapshotNote|modalFooter/);
-  assert.match(projectStyles, /\.actions[\s\S]*background: var\(--paper\)/);
 });

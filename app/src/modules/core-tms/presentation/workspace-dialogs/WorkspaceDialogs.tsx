@@ -1,7 +1,6 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
-import { IntegrationDialog } from "../dialogs/integration/IntegrationDialog";
 import { ProjectDialog } from "../dialogs/project/ProjectDialog";
 import { SuiteDialog } from "../dialogs/suite/SuiteDialog";
 import { WorkspaceExecutionDialogs } from "./WorkspaceExecutionDialogs";
@@ -61,27 +60,6 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           );
           close();
           model.notify(t("actions.folderCreated", { path: folderPath }));
-        }}
-      />
-    );
-  }
-  if (model.dialog === "integration" && model.project) {
-    return (
-      <IntegrationDialog
-        project={model.project}
-        casesCount={model.projectCases.length}
-        offline={model.connection === "demo"}
-        onClose={close}
-        onCreated={(testCase, etag) => {
-          const { current: _current, linkIds: _linkIds, ...summary } = testCase;
-          model.setData((current) => ({
-            ...current,
-            testCases: [...current.testCases, { ...summary, etag: etag ?? "" }],
-          }));
-          model.setSelectedCaseId(testCase.id);
-          model.setSelectedFolder(testCase.folderPath);
-          close();
-          model.notify(t("actions.integrationCreated", { key: testCase.key }));
         }}
       />
     );

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
-import { createProject } from "./createProject";
+import { createProject, updateProject } from "./createProject";
 
 test("default-environment failure never performs an unsafe project rollback", async () => {
   const calls: Array<{ url: string; init: RequestInit }> = [];
@@ -43,4 +43,26 @@ test("default-environment failure never performs an unsafe project rollback", as
   assert.equal(calls.some(({ init }) => init.method === "DELETE"), false);
   assert.equal(new Headers(calls[0].init.headers).get("idempotency-key"), "workspace-project-operation:project");
   assert.equal(new Headers(calls[1].init.headers).get("idempotency-key"), "workspace-project-operation:environment");
+});
+
+test("editing project metadata retains its permanent key and uses optimistic concurrency", async () => {
+  const project = { id: "project-1", workspaceId: "workspace-1", key: "HOST", slug: "host",
+    name: "Host", description: "", status: "active" as const,
+    createdAt: "2026-09-09T00:00:00.000Z", updatedAt: "2026-09-09T00:00:00.000Z" };
+  let request: RequestInit | undefined;
+  const http = createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "test-token",
+    fetch: (async (_url, init) => {
+      request = init;
+      return new Response(JSON.stringify({ data: { ...project, ...JSON.parse(String(init?.body)) } }), {
+        status: 200, headers: { "content-type": "application/json", etag: '\"project:project-1:2\"' },
+      });
+    }) as typeof fetch,
+  });
+  const result = await updateProject({ http, project, etag: '\"project:project-1:1\"', offline: false,
+    name: "  Umbrella Host  ", description: "  Product QA  ", key: "UNUSED", operationKey: "edit-project-operation" });
+  assert.deepEqual(JSON.parse(String(request?.body)), { name: "Umbrella Host", description: "Product QA" });
+  assert.equal(new Headers(request?.headers).get("if-match"), '\"project:project-1:1\"');
+  assert.equal(new Headers(request?.headers).get("idempotency-key"), "edit-project-operation");
+  assert.equal(result.data.key, "HOST");
+  assert.equal(result.etag, '\"project:project-1:2\"');
 });

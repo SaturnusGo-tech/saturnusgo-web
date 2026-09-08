@@ -53,7 +53,7 @@ export function ReportsView({ workspaceId, defects, runs, links, selectedDefectI
   return <div className={surface.workspace} data-testid="reports-view" data-detail-open={Boolean(selectedDefectId) || undefined}>
     <section className={surface.listPane} aria-label={t("reports.title")}>
       <header className={surface.toolbar}>
-        <label className={surface.searchField}>
+        <label className={surface.searchField} data-input-shell>
           <Search size={17} aria-hidden="true" />
           <input value={query} onChange={(event) => setQuery(event.target.value)}
             placeholder={t("reports.searchPlaceholder")} aria-label={t("reports.searchPlaceholder")} />

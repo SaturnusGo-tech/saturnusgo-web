@@ -9,6 +9,7 @@ import { IntegrationThemeToggle } from "../shared/theme/IntegrationThemeToggle";
 import { IntegrationGuideLink } from "../shared/theme/IntegrationGuideLink";
 import type { HooksCopy } from "../shared/hooks-copy";
 import { INTEGRATIONS, INTEGRATION_GROUPS, type IntegrationDefinition, type IntegrationGroup } from "./integration-definitions";
+import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import styles from "./catalog.module.css";
 
 type Filter = "all" | "connected" | "attention" | "planned";
@@ -47,13 +48,12 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
       {INTEGRATION_GROUPS.map((id) => <button type="button" key={id} aria-pressed={group === id} onClick={() => setGroup(id)}>{copy.groups[id]}</button>)}
     </nav>
     <div className={styles.toolbar}>
-      <div className={styles.search}><Search size={16} aria-hidden="true" /><input type="search" value={query}
+      <div className={styles.search} data-input-shell><Search size={16} aria-hidden="true" /><input type="search" value={query}
         aria-label={russian ? "Найти интеграцию" : "Find an integration"} placeholder={russian ? "Найти сервис…" : "Find a service…"}
         onChange={(event) => setQuery(event.target.value)} />
         {query && <button type="button" onClick={() => setQuery("")} aria-label={russian ? "Очистить поиск" : "Clear search"}><X size={14} /></button>}</div>
-      <select aria-label={russian ? "Статус подключения" : "Connection status"} value={filter} onChange={(event) => setFilter(event.target.value as Filter)}>
-        {filters.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-      </select>
+      <AnimatedSelect className={styles.connectionFilter} label={russian ? "Статус подключения" : "Connection status"}
+        value={filter} options={filters.map(([value, label]) => ({ value, label }))} onChange={(value) => setFilter(value as Filter)} />
       <button type="button" className={styles.iconButton} onClick={onRefresh} aria-label={copy.refresh} title={copy.refresh}><RefreshCw size={15} /></button>
     </div>
     {(statusFailed || connectorState === "error") && <p className={styles.warning} role="status">{russian

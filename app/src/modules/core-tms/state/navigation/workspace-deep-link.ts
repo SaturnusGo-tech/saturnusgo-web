@@ -9,6 +9,7 @@ export function readWorkspaceDeepLink(href: string): { view: View | null; runId:
   const item = query.get("runItemId");
   const runSelection = { view: "runs" as const, runId,
     ...(runId && item && /^[A-Za-z0-9._:-]{1,128}$/.test(item) ? { runItemId: item } : {}) };
+  if (view === "integrations") return { view: "cases", runId: null };
   if (view === "runs") return runSelection;
   if (view && workspaceViews.includes(view as View)) return { view: view as View, runId: null };
   if (query.get("defectId") || query.get("defect")) return { view: "reports", runId: null };

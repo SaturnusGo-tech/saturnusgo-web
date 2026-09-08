@@ -1,0 +1,21 @@
+.picker { min-width: 0; }
+.picker .trigger { display: grid; grid-template-columns: 16px minmax(0, 1fr) 16px; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--ink); background: var(--paper); text-align: left; cursor: pointer; font: inherit; font-size: 13px; }
+.picker .trigger span { color: var(--ink); font-weight: 400; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.trigger svg { color: var(--muted); }
+.trigger > svg:last-child { transition: transform 160ms ease; }
+.trigger[aria-expanded="true"] > svg:last-child { transform: rotate(180deg); }
+.trigger:focus-visible { outline: 2px solid var(--tms-focus-ring); outline-offset: 2px; }
+.browser { margin-top: 8px; padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); animation: folder-open 160ms ease-out; }
+.search { display: flex; align-items: center; gap: 8px; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); }
+.search input { width: 100%; min-width: 0; height: 34px; padding: 0; font-size: 12px; }
+.list { max-height: min(220px, 30dvh); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; padding-top: 5px; scroll-padding-block: 5px; }
+.list > button { display: grid; grid-template-columns: 15px minmax(0, 1fr) 15px; align-items: center; gap: 9px; width: 100%; min-height: 36px; padding: 8px; color: var(--ink); background: transparent; border: 0; border-radius: 7px; text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
+.list > button > span { overflow-wrap: anywhere; line-height: 1.5; }
+.list > button > svg { color: var(--muted); }
+.list > button:hover, .list > button:focus-visible, .list > button[aria-selected="true"] { background: var(--control-hover); outline: none; }
+.list > button:focus-visible { box-shadow: inset 0 0 0 1px var(--tms-focus-border); }
+.empty { padding: 16px 8px; text-align: center; color: var(--muted); font-size: 12px; }
+@keyframes folder-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .browser { animation: none; } .trigger > svg { transition: none; } }
+
+.picker .search input { min-height: 34px; height: 34px; padding: 0; }

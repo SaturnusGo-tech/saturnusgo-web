@@ -8,7 +8,6 @@ import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
 import { DashboardView } from "../dashboard/DashboardView";
 import { HooksView } from "../hooks/HooksView";
-import { IntegrationsView } from "../integrations/IntegrationsView";
 import { ProjectOnboarding } from "../onboarding/ProjectOnboarding";
 import { ReportsView } from "../reports/ReportsView";
 import { WorkspaceRunsStage } from "./runs/WorkspaceRunsStage";
@@ -91,20 +90,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "shared-steps") {
     return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
   }
-  if (model.view === "integrations") {
-    return (
-      <IntegrationsView
-        cases={model.projectCases}
-        onCreate={() => model.setDialog("integration")}
-        onOpenCase={(testCase) => {
-          model.setSelectedCaseId(testCase.id);
-          model.setSelectedFolder(testCase.folderPath);
-          model.setView("cases");
-        }}
-        onRun={(caseId) => model.openRunDialog({ caseIds: [caseId] })}
-      />
-    );
-  }
   if (model.view === "api") return <ApiTestingView key={`${model.data.workspace.id}:${model.project.id}`}
     scope={{ workspaceId: model.data.workspace.id, projectId: model.project.id }} canManage={model.canManageIntegrations} />;
   if (model.view === "suites") {
@@ -136,7 +121,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   }
   if (model.view === "config") {
     return (
-      <ConfigView
+      <ConfigView key={model.project.id}
         environments={model.projectEnvironments}
         project={model.project}
         onCreate={model.openNewEnvironment}

@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
-import { AnimatedSelect } from "../../common/select/AnimatedSelect";
+import { ParentFolderPicker } from "./parent/ParentFolderPicker";
 import { getFolderDialogCopy } from "./copy";
 import shared from "../../../tms.module.css";
 import styles from "./FolderDialog.module.css";
@@ -18,7 +18,7 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated }: {
   const duplicate = existing.includes(path);
   const parents = [
     { value: "/", label: copy.root },
-    ...Array.from(new Set(existing)).sort((left, right) => left.localeCompare(right)).map((folderName) => ({ value: folderName, label: folderName })),
+    ...Array.from(new Set(existing.filter((path) => path !== "/"))).sort((left, right) => left.localeCompare(right)).map((folderName) => ({ value: folderName, label: folderName })),
   ];
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -28,13 +28,14 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated }: {
   return <Modal title={copy.title} onClose={onClose} panelClassName={styles.dialog}>
     <form className={styles.form} onSubmit={submit}>
       <div className={styles.body}>
+        <p className={styles.subtitle}>{copy.subtitle}</p>
         <div className={styles.fields}>
           <Field label={copy.name} wide>
-            <input required autoFocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" />
+            <input required autoFocus data-autofocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" />
           </Field>
-          <Field label={copy.parent} wide>
-            <AnimatedSelect label={copy.parent} value={parent} options={parents} onChange={setParent} />
-          </Field>
+          <div className={shared.formField} role="group" aria-label={copy.parent}><span>{copy.parent}</span>
+            <ParentFolderPicker label={copy.parent} searchLabel={copy.searchParent} emptyLabel={copy.noFolders} value={parent} options={parents} onChange={setParent} />
+          </div>
         </div>
         <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
           <Folder size={16} aria-hidden="true" />

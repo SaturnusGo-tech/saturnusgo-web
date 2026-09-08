@@ -100,3 +100,9 @@ test("reports preserve a scoped detail and closing it restores the report list a
     assert.equal(new URL(moved).searchParams.get("defectId"), null);
   }
 });
+
+test("retired integration testing links open the repository without changing connector routes", () => {
+  assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=integrations"), { view: "cases", runId: null });
+  assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=api"), { view: "api", runId: null });
+  assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=hooks&integration=swagger"), { view: "hooks", runId: null });
+});

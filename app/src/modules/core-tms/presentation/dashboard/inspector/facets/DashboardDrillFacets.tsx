@@ -37,7 +37,7 @@ export function DashboardDrillFacets({ rows, value, onChange }: {
   };
   return <aside className={surface.drillFacets} aria-label={t("dashboard.refineList")}>
     <h3><SlidersHorizontal size={14} />{t("dashboard.refineList")}{selectedCount > 0 && <span>{selectedCount}</span>}</h3>
-    <label className={surface.drillSearch}><span>{t("dashboard.searchRecords")}</span><div><Search size={14} /><input type="search" value={value.query}
+    <label className={surface.drillSearch}><span>{t("dashboard.searchRecords")}</span><div data-input-shell><Search size={14} /><input type="search" value={value.query}
       onChange={(event) => onChange({ ...value, query: event.target.value })} placeholder={t("dashboard.searchPlaceholder")} /></div></label>
     {(["type", "project", "component", "status", "priority"] as const).map((key) => {
       const options = facetValues(rows, key);

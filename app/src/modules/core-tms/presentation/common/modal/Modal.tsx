@@ -104,8 +104,9 @@ export function Modal({
   useEffect(() => {
     const bodyOverflow = document.body.style.overflow;
     const focusPanel = window.requestAnimationFrame(() => {
+      if (panelRef.current?.contains(document.activeElement) && document.activeElement?.matches("input, textarea, select, [contenteditable=true]")) return;
       const target =
-        panelRef.current?.querySelector<HTMLElement>("[autofocus]") ??
+        panelRef.current?.querySelector<HTMLElement>("[autofocus], [data-autofocus]") ??
         panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
         panelRef.current;
       target?.focus();
@@ -120,7 +121,7 @@ export function Modal({
       if (event.key !== "Tab" || !panelRef.current) return;
       const focusable = Array.from(
         panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
-      ).filter((element) => !element.hidden && element.tabIndex !== -1);
+      ).filter((element) => !element.hidden && element.tabIndex !== -1 && element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden");
       if (focusable.length === 0) {
         event.preventDefault();
         panelRef.current.focus();

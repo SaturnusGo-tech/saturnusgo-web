@@ -69,7 +69,7 @@ export function CasesToolbar(props: Props) {
   return <div ref={rootRef}>
     <div className={styles.controls}>
       <div className={styles.searchLine}>
-        <label className={styles.inputShell}><Search size={14} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Поиск по названию" : "Search by title"} aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить" : "Clear"}><X size={12} /></button>}</label>
+        <label className={styles.inputShell} data-input-shell><Search size={14} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Поиск по названию" : "Search by title"} aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить" : "Clear"}><X size={12} /></button>}</label>
         <button type="button" aria-pressed={props.selectionMode}
           className={`${styles.secondaryButton} ${styles.selectionModeButton} ${props.selectionMode ? styles.selectionModeActive : ""}`}
           aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined}

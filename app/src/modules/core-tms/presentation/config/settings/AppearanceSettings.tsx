@@ -1,6 +1,5 @@
 import { Moon, Sun } from "lucide-react";
 import { useColorMode } from "../../../../../shared/_hooks/useColorMode";
-import { TmsSessionControl } from "../../../auth/presentation/session/TmsSessionControl";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import type { TmsLocale } from "../../../localization/model/locale";
 import surface from "../config.module.css";
@@ -16,22 +15,20 @@ export function AppearanceSettings() {
 
   return (
     <section className={surface.preferenceSection} aria-labelledby="interface-settings-title">
-      <div className={surface.sectionLabel}>
-        <h2 id="interface-settings-title">{t("config.interface")}</h2>
-      </div>
-      <div className={surface.preferenceRow}>
+      <h3 className={surface.visuallyHidden} id="interface-settings-title">{t("config.interface")}</h3>
+      <div className={surface.themeRow}>
         <div className={surface.preferenceCopy}>
           <strong>{t("config.appearance")}</strong>
           <span>{t("config.appearanceHint")}</span>
         </div>
-        <div className={surface.choiceGroup} role="group" aria-label={t("config.appearance")}>
+        <div className={surface.themeChoices} role="group" aria-label={t("config.appearance")}>
           <button
             type="button"
             data-active={isLight}
             aria-pressed={isLight}
             onClick={(event) => isLight || toggleAnimated({ x: event.clientX, y: event.clientY })}
           >
-            <Sun size={15} /> {t("config.lightMode")}
+            <span className={surface.themePreview} data-theme="light" aria-hidden="true"><i /><span><b /><b /><b /></span></span><Sun size={15} /> {t("config.lightMode")}
           </button>
           <button
             type="button"
@@ -39,7 +36,7 @@ export function AppearanceSettings() {
             aria-pressed={!isLight}
             onClick={(event) => !isLight || toggleAnimated({ x: event.clientX, y: event.clientY })}
           >
-            <Moon size={15} /> {t("config.darkMode")}
+            <span className={surface.themePreview} data-theme="dark" aria-hidden="true"><i /><span><b /><b /><b /></span></span><Moon size={15} /> {t("config.darkMode")}
           </button>
         </div>
       </div>
@@ -64,13 +61,6 @@ export function AppearanceSettings() {
             );
           })}
         </div>
-      </div>
-      <div className={surface.preferenceRow}>
-        <div className={surface.preferenceCopy}>
-          <strong>{t("config.session")}</strong>
-          <span>{t("config.sessionHint")}</span>
-        </div>
-        <TmsSessionControl />
       </div>
     </section>
   );

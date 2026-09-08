@@ -5186,3 +5186,60 @@
     animation-iteration-count: 1;
   }
 }
+
+/* Shared Falcon controls: one focus surface, including composite search fields. */
+.app {
+  --radius-control: 8px;
+  --radius-modal: 18px;
+  --tms-focus-border: #89898f;
+  --tms-focus-ring: rgb(113 113 122 / 16%);
+}
+:global(.dark) .app {
+  --tms-focus-border: #75757d;
+  --tms-focus-ring: rgb(161 161 170 / 15%);
+}
+.app :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([data-inline-title]):not([data-input-shell] input):not(.searchField input):not(.tableSearch input):is(:focus, :focus-visible) {
+  outline: 0 !important;
+  border-color: var(--tms-focus-border) !important;
+  box-shadow: 0 0 0 2px var(--tms-focus-ring) !important;
+}
+.app :is(.searchField, .tableSearch, [data-input-shell]):focus-within {
+  outline: 0 !important;
+  border-color: var(--tms-focus-border) !important;
+  box-shadow: 0 0 0 2px var(--tms-focus-ring) !important;
+}
+.app :is(.searchField, .tableSearch, [data-input-shell]) input,
+.app :is(.searchField, .tableSearch, [data-input-shell]) input:is(:focus, :focus-visible) {
+  outline: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.app input[data-inline-title], .app input[data-inline-title]:is(:focus, :focus-visible) {
+  background: transparent !important; outline: 0 !important; box-shadow: none !important;
+}
+.app .modal:not(.modalDrawer):not(.modalSheet) {
+  border-radius: var(--radius-modal);
+  border-color: var(--line-strong);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 24%);
+  max-height: calc(100dvh - 40px);
+}
+.app .modal:not(.modalDrawer):not(.modalSheet) > header {
+  min-height: 72px; padding: 22px 24px 18px; flex-shrink: 0; border-bottom: 0;
+}
+.app .modal:not(.modalDrawer):not(.modalSheet) > header h2 { font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+.app .modal > header .iconButton { border-radius: 8px; background: transparent; border-color: transparent; }
+.app .modal .formField :is(input, textarea, select) { border-radius: 8px; }
+.app :is(.toolbarPopover, .runArchivePopover, .projectSelectorMenu, .actionMenu) { border-radius: 12px; }
+.app :is(.toolbarPopover, .runArchivePopover, .projectSelectorMenu, .actionMenu) button { border-radius: 7px; }
+
+.app .formField { color: var(--muted); font-weight: 500; }
+.app .formField > span { color: var(--muted); }
+
+.app [role="menu"] { border-radius: 10px; }
+.app [role="menu"] > :is(button, [role="menuitem"]) { border-radius: 6px; }
+.app :is(button[aria-haspopup="listbox"], [role="combobox"]):focus-visible {
+  outline: 0; border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring);
+}
+
+.app [data-input-shell] { border-radius: 8px; }

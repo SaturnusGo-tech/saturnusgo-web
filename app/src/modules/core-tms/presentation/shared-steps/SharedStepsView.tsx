@@ -40,7 +40,7 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
         <Plus size={16} />{ru ? "Общий шаг" : "Shared step"}
       </button>
     </header>
-    <div className={styles.toolbar}>
+    <div className={styles.toolbar} data-input-shell>
       <Search size={17} aria-hidden="true" />
       <input value={query} onChange={(event) => setQuery(event.target.value)}
         placeholder={ru ? "Поиск по названию" : "Search by title"} />

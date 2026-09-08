@@ -4,7 +4,7 @@ export const swaggerArticle: DocArticle = {
   id: "swagger", title: "Swagger · API проекта", group: "integrations",
   description: "Подключите свою спецификацию OpenAPI, настройте доступ и проверяйте API в Falcon без отдельной сессии Swagger.",
   keywords: ["Swagger", "OpenAPI", "API Testing", "JSON", "YAML", "Basic", "логин", "пароль", "Bearer", "авторизация", "docs-json"],
-  related: ["integration-testing", "integration-overview", "create-test-case"],
+  related: ["api-testing", "integration-overview", "create-test-case"],
   sources: [{ title: "Конфигурация Swagger UI", url: "https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/" }],
   sections: [
     section("purpose", "Что даёт подключение", paragraph("Каждый проект Falcon может подключить **свою спецификацию Swagger/OpenAPI**. Команда видит операции, параметры, схемы и ответы в разделе **API Testing**, может найти нужный endpoint и выполнить запрос. При выборе другого проекта открывается его подключение. Хуки, события и внешняя автоматизация для Swagger не нужны.")),
@@ -39,6 +39,6 @@ export const swaggerArticle: DocArticle = {
       ["Внешние ссылки в спецификации", "Опубликуйте bundled OpenAPI с локальными $ref вместо ссылок на отдельные файлы."],
       ["Не ответил за 15 секунд", "Проверьте доступность сервера и повторите. Это таймаут загрузки, а не срок сессии."],
       ["Нет подключения в проекте", "Проверьте выбранный проект и что интеграция сохранена включённой."])),
-    section("next", "Связанные инструкции", articles("integration-testing", "create-test-case", "execute-run")),
+    section("next", "Связанные инструкции", articles("api-testing", "create-test-case", "execute-run")),
   ],
 };

@@ -13,7 +13,7 @@ export function DocumentationTree({ navigation, query, onQuery, searchRef, onNav
   useEffect(() => { if (group) setClosed((items) => items.filter((id) => id !== group)); }, [group]);
   return <>
     <div className={styles.treeIdentity}><BookOpen size={18} aria-hidden="true" /><div><strong>Falcon Docs</strong><span>Руководство пользователя</span></div></div>
-    <form className={styles.searchField} role="search" onSubmit={(event) => { event.preventDefault(); onSearch(); }}><Search size={15} aria-hidden="true" />
+    <form className={styles.searchField} data-input-shell role="search" onSubmit={(event) => { event.preventDefault(); onSearch(); }}><Search size={15} aria-hidden="true" />
       <input ref={searchRef} type="search" aria-label="Поиск по документации" placeholder="Поиск в руководстве…"
         value={query} onChange={(event) => onQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") onQuery(""); }} />
       {query ? <button type="button" aria-label="Очистить поиск" onClick={() => { onQuery(""); searchRef.current?.focus(); }}><X size={14} /></button> : <kbd>/</kbd>}

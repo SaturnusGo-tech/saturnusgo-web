@@ -46,7 +46,7 @@ export function RunScopeBuilder({ cases, caseIds, setCaseIds, copy }: Props) {
 
   return <div className={styles.scopeBuilder} data-testid="run-case-picker">
     <div className={styles.scopeToolbar}>
-      <label className={styles.scopeSearch}>
+      <label className={styles.scopeSearch} data-input-shell>
         <Search size={16} />
         <input autoFocus aria-label={copy.searchAria} value={filters.query} onChange={(event) => update("query", event.target.value)} placeholder={copy.searchPlaceholder} />
       </label>

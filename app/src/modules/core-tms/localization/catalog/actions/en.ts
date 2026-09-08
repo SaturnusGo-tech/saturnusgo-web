@@ -21,7 +21,6 @@ export const enActionMessages = {
   "actions.projectRestored": "Project restored",
   "actions.projectTransitionError": "Could not change the project status",
   "actions.folderCreated": "Folder {path} created",
-  "actions.integrationCreated": "Integration case {key} created",
   "actions.suiteCreated": "Test suite created",
   "actions.suiteUpdated": "Test suite updated",
   "actions.environmentCreated": "Environment created",

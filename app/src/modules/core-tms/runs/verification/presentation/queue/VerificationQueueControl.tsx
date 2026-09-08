@@ -1,11 +1,12 @@
 import { Loader2, Play } from "lucide-react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import type { WorkspaceVerification } from "../../state/workspace/useWorkspaceVerification";
+import { showVerificationControl } from "./visibility";
 import css from "./verification-queue.module.css";
 
 export function VerificationQueueControl({ state }: { state: WorkspaceVerification }) {
   const { locale } = useTmsLocale();
-  if (!state.enabled) return null;
+  if (!showVerificationControl(state)) return null;
   const ru = locale === "ru";
   return <button type="button" className={css.start}
     disabled={Boolean(state.disabledReason) || state.pendingStart || state.pending}

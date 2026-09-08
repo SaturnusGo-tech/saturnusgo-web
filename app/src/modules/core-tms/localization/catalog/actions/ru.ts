@@ -23,7 +23,6 @@ export const ruActionMessages = {
   "actions.projectRestored": "Проект восстановлен",
   "actions.projectTransitionError": "Не удалось изменить статус проекта",
   "actions.folderCreated": "Папка {path} создана",
-  "actions.integrationCreated": "Интеграционный кейс {key} создан",
   "actions.suiteCreated": "Тест-сьют создан",
   "actions.suiteUpdated": "Тест-сьют обновлён",
   "actions.environmentCreated": "Окружение создано",
