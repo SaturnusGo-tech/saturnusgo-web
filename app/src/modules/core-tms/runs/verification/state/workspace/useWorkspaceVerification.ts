@@ -59,7 +59,8 @@ export function useWorkspaceVerification(state: ReturnType<typeof useWorkspaceSt
       state.setSelectedRunEtag(result.etag);
       queue.setExpanded(false);
       setOperation({ scope, pending: false, error: "" });
-      openRun(result.data.id, null);
+      openRun(result.data.id, result.data.id === derived.selectedRun?.id
+        ? derived.selectedRunItem?.id ?? state.runItems[0]?.id ?? null : null);
       void queue.refresh();
     } catch (failure) {
       if (owner.current !== scope || request.signal.aborted) return;

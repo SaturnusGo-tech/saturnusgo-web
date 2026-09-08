@@ -19,13 +19,13 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   return (
     <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
-      {model.selectedRun?.configuration.fixVerificationScope && <RunVerificationPanel
+      <div style={{ flex: 1, minHeight: 0 }}>
+      <RunsView
+        verificationContext={model.selectedRun?.configuration.fixVerificationScope && <RunVerificationPanel
         key={model.selectedRun.id} runId={model.selectedRun.id}
         caseId={model.selectedRunItem?.caseId ?? null} caseKey={model.selectedRunItem?.caseKey ?? null}
         enabled={model.verification.enabled && Boolean(model.selectedRunItem)} ru={locale === "ru"} onOpenDefect={model.openDefect}
       />}
-      <div style={{ flex: 1, minHeight: 0 }}>
-      <RunsView
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
         runs={model.projectRuns}
