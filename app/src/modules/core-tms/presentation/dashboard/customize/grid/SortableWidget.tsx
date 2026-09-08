@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 import type { BoardWidget } from "../../../../dashboards/layout/model/layout";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import { useWidgetRows } from "./measurement/useWidgetRows";
 import styles from "../layout.module.css";
 
 export function SortableWidget({ widget, title, editing, disabled, onRemove, onResize, children }: {
@@ -13,13 +14,14 @@ export function SortableWidget({ widget, title, editing, disabled, onRemove, onR
   onRemove: (id: string) => void; onResize: (id: string, width: number) => void; children: ReactNode;
 }) {
   const { t } = useTmsLocale(); const reduced = useReducedMotion();
+  const measured = useWidgetRows();
   const sortable = useSortable({ id: widget.id, disabled: !editing || disabled,
     animateLayoutChanges: (args) => !reduced && defaultAnimateLayoutChanges({ ...args, wasDragging: true }),
     transition: reduced ? null : { duration: 240, easing: "cubic-bezier(.2,.8,.2,1)" } });
   const name = { name: title };
-  return <div ref={sortable.setNodeRef} className={`${styles.widget} ${editing ? styles.editingWidget : ""}`}
+  return <div ref={(node) => { sortable.setNodeRef(node); measured.ref(node); }} className={`${styles.widget} ${editing ? styles.editingWidget : ""}`}
     data-widget-id={widget.id} data-widget-title={title} data-widget-width={widget.position.width}
-    style={{ "--widget-span": widget.position.width, transform: CSS.Translate.toString(sortable.transform),
+    style={{ "--widget-span": widget.position.width, gridRowEnd: `span ${measured.rows}`, transform: CSS.Translate.toString(sortable.transform),
       transition: sortable.transition, opacity: sortable.isDragging ? .3 : 1 } as CSSProperties}>
     {editing && <div className={styles.widgetTools}>
       <button type="button" ref={sortable.setActivatorNodeRef} {...sortable.attributes} {...sortable.listeners}

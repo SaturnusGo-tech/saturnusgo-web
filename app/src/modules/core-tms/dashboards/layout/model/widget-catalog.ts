@@ -5,10 +5,38 @@ export type WidgetDefinition = {
   key: string; type: WidgetType; group: WidgetGroup; width: 3 | 6 | 12;
   ru: string; en: string; hintRu: string; hintEn: string;
 };
-const metric = (key: string, ru: string, en: string, group: WidgetGroup = "live"): WidgetDefinition => ({
+const metricHints = {
+  activeRuns: ["Прогоны, в которых ещё идёт тестирование", "Runs where testing is still ongoing"],
+  readyForRetest: ["Исправленные дефекты, ожидающие повторной проверки QA", "Fixed defects waiting for QA verification"],
+  blockedItems: ["Проверки активных ранов, которые сейчас нельзя продолжить", "Checks in active runs that cannot proceed"],
+  openDefects: ["Незакрытые дефекты в текущей рабочей выборке", "Unresolved defects in the current work scope"],
+  notRunItems: ["Кейсы активных ранов, к которым ещё не приступили", "Checks in active runs that have not started"],
+  inProgressItems: ["Проверки активных ранов, которые выполняются сейчас", "Checks currently being executed in active runs"],
+  outdatedItems: ["Проверки, для которых уже есть новая редакция тест-кейса", "Checks with a newer test case revision available"],
+  runsWithoutBuild: ["Активные прогоны без указанной версии сборки", "Active runs without a specified build version"],
+  currentCases: ["Размер текущей базы тест-кейсов проекта", "The current size of the project’s test library"],
+  casesCreated: ["Тест-кейсы, добавленные за выбранный период", "Test cases added during the selected period"],
+  runsLaunched: ["Количество запусков тестирования за выбранный период", "Testing runs launched during the selected period"],
+  completedRuns: ["Завершённые прогоны за период, независимо от результата", "Runs completed during the period, regardless of outcome"],
+  passedRuns: ["Прогоны, завершённые успешно за выбранный период", "Runs completed successfully during the selected period"],
+  passRate: ["Доля успешных среди завершённых прогонов за период", "Successful runs as a share of completed runs in the period"],
+  currentDefects: ["Общее число дефектов проекта во всех статусах", "All project defects across every status"],
+  reportedDefects: ["Дефекты, зарегистрированные за выбранный период", "Defects reported during the selected period"],
+  linkedDefects: ["Дефекты со ссылкой на задачу во внешнем трекере", "Defects linked to an issue in an external tracker"],
+  "defect:open": ["Новые дефекты, ожидающие разбора", "New defects waiting for triage"],
+  "defect:triaged": ["Разобранные дефекты, ожидающие дальнейшей работы", "Triaged defects waiting for further work"],
+  "defect:in_progress": ["Дефекты, над исправлением которых идёт работа", "Defects currently being worked on"],
+  "defect:ready_for_retest": ["Все дефекты проекта в статусе «На проверке»", "All project defects in the Ready for QA status"],
+  "defect:verified": ["Дефекты, исправление которых проверено", "Defects whose fixes have been verified"],
+  "defect:closed": ["Количество закрытых дефектов проекта", "The number of closed project defects"],
+  "defect:reopened": ["Дефекты, возвращённые в работу после проверки", "Defects reopened after verification"],
+  "type:manual": ["Сценарии в базе, предназначенные для ручной проверки", "Test library scenarios intended for manual execution"],
+  "type:automated": ["Кейсы проекта с типом «Автоматизированный»", "Project test cases with the Automated type"],
+  "type:checklist": ["Сценарии проекта, оформленные как чек-листы", "Project scenarios organized as checklists"],
+} as const;
+const metric = (key: keyof typeof metricHints, ru: string, en: string, group: WidgetGroup = "live"): WidgetDefinition => ({
   key, ru, en, type: "summary", group, width: 3,
-  hintRu: group === "history" ? "Показатель за выбранный период · откройте исходные записи" : "Текущее значение · откройте исходные записи",
-  hintEn: group === "history" ? "Selected period · open the underlying records" : "Current value · open the underlying records",
+  hintRu: metricHints[key][0], hintEn: metricHints[key][1],
 });
 const visual = (key: string, ru: string, en: string, hintRu: string, hintEn: string,
   type: WidgetType, group: WidgetGroup, width: 6 | 12 = 6): WidgetDefinition => ({key, ru, en, hintRu, hintEn, type, group, width});

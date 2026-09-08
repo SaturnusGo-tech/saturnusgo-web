@@ -114,7 +114,7 @@ test("analytics listings use one sortable priority signal and calm active status
 
 test("dashboard uses custom menus and theme-safe chart tooltips", () => {
   for (const source of [dashboard, trend, inspector]) assert.doesNotMatch(source, /<select\b/);
-  for (const source of [trend, breakdowns]) assert.match(source, /DashboardChartTooltip/);
+  assert.match(trend, /DashboardChartTooltip/);
   assert.match(tooltip, /surface\.chartTooltip/);
   assert.match(styles, /\.chartTooltip\s*\{/);
   assert.match(styles, /\.overflowMarquee[^}]*text-overflow: ellipsis/s);
@@ -126,9 +126,12 @@ test("dashboard copy does not expose implementation details", () => {
   }
 });
 
-test("tag and coverage charts use a legible categorical palette in both themes", () => {
-  assert.match(breakdowns, /DIMENSION_COLORS/);
-  assert.match(breakdowns, /<Cell key=\{item\.key\} fill=\{DIMENSION_COLORS/);
+test("tag and coverage rows retain theme colors and covered/uncovered drill actions", () => {
+  const rowStyles = readFileSync(new URL("../charts/breakdowns.module.css", import.meta.url), "utf8");
+  assert.match(rowStyles, /background: var\(--row-color\)/);
+  assert.match(breakdowns, /onOpenDrill\(item\.drills\.covered!/);
+  assert.match(breakdowns, /onOpenDrill\(item\.drills\.uncovered!/);
+  assert.match(breakdowns, /onOpenDrill\(\{ \.\.\.item\.drill, label: item\.label \}\)/);
   for (const token of ["dash-teal", "dash-violet", "dash-orange", "dash-cyan", "dash-rose"]) {
     assert.match(styles, new RegExp(`--${token}:`));
   }

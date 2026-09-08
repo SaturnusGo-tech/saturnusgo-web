@@ -8,6 +8,8 @@ The 36 catalog entries can be added, removed, resized and reordered. A pencil op
 
 The widget library is a full page within the existing Falcon shell. It preserves the global navigation and project context. Categories, search and compact icon/text entries replace the former modal and image-cover cards. Back to layout preserves the editing draft; Save publishes it to the project. The library does not mount a portal, backdrop or focus trap.
 
+Numeric widgets use compact label/value rows with full values in their accessible labels and tooltips. The CSS grid reserves measured row spans from intrinsic content height, so a counter is not stretched to a neighboring chart. ResizeObserver recomputes spans for changes in width, content and editing controls; DOM ordering and the existing persisted layout remain authoritative. Tags and coverage use a single interactive bar/list representation, and defect statuses adapt to the widget container width.
+
 ## Artwork provenance
 
 The three flat technical covers were generated with the built-in image_gen tool, then encoded as 768px WebP assets with cwebp for delivery. Original generated PNGs remain in the Codex generated_images directory. Only cover-library.webp is currently used, as the empty-state illustration; catalog entries use semantic icons. The other two assets remain available for compatibility with previously deployed bundles. No 3D art is shipped.

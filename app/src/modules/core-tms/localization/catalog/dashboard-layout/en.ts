@@ -32,4 +32,5 @@ export const enDashboardLayoutMessages = {
   "dashboardLayout.back": "Back to layout",
   "dashboardLayout.categories": "Categories",
   "dashboardLayout.selectedCount": "Selected: {count}",
+  "dashboardLayout.currentValue": "Current", "dashboardLayout.periodValue": "Selected period",
 } as const;

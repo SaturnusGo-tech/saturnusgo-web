@@ -32,4 +32,5 @@ export const ruDashboardLayoutMessages = {
   "dashboardLayout.back": "К настройке",
   "dashboardLayout.categories": "Категории",
   "dashboardLayout.selectedCount": "Выбрано: {count}",
+  "dashboardLayout.currentValue": "Сейчас", "dashboardLayout.periodValue": "За период",
 } as const;

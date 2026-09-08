@@ -20,7 +20,7 @@
   --dash-warning: #aa7a36;
   --dash-aborted: #8b819f;
   --chart-grid: color-mix(in srgb, var(--ink) 9%, transparent);
-  container-type: inline-size;
+  container: dashboard-page / inline-size;
   width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 16px;
   padding: 25px 28px 32px; color: var(--ink); background: var(--canvas); font-size: 13px;
 }
@@ -283,5 +283,6 @@
 
 :global(.dark) .page.page[data-dashboard-workspace] { background: var(--canvas); }
 
-.singleBreakdown { min-width: 0; height: 100%; }
-.singleBreakdown > section { height: 100%; }
+
+
+@container dashboard-widget (max-width: 650px) { .hotspotTable { overflow-x: auto; }.hotspotHeader, .hotspotRow { min-width: 650px; } }

@@ -1,0 +1,18 @@
+.panel { min-width: 0; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--paper); overflow: hidden; }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 18px; padding: 17px 18px 8px; }
+.heading h2 { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: 13px; line-height: 1.5; font-weight: 550; }
+.heading h2 span { font-size: 12px; color: var(--muted); font-weight: 450; font-variant-numeric: tabular-nums; }
+.panel .heading button { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
+.panel .heading button:hover { color: var(--action); }.heading strong { font-weight: 550; }
+.statuses { display: grid; grid-template-columns: minmax(0,1fr); gap: 0 26px; padding: 0 18px 14px; }
+.panel .status { min-width: 0; min-height: 40px; display: grid; align-items: center; grid-template-columns: 6px minmax(0,1fr) 55px auto; gap: 10px; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.panel .status:hover { color: var(--action); }.status > span { font-size: 12px; overflow-wrap: anywhere; line-height: 1.5; }
+.status strong { min-width: 18px; text-align: right; font-size: 12px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-color); }
+.track { display: block; height: 3px; background: var(--control-hover); border-radius: 2px; overflow: hidden; }
+.track i { display: block; height: 100%; background: var(--status-color); border-radius: inherit; }
+.empty { margin: 0; padding: 10px 18px 20px; color: var(--muted); font-size: 12px; }
+@container dashboard-widget (min-width: 480px) { .statuses { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@container dashboard-widget (max-width: 300px) { .status .track { display: none; }.panel .status { grid-template-columns: 6px minmax(0,1fr) auto; }.heading { padding-inline: 14px; }.statuses { padding-inline: 14px; } }
+
+@container dashboard-widget (min-width: 1000px) { .statuses { grid-template-columns: repeat(4,minmax(0,1fr)); } }
