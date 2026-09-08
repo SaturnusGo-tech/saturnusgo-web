@@ -8,13 +8,13 @@ import {
   FaSlack,
   FaTrello,
 } from "react-icons/fa6";
-import { SiLinear, SiTeamcity } from "react-icons/si";
+import { SiLinear, SiTeamcity, SiSwagger } from "react-icons/si";
 
 export type IntegrationId =
   | "youtrack" | "jira" | "linear" | "trello" | "github"
-  | "gitlab" | "jenkins" | "teamcity" | "slack" | "confluence";
+  | "gitlab" | "jenkins" | "teamcity" | "slack" | "confluence" | "swagger";
 
-export type IntegrationGroup = "tracker" | "delivery" | "communication";
+export type IntegrationGroup = "tracker" | "delivery" | "communication" | "api";
 
 export type IntegrationDefinition = Readonly<{
   id: IntegrationId;
@@ -24,9 +24,11 @@ export type IntegrationDefinition = Readonly<{
   icon?: IconType;
 }>;
 
-export const INTEGRATION_GROUPS = ["tracker", "delivery", "communication"] as const;
+export const INTEGRATION_GROUPS = ["tracker", "delivery", "communication", "api"] as const;
 
 export const INTEGRATIONS: readonly IntegrationDefinition[] = [
+  item("swagger", "Swagger", "api", "Спецификация OpenAPI и проверка запросов к API вашего проекта.",
+    "Connect your project’s OpenAPI specification and test API requests.", SiSwagger),
   item("youtrack", "YouTrack", "tracker",
     "Создание задач по дефектам и синхронизация статусов.",
     "Create defect issues and keep their statuses in sync."),

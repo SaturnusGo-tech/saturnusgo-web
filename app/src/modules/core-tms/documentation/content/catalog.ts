@@ -1,3 +1,4 @@
+import { swaggerArticle } from "./integrations/swagger/swagger";
 import { gettingStarted } from "./start/getting-started";
 import { dashboardArticle } from "./start/dashboard";
 import { caseAuthoring } from "./cases/authoring";
@@ -28,6 +29,6 @@ export const docArticles: readonly DocArticle[] = [
   ...gettingStarted, dashboardArticle, ...caseAuthoring, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
-  ...communicationArticles, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,
+  ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,
 ];
 export const articleById = new Map(docArticles.map((article) => [article.id, article]));

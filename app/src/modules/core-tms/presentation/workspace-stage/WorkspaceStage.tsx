@@ -106,7 +106,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (model.view === "api") return <ApiTestingView />;
+  if (model.view === "api") return <ApiTestingView key={`${model.data.workspace.id}:${model.project.id}`}
+    scope={{ workspaceId: model.data.workspace.id, projectId: model.project.id }} canManage={model.canManageIntegrations} />;
   if (model.view === "suites") {
     return (
       <SuitesView

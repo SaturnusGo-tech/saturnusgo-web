@@ -115,7 +115,7 @@ export const ruViewMessages = {
   "integrations.notSet": "Не указано",
   "apiTesting.title": "API Testing",
   "apiTesting.loading": "Загрузка документации Swagger",
-  "apiTesting.frameTitle": "Документация Umbrella API в Swagger",
+  "apiTesting.frameTitle": "Спецификация API проекта",
   "apiTesting.toolsLabel": "Инструменты API-тестирования",
   "reports.eyebrow": "Дефекты и результаты",
   "reports.title": "Отчёты",

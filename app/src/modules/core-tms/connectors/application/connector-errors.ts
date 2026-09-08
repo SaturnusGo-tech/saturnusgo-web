@@ -2,6 +2,18 @@ import { TmsApiError } from "../../../../core/tms/transport/http";
 import { connectorFailureLabel } from "../localization/connector-failure-copy";
 export const connectorError = (error: unknown, russian: boolean): string => {
   const text: Record<string, [string, string]> = {
+    SPECIFICATION_CONTAINS_CREDENTIALS: ["Ответ сервера содержит данные доступа. Уберите их из спецификации перед подключением.", "The server response contains access credentials. Remove them from the specification before connecting."],
+    SPECIFICATION_URL_REQUIRED: ["Укажите прямой URL спецификации OpenAPI.", "Enter a direct OpenAPI specification URL."],
+    SPECIFICATION_URL_INVALID: ["Нужен публичный HTTPS-адрес без пароля и токена в URL, без нестандартного порта или фрагмента #.", "Use a public HTTPS URL without embedded credentials, nonstandard ports or a # fragment."],
+    SPECIFICATION_ADDRESS_BLOCKED: ["Внутренние, локальные и служебные адреса недоступны из Falcon. Опубликуйте защищённый HTTPS endpoint спецификации.", "Private, local and reserved addresses cannot be accessed from Falcon. Publish a protected HTTPS specification endpoint."],
+    SPECIFICATION_ACCESS_DENIED: ["Swagger отклонил доступ. Проверьте необходимость авторизации и данные доступа к спецификации.", "Swagger denied access. Check whether authentication is required and verify the specification credentials."],
+    SPECIFICATION_REDIRECT: ["Адрес перенаправляет запрос. Укажите конечную ссылку на JSON или YAML.", "This URL redirects. Enter the final JSON or YAML URL."],
+    SPECIFICATION_INVALID: ["Ответ не является корректной спецификацией OpenAPI 2.0, 3.0 или 3.1. Нужен JSON/YAML, а не HTML-страница Swagger.", "The response is not an OpenAPI 2.0, 3.0 or 3.1 specification. Use JSON/YAML rather than the Swagger HTML page."],
+    SPECIFICATION_EXTERNAL_REFS: ["Спецификация содержит внешние ссылки. Опубликуйте объединённый OpenAPI-файл с локальными $ref.", "The specification contains external references. Publish a bundled OpenAPI document with local $refs."],
+    SPECIFICATION_TOO_LARGE: ["Спецификация превышает 8 МБ. Разделите API по проектам или уменьшите примеры.", "The specification exceeds 8 MB. Split the API by project or reduce examples."],
+    SPECIFICATION_TOO_COMPLEX: ["Спецификация слишком сложная. Уменьшите вложенность схем и размер примеров.", "The specification is too complex. Reduce schema nesting and example sizes."],
+    SPECIFICATION_ENCODING_UNSUPPORTED: ["Сервер проигнорировал Accept-Encoding: identity. Настройте выдачу JSON/YAML без сжатия для этого клиента.", "The server ignored Accept-Encoding: identity. Configure an uncompressed JSON/YAML response for this client."],
+    UPSTREAM_TIMEOUT: ["Swagger не ответил за 15 секунд. Повторите запрос или проверьте доступность сервиса.", "Swagger did not respond within 15 seconds. Retry or check service availability."],
     ENCRYPTION_KEY_REQUIRED: ["На сервере ещё не настроено шифрование ключей интеграций.", "Integration credential encryption is not configured on the server."],
     UPSTREAM_ACCESS_DENIED: ["Сервис отклонил доступ. Проверьте ключ и его права.", "The service denied access. Check the token and its permissions."],
     UPSTREAM_RATE_LIMITED: ["Сервис ограничил частоту запросов. Повторите позже.", "The service rate limit was reached. Try again later."],

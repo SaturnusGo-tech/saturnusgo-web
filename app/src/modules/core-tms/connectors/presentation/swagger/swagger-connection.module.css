@@ -1,0 +1,20 @@
+.root { display: grid; grid-template-columns: minmax(0, 620px) minmax(200px, 300px); gap: 56px; padding-bottom: 28px; }
+.fields h2 { display: flex; gap: 9px; align-items: center; margin: 0 0 24px; font-size: 15px; font-weight: 600; }
+.fields label { display: grid; gap: 8px; font-size: 13px; font-weight: 500; margin-top: 20px; }
+.fields input:not([type=checkbox]), .fields select { width: 100%; min-width: 0; border: 1px solid var(--c-line); border-radius: 7px; background: var(--c-panel); color: var(--c-ink); padding: 11px 12px; font: inherit; }
+.fields input[readonly] { color: var(--c-muted); }
+.fields input:focus-visible, .fields select:focus-visible, .root button:focus-visible, .root a:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.fields p, .guide p { font-size: 12px; line-height: 1.7; color: var(--c-muted); margin: 10px 0; }
+.fields .toggle { display: flex; align-items: center; gap: 10px; margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--c-line); }
+.toggle input { width: 16px; height: 16px; accent-color: var(--c-accent); }
+.credentials { margin-top: 18px; }
+.verify { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; border: 1px solid var(--c-line); border-radius: 7px; background: var(--c-panel); color: var(--c-ink); padding: 10px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+.verify:hover { background: var(--c-soft); }
+.verify:disabled { opacity: .6; cursor: default; }
+.verified { display: flex; align-items: flex-start; gap: 10px; margin-top: 22px; color: var(--c-accent); font-size: 13px; }
+.verified p { margin: 4px 0 0; }
+.guide { border-left: 1px solid var(--c-line); padding-left: 28px; }
+.guide h3 { font-size: 13px; font-weight: 600; margin: 2px 0 14px; }
+.guide p { margin-bottom: 18px; }
+.guide a { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-accent); text-decoration: none; }
+@media (max-width: 1100px) { .root { grid-template-columns: minmax(0, 1fr); gap: 26px; } .guide { border-left: 0; border-top: 1px solid var(--c-line); padding: 22px 0 0; } }

@@ -1,4 +1,5 @@
 "use client";
+import { SwaggerConnectionPanel } from "./swagger/SwaggerConnectionPanel";
 import { useState } from "react";
 import { LoaderCircle, Save, RefreshCw } from "lucide-react";
 import type { Provider } from "../model/connector-types";
@@ -44,7 +45,8 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
         <form onSubmit={(event) => { event.preventDefault(); void state.save(); }}>
           <fieldset className={styles.form} disabled={!canManage || Boolean(state.pending)}>
             <legend className={styles.srOnly}>{ru ? "Настройки интеграции" : "Integration settings"}</legend>
-            {tab === "connection" ? <ConnectionPanel provider={provider} ru={ru} draft={state.draft} snapshot={snapshot}
+            {provider === "swagger" ? <SwaggerConnectionPanel ru={ru} draft={state.draft} snapshot={snapshot}
+              discovery={state.discovery} pending={state.pending} onChange={state.setDraft} onDiscover={() => void state.discover()} /> : tab === "connection" ? <ConnectionPanel provider={provider} ru={ru} draft={state.draft} snapshot={snapshot}
               discovery={state.discovery} pending={state.pending} onChange={state.setDraft} onDiscover={() => void state.discover()} /> :
               <AutomationPanel provider={provider} ru={ru} draft={state.draft} discovery={state.discovery} catalog={snapshot.catalog} onChange={state.setDraft} />}
           </fieldset>
@@ -52,11 +54,11 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
             disabled={Boolean(state.pending)} onChange={(e) => state.setDraft({ ...state.draft, enabled: e.target.checked })} />
             <span>{ru ? "Включить интеграцию" : "Enable integration"}</span></label>
             <small>{state.draft.enabled ? (ru ? "Изменения применятся после сохранения." : "Changes take effect after saving.") :
-              (ru ? "Подключение сохранится без запуска автоматизации." : "The connection will be saved without starting automation.")}</small>
+              (provider === "swagger" ? (ru ? "Спецификация будет недоступна в API Testing, пока подключение выключено." : "The specification will be unavailable in API Testing while disabled.") : (ru ? "Подключение сохранится без запуска автоматизации." : "The connection will be saved without starting automation."))}</small>
             <button type="submit" className={styles.primary} disabled={Boolean(state.pending) || !snapshot.etag}>
               {state.pending === "save" ? <LoaderCircle size={16} /> : <Save size={16} />}{state.pending === "save" ? (ru ? "Сохраняем…" : "Saving…") :
                 !snapshot.connection ? (ru ? "Сохранить подключение" : "Save connection") : (ru ? "Сохранить" : "Save changes")}</button></footer>}
-          {tab === "connection" && snapshot.connection && canManage && <DisconnectPanel ru={ru}
+          {tab === "connection" && snapshot.connection && canManage && <DisconnectPanel ru={ru} specification={provider === "swagger"}
             pending={Boolean(state.pending)} onDisconnect={() => void state.disconnect()} />}
         </form>}
     </>}

@@ -248,3 +248,6 @@
   .deliveryMain { align-items: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) { .loading svg { animation: none; } }
+
+.root[data-provider="swagger"] { --c-accent: #267d12; --c-highlight: #e9f5e5; --c-radius: 8px; }
+:global(.dark) .root[data-provider="swagger"] { --c-accent: #85c95d; --c-highlight: #233020; }

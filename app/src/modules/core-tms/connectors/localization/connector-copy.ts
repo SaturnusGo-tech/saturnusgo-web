@@ -1,7 +1,12 @@
 import type { Provider, Settings } from "../model/connector-types";
-const names: Record<Provider, string> = { jira: "Jira", trello: "Trello", linear: "Linear", github: "GitHub", slack: "Slack", confluence: "Confluence" };
+const names: Record<Provider, string> = { swagger: "Swagger", jira: "Jira", trello: "Trello", linear: "Linear", github: "GitHub", slack: "Slack", confluence: "Confluence" };
 const copy: Record<Provider, { heading: [string, string]; purpose: [string, string]; remote: [string, string];
   destination: [string, string]; hint: [string, string]; docs: string }> = {
+  swagger: { heading: ["API вашего проекта", "Your project’s API"],
+    purpose: ["Подключите спецификацию OpenAPI. Команда сможет изучать операции и проверять запросы прямо в Falcon.", "Connect an OpenAPI specification so your team can explore operations and test requests in Falcon."],
+    remote: ["Спецификация", "Specification"], destination: ["API Testing", "API Testing"],
+    hint: ["JSON или YAML по HTTPS. Доступ к спецификации настраивается отдельно от авторизации запросов к API.", "JSON or YAML over HTTPS. Specification access is separate from API request authorization."],
+    docs: "https://swagger.io/docs/specification/" },
   jira: { heading: ["Качество в вашем проекте", "Quality in your project"],
     purpose: ["Дефекты становятся задачами Jira. Готовое исправление возвращается в Falcon для повторной проверки.", "Defects become Jira issues. Ready fixes return to Falcon for retesting."],
     remote: ["Ключ проекта Jira", "Jira project key"], destination: ["Тип задачи", "Issue type"],

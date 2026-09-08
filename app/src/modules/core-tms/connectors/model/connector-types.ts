@@ -16,5 +16,5 @@ export type Scope = Readonly<{ workspaceId: string; projectId: string }>;
 export type Snapshot = Readonly<{ connection: Connection | null; etag: string | null;
   catalog: Catalog; deliveries: readonly Delivery[]; links: readonly Link[]; webhook: Webhook;
   nextCursor: string | null }>;
-export const providers: readonly Provider[] = ["jira", "trello", "linear", "github", "slack", "confluence"];
+export const providers: readonly Provider[] = ["jira", "trello", "linear", "github", "slack", "confluence", "swagger"];
 export const isProvider = (value: string): value is Provider => providers.includes(value as Provider);

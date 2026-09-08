@@ -53,7 +53,7 @@ test("adds a restrictive browser policy when the static origin supplies none", a
   assert.match(policy, /default-src 'self'/);
   assert.match(policy, /frame-ancestors 'none'/);
   assert.match(policy, /object-src 'none'/);
-  assert.match(policy, /frame-src blob: https:\/\/sieger-assistente-production\.up\.railway\.app/);
+  assert.match(policy, /frame-src blob: https:\/\/\*\.r2\.cloudflarestorage\.com/);
 });
 
 test("canonicalizes public routes and preserves their query", async () => {

@@ -38,9 +38,8 @@ const CONTENT_SECURITY_POLICY = [
   "img-src 'self' data: blob: https://*.r2.cloudflarestorage.com",
   "media-src 'self' blob: https://*.r2.cloudflarestorage.com",
   "connect-src 'self' https://api.tms.saturnusgo.com " +
-    "https://dev-4v1srvqwzp1m7cdl.us.auth0.com https://*.r2.cloudflarestorage.com",
-  "frame-src blob: https://sieger-assistente-production.up.railway.app " +
-    "https://*.r2.cloudflarestorage.com",
+    "https://dev-4v1srvqwzp1m7cdl.us.auth0.com https://*.r2.cloudflarestorage.com https:",
+  "frame-src blob: https://*.r2.cloudflarestorage.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "upgrade-insecure-requests",

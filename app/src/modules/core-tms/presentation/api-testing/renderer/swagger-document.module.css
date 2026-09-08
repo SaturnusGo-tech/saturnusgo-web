@@ -1,0 +1,31 @@
+.document { padding: 4px 12px 50px; color: var(--ink); min-width: 0; }
+.document :global(.swagger-ui) { font-family: inherit; color: var(--ink); }
+.document :global(.swagger-ui .wrapper) { max-width: none; padding-inline: 12px; }
+.document :global(.swagger-ui .info) { margin: 24px 0; }
+.document :global(.swagger-ui .info .title) { font-size: 26px; letter-spacing: -.6px; }
+.document :global(.swagger-ui .scheme-container) { background: transparent; box-shadow: none; padding: 16px 0; border-block: 1px solid var(--line); }
+.document :global(.swagger-ui .opblock) { box-shadow: none; border-radius: 7px; margin-bottom: 10px; }
+.document :global(.swagger-ui .opblock-tag) { border-color: var(--line); font-size: 17px; padding-block: 14px; }
+.document :global(.swagger-ui .opblock-summary-method) { min-width: 70px; border-radius: 4px; text-shadow: none; font-size: 12px; }
+.document :global(.swagger-ui .btn) { box-shadow: none; border-radius: 6px; }
+.document :global(.swagger-ui input), .document :global(.swagger-ui select), .document :global(.swagger-ui textarea) { background: var(--paper); color: var(--ink); border-color: var(--line); border-radius: 5px; }
+.document :global(.swagger-ui .download-contents) { display: none; }
+.document :global(.swagger-ui .info .title), .document :global(.swagger-ui .info p),
+.document :global(.swagger-ui .info li), .document :global(.swagger-ui .opblock-tag),
+.document :global(.swagger-ui .opblock-summary-path), .document :global(.swagger-ui .opblock-summary-description),
+.document :global(.swagger-ui .parameter__name), .document :global(.swagger-ui .parameter__type),
+.document :global(.swagger-ui .response-col_status), .document :global(.swagger-ui .response-col_links),
+.document :global(.swagger-ui .opblock-description-wrapper p), .document :global(.swagger-ui .opblock-section-header h4),
+.document :global(.swagger-ui table thead tr td), .document :global(.swagger-ui table thead tr th),
+.document :global(.swagger-ui label), .document :global(.swagger-ui .tab li), .document :global(.swagger-ui .model-title),
+.document :global(.swagger-ui .model), .document :global(.swagger-ui .markdown p), .document :global(.swagger-ui .markdown li),
+.document :global(.swagger-ui .dialog-ux .modal-ux-header h3), .document :global(.swagger-ui .dialog-ux .modal-ux-content h4),
+.document :global(.swagger-ui .dialog-ux .modal-ux-content p) { color: var(--ink); }
+.document :global(.swagger-ui .opblock .opblock-section-header), .document :global(.swagger-ui section.models),
+.document :global(.swagger-ui .dialog-ux .modal-ux), .document :global(.swagger-ui .model-box) { background: var(--paper); border-color: var(--line); }
+.document :global(.swagger-ui .dialog-ux .modal-ux) { max-height: 85vh; overflow: auto; border-radius: 10px; }
+.document :global(.swagger-ui .dialog-ux .modal-ux-header) { border-color: var(--line); }
+:global(.dark) .document :global(.swagger-ui svg) { fill: #b7b7bc; }
+:global(.dark) .document :global(.swagger-ui .btn) { color: #dbdbe0; border-color: #66666f; }
+:global(.dark) .document :global(.swagger-ui .btn.authorize) { color: #85c95d; border-color: #85c95d; }
+:global(.dark) .document :global(.swagger-ui .opblock-summary-method) { color: #13131a; }

@@ -110,6 +110,10 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
     setNotice(russian ? "Обновление отчёта поставлено в очередь. Статус доставки показан ниже." :
       "Report update queued. Delivery progress is shown below.");
   });
-  return { snapshot, draft, setDraft, discovery, pending, error, notice, activityFailed, configurationReloadRequired,
+  const updateDraft = (value: ConnectionInput) => {
+    setDraft(value);
+    if (provider === "swagger") { setDiscovery(null); setNotice(null); }
+  };
+  return { snapshot, draft, setDraft: updateDraft, discovery, pending, error, notice, activityFailed, configurationReloadRequired,
     load, refreshActivity, discover, save, disconnect, recover, more, republish };
 }

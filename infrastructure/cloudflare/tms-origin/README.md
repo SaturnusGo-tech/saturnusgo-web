@@ -67,5 +67,9 @@ canonical host are upgraded to the identical HTTPS URL with `308`. Missing origi
 non-success responses, and MIME mismatches become a local plain-text `404`, so legacy Pages HTML
 cannot appear under the TMS origin. The Worker also replaces origin browser policy headers with the
 reviewed Falcon policy: anti-framing CSP, HSTS, MIME sniffing protection, a strict referrer policy,
-and a minimal permissions policy. Keep the Auth0, backend, Swagger, and private R2 origins in that
+and a minimal permissions policy. Keep the Auth0, backend and private R2 origins in that
 CSP synchronized with production configuration.
+
+Swagger/OpenAPI is rendered in Falcon from the project connector. No Umbrella iframe origin is required.
+The workspace connect-src permits HTTPS for customer API execution; Swagger requests omit cookies
+and reject Falcon, Auth0 and online-validator targets. Specification credentials stay on the backend.

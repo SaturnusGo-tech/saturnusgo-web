@@ -1768,6 +1768,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/integrations/connectors/swagger/specification": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Load the project Swagger specification
+         * @description Requires integration:read. Retrieves a single OpenAPI 2.0, 3.0 or 3.1 JSON/YAML document from a public HTTPS URL using optional encrypted specification credentials. External refs and redirects are rejected. Response is no-store.
+         */
+        get: operations["getSwaggerSpecification"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/integrations/connectors": {
         parameters: {
             query?: never;
@@ -4596,8 +4619,23 @@ export interface components {
                 };
             };
         };
+        SwaggerSpecification: {
+            document: {
+                [key: string]: unknown;
+            };
+            title: string;
+            version: string;
+            format: string;
+            operationCount: number;
+            /** Format: date-time */
+            fetchedAt: string;
+            connectionVersion: number;
+        };
+        SwaggerSpecificationEnvelope: {
+            data: components["schemas"]["SwaggerSpecification"];
+        };
         /** @enum {string} */
-        ConnectorProvider: "jira" | "trello" | "linear" | "github" | "slack" | "confluence";
+        ConnectorProvider: "jira" | "trello" | "linear" | "github" | "slack" | "confluence" | "swagger";
         /** @enum {string} */
         ConnectorEvent: "defect.created" | "defect.updated" | "defect.status_changed" | "defect.fix_confirmed" | "run.created" | "run.start" | "run.complete" | "run.abort" | "pull_request" | "push" | "release" | "workflow_failed" | "github.release" | "github.workflow_failed";
         ConnectorRunRule: {
@@ -4625,6 +4663,11 @@ export interface components {
                 reopened?: string;
             };
             rules: components["schemas"]["ConnectorRunRule"][];
+            /**
+             * @description Swagger specification access only. Defaults to none. Does not authorize API execution.
+             * @enum {string}
+             */
+            specAuthMode?: "none" | "basic" | "bearer";
         };
         /** @description Only submitted credentials are replaced. Secrets are encrypted at rest and are never returned. A missing field preserves its existing value. */
         ConnectorSecrets: {
@@ -4633,6 +4676,8 @@ export interface components {
             email?: string;
             apiKey?: string;
             signingSecret?: string;
+            username?: string;
+            password?: string;
         };
         ConnectorConfigurationRequest: {
             enabled: boolean;
@@ -8823,6 +8868,47 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    getSwaggerSpecification: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                projectId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Validated specification for the enabled project connection. Credentials are never returned. */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwaggerSpecificationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            422: components["responses"]["UnprocessableEntity"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ConnectorUnavailable"];
         };
     };
     listConnectors: {

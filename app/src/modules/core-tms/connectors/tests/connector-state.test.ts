@@ -20,12 +20,13 @@ test("draft settings and secrets are independent across provider forms", () => {
   assert.ok(two.settings.events.length > 0); assert.deepEqual(two.secrets, {});
   assert.deepEqual(connectionDraft("confluence", null).settings.events, ["run.complete"]);
 });
-test("new connections save paused so webhook registration can precede activation", () => {
+test("event integrations start paused; Swagger starts enabled without webhook setup", () => {
   for (const provider of providers) {
     const draft = connectionDraft(provider, null);
-    assert.equal(draft.enabled, false, provider);
+    assert.equal(draft.enabled, provider === "swagger", provider);
     assert.deepEqual(draft.secrets, {}, provider);
-    assert.equal(draft.settings.remoteId, "", provider);
+    assert.equal(draft.settings.remoteId, provider === "swagger" ? "openapi" : "", provider);
+    if (provider === "swagger") { assert.equal(draft.settings.specAuthMode, "none"); assert.deepEqual(draft.settings.events, []); }
   }
 });
 test("editing preserves saved activation and settings without hydrating stored credentials", () => {

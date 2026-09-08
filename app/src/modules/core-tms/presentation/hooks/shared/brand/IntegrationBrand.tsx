@@ -7,5 +7,5 @@ export function IntegrationBrand({ provider }: { provider: IntegrationId }) {
   const asset = assets[provider];
   if (asset) return <img src={`/falcon/integrations/${asset}`} alt="" aria-hidden="true" />;
   const Icon = INTEGRATIONS.find((entry) => entry.id === provider)?.icon;
-  return Icon ? <Icon aria-hidden="true" /> : null;
+  return Icon ? <Icon aria-hidden="true" style={provider === "swagger" ? { color: "#64a830" } : undefined} /> : null;
 }

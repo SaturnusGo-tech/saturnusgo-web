@@ -12,8 +12,8 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
   const logo = <IntegrationBrand provider={provider} />; const copy = providerCopy(provider, ru);
   const tabs = [
     { id: "connection" as const, icon: Settings2, label: ru ? "Подключение" : "Connection" },
-    { id: "automation" as const, icon: Zap, label: ru ? "Автоматизация" : "Automation" },
-    { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" },
+    ...(provider === "swagger" ? [] : [{ id: "automation" as const, icon: Zap, label: ru ? "Автоматизация" : "Automation" },
+    { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" }]),
     ...(provider === "github" ? [{ id: "impact" as const, icon: GitBranch, label: "Impact Analysis" }] : []),
   ];
   return <main className={styles.root} data-provider={provider} data-integration-workspace data-testid={`connector-${provider}`}>

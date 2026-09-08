@@ -113,7 +113,7 @@ export const enViewMessages = {
   "integrations.notSet": "Not set",
   "apiTesting.title": "API Testing",
   "apiTesting.loading": "Loading Swagger documentation",
-  "apiTesting.frameTitle": "Umbrella API Swagger documentation",
+  "apiTesting.frameTitle": "Project API specification",
   "apiTesting.toolsLabel": "API testing tools",
   "reports.eyebrow": "Defects and results",
   "reports.title": "Reports",
