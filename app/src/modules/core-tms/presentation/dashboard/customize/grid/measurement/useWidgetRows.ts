@@ -1,13 +1,13 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 // Measure against the actual grid tracks so density changes do not introduce blank rows.
-export function useWidgetRows() {
+export function useWidgetRows(enabled = true) {
   const element = useRef<HTMLDivElement | null>(null);
   const [rows, setRows] = useState(1);
   const ref = useCallback((node: HTMLDivElement | null) => { element.current = node; }, []);
   useLayoutEffect(() => {
     const node = element.current;
-    if (!node) return;
+    if (!node || !enabled) return;
     const measure = () => {
       const grid = node.parentElement; if (!grid) return;
       const style = getComputedStyle(grid);
@@ -19,6 +19,6 @@ export function useWidgetRows() {
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [enabled]);
   return { ref, rows };
 }

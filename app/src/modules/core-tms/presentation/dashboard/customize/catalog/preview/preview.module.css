@@ -1,6 +1,8 @@
 .preview { --preview-blue: #4981f6; --preview-green: #49b775; --preview-red: #e75b66; width: 100%; min-width: 0; pointer-events: none; user-select: none; color: var(--ink); }
 .actual { min-width: 0; container: dashboard-widget / inline-size; }
 .actual > * { max-width: 100%; }
+.preview[data-compact="false"] .actual > *, .preview[data-compact="false"] .actual > div > section { border: 0; border-radius: 0; box-shadow: none; }
+.preview[data-compact="false"]:not([data-accent="true"]) .actual > *, .preview[data-compact="false"] .actual > div > section { background: transparent; }
 .preview[data-compact="true"] { position: relative; height: 100%; overflow: hidden; }
 .preview[data-compact="true"] .actual { position: absolute; width: 500px; max-width: none; transform-origin: top left; }
 .preview[data-compact="true"] .actual :is(button, a) { pointer-events: none; }

@@ -1,4 +1,4 @@
-.catalog { --store-blue: #3768ef; --store-link: #3668df; --store-green: #208b48; width: 100%; max-width: 1640px; margin: 0 auto; padding-bottom: 64px; container: widget-store / inline-size; }
+.catalog { --store-list-heading-height: 35px; --store-blue: #3768ef; --store-link: #3668df; --store-green: #208b48; width: 100%; max-width: 1640px; margin: 0 auto; padding-bottom: 64px; container: widget-store / inline-size; }
 :global(.dark) .catalog { --store-link: #7197ff; --store-green: #78d892; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 38px; }
 .catalog .back { display: inline-flex; align-items: center; gap: 10px; min-width: 0; max-width: 50%; padding: 5px 0; border: 0; background: transparent; color: var(--ink); font-size: 12px; cursor: pointer; }
@@ -25,7 +25,7 @@
 .sidebar nav button:hover { color: var(--ink); background: color-mix(in srgb, var(--control) 55%, transparent); }
 .catalog .addAll { display: inline-flex; align-items: center; gap: 9px; border: 0; border-top: 1px solid var(--line); padding: 24px 0 0; margin-top: 26px; width: 100%; color: var(--store-link); background: transparent; font-size: 12px; line-height: 1.6; text-align: left; cursor: pointer; }
 .addAll svg { flex-shrink: 0; }.addAll:disabled { color: var(--muted); cursor: default; }
-.results { min-width: 0; }.resultsHeading { min-height: 35px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.results { min-width: 0; }.resultsHeading { min-height: var(--store-list-heading-height); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .resultsHeading h2 { margin: 0; font-size: 16px; font-weight: 560; line-height: 1.4; }.resultsHeading > span { color: var(--muted); font-size: 11px; }
 .entries { display: flex; flex-direction: column; gap: 9px; }
 .entry { display: grid; position: relative; grid-template-columns: minmax(130px, 34%) minmax(0, 1fr) auto; align-items: center; gap: 15px; min-width: 0; min-height: 116px; padding: 9px 15px 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--paper) 85%, var(--control)); transition: border-color .16s, background .16s; }

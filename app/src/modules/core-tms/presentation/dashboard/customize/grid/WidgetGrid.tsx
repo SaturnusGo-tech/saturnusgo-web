@@ -16,6 +16,7 @@ export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onRes
 }) {
   const { locale, t } = useTmsLocale(); const reduced = useReducedMotion();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const alignRows = widgets.every(widget => ["queue", "freshness", "readyForRetest"].includes(widgetKey(widget)));
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
   const title = (widget: BoardWidget) => { const definition = widgetByKey.get(widgetKey(widget));
@@ -31,8 +32,8 @@ export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onRes
     onDragStart={({ active }) => setActiveId(String(active.id))} onDragCancel={() => setActiveId(null)}
     onDragEnd={({ active, over }) => { setActiveId(null); if (over && active.id !== over.id) onMove(String(active.id),widgets.findIndex(item=>item.id===over.id)); }}>
     <SortableContext items={widgets.map((widget) => widget.id)} strategy={rectSortingStrategy}>
-      <div className={styles.grid}>{widgets.map((widget) => <SortableWidget key={widget.id} widget={widget} title={title(widget)}
-        editing={editing} disabled={disabled} onResize={onResize} onRemove={onRemove}>
+      <div className={styles.grid} data-align-rows={alignRows}>{widgets.map((widget) => <SortableWidget key={widget.id} widget={widget} title={title(widget)}
+        editing={editing} disabled={disabled} alignRows={alignRows} onResize={onResize} onRemove={onRemove}>
         {render(widget,title(widget))}
       </SortableWidget>)}</div>
     </SortableContext>

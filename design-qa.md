@@ -61,3 +61,13 @@ The final combined comparison and focused browser views found no remaining actio
 The first production smoke test found that opening all sections triggered a Recharts tick-generation exception when runtime intrinsics were frozen. The existing dependency patch covered `decimal.js`, while Recharts' automatic ticks also use `decimal.js-light`. Its constructor attempted to assign an inherited, read-only `constructor` property. Both CommonJS and ESM entry points now define an own writable property, following the existing dependency-patch mechanism. The regression test exercises real Recharts automatic ticks with frozen intrinsics, including fractional and zero domains, rather than only testing an externally supplied scale.
 
 Production documentation independently passed: all 13 new image URLs return HTTP 200 and match the committed assets. The live article uses only the new `dashboard-v2-*` captures; viewport-visible images load correctly through the existing lazy loading.
+
+## Queue and catalog polish — 9 September 2026
+
+- Compact queue titles remove context only from recognized Falcon-generated names. Custom names and canonical run records remain unchanged. Full titles and context remain available in run/detail views.
+- Open/Continue is an inline text action with a chevron in the progress caption; the whole row remains one keyboard-accessible button. Both states use identical typography and spacing, with a full-width progress track.
+- Operational widgets share normal CSS grid row sizing while other sections retain measured masonry tracks. Browser measurements at 1280 × 720: all three cards 347px high in reading mode and 382px with editing controls. Keyboard reordering and removing a card were exercised.
+- Catalog detail and first result top both measured 255.390625px at the same viewport. The detail preview and the rendered widget have no nested outer borders. Chart, defect and freshness content retain their internal data separators.
+- Light/dark screenshots inspected in `output/dashboard-ui-polish-20260909`. Seven affected documentation screenshots recaptured from Falcon Guide and given fresh v3 URLs to avoid cached older frames. The other six screenshots depict unchanged surfaces.
+- The temporary documentation layout was removed; Falcon Guide's original empty board was saved and verified.
+- Verification: 376 adapter/documentation/dashboard tests pass, including generated/custom title cases and existing freshness/progress tests now included in the standard suite. Typecheck and the 570-file architecture check pass. Production verification is recorded separately after release.

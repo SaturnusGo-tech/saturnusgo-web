@@ -1,10 +1,11 @@
-import { ArrowUpRight, Play } from "lucide-react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import type { WorkbenchQueue } from "../../../../dashboards/workbench/model/workbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../../localization/format/labels";
 import { RunProgress } from "./progress/RunProgress";
 import { queueCopy, runProgress } from "./progress/model";
+import { compactRunTitle } from "./title/compact-run-title";
 import styles from "../workbench.module.css";
 
 type Props = { queue: WorkbenchQueue; onOpenRow: (row: DashboardDrillRow) => void; detail?: boolean };
@@ -18,25 +19,25 @@ export function WorkbenchRows({ queue, onOpenRow, detail = false }: Props) {
   return <ul className={styles.rows}>
     {queue.rows.map((row) => {
       const record = row.navigation;
+      const title = row.progress && !detail ? compactRunTitle(record.title, record.project, row.buildReference) : record.title;
       const progress = row.progress && runProgress(row.progress);
       const canContinue = progress && progress.completed < progress.total;
       const progressLabel = progress ? copy.completed(format.format(progress.completed), format.format(progress.total)) : "";
       return <li key={`${record.projectId}:${record.entity}:${record.id}`}>
         <button type="button" className={`${styles.row} ${row.progress && !detail ? styles.runRow : ""}`} onClick={() => onOpenRow(record)}
-          aria-label={`${canContinue ? copy.continue : copy.open}: ${record.key}. ${record.title}. ${progressLabel}`}>
+          aria-label={`${canContinue ? copy.continue : copy.open}: ${record.key}. ${title}. ${progressLabel}`}>
           <div className={styles.rowTitle}>
-            <span className={styles.recordKey}>{record.key}</span><strong>{record.title}</strong>
+            <span className={styles.recordKey}>{record.key}</span><strong>{title}</strong>
             <ArrowUpRight size={14} aria-hidden="true" />
           </div>
-          <div className={styles.rowContext}>
+          {detail && <div className={styles.rowContext}>
             <span>{record.project}</span><span>{row.environmentName ?? t("dashboardWorkbench.noEnvironment")}</span>
             <span className={styles.build}>{row.buildReference || t("dashboardWorkbench.noBuild")}</span>
-          </div>
+          </div>}
           {row.progress && <div className={styles.runExecution}>
-            <RunProgress progress={row.progress} />
-            <span className={styles.continue} data-primary={Boolean(canContinue)}>
-              <Play size={13} fill="currentColor" aria-hidden="true" />{canContinue ? copy.continue : copy.open}
-            </span>
+            <RunProgress progress={row.progress} action={<span className={styles.continue}>
+              {canContinue ? copy.continue : copy.open}<ChevronRight size={14} aria-hidden="true" />
+            </span>} />
           </div>}
           {(!row.progress || detail) && <div className={styles.rowSignals}>
             {record.status && <span className={styles.status} data-status={record.status}>{localizedLabel(locale, record.status)}</span>}

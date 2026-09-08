@@ -199,35 +199,7 @@
     "width": 1087,
     "height": 814
   },
-  "dashboard-v2-02-catalog": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-03-preview": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-04-edit": {
-    "width": 1087,
-    "height": 814
-  },
   "dashboard-v2-05-size": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-06-remove": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-07-overview": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-08-freshness": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-09-context": {
     "width": 1087,
     "height": 814
   },
@@ -246,5 +218,33 @@
   "dashboard-v2-13-run": {
     "width": 1087,
     "height": 814
+  },
+  "dashboard-v3-02-catalog": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-03-preview": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-04-edit": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-06-remove": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-07-overview": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-08-freshness": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-09-context": {
+    "width": 1280,
+    "height": 720
   }
 }

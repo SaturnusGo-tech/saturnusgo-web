@@ -101,3 +101,7 @@
 @container dashboard-page (max-width: 1100px) { .toolbar { gap: 4px 12px; }.sectionNavigation { gap: 16px; }.toolbar .context .quiet { padding-inline: 4px; } }
 
 .grid { grid-auto-flow: row dense; }
+.grid[data-align-rows="true"] { grid-auto-rows: auto; align-items: stretch; }
+.grid[data-align-rows="true"] .widget { display: flex; flex-direction: column; }
+.grid[data-align-rows="true"] .widgetContent { flex: 1; display: flex; flex-direction: column; }
+.grid[data-align-rows="true"] .widgetContent > * { flex: 1; height: auto; }
