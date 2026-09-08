@@ -216,6 +216,14 @@
     "height": 720
   },
   "dashboard-06-edit": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-07-remove": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-08-saved": {
     "width": 1087,
     "height": 814
   }
