@@ -1,4 +1,5 @@
 import { articles, code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../../model/article";
+import { swaggerWalkthrough } from "./walkthrough";
 export const swaggerArticle: DocArticle = {
   id: "swagger", title: "Swagger · API проекта", group: "integrations",
   description: "Подключите свою спецификацию OpenAPI, настройте доступ и проверяйте API в Falcon без отдельной сессии Swagger.",
@@ -17,6 +18,7 @@ export const swaggerArticle: DocArticle = {
       ["Проверьте подключение", "Нажмите «Проверить подключение». Falcon загрузит документ и покажет название API, версию OpenAPI и количество операций. Эта проверка не выполняет бизнес-запросы к API."],
       ["Сохраните", "Оставьте «Включить интеграцию» включённым и нажмите «Сохранить подключение». Включённое подключение повторно проверяется при сохранении."],
       ["Откройте API Testing", "Перейдите по ссылке в карточке или откройте API Testing в глобальном сайдбаре. Появится спецификация выбранного проекта."])),
+    section("visual-flow", "Подключение и первый запрос на экране", swaggerWalkthrough),
     section("access", "Два независимых уровня авторизации", table(["Где", "Для чего", "Как работает"],
       ["Хуки → Swagger", "Прочитать защищённый JSON/YAML", "HTTP Basic: логин и пароль. Bearer: токен. Falcon хранит их зашифрованно и отправляет только серверу спецификации."],
       ["API Testing → Authorize", "Выполнять защищённые операции API", "Введите API-токен или другие данные согласно security scheme вашей спецификации. Данные документации не подставляются в запросы API."]),

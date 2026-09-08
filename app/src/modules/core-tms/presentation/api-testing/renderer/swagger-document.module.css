@@ -29,3 +29,6 @@
 :global(.dark) .document :global(.swagger-ui .btn) { color: #dbdbe0; border-color: #66666f; }
 :global(.dark) .document :global(.swagger-ui .btn.authorize) { color: #85c95d; border-color: #85c95d; }
 :global(.dark) .document :global(.swagger-ui .opblock-summary-method) { color: #13131a; }
+
+.document :global(.swagger-ui .opblock-tag small), .document :global(.swagger-ui .parameter__in), .document :global(.swagger-ui .parameter__deprecated) { color: var(--muted); }
+.document :global(.swagger-ui .renderedMarkdown p), .document :global(.swagger-ui .renderedMarkdown li), .document :global(.swagger-ui .responses-inner h4), .document :global(.swagger-ui .responses-inner h5) { color: var(--ink); }

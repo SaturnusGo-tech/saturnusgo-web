@@ -190,5 +190,21 @@
   "workspace-03-project": {
     "width": 1087,
     "height": 814
+  },
+  "swagger-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-02-auth": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-03-operations": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-04-request": {
+    "width": 1087,
+    "height": 814
   }
 }
