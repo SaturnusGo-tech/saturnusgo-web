@@ -15,8 +15,8 @@ const resource = (value: Api["SharedStep"], etag: string | null): SharedStep => 
 });
 const body = (draft: SharedStepDraft): Api["SharedStepWriteRequest"] => ({
   title: draft.title, changeNote: draft.changeNote,
-  items: draft.items.map(({ id, order, action, expectedResult, testData, required }) => ({
-    id, order, action, expectedResult, testData, required,
+  items: draft.items.map(({ id, order, action, expectedResult, testData, required, attachmentIds }) => ({
+    id, order, action, expectedResult, testData, required, attachmentIds: [...attachmentIds],
   })),
 });
 
@@ -35,17 +35,17 @@ export async function getSharedStep(http: TmsHttpClient, projectId: string,
 }
 
 export async function createSharedStep(http: TmsHttpClient, projectId: string,
-  draft: SharedStepDraft): Promise<SharedStep> {
+  draft: SharedStepDraft, operationKey = crypto.randomUUID()): Promise<SharedStep> {
   const result = await http.mutateResource<Api["SharedStep"]>(
     `/projects/${encodeURIComponent(projectId)}/shared-steps`, "POST", body(draft),
-    { idempotencyKey: crypto.randomUUID() });
+    { idempotencyKey: operationKey });
   return resource(result.data, result.etag);
 }
 
 export async function reviseSharedStep(http: TmsHttpClient, value: SharedStep,
-  draft: SharedStepDraft): Promise<SharedStep> {
+  draft: SharedStepDraft, operationKey = crypto.randomUUID()): Promise<SharedStep> {
   const result = await http.mutateResource<Api["SharedStep"]>(
     `/projects/${encodeURIComponent(value.projectId)}/shared-steps/${encodeURIComponent(value.id)}`,
-    "PATCH", body(draft), { ifMatch: value.etag, idempotencyKey: crypto.randomUUID() });
+    "PATCH", body(draft), { ifMatch: value.etag, idempotencyKey: operationKey });
   return resource(result.data, result.etag);
 }

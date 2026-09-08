@@ -7,7 +7,7 @@ import type {
   UploadPrivateAttachmentInput,
 } from "../domain/attachment";
 import { AttachmentClientError } from "../domain/attachment-client-error";
-import type { AttachmentTransportPort } from "./attachment-transport-port";
+import type { AttachmentTransportPort, FinalizeUploadInput } from "./attachment-transport-port";
 
 export interface PrivateAttachmentClient {
   getMetadata(attachmentId: string, signal?: AbortSignal): Promise<AttachmentMetadataResource>;
@@ -38,6 +38,7 @@ export function createPrivateAttachmentClient(
   dependencies: PrivateAttachmentClientDependencies,
 ): PrivateAttachmentClient {
   const now = dependencies.now ?? Date.now;
+  const finalizations = new Map<string, { identity: string; input: FinalizeUploadInput }>();
   return Object.freeze({
     getMetadata(attachmentId: string, signal?: AbortSignal): Promise<AttachmentMetadataResource> {
       return dependencies.transport.getMetadata(attachmentId, signal);
@@ -51,6 +52,14 @@ export function createPrivateAttachmentClient(
       const sha256 = await dependencies.digest(input.file, input.signal);
       if (!digestPattern.test(sha256)) {
         throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment digest provider returned an invalid digest.");
+      }
+      const identity = JSON.stringify([input.projectId, input.owner, input.kind, input.mimeType, input.file.name, sha256]);
+      const previous = finalizations.get(operationKey);
+      if (previous) {
+        if (previous.identity !== identity) throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment operation key was reused.");
+        const metadata = await dependencies.transport.finalizeUpload({ ...previous.input, signal: input.signal });
+        finalizations.delete(operationKey);
+        return metadata;
       }
       const created = await dependencies.transport.createUploadIntent({
         projectId: input.projectId,
@@ -78,7 +87,7 @@ export function createPrivateAttachmentClient(
         input.file,
         input.signal,
       );
-      return dependencies.transport.finalizeUpload({
+      const finalization: FinalizeUploadInput = {
         intent: created.intent,
         byteSize: input.file.size,
         sha256,
@@ -87,7 +96,12 @@ export function createPrivateAttachmentClient(
         idempotencyKey: `finalize:${operationKey}`,
         requestId: input.requestId,
         signal: input.signal,
-      });
+      };
+      if (finalizations.size >= 100) finalizations.delete(finalizations.keys().next().value!);
+      finalizations.set(operationKey, { identity, input: finalization });
+      const metadata = await dependencies.transport.finalizeUpload(finalization);
+      finalizations.delete(operationKey);
+      return metadata;
     },
     async createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess> {
       const access = await dependencies.transport.createAccess(input);

@@ -27,6 +27,7 @@ export function useSharedSteps(projectId: string, connection: Connection) {
 
   useEffect(() => {
     setSelected(null);
+    cache.current.clear();
     const controller = new AbortController();
     void refresh(controller.signal);
     return () => controller.abort();
@@ -53,7 +54,7 @@ export function useSharedSteps(projectId: string, connection: Connection) {
     } catch { setStatus("error"); return null; }
   }, [resolve]);
 
-  const save = useCallback(async (draft: SharedStepDraft, current?: SharedStep | null) => {
+  const save = useCallback(async (draft: SharedStepDraft, current?: SharedStep | null, operationKey?: string) => {
     if (!projectId) return null;
     setSaving(true);
     try {
@@ -75,8 +76,8 @@ export function useSharedSteps(projectId: string, connection: Connection) {
           updatedAt: local.updatedAt, etag: local.etag }, ...values.filter(({ id }) => id !== local.id)]);
         return local;
       }
-      const saved = current ? await reviseSharedStep(http, current, draft)
-        : await createSharedStep(http, projectId, draft);
+      const saved = current ? await reviseSharedStep(http, current, draft, operationKey)
+        : await createSharedStep(http, projectId, draft, operationKey);
       setSelected(saved);
       cache.current.set(saved.id, saved);
       await refresh();
@@ -84,6 +85,13 @@ export function useSharedSteps(projectId: string, connection: Connection) {
     } finally { setSaving(false); }
   }, [connection, http, projectId, refresh]);
 
-  return { items, selected, status, saving, open, resolve, save, refresh,
+  const reload = useCallback(async (id: string) => {
+    const value = await getSharedStep(http, projectId, id);
+    cache.current.set(id, value); setSelected(value);
+    return value;
+  }, [http, projectId]);
+
+  return { items, selected, status, saving, open, resolve, save, refresh, reload,
+    attachmentsEnabled: connection === "connected",
     close: () => setSelected(null), setSelected };
 }

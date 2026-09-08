@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import {
@@ -28,6 +28,8 @@ type Props = {
   ru: boolean;
   sharedSteps: readonly SharedStepSummary[];
   allowSharedSteps?: boolean;
+  attachments?: ReactNode;
+  attachmentScope?: "step";
   onChange: (next: Partial<TestStep>) => void;
   onAddAfter: (withExpectedResult: boolean) => void;
   onInsertShared: (id: string) => void;
@@ -43,11 +45,11 @@ export function ScenarioStepEditor(props: Props) {
     stepId: props.step.id,
   });
   const expectedAttachments = useScenarioAttachments({
-    fieldKey: `step:${props.step.id}:expected`,
+    fieldKey: `step:${props.step.id}:${props.attachmentScope ? "action" : "expected"}`,
     stepId: props.step.id,
   });
   const dataAttachments = useScenarioAttachments({
-    fieldKey: `step:${props.step.id}:data`,
+    fieldKey: `step:${props.step.id}:${props.attachmentScope ? "action" : "data"}`,
     stepId: props.step.id,
   });
 
@@ -110,7 +112,7 @@ export function ScenarioStepEditor(props: Props) {
           onPaste={actionAttachments.paste}
         />
       </div>)}
-      {!collapsed && <div className={css.actionAttachmentRow}>
+      {!collapsed && !props.attachmentScope && <div className={css.actionAttachmentRow}>
         <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />
       </div>}
     </div>
@@ -126,10 +128,10 @@ export function ScenarioStepEditor(props: Props) {
         onChange={(expectedResult) => props.onChange({ expectedResult })}
         onPaste={expectedAttachments.paste}
       />
-      <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} />
+      {!props.attachmentScope && <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} />}
     </div>}
 
-    {!collapsed && (props.step.testData || dataAttachments.pending.length > 0) && <div className={css.optionalData}>
+    {!collapsed && (props.step.testData || (!props.attachmentScope && dataAttachments.pending.length > 0)) && <div className={css.optionalData}>
       <ScenarioTextInput
         value={props.step.testData ?? ""}
         label={`${props.ru ? "Тестовые данные шага" : "Test data for step"} ${props.order}`}
@@ -138,10 +140,13 @@ export function ScenarioStepEditor(props: Props) {
         onChange={(testData) => props.onChange({ testData })}
         onPaste={dataAttachments.paste}
       />
-      {(props.step.testData || dataAttachments.pending.length > 0) && <ScenarioAttachmentControls
+      {!props.attachmentScope && (props.step.testData || dataAttachments.pending.length > 0) && <ScenarioAttachmentControls
         fieldKey={`step:${props.step.id}:data`}
         stepId={props.step.id}
       />}
     </div>}
+    {!collapsed && props.attachmentScope && <ScenarioAttachmentControls
+      fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />}
+    {!collapsed && props.attachments}
   </article>;
 }

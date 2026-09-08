@@ -6722,7 +6722,7 @@
       },
       "AttachmentOwnerKind": {
         "type": "string",
-        "enum": ["test_case_revision", "run", "run_attempt", "defect"]
+        "enum": ["test_case_revision", "shared_step_revision", "run", "run_attempt", "defect"]
       },
       "PageMeta": {
         "type": "object",
@@ -7652,6 +7652,7 @@
         "type": "object", "additionalProperties": false,
         "required": ["action", "expectedResult"],
         "properties": {
+          "attachmentIds": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Identifier" } },
           "id": { "$ref": "#/components/schemas/Identifier" },
           "order": { "type": "integer", "minimum": 1, "maximum": 100 },
           "action": { "allOf": [{ "$ref": "#/components/schemas/LongText" }], "minLength": 1 },
@@ -9424,9 +9425,20 @@
           "defectId": { "$ref": "#/components/schemas/Identifier" }
         }
       },
+      "SharedStepRevisionAttachmentOwner": {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "sharedStepId", "revisionNo", "stepId"],
+        "properties": {
+          "kind": { "const": "shared_step_revision" },
+          "sharedStepId": { "$ref": "#/components/schemas/Identifier" },
+          "revisionNo": { "type": "integer", "minimum": 1 },
+          "stepId": { "$ref": "#/components/schemas/Identifier" }
+        }
+      },
       "AttachmentOwner": {
         "oneOf": [
           { "$ref": "#/components/schemas/TestCaseRevisionAttachmentOwner" },
+          { "$ref": "#/components/schemas/SharedStepRevisionAttachmentOwner" },
           { "$ref": "#/components/schemas/RunAttachmentOwner" },
           { "$ref": "#/components/schemas/RunAttemptAttachmentOwner" },
           { "$ref": "#/components/schemas/DefectAttachmentOwner" }
@@ -9435,6 +9447,7 @@
           "propertyName": "kind",
           "mapping": {
             "test_case_revision": "#/components/schemas/TestCaseRevisionAttachmentOwner",
+            "shared_step_revision": "#/components/schemas/SharedStepRevisionAttachmentOwner",
             "run": "#/components/schemas/RunAttachmentOwner",
             "run_attempt": "#/components/schemas/RunAttemptAttachmentOwner",
             "defect": "#/components/schemas/DefectAttachmentOwner"

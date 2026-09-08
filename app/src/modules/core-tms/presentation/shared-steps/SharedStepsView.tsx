@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { emptySharedStepDraft, type SharedStepDraft } from "../../shared-steps/model/shared-step";
 import type { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
-import { SharedStepEditor } from "./SharedStepEditor";
+import { SharedStepAttachmentEditor } from "./attachments/SharedStepAttachmentEditor";
 import styles from "./sharedSteps.module.css";
 
 type Resource = ReturnType<typeof useSharedSteps>;
@@ -25,11 +25,9 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
     if (!current) { setEditingId(null); return; }
     setDraft({ title: current.current.title, items: current.current.items, changeNote: "" });
   };
-  if (draft) return <SharedStepEditor draft={draft} saving={resource.saving} ru={ru}
-    onChange={setDraft} onCancel={() => { setDraft(null); setEditingId(null); resource.close(); }}
-    onSave={() => void resource.save(draft, editingId ? resource.selected : null).then((saved) => {
-      if (!saved) return; setDraft(null); setEditingId(null); resource.close();
-    })} />;
+  if (draft) return <SharedStepAttachmentEditor draft={draft} resource={resource}
+    current={editingId ? resource.selected : null} ru={ru} onChange={setDraft}
+    onClose={() => { setDraft(null); setEditingId(null); resource.close(); }} />;
 
   return <section className={styles.view}>
     <header className={styles.header}>

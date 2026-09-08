@@ -48,7 +48,8 @@ export async function uploadEvidence(input: {
       owner: input.owner,
       kind: kind(mime, file),
       mimeType: mime,
-      file,
+      file: file.type && file.type !== mime
+        ? new File([file], file.name, { type: mime, lastModified: file.lastModified }) : file,
       operationKey: `${input.operationKeyPrefix}:${index}`,
       signal: input.signal,
     }));

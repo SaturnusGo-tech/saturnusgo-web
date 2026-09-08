@@ -16,6 +16,7 @@ export type AttachmentMimeType =
   | "application/octet-stream";
 
 export type AttachmentOwner =
+  | { readonly kind: "shared_step_revision"; readonly sharedStepId: string; readonly revisionNo: number; readonly stepId: string }
   | { readonly kind: "test_case_revision"; readonly caseId: string; readonly revisionNo: number; readonly stepId?: string }
   | { readonly kind: "run"; readonly runId: string }
   | {

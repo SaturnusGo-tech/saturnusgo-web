@@ -14,6 +14,8 @@ function owner(dto: AttachmentDto["owner"]): AttachmentOwner {
   switch (dto.kind) {
     case "test_case_revision":
       return { kind: dto.kind, caseId: dto.caseId, revisionNo: dto.revisionNo, stepId: dto.stepId };
+    case "shared_step_revision":
+      return { kind: dto.kind, sharedStepId: dto.sharedStepId, revisionNo: dto.revisionNo, stepId: dto.stepId };
     case "run":
       return { kind: dto.kind, runId: dto.runId };
     case "run_attempt":

@@ -24,10 +24,11 @@ test("shared-step adapter uses project-scoped collection routes", async () => {
   await listSharedSteps(http, "project-1");
   const created = await createSharedStep(http, "project-1", { title: "Авторизация", items: [
     { id: "item-1", order: 1, action: "Войти", expectedResult: "Главная открыта",
-      testData: "", required: true, attachmentIds: [] }], changeNote: "" });
+      testData: "", required: true, attachmentIds: ["asset-existing"] }], changeNote: "" });
 
   assert.equal(calls[0]?.path, "/projects/project-1/shared-steps?limit=100");
   assert.equal(calls[1]?.path, "/projects/project-1/shared-steps");
   assert.equal(calls[1]?.method, "POST");
   assert.equal(created.current.items[0]?.id, "item-1");
+  assert.deepEqual((calls[1]?.body as { items: { attachmentIds: string[] }[] }).items[0].attachmentIds, ["asset-existing"]);
 });

@@ -2431,7 +2431,7 @@ export interface components {
         /** @description Stable workspace-scoped integration route id. android, ios, and backend remain valid legacy values. On defect representations and mutations, a null target remains Falcon-only under a v1 configuration and means automatic matcher-then-default routing only after an administrator explicitly saves configurationVersion 2. */
         DefectIntegrationTarget: string;
         /** @enum {string} */
-        AttachmentOwnerKind: "test_case_revision" | "run" | "run_attempt" | "defect";
+        AttachmentOwnerKind: "test_case_revision" | "shared_step_revision" | "run" | "run_attempt" | "defect";
         PageMeta: {
             limit: number;
             hasMore: boolean;
@@ -2936,6 +2936,7 @@ export interface components {
             sharedStep: components["schemas"]["SharedStepSnapshot"] | null;
         };
         SharedStepItemInput: {
+            attachmentIds?: components["schemas"]["Identifier"][];
             id?: components["schemas"]["Identifier"];
             order?: number;
             action: components["schemas"]["LongText"];
@@ -4124,7 +4125,17 @@ export interface components {
             kind: "defect";
             defectId: components["schemas"]["Identifier"];
         };
-        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"];
+        SharedStepRevisionAttachmentOwner: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "shared_step_revision";
+            sharedStepId: components["schemas"]["Identifier"];
+            revisionNo: number;
+            stepId: components["schemas"]["Identifier"];
+        };
+        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["SharedStepRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"];
         /** @description Private object metadata. Bucket, object key, provider details, and reusable public URLs are never exposed. */
         Attachment: {
             id: components["schemas"]["Identifier"];

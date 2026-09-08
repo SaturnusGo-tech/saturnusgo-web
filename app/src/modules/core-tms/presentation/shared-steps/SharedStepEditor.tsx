@@ -3,12 +3,15 @@
 import { ArrowLeft, Plus, Save } from "lucide-react";
 import type { TestStep } from "../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepDraft } from "../../shared-steps/model/shared-step";
+import { SharedStepSavedAttachments } from "./attachments/SharedStepSavedAttachments";
 import { ScenarioStepEditor } from "../cases/inspector/steps/editor/ScenarioStepEditor";
 import styles from "./sharedSteps.module.css";
 
-export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave }: {
+export function SharedStepEditor({ draft, saving, locked = false, error, ru, onChange, onCancel, onSave }: {
   draft: SharedStepDraft;
   saving: boolean;
+  locked?: boolean;
+  error?: string;
   ru: boolean;
   onChange: (draft: SharedStepDraft) => void;
   onCancel: () => void;
@@ -46,11 +49,11 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
     draft.items.every((item) => item.action.trim() && item.expectedResult.trim());
   return <section className={styles.editor} aria-label={ru ? "Редактор общего шага" : "Shared step editor"}>
     <header className={styles.editorHeader}>
-      <button type="button" className={styles.iconButton} onClick={onCancel}
+      <button type="button" className={styles.iconButton} onClick={onCancel} disabled={saving}
         aria-label={ru ? "Вернуться к списку" : "Back to list"}><ArrowLeft size={18} /></button>
       <div className={styles.titleField}>
         <span>{ru ? "Блок общих шагов" : "Shared step block"}</span>
-        <input autoFocus aria-label={ru ? "Название блока общих шагов" : "Shared step block title"}
+        <input autoFocus disabled={saving || locked} aria-label={ru ? "Название блока общих шагов" : "Shared step block title"}
           value={draft.title} onChange={(event) => onChange({ ...draft,
           title: event.target.value })} placeholder={ru ? "Например, авторизация" : "For example, authentication"} />
       </div>
@@ -64,6 +67,8 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
       </div>
     </header>
     <div className={styles.editorScroll}>
+      {error && <p role="alert" className={styles.saveError}>{error}</p>}
+      <fieldset className={styles.editorFields} disabled={saving || locked}>
       <div className={styles.paper}>
         <div className={styles.scenarioHeading}>
           <h2>{ru ? "Шаги" : "Steps"}</h2>
@@ -73,7 +78,9 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
           {draft.items.map((item, index) => <ScenarioStepEditor key={item.id}
             step={{ ...item, attachmentIds: [...item.attachmentIds] }} order={index + 1}
             autoFocus={false} canRemove={draft.items.length > 1} ru={ru}
-            sharedSteps={[]} allowSharedSteps={false}
+            sharedSteps={[]} allowSharedSteps={false} attachmentScope="step"
+            attachments={<SharedStepSavedAttachments ids={item.attachmentIds} ru={ru}
+              onRemove={(id) => updateItem(item.id, { attachmentIds: item.attachmentIds.filter((value) => value !== id) })} />}
             onChange={(patch) => updateItem(item.id, patch)}
             onAddAfter={(withExpected) => addAfter(index, withExpected)}
             onInsertShared={() => undefined} onDuplicate={() => duplicate(index)}
@@ -83,6 +90,7 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
           </button>
         </div>
       </div>
+      </fieldset>
     </div>
   </section>;
 }

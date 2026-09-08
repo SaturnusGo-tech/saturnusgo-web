@@ -10,8 +10,9 @@ import {
 import { AttachmentMediaFrame } from "./AttachmentMediaFrame";
 import styles from "./attachmentLink.module.css";
 
-export function AttachmentLink({ attachmentId, presentation = "link", variant = "scenario" }: {
+export function AttachmentLink({ attachmentId, presentation = "link", variant = "scenario", onDetach }: {
   attachmentId: string;
+  onDetach?: () => void;
   presentation?: "link" | "media";
   variant?: "scenario" | "gallery";
 }) {
@@ -113,7 +114,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
       loading={opening}
       removing={removing}
       onOpen={() => void open()}
-      onRemove={() => void remove()}
+      onRemove={onDetach ?? (resource.metadata.owner.kind === "shared_step_revision" ? undefined : () => void remove())}
       onExpandedChange={(expanded) => { if (expanded) setPreviewRequested(true); }}
     />;
   }
@@ -122,10 +123,10 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
     <button type="button" onClick={() => void open()} disabled={opening}>
       <Paperclip size={14} />{resource.metadata.originalFilename}
     </button>
-    <button type="button" onClick={() => void remove()} disabled={removing}
+    {(onDetach || resource.metadata.owner.kind !== "shared_step_revision") && <button type="button" onClick={onDetach ?? (() => void remove())} disabled={removing}
       aria-label={`${t("common.remove")} ${resource.metadata.originalFilename}`} title={t("common.remove")}>
       <Trash2 size={13} />
-    </button>
+    </button>}
   </span>;
 }
 

@@ -90,7 +90,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     return <WorkspaceCasesStage model={model} />;
   }
   if (model.view === "shared-steps") {
-    return <SharedStepsView resource={model.sharedSteps} />;
+    return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
   }
   if (model.view === "integrations") {
     return (
