@@ -2,6 +2,27 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import type { CollisionDetection } from "@dnd-kit/core";
+import { widgetCollisions } from "../customize/grid/collision/widgetCollisions";
+
+test("unequal widget sizes target the intended counter with keyboard and pointer", () => {
+  const rect = (left: number, top: number, width: number, height: number) =>
+    ({ left, top, width, height, right: left + width, bottom: top + height });
+  const metric = rect(96, 242, 280, 124), panel = rect(96, 386, 1156, 196);
+  const containers = ["metric", "panel"].map((id, i) => ({ id, key: id, disabled: false,
+    data: { current: {} }, node: { current: null }, rect: { current: i ? panel : metric } }));
+  const args: Parameters<CollisionDetection>[0] = {
+    active: { id: "panel", data: { current: {} }, rect: { current: { initial: panel, translated: null } } },
+    collisionRect: rect(96, 242, 1156, 196),
+    droppableRects: new Map([["metric", metric], ["panel", panel]]),
+    droppableContainers: containers, pointerCoordinates: null,
+  };
+  assert.equal(widgetCollisions(args)[0].id, "metric");
+  assert.equal(widgetCollisions({ ...args, pointerCoordinates: { x: 114, y: 260 } })[0].id, "metric");
+  assert.equal(widgetCollisions({ ...args, collisionRect: panel })[0].id, "panel");
+  assert.equal(widgetCollisions({ ...args, pointerCoordinates: { x: 700, y: 410 } })[0].id, "panel");
+  assert.equal(widgetCollisions({ ...args, pointerCoordinates: { x: 240, y: 380 } }).length, 2);
+});
 
 const portfolio = readFileSync(new URL("../sections/DashboardPortfolio.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../dashboard.module.css", import.meta.url), "utf8");

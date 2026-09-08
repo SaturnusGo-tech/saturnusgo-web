@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCenter, MeasuringStrategy, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, MeasuringStrategy, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useReducedMotion } from "framer-motion";
 import type { BoardWidget } from "../../../../dashboards/layout/model/layout";
 import { widgetByKey, widgetKey } from "../../../../dashboards/layout/model/widget-catalog";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { SortableWidget } from "./SortableWidget";
+import { widgetCollisions } from "./collision/widgetCollisions";
 import styles from "../layout.module.css";
 
 export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onResize, render }: {
@@ -20,7 +21,7 @@ export function WidgetGrid({ widgets, editing, disabled, onMove, onRemove, onRes
   const title = (widget: BoardWidget) => { const definition = widgetByKey.get(widgetKey(widget));
     return definition ? locale === "ru" ? definition.ru : definition.en : widget.title; };
   const name = (id: string | number) => { const widget = widgets.find((item) => item.id === String(id)); return widget ? title(widget) : String(id); };
-  return <DndContext sensors={sensors} collisionDetection={closestCenter} measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+  return <DndContext sensors={sensors} collisionDetection={widgetCollisions} measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
     accessibility={{ screenReaderInstructions: { draggable: t("dashboardLayout.dragHelp") }, announcements: {
       onDragStart: ({active}) => t("dashboardLayout.picked", {name:name(active.id)}),
       onDragOver: ({active,over}) => over ? t("dashboardLayout.dropped",{name:name(active.id),position:widgets.findIndex(w=>w.id===over.id)+1}) : undefined,
