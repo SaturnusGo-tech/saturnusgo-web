@@ -21,8 +21,11 @@ export function DashboardView(props: DashboardViewProps) {
   const canEdit = data.meta.authorization.capabilities.includes("report:manage");
   const disabled = layout.saving || layout.retryPending;
   const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
-  const create = () => { layout.controller.edit(t("dashboardLayout.defaultName")); };
-  const openCatalog = () => setCatalogScope(scope);
+  const edit = () => { layout.controller.edit(t("dashboardLayout.defaultName")); };
+  const openCatalog = () => {
+    if (!editing) edit();
+    setCatalogScope(scope);
+  };
   const catalogOpen = editing && catalogScope === scope;
   const addButton = useRef<HTMLButtonElement>(null);
   const wasCatalogOpen = useRef(false);
@@ -51,7 +54,7 @@ export function DashboardView(props: DashboardViewProps) {
           <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
           <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft!.name.trim() || layout.failure === "conflict"}
             onClick={() => void layout.controller.save()}>{layout.saving && <LoaderCircle size={15} className={surface.spin} />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
-        </> : canEdit && board && <button type="button" className={styles.editButton} onClick={create} aria-label={t("dashboardLayout.edit")} title={t("dashboardLayout.edit")}><Pencil size={15} />{t("dashboardLayout.edit")}</button>}
+        </> : canEdit && board && <button type="button" className={styles.editButton} onClick={edit} aria-label={t("dashboardLayout.edit")} title={t("dashboardLayout.edit")}><Pencil size={15} />{t("dashboardLayout.edit")}</button>}
       </div>}
     </header>
     {layout.failure && <div className={styles.failure} role="alert">
@@ -59,8 +62,8 @@ export function DashboardView(props: DashboardViewProps) {
       {!layout.retryPending && <button type="button" onClick={() => void layout.controller.load()}>{t(layout.draft ? "dashboardLayout.reload" : "dashboardLayout.retry")}</button>}
     </div>}
     {layout.loading ? <div className={styles.loading} role="status"><LoaderCircle size={20} className={surface.spin} />{t("dashboardLayout.loading")}</div>
-      : !board ? !layout.failure && <DashboardEmpty editing={false} canEdit={canEdit} onCreate={create} />
-      : !board.widgets.length ? <DashboardEmpty editing={editing} canEdit={canEdit && !disabled} onCreate={editing ? openCatalog : create} />
+      : !board ? !layout.failure && <DashboardEmpty editing={false} canEdit={canEdit} onAdd={openCatalog} />
+      : !board.widgets.length ? <DashboardEmpty editing={editing} canEdit={canEdit && !disabled && layout.failure !== "conflict"} onAdd={openCatalog} />
       : <DashboardContent key={scope} {...props} layout={layout} />}
   </div>;
 }

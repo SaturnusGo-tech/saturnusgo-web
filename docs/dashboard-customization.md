@@ -2,7 +2,7 @@
 
 The dashboard uses existing dashboard and widget records. No database migration is needed. GET /dashboards supports projectOnly=true, bound to the project scope and pagination cursor. Existing callers retain their original behavior.
 
-A project starts empty. The current dashboard is its active default, or first active project dashboard if none is marked default. Layout is shared by the project team. The first iteration exposes one current layout per project. Changes remain an editing draft until Save. ETag protects concurrent updates; an interrupted save retries the same idempotent command. Widget settings.presentation identifies a catalog presentation without duplicating metric calculation. Server analytics and workbench projections remain authoritative.
+A project starts empty. Its Add widgets button initializes an unsaved editing draft and opens the full-page catalog in the same action; no intermediate Create dashboard step is shown. This also applies to a saved empty layout. The current dashboard is its active default, or first active project dashboard if none is marked default. Layout is shared by the project team. The first iteration exposes one current layout per project. Changes remain an editing draft until Save. ETag protects concurrent updates; an interrupted save retries the same idempotent command. Widget settings.presentation identifies a catalog presentation without duplicating metric calculation. Server analytics and workbench projections remain authoritative.
 
 The 36 catalog entries can be added, removed, resized and reordered. A pencil opens editing; drag handles and remove/size controls are absent in viewing mode. Pointer and keyboard dragging, reduced motion, Russian/English and responsive layouts are supported.
 
@@ -12,7 +12,7 @@ Numeric widgets always use the compact width, including legacy saved metrics con
 
 ## Artwork provenance
 
-The three flat technical covers were generated with the built-in image_gen tool, then encoded as 768px WebP assets with cwebp for delivery. Original generated PNGs remain in the Codex generated_images directory. Only cover-library.webp is currently used, as the empty-state illustration; catalog entries use semantic icons. The other two assets remain available for compatibility with previously deployed bundles. No 3D art is shipped.
+The three flat technical covers were generated with the built-in image_gen tool, then encoded as 768px WebP assets with cwebp for delivery. Original generated PNGs remain in the Codex generated_images directory. The empty state uses empty-library.webp, a transparent-alpha extraction of cover-library.webp made with the built-in image_gen tool; it has no container background. The original cover assets remain for compatibility; catalog entries use semantic icons. No 3D art is shipped.
 
 ### cover-activity.webp
 
@@ -25,3 +25,7 @@ Use case: productivity-visual. Asset type: premium developer-tool extension mark
 ### cover-library.webp
 
 Use case: productivity-visual. Asset type: premium developer-tool extension marketplace cover art, 1536x1024 landscape, flat 2D only. Extremely precise technical editorial graphic with sophisticated graphic design, like a carefully drawn systems diagram from a high-end developer magazine. Off-black #141416 background, subtle neutral hairlines, restrained electric-blue highlights, crisp negative space, optical balance. No 3D, no glass, no bevels, no shadows, no floating windows, no dashboard mockup, no gradients, no stock sci-fi imagery, no robots, no text, no letters, no numbers, no watermark. The art must still read clearly as a small cover at 200px wide. Three or four strong shapes and controlled fine detail, designed rather than random. Subject: a flat index of modular technical diagrams arranged on a sparse drafting grid: four outlined square modules, one with an elegant dot matrix, one with three fine aligned lines, and one selected module marked by small cobalt corner brackets. The connected modules fit together like a logical system. No overlapping cards, no depth.
+
+### empty-library.webp
+
+Background extraction of the existing modular line illustration. Real alpha, transparent module interiors, no construction-grid backdrop. Encoded as lossless 768 × 512 WebP; source PNG is exec-45352d13-f252-4dae-af72-1c5dcd0c4afe.png in the Codex generated_images directory.
