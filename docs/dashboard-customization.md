@@ -6,9 +6,11 @@ A project starts empty. The current dashboard is its active default, or first ac
 
 The 36 catalog entries can be added, removed, resized and reordered. A pencil opens editing; drag handles and remove/size controls are absent in viewing mode. Pointer and keyboard dragging, reduced motion, Russian/English and responsive layouts are supported.
 
+The widget library is a full page within the existing Falcon shell. It preserves the global navigation and project context. Categories, search and compact icon/text entries replace the former modal and image-cover cards. Back to layout preserves the editing draft; Save publishes it to the project. The library does not mount a portal, backdrop or focus trap.
+
 ## Artwork provenance
 
-The three flat technical covers were generated with the built-in image_gen tool, then encoded as 768px WebP assets with cwebp for delivery. Original generated PNGs remain in the Codex generated_images directory. The library illustration also serves the empty state. No 3D art is shipped.
+The three flat technical covers were generated with the built-in image_gen tool, then encoded as 768px WebP assets with cwebp for delivery. Original generated PNGs remain in the Codex generated_images directory. Only cover-library.webp is currently used, as the empty-state illustration; catalog entries use semantic icons. The other two assets remain available for compatibility with previously deployed bundles. No 3D art is shipped.
 
 ### cover-activity.webp
 
@@ -21,4 +23,3 @@ Use case: productivity-visual. Asset type: premium developer-tool extension mark
 ### cover-library.webp
 
 Use case: productivity-visual. Asset type: premium developer-tool extension marketplace cover art, 1536x1024 landscape, flat 2D only. Extremely precise technical editorial graphic with sophisticated graphic design, like a carefully drawn systems diagram from a high-end developer magazine. Off-black #141416 background, subtle neutral hairlines, restrained electric-blue highlights, crisp negative space, optical balance. No 3D, no glass, no bevels, no shadows, no floating windows, no dashboard mockup, no gradients, no stock sci-fi imagery, no robots, no text, no letters, no numbers, no watermark. The art must still read clearly as a small cover at 200px wide. Three or four strong shapes and controlled fine detail, designed rather than random. Subject: a flat index of modular technical diagrams arranged on a sparse drafting grid: four outlined square modules, one with an elegant dot matrix, one with three fine aligned lines, and one selected module marked by small cobalt corner brackets. The connected modules fit together like a logical system. No overlapping cards, no depth.
-

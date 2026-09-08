@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, Plus, Pencil } from "lucide-react";
 import { useDashboardLayout } from "../../dashboards/layout/application/useDashboardLayout";
 import { createBoardWidget, widgetKey } from "../../dashboards/layout/model/widget-catalog";
@@ -24,6 +23,19 @@ export function DashboardView(props: DashboardViewProps) {
   const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
   const create = () => { layout.controller.edit(t("dashboardLayout.defaultName")); };
   const openCatalog = () => setCatalogScope(scope);
+  const catalogOpen = editing && catalogScope === scope;
+  const addButton = useRef<HTMLButtonElement>(null);
+  const wasCatalogOpen = useRef(false);
+  useEffect(() => { setCatalogScope(null); }, [scope]);
+  useEffect(() => {
+    if (!catalogOpen && wasCatalogOpen.current) addButton.current?.focus();
+    wasCatalogOpen.current = catalogOpen;
+  }, [catalogOpen]);
+  if (catalogOpen) return <div className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
+    <WidgetCatalog dashboardName={board!.name} selected={new Set(board!.widgets.map(widgetKey))}
+      onBack={() => setCatalogScope(null)}
+      onAdd={(definitions) => layout.controller.add(definitions.map((definition) => createBoardWidget(definition, locale, crypto.randomUUID())))} />
+  </div>;
   return <div className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
     <header className={styles.header}>
       <div className={styles.heading}>
@@ -36,7 +48,7 @@ export function DashboardView(props: DashboardViewProps) {
       {!layout.loading && <div className={styles.actions}>
         {editing ? <>
           <button type="button" className={styles.quiet} disabled={disabled} onClick={() => { setCatalogScope(null); layout.controller.cancel(); }}>{t("dashboardLayout.cancel")}</button>
-          <button type="button" className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
+          <button type="button" ref={addButton} className={styles.secondary} disabled={disabled || layout.failure === "conflict"} onClick={openCatalog}><Plus size={15} />{t("dashboardLayout.add")}</button>
           <button type="button" className={styles.primary} disabled={layout.saving || !layout.draft!.name.trim() || layout.failure === "conflict"}
             onClick={() => void layout.controller.save()}>{layout.saving && <LoaderCircle size={15} className={surface.spin} />}{t(layout.saving ? "dashboardLayout.saving" : layout.retryPending ? "dashboardLayout.retry" : "dashboardLayout.save")}</button>
         </> : canEdit && board && <button type="button" className={styles.editButton} onClick={create} aria-label={t("dashboardLayout.edit")} title={t("dashboardLayout.edit")}><Pencil size={15} />{t("dashboardLayout.edit")}</button>}
@@ -50,7 +62,5 @@ export function DashboardView(props: DashboardViewProps) {
       : !board ? !layout.failure && <DashboardEmpty editing={false} canEdit={canEdit} onCreate={create} />
       : !board.widgets.length ? <DashboardEmpty editing={editing} canEdit={canEdit && !disabled} onCreate={editing ? openCatalog : create} />
       : <DashboardContent key={scope} {...props} layout={layout} />}
-    <AnimatePresence>{editing && catalogScope === scope && <WidgetCatalog selected={new Set(board?.widgets.map(widgetKey))}
-      onClose={() => setCatalogScope(null)} onAdd={(definitions) => layout.controller.add(definitions.map((definition) => createBoardWidget(definition,locale,crypto.randomUUID())))} />}</AnimatePresence>
   </div>;
 }

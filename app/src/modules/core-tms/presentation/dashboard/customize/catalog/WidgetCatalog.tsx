@@ -1,51 +1,74 @@
 "use client";
-import { createPortal } from "react-dom";
-import surface from "../../dashboard.module.css";
-import { Search, X } from "lucide-react";
+import { ArrowLeft, ChartNoAxesCombined, Grid2X2, Layers3, Play, Plus, Search } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import { widgetCatalog, type WidgetDefinition, type WidgetGroup } from "../../../../dashboards/layout/model/widget-catalog";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import styles from "../layout.module.css";
-import store from "./catalog.module.css";
-import { WidgetCard } from "./WidgetCard";
+import styles from "./catalog.module.css";
+import { WidgetEntry } from "./WidgetEntry";
 
-export function WidgetCatalog({ selected, onAdd, onClose }: {
-  selected: Set<string>; onAdd: (widgets: WidgetDefinition[]) => void; onClose: () => void;
+const categories = [
+  { key: "all", icon: Grid2X2 }, { key: "live", icon: Play },
+  { key: "history", icon: ChartNoAxesCombined }, { key: "library", icon: Layers3 },
+] as const;
+
+export function WidgetCatalog({ dashboardName, selected, onAdd, onBack }: {
+  dashboardName: string;
+  selected: Set<string>;
+  onAdd: (widgets: WidgetDefinition[]) => void;
+  onBack: () => void;
 }) {
-  const { t } = useTmsLocale(); const reduced = useReducedMotion(); const id = useId();
-  const ref = useRef<HTMLDivElement>(null); const [search, setSearch] = useState("");
+  const { t } = useTmsLocale();
+  const titleId = useId();
+  const heading = useRef<HTMLHeadingElement>(null);
+  const [search, setSearch] = useState("");
   const [group, setGroup] = useState<WidgetGroup | "all">("all");
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    ref.current?.querySelector<HTMLInputElement>("input")?.focus();
-    return () => previous?.focus();
-  }, []);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, []);
   const rows = widgetCatalog.filter((widget) => (group === "all" || widget.group === group) &&
     `${widget.ru} ${widget.en} ${widget.hintRu} ${widget.hintEn}`.toLowerCase().includes(search.trim().toLowerCase()));
   const missing = widgetCatalog.filter((widget) => !selected.has(widget.key));
-  return createPortal(<div className={`${surface.page} ${styles.portal}`}><div className={store.backdrop} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <motion.div ref={ref} role="dialog" aria-modal="true" aria-labelledby={id} className={store.catalog}
-      initial={reduced ? false : { y: 14, scale: .985, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} exit={{ y: 14, scale: .985, opacity: 0 }} transition={{ duration: reduced ? 0 : .2 }}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") { event.stopPropagation(); onClose(); }
-        if (event.key !== "Tab") return;
-        const elements = Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, [tabindex="0"]') ?? []);
-        const first = elements[0]; const last = elements[elements.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-      }}>
-      <header><div><span className={store.eyebrow}>FALCON / WIDGETS</span><h2 id={id}>{t("dashboardLayout.catalog")}</h2><p>{t("dashboardLayout.catalogHint")}</p></div>
-        <button type="button" onClick={onClose} aria-label={t("dashboardLayout.close")}><X size={18} /></button></header>
-      <div className={store.discovery}><label className={store.search}><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("dashboardLayout.search")} aria-label={t("dashboardLayout.search")} /></label>
-      <div className={store.categories}>{(["all", "live", "history", "library"] as const).map((item) =>
-        <button key={item} type="button" aria-pressed={group === item} onClick={() => setGroup(item)}>{t(`dashboardLayout.${item}`)}</button>)}</div></div>
-      <div className={store.results}>
-        <div className={store.resultsHeading}><strong>{t(group === "all" ? "dashboardLayout.all" : `dashboardLayout.${group}`)}</strong><span>{rows.length}</span></div>
-        <div className={store.cards}>{rows.map((widget) => <WidgetCard key={widget.key} widget={widget} added={selected.has(widget.key)} onAdd={() => onAdd([widget])} />)}</div>
-        {!rows.length && <p className={styles.noResults}>{t("dashboardLayout.noMatches")}</p>}
+  return <section className={styles.catalog} aria-labelledby={titleId}>
+    <div className={styles.topbar}>
+      <button type="button" className={styles.back} onClick={onBack} aria-label={`${t("dashboardLayout.back")}: ${dashboardName}`}>
+        <ArrowLeft size={16} /><span>{dashboardName}</span>
+      </button>
+      <div className={styles.selection}>
+        <span aria-live="polite">{t("dashboardLayout.selectedCount", { count: selected.size })}</span>
+        <button type="button" className={styles.returnButton} onClick={onBack}>{t("dashboardLayout.back")}</button>
       </div>
-      <footer><span>{selected.size} / {widgetCatalog.length}</span><button className={styles.primary} disabled={!missing.length} onClick={() => onAdd(missing)}>{t("dashboardLayout.addAll")}</button></footer>
-    </motion.div>
-  </div></div>, document.body);
+    </div>
+    <header className={styles.heading}>
+      <h1 id={titleId} ref={heading} tabIndex={-1}>{t("dashboardLayout.catalog")}</h1>
+      <p>{t("dashboardLayout.catalogHint")}</p>
+    </header>
+    <div className={styles.layout}>
+      <aside className={styles.sidebar}>
+        <span className={styles.sidebarLabel}>{t("dashboardLayout.categories")}</span>
+        <nav aria-label={t("dashboardLayout.categories")}>
+          {categories.map(({ key, icon: Icon }) => <button type="button" key={key}
+            aria-pressed={group === key} onClick={() => setGroup(key)}>
+            <Icon size={15} aria-hidden="true" /><span>{t(`dashboardLayout.${key}`)}</span>
+            <small>{key === "all" ? widgetCatalog.length : widgetCatalog.filter((widget) => widget.group === key).length}</small>
+          </button>)}
+        </nav>
+        <button type="button" className={styles.addAll} disabled={!missing.length} onClick={() => onAdd(missing)}>
+          <Plus size={14} />{t("dashboardLayout.addAll")}
+        </button>
+      </aside>
+      <section className={styles.results} aria-label={t("dashboardLayout.all")}>
+        <div className={styles.resultsHeading}>
+          <h2>{t(`dashboardLayout.${group}`)}<span>{rows.length}</span></h2>
+          <label className={styles.search}>
+            <Search size={15} aria-hidden="true" />
+            <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
+              placeholder={t("dashboardLayout.search")} aria-label={t("dashboardLayout.search")} />
+          </label>
+        </div>
+        <div className={styles.entries}>
+          {rows.map((widget) => <WidgetEntry key={widget.key} widget={widget}
+            added={selected.has(widget.key)} onAdd={() => onAdd([widget])} />)}
+        </div>
+        {!rows.length && <p className={styles.noResults}>{t("dashboardLayout.noMatches")}</p>}
+      </section>
+    </div>
+  </section>;
 }
