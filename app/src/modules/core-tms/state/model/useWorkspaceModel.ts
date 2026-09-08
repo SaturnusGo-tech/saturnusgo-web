@@ -13,6 +13,7 @@ import { useDefectNavigation } from "../defect-navigation/useDefectNavigation";
 import { useSelectedDefectResource } from "../defect-resource/useSelectedDefectResource";
 import { useRunNavigation } from "../run-navigation/useRunNavigation";
 import { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
+import { useWorkspaceVerification } from "../../runs/verification/state/workspace/useWorkspaceVerification";
 
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
@@ -49,6 +50,7 @@ export function useWorkspaceModel() {
     defectNavigation.selectedDefectId,
   );
   const sharedSteps = useSharedSteps(derived.project?.id ?? "", state.connection);
+  const verification = useWorkspaceVerification(state, derived, openRun);
   useEffect(() => {
     if (state.canWriteNavigation() && state.view === "reports" && selectedDefectResource.status === "ready"
       && selectedDefectResource.data?.projectId === derived.project?.id) {
@@ -76,6 +78,7 @@ export function useWorkspaceModel() {
     reportDefects,
     selectedDefectResource,
     sharedSteps,
+    verification,
     canManageIntegrations: capabilities.includes("integration:manage"),
   };
 }

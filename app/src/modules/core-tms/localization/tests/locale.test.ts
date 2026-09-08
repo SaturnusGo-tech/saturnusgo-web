@@ -52,4 +52,6 @@ test("stable enum values receive locale-aware labels", () => {
   assert.equal(localizedLabel("ru", "not_started"), "Не начат");
   assert.equal(localizedLabel("ru", "aborted"), "Прерван");
   assert.equal(localizedLabel("en", "aborted"), "Aborted");
+  assert.equal(localizedLabel("ru", "ready_for_retest"), "На проверку");
+  assert.equal(localizedLabel("en", "ready_for_retest"), "Ready for QA");
 });

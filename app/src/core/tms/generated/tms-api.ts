@@ -4,6 +4,101 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/shared-steps/{sharedStepId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                sharedStepId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Remove a shared step from the library while preserving existing references */
+        post: operations["archiveSharedStep"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/runs/{runId}/verification": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Read immutable defect scope and current readiness for a run */
+        get: operations["getRunVerificationScope"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/verification-runs": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create or open a standard run for the current verification queue
+         * @description Rechecks scope under transactional locks, deduplicates cases, and reuses an active run for the same scope, environment and build. Does not confirm fixes. Requires run management and execution capabilities.
+         */
+        post: operations["createVerificationRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/verification-queue": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Find test cases linked to fixes awaiting QA
+         * @description Project-scoped queue, up to 100 entries per page. Scope token covers the complete snapshot. Above 10,000 occurrence mappings the request explicitly fails rather than truncating scope. Archived or deprecated cases and missing exact steps are listed as blocked.
+         */
+        get: operations["getVerificationQueue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspaceId}/dashboard-analytics/workbench": {
         parameters: {
             query?: never;
@@ -2171,6 +2266,71 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        RunVerificationEnvelope: {
+            data: components["schemas"]["RunVerificationEntry"][];
+            meta: components["schemas"]["VerificationPageMeta"];
+        };
+        VerificationQueueEnvelope: {
+            data: components["schemas"]["VerificationQueue"];
+            meta: components["schemas"]["VerificationPageMeta"];
+        };
+        VerificationRunRequest: {
+            scopeToken: string;
+            environmentId: components["schemas"]["Identifier"];
+            build: string;
+            name: string;
+        };
+        VerificationQueue: {
+            scopeToken: string;
+            totalDefects: number;
+            totalCases: number;
+            blockedEntries: number;
+            entries: components["schemas"]["VerificationEntry"][];
+        };
+        VerificationPageMeta: {
+            offset: number;
+            limit: number;
+            hasMore: boolean;
+            nextOffset: number | null;
+        };
+        RunVerificationEntry: {
+            defectId: components["schemas"]["Identifier"];
+            defectKey: string;
+            defectTitle: string;
+            defectVersion: number;
+            /** Format: date-time */
+            readyAt: string;
+            occurrenceId: components["schemas"]["Identifier"] | null;
+            caseId: components["schemas"]["Identifier"] | null;
+            caseKey: string | null;
+            caseTitle: string | null;
+            caseRevision: number | null;
+            stepId: components["schemas"]["Identifier"] | null;
+            stepAction: string | null;
+            /** @enum {string|null} */
+            blockedReason: null | "no_linked_case" | "case_unavailable" | "step_missing";
+            runItemId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            currentStatus: "open" | "triaged" | "in_progress" | "ready_for_retest" | "verified" | "closed" | "reopened";
+            readinessChanged: boolean;
+        };
+        VerificationEntry: {
+            defectId: components["schemas"]["Identifier"];
+            defectKey: string;
+            defectTitle: string;
+            defectVersion: number;
+            /** Format: date-time */
+            readyAt: string;
+            occurrenceId: components["schemas"]["Identifier"] | null;
+            caseId: components["schemas"]["Identifier"] | null;
+            caseKey: string | null;
+            caseTitle: string | null;
+            caseRevision: number | null;
+            stepId: components["schemas"]["Identifier"] | null;
+            stepAction: string | null;
+            /** @enum {string|null} */
+            blockedReason: null | "no_linked_case" | "case_unavailable" | "step_missing";
+        };
         DashboardWorkbenchRun: {
             workspaceId: components["schemas"]["Identifier"];
             projectId: components["schemas"]["Identifier"];
@@ -5932,6 +6092,136 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    archiveSharedStep: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                sharedStepId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["SharedStepResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRunVerificationScope: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+                caseId?: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded verification scope. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunVerificationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createVerificationRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerificationRunRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["RunResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getVerificationQueue: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded verification scope. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationQueueEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getDashboardWorkbench: {
         parameters: {
             query?: {

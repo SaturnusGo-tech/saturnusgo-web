@@ -1,10 +1,11 @@
 "use client";
 
-import { Plus, Repeat2, Search, Workflow } from "lucide-react";
+import { Plus, Repeat2, Search, Trash2, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { emptySharedStepDraft, type SharedStepDraft } from "../../shared-steps/model/shared-step";
+import { emptySharedStepDraft, type SharedStepSummary, type SharedStepDraft } from "../../shared-steps/model/shared-step";
 import type { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
+import { ArchiveSharedStepDialog } from "./archive/ArchiveSharedStepDialog";
 import { SharedStepAttachmentEditor } from "./attachments/SharedStepAttachmentEditor";
 import styles from "./sharedSteps.module.css";
 
@@ -15,6 +16,7 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
   const ru = locale === "ru";
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState<SharedStepDraft | null>(null);
+  const [removing, setRemoving] = useState<SharedStepSummary | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const rows = useMemo(() => resource.items.filter((item) =>
     item.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())), [query, resource.items]);
@@ -56,8 +58,8 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
           {!query && <button type="button" className={styles.secondaryButton}
             onClick={() => setDraft(emptySharedStepDraft())}><Plus size={15} />{ru ? "Создать" : "Create"}</button>}
         </div>}
-      {rows.map((item) => <button key={item.id} type="button" className={styles.row}
-        onClick={() => void beginEdit(item.id)}>
+      {rows.map((item) => <div key={item.id} className={styles.row}>
+        <button type="button" className={styles.rowOpen} onClick={() => void beginEdit(item.id)}>
         <span className={styles.rowIcon}><Workflow size={17} /></span>
         <span className={styles.rowTitle}><strong>{item.title}</strong><small>{ru
           ? `Версия ${item.currentRevision}` : `Revision ${item.currentRevision}`}</small></span>
@@ -65,7 +67,14 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
         <span className={styles.rowMetric}><b>{item.usageCount}</b><small>{ru ? "использований" : "usages"}</small></span>
         <span className={styles.rowDate}>{new Intl.DateTimeFormat(ru ? "ru-RU" : "en-US", {
           day: "numeric", month: "short", year: "numeric" }).format(new Date(item.updatedAt))}</span>
-      </button>)}
+        </button>
+        <button type="button" className={styles.removeButton} disabled={!resource.archiveEnabled}
+          aria-label={ru ? `Удалить общий шаг «${item.title}»` : `Remove shared step “${item.title}”`}
+          title={ru ? "Удалить общий шаг" : "Remove shared step"} onClick={() => setRemoving(item)}>
+          <Trash2 size={15} aria-hidden="true" />
+        </button>
+      </div>)}
     </div>
+    {removing && <ArchiveSharedStepDialog item={removing} resource={resource} ru={ru} onClose={() => setRemoving(null)} />}
   </section>;
 }

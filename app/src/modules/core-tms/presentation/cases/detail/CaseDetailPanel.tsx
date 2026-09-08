@@ -2,6 +2,7 @@ import { ListChecks, Pencil } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { TmsLocale } from "../../../localization/model/locale";
+import { localizedLabel } from "../../../localization/format/labels";
 import {
   caseRevisionAttachmentIds, editorSessionClosed, inspectorRevisionProblem,
   type CaseInspectorEditor,
@@ -138,7 +139,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onClose={props.onClose}
       />
       {readyDefects > 0 && <div className={inspector.metaRow}>
-        {readyDefects > 0 && <span className={inspector.retestBadge} role="status">{ru ? "Готово к тестированию" : "Ready for testing"} · {readyDefects}</span>}
+        <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
       </div>}
       <div className={inspector.titleRow}>
         {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}

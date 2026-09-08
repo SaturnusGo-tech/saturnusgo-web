@@ -50,7 +50,7 @@ const events: Record<Settings["events"][number], [string, string]> = {
 export const eventLabel = (event: string, ru: boolean) => events[event as keyof typeof events]?.[ru ? 0 : 1] ?? event;
 export const statusLabel = (status: string, ru: boolean) => ({
   open: ["Открыт", "Open"], triaged: ["Разобран", "Triaged"], in_progress: ["В работе", "In progress"],
-  ready_for_retest: ["Готов к ретесту", "Ready for retest"], verified: ["Проверен", "Verified"],
+  ready_for_retest: ["На проверку", "Ready for QA"], verified: ["Проверен", "Verified"],
   closed: ["Закрыт", "Closed"], reopened: ["Переоткрыт", "Reopened"],
   pending: ["В очереди", "Queued"], processing: ["В обработке", "Processing"], delivered: ["Доставлено", "Delivered"],
   failed: ["Ошибка", "Failed"], uncertain: ["Нужно сверить", "Reconciliation needed"], cancelled: ["Отменено", "Cancelled"],

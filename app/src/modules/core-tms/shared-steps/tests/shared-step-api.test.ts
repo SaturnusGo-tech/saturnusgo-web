@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
-import { createSharedStep, listSharedSteps } from "../data/shared-step-api";
+import { archiveSharedStep, createSharedStep, listSharedSteps } from "../data/shared-step-api";
 
 test("shared-step adapter uses project-scoped collection routes", async () => {
   const calls: Array<{ path: string; method?: string; body?: unknown }> = [];
@@ -31,4 +31,24 @@ test("shared-step adapter uses project-scoped collection routes", async () => {
   assert.equal(calls[1]?.method, "POST");
   assert.equal(created.current.items[0]?.id, "item-1");
   assert.deepEqual((calls[1]?.body as { items: { attachmentIds: string[] }[] }).items[0].attachmentIds, ["asset-existing"]);
+});
+
+test("archive sends the listed version and stable operation key without editing shared content", async () => {
+  const calls: { path: string; method: string; body: unknown; options: unknown }[] = [];
+  const listed = { id: "shared-a", projectId: "project-a", title: "Sign in", currentRevision: 3,
+    itemCount: 1, usageCount: 4, revisionCount: 3, archivedAt: null,
+    etag: '\"shared-step:shared-a:v5\"', createdAt: "2026-09-08T00:00:00.000Z", updatedAt: "2026-09-08T00:00:00.000Z" };
+  const http = { async mutateResource(path: string, method: string, body: unknown, options: unknown) {
+    calls.push({ path, method, body, options });
+    return { data: { ...listed, archivedAt: "2026-09-08T01:00:00.000Z",
+      current: { revision: 3, title: listed.title, items: [], changeNote: "", createdBy: "qa", createdAt: listed.createdAt } },
+      etag: '\"shared-step:shared-a:v6\"' };
+  } } as unknown as TmsHttpClient;
+  const signal = new AbortController().signal;
+  const archived = await archiveSharedStep(http, listed, "stable-archive-key", signal);
+  assert.deepEqual(calls, [{ path: "/projects/project-a/shared-steps/shared-a/archive", method: "POST", body: undefined,
+    options: { ifMatch: listed.etag, idempotencyKey: "stable-archive-key", signal } }]);
+  assert.equal(archived.currentRevision, 3);
+  assert.equal(archived.etag, '\"shared-step:shared-a:v6\"');
+  assert.equal(archived.archivedAt, "2026-09-08T01:00:00.000Z");
 });

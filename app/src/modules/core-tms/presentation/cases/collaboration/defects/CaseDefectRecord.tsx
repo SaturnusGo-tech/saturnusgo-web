@@ -75,7 +75,7 @@ export function CaseDefectRecord(props: Props) {
 
     {defect.readyForTest && <div className={css.readyBanner} role="status">
       <CheckCircle2 size={15} />
-      <strong>{ru ? "Готово к тестированию" : "Ready for testing"}</strong>
+      <strong>{localizedLabel(props.locale, "ready_for_retest")}</strong>
       <span>{defect.youTrack
         ? `${ru ? "YouTrack" : "YouTrack"}: ${defect.youTrack.status}`
         : (ru ? "Статус получен в Falcon" : "Status received in Falcon")}</span>

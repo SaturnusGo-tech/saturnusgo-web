@@ -7,6 +7,7 @@ import {
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
+import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -71,6 +72,7 @@ export function WorkspaceHeader({
         </div>
       </div>
 
+      <VerificationQueueControl state={model.verification} onOpenDefect={model.openDefect} />
       <div className={shellStyles.headerMeta}>
         <div className={shellStyles.headerMetaItem} title={`${t("header.environment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />

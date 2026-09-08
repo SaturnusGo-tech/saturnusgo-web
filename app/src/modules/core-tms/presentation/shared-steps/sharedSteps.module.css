@@ -54,8 +54,13 @@
 .toolbar { height: 52px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 20px; padding: 0 13px; color: var(--ss-muted); background: var(--ss-control); border: 1px solid var(--ss-control-line); border-radius: 12px; }
 .toolbar input { width: 100%; border: 0; outline: 0; color: var(--ss-text); background: transparent; font: inherit; font-size: 13px; }
 .list { min-height: 0; overflow: auto; padding: 0 20px 24px; }
-.row { width: 100%; min-height: 64px; display: grid; grid-template-columns: 36px minmax(180px, 1fr) 92px 112px 116px; align-items: center; gap: 10px; padding: 8px 14px; color: var(--ss-text); background: transparent; border: 0; border-bottom: 1px solid var(--ss-line); cursor: pointer; text-align: left; }
-.row:hover,.row:focus-visible { background: var(--ss-hover); outline: 0; }
+.row { width: 100%; min-height: 64px; display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center; border-bottom: 1px solid var(--ss-line); }
+.row:hover,.row:focus-within { background: var(--ss-hover); }
+.rowOpen { min-width: 0; min-height: 64px; display: grid; grid-template-columns: 36px minmax(120px, 1fr) 72px 90px 94px; align-items: center; gap: 10px; padding: 8px 14px; color: var(--ss-text); background: transparent; border: 0; cursor: pointer; text-align: left; }
+.rowOpen:focus-visible,.removeButton:focus-visible { outline: 1px solid var(--ss-primary); outline-offset: -2px; }
+.removeButton { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--ss-muted); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
+.removeButton:hover { color: #cf4554; background: color-mix(in srgb, #cf4554 10%, transparent); }
+.removeButton:disabled { opacity: .4; cursor: default; }
 .rowIcon { width: 30px; height: 30px; display: grid; place-items: center; color: #7455c5; background: color-mix(in srgb, #7455c5 12%, transparent); border-radius: 9px; }
 .rowTitle,.rowMetric { min-width: 0; display: grid; gap: 2px; }
 .rowTitle strong { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
@@ -88,9 +93,18 @@
 .editor .paper .sharedRail textarea:hover { background: color-mix(in srgb, var(--ss-hover) 38%, transparent); }
 .editor .paper .sharedRail textarea:focus { background: var(--ss-raised); border-radius: 4px; border-bottom-color: transparent; box-shadow: inset 0 0 0 1px var(--ss-control-line) !important; }
 .addButton { margin: 2px 0 0 35px; background: transparent; border-color: transparent; }
-@media (max-width: 720px) { .row { grid-template-columns: 34px minmax(0, 1fr) 76px; }.rowMetric:nth-of-type(4),.rowDate { display: none; }.editorHeader { grid-template-columns: 36px minmax(0,1fr); }.editorActions { grid-column: 1/-1; justify-content: flex-end; }.editorScroll { padding: 18px 16px 42px; } }
+@media (max-width: 720px) { .rowOpen { grid-template-columns: 30px minmax(0, 1fr) 50px; padding: 8px 6px; gap: 6px; }.rowMetric:nth-of-type(4),.rowDate { display: none; }.editorHeader { grid-template-columns: 36px minmax(0,1fr); }.editorActions { grid-column: 1/-1; justify-content: flex-end; }.editorScroll { padding: 18px 16px 42px; } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
 
 .editorFields { min-width: 0; border: 0; padding: 0; margin: 0; }
 .saveError { margin: 0 0 16px; color: var(--ss-text); font-size: 13px; line-height: 1.5; }
 .savedAssets { display: flex; flex-wrap: wrap; align-items: start; gap: 12px; margin: 8px 0 20px 35px; }
+
+.archiveDialog { width: min(460px, calc(100vw - 32px)); }
+.archiveBody { padding: 20px 24px 24px; font-size: 13px; line-height: 1.6; }
+.archiveBody > strong { display: block; overflow-wrap: anywhere; }
+.archiveBody p { color: var(--ss-muted); margin: 12px 0 20px; }
+.archiveBody p[role="alert"] { color: #cf4554; }
+.archiveActions { display: flex; justify-content: flex-end; gap: 8px; }
+.dangerButton { min-height: 36px; padding: 0 13px; border: 1px solid #ba3544; border-radius: 10px; color: #fff; background: #ba3544; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.dangerButton:disabled { opacity: .48; cursor: default; }

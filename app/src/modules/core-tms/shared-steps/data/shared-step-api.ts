@@ -49,3 +49,11 @@ export async function reviseSharedStep(http: TmsHttpClient, value: SharedStep,
     "PATCH", body(draft), { ifMatch: value.etag, idempotencyKey: operationKey });
   return resource(result.data, result.etag);
 }
+
+export async function archiveSharedStep(http: TmsHttpClient, value: SharedStepSummary,
+  operationKey: string, signal?: AbortSignal): Promise<SharedStep> {
+  const result = await http.mutateResource<Api["SharedStep"]>(
+    `/projects/${encodeURIComponent(value.projectId)}/shared-steps/${encodeURIComponent(value.id)}/archive`,
+    "POST", undefined, { ifMatch: value.etag, idempotencyKey: operationKey, signal });
+  return resource(result.data, result.etag);
+}

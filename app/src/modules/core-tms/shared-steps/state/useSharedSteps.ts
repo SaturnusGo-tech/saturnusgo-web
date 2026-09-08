@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { TmsApiError } from "../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import {
-  createSharedStep, getSharedStep, listSharedSteps, reviseSharedStep,
+  archiveSharedStep, createSharedStep, getSharedStep, listSharedSteps, reviseSharedStep,
 } from "../data/shared-step-api";
 import type { SharedStep, SharedStepDraft, SharedStepSummary } from "../model/shared-step";
 
@@ -12,6 +13,8 @@ export function useSharedSteps(projectId: string, connection: Connection) {
   const http = useTmsHttpClient();
   const [items, setItems] = useState<SharedStepSummary[]>([]);
   const [selected, setSelected] = useState<SharedStep | null>(null);
+  const activeProject = useRef(projectId);
+  activeProject.current = projectId;
   const cache = useRef(new Map<string, SharedStep>());
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [saving, setSaving] = useState(false);
@@ -91,7 +94,25 @@ export function useSharedSteps(projectId: string, connection: Connection) {
     return value;
   }, [http, projectId]);
 
-  return { items, selected, status, saving, open, resolve, save, refresh, reload,
-    attachmentsEnabled: connection === "connected",
+  const archive = useCallback(async (item: SharedStepSummary, operationKey: string, signal?: AbortSignal) => {
+    try {
+      if (connection !== "connected" || item.projectId !== projectId) return "failed" as const;
+      const archived = await archiveSharedStep(http, item, operationKey, signal);
+      if (activeProject.current !== projectId || signal?.aborted) return "failed" as const;
+      cache.current.set(archived.id, archived);
+      setItems((values) => values.filter(({ id }) => id !== archived.id));
+      setSelected((value) => value?.id === archived.id ? null : value);
+      return "success" as const;
+    } catch (error) {
+      if (error instanceof TmsApiError && error.status === 412) {
+        await refresh(signal); return "changed" as const;
+      }
+      if (error instanceof TmsApiError && error.status === 403) return "forbidden" as const;
+      return "failed" as const;
+    }
+  }, [connection, http, projectId, refresh]);
+
+  return { items, selected, status, saving, open, resolve, save, refresh, reload, archive,
+    attachmentsEnabled: connection === "connected", archiveEnabled: connection === "connected",
     close: () => setSelected(null), setSelected };
 }

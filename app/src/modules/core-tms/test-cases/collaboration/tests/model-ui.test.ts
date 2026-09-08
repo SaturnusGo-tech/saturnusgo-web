@@ -195,6 +195,6 @@ test("collaboration UI exposes real links, cursor retry, and durable sync truth"
   assert.doesNotMatch(activity, /status === "error"\) return/);
   assert.match(activity, /&& !props\.model\.defects\.refreshFailed/);
   assert.match(activity, /caseActivity\.length > 0/);
-  assert.match(panel, /Готово к тестированию|Ready for testing/); assert.match(overview, /<CaseCommentsSection/);
+  assert.match(panel, /localizedLabel\(props\.locale, "ready_for_retest"\)/); assert.match(overview, /<CaseCommentsSection/);
   assert.doesNotMatch(tabs, /comments:|Комментарии|Comments/);
 });

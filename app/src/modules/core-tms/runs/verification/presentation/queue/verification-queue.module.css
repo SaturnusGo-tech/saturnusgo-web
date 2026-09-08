@@ -1,0 +1,40 @@
+.control { flex: 0 0 auto; margin-left: auto; }
+.triggerGroup { display: flex; align-items: center; height: 30px; border: 1px solid var(--line); border-radius: 5px; }
+.start, .expand { height: 28px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 9px; color: var(--ink); background: transparent; border: 0; font: inherit; font-size: 11px; font-weight: 500; white-space: nowrap; cursor: pointer; }
+.start { border-radius: 4px 0 0 4px; }
+.start b { min-width: 16px; font-size: 10px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.compactLabel { display: none; }
+.expand { width: 27px; padding: 0; border-left: 1px solid var(--line); border-radius: 0 4px 4px 0; }
+.start:hover, .expand:hover { background: var(--tms-bg-hover, #f1f2f4); }
+.start:disabled { color: var(--muted); cursor: default; opacity: .65; }
+.control button:focus-visible, .dialog input:focus-visible, .dialog select:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+.dialog { position: fixed; top: 64px; right: 18px; left: auto; bottom: auto; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 84px); margin: 0; padding: 0; overflow: hidden; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 18px 65px rgb(0 0 0 / 24%); font: inherit; }
+.dialog::backdrop { background: rgb(0 0 0 / 18%); }
+.dialogBody { display: flex; flex-direction: column; max-height: calc(100dvh - 86px); }
+.dialogHeader { display: flex; align-items: start; justify-content: space-between; gap: 14px; padding: 19px 20px 14px; }
+.dialogHeader h2 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
+.dialogHeader p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.dialogHeader button, .summary button { flex: 0 0 auto; width: 28px; height: 28px; display: grid; place-items: center; padding: 0; color: var(--muted); background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
+.dialogHeader button:hover, .summary button:hover { color: var(--ink); background: var(--tms-bg-hover, #f1f2f4); }
+.summary { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 0 20px 12px; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 11px; }
+.summary span { display: flex; align-items: baseline; gap: 5px; }
+.summary b { color: var(--ink); font-weight: 600; }
+.summary button { margin-left: auto; }
+.summary .blocked { color: #a5651a; }
+.target { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.target label { min-width: 0; display: grid; gap: 6px; color: var(--muted); font-size: 11px; }
+.target input, .target select { width: 100%; min-width: 0; height: 32px; padding: 0 8px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 12px; }
+.entries { min-height: 80px; overflow: auto; padding: 15px 20px; scrollbar-gutter: stable; }
+.empty { margin: 0; padding: 15px 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.footer { display: flex; flex-direction: column; align-items: flex-end; gap: 9px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
+.footer p { align-self: stretch; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.dialog .primary { min-height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--paper); background: var(--ink); border: 1px solid var(--ink); border-radius: 5px; font: inherit; font-size: 12px; font-weight: 550; cursor: pointer; }
+.dialog .primary:disabled { opacity: .45; cursor: default; }
+.error, .footer .error { margin: 0 0 8px; color: #b54b51; font-size: 12px; line-height: 1.5; }
+.spinner { animation: verification-spin .8s linear infinite; }
+:global(.dark) .error, :global(.dark) .footer .error { color: #e79298; }
+:global(.dark) .summary .blocked { color: #dfb86a; }
+@media (max-width: 1050px) { .buttonLabel { display: none; } .compactLabel { display: inline; } }
+@media (max-width: 560px) { .dialog { top: 60px; right: 8px; width: calc(100vw - 16px); } .summary { gap: 9px; } .target { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+@keyframes verification-spin { to { transform: rotate(360deg); } }
