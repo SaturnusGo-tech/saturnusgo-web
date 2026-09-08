@@ -1,0 +1,41 @@
+.metric {
+  --metric-accent: var(--dash-blue, #3671f6);
+  box-sizing: border-box; position: relative; display: flex; flex-direction: column; gap: 13px;
+  width: 100%; min-width: 0; height: 100%; min-height: 174px; padding: 19px 20px 16px; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper);
+  font: inherit; text-align: left; cursor: pointer; transition: border-color 160ms, box-shadow 160ms;
+}
+.metric[data-tone="success"] { --metric-accent: var(--dash-success, #43b961); }
+.metric[data-tone="danger"] { --metric-accent: var(--dash-danger, #dc5865); }
+.metric:disabled { cursor: default; }
+.metric:disabled .value, .metric:disabled .glyph, .metric:disabled .ring { opacity: .45; }
+.metric:hover:not(:disabled) { border-color: color-mix(in srgb, var(--metric-accent) 50%, var(--line)); box-shadow: 0 3px 15px #00000008; }
+.metric:focus-visible { outline: 2px solid var(--dash-blue, #3671f6); outline-offset: 3px; }
+.metricText { display: block; min-width: 0; }
+.metricText > span { display: block; max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.5; letter-spacing: -.015em; overflow-wrap: anywhere; }
+.metricText small { display: block; margin-top: 5px; font-size: 11px; line-height: 1.5; }
+.composition { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.value { min-width: 0; font-size: clamp(32px, 3vw, 44px); line-height: 1.1; font-weight: 630; letter-spacing: -.06em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.glyph { flex-shrink: 0; color: var(--metric-accent); }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); }
+.footer small { font-size: 10px; line-height: 1.5; }
+.footer > svg { flex-shrink: 0; opacity: .5; }
+.metric:hover:not(:disabled) .footer > svg { opacity: 1; color: var(--metric-accent); }
+.ring { width: 64px; flex: 0 0 64px; color: var(--metric-accent); }
+.ring circle { fill: none; stroke-width: 6; }
+.ringTrack { stroke: var(--line-strong, var(--line)); }
+.ringValue { stroke: var(--metric-accent); }
+.metric[data-hero="true"] { min-height: 286px; padding: 22px 23px 19px; border-color: #4f7cff; color: #fff; background: linear-gradient(140deg, #336df6 0%, #285ce2 56%, #2145b6 100%); box-shadow: inset 0 1px 0 #ffffff12; }
+.metric[data-hero="true"]:hover:not(:disabled) { border-color: #99b4ff; box-shadow: 0 5px 22px #2458d22a; }
+.metric[data-hero="true"] .metricText > span { font-size: 17px; line-height: 1.35; font-weight: 590; letter-spacing: -.025em; }
+.metric[data-hero="true"] .metricText small { color: #dbe5ff; font-size: 12px; }
+.metric[data-hero="true"] .value { color: white; font-size: clamp(66px, 7.5vw, 108px); line-height: 1; letter-spacing: -.07em; font-weight: 640; }
+.metric[data-hero="true"] .glyph { width: 60px; height: 76px; padding: 8px; border-radius: 12px; color: #d6e1ff; background: #ffffff17; }
+.metric[data-hero="true"][data-long-value="true"] .value { font-size: 54px; }
+.metric[data-hero="true"][data-compact-value="true"] .value { font-size: 40px; }
+.metric[data-hero="true"][data-long-value="true"] .glyph { width: 44px; height: 59px; }
+.metric[data-hero="true"] .footer { color: #dbe5ff; }
+.heroArrow { display: grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #ffffff18; color: #fff; }
+:global(.dark) .metric[data-hero="true"] { background: linear-gradient(140deg, #356cf2 0%, #2d5cdb 58%, #2448bd 100%); border-color: #5077e9; }
+@media (max-width: 640px) { .metric { min-height: 157px; padding: 16px; }.value { font-size: 34px; }.glyph { width: 30px; height: 30px; }.metric[data-hero="true"] { min-height: 260px; }.metric[data-hero="true"] .value { font-size: 80px; } }
+@media (prefers-reduced-motion: reduce) { .metric { transition: none; } }

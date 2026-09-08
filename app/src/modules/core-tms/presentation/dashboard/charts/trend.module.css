@@ -1,7 +1,7 @@
 .panel {
   --trend-launched: var(--ink);
-  --trend-passed: color-mix(in srgb, var(--dash-success) 48%, var(--muted));
-  --trend-failed: color-mix(in srgb, var(--dash-danger) 58%, var(--muted));
+  --trend-passed: color-mix(in srgb, var(--dash-success) 85%, var(--muted));
+  --trend-failed: color-mix(in srgb, var(--dash-danger) 85%, var(--muted));
   --trend-blocked: color-mix(in srgb, var(--dash-warning) 50%, var(--muted));
   --trend-incomplete: color-mix(in srgb, var(--ink) 72%, var(--paper));
   --trend-not_started: var(--muted);
@@ -11,7 +11,7 @@
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 15px;
 }
 
 .heading {

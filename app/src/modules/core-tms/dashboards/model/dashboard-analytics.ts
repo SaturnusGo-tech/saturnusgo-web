@@ -149,6 +149,7 @@ export type DashboardSnapshot = {
     reportedDefects: number;
     linkedDefects: number;
     passRate: number | null;
+    casePassRate?: number | null;
   };
   trend: DashboardTrendPoint[];
   runOutcomes: Array<DashboardDimensionDatum<DashboardRunOutcome>>;

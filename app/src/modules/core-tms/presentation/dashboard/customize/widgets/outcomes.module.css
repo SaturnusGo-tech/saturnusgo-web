@@ -1,0 +1,14 @@
+.panel { height: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 15px; color: var(--ink); background: var(--paper); overflow: hidden; }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; padding: 17px 18px 16px; }
+.heading h2 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.heading > span { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.composition { padding: 0 18px 13px; }
+.outcomes { padding: 0 18px 15px; }
+.panel .outcomes button { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 35px; padding: 8px 0; color: var(--ink); border: 0; background: transparent; text-align: left; font-size: 12px; line-height: 1.45; cursor: pointer; }
+.outcomes button + button { border-top: 1px solid var(--line); }
+.outcomes i { width: 10px; height: 10px; border-radius: 50%; background: var(--outcome-color); }
+.outcomes strong { font-size: 12px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.outcomes button > span { min-width: 0; overflow-wrap: anywhere; }
+.panel .outcomes button:hover { color: var(--action); }
+.outcomes button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
+@container dashboard-widget (max-width: 300px) { .heading, .composition, .outcomes { padding-inline: 14px; } }

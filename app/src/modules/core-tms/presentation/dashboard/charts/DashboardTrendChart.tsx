@@ -61,7 +61,7 @@ export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
     drill: key === "launched" ? launched : outcomeDrill(key), color: `var(--trend-${key})`,
     value: selectedPoint ? selectedPoint[key] : snapshot.trend.reduce((total, point) => total + point[key], 0),
   }));
-  const selectedPassRate = selectedPoint ? selectedPoint.passRate : snapshot.metrics.passRate;
+  const selectedPassRate = selectedPoint ? selectedPoint.passRate : snapshot.metrics.casePassRate ?? null;
   const passRateLabel = selectedPassRate === null ? "—" : `${numberFormat.format(selectedPassRate)}%`;
   const hasFlow = snapshot.trend.some((point) => SERIES.some((key) => point[key] > 0));
   const toggle = (key: SeriesKey) => setHidden((current) => current.includes(key)

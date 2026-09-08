@@ -79,3 +79,25 @@
 
 @container dashboard-page (max-width: 600px) { .actions { max-width: 100%; flex: 1 1 100%; }.header { align-items: flex-start; } }
 .widget[data-widget-kind="metric"] .widgetTools > span { display: block; }
+
+.sections { display: grid; gap: 42px; padding-bottom: 64px; }
+.dashboardSection { min-width: 0; display: grid; gap: 20px; }
+.sectionHeading { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+.sectionHeading h2 { margin: 0; font-size: 18px; line-height: 1.4; font-weight: 560; letter-spacing: -.5px; }
+.sectionHeading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.sectionHeading > span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.sectionNavigation { display: flex; align-items: center; gap: 22px; min-height: 44px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: thin; }
+.sectionNavigation button { min-height: 44px; padding: 0 1px; background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.sectionNavigation button[aria-current] { color: var(--ink); border-bottom-color: #4968d8; }
+.sectionNavigation button:hover { color: var(--ink); }
+.widget { border-radius: 18px; }
+.widgetTools { border-radius: 18px 18px 0 0; }
+.editingWidget .widgetContent > section, .editingWidget .widgetContent > button { border-radius: 0 0 18px 18px; }
+.grid { gap: 16px; }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; border-bottom: 1px solid var(--line); }
+.toolbar .sectionNavigation { flex: 1 1 auto; border-bottom: 0; }
+.toolbar .context { flex: 0 0 auto; margin-left: auto; }
+@container dashboard-page (max-width: 1100px) { .toolbar { gap: 4px 12px; }.sectionNavigation { gap: 16px; }.toolbar .context .quiet { padding-inline: 4px; } }
+
+.grid { grid-auto-flow: row dense; }

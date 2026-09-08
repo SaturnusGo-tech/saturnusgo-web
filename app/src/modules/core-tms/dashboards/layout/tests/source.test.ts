@@ -3,6 +3,8 @@ import test from "node:test";
 import { createTmsHttpClient } from "../../../../../core/tms/transport/http";
 import { createLayoutSource } from "../data/layout-source";
 import { createBoardWidget, widgetCatalog, widgetKey } from "../model/widget-catalog";
+import { defaultPreferences, parsePreferences, preferenceKey } from "../preferences/preferences";
+import { dashboardSections, widgetSection } from "../sections/widget-sections";
 import { LayoutError } from "../model/layout";
 
 const scope={workspaceId:"w",projectId:"p"};
@@ -42,4 +44,42 @@ test("every catalog entry is independently serializable with a stable identity",
     assert.equal(widgetKey(widget),entry.key);assert.equal(widget.title,entry.ru);
     assert.ok(entry.ru && entry.en && entry.hintRu && entry.hintEn);
   }
+});
+
+test("catalog exposes 29 widgets in four meaningful sections without obsolete freshness signals",()=>{
+  assert.equal(widgetCatalog.length,29);
+  assert.deepEqual(dashboardSections.map(section=>widgetCatalog.filter(item=>widgetSection(item.key)===section).length),[3,7,11,8]);
+  for(const key of ["activeRuns","blockedItems","openDefects","notRunItems","inProgressItems","outdatedItems","runsWithoutBuild"])
+    assert.ok(!widgetCatalog.some(item=>item.key===key));
+});
+
+test("malformed preference payloads cannot replace safe defaults",()=>{
+  for(const raw of [null,"","broken","null","42","true",'"runs"',"[]","[{}]"])
+    assert.deepEqual(parsePreferences(raw),defaultPreferences);
+  assert.deepEqual(parsePreferences(JSON.stringify({section:"unknown",period:"14d",filtersOpen:"true",
+    environmentId:{id:"env"},buildReference:99,queueTab:"unknown",freshnessPage:-1})),defaultPreferences);
+  assert.deepEqual(parsePreferences(JSON.stringify({section:["runs"],period:["7d"]})),defaultPreferences);
+  assert.deepEqual(parsePreferences(JSON.stringify({section:{value:"runs"},period:{value:"7d"}})),defaultPreferences);
+  assert.deepEqual(parsePreferences(JSON.stringify({environmentId:"x".repeat(201),buildReference:"x".repeat(501)})),defaultPreferences);
+  const restored=parsePreferences(null);restored.section="all";assert.equal(defaultPreferences.section,"overview");
+});
+
+test("valid preferences round-trip while unknown properties and coercible values are discarded",()=>{
+  const valid={section:"defects" as const,period:"90d" as const,filtersOpen:true,environmentId:"e".repeat(200),
+    buildReference:"b".repeat(500),queueTab:"readyForRetest" as const,freshnessPage:1};
+  assert.deepEqual(parsePreferences(JSON.stringify({...valid,untrusted:"ignored"})),valid);
+  assert.deepEqual(parsePreferences(JSON.stringify({...valid,filtersOpen:1,freshnessPage:"1"})),
+    {...valid,filtersOpen:false,freshnessPage:0});
+  for(const section of ["all",...dashboardSections])
+    assert.equal(parsePreferences(JSON.stringify({section})).section,section);
+});
+
+test("preferences use separate account, workspace and project keys, including delimiter-like IDs",()=>{
+  const keys=[];
+  for(const subject of [null,"null","","alice","bob","a:b"])
+    for(const workspace of ["w","w:p","w/other"])
+      for(const project of ["p","p:w",'p"other']) keys.push(preferenceKey(subject,workspace,project));
+  assert.equal(new Set(keys).size,keys.length);
+  assert.notEqual(preferenceKey("a:b","c","d"),preferenceKey("a","b:c","d"));
+  assert.equal(preferenceKey("alice","workspace","project"),preferenceKey("alice","workspace","project"));
 });

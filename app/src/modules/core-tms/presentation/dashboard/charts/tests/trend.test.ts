@@ -40,7 +40,7 @@ const find = (tree: Node, type: string) => nodes(tree).find((node) => node.type 
 const button = (tree: Node, label: string) => nodes(tree).find((node) => node.type === "button" && node.props["aria-label"]?.startsWith(label))!;
 const data: DashboardSnapshot = {
   generatedAt: "2026-09-07T12:00:00Z", query: { workspaceId: "workspace", projectId: "project", period: "7d" },
-  metrics: { passRate: 75, currentCases: 0, casesCreated: 0, runsLaunched: 3, completedRuns: 2, passedRuns: 1,
+  metrics: { passRate: 50, casePassRate: 75, currentCases: 0, casesCreated: 0, runsLaunched: 3, completedRuns: 2, passedRuns: 1,
     activeRuns: 0, currentDefects: 0, openDefects: 0, reportedDefects: 0, linkedDefects: 0 },
   runOutcomes: [], caseTypes: [], tags: [], hotspots: [], defects: [], dataNotes: [],
   trend: [

@@ -130,7 +130,8 @@ export function createDashboardSnapshot(data: Bootstrap, query: DashboardAnalyti
       completedRuns: completedRuns.length, passedRuns, activeRuns: runs.filter((item) => item.status === "active").length,
       currentDefects: defects.length, openDefects: currentDefects.length,
       reportedDefects: defects.filter((item) => inRange(item.createdAt, startTime)).length,
-      linkedDefects, passRate: null,
+      linkedDefects, passRate: completedRuns.length ? Math.round(passedRuns / completedRuns.length * 1000) / 10 : null,
+      casePassRate: null,
     },
     trend: points,
     runOutcomes: (["passed", "failed", "blocked", "incomplete", "not_started", "aborted"] as const).map((outcome) => ({

@@ -1,0 +1,41 @@
+.operationsPanel { height: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 15px; color: var(--ink); background: var(--paper); overflow: hidden; }
+.panelHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 17px 18px 13px; }
+.panelHeading > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; min-width: 0; }
+.panelHeading h2 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.panelHeading p { margin: 0; font-size: 11px; line-height: 1.5; color: var(--muted); }
+.panelHeading > svg { flex: 0 0 auto; color: var(--muted); }
+.hotspotTable { margin: 0 18px 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 7px; }
+.hotspotHeader, .hotspotRow { min-width: 650px; display: grid; grid-template-columns: minmax(150px,1.5fr) minmax(65px,.55fr) minmax(125px,1fr) minmax(70px,.6fr) minmax(80px,.65fr) minmax(65px,.6fr); align-items: center; }
+.hotspotHeader { background: var(--control); color: var(--muted); font-size: 10px; line-height: 1.4; }
+.hotspotHeader span { min-width: 0; padding: 10px 12px; white-space: normal; }
+.hotspotRow { --risk-color: var(--dash-slate); border-top: 1px solid var(--line); }
+.hotspotRow[data-risk="failed"] { --risk-color: var(--dash-danger); }
+.hotspotRow[data-risk="blocked"] { --risk-color: var(--dash-warning); }
+.hotspotRow[data-risk="open"] { --risk-color: var(--dash-blue); }
+.hotspotRow > div { min-width: 0; padding: 5px 12px; }
+.hotspotRow > div + div { border-left: 1px solid var(--line); }
+.portfolioPanel button { padding: 4px 0; color: var(--ink); border: 0; background: transparent; font-size: 12px; line-height: 1.5; cursor: pointer; font-variant-numeric: tabular-nums; }
+.portfolioPanel button:hover { color: var(--action); }
+.portfolioPanel button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
+.portfolioPanel .hotspotName { width: 100%; display: flex; align-items: center; gap: 9px; text-align: left; }
+.riskDot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: var(--risk-color); }
+.hotspotName > span { display: grid; min-width: 0; gap: 2px; }
+.hotspotName strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 550; font-size: 12px; }
+.hotspotName small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 10px; }
+.hotspotName > svg { flex: 0 0 auto; margin-left: auto; color: var(--muted); }
+.passRateScore strong { font-size: 11px; font-weight: 500; }
+.portfolioPanel .coverageCell { width: 100%; display: flex; align-items: center; gap: 9px; }
+.coverageCell strong { min-width: 38px; font-size: 11px; font-weight: 500; text-align: right; }
+.coverageCell progress { width: 100%; min-width: 35px; height: 7px; appearance: none; border: 0; overflow: hidden; border-radius: 3px; background: var(--control-hover); }
+.coverageCell progress::-webkit-progress-bar { background: var(--control-hover); border-radius: 3px; }
+.coverageCell progress::-webkit-progress-value { background: var(--dash-success); border-radius: 3px; }
+.coverageCell progress::-moz-progress-bar { background: var(--dash-success); border-radius: 3px; }
+.signalUnavailable { color: var(--muted); font-size: 11px; }
+.portfolioPanel .signalCell[data-active="true"], .defectSignals button[data-active="true"] { color: var(--dash-danger); font-weight: 600; }
+.hotspotRow > div:nth-child(5) .signalCell[data-active="true"] { color: var(--dash-warning); }
+.defectSignals { display: flex; align-items: center; gap: 8px; }
+.portfolioPanel .criticalSignal { display: inline-flex; align-items: center; gap: 3px; color: var(--dash-danger); font-size: 10px; }
+.panelEmpty { margin: 0; padding: 12px 18px 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.dataNote { display: flex; align-items: flex-start; gap: 6px; margin: 0; padding: 0 18px 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.dataNote svg { flex: 0 0 auto; margin-top: 2px; }
+@container dashboard-widget (max-width: 340px) { .panelHeading { padding-inline: 14px; }.hotspotTable { margin-inline: 14px; } }

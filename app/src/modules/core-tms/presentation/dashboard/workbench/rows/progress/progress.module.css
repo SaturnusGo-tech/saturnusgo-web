@@ -1,0 +1,12 @@
+.progress { display: block; min-width: 0; }
+.caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; line-height: 1.5; }
+.caption strong { color: var(--ink); font-size: 11px; font-weight: 500; }
+.track { display: flex; height: 9px; width: 100%; overflow: hidden; border-radius: 6px; background: var(--line-strong, var(--line)); }
+.track > span { min-width: 2px; height: 100%; }
+.track > span + span { border-left: 2px solid var(--paper); }
+.track [data-status="passed"] { background: var(--dash-success, #43b961); }
+.track [data-status="failed"] { background: var(--dash-danger, #dc5865); }
+.track [data-status="blocked"] { background: var(--dash-warning, #dda43d); }
+.track [data-status="inProgress"] { background: var(--dash-blue, #4d7bea); }
+.track [data-status="skipped"] { background: var(--dash-slate, #7b8190); }
+.track [data-status="notRun"] { background: var(--line-strong, var(--line)); }

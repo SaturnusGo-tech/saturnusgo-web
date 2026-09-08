@@ -1,0 +1,3 @@
+.bar { display: flex; width: 100%; height: 16px; overflow: hidden; background: var(--control-hover); border-radius: 5px; }
+.bar > span { display: block; flex: 0 0 auto; min-width: 0; height: 100%; background: var(--segment-color); }
+.bar > span + span { border-left: 1px solid var(--paper); box-sizing: border-box; }

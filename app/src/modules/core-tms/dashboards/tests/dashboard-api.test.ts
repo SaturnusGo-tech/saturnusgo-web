@@ -25,10 +25,14 @@ test("analytics mapper keeps server timeline, risk counts, and exact drills", ()
     runs: { timeline: { timezone: "UTC", granularity: "day", buckets: [{
       start: "2026-09-01T09:00:00.000Z", end: "2026-09-02T09:00:00.000Z", launched: 2,
       completedOutcomes: { passed: 1, failed: 1, blocked: 0, incomplete: 0,
-        notStarted: 0, aborted: 0 }, completedItems: { passed: 2, failed: 1, blocked: 1, skipped: 0 },
-      passRate: .5 }] }, launchedInPeriod: { total: 2, byStatus: [], byProject: projectDimension },
-      completedInPeriod: { total: 2, byOutcome: [{ key: "passed", count: 1 },
-        { key: "failed", count: 1 }], byProject: projectDimension },
+        notStarted: 0, aborted: 1 }, completedItems: { passed: 8, failed: 1, blocked: 1, skipped: 99 },
+      passRate: .8 }, {
+        start: "2026-08-31T09:00:00.000Z", end: "2026-09-01T09:00:00.000Z", launched: 0,
+        completedOutcomes: { passed: 0, failed: 0, blocked: 0, incomplete: 0, notStarted: 0, aborted: 0 },
+        completedItems: { passed: 1, failed: 3, blocked: 0, skipped: 10 }, passRate: .25,
+      }] }, launchedInPeriod: { total: 2, byStatus: [], byProject: projectDimension },
+      completedInPeriod: { total: 3, byOutcome: [{ key: "passed", count: 1 },
+        { key: "failed", count: 1 }, { key: "aborted", count: 1 }], byProject: projectDimension },
       currentActive: { total: 1, byProject: projectDimension } },
     defects: { reportedInPeriod: { total: 1, byProject: projectDimension }, current: {
       total: 4, linked: 2, totalExternalLinks: 2,
@@ -43,11 +47,23 @@ test("analytics mapper keeps server timeline, risk counts, and exact drills", ()
   } as Summary;
   const mapped = mapDashboardAnalyticsSummary(summary,
     { workspaceId: "workspace-1", period: "30d" });
-  assert.equal(mapped.metrics.passRate, 50);
+  assert.equal(mapped.metrics.passRate, 33.3, "scalar includes every completed run outcome in denominator");
+  assert.equal(mapped.metrics.casePassRate, 64.3, "case rate uses weighted item counts, not average bucket rates or run count");
+  assert.equal(mapped.trend[0].passRate, 80, "bucket rate keeps server case semantics");
   assert.equal(mapped.metrics.openDefects, 2);
   assert.deepEqual(mapped.trend[0] && [mapped.trend[0].start, mapped.trend[0].end],
     ["2026-09-01T09:00:00.000Z", "2026-09-02T09:00:00.000Z"]);
   assert.deepEqual(mapped.hotspots[0]?.drills.failures?.filter,
     { entity: "run_item", status: "failed" });
   assert.ok(mapped.dataNotes.includes("tags-truncated"));
+  const noCompleted = mapDashboardAnalyticsSummary({ ...summary, runs: { ...summary.runs,
+    completedInPeriod: { ...summary.runs.completedInPeriod, total: 0, byOutcome: [] },
+  } }, mapped.query);
+  assert.equal(noCompleted.metrics.passRate, null, "no completed runs is unavailable, not zero percent");
+  const noPassed = mapDashboardAnalyticsSummary({ ...summary, runs: { ...summary.runs,
+    completedInPeriod: { ...summary.runs.completedInPeriod, byOutcome: [{ key: "failed", count: 3 }] },
+    timeline: { ...summary.runs.timeline, buckets: [] },
+  } }, mapped.query);
+  assert.equal(noPassed.metrics.passRate, 0);
+  assert.equal(noPassed.metrics.casePassRate, null);
 });

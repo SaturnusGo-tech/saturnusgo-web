@@ -286,3 +286,8 @@
 
 
 @container dashboard-widget (max-width: 650px) { .hotspotTable { overflow-x: auto; }.hotspotHeader, .hotspotRow { min-width: 650px; } }
+
+.page { --action: #4968d8; --dash-blue: #4968d8; --dash-success: #218767; --dash-danger: #d54d64; --dash-warning: #b17c28; --dash-violet: #8768c5; --dash-orange: #c77f37; }
+:global(.dark) .page { --action: #91aaff; --dash-blue: #809af1; --dash-success: #69b998; --dash-danger: #eb7c8c; --dash-warning: #d5b368; --dash-violet: #af93dd; --dash-orange: #e0a062; }
+
+.chartPanel, .operationsPanel { border-radius: 18px; }

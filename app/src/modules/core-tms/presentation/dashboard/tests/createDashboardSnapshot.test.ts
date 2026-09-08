@@ -102,7 +102,8 @@ test("dashboard snapshot uses only authoritative project records in its 30-day w
   assert.equal(result.metrics.completedRuns, 2);
   assert.equal(result.metrics.openDefects, 1);
   assert.equal(result.metrics.reportedDefects, 1);
-  assert.equal(result.metrics.passRate, null);
+  assert.equal(result.metrics.passRate, 0);
+  assert.equal(result.metrics.casePassRate, null);
   assert.equal(result.trend.every(({ passRate }) => passRate === null), true);
   assert.equal(result.trend.length, 30);
   assert.equal(result.trend.find(({ day }) => day === "2026-08-16")?.launched, 1);

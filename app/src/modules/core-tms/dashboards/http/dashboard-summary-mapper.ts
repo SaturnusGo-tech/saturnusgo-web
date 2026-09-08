@@ -74,7 +74,9 @@ export function mapDashboardAnalyticsSummary(summary: Summary,
       openDefects: activeDefects,
       reportedDefects: summary.defects.reportedInPeriod.total,
       linkedDefects: summary.defects.current.linked,
-      passRate: itemPassRate(summary),
+      passRate: summary.runs.completedInPeriod.total
+        ? percent((outcomeCount.get("passed") ?? 0) / summary.runs.completedInPeriod.total) : null,
+      casePassRate: itemPassRate(summary),
     },
     trend: summary.runs.timeline.buckets.map((bucket) => ({
       day: bucket.start.slice(0, 10), start: bucket.start, end: bucket.end,

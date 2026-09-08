@@ -6,3 +6,5 @@
 @media (max-width: 560px) { .start.start { right: max(16px, env(safe-area-inset-right)); padding: 0 15px; } }
 @media (prefers-reduced-motion: reduce) { .start { transition: none; } .spinner { animation: none; } }
 @keyframes verification-spin { to { transform: rotate(360deg); } }
+
+:global(body:has([data-dashboard-workspace])) .start.start { bottom: calc(24px + env(safe-area-inset-bottom)); }

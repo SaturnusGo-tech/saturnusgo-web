@@ -19,7 +19,7 @@ export function WorkbenchPanel({ model, onOpenRow }: {
     hour: "2-digit", minute: "2-digit",
   }).format(new Date(model.snapshot.generatedAt));
 
-  return <section className={styles.panel} aria-labelledby={`${id}-title`} aria-busy={model.loading}>
+  return <section className={`${styles.panel} ${styles.queuePanel}`} aria-labelledby={`${id}-title`} aria-busy={model.loading}>
     <header className={styles.heading}><h2 id={`${id}-title`}>{t("dashboardWorkbench.title")}</h2>
       {updated && <small>{t("dashboardWorkbench.updated", { date: updated })}</small>}</header>
     <div className={styles.tabs} role="tablist" aria-label={t("dashboardWorkbench.title")}>
@@ -37,7 +37,7 @@ export function WorkbenchPanel({ model, onOpenRow }: {
         <span>{model.snapshot?.queues[tab].total ?? "—"}</span>
       </button>)}
     </div>
-    <div id={`${id}-content`} role="tabpanel" aria-labelledby={`${id}-${model.tab}`} tabIndex={0}>
+    <div className={styles.queueContent} id={`${id}-content`} role="tabpanel" aria-labelledby={`${id}-${model.tab}`} tabIndex={0}>
       <WorkbenchStatus loading={model.loading} error={model.error} hasSnapshot={Boolean(model.snapshot)}
         enabled={model.enabled} onRetry={model.refresh} />
       {queue && <div className={styles.preview}><WorkbenchRows queue={queue} onOpenRow={onOpenRow} /></div>}

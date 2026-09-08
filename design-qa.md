@@ -1,340 +1,57 @@
-# Design QA — shared-step editor polish, 2026-09-08
-
-The user selected the compact refinement of the original editor, then explicitly requested a transparent title while editing and a back arrow without a button surface in both themes.
-
-- Source visual truth: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-f8d03c62-61ae-4f03-9c4f-c0e0d39e671f.png`, with the subsequent title/back corrections taking precedence.
-- Original product reference: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/artifacts/falcon-shared-steps-audit-2026-09-08/04-create-filled.png`.
-- Browser-rendered implementation: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/artifacts/falcon-shared-steps-polish-2026-09-08/04-dark-action-focus.png`.
-- Title-focused states: `01-dark-title-focus.png` and `03-light-title-focus.png` in that evidence directory. Return-button focus: `02-dark-back-focus.png`.
-- Verification surface: a temporary local fixture rendering the actual production `SharedStepEditor`, `Navigation`, theme provider and CSS. The fixture made no API requests and was removed from the source tree before the export build; its source is retained with the evidence.
-- Source dimensions: 1448 × 1086 pixels; original application capture: 1087 × 814. Implementation: 1280 × 720 CSS/pixel viewport, 1× capture. The generated reference is approximately 1.33× the original composition. No resampling or cropping was applied. The wider/shorter current viewport is an intentional responsive context, not evidence of pixel-identical full-screen geometry.
-- Full-view evidence: source and rendered implementation were opened together in one comparison input. The original 240px sidebar, 76px editor header, 18px title, 13px step text, action/result order and compact heights are retained. Header and input detail is readable in the full-size focused-state captures; additional crops were unnecessary for this narrow change.
-
-## Findings and comparison history
-
-- The original dark global input rule overrode transparent local editor surfaces. Scoped editor selectors now win without modifying global form controls.
-- The title remains transparent, borderless and without a shadow when focused, hovered or idle. Both theme checks reported `background: rgba(0,0,0,0)`, `border: 0px`, `shadow: none`. The caret and accessible title label remain available.
-- The back control retains its 36×36 target and accessible name. Background, border color and shadow are transparent/none. The return callback was exercised in the browser. Keyboard-only focus outline is retained in CSS; a complete keyboard traversal was not performed.
-- Inactive action/result fields no longer show solid strips. Only the focused step field receives a subtle rounded surface and inset border. The shared guide is thinner without shifting text alignment.
-- The reviewed first implementation had no actionable P0/P1/P2 discrepancy for the requested scope. Separate dark-title, light-title and dark-step focus captures confirm the final state; there was no visual-fix iteration after this comparison.
-
-## Fidelity surfaces
-
-- Typography: existing font stack, text sizes, weights and wrapping preserved; labels now identify the shared block and its steps.
-- Spacing: original dense outline and content width preserved; reducing the guide from 3px to 1px is balanced by 2px additional inner padding.
-- Colors/tokens: existing neutral Falcon dark/light tokens; transparent title/back in both themes; subtle focus only inside step fields.
-- Assets: original Falcon logo and existing navigation/icon components reused. No generated replacement assets were added to application code.
-- Copy/content: original three-action example preserved in the fixture. The mock's version/usage/status text was not added as static production copy; real metadata requires separate domain/UI work and was outside these appearance changes.
-
-## Verification limits
-
-This is component and visual verification, not a production deployment or an end-to-end persistence test. No production shared step was edited. Full screen-reader testing, keyboard traversal and mobile viewport testing were not performed. Development-server output contained no runtime/compile errors; browser console inspection was not available through the capture API used. Build/dependency warnings are recorded separately from visual findings.
-
-## Code verification
-
-- TypeScript `tsc --noEmit`: passed.
-- Existing shared-step API and scenario-operation tests: 9 passed, 0 failed.
-- TMS architecture check: passed for 485 files.
-- Production static export: passed, 62 pages, using the existing deployment procedure's temporary exclusion of server-only `app/api` routes. The first direct export attempt encountered that known server-route constraint; no source change was needed. API sources were restored afterward.
-- The local visual-fixture route is absent from both source and export. Compiled CSS contains the scoped header rule.
-- Existing nonblocking warnings: Browserslist dataset age and `methodology.css` autoprefixer `end` value. No unrelated warning cleanup was included.
-- `git diff --check`: passed.
+# Falcon dashboard redesign — design QA
 
 final result: passed
 
----
-
-# Earlier design QA — dashboard analytics explorer
-
-- source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-3301dc23-f328-4ae9-9953-fbacdb2d498a.png`
-- implementation screenshot: `.design-audit/2026-09-04-dashboard-drill-redesign/production-testcases-final.png`
-- compact-state screenshot: `.design-audit/2026-09-04-dashboard-drill-redesign/production-compact-final.png`
-- normalized source: `.design-audit/2026-09-04-dashboard-drill-redesign/reference-testcases-normalized.png`
-- combined comparison: `.design-audit/2026-09-04-dashboard-drill-redesign/reference-vs-production-testcases.png`
-- production URL: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`
-- viewport: 1087 × 814 CSS px for the final matching-state comparison; interaction geometry also verified at 1280 × 720
-- state: authenticated production, light theme, `Запущено ранов` drill, test-case/run/defect tabs
-
-## Findings
-
-- No actionable P0, P1, or P2 visual differences remain for the requested redesign.
-- The analytics drill now opens as a full-screen surface from the bottom and uses the same dense table identity as the canonical test-case listing.
-- The old empty `Обзор` surface and detached blue action bar are removed. The selected entity list is the primary content, with a quiet `Перейти в раздел` action beside sorting.
-- Filter semantics are preserved while each facet supports multi-select. Two component filters were selected simultaneously in production and returned the expected four test cases with a selected-count badge of `2`.
-- Test cases, runs, and defects use entity-specific columns, compact semantic pills, gray identifiers, saturated priority/status colors, and restrained dividers.
-- The filter rail, search field, sorting menu, list rows, and empty/loading states stay within the Falcon typography, spacing, and radius system.
-- Full-screen geometry is `0 px` radius with no visible outer border. Dragging the top handle down produces a 48 px total gutter, an 8dvh height reduction, and an `18 px` animated top radius. Dragging upward restores the exact full-screen state.
-- Pointer tracking continues outside the panel while dragging, so the upward return gesture completes reliably.
-- Production console check returned no warnings or errors.
-
-## Comparison history
-
-- The supplied source showed the earlier compact technical modal, duplicate separators, a secondary overview, single-select filters, and detached navigation buttons.
-- The first production comparison confirmed the full-screen information hierarchy, list density, and reduced chrome.
-- Interaction QA then exposed two cascade/gesture issues: the global panel radius token overrode the adaptive radius, and the compact-to-full threshold exceeded the available top offset.
-- The final production pass verified `0 px → 18 px → 0 px` radius and successful `full → compact → full` transitions.
-
-## Verification
-
-- [x] `npm run typecheck`
-- [x] 13 focused dashboard analytics and rendering tests
-- [x] `npm run build:once`
-- [x] full-screen and compact drag states in production
-- [x] multi-select component filters in production
-- [x] test-case, run, and defect list tabs in production
-- [x] no production console warnings or errors
-- [x] source and implementation judged together in one normalized comparison image
-
-final result: passed
-
----
-
-# Design QA — Falcon landing copy and integrations
-
-- editorial reference: `.design-audit/2026-09-05-falcon-copy-integrations/15-qatools-reference-top.png`
-- final Falcon hero: `.design-audit/2026-09-05-falcon-copy-integrations/12-final-copy-desktop-top.png`
-- same-viewport comparison: `.design-audit/2026-09-05-falcon-copy-integrations/16-reference-vs-falcon.png`
-- test-case chapter: `.design-audit/2026-09-05-falcon-copy-integrations/13-final-copy-testcases.png`
-- integrations directory: `.design-audit/2026-09-05-falcon-copy-integrations/14-final-integrations-desktop.png`
-- viewport: 1440 × 1000 CSS px
-
-## Findings
-
-- The reference and Falcon hero were inspected together at the same viewport. Falcon now follows the reference's direct editorial pattern: a literal product category, one factual capability sentence, and one clear account action.
-- Rejected slogan-like copy, numbered feature blocks, unsupported promises, and technical explanations aimed at implementers are absent from the rendered landing.
-- Each product chapter uses a concrete action heading and names only capabilities present in Falcon: test cases, test runs, defects, attachments, shared steps, and dashboard filters.
-- Planned integrations are clearly labelled as future work. Eleven services are grouped by use case, followed by REST API and webhooks for internal systems.
-- Brand marks use the official YouTrack source asset or packaged icon-library marks. No handwritten logo approximations are present.
-- The integrations section remains an editorial directory rather than a grid of interchangeable cards or pills.
-- A fresh browser load produced no console errors or warnings.
-- An independent copy review found no remaining high-priority AI-like language after the final literal rewrites.
-
-## Verification
-
-- [x] source reference and Falcon implementation inspected in one same-viewport comparison image
-- [x] hero, test-case chapter, and integrations section inspected in the in-app browser
-- [x] rendered heading hierarchy, copy, links, integration names, and future-work disclosure verified from the live DOM
-- [x] stale-copy regression test covers every phrase explicitly rejected by the user
-- [x] `npm run typecheck`
-- [x] `npm run test:tms-auth` — 39/39 passed
-- [x] `npm run test:tms-worker` — 28/28 passed
-- [x] `npm run test:tms-attachments` — 6/6 passed
-- [x] `npm run test:tms-adapters` — 188/188 passed
-- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
-- [x] `git diff --check`
-
-final result: passed
-
----
-
-# Design QA — Falcon registration CTA placement
-
-## Findings
-
-- The first viewport exposes one registration action: `Создать аккаунт` in the fixed header.
-- The hero contains only the product promise and supporting sentence; its former registration button is removed.
-- The shorter hero copy group is optically centered lower in the viewport without changing the existing scroll animation.
-- Falcon, `Войти`, and `Создать аккаунт` fit without wrapping or horizontal overflow at both desktop and 320 px widths.
-- The header no longer stops at a 1380 px content cap: registration actions align 24 px from the right edge on wide screens while the Falcon brand aligns 12 px from the left. At 320 px those insets contract to 10 px and 6 px. The registration control uses a full pill radius.
-
-## Verification
-
-- [x] final hero and header inspected together at desktop and 320 px widths in the in-app browser
-- [x] rendered banner contains the only first-viewport `/signup/` link
-- [x] rendered hero contains no registration control
-- [x] 1920 px header geometry verified with a 24 px right inset; 320 px geometry verified with no wrapping or overflow
-- [x] `npm run typecheck`
-- [x] `npm run test:tms-auth` — 39/39 passed
-- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
-- [x] `git diff --check`
-
-final result: passed
-
-# Design QA — Falcon public landing, production-data pass
-
-- source visual truth: `https://qatools.ru/`
-- production-data sources: authenticated Falcon production workspace `Umbrella-Host` on `https://tms.saturnusgo.com/`
-- reference screenshot: `.design-audit/2026-09-05-falcon-landing-redesign/48-reference-hero-1440x1000.png`
-- implementation screenshot: `.design-audit/2026-09-05-falcon-landing-redesign/35-fresh-prod-hero.png`
-- combined comparison: `.design-audit/2026-09-05-falcon-landing-redesign/49-reference-vs-prod-hero-1440x1000.png`
-- desktop sections: `.design-audit/2026-09-05-falcon-landing-redesign/37-platform-prod.png` through `40-analytics-prod.png`
-- mobile sections: `.design-audit/2026-09-05-falcon-landing-redesign/42-mobile-hero-prod.png` through `46-mobile-analytics-prod.png`
-- viewports: 1440 × 1000 and 390 × 844 CSS px
-
-## Findings
-
-- The landing now follows the reference's compact navigation, centered product-first hero, alternating editorial feature sections, restrained monochrome palette, and full-width closing CTA without copying TestOps branding or copy.
-- Numbered `01–05` tiles, decorative pill copy, repeated cards, redundant captions, and other generic landing-page chrome are removed.
-- Every visible Falcon product image was recaptured from the authenticated production account on 5 September 2026. No localhost, demo workspace, or stale imported screenshot remains in the rendered landing.
-- Desktop and mobile use purpose-captured, 2× processed assets for the run detail, case repository, run builder, defect card, and analytics dashboard. A responsive `picture` selects exactly one source per viewport; declared dimensions match the generated files and avoid layout shift.
-- The 1440 × 1000 reference/implementation board was judged as one image. Header height, hero centerline, CTA hierarchy, product-preview scale, and fold position align; Falcon's monochrome surface and black action are intentional identity choices.
-- Desktop feature sections keep one clear narrative and one product surface per section. Mobile sections preserve readable headings and show the corresponding responsive production UI without horizontal overflow.
-
-## Verification
-
-- [x] same-viewport reference comparison at 1440 × 1000
-- [x] desktop hero and every feature section inspected with production images loaded
-- [x] mobile hero, cases, runs, defects, and analytics inspected at 390 × 844
-- [x] tablet navigation and full-screen menu inspected at 900 × 800; Escape closes and dialog semantics contain the menu toggle
-- [x] mobile and desktop source selection verified independently with no duplicate screenshot request
-- [x] authenticated production source verified as `Umbrella-Host`, 398 test cases, 24 runs, and 23 linked defects
-- [x] no numbered feature blocks or old screenshot paths remain in the landing component
-
-final result: passed
-
----
-
-# Design QA — listing priority geometry and persistent dark navigation
-
-- source visual truth: `.design-audit/2026-09-04-listing-priority-status/01-before-new-feedback.png`
-- production screenshot: `.design-audit/2026-09-04-listing-priority-status/04-production-final-1280.png`
-- combined comparison: `.design-audit/2026-09-04-listing-priority-status/05-before-vs-production.png`
-- production URL: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`
-- viewport: 1280 × 720 CSS px for the final matching-state comparison
-- state: authenticated production, light theme, priority-sorted test-case listing with split detail
-
-## Findings
-
-- The global navigation stays dark in both application themes and uses the restrained existing cold charcoal gradient. The production computed background is `#252a36 → #282936 → #292731 → #25232c` and the foreground is `#e7e9ec`.
-- Priority markers and the sort chevron share the same horizontal center (`86.8 px`) in the production table.
-- The priority and case-type tracks are now distinct (`32 px` and `36 px`), giving the neutral hand/robot icon clear separation from the diamond or triangle.
-- The case ID track was reduced to `90 px` while status remains a fixed `92 px`, removing the oversized visual gap before the status pill.
-- The same priority/type spacing is applied to the reusable embedded case list, run navigator, and dashboard drill list.
-- Priority sorting was verified in production: the first activation places `Критический` first and the reverse direction places `Низкий` first.
-- No production console warnings or errors were recorded after deployment.
-
-## Verification
-
-- [x] `npm run test:tms-adapters` — 188/188 passed
-- [x] `npm run typecheck`
-- [x] `npm run build:once`
-- [x] production source SHA `a78e80a6`
-- [x] production Pages SHA `bd1ec046`
-- [x] persistent dark navigation verified in light theme
-- [x] priority/type spacing and ID/status density verified in production
-- [x] priority sort direction verified in production
-- [x] source and implementation judged together in one same-viewport comparison image
-
-final result: passed
-
----
-
-# Design QA — Falcon public onboarding
-
-- source visual truth: `/tmp/qatools-reference-home-viewport.png` and `/tmp/qatools-reference-home-full.png`
-- same-viewport implementation: `.design-qa/falcon-public-reference-viewport-1280x720.png`
-- combined reference/implementation board: `.design-qa/falcon-comparison-1280x720.png` (2560 × 720; source left, Falcon right)
-- desktop implementation: `.design-qa/falcon-public-hero-1440x900.png`
-- mobile implementation: `.design-qa/falcon-public-mobile-390x844.png`
-- mobile navigation: `.design-qa/falcon-public-mobile-menu-390x844.png`
-- personal registration: `.design-qa/falcon-signup-1440x900.png` and `.design-qa/falcon-signup-mobile-390x844.png`
-- organization wait-state: `.design-qa/falcon-signup-organization-1440x900.png`
-- returning-user login: `.design-qa/falcon-cloud-login-1440x900.png`
-- integrations section: `.design-qa/falcon-public-integrations-1280x720.png`
-- viewports: 1280 × 720, 1440 × 900, and 390 × 844 CSS px
-- states: landing, responsive menu, personal registration, staged organization path, cloud login
-
-## Comparison
-
-- The landing preserves the reference's compact header, centered hero, paired calls to action, real product preview at the fold, alternating feature narratives, final CTA, and dense footer.
-- QAtools branding, copy, purple/blue gradients, and reference imagery are intentionally replaced with Falcon's own warm monochrome identity and real Falcon product screenshots.
-- The hero and product preview retain the reference's information hierarchy at the same 1280 × 720 viewport without cloning copyrighted text or assets.
-- The combined 2560 × 720 board was inspected as one image: header height, hero centerline, CTA grouping, fold position, and product-preview footprint align closely; Falcon's warmer neutral surface and black primary action are intentional identity changes.
-- The public routes render through a dedicated Falcon server layout. No legacy SaturnusGo header, footer, background, or unrelated navigation is present in their server HTML.
-- Personal registration and cloud login use the same visual system as the landing. The organization choice is clearly marked as forthcoming and cannot create a fake workspace.
-
-## Findings
-
-- No actionable P0, P1, or P2 visual defects remain in the requested landing and onboarding surfaces.
-- Desktop and mobile pages have no horizontal overflow. The mobile menu fills the viewport, scrolls when needed, exposes dialog semantics, and closes with Escape.
-- Inputs use visible monochrome focus treatment without browser-blue outlines; labels, consent links, password visibility controls, loading, errors, and success feedback remain keyboard accessible.
-- Admin OAuth and cloud account entry remain visibly distinct. Explicit admin entry and OAuth callback parameters bypass cloud-session probing; cloud probe failures render a recoverable retry state instead of silently redirecting users.
-- Registration enforces the current server contract: a 12–128-character password, explicit consent, `termsAccepted: true`, cookie credentials, and a payload-stable idempotency key.
-- Fresh in-app-browser verification confirmed `/`, `/signup/`, `/cloud-login/`, the disabled organization state, and the existing Auth0 consent handoff from `?auth=admin`.
-
-## Verification
-
-- [x] `npm run typecheck`
-- [x] `npm run test:tms-auth` — 34/34 passed
-- [x] `npm run test:tms-attachments` — 6/6 passed
-- [x] `git diff --check`
-- [x] clean server HTML for `/`, `/signup/`, and `/cloud-login/` with zero legacy navigation links
-- [x] legacy `/features/` route still renders its original shell
-- [x] same-viewport reference comparison and desktop/mobile visual inspection
-- [x] responsive menu, registration choices, cloud login, and geometry checked in the in-app browser
-- [x] full repository production static export — 62/62 pages after adding the required Suspense boundaries to legacy investor and career routes
-
-final result: passed
-
----
-
-# Design QA — Falcon cinematic landing, selected variant 1
-
-- selected visual target: `.design-audit/2026-09-05-falcon-scroll-motion/11-selected-cinematic-run.png`
-- normalized reference: `.design-audit/2026-09-05-falcon-scroll-motion/14-reference-1440.png`
-- final implementation state: `.design-audit/2026-09-05-falcon-scroll-motion/21-implementation-final-ghost-1440.png`
-- combined reference/implementation board: `.design-audit/2026-09-05-falcon-scroll-motion/22-reference-vs-final-ghost.png`
-- final mobile state: `.design-audit/2026-09-05-falcon-scroll-motion/20-mobile-final-320.png`
-- chapter contact sheet: `.design-audit/2026-09-05-falcon-scroll-motion/28-page-contact-sheet.png`
-- viewports: 1440 × 1024 and 320 × 760 CSS px
-
-## Findings
-
-- The selected dark cinematic direction is implemented with a sticky scroll sequence: the opening promise recedes with controlled blur, the run-context statement resolves into focus, and the current production run screen rises into the viewport with scale and perspective depth.
-- The header now contains only Falcon, `Войти`, and `Создать аккаунт`; the temporary product-category navigation is removed.
-- All product chapters use current authenticated production screenshots and a restrained editorial rhythm instead of numbered feature tiles, pills, repeated cards, or generic marketing blocks.
-- The generated ambient image is served as a 2560 × 1440 WebP asset and is covered by the fail-closed Pages release manifest.
-- The same-viewport comparison was judged as one image. Hero centerline, background depth, statement hierarchy, product reveal, and fold composition match the selected variant without copying another product's identity.
-- The outgoing hero remains as a subtle blurred depth layer. The scroll cue disappears before the screenshot reaches it.
-- At 320 px the brand and both auth actions remain visible, the hero becomes a readable static sequence, and document/body widths stay exactly 320 px without horizontal overflow.
-- The opening copy is removed from the accessibility tree when it becomes visually hidden. Focus treatment is high-contrast, semantic hero phases use one `h1` followed by an `h2`, and reduced-motion mode disables both motion transforms and global smooth scrolling.
-- Three independent final reviews found no remaining P0, P1, or P2 issues in visual matching, runtime/accessibility, or product copy.
-
-## Verification
-
-- [x] selected reference and final implementation inspected together at 1440 × 1024
-- [x] desktop hero, all product chapters, integration statement, footer CTA, and 320 px layout inspected in the in-app browser
-- [x] hidden/visible CTA tab order and scroll-cue opacity verified at runtime
-- [x] one `h1`, semantic hero `h2`, direct auth links, and zero horizontal overflow verified in rendered DOM
-- [x] `npm run typecheck`
-- [x] `npm run test:tms-auth` — 38/38 passed
-- [x] `npm run test:tms-worker` — 28/28 passed
-- [x] `npm run test:tms-attachments` — 6/6 passed
-- [x] `npm run test:tms-adapters` — 188/188 passed
-- [x] `npm run build:once` — 63/63 static pages plus expected dynamic API routes
-- [x] `git diff --check`
-
-final result: passed
-
----
-
-# Design QA — workspace integrations and YouTrack
-
-- production route: `https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project_59c48ce2121f461c8e604f35a9706aa3`
-- release source SHA: `5a0276ee7c158e256bd9ff319bfbe09f303b0160`
-- production viewport: 1087 × 814 CSS px
-- states: integration catalog, persisted YouTrack configuration, live connection check, laptop-width responsive layout
-
-## Findings
-
-- The Hooks screen exposes one integration catalog grouped by work type. YouTrack is interactive; Jira, Linear, Trello, GitHub, GitLab, Jenkins, TeamCity, Slack, and Confluence are visibly unavailable rather than presenting non-functional controls.
-- YouTrack opens in a dedicated configuration screen with the saved service root, a non-readable token field, Android/iOS/backend project routing, ready-for-test stages, the accepted stage, synchronization totals, and connection metadata.
-- A live production connection check returned three projects: `Umbrella-Android`, `Umbrella-Ios`, and `Umbrella-Backend`. Existing project mappings remained selected after project discovery.
-- The saved configuration is workspace-scoped and reports `Рабочее пространство` as its source. The persistent token is never returned to the browser.
-- At 1087 px the routing table remains fully readable. Synchronization and connection-state summaries move below the form, avoiding the previous horizontal clipping at laptop widths.
-- The catalog and settings reuse Falcon navigation, typography, neutral surfaces, restrained status color, spacing, and rounded controls instead of introducing a separate visual system.
-
-## Verification
-
-- [x] production manifest resolves to source SHA `5a0276ee7c158e256bd9ff319bfbe09f303b0160`
-- [x] production backend health check passes after migration `0022`
-- [x] live YouTrack connection check — 3/3 projects discovered
-- [x] persisted Android, iOS, and Backend routes verified in production
-- [x] laptop-width catalog, form, routing table, workflow controls, and summary layout inspected in the in-app browser
-- [x] `npm run test:tms-adapters` — 195/195 passed
-- [x] `npm run typecheck`
-- [x] architecture checks — 334 files passed
-- [x] `npm run build:once` — 62/62 static pages
-- [x] `git diff --check`
-
-final result: passed
+## Visual truth and state
+
+Selected generated references are in `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/`:
+- `exec-d7ad3000-f97f-4358-9ad0-65614b75076f.png` — dark overview, 1586 × 992.
+- `exec-e53d29e2-3761-4174-81fd-1b9089f8d03f.png` — light overview.
+- `exec-79a8eabb-13a9-4ff4-abf5-faa818f4858d.png` — marketplace, 1513 × 1040.
+- `exec-cef8718d-9d3d-4ddd-8083-3acf0abfd5f1.png` and `exec-76004484-0a0b-4093-a5d0-e158da047762.png` — complete widget families.
+
+The latest approved product correction supersedes the original overview composition: seven standalone operational metrics are now two pages inside Freshness. There are 29 installable widgets, grouped 3 / 7 / 11 / 8. The previous illustrative values and decorative graphics are not treated as production data or exact artwork to reproduce.
+
+Implementation: the actual authenticated Falcon application on localhost:3000, using the normal authenticated API transport to production data through a loopback-only development proxy. The proxy is outside the repository and is never included in the production export. No mocked analytics or browser state injection was used.
+
+Evidence directory: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/dashboard-redesign-20260908/`.
+- Overview: `01-overview-light.jpg`, `02-freshness-page-two.jpg`, `07-overview-dark.jpg`.
+- All enabled widgets: `08-all-top-dark.jpg`, `09-all-bottom-dark.jpg`; DOM verification counted exactly 29 widgets across four sections, with no outer widget overflow.
+- Marketplace: `06-catalog-light.jpg` (initial comparison), `10-catalog-dark.jpg` (final).
+- Combined source/render inputs: `comparison-overview.jpg`, `comparison-store.jpg`, `comparison-store-final.jpg`.
+- Documentation contact sheet: `docs-contact-sheet.jpg`; all 13 source captures are published under `public/falcon/docs/2026-09/dashboard-v2-*.jpg`.
+
+Captured CSS viewports: 1087 × 814 and 1280 × 720, screenshot pixels equal the CSS viewport (1×). Reference rasters have no reliable CSS density metadata; combined comparison sheets fit each source and render to the same comparison column width, preserving aspect ratio. This is a comparison of the approved visual direction and responsive behavior, not a claim of pixel identity between different viewport sizes. Theme, content and composition differences are explicitly intentional as described above.
+
+## Comparison iterations and fixes
+
+1. P2 — excessive empty grid tracks: the measurement hook assumed a 12px gap while the new layout used 16px. It now reads actual track and gap values. Dense packing fills available row space. Rechecked in the later overview/library and all-widget captures.
+2. P2 — operational widgets occupied an extra mostly empty row. Freshness and the retest hero use compact natural widths around the wider work queue. Users can still resize the non-scalar Freshness panel. The final overview shows all three together.
+3. P2 — header duplication consumed too much of the first screen. Section navigation and context controls now share one toolbar; the redundant shared-project caption was removed from reading mode.
+4. P2 — the global retest button covered the Freshness paging controls at the narrower viewport. On the dashboard it now sits 24px above the bottom edge, with reserved trailing content space. Both paging controls are visible in the final overview.
+5. P2 — fixed-scale catalog thumbnails clipped tall widgets. They now measure the actual content and slot with ResizeObserver and fit the entire widget. The final catalog capture includes the full run chart and queue in the thumbnails.
+6. P2 — inconsistent outer panel corners and overly muted result lines. Outer chart/panel radii are now 15px; run outcomes use stronger semantic colors. The final dark catalog and library captures show the updated tokens.
+7. P2 — catalog could inherit the dashboard scroll offset. Distinct keyed scroll surfaces start the catalog at its heading.
+
+The final combined comparison and focused browser views found no remaining actionable P0/P1/P2 mismatch within the tested desktop/tablet-sized scope. Narrow phone-sized layout and assistive-technology use on a physical device were not exercised; those are residual test coverage limits, not claimed passes.
+
+## Required fidelity surfaces
+
+- Typography: existing Falcon Geist/system stack retained; count hierarchy, localized labels and long run names checked in actual rendering. The dense section toolbar and utility copy remain subordinate to the data.
+- Spacing/layout: stable carousel height, four/three metrics, section separation, compact counters, full-page catalog with inline detail, no clipped outer widget content in the complete board. User ordering and available width are retained.
+- Colors/tokens: neutral dark canvas/panels and light equivalents, white text on cobalt actions, semantic success/warning/defect accents. Theme change verified through the product settings UI.
+- Images/assets: existing Falcon logo and transparent empty-state art retained. Functional charts and icons remain code-rendered, with real values. All 13 guide images are actual new browser captures, with exact dimensions in the manifest; eight superseded dashboard images removed.
+- Copy/content: 29 widgets, four contexts, accurate coverage semantics and separate run/case success ratios; no internal QA debug labels in the product. Guidance distinguishes shared server layout from personal same-browser context.
+
+## Interactions and checks
+
+- Empty project → Add widgets opens the full-page catalog directly.
+- Search, categories, actual inert preview, single add and Add all, added-state deduplication, back navigation.
+- Edit-only controls, keyboard drag (queue moved to the first position), width changed to12, remove, save and cancel.
+- Saved board state read from the server; Umbrella's old operational metrics consolidated. The documentation project's temporary widgets were removed and its original empty board verified after saving.
+- Freshness arrows, both pages, correct real count drills; no timed auto-rotation.
+- Environment/build context restored after leaving and returning; Freshness page also restored. Account/project keyed component boundary isolates the controllers and drafts.
+- Historical successful-run drill opened GUIDE-TR-1 and its case result through normal navigation.
+- Authenticated local API interruption displayed the existing explicit unavailable/retry state; retry recovered without replacing stored data.
+- Browser error logs were checked during the run; no rendering errors reported by the browser log tool.
+- Verification at completion: 366 adapter/documentation/chart tests, 39 auth tests, typecheck and architecture pass; standalone workbench progress/navigation tests also pass. Production build and deployed-origin verification are recorded in the release output.

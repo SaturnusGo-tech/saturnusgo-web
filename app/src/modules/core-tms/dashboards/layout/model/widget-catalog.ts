@@ -41,23 +41,16 @@ const metric = (key: keyof typeof metricHints, ru: string, en: string, group: Wi
 const visual = (key: string, ru: string, en: string, hintRu: string, hintEn: string,
   type: WidgetType, group: WidgetGroup, width: 6 | 12 = 6): WidgetDefinition => ({key, ru, en, hintRu, hintEn, type, group, width});
 export const widgetCatalog: readonly WidgetDefinition[] = [
-  metric("activeRuns", "Активные раны", "Active runs"),
   metric("readyForRetest", "На проверке", "Ready for QA"),
-  metric("blockedItems", "Заблокированные проверки", "Blocked checks"),
-  metric("openDefects", "Открытые дефекты", "Open defects"),
   visual("trend", "Динамика прогонов", "Run activity", "Запуски и результаты за 7, 30 или 90 дней", "Launches and outcomes over 7, 30 or 90 days", "run_progress", "history"),
   visual("queue", "Рабочая очередь", "Work queue", "Активные раны и исправления, ожидающие QA", "Active runs and fixes waiting for QA", "assigned_to_me", "live"),
   visual("portfolio", "Компоненты и риски", "Components and risks", "Покрытие, результаты и дефекты по компонентам проекта", "Coverage, outcomes and defects by project component", "summary", "library", 12),
-  visual("freshness", "Актуальность проверок", "Check freshness", "Незапущенные, выполняемые и устаревшие проверки", "Unstarted, ongoing and outdated checks", "recent_activity", "live"),
+  visual("freshness", "Актуальность проверок", "Check freshness", "Семь рабочих показателей: проверки, раны и дефекты", "Seven operational signals: checks, runs and defects", "recent_activity", "live"),
   visual("types", "Состав базы", "Case types", "Ручные, автоматизированные тесты и чек-листы", "Manual cases, automated cases and checklists", "summary", "library"),
   visual("tags", "Теги тест-кейсов", "Case tags", "Распределение тест-кейсов по тегам", "How test cases are distributed by tag", "summary", "library"),
-  visual("coverage", "Покрытие", "Coverage", "Проверенные и непроверенные кейсы по компонентам", "Covered and uncovered cases by component", "summary", "library"),
+  visual("coverage", "Покрытие", "Coverage", "Кейсы в прогонах за период и пробелы по компонентам", "Cases included in period runs and gaps by component", "summary", "library"),
   visual("defects", "Статусы дефектов", "Defect statuses", "Распределение дефектов и связи с трекерами", "Defect lifecycle and tracker links", "defects", "library", 12),
   visual("outcomes", "Результаты прогонов", "Run outcomes", "Распределение результатов за выбранный период", "Outcome distribution for the selected period", "run_progress", "history"),
-  metric("notRunItems", "Не запускались", "Not started"),
-  metric("inProgressItems", "Выполняются", "In progress"),
-  metric("outdatedItems", "Устаревшие ревизии", "Outdated revisions"),
-  metric("runsWithoutBuild", "Раны без сборки", "Runs without a build"),
   metric("currentCases", "Всего тест-кейсов", "Total test cases", "library"),
   metric("casesCreated", "Новые тест-кейсы", "New test cases", "history"),
   metric("runsLaunched", "Запущенные раны", "Runs launched", "history"),
@@ -88,6 +81,6 @@ export function widgetLayoutWidth(widget: BoardWidget): number {
 }
 export function createBoardWidget(definition: WidgetDefinition, locale: string, id: string): BoardWidget {
   return { id, type: definition.type, title: locale === "ru" ? definition.ru : definition.en,
-    position: { x: 0, y: 0, width: definition.width, height: definition.width === 3 ? 1 : 3 },
+    position: { x: 0, y: 0, width: definition.key === "freshness" ? 3 : definition.width, height: definition.width === 3 ? 1 : 3 },
     settings: { presentation: definition.key } };
 }

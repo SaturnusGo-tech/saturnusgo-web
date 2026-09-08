@@ -1,3 +1,4 @@
+import { consolidateWidgets } from "../migration/consolidate-widgets";
 import { widgetKey } from "../model/widget-catalog";
 import { LayoutError, moveWidget, placeWidgets, type BoardDraft, type BoardScope,
   type BoardWidget, type LayoutSource, type LayoutState, type ProjectBoard } from "../model/layout";
@@ -22,7 +23,7 @@ export class DashboardLayoutController {
     this.emit({ loading: true, failure: null, draft: null, saving: false, retryPending: false });
     try {
       const board = await this.source.load(this.scope, reader.signal);
-      if (generation === this.generation && !reader.signal.aborted) this.emit({ board, loading: false });
+      if (generation === this.generation && !reader.signal.aborted) this.emit({ board: board ? { ...board, widgets: consolidateWidgets(board.widgets) } : null, loading: false });
     } catch (error) {
       if (generation === this.generation && !reader.signal.aborted) {
         this.emit({ loading: false, failure: error instanceof LayoutError ? error.kind : "unavailable" });
