@@ -1494,10 +1494,7 @@ export interface paths {
     };
     "/dashboards": {
         parameters: {
-            query?: {
-                /** @description With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list. */
-                projectOnly?: boolean;
-            };
+            query?: never;
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];
@@ -1507,7 +1504,7 @@ export interface paths {
         };
         /**
          * List bounded dashboard summaries newest first
-         * @description When projectId is supplied, returns workspace-level dashboards and dashboards for that project. Widget definitions are hydrated only through the singleton resource.
+         * @description When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.
          */
         get: operations["listDashboards"];
         put?: never;
@@ -8507,10 +8504,7 @@ export interface operations {
     };
     createDashboard: {
         parameters: {
-            query?: {
-                /** @description With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list. */
-                projectOnly?: boolean;
-            };
+            query?: never;
             header: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];

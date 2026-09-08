@@ -23,13 +23,14 @@ export type LayoutState = {
   draft: BoardDraft | null; failure: LayoutFailure | null; retryPending: boolean;
 };
 export function placeWidgets(widgets: readonly BoardWidget[]): BoardWidget[] {
-  let x = 0; let y = 0;
+  let x = 0; let y = 0; let rowHeight = 0;
   return widgets.map((widget) => {
     const width = Math.min(12, Math.max(3, widget.position.width));
-    if (x + width > 12) { x = 0; y += 1; }
+    if (x + width > 12) { x = 0; y += rowHeight; rowHeight = 0; }
     const next = { ...widget, position: { x, y, width, height: widget.position.height } };
+    rowHeight = Math.max(rowHeight, widget.position.height);
     x += width;
-    if (x === 12) { x = 0; y += 1; }
+    if (x === 12) { x = 0; y += rowHeight; rowHeight = 0; }
     return next;
   });
 }

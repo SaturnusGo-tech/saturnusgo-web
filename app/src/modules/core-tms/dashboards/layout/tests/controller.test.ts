@@ -53,7 +53,7 @@ test("packing preserves order without overlaps after repeated moves and width ch
   let layout=placeWidgets(widgets);layout=moveWidget(layout,"w4",0);
   for(let i=0;i<layout.length;i++) for(let j=i+1;j<layout.length;j++) {
     const a=layout[i].position,b=layout[j].position;
-    assert.ok(a.y!==b.y || a.x+a.width<=b.x || b.x+b.width<=a.x);
+    assert.ok(a.y+a.height<=b.y || b.y+b.height<=a.y || a.x+a.width<=b.x || b.x+b.width<=a.x);
   }
   assert.equal(layout[0].id,"w4");assert.deepEqual(moveWidget(layout,"missing",1),layout);
 });

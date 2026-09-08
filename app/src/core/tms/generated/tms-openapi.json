@@ -2204,15 +2204,15 @@
       }
     },
     "/dashboards": {
-      "parameters": [
-          { "name": "projectOnly", "in": "query", "description": "With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list.", "schema": { "type": "boolean", "default": false } },{ "$ref": "#/components/parameters/XRequestId" }],
+      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
         "tags": ["Dashboards"],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
+          { "name": "projectOnly", "in": "query", "description": "With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list.", "schema": { "type": "boolean", "default": false } },
           { "$ref": "#/components/parameters/WorkspaceIdQueryRequired" },
           { "$ref": "#/components/parameters/ProjectIdQuery" },
           { "$ref": "#/components/parameters/EntityStatusQuery" },

@@ -206,5 +206,17 @@
   "swagger-04-request": {
     "width": 1087,
     "height": 814
+  },
+  "dashboard-04-empty": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-05-library": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-06-edit": {
+    "width": 1087,
+    "height": 814
   }
 }
