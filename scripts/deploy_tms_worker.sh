@@ -77,32 +77,60 @@ fi
   echo "Worker publishing requires TMS_WORKER_RELEASE_APPROVED=YES after Pages readiness review." >&2
   exit 11
 }
-[[ -n "${CLOUDFLARE_API_TOKEN:-}" ]] || {
-  echo "CLOUDFLARE_API_TOKEN is required for Worker publishing." >&2
-  exit 12
+worker_auth_mode=${TMS_WORKER_AUTH_MODE:-token}
+case "$worker_auth_mode" in
+  token)
+    [[ -n "${CLOUDFLARE_API_TOKEN:-}" ]] || {
+      echo "CLOUDFLARE_API_TOKEN is required for Worker publishing in token mode." >&2
+      exit 12
+    }
+    ;;
+  oauth) ;;
+  *) echo "TMS_WORKER_AUTH_MODE must be token or oauth." >&2; exit 13 ;;
+esac
+
+run_wrangler() {
+  if [[ "$worker_auth_mode" == "oauth" ]]; then
+    env -u CLOUDFLARE_API_TOKEN -u CF_API_TOKEN -u CLOUDFLARE_API_KEY -u CF_API_KEY \
+      "$wrangler_bin" "$@"
+  else
+    "$wrangler_bin" "$@"
+  fi
 }
 
 deployment_output=$(mktemp)
 deployment_status=$(mktemp)
+auth_preflight=$(mktemp)
 cleanup_evidence() {
-  rm -f "$deployment_output" "$deployment_status"
+  rm -f "$deployment_output" "$deployment_status" "$auth_preflight"
 }
 trap cleanup_evidence EXIT
 
+if [[ "$worker_auth_mode" == "oauth" ]]; then
+  if ! (
+    cd "$worker_dir"
+    run_wrangler deployments status --config wrangler.toml
+  ) > "$auth_preflight" 2>&1; then
+    echo "Existing Wrangler OAuth cannot read the configured account's Worker deployment. Re-authenticate with Wrangler login and retry." >&2
+    exit 14
+  fi
+fi
+
 (
   cd "$worker_dir"
-  "$wrangler_bin" deploy \
+  run_wrangler deploy \
     --config wrangler.toml \
     --message "Falcon TMS ${actual_sha}"
 ) 2>&1 | tee "$deployment_output"
 (
   cd "$worker_dir"
-  "$wrangler_bin" deployments status --config wrangler.toml
+  run_wrangler deployments status --config wrangler.toml
 ) 2>&1 | tee "$deployment_status"
 
 printf '\nWorker production release evidence:\n'
 printf '  source_sha=%s\n' "$actual_sha"
 printf '  wrangler=%s\n' "$installed_wrangler_version"
+printf '  auth_mode=%s\n' "$worker_auth_mode"
 printf '  config=%s\n' "$wrangler_config"
 printf '  deploy_output_sha256=%s\n' "$(shasum -a 256 "$deployment_output" | awk '{ print $1 }')"
 printf '  status_output_sha256=%s\n' "$(shasum -a 256 "$deployment_status" | awk '{ print $1 }')"

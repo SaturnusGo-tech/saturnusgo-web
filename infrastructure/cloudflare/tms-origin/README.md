@@ -31,7 +31,10 @@ The source of truth is `route-manifest.mjs`. Public HTML is copied into the isol
    assets, and referenced Next.js runtime assets over HTTPS.
 6. Run `TMS_SOURCE_SHA=<full-reviewed-sha> npm run prepare:tms-worker`. This repeats Worker tests,
    proves Pages serves the exact reviewed SHA, and performs a Wrangler dry-run.
-7. Deploy only with `CLOUDFLARE_API_TOKEN` set and
+7. Deploy with `CLOUDFLARE_API_TOKEN` set (the default token mode), or explicitly set
+   `TMS_WORKER_AUTH_MODE=oauth` to use the existing Wrangler login. OAuth mode removes token/key
+   environment overrides from Wrangler commands and verifies read access to the configured
+   account's existing Worker deployment before publishing. Both modes require
    `TMS_SOURCE_SHA=<full-reviewed-sha> TMS_WORKER_RELEASE_APPROVED=YES npm run deploy:tms-worker`.
    Preserve the printed source SHA, Wrangler version, deployment status, and evidence hashes in the
    release record.
@@ -73,3 +76,18 @@ CSP synchronized with production configuration.
 Swagger/OpenAPI is rendered in Falcon from the project connector. No Umbrella iframe origin is required.
 The workspace connect-src permits HTTPS for customer API execution; Swagger requests omit cookies
 and reject Falcon, Auth0 and online-validator targets. Specification credentials stay on the backend.
+
+## Saved documentation audio
+
+`DOCS_AUDIO` binds the existing public `cdn-saturnusgo` R2 bucket. The Worker reads only keys matching
+`falcon/docs/audio/ru/<article-id>/<64-lowercase-hex-version>.mp3` and never offers uploads or listing.
+The version identifies the article text and voice settings; upload new content to a new key.
+Set object `Content-Type` to `audio/mpeg`. Successful responses use an immutable one-year cache
+policy and support GET, HEAD, ETag revalidation and a single byte range for playback seeking.
+Missing files return 404; invalid object metadata returns 502 and storage failures return 503,
+all with `no-store`. Private tenant attachments keep their existing separate bucket and grants.
+
+Use the pinned local Wrangler with `CLOUDFLARE_ACCOUNT_ID=4b485e3b82c9e0b429aa9aa753c250a7` for R2
+commands. Publishing an MP3 uses `wrangler r2 object put cdn-saturnusgo/<key> --remote --file <mp3>`
+with `--content-type audio/mpeg --cache-control "public, max-age=31536000, immutable"`.
+Verify the stored object and public GET/HEAD/Range responses before referencing its URL in a release.

@@ -7,6 +7,7 @@ import {
   SOURCE_ORIGIN,
   TMS_HOST,
 } from "./route-manifest.mjs";
+import { serveDocsAudio } from "./audio/response.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -201,7 +202,7 @@ async function proxyToPublicSite(request, incoming, originPath) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const incoming = new URL(request.url);
     if (incoming.hostname !== TMS_HOST) return notFoundResponse();
     if (incoming.protocol === "http:") {
@@ -213,6 +214,9 @@ export default {
     // public surface canonical so an allowed prefix cannot be turned into an origin traversal.
     if (incoming.pathname.includes("%") || incoming.pathname.includes("\\")) {
       return notFoundResponse();
+    }
+    if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
+      return secureResponse(await serveDocsAudio(request, env?.DOCS_AUDIO));
     }
     if (!["GET", "HEAD"].includes(request.method)) {
       return notFoundResponse();

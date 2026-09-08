@@ -66,6 +66,8 @@ printf 'node %s\\n' "$*" >> "$CALL_LOG"
 set -euo pipefail
 if [[ "\${1:-}" == "--version" ]]; then echo "wrangler 4.129.0"; exit 0; fi
 printf 'wrangler %s\\n' "$*" >> "$CALL_LOG"
+if [[ "\${TEST_EXPECT_OAUTH:-}" == "YES" && -n "\${CLOUDFLARE_API_TOKEN:-}\${CF_API_TOKEN:-}\${CLOUDFLARE_API_KEY:-}\${CF_API_KEY:-}" ]]; then exit 90; fi
+if [[ "\${1:-}" == "deployments" && "\${TEST_STATUS_FAIL:-}" == "YES" ]]; then exit 91; fi
 if [[ "\${1:-}" == "deployments" ]]; then echo "Current Version ID: fixture-version"; fi
 if [[ "\${1:-}" == "deploy" && "$*" != *"--dry-run"* ]]; then echo "Version ID: fixture-version"; fi
 `, true);
@@ -85,6 +87,7 @@ function release(fixture, mode, extraEnvironment = {}) {
     cwd: fixture.source,
     env: {
       ...process.env,
+      TMS_WORKER_AUTH_MODE: "token",
       ...extraEnvironment,
       CALL_LOG: fixture.callLog,
       PATH: `${fixture.bin}:${process.env.PATH}`,
@@ -151,4 +154,33 @@ test("publish deploys only after gates and prints version evidence", (context) =
   assert.match(result.stdout, /Worker production release evidence/);
   assert.match(result.stdout, /deploy_output_sha256=[0-9a-f]{64}/);
   assert.doesNotMatch(`${result.stdout}${result.stderr}`, /fixture-secret/);
+});
+
+test("explicit OAuth mode verifies configured Worker access before publishing without token variables", (context) => {
+  const fixture = createFixture(context);
+  const result = release(fixture, "--publish", {
+    TMS_WORKER_AUTH_MODE: "oauth", TMS_WORKER_RELEASE_APPROVED: "YES", TEST_EXPECT_OAUTH: "YES",
+    CLOUDFLARE_API_TOKEN: "unused-token", CF_API_TOKEN: "unused-token",
+    CLOUDFLARE_API_KEY: "unused-key", CF_API_KEY: "unused-key",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const calls = readFileSync(fixture.callLog, "utf8");
+  assert.match(calls, /verify-pages-origin-readiness[\s\S]*wrangler deployments status --config wrangler\.toml\nwrangler deploy --config/);
+  assert.equal(calls.match(/wrangler deployments status/g)?.length, 2);
+  assert.match(result.stdout, /auth_mode=oauth/);
+  assert.doesNotMatch(`${result.stdout}${result.stderr}`, /unused-token|unused-key/);
+});
+
+test("OAuth verification failure or an unknown authentication mode stops before deployment", (context) => {
+  const fixture = createFixture(context);
+  for (const [mode, status] of [["oauth", 14], ["unknown", 13]]) {
+    writeFileSync(fixture.callLog, "");
+    const result = release(fixture, "--publish", {
+      TMS_WORKER_AUTH_MODE: mode, TMS_WORKER_RELEASE_APPROVED: "YES", TEST_STATUS_FAIL: "YES",
+      CLOUDFLARE_API_TOKEN: "",
+    });
+    assert.equal(result.status, status, result.stderr);
+    assert.doesNotMatch(readFileSync(fixture.callLog, "utf8"), /wrangler deploy --config/);
+    assert.match(result.stderr, mode === "oauth" ? /OAuth cannot read the configured account/ : /must be token or oauth/);
+  }
 });

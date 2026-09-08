@@ -7,3 +7,7 @@ workers_dev = false
 routes = [
   { pattern = "tms.saturnusgo.com", custom_domain = true }
 ]
+
+[[r2_buckets]]
+binding = "DOCS_AUDIO"
+bucket_name = "cdn-saturnusgo"

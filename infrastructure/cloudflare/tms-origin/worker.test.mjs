@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import worker from "./worker.mjs";
+import "./audio/response.test.mjs";
 
 function mockFetch(context, implementation) {
   const originalFetch = globalThis.fetch;
