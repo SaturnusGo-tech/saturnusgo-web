@@ -79,7 +79,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         data={model.data}
         projectId={model.project.id}
         serverAnalytics={model.connection === "connected"}
-        onCreate={() => model.setDialog("dashboard")}
         onOpenEntity={(entity, drill) => void openDashboardEntity(entity, drill)}
         onOpenRow={(row) => void openDashboardRow(row)}
         onCreateRun={(caseIds) => model.openRunDialog({ caseIds })}

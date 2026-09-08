@@ -2204,7 +2204,8 @@
       }
     },
     "/dashboards": {
-      "parameters": [{ "$ref": "#/components/parameters/XRequestId" }],
+      "parameters": [
+          { "name": "projectOnly", "in": "query", "description": "With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list.", "schema": { "type": "boolean", "default": false } },{ "$ref": "#/components/parameters/XRequestId" }],
       "get": {
         "tags": ["Dashboards"],
         "summary": "List bounded dashboard summaries newest first",

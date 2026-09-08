@@ -1,3 +1,5 @@
+import { enDashboardLayoutMessages } from "./dashboard-layout/en";
+import { ruDashboardLayoutMessages } from "./dashboard-layout/ru";
 import { enActionMessages } from "./actions/en";
 import { ruActionMessages } from "./actions/ru";
 import { enCaseMessages } from "./cases/en";
@@ -20,6 +22,7 @@ const enMessages = {
   ...enViewMessages,
   ...enDashboardMessages,
   ...enDashboardWorkbenchMessages,
+  ...enDashboardLayoutMessages,
   ...enActionMessages,
 } as const;
 
@@ -30,6 +33,7 @@ const ruMessages = {
   ...ruViewMessages,
   ...ruDashboardMessages,
   ...ruDashboardWorkbenchMessages,
+  ...ruDashboardLayoutMessages,
   ...ruActionMessages,
 } satisfies Record<keyof typeof enMessages, string>;
 

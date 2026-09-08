@@ -21,7 +21,9 @@ const compactAxisLabel = (value: string, limit = 16) => value.length > limit
 export function DashboardBreakdowns({
   snapshot,
   onOpenDrill,
+  kind,
 }: {
+  kind?: "types" | "tags" | "coverage";
   snapshot: DashboardSnapshot;
   onOpenDrill: (drill: DashboardDrill) => void;
 }) {
@@ -42,8 +44,8 @@ export function DashboardBreakdowns({
     }));
 
   return (
-    <div className={surface.breakdownGrid}>
-      <section className={surface.chartPanel}>
+    <div className={kind ? surface.singleBreakdown : surface.breakdownGrid}>
+      {(!kind || kind === "types") && <section className={surface.chartPanel}>
         <header className={surface.panelHeading}><div><h2>{t("dashboard.byType")}</h2></div></header>
         <div className={surface.donutWrap}>
           <div className={surface.donutChart} role="img" aria-label={t("dashboard.byType")}>
@@ -65,9 +67,9 @@ export function DashboardBreakdowns({
             ))}
           </div>
         </div>
-      </section>
+      </section>}
 
-      <section className={surface.chartPanel}>
+      {(!kind || kind === "tags") && <section className={surface.chartPanel}>
         <header className={surface.panelHeading}><div><h2>{t("dashboard.byTag")}</h2></div></header>
         {tags.length ? <>
           <div className={surface.tagChart} role="img" aria-label={t("dashboard.byTag")}>
@@ -90,9 +92,9 @@ export function DashboardBreakdowns({
             </button>)}
           </div>
         </> : <p className={surface.chartEmpty}>{t("dashboard.noTags")}</p>}
-      </section>
+      </section>}
 
-      <section className={surface.chartPanel}>
+      {(!kind || kind === "coverage") && <section className={surface.chartPanel}>
         <header className={surface.panelHeading}><div><h2>{t("dashboard.coverage")}</h2><p>{t("dashboard.coverageHint")}</p></div></header>
         {coverage.length ? <><div className={surface.coverageChart} role="img" aria-label={t("dashboard.coverage")}>
           <ResponsiveContainer width="100%" height="100%">
@@ -125,7 +127,7 @@ export function DashboardBreakdowns({
           ))}
         </div>
         </> : <p className={surface.chartEmpty}>{t("dashboard.noCoverage")}</p>}
-      </section>
+      </section>}
     </div>
   );
 }

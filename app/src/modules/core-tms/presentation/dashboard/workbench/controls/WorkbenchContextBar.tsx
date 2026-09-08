@@ -1,13 +1,13 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { DashboardWorkbenchModel } from "../../../../dashboards/workbench/application/useDashboardWorkbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import { AnimatedSelect } from "../../../common/select/AnimatedSelect";
 import styles from "../workbench.module.css";
 
 export function WorkbenchContextBar({ model }: { model: DashboardWorkbenchModel }) {
   const { t } = useTmsLocale();
-  const buildListId = useId();
   const current = JSON.stringify([model.scopeKey, model.filters]);
   const [draft, setDraft] = useState({ owner: current, ...model.filters });
   const filters = draft.owner === current ? draft : model.filters;
@@ -28,23 +28,29 @@ export function WorkbenchContextBar({ model }: { model: DashboardWorkbenchModel 
       event.preventDefault();
       model.setFilters({ environmentId: filters.environmentId, buildReference: filters.buildReference.trim() });
     }}>
-      <label><span>{t("dashboardWorkbench.environment")}</span>
-        <select value={filters.environmentId} disabled={!model.enabled}
-          onChange={(event) => update("environmentId", event.target.value)}>
-          <option value="">{t("dashboardWorkbench.allEnvironments")}</option>
-          {filters.environmentId && !choices?.environments.some((item) => item.id === filters.environmentId) &&
-            <option value={filters.environmentId}>{t("dashboardWorkbench.selectedEnvironment")}</option>}
-          {choices?.environments.map((item) => <option key={`${item.projectId}:${item.id}`} value={item.id}>
-            {item.projectName} · {item.name}
-          </option>)}
-        </select>
-      </label>
-      <label><span>{t("dashboardWorkbench.build")}</span>
-        <input list={buildListId} value={filters.buildReference} disabled={!model.enabled} maxLength={500}
-          placeholder={t("dashboardWorkbench.allBuilds")} title={t("dashboardWorkbench.exactBuild")}
-          onChange={(event) => update("buildReference", event.target.value)} />
-        <datalist id={buildListId}>{choices?.builds.map((build) => <option key={build} value={build} />)}</datalist>
-      </label>
+      <div className={styles.filterField}><span>{t("dashboardWorkbench.environment")}</span>
+        <AnimatedSelect compact className={styles.filterSelect} label={t("dashboardWorkbench.environment")}
+          value={filters.environmentId} disabled={!model.enabled} onChange={(value) => update("environmentId", value)}
+          options={[
+            { value: "", label: t("dashboardWorkbench.allEnvironments") },
+            ...(filters.environmentId && !choices?.environments.some((item) => item.id === filters.environmentId)
+              ? [{ value: filters.environmentId, label: t("dashboardWorkbench.selectedEnvironment") }] : []),
+            ...(choices?.environments.map((item) => ({ value: item.id, label: `${item.projectName} · ${item.name}` })) ?? []),
+          ]} />
+      </div>
+      <div className={styles.filterField}><span>{t("dashboardWorkbench.build")}</span>
+        <AnimatedSelect compact className={styles.filterSelect} label={t("dashboardWorkbench.build")}
+          value={filters.buildReference} disabled={!model.enabled} onChange={(value) => update("buildReference", value)}
+          options={[
+            { value: "", label: t("dashboardWorkbench.allBuilds") },
+            ...(filters.buildReference && !choices?.builds.includes(filters.buildReference)
+              ? [{ value: filters.buildReference, label: filters.buildReference }] : []),
+            ...(choices?.builds.map((build) => ({ value: build, label: build })) ?? []),
+          ]} />
+        {choices?.buildsTruncated && <input value={filters.buildReference} disabled={!model.enabled} maxLength={500}
+          aria-label={t("dashboardWorkbench.exactBuild")} placeholder={t("dashboardWorkbench.exactBuild")}
+          onChange={(event) => update("buildReference", event.target.value)} />}
+      </div>
       <button type="submit" disabled={!model.enabled || !changed}>{t("dashboardWorkbench.apply")}</button>
       {(model.filters.environmentId || model.filters.buildReference || changed) &&
         <button type="button" className={styles.quietButton} onClick={reset}>{t("dashboardWorkbench.reset")}</button>}

@@ -282,3 +282,6 @@
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } .metric { transition: none; } }
 
 :global(.dark) .page.page[data-dashboard-workspace] { background: var(--canvas); }
+
+.singleBreakdown { min-width: 0; height: 100%; }
+.singleBreakdown > section { height: 100%; }

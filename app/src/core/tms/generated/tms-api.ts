@@ -1494,7 +1494,10 @@ export interface paths {
     };
     "/dashboards": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list. */
+                projectOnly?: boolean;
+            };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];
@@ -8475,6 +8478,8 @@ export interface operations {
     listDashboards: {
         parameters: {
             query: {
+                /** @description With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list. */
+                projectOnly?: boolean;
                 /** @description Required tenant boundary for the query. */
                 workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
                 projectId?: components["parameters"]["ProjectIdQuery"];
@@ -8502,7 +8507,10 @@ export interface operations {
     };
     createDashboard: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description With projectId, list only dashboards owned by this project; workspace dashboards are excluded. Default false preserves the visible dashboard list. */
+                projectOnly?: boolean;
+            };
             header: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];

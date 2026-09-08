@@ -117,3 +117,9 @@
   .freshness { padding-inline: 14px; }
   .rowSignals time { margin-left: 0; }
 }
+
+.filterField { display: grid; min-width: 0; gap: 5px; color: var(--muted); font-size: 10px; }
+.filterSelect { width: 180px; max-width: 100%; }
+.filterSelect > button { width: 100%; border-radius: 7px; }
+.filterSelect [role="option"] { border: 0; width: 100%; text-align: left; background: transparent; }
+@media (max-width: 640px) { .filterField { flex: 1 1 130px; }.filterSelect { width: 100%; } }

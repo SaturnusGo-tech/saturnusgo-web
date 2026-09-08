@@ -1,7 +1,6 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../localization/format/labels";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
-import { DashboardDialog } from "../dialogs/dashboard/DashboardDialog";
 import { DefectDialog } from "../dialogs/defect/DefectDialog";
 import { EnvironmentDialog } from "../dialogs/environment/EnvironmentDialog";
 import { RunDialog } from "../dialogs/run/RunDialog";
@@ -88,24 +87,6 @@ export function WorkspaceExecutionDialogs({
           }));
           close();
           model.notify(t("actions.defectCreated", { key: defect.key }));
-        }}
-      />
-    );
-  }
-  if (model.dialog === "dashboard") {
-    return (
-      <DashboardDialog
-        workspaceId={model.data.workspace.id}
-        projectId={model.project?.id ?? null}
-        offline={model.connection === "demo"}
-        onClose={close}
-        onCreated={(dashboard) => {
-          model.setData((current) => ({
-            ...current,
-            dashboards: [...current.dashboards, dashboard],
-          }));
-          close();
-          model.notify(t("actions.dashboardCreated"));
         }}
       />
     );
