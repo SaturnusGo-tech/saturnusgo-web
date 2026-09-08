@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
+import { resolveSelectedCase } from "../../test-cases/navigation/selection/selected-case";
 
 export const isAuthoritativelyActiveRun = (
   run: Pick<TestRunSummary, "status" | "archivedAt">,
@@ -31,9 +32,7 @@ export function useWorkspaceDerived(
         ))
     );
   });
-  const selectedCase =
-    state.data.testCases.find((item) => item.id === state.selectedCaseId) ??
-    visibleCases[0];
+  const selectedCase = resolveSelectedCase(state.data.testCases, project?.id, state.selectedCaseId);
   const selectedRevision = state.selectedCaseDetail && selectedCase &&
     state.selectedCaseDetail.id === selectedCase.id
     ? state.selectedCaseDetail.current

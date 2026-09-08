@@ -1,9 +1,7 @@
-import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 
 export function useWorkspaceActions(
   state: ReturnType<typeof useWorkspaceState>,
-  derived: ReturnType<typeof useWorkspaceDerived>,
 ) {
   const notify = (message: string) => state.setNotice(message);
 
@@ -23,7 +21,7 @@ export function useWorkspaceActions(
       (item) => item.projectId === nextProjectId,
     );
     state.resetCaseEditor(nextCase?.folderPath ?? "/Unsorted");
-    state.setSelectedCaseId(nextCase?.id ?? "");
+    state.setSelectedCaseId("");
     state.setSelectedFolder(nextCase?.folderPath ?? "/Unsorted");
     state.setSelectedSuiteId(
       suites.find((item) => item.projectId === nextProjectId)?.id ??
@@ -52,10 +50,7 @@ export function useWorkspaceActions(
     state.setCollapsedFolders((current) =>
       current.filter((item) => item !== folderPath),
     );
-    const firstCase = derived.visibleCases.find(
-      (item) => item.folderPath === folderPath,
-    );
-    state.setSelectedCaseId(firstCase?.id ?? "");
+    state.setSelectedCaseId("");
   }
 
   return { notify, chooseProject, selectFolder };

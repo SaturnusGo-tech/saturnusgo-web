@@ -32,6 +32,7 @@ function LocalizedWorkspace() {
   }
 
   function changeView(next: typeof model.view) {
+    if (next === "cases" && model.dialog !== "case") model.setSelectedCaseId("");
     if (model.selectedDefectId) model.setSelectedDefectId(null);
     if (next === "runs") {
       const activeRun = model.activeProjectRuns[0];

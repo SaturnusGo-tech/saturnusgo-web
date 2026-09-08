@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCount } from "../../../localization/format/count";
 import type { TmsLocale } from "../../../localization/model/locale";
-import { readCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
 import {
   filterCaseRows,
   resolveDependentCaseFacets,
@@ -22,7 +21,7 @@ export function useCasesViewController(
   languageTag: string,
 ) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(true);
+  const [detailOpen, setDetailOpen] = useState(Boolean(props.selectedCaseId));
   const [detailFullscreen, setDetailFullscreen] = useState(false);
   const [sort, setSort] = useState<CaseSort>({ key: "key", direction: "asc" });
   const [qlQuery, setQlQuery] = useState("");
@@ -31,7 +30,6 @@ export function useCasesViewController(
   const [selectionMode, setSelectionMode] = useState(false);
   const [facetFilters, setFacetFilters] = useState<CaseFacetFilters>({ folders: [], components: [] });
   const workspaceRef = useRef<HTMLDivElement>(null);
-  const deepLinkOpenedRef = useRef(false);
   const inspectorResize = useCaseInspectorResize(workspaceRef);
 
   const allRows = useMemo<CaseListRow[]>(() => props.testCases.map((testCase) => ({
@@ -84,13 +82,8 @@ export function useCasesViewController(
 
   useEffect(() => { if (props.editor) setDetailOpen(true); }, [props.editor]);
   useEffect(() => {
-    if (deepLinkOpenedRef.current) return;
-    const linkedCaseId = readCaseDeepLink(window.location.href).caseId;
-    if (!linkedCaseId) { deepLinkOpenedRef.current = true; return; }
-    if (linkedCaseId !== props.testCase?.id) return;
-    deepLinkOpenedRef.current = true;
-    setDetailOpen(true);
-  }, [props.testCase?.id]);
+    setDetailOpen(Boolean(props.selectedCaseId));
+  }, [props.selectedCaseId]);
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
@@ -131,6 +124,7 @@ export function useCasesViewController(
   }
   function closeInspector() {
     props.editor?.onCancel();
+    if (!props.editor) props.onSelectCase("");
     setDetailFullscreen(false);
     setDetailOpen(false);
   }
@@ -143,7 +137,7 @@ export function useCasesViewController(
 
   return {
     workspaceRef, inspectorResize, filterOpen, setFilterOpen, detailFullscreen,
-    setDetailFullscreen, inspectorOpen: detailOpen || Boolean(props.editor), sort,
+    setDetailFullscreen, inspectorOpen: (detailOpen && Boolean(props.testCase)) || Boolean(props.editor), sort,
     toggleSort, qlQuery, setQlQuery, viewMode, setViewMode, groupBy, setGroupBy,
     facetFilters, setFacetFilters, facetOptions, rows, countLabel, estimateLabel,
     selectRow, createCase, closeInspector, selectionMode, toggleSelectionMode,

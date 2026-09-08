@@ -17,7 +17,7 @@ import { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
   const derived = useWorkspaceDerived(state);
-  const workspace = useWorkspaceActions(state, derived);
+  const workspace = useWorkspaceActions(state);
   const resources = useWorkspaceResourceActions(
     state,
     derived,

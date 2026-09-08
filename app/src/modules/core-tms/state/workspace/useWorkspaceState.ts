@@ -10,6 +10,7 @@ import { buildCaseDeepLink, readCaseDeepLink } from "../../test-cases/navigation
 import { useSelectedSuiteResource } from "../workspace-resources/useSelectedSuiteResource";
 import { useCaseEditorState } from "../case-editor/useCaseEditorState";
 import { useSelectedCaseResource } from "../case-resource/useSelectedCaseResource";
+import { resolveSelectedCase } from "../../test-cases/navigation/selection/selected-case";
 
 const defaultFilters: CaseFilters = {
   type: "all",
@@ -68,12 +69,8 @@ export function useWorkspaceState() {
       : active.some((item) => item.id === remembered)
       ? remembered!
       : (active[0]?.id ?? "");
-    const linkedCase = data.testCases.find(
-      (item) => item.projectId === initialProjectId && item.id === linked.caseId,
-    );
-    const initialCase = linkedCase ?? data.testCases.find(
-      (item) => item.projectId === initialProjectId && !item.archivedAt,
-    );
+    const initialCase = resolveSelectedCase(data.testCases, initialProjectId,
+      !destination.view || destination.view === "cases" ? linked.caseId : null);
     const initialRunId = destination.runId
       ?? data.runs.find((item) => item.projectId === initialProjectId && item.status === "active" && !item.archivedAt)?.id
       ?? data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id ?? null;
