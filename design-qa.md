@@ -53,5 +53,11 @@ The final combined comparison and focused browser views found no remaining actio
 - Environment/build context restored after leaving and returning; Freshness page also restored. Account/project keyed component boundary isolates the controllers and drafts.
 - Historical successful-run drill opened GUIDE-TR-1 and its case result through normal navigation.
 - Authenticated local API interruption displayed the existing explicit unavailable/retry state; retry recovered without replacing stored data.
-- Browser error logs were checked during the run; no rendering errors reported by the browser log tool.
-- Verification at completion: 366 adapter/documentation/chart tests, 39 auth tests, typecheck and architecture pass; standalone workbench progress/navigation tests also pass. Production build and deployed-origin verification are recorded in the release output.
+- Local browser error logs were checked during the run; no rendering errors were reported there. The production smoke test subsequently exposed the hardened-runtime issue documented below.
+- Verification at completion: 367 adapter/documentation/chart tests, 39 auth tests, typecheck and architecture pass; standalone workbench progress/navigation tests also pass. Production build and deployed-origin verification are recorded in the release output.
+
+## Production runtime regression
+
+The first production smoke test found that opening all sections triggered a Recharts tick-generation exception when runtime intrinsics were frozen. The existing dependency patch covered `decimal.js`, while Recharts' automatic ticks also use `decimal.js-light`. Its constructor attempted to assign an inherited, read-only `constructor` property. Both CommonJS and ESM entry points now define an own writable property, following the existing dependency-patch mechanism. The regression test exercises real Recharts automatic ticks with frozen intrinsics, including fractional and zero domains, rather than only testing an externally supplied scale.
+
+Production documentation independently passed: all 13 new image URLs return HTTP 200 and match the committed assets. The live article uses only the new `dashboard-v2-*` captures; viewport-visible images load correctly through the existing lazy loading.

@@ -43,6 +43,8 @@ test("Recharts scales render with frozen runtime intrinsics", () => {
       rechartsScaleFactory,
     } = require("./node_modules/recharts/lib/util/scale/RechartsScale.js");
     const Decimal = require("./node_modules/decimal.js/decimal.js");
+    const { getNiceTickValues, getTickValuesFixedDomain } =
+      require("./node_modules/recharts/lib/util/scale/getNiceTickValues.js");
 
     function scale(value) {
       return value * 10;
@@ -56,6 +58,11 @@ test("Recharts scales render with frozen runtime intrinsics", () => {
 
     const decimal = new Decimal("0.1").plus("0.2");
     assert.equal(decimal.toString(), "0.3");
+    assert.deepEqual(getNiceTickValues([0, 23], 6, false), [0, 5, 10, 15, 20, 25]);
+    assert.deepEqual(getNiceTickValues([0, 0], 6, false), [0, 1, 2, 3, 4, 5]);
+    assert.deepEqual(getNiceTickValues([0.1, 0.9], 5, true), [0, 0.25, 0.5, 0.75, 1]);
+    assert.deepEqual(getNiceTickValues([0, 23], 6, false, "snap125"), [0, 5, 10, 15, 20, 25]);
+    assert.deepEqual(getTickValuesFixedDomain([0, 23], 6, false), [0, 5, 10, 15, 20, 23]);
 
     const adapted = rechartsScaleFactory(scale);
     assert.deepEqual(adapted.domain(), [0, 10]);
@@ -72,6 +79,24 @@ test("Recharts scales render with frozen runtime intrinsics", () => {
   });
 
   assert.equal(output, "");
+});
+
+test("Decimal light ES module arithmetic and clones work with frozen intrinsics", () => {
+  const script = String.raw`
+    import assert from "node:assert/strict";
+    import Decimal from "./node_modules/decimal.js-light/decimal.mjs";
+    Object.freeze(Function.prototype);
+    Object.freeze(Object.prototype);
+    assert.equal(new Decimal("0.1").plus("0.2").toString(), "0.3");
+    const LocalDecimal = Decimal.clone({ precision: 8 });
+    const value = new LocalDecimal(1).div(3);
+    assert.equal(value.toString(), "0.33333333");
+    assert.equal(value.constructor, LocalDecimal);
+    assert.equal(Object.isFrozen(Object.prototype), true);
+  `;
+  assert.equal(execFileSync(process.execPath, ["--input-type=module", "-e", script], {
+    cwd: process.cwd(), encoding: "utf8",
+  }), "");
 });
 
 test("risk headers remain readable without unexplained abbreviations", () => {
