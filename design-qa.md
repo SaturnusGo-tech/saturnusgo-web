@@ -1,4 +1,50 @@
-# Design QA — dashboard analytics explorer
+# Design QA — shared-step editor polish, 2026-09-08
+
+The user selected the compact refinement of the original editor, then explicitly requested a transparent title while editing and a back arrow without a button surface in both themes.
+
+- Source visual truth: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-f8d03c62-61ae-4f03-9c4f-c0e0d39e671f.png`, with the subsequent title/back corrections taking precedence.
+- Original product reference: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/artifacts/falcon-shared-steps-audit-2026-09-08/04-create-filled.png`.
+- Browser-rendered implementation: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/artifacts/falcon-shared-steps-polish-2026-09-08/04-dark-action-focus.png`.
+- Title-focused states: `01-dark-title-focus.png` and `03-light-title-focus.png` in that evidence directory. Return-button focus: `02-dark-back-focus.png`.
+- Verification surface: a temporary local fixture rendering the actual production `SharedStepEditor`, `Navigation`, theme provider and CSS. The fixture made no API requests and was removed from the source tree before the export build; its source is retained with the evidence.
+- Source dimensions: 1448 × 1086 pixels; original application capture: 1087 × 814. Implementation: 1280 × 720 CSS/pixel viewport, 1× capture. The generated reference is approximately 1.33× the original composition. No resampling or cropping was applied. The wider/shorter current viewport is an intentional responsive context, not evidence of pixel-identical full-screen geometry.
+- Full-view evidence: source and rendered implementation were opened together in one comparison input. The original 240px sidebar, 76px editor header, 18px title, 13px step text, action/result order and compact heights are retained. Header and input detail is readable in the full-size focused-state captures; additional crops were unnecessary for this narrow change.
+
+## Findings and comparison history
+
+- The original dark global input rule overrode transparent local editor surfaces. Scoped editor selectors now win without modifying global form controls.
+- The title remains transparent, borderless and without a shadow when focused, hovered or idle. Both theme checks reported `background: rgba(0,0,0,0)`, `border: 0px`, `shadow: none`. The caret and accessible title label remain available.
+- The back control retains its 36×36 target and accessible name. Background, border color and shadow are transparent/none. The return callback was exercised in the browser. Keyboard-only focus outline is retained in CSS; a complete keyboard traversal was not performed.
+- Inactive action/result fields no longer show solid strips. Only the focused step field receives a subtle rounded surface and inset border. The shared guide is thinner without shifting text alignment.
+- The reviewed first implementation had no actionable P0/P1/P2 discrepancy for the requested scope. Separate dark-title, light-title and dark-step focus captures confirm the final state; there was no visual-fix iteration after this comparison.
+
+## Fidelity surfaces
+
+- Typography: existing font stack, text sizes, weights and wrapping preserved; labels now identify the shared block and its steps.
+- Spacing: original dense outline and content width preserved; reducing the guide from 3px to 1px is balanced by 2px additional inner padding.
+- Colors/tokens: existing neutral Falcon dark/light tokens; transparent title/back in both themes; subtle focus only inside step fields.
+- Assets: original Falcon logo and existing navigation/icon components reused. No generated replacement assets were added to application code.
+- Copy/content: original three-action example preserved in the fixture. The mock's version/usage/status text was not added as static production copy; real metadata requires separate domain/UI work and was outside these appearance changes.
+
+## Verification limits
+
+This is component and visual verification, not a production deployment or an end-to-end persistence test. No production shared step was edited. Full screen-reader testing, keyboard traversal and mobile viewport testing were not performed. Development-server output contained no runtime/compile errors; browser console inspection was not available through the capture API used. Build/dependency warnings are recorded separately from visual findings.
+
+## Code verification
+
+- TypeScript `tsc --noEmit`: passed.
+- Existing shared-step API and scenario-operation tests: 9 passed, 0 failed.
+- TMS architecture check: passed for 485 files.
+- Production static export: passed, 62 pages, using the existing deployment procedure's temporary exclusion of server-only `app/api` routes. The first direct export attempt encountered that known server-route constraint; no source change was needed. API sources were restored afterward.
+- The local visual-fixture route is absent from both source and export. Compiled CSS contains the scoped header rule.
+- Existing nonblocking warnings: Browserslist dataset age and `methodology.css` autoprefixer `end` value. No unrelated warning cleanup was included.
+- `git diff --check`: passed.
+
+final result: passed
+
+---
+
+# Earlier design QA — dashboard analytics explorer
 
 - source visual truth: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/codex-clipboard-3301dc23-f328-4ae9-9953-fbacdb2d498a.png`
 - implementation screenshot: `.design-audit/2026-09-04-dashboard-drill-redesign/production-testcases-final.png`

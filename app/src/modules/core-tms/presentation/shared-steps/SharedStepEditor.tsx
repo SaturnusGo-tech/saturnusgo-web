@@ -49,8 +49,9 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
       <button type="button" className={styles.iconButton} onClick={onCancel}
         aria-label={ru ? "Вернуться к списку" : "Back to list"}><ArrowLeft size={18} /></button>
       <div className={styles.titleField}>
-        <span>{ru ? "Общий шаг" : "Shared step"}</span>
-        <input autoFocus value={draft.title} onChange={(event) => onChange({ ...draft,
+        <span>{ru ? "Блок общих шагов" : "Shared step block"}</span>
+        <input autoFocus aria-label={ru ? "Название блока общих шагов" : "Shared step block title"}
+          value={draft.title} onChange={(event) => onChange({ ...draft,
           title: event.target.value })} placeholder={ru ? "Например, авторизация" : "For example, authentication"} />
       </div>
       <div className={styles.editorActions}>
@@ -65,7 +66,7 @@ export function SharedStepEditor({ draft, saving, ru, onChange, onCancel, onSave
     <div className={styles.editorScroll}>
       <div className={styles.paper}>
         <div className={styles.scenarioHeading}>
-          <h2>{ru ? "Сценарий" : "Scenario"}</h2>
+          <h2>{ru ? "Шаги" : "Steps"}</h2>
           <span>{draft.items.length}</span>
         </div>
         <div className={styles.sharedRail}>

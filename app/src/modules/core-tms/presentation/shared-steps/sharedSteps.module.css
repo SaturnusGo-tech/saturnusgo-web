@@ -48,8 +48,8 @@
 .addButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 13px; border: 1px solid var(--ss-control-line); border-radius: 10px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
 .primaryButton { color: #fff !important; background: var(--ss-primary); border-color: var(--ss-primary); }
 .primaryButton:hover { background: #2865da; }
-.secondaryButton,.iconButton,.addButton { color: var(--ss-text); background: var(--ss-control); }
-.secondaryButton:hover,.iconButton:hover,.addButton:hover { background: var(--ss-hover); }
+.secondaryButton,.addButton { color: var(--ss-text); background: var(--ss-control); }
+.secondaryButton:hover,.addButton:hover { background: var(--ss-hover); }
 .primaryButton:disabled,.secondaryButton:disabled { cursor: default; opacity: .48; }
 .toolbar { height: 52px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 20px; padding: 0 13px; color: var(--ss-muted); background: var(--ss-control); border: 1px solid var(--ss-control-line); border-radius: 12px; }
 .toolbar input { width: 100%; border: 0; outline: 0; color: var(--ss-text); background: transparent; font: inherit; font-size: 13px; }
@@ -69,19 +69,24 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .editor { display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .editorHeader { min-height: 76px; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--ss-line); }
-.iconButton { width: 36px; padding: 0; }
+.editor .editorHeader .iconButton { width: 36px; padding: 0; color: var(--ss-muted); background: transparent; border-color: transparent; box-shadow: none; }
+.editor .editorHeader .iconButton:hover { color: var(--ss-text); }
+.editor .editorHeader .iconButton:focus-visible { outline: 1px solid var(--ss-primary); outline-offset: 2px; }
 .titleField { min-width: 0; display: grid; gap: 3px; }
 .titleField span { color: var(--ss-muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-.titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--ss-text); background: transparent; border: 0; border-bottom: 1px solid transparent; outline: 0; font: inherit; font-size: 18px; font-weight: 620; }
-.titleField input:focus,
-.titleField input:focus-visible { border-bottom-color: var(--ss-control-line); outline: 0 !important; box-shadow: none !important; }
+.editor .editorHeader .titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--ss-text); background: transparent; border: 0; border-radius: 0; outline: 0; box-shadow: none; font: inherit; font-size: 18px; font-weight: 620; caret-color: var(--ss-text); }
+.editor .editorHeader .titleField input:focus,
+.editor .editorHeader .titleField input:focus-visible { background: transparent; outline: 0; box-shadow: none; }
 .editorActions { display: flex; align-items: center; gap: 8px; }
 .editorScroll { min-height: 0; overflow: auto; padding: 24px 28px 60px; background: var(--ss-bg); }
 .paper { width: min(920px, 100%); margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .scenarioHeading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .scenarioHeading h2 { margin: 0; font-size: 15px; font-weight: 650; }
 .scenarioHeading span { min-width: 20px; padding: 2px 6px; color: var(--ss-muted); background: var(--ss-hover); border-radius: 999px; font-size: 10px; text-align: center; }
-.sharedRail { padding-left: 8px; border-left: 3px solid #7952cf; }
+.sharedRail { padding-left: 10px; border-left: 1px solid #7952cf; }
+.editor .paper .sharedRail textarea { color: var(--ss-text); background: transparent; border-color: transparent; }
+.editor .paper .sharedRail textarea:hover { background: color-mix(in srgb, var(--ss-hover) 38%, transparent); }
+.editor .paper .sharedRail textarea:focus { background: var(--ss-raised); border-radius: 4px; border-bottom-color: transparent; box-shadow: inset 0 0 0 1px var(--ss-control-line) !important; }
 .addButton { margin: 2px 0 0 35px; background: transparent; border-color: transparent; }
 @media (max-width: 720px) { .row { grid-template-columns: 34px minmax(0, 1fr) 76px; }.rowMetric:nth-of-type(4),.rowDate { display: none; }.editorHeader { grid-template-columns: 36px minmax(0,1fr); }.editorActions { grid-column: 1/-1; justify-content: flex-end; }.editorScroll { padding: 18px 16px 42px; } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
