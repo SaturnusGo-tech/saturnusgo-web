@@ -77,3 +77,4 @@
 .page.page [role="listbox"] [role="option"]:focus-visible { outline: 1px solid var(--action); outline-offset: -1px; }
 
 @container dashboard-page (max-width: 600px) { .actions { max-width: 100%; flex: 1 1 100%; }.header { align-items: flex-start; } }
+.widget[data-widget-kind="metric"] .widgetTools > span { display: block; }

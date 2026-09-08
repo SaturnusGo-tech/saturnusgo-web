@@ -8,7 +8,7 @@ The 36 catalog entries can be added, removed, resized and reordered. A pencil op
 
 The widget library is a full page within the existing Falcon shell. It preserves the global navigation and project context. Categories, search and compact icon/text entries replace the former modal and image-cover cards. Back to layout preserves the editing draft; Save publishes it to the project. The library does not mount a portal, backdrop or focus trap.
 
-Numeric widgets use compact label/value rows with full values in their accessible labels and tooltips. The CSS grid reserves measured row spans from intrinsic content height, so a counter is not stretched to a neighboring chart. ResizeObserver recomputes spans for changes in width, content and editing controls; DOM ordering and the existing persisted layout remain authoritative. Tags and coverage use a single interactive bar/list representation, and defect statuses adapt to the widget container width.
+Numeric widgets always use the compact width, including legacy saved metrics configured at full width; editing normalizes their persisted positions and cancel leaves the stored layout untouched. Only visual and list widgets expose width controls. Numeric widgets use compact label/value rows with full values in their accessible labels and tooltips. The CSS grid reserves measured row spans from intrinsic content height, so a counter is not stretched to a neighboring chart. ResizeObserver recomputes spans for changes in width, content and editing controls; DOM ordering and the existing persisted layout remain authoritative. Tags and coverage use a single interactive bar/list representation, and defect statuses adapt to the widget container width.
 
 ## Artwork provenance
 

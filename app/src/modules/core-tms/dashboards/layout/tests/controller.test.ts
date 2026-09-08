@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DashboardLayoutController } from "../application/DashboardLayoutController";
 import { LayoutError, type LayoutSource, type ProjectBoard, moveWidget, placeWidgets } from "../model/layout";
-import { createBoardWidget, widgetCatalog } from "../model/widget-catalog";
+import { createBoardWidget, widgetCatalog, widgetLayoutWidth } from "../model/widget-catalog";
 
 const scope = { workspaceId: "w", projectId: "p" };
 const widgets = widgetCatalog.slice(0,6).map((entry,index) => createBoardWidget(entry,"en",`w${index}`));
@@ -64,4 +64,17 @@ test("repeated catalog additions do not duplicate a widget, even with a new clie
   assert.equal(c.getState().draft?.widgets.length,widgets.length);
   c.remove("w0"); c.add([{...widgets[0],id:"reinstalled"}]);
   assert.equal(c.getState().draft?.widgets[widgets.length - 1]?.id,"reinstalled");
+});
+
+test("legacy full-width metrics render compactly and are normalized only in the editing draft",async()=>{
+  const oldMetric = {...widgets[0],position:{...widgets[0].position,width:12}};
+  const legacy = {...board,widgets:[oldMetric,widgets[4]]};
+  const {controller:c}=setup({load:async()=>legacy}); await c.load();
+  assert.equal(widgetLayoutWidth(oldMetric),3);
+  assert.equal(c.getState().board?.widgets[0].position.width,12);
+  c.edit(""); assert.equal(c.getState().draft?.widgets[0].position.width,3);
+  c.resize(oldMetric.id,12); assert.equal(c.getState().draft?.widgets[0].position.width,3);
+  c.resize(widgets[4].id,12); assert.equal(c.getState().draft?.widgets[1].position.width,12);
+  c.cancel(); assert.equal(c.getState().board?.widgets[0].position.width,12);
+  c.edit(""); await c.save(); assert.equal(c.getState().board?.widgets[0].position.width,3);
 });

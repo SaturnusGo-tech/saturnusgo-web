@@ -83,6 +83,9 @@ export function widgetKey(widget: BoardWidget): string {
   return typeof widget.settings.presentation === "string" ? widget.settings.presentation :
     ({ summary: "currentCases", run_progress: "trend", recent_activity: "freshness", defects: "defects", assigned_to_me: "queue" })[widget.type];
 }
+export function widgetLayoutWidth(widget: BoardWidget): number {
+  return widgetByKey.get(widgetKey(widget))?.width === 3 ? 3 : widget.position.width;
+}
 export function createBoardWidget(definition: WidgetDefinition, locale: string, id: string): BoardWidget {
   return { id, type: definition.type, title: locale === "ru" ? definition.ru : definition.en,
     position: { x: 0, y: 0, width: definition.width, height: definition.width === 3 ? 1 : 3 },

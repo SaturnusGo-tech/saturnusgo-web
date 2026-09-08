@@ -1,4 +1,5 @@
 import type { components } from "../../../../../core/tms/generated/tms-api";
+import { widgetLayoutWidth } from "./widget-catalog";
 
 type Wire = components["schemas"];
 export type WidgetType = Wire["DashboardWidgetType"];
@@ -25,7 +26,7 @@ export type LayoutState = {
 export function placeWidgets(widgets: readonly BoardWidget[]): BoardWidget[] {
   let x = 0; let y = 0; let rowHeight = 0;
   return widgets.map((widget) => {
-    const width = Math.min(12, Math.max(3, widget.position.width));
+    const width = Math.min(12, Math.max(3, widgetLayoutWidth(widget)));
     if (x + width > 12) { x = 0; y += rowHeight; rowHeight = 0; }
     const next = { ...widget, position: { x, y, width, height: widget.position.height } };
     rowHeight = Math.max(rowHeight, widget.position.height);

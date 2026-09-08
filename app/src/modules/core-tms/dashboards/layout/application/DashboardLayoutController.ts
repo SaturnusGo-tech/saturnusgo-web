@@ -32,7 +32,7 @@ export class DashboardLayoutController {
   edit = (name: string) => {
     if (this.state.loading || this.state.saving || this.state.retryPending) return;
     const board = this.state.board;
-    this.emit({ draft: board ? { name: board.name, widgets: board.widgets } : { name, widgets: [] }, failure: null });
+    this.emit({ draft: board ? { name: board.name, widgets: placeWidgets(board.widgets) } : { name, widgets: [] }, failure: null });
   };
   cancel = () => {
     if (this.state.saving || this.state.retryPending) return;
