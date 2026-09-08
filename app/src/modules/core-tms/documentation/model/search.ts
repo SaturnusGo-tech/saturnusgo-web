@@ -5,6 +5,8 @@ export function blockText(block: DocBlock): string {
     case "paragraph": case "code": return block.text;
     case "callout": return `${block.title} ${block.text}`;
     case "steps": return block.items.map((item) => `${item.title} ${item.text}`).join(" ");
+    case "walkthrough": return `${block.title} ${block.steps.map((step) =>
+      `${step.title} ${step.instruction} ${step.result} ${step.image.alt}`).join(" ")}`;
     case "list": return block.items.join(" ");
     case "table": return [block.columns, ...block.rows].flat().join(" ");
     case "articles": return "";

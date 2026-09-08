@@ -1,8 +1,10 @@
+import { dashboardWalkthrough } from "../walkthroughs/start/context";
 import { bullets, note, paragraph, section, steps, table, type DocArticle } from "../../model/article";
 export const dashboardArticle: DocArticle = {
   id: "dashboard", title: "Мониторинг дашборда", group: "start", description: "Понимайте, что требует внимания сейчас, и переходите от показателя к конкретной проверке.",
   keywords: ["дашборд", "dashboard", "метрики", "охват", "pass rate", "график", "блокировки"], related: ["execute-run", "retest", "workspace"],
   sections: [
+      section("walkthrough", "На практике: от графика к прогону", dashboardWalkthrough),
     section("context", "Начните с контекста", steps(
       ["Выберите область", "В поле «Показать» выберите доступный проект или общую область. Проверьте, за какую работу вы сейчас смотрите показатели."],
       ["Отфильтруйте текущую работу", "Выберите окружение и сборку, затем нажмите «Применить». Эти фильтры относятся к текущим показателям, рабочей очереди и актуальности проверок."],

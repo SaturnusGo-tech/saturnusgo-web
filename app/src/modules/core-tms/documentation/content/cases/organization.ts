@@ -1,8 +1,10 @@
+import { sharedStepsWalkthrough } from "../walkthroughs/shared/steps";
 import { bullets, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const caseOrganization: DocArticle[] = [
   { id: "shared-steps", title: "Общие шаги", group: "cases", description: "Создавайте повторяемые процедуры один раз и вставляйте их в сценарии проекта.",
     keywords: ["shared steps", "общий шаг", "переиспользование", "авторизация", "шаблон"], related: ["create-test-case", "edit-test-case"],
     sections: [
+      section("walkthrough", "На практике: процедура с изображением и файлом", sharedStepsWalkthrough),
       section("use", "Когда нужен общий шаг", paragraph("Вынесите в общий шаг процедуру, повторяющуюся в нескольких проверках: вход в приложение, подготовку заказа или очистку тестовых данных. Общие шаги принадлежат проекту.")),
       section("create", "Создать процедуру", steps(
         ["Откройте «Общие шаги»", "Нажмите «Общий шаг» в верхней части списка."],

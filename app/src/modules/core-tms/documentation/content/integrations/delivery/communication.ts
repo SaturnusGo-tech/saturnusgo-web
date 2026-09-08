@@ -1,3 +1,4 @@
+import { slackWalkthrough, confluenceWalkthrough } from "../../walkthroughs/integrations/delivery";
 import { code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../../model/article";
 export const communicationArticles: DocArticle[] = [
   { id: "slack", title: "Slack", group: "integrations", description: "Отправляйте события тестирования в канал команды: запуск и итог прогона, дефекты, релизы и падения Actions.",
@@ -5,6 +6,7 @@ export const communicationArticles: DocArticle[] = [
     sources: [{ title: "Slack: создание приложения", url: "https://docs.slack.dev/quickstart/" },
       { title: "Slack: публикация сообщений", url: "https://docs.slack.dev/reference/methods/chat.postMessage/" }],
     sections: [
+      section("walkthrough", "Где настраивать в Falcon", slackWalkthrough),
       section("app", "Подготовьте приложение Slack", steps(
         ["Создайте или выберите Slack app", "В панели приложений Slack используйте приложение команды для Falcon. Выберите правильное workspace."],
         ["Настройте Bot Token Scopes", "В OAuth & Permissions добавьте chat:write и channels:read. Для приватного канала нужен также groups:read."],
@@ -28,6 +30,7 @@ export const communicationArticles: DocArticle[] = [
     sources: [{ title: "Atlassian: API tokens", url: "https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/" },
       { title: "Confluence Cloud: страницы и права", url: "https://developer.atlassian.com/cloud/confluence/rest/v2/api-group-page/" }],
     sections: [
+      section("walkthrough", "Где настраивать в Falcon", confluenceWalkthrough),
       section("prepare", "Подготовьте пространство", paragraph("Нужны Confluence Cloud, существующее пространство и родительская страница для отчётов. У владельца API token должны быть права просмотра пространства и создания/изменения страниц с учётом ограничений родителя.")),
       section("fields", "Какие значения потребуются", table(["Поле Falcon", "Значение"],
         ["Адрес сайта", "https://company.atlassian.net, без адреса конкретной страницы."],

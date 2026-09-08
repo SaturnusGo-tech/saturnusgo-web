@@ -32,3 +32,23 @@ The production static export must pass the normal repository workflow.
 The module is loaded through `DocumentationEntry` only when Help is opened.
 It uses the existing Falcon color-mode hook and shared dark surface tokens.
 No additional service, CMS, credentials or package dependencies are required.
+
+## Illustrated workflows
+
+`content/walkthroughs/` describes numbered sequences with an instruction,
+actual UI screenshot, expected outcome and descriptive alt text per step.
+Capture real Falcon UI using neutral data in the isolated Falcon Guide project.
+Do not generate or retouch interface controls, expose credentials, or capture
+customer records. Clearly label hypothetical defects and unsaved setup forms.
+
+Store JPEG captures under `public/falcon/docs/<edition>/`. The current edition
+was captured on 8 September 2026. `media/screenshots.json` records each image's
+intrinsic dimensions; `screenshotStep` restricts references to this inventory.
+When replacing captures, update dimensions and provenance together. The visual
+catalog tests check JPEG headers, size limits, coverage and discoverability.
+
+Images load lazily with reserved dimensions. A native modal dialog provides
+enlargement, previous/next, arrow keys and Escape; it uses the current theme.
+Test keyboard focus restoration, article navigation, image loading, and narrow
+screens. Capture dimensions can vary with the real browser viewport.
+The `/falcon/` public prefix is included in the existing Pages export pipeline.

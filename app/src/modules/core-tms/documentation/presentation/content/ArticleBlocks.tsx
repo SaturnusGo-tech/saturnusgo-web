@@ -4,6 +4,7 @@ import { articleById } from "../../content/catalog";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import { CopyButton } from "../controls/CopyButton";
 import { InlineText } from "./InlineText";
+import { ArticleWalkthrough } from "../walkthrough/ArticleWalkthrough";
 import styles from "../documentation.module.css";
 type Navigation = ReturnType<typeof useDocumentationNavigation>;
 
@@ -12,6 +13,7 @@ export function ArticleBlocks({ blocks, navigation }: { blocks: DocBlock[]; navi
 }
 function Block({ block, navigation }: { block: DocBlock; navigation: Navigation }) {
   switch (block.kind) {
+    case "walkthrough": return <ArticleWalkthrough block={block} />;
     case "paragraph": return <p><InlineText text={block.text} /></p>;
     case "list": {
       const List = block.ordered ? "ol" : "ul";

@@ -1,8 +1,10 @@
+import { defectWalkthrough } from "../walkthroughs/defects/report";
 import { bullets, code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const defectArticles: DocArticle[] = [
   { id: "create-defect", title: "Создать дефект", group: "defects", description: "Сохраните воспроизводимую проблему вместе с контекстом проверки и материалами для разработчика.",
     keywords: ["дефект", "баг", "bug", "баг-репорт", "создать баг", "ошибка"], related: ["link-defect", "retest", "integration-overview"],
     sections: [
+      section("walkthrough", "На практике: подготовить связанный баг", defectWalkthrough),
       section("from-run", "Создать из падения", steps(
         ["Сохраните неуспешный результат", "В активном прогоне выберите кейс, отметьте проваленный шаг и запишите фактическое поведение."],
         ["Нажмите «Завести баг»", "Форма получает контекст рана, кейса и шага. Проверьте, что проблема относится к выбранному действию."],

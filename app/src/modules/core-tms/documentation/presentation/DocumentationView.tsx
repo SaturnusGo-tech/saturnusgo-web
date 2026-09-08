@@ -24,6 +24,7 @@ export function DocumentationView() {
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
+      if (target.closest("dialog[open]")) return;
       if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey && !target.closest("input,textarea,select,[contenteditable=true]")) {
         event.preventDefault(); setTreeOpen(true); requestAnimationFrame(() => searchRef.current?.focus());
       }
@@ -74,7 +75,7 @@ export function DocumentationView() {
       <div className={styles.readingArea}>
         <div ref={scrollRef} className={styles.scroll}>
           {searching ? <SearchResults query={query.trim()} navigation={navigation} onSelect={select} /> : article
-            ? <DocumentationArticle article={article} navigation={navigation} />
+            ? <DocumentationArticle key={article.id} article={article} navigation={navigation} />
             : <section className={styles.searchResults}><span className={styles.eyebrow}>Руководство Falcon</span><h1>Статья не найдена</h1>
               <p>Возможно, ссылка устарела. Выберите статью в дереве или воспользуйтесь поиском.</p>
               <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>Открыть руководство</a></section>}

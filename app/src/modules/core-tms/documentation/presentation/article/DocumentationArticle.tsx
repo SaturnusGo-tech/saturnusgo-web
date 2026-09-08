@@ -38,6 +38,6 @@ export function DocumentationArticle({ article, navigation }: {
     <nav className={styles.pagination} aria-label="Соседние статьи">{adjacent.map(({ label, article: neighbor, Icon }) => neighbor
       ? <a key={label} href={navigation.link(neighbor.id)} onClick={(event) => navigation.navigate(event, neighbor.id)}>
         <span>{label}</span><strong><Icon size={15} />{neighbor.title}</strong></a> : <span key={label} />)}</nav>
-    <footer className={styles.articleFooter}>Falcon · Руководство пользователя<span>Редакция от 7 сентября 2026</span></footer>
+    <footer className={styles.articleFooter}>Falcon · Руководство пользователя<span>Редакция от 8 сентября 2026</span></footer>
   </article>;
 }

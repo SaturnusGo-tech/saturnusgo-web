@@ -1,3 +1,4 @@
+import { trelloWalkthrough } from "../walkthroughs/integrations/trackers";
 import { code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const boardAndYouTrack: DocArticle[] = [
   { id: "trello", title: "Trello", group: "integrations", description: "Создавайте карточки дефектов и используйте списки доски как этапы исправления и ретеста.",
@@ -5,6 +6,7 @@ export const boardAndYouTrack: DocArticle[] = [
     sources: [{ title: "Trello: webhooks", url: "https://developer.atlassian.com/cloud/trello/guides/rest-api/webhooks/" },
       { title: "Trello: API key и авторизация", url: "https://developer.atlassian.com/cloud/trello/guides/rest-api/authorization/" }],
     sections: [
+      section("walkthrough", "Где настраивать в Falcon", trelloWalkthrough),
       section("prepare", "Подготовьте доску и доступ", table(["Значение", "Назначение"],
         ["API key Power-Up", "Идентифицирует приложение Trello."], ["Пользовательский API token", "Даёт read/write к нужной доске."],
         ["Секрет приложения Trello", "Проверяет подпись webhook; берётся в настройках Power-Up."],

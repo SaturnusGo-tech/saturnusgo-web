@@ -1,0 +1,194 @@
+{
+  "archive-01-removed": {
+    "width": 1280,
+    "height": 720
+  },
+  "archive-02-filter": {
+    "width": 1280,
+    "height": 720
+  },
+  "archive-03-restore": {
+    "width": 1280,
+    "height": 720
+  },
+  "case-01-library": {
+    "width": 1280,
+    "height": 720
+  },
+  "case-02-context": {
+    "width": 1280,
+    "height": 720
+  },
+  "case-03-add-step": {
+    "width": 1280,
+    "height": 720
+  },
+  "case-04-ready": {
+    "width": 1280,
+    "height": 720
+  },
+  "case-05-saved": {
+    "width": 1280,
+    "height": 720
+  },
+  "confluence-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "confluence-02-events": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-01-context": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-02-drilldown": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-03-run": {
+    "width": 1087,
+    "height": 814
+  },
+  "defect-01-failed-step": {
+    "width": 1087,
+    "height": 814
+  },
+  "defect-02-context": {
+    "width": 1087,
+    "height": 814
+  },
+  "defect-03-evidence": {
+    "width": 1087,
+    "height": 814
+  },
+  "edit-01-description": {
+    "width": 1280,
+    "height": 720
+  },
+  "edit-02-saved": {
+    "width": 1280,
+    "height": 720
+  },
+  "execute-01-result": {
+    "width": 1087,
+    "height": 814
+  },
+  "execute-02-steps-passed": {
+    "width": 1087,
+    "height": 814
+  },
+  "execute-03-complete-action": {
+    "width": 1087,
+    "height": 814
+  },
+  "execute-04-completed": {
+    "width": 1087,
+    "height": 814
+  },
+  "github-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "github-02-automation": {
+    "width": 1087,
+    "height": 814
+  },
+  "github-03-rule": {
+    "width": 1087,
+    "height": 814
+  },
+  "integrations-01-catalog": {
+    "width": 1087,
+    "height": 814
+  },
+  "jira-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "jira-02-automation": {
+    "width": 1087,
+    "height": 814
+  },
+  "jira-03-log": {
+    "width": 1087,
+    "height": 814
+  },
+  "linear-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "linear-02-events": {
+    "width": 1087,
+    "height": 814
+  },
+  "run-01-library": {
+    "width": 1280,
+    "height": 720
+  },
+  "run-02-scope": {
+    "width": 1280,
+    "height": 720
+  },
+  "run-03-target": {
+    "width": 1280,
+    "height": 720
+  },
+  "run-04-started": {
+    "width": 1087,
+    "height": 814
+  },
+  "shared-01-library": {
+    "width": 1280,
+    "height": 720
+  },
+  "shared-02-editor-assets": {
+    "width": 1280,
+    "height": 720
+  },
+  "shared-03-saved": {
+    "width": 1280,
+    "height": 720
+  },
+  "shared-04-insert-menu": {
+    "width": 1280,
+    "height": 720
+  },
+  "shared-05-in-case": {
+    "width": 1087,
+    "height": 814
+  },
+  "slack-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "slack-02-events": {
+    "width": 1087,
+    "height": 814
+  },
+  "slack-03-log": {
+    "width": 1087,
+    "height": 814
+  },
+  "trello-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "trello-02-events": {
+    "width": 1087,
+    "height": 814
+  },
+  "workspace-01-settings": {
+    "width": 1087,
+    "height": 814
+  },
+  "workspace-02-environment": {
+    "width": 1087,
+    "height": 814
+  },
+  "workspace-03-project": {
+    "width": 1087,
+    "height": 814
+  }
+}

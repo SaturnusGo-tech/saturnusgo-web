@@ -1,4 +1,7 @@
+import type { WalkthroughBlock } from "./visual/walkthrough";
+
 export type DocBlock =
+  | WalkthroughBlock
   | { kind: "paragraph"; text: string }
   | { kind: "list"; items: string[]; ordered?: boolean }
   | { kind: "steps"; items: { title: string; text: string }[] }

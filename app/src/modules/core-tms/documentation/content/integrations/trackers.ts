@@ -1,3 +1,4 @@
+import { jiraWalkthrough, linearWalkthrough } from "../walkthroughs/integrations/trackers";
 import { code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../model/article";
 export const trackerArticles: DocArticle[] = [
   { id: "jira", title: "Jira", group: "integrations", description: "Создавайте задачи из дефектов Falcon и возвращайте готовые исправления на ретест.",
@@ -5,6 +6,7 @@ export const trackerArticles: DocArticle[] = [
     sources: [{ title: "Atlassian: API tokens", url: "https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/" },
       { title: "Jira: webhooks и подписи", url: "https://developer.atlassian.com/cloud/jira/platform/webhooks/" }],
     sections: [
+      section("walkthrough", "Где настраивать в Falcon", jiraWalkthrough),
       section("prepare", "Подготовьте доступ", paragraph("Подключение рассчитано на Jira Cloud. Нужны адрес сайта, почта Atlassian и API token аккаунта, которому доступны чтение проекта, создание и изменение задач и переходы по workflow."),
         note("Тип токена", "Текущий коннектор обращается прямо к company.atlassian.net. Используйте совместимый API token без scopes: токены со scopes используют другой API-маршрут Atlassian. Задайте срок действия и права аккаунта только на нужные ресурсы.")),
       section("connect", "Заполните подключение", steps(
@@ -25,6 +27,7 @@ export const trackerArticles: DocArticle[] = [
     keywords: ["Linear", "линеар", "team", "команда", "API key"], related: ["integration-overview", "retest", "integration-troubleshooting"],
     sources: [{ title: "Linear: webhooks", url: "https://linear.app/developers/webhooks" }, { title: "Linear: доступ к API", url: "https://linear.app/developers/graphql" }],
     sections: [
+      section("walkthrough", "Где настраивать в Falcon", linearWalkthrough),
       section("access", "Подготовьте команду и ключ", paragraph("Понадобятся **API key** с доступом к выбранной команде, чтению и управлению задачами, а также **ID команды Linear**. Ограничьте ключ нужной командой. Для создания webhook требуется администратор workspace Linear.")),
       section("connect", "Подключите Falcon", steps(
         ["Создайте ключ", "В Linear откройте настройки Security & access и создайте персональный API key для Falcon. Предоставьте права, необходимые для создания, обновления и чтения задач."],

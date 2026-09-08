@@ -1,3 +1,4 @@
+import { githubWalkthrough } from "../../walkthroughs/integrations/delivery";
 import { code, note, paragraph, section, steps, table, warning, type DocArticle } from "../../../model/article";
 export const githubArticle: DocArticle = {
   id: "github", title: "GitHub и GitHub Actions", group: "integrations", description: "Свяжите изменения кода с нужными тестами: автоматические раны, точная сборка и результат QA в статусе коммита.",
@@ -5,6 +6,7 @@ export const githubArticle: DocArticle = {
   sources: [{ title: "GitHub: создание webhook", url: "https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks" },
     { title: "GitHub: токены доступа", url: "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens" }],
   sections: [
+      section("walkthrough", "Где настраивать в Falcon", githubWalkthrough),
     section("flow", "Что происходит автоматически", table(["Событие", "Когда Falcon создаёт прогон"],
       ["Pull request", "Открытие, повторное открытие, новый commit или готовность к review. PR должен быть открытым и не draft."],
       ["Push", "Изменение ветки; удаление ветки и push тега не используются как запуск."],
