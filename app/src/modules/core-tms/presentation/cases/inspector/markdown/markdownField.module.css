@@ -10,7 +10,7 @@
   transition: border-color 120ms ease;
 }
 
-.field:focus-within { border-color: var(--cases-link); }
+.field:focus-within { border-color: var(--tms-focus-border, #89898f); }
 
 .wysiwyg.wysiwyg {
   --accentBase: var(--cases-control);
@@ -202,9 +202,9 @@
   font-size: 13px;
 }
 :global(.mdxeditor-popup-container).wysiwyg :global([role="dialog"] input:focus) {
-  border-color: var(--cases-primary);
-  outline: 2px solid color-mix(in srgb, var(--cases-primary) 24%, transparent);
-  outline-offset: 0;
+  border-color: var(--tms-focus-border, #89898f);
+  outline: 0;
+  box-shadow: 0 0 0 2px var(--tms-focus-ring, rgb(113 113 122 / 16%));
 }
 :global(.mdxeditor-popup-container).wysiwyg :global([role="dialog"] form > div:last-child) { gap: 7px !important; padding-top: 3px; }
 :global(.mdxeditor-popup-container).wysiwyg :global([role="dialog"] button) {
@@ -285,4 +285,11 @@
 @media (prefers-reduced-motion: reduce) {
   .field { transition: none; }
   :global(.mdxeditor-popup-container).wysiwyg:has(form) { animation: none; }
+}
+
+/* Editor portals may live outside the workspace and still share its focus treatment. */
+:global(.dark) .field:focus-within { border-color: var(--tms-focus-border, #75757d); }
+:global(.dark) :global(.mdxeditor-popup-container).wysiwyg :global([role="dialog"] input:focus) {
+  border-color: var(--tms-focus-border, #75757d);
+  box-shadow: 0 0 0 2px var(--tms-focus-ring, rgb(161 161 170 / 15%));
 }

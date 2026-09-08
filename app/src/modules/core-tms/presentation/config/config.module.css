@@ -55,7 +55,7 @@
 .envTitle h3 { margin: 0; font-size: 14px; font-weight: 550; overflow-wrap: anywhere; }
 .envInfo p { margin: 8px 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .envInfo > small { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; }
-.rowActions { display: flex; gap: 6px; align-items: start; }
+.rowActions { display: flex; gap: 6px; align-items: flex-start; }
 .rowActions > button { width: 30px; min-width: 30px; height: 30px; border-radius: 7px; }
 .url { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
 .url code { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
