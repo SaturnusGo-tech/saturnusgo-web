@@ -15,6 +15,8 @@ function validDrill(value: unknown): value is DashboardDrill {
   const entities: Record<string, string[]> = { test_case: ["current", "created"], run: ["launched", "completed", "active"], run_item: [], defect: ["reported", "current"] };
   if (!text(f.entity) || !Object.prototype.hasOwnProperty.call(entities, f.entity)) return false;
   if (f.entity !== "run_item" && (!text(f.basis) || !entities[f.entity].includes(f.basis))) return false;
+  if (f.entity === "run" && f.basis !== "completed" &&
+    (f.component !== undefined || f.componentIsEmpty || f.itemStatus !== undefined)) return false;
   const strings = ["component", "status", "type", "tag", "coverage", "outcome", "itemStatus", "severity", "runId", "testCaseId"];
   const flags = ["componentIsEmpty", "untagged", "hasLink", "activeOnly"];
   return Object.entries(f).every(([key, field]) => ["entity", "basis"].includes(key) || strings.includes(key) && text(field) || flags.includes(key) && typeof field === "boolean");

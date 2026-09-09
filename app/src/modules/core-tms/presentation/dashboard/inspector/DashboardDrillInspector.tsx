@@ -43,8 +43,12 @@ export function DashboardDrillInspector(props: Props) {
   const displayTab = props.selected.filter.entity;
   const tabOrigin = originFilter.entity === "run_item" ? { ...props.origin, id: `${props.origin.id}:component-scope`, filter: { entity: "test_case" as const, basis: "current" as const,
     ...(originFilter.component !== undefined ? { component: originFilter.component } : {}), ...(originFilter.componentIsEmpty ? { componentIsEmpty: true } : {}) } } : props.origin;
-  const tabs: Array<{ id: string; drill: DashboardDrill | null; label: string }> = (["test_case", "run", "defect"] as const).map(id => ({ id, drill: relatedDashboardDrill(tabOrigin, id),
-    label: t(id === "test_case" ? "dashboard.testCases" : id === "run" ? "dashboard.runs" : "dashboard.defects") }));
+  const tabs: Array<{ id: string; drill: DashboardDrill | null; label: string }> = (["test_case", "run", "defect"] as const).map(id => {
+    const drill = relatedDashboardDrill(tabOrigin, id);
+    const completed = drill?.filter.entity === "run" && drill.filter.basis === "completed";
+    return { id, drill, label: completed ? (ru ? "Завершённые прогоны" : "Completed runs")
+      : t(id === "test_case" ? "dashboard.testCases" : id === "run" ? "dashboard.runs" : "dashboard.defects") };
+  });
   if (originFilter.entity === "run_item") tabs.splice(2, 0, { id: "run_item", drill: props.origin, label: ru ? "Проверки" : "Checks" });
   const chooseComponent = (next?: string) => props.onSelectComponent({ id: `component-context:${next ?? "all"}`, label: next ?? (ru ? "Все компоненты" : "All components"),
     projectId: props.origin.projectId ?? props.query.projectId, window: props.origin.window,

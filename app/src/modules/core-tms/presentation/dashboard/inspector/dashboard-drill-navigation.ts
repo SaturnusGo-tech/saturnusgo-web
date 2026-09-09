@@ -25,7 +25,8 @@ export function relatedDashboardDrill(
   const shared = componentScope(filter);
   let next: DashboardDrillFilter;
   if (tab === "test_case") next = { entity: "test_case", basis: "current", ...shared };
-  else if (tab === "run") next = { entity: "run", basis: "launched", ...shared };
+  else if (tab === "run") next = { entity: "run",
+    basis: filter.component !== undefined || filter.componentIsEmpty ? "completed" : "launched", ...shared };
   else next = { entity: "defect", basis: "current", ...shared };
   return {
     id: `${origin.id}:related:${tab}`,
