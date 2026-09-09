@@ -31,7 +31,7 @@ test("resource hydration uses the branded loader instead of a false empty state"
     "utf8",
   );
   const suitesSource = readFileSync(
-    new URL("../../suites/SuitesView.tsx", import.meta.url),
+    new URL("../../suites/detail/SuiteDetail.tsx", import.meta.url),
     "utf8",
   );
   const runsSource = readFileSync(
@@ -127,4 +127,15 @@ test("project switching resets editors only after a successful load", () => {
   assert.match(actionsSource.slice(failureGuard), /state\.setCaseFilters\(\{/);
   assert.match(stageSource, /<WorkspaceCasesStage model=\{model\}/);
   assert.match(casesStageSource, /<CasesView key=\{model\.project!\.id\}/);
+});
+
+test("suite detail failures remain retryable and do not become empty suites", () => {
+  const resource = readFileSync(new URL("../../../state/workspace-resources/useSelectedSuiteResource.ts", import.meta.url), "utf8");
+  const detail = readFileSync(new URL("../../suites/detail/SuiteDetail.tsx", import.meta.url), "utf8");
+  assert.match(resource, /if \(!controller.signal.aborted\) setFailed\(true\)/);
+  assert.match(resource, /setRequestVersion\(\(current\) => current \+ 1\)/);
+  assert.doesNotMatch(resource, /catch\(\(\) => \{\}\)/);
+  assert.match(detail, /props.error && !detail/);
+  assert.match(detail, /data-testid="suite-detail-error"/);
+  assert.match(detail, /onClick=\{props.onRetry\}/);
 });

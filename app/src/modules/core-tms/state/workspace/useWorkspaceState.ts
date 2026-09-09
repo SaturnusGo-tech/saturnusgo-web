@@ -156,5 +156,6 @@ export function useWorkspaceState() {
     retrySelectedCaseDetail: selectedCase.retry, selectedSuiteDetail: selectedSuite.detail,
     setSelectedSuiteDetail: selectedSuite.setDetail, selectedSuiteEtag: selectedSuite.etag,
     setSelectedSuiteEtag: selectedSuite.setEtag, ...runResource,
+    selectedSuiteDetailError: selectedSuite.failed, retrySelectedSuiteDetail: selectedSuite.retry,
   };
 }

@@ -82,7 +82,8 @@ test("suite configuration follows the editable test-case document hierarchy", ()
 test("suite primary actions keep white labels and neutral focus treatment", () => {
   const styles = source("app/src/modules/core-tms/presentation/dialogs/suite/suite-dialog.module.css");
   const suites = source("app/src/modules/core-tms/presentation/suites/suites.module.css");
-  assert.match(suites, /\.createButton\.createButton[\s\S]*color: #fff !important/);
-  assert.match(suites, /\.workspace :is\(button, input\):focus-visible\s*\{[^}]*outline: 0 !important/s);
+  assert.match(suites, /\.primary\.primary[\s\S]*color: #fff !important/);
+  assert.match(suites, /\.search input\s*\{[^}]*background: transparent; outline: none; box-shadow: none/s);
+  assert.match(suites, /button:focus-visible[^}]*outline: 2px solid var\(--muted\)/);
   assert.doesNotMatch(styles, /focus[^}]*border-color: var\(--action\)/s);
 });

@@ -95,10 +95,14 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "suites") {
     return (
       <SuitesView
+        key={`${model.data.workspace.id}:${model.project.id}`}
+        workspaceId={model.data.workspace.id} projectId={model.project.id} projectName={model.project.name}
         suites={model.projectSuites}
         cases={model.projectCases}
-        selected={model.selectedSuiteId}
         selectedDetail={model.selectedSuite}
+        detailError={model.selectedSuiteDetailError} onRetryDetail={model.retrySelectedSuiteDetail}
+        canManage={model.data.meta.authorization.capabilities.includes("suite:manage")}
+        canRun={model.data.meta.authorization.capabilities.includes("run:manage")}
         onSelect={model.setSelectedSuiteId}
         onCreate={() => {
           model.setEditingSuiteId(null);

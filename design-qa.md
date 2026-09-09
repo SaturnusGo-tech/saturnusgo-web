@@ -25,3 +25,22 @@ The final rail search height was measured at 36 px; remaining rail space is rese
 Open P0/P1/P2 visual issues: none at the verified desktop viewport.
 
 A production component-to-runs check exposed an unsupported launched/component query. Related component history now uses the documented completed-run basis, labels that scope explicitly, and rejects obsolete incompatible deep links before querying. The adapter regression covers named and empty components, valid empty data, and unscoped launch history.
+
+# Test-suite catalog — 2026-09-09
+
+Selected target: option 2, classic full-width catalog. The generated reference and final local screenshot were viewed together at 1488 × 1058. Evidence lives in `../output/falcon-suite-catalog-20260909/`.
+
+- One catalog on entry. No automatic suite detail, split rail, inspector or resizable overlay.
+- Project context, heading/count, blue create action, flat table, manual/tag composition, case count, updated date and discrete run/open icons follow the approved layout.
+- Reference refinements: increased title and row typography, 74 px rows, 42 px primary/search controls, consistent column baselines. Existing Falcon navigation/header and priority/status semantics retained.
+- Deliberate adaptations: mock-only overflow control omitted; dates show the real update timestamp; dynamic summary zero is not presented as resolved coverage. Exact tag scope count appears only with matching hydrated detail or in the existing run builder.
+- Detail is a full page with a short metadata line, existing case-list renderer, case search, configuration and run actions. Configure waits for hydrated detail.
+- Neutral focus is drawn on the search shell; inner input has transparent background and no outline/shadow. Primary text/icons verified white in light mode. Global sidebar stays dark.
+- 1488 px desktop, 768 px tablet, 390 px mobile inspected. No document horizontal overflow. Secondary columns fold away at narrow widths; name/count/run/open remain visible.
+- Browser interactions passed: composition filter; normalized search; clear/reset; sorting; open detail; browser back preserves filter/search and focuses prior row; sidebar returns to catalog; direct suite URL; configure existing suite; create a local test suite and see its 1-case row; run from row opens the existing builder without opening detail; error retry restores cases; genuine empty state.
+- Local dense/failure test harness is not a production route. No production fixture data is created.
+- Added catalog and scoped navigation tests; updated resource-loading and neutral-focus regression checks. 400 adapter tests passed. Typecheck and architecture checks passed. Documentation now describes catalog search, composition, count semantics, scope editing and launch.
+
+Open P0/P1/P2 visual issues: none in tested states.
+
+final result: passed
