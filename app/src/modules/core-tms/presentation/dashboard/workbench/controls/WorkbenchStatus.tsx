@@ -1,3 +1,4 @@
+import { ContentSkeleton } from "../../../common/skeleton/ContentSkeleton";
 import type { WorkbenchFailure } from "../../../../dashboards/workbench/model/workbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import styles from "../workbench.module.css";
@@ -13,6 +14,7 @@ export function WorkbenchStatus({ loading, error, hasSnapshot, enabled = true, o
     {error.requestId && <small>{t("dashboardWorkbench.requestId", { id: error.requestId })}</small>}
     <button type="button" onClick={onRetry}>{t("dashboardWorkbench.retry")}</button>
   </div>;
+  if (loading && !hasSnapshot) return <ContentSkeleton variant="dashboard" label={t("dashboardWorkbench.loading")} />;
   if (loading) return <p className={styles.state} role="status">
     {t(hasSnapshot ? "dashboardWorkbench.refreshing" : "dashboardWorkbench.loading")}
   </p>;

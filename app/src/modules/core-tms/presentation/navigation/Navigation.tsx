@@ -26,8 +26,8 @@ const navigationItems: Array<{
   labelKey: TmsMessageKey;
   icon: ReactNode;
 }> = [
-  { id: "portfolios", labelKey: "nav.portfolios", icon: <PiBriefcaseDuotone size={21} /> },
   { id: "dashboard", labelKey: "nav.dashboard", icon: <LayoutDashboard size={20} /> },
+  { id: "portfolios", labelKey: "nav.portfolios", icon: <PiBriefcaseDuotone size={21} /> },
   { id: "cases", labelKey: "nav.cases", icon: <FolderKanban size={20} /> },
   { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Repeat2 size={20} /> },
   { id: "api", labelKey: "nav.apiTesting", icon: <Code2 size={20} /> },

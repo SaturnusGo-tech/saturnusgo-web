@@ -1,3 +1,4 @@
+import { ContentSkeleton } from "../../common/skeleton/ContentSkeleton";
 import { ArrowLeft, ArrowUpRight, CircleCheck, LoaderCircle, RefreshCw } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -30,7 +31,7 @@ export function DetailState({ loading, error, empty, filtered, onRetry }: {
   const { locale, t } = useTmsLocale();
   if (error) return <div className={styles.failure} role="alert"><span>{error}</span>
     <button type="button" className={styles.quiet} onClick={onRetry}><RefreshCw size={14} />{t("dashboard.retry")}</button></div>;
-  if (loading) return <div className={styles.state} role="status" aria-label={t("dashboard.drillLoading")}><LoaderCircle className={surface.spin} size={23} /></div>;
+  if (loading) return <ContentSkeleton variant="list" label={t("dashboard.drillLoading")} />;
   if (!empty) return null;
   return <div className={styles.state}><CircleCheck size={27} strokeWidth={1.25} />
     <strong>{locale === "ru" ? filtered ? "Совпадений нет" : "Здесь пока нет записей" : filtered ? "No matches" : "No records yet"}</strong>

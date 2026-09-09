@@ -1,5 +1,6 @@
 "use client";
 
+import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -32,13 +33,13 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const [configurationFailed, setConfigurationFailed] = useState(false);
   const [reload, setReload] = useState(0);
   const connectors = useConnectorCatalog(workspaceId, reload);
-  const open = (target: "catalog" | "youtrack" | Provider) => {
+  const open = (target: "catalog" | "youtrack" | Provider) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
     url.searchParams.delete("analysisId"); url.searchParams.delete("impact");
     if (target === "catalog") url.searchParams.delete("integration"); else url.searchParams.set("integration", target);
     window.history.replaceState(window.history.state, "", url);
-  };
+  });
   const refresh = useCallback(() => setReload((value) => value + 1), []);
 
   useEffect(() => {

@@ -21,7 +21,7 @@ export function AttachProjectDialog({ workspaceId, copy, pending, error, onAttac
         <p className={styles.note}>{copy.attachHint}</p>
         <label className={styles.search} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input autoFocus data-autofocus aria-label={copy.searchProject}
           value={search} onChange={(event) => { setSearch(event.target.value); setSelected(null); }} placeholder={copy.searchProject} /></label>
-        <ResourceFeedback loading={page.loading} error={page.error} copy={copy} retry={page.reload} />
+        <ResourceFeedback hasContent={items.length > 0} loading={page.loading} error={page.error} copy={copy} retry={page.reload} />
         <fieldset className={styles.choices}><legend className={styles.srOnly}>{copy.choose}</legend>
           {items.map((project) => <label key={project.id} className={styles.choice} data-selected={selected === project.id}>
             <PiFolderSimpleDuotone size={20} aria-hidden="true" /><span>{project.name}<small>{project.key}</small></span>

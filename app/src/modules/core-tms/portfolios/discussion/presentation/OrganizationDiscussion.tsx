@@ -1,3 +1,4 @@
+import { ContentSkeleton } from "../../../presentation/common/skeleton/ContentSkeleton";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
 import type { WorkflowPhase } from "../../management/model/organization";
@@ -30,17 +31,18 @@ export function OrganizationDiscussion({ canPost, workflowPhase = "new", phaseDi
     }}>
       <div className={css.statusStrip}><span>{organizationCopy(locale).phase}</span><WorkflowSelect value={workflowPhase}
         disabled={phaseDisabled || state.command.pending} onChange={(value) => onPhaseChange?.(value)} /></div>
-      <div className={css.editor}><MarkdownField label={copy.label} value={body} emptyLabel={copy.placeholder} allowAttachments={false}
-        onChange={state.command.pending ? undefined : (value) => { setBody(value); setSent(false); }} /></div>
+      <div className={css.editor} data-has-body={Boolean(body.trim()) || undefined} aria-busy={state.command.pending}><MarkdownField label={copy.label} value={body} emptyLabel={copy.placeholder} allowAttachments={false}
+        onChange={(value) => { if (!state.command.pending) { setBody(value); setSent(false); } }} />
+        {Boolean(body.trim()) && <button className={`${shared.primary} ${css.send}`} disabled={state.command.pending || body.length > 20000}>
+          <PiPaperPlaneRight aria-hidden="true" />{state.command.pending ? copy.sending : copy.send}</button>}
+      </div>
       {body.length > 20000 && <p className={css.limit} role="alert">{locale === "ru" ? "Не более 20 000 символов." : "Maximum 20,000 characters."}</p>}
-      <footer><span role="status">{sent ? copy.sent : ""}</span><button className={shared.primary} disabled={state.command.pending || body.length > 20000 || !body.trim()}>
-        <PiPaperPlaneRight aria-hidden="true" />{state.command.pending ? copy.sending : copy.send}</button></footer>
+      <span className={css.feedback} role="status">{sent ? copy.sent : ""}</span>
     </form>}
     {state.command.error && <FormError message={formatTmsMutationFailure(state.command.error, copy.sendError)} />}
-    {state.loading && <p className={shared.loading} role="status">{copy.loading}</p>}
+    {state.loading && !state.items.length && <ContentSkeleton compact variant="list" label={copy.loading} />}
     {state.error && <div className={shared.error}><FormError message={formatTmsMutationFailure(state.error, copy.loadError)} />
       <button type="button" className={shared.secondary} onClick={state.reload}>{copy.retry}</button></div>}
-    {!state.items.length && !state.loading && !state.error && <p className={css.empty}>{copy.empty}<span>{copy.hint}</span></p>}
     <ol className={css.comments}>{state.items.map((item) => <li key={item.id}>
       <div><strong>{item.author.displayName}</strong><time dateTime={item.createdAt}>{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt))}</time></div>
       <MarkdownField label={copy.label} value={item.body} allowAttachments={false} />

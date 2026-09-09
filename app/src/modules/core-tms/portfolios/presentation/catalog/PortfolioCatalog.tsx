@@ -1,3 +1,4 @@
+import { transitionContent } from "../../../presentation/workspace/motion/transition/content-transition";
 import { PiMagnifyingGlass, PiPlus } from "react-icons/pi";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import type { PortfolioCopy } from "../../model/copy";
@@ -23,12 +24,12 @@ export function PortfolioCatalog({ state, workspaceId, canManage, copy }: { stat
       </div>
     </header>
     <nav className={styles.tabs} aria-label={copy.title}>{tabs.map((tab) => <button type="button" key={tab.id} aria-current={state.tab === tab.id ? "page" : undefined}
-      onClick={() => state.setTab(tab.id)}>{tab.label}</button>)}</nav>
+      onClick={() => transitionContent(() => state.setTab(tab.id))}>{tab.label}</button>)}</nav>
     <div className={styles.toolbar}><label className={styles.search} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input aria-label={copy.search} placeholder={copy.search} value={state.search} onChange={(event) => state.setSearch(event.target.value)} /></label>
       <AnimatedSelect compact label={copy.status} value={state.status} options={[{ value: "active", label: copy.active }, { value: "archived", label: copy.archived }]}
         onChange={(value) => state.setStatus(value as "active" | "archived")} />
     </div>
-    <ResourceFeedback copy={copy} loading={loading} error={state.portfolioList.error ?? state.projects.error} retry={state.refresh} />
+    <ResourceFeedback hasContent={!empty} copy={copy} loading={loading} error={state.portfolioList.error ?? state.projects.error} retry={state.refresh} />
     {!empty && <CatalogTable portfolios={portfolios} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} />}
     {empty && !loading && !state.portfolioList.error && !state.projects.error && <section className={styles.empty}>
       <h2>{query ? copy.noResults : copy.emptyTitle}</h2>

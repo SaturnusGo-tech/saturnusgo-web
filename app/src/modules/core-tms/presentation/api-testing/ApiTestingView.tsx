@@ -1,4 +1,6 @@
 "use client";
+import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
+import { ContentSkeleton } from "../common/skeleton/ContentSkeleton";
 import dynamic from "next/dynamic";
 import { FileJson2, RefreshCw, Send, Settings2 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -7,13 +9,13 @@ import { useSwaggerSpecification } from "../../connectors/application/swagger/us
 import { POSTMAN_WEB_URL, swaggerWorkspaceUrl } from "./model";
 import surface from "./api-testing.module.css";
 const SwaggerDocument = dynamic(() => import("./renderer/SwaggerDocument"), {
-  ssr: false, loading: () => <div className={surface.state} role="status">Swagger…</div>,
+  ssr: false, loading: () => <ContentSkeleton label="Swagger" />,
 });
 export function ApiTestingView({ scope, canManage }: { scope: Scope; canManage: boolean }) {
   const { locale, t } = useTmsLocale();
   const ru = locale === "ru";
   const state = useSwaggerSpecification(scope, ru);
-  const configure = () => window.location.assign(swaggerWorkspaceUrl(window.location.href, "hooks"));
+  const configure = () => visitWorkspace(swaggerWorkspaceUrl(window.location.href, "hooks"));
   return <section className={surface.page} data-testid="api-testing-view">
     <header className={surface.header}><h1>{t("apiTesting.title")}</h1><div className={surface.actions}>
       {canManage && <button type="button" onClick={configure}><Settings2 size={15} />{ru ? "Подключение" : "Connection"}</button>}
@@ -25,7 +27,7 @@ export function ApiTestingView({ scope, canManage }: { scope: Scope; canManage: 
       {state.specification && <span className={surface.meta}>{state.specification.operationCount} {ru ? "операций" : "operations"} · OpenAPI {state.specification.format}</span>}
     </nav>
     <div className={surface.webview}>
-      {state.status === "loading" && <div className={surface.state} role="status"><RefreshCw size={22} /><p>{ru ? "Загружаем спецификацию проекта…" : "Loading the project specification…"}</p></div>}
+      {state.status === "loading" && <ContentSkeleton variant="list" label={t("common.loading")} />}
       {state.status === "empty" && <div className={surface.state}><FileJson2 size={30} /><h2>{ru ? "Подключите API проекта" : "Connect your project’s API"}</h2>
         <p>{ru ? "Добавьте Swagger в хуках: укажите OpenAPI JSON или YAML и при необходимости данные доступа." : "Add Swagger in Integrations: enter an OpenAPI JSON or YAML URL and credentials if required."}</p>
         {canManage ? <button type="button" className={surface.primary} onClick={configure}>{ru ? "Подключить Swagger" : "Connect Swagger"}</button> :

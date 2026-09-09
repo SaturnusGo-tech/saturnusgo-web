@@ -76,9 +76,9 @@
   margin: 8px auto;
   max-width: calc(100% - 16px);
   padding: 7px;
-  color: var(--cases-strong);
-  background: var(--cases-raised);
-  border: 1px solid var(--cases-row-border);
+  color: #fff;
+  background: #3464db;
+  border: 1px solid transparent;
   border-radius: 14px;
   box-shadow: 0 3px 12px rgb(0 0 0 / 5%);
   animation: bulkBarReveal 160ms ease-out both;
@@ -103,7 +103,7 @@
   justify-content: center;
   gap: 6px;
   padding: 0 10px;
-  color: var(--cases-strong);
+  color: #fff;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 9px;
@@ -112,14 +112,14 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.bulkBar .bulkPrimary { color: #fff; background: var(--cases-primary, #3574f0); }
-.bulkBar .bulkPrimary:hover:not(:disabled) { color: #fff; background: color-mix(in srgb, var(--cases-primary, #3574f0) 88%, #202735); }
+.bulkBar .bulkPrimary { color: #fff; background: rgb(255 255 255 / 14%); }
+.bulkBar .bulkPrimary:hover:not(:disabled) { color: #fff; background: rgb(255 255 255 / 22%); }
 .bulkBar .bulkAction:hover:not(:disabled),
 .bulkBar .bulkAction[aria-expanded="true"],
-.bulkBar .bulkClose:hover:not(:disabled) { background: var(--cases-hover-strong); }
+.bulkBar .bulkClose:hover:not(:disabled) { background: rgb(255 255 255 / 14%); }
 .bulkBar .bulkClose { width: 32px; padding: 0; }
 .bulkBar button:disabled { cursor: not-allowed; opacity: .5; }
-.bulkBar button:focus-visible { outline: 2px solid var(--cases-control-border); outline-offset: 2px; }
+.bulkBar button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .bulkMenuRoot { position: relative; flex: 0 0 auto; }
 .bulkMenu {
   position: absolute;
@@ -159,7 +159,7 @@
 .bulkMenu button:hover:not(:disabled),
 .bulkMenu button:focus-visible { color: var(--cases-strong); background: var(--cases-hover-strong); }
 .bulkMenu .bulkBack { margin-bottom: 4px; font-weight: 550; }
-.bulkError { flex: 0 0 100%; min-width: 0; padding: 2px 4px; color: var(--cases-strong); font-size: 12px; overflow-wrap: anywhere; }
+.bulkError { flex: 0 0 100%; min-width: 0; padding: 2px 4px; color: #fff; font-size: 12px; overflow-wrap: anywhere; }
 .critical { color: #ef4d55; }
 .high { color: #e9a23b; }
 .medium { color: #75a7ff; }

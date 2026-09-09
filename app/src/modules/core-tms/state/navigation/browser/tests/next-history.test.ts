@@ -40,7 +40,7 @@ function harness() {
   const source = readFileSync(new URL("../workspace-history.ts", import.meta.url), "utf8");
   runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } }).outputText, {
     module, exports: module.exports, window, crypto: { randomUUID: () => "session" }, Event,
-    require(name: string) { assert.equal(name, "../history/history"); return { createNavigationHistory, navigationEntry }; },
+    require(name: string) { if (name.endsWith("content-transition")) return { transitionContent: (update: () => void) => update() }; assert.equal(name, "../history/history"); return { createNavigationHistory, navigationEntry }; },
   });
   return { api: module.exports, href: () => href, state: () => state, canonical: () => canonicalUrl, writes,
     routerCommit: () => window.history.replaceState({ ...state, __NA: true }, "", canonicalUrl) };

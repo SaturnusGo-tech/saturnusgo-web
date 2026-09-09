@@ -15,10 +15,17 @@ test("discussion composes and reads through the canonical Markdown field with st
   const props = { workspaceId: "w", targetType: "project" as const, targetId: "p", canPost: true, workflowPhase: "in_progress" as const, phaseDisabled: false, onPhaseChange: (phase: string) => phases.push(phase) };
   const render = () => nodes(h.render(() => view.OrganizationDiscussion(props)));
   let all = render(); assert.equal(all.some((node) => node.type === "textarea"), false);
+  assert.equal(all.some((node) => node.type === "button" && String(node.props.className).includes("send")), false);
   const status = all.find((node) => node.type === "WorkflowSelect")!;
   assert.equal(status.props.value, "in_progress"); invoke(status, "onChange", "in_review"); assert.deepEqual(phases, ["in_review"]);
   const editor = all.find((node) => node.type === "MarkdownField")!;
   assert.equal(all.indexOf(status) < all.indexOf(editor), true); invoke(editor, "onChange", "**Проверено**: возврат работает.");
-  all = render(); await invoke(all.find((node) => node.type === "form")!, "onSubmit", { preventDefault() {} });
+  all = render();
+  const send = all.find((node) => node.type === "button" && String(node.props.className).includes("send"))!;
+  assert.ok(send);
+  const editorRegion = all.find((node) => node.props["data-has-body"] === true)!;
+  assert.ok(nodes(editorRegion).includes(send));
+  await invoke(all.find((node) => node.type === "form")!, "onSubmit", { preventDefault() {} });
   assert.deepEqual(posts, ["**Проверено**: возврат работает."]);
+  assert.equal(render().some((node) => node.type === "button" && String(node.props.className).includes("send")), false);
 });

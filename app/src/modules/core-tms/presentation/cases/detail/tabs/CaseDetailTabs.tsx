@@ -1,3 +1,4 @@
+import { transitionContent } from "../../../workspace/motion/transition/content-transition";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import {
   inspectorTabAfterKey,
@@ -35,7 +36,7 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0
       event.preventDefault();
       event.stopPropagation();
       const next = inspectorTabAfterKey(active, event.key as InspectorTabKey);
-      onActive(next);
+      transitionContent(() => onActive(next));
       requestAnimationFrame(() => document.getElementById(`${tabsId}-${next}`)?.focus());
     }}
   >
@@ -48,7 +49,7 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0
       aria-selected={active === tab}
       aria-controls={`${tabsId}-panel`}
       className={active === tab ? styles.detailTabActive : ""}
-      onClick={() => onActive(tab)}
+      onClick={() => transitionContent(() => onActive(tab))}
     >{labels[tab]}{tab === "files" && fileCount > 0 && <span>{fileCount}</span>}
       {tab === "activity" && activityCount > 0 && <span>{activityCount}</span>}
     </button>)}

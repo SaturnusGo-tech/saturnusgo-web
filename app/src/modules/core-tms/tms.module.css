@@ -2863,13 +2863,13 @@
 }
 
 @keyframes tms-reveal-panel {
-  from { opacity: 0; transform: translateY(-8px) scaleY(.985); }
-  to { opacity: 1; transform: translateY(0) scaleY(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes tms-reveal-popover {
-  from { opacity: 0; transform: translateY(-5px) scale(.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes tms-toast-in {

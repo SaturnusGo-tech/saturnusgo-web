@@ -1,4 +1,5 @@
 import { Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
+import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useState } from "react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -31,7 +32,7 @@ export function ConfigView(props: ConfigViewProps) {
           return <div key={id}>
             {id === "appearance" && <div className={css.navLabel}>{copy.personalGroup}</div>}
             <button type="button" aria-current={section === id ? "page" : undefined} aria-controls={`settings-${id}`}
-              onClick={() => setSection(id)}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
+              onClick={() => transitionContent(() => setSection(id))}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
           </div>;
         })}
       </nav>

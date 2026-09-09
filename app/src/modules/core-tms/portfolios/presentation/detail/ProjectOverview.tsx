@@ -35,7 +35,7 @@ export function ProjectOverview({ state, projectId, workspaceId, canManage, canM
       <h1>{project.name}<code className={styles.key}>{project.key}</code></h1>
     </div>{canManage && project.status !== "archived" && <button type="button" className={styles.secondary}
       onClick={() => state.setDialog("project-edit")}><PiPencilSimple />{copy.change}</button>}</header>
-    <ResourceFeedback loading={state.project.loading} error={state.project.error} copy={copy} retry={state.project.reload} />
+    <ResourceFeedback hasContent loading={state.project.loading} error={state.project.error} copy={copy} retry={state.project.reload} />
     {project.status === "archived" && <p className={styles.status}>{copy.archived}</p>}
     <nav className={styles.tabs} aria-label={project.name}>
       <button type="button" aria-current={navigation.tab === "overview" ? "page" : undefined} onClick={() => navigation.select("overview")}>{copy.overview}</button>

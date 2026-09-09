@@ -1,3 +1,4 @@
+import { ContentSkeleton } from "../skeleton/ContentSkeleton";
 import styles from "../../../tms.module.css";
 
 export function TessiqLoader({
@@ -9,6 +10,7 @@ export function TessiqLoader({
   pane?: boolean;
   testId?: string;
 }) {
+  if (pane) return <ContentSkeleton label={label} testId={testId} />;
   return (
     <section
       className={`${styles.tessiqLoader} ${pane ? styles.tessiqLoaderPane : ""}`}

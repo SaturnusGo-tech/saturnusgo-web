@@ -1,3 +1,4 @@
+import { defaultFolderExpansion, resolveFolderExpansion } from "../../../../folders/model/expansion/default-expansion";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { hookHarness } from "../../../../state/navigation/browser/tests/project/hook-harness";
 import * as selection from "../../bulk/selection/caseSelection";
@@ -69,6 +70,7 @@ export function browserHarness() {
     return resolvePresentation(name);
   });
   const repositoryComponent = repository.load<{ RepositoryFolders: typeof RepositoryFolders }>(new URL("../../../../folders/presentation/tree/RepositoryFolders.tsx", import.meta.url), (name) => {
+    if (name.endsWith("default-expansion")) return { defaultFolderExpansion, resolveFolderExpansion };
     if (name.endsWith("model/tree")) return tree;
     if (name === "@dnd-kit/core") return { useDroppable: () => ({ setNodeRef() {}, isOver: false }) };
     if (name.endsWith("useRepositoryWidth")) return { useRepositoryWidth: () => ({ ref: { current: null }, style: {}, handleProps: {}, width: 304 }), REPOSITORY_MIN: 240, REPOSITORY_MAX: 620 };

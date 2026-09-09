@@ -1,8 +1,9 @@
 import { useDroppable } from "@dnd-kit/core";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PiArchiveDuotone, PiFolderPlusDuotone, PiUploadSimple } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
+import { defaultFolderExpansion, resolveFolderExpansion } from "../../model/expansion/default-expansion";
 import { buildFolderTree } from "../../model/tree";
 import { RepositoryFolderBranch } from "../branch/RepositoryFolderBranch";
 import { RepositoryCaseLeaf } from "../case/RepositoryCaseLeaf";
@@ -19,11 +20,15 @@ export function RepositoryFolders(props: {
 }) {
   const { resource, ru } = props;
   const resize = useRepositoryWidth();
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [revealed, setExpanded] = useState<Set<string>>(new Set());
+  const [overrides, setOverrides] = useState<Map<string, boolean>>(new Map());
+  const lastRevealed = useRef("");
   const [archive, setArchive] = useState(false);
   useEffect(() => { props.onArchiveChange?.(archive); }, [archive, props.onArchiveChange]);
   const [menu, setMenu] = useState<RepositoryFolder | null>(null);
   const tree = useMemo(() => buildFolderTree(resource.items, props.cases, archive, props.includeArchived), [resource.items, props.cases, archive, props.includeArchived]);
+  const defaults = useMemo(() => defaultFolderExpansion(tree.roots), [tree]);
+  const expanded = resolveFolderExpansion(defaults, overrides, revealed);
   const roots = useMemo(() => {
     function prune(nodes: typeof tree.roots): typeof tree.roots {
       return nodes.filter((node) => node.caseIds.length).map((node) => ({ ...node, children: prune(node.children) }));
@@ -37,14 +42,19 @@ export function RepositoryFolders(props: {
     const active = props.cases.find((item) => item.id === props.activeCaseId);
     const path = active?.folderPath ?? props.selectedFolder;
     if (!path) return;
+    const revealKey = [props.activeCaseId, path, ...resource.items.filter((folder) => path === folder.path || path.startsWith(`${folder.path}/`)).map((folder) => folder.id)].join(":");
+    if (lastRevealed.current === revealKey) return;
+    lastRevealed.current = revealKey;
+    setOverrides((current) => new Map([...current].filter(([id]) => { const folder = resource.items.find((item) => item.id === id); return !folder || !(path === folder.path || path.startsWith(`${folder.path}/`)); })));
     setExpanded((current) => new Set([...current, ...resource.items.filter((folder) => path === folder.path || path.startsWith(`${folder.path}/`)).map((folder) => folder.id)]));
   }, [props.activeCaseId, props.selectedFolder, props.selectedFolderId, resource.items]);
   useEffect(() => {
     if (!props.filtered) return;
     const paths = props.cases.map((item) => item.folderPath);
+    setOverrides((current) => new Map([...current].filter(([id]) => { const folder = resource.items.find((item) => item.id === id); return !folder || !paths.some((path) => path === folder.path || path.startsWith(`${folder.path}/`)); })));
     setExpanded((current) => new Set([...current, ...resource.items.filter((folder) => paths.some((path) => path === folder.path || path.startsWith(`${folder.path}/`))).map((folder) => folder.id)]));
   }, [props.filtered, props.cases, resource.items]);
-  function toggle(id: string) { setExpanded((current) => { const next = new Set(current); next.has(id) ? next.delete(id) : next.add(id); return next; }); }
+  function toggle(id: string) { setOverrides((current) => new Map(current).set(id, !expanded.has(id))); }
   return <aside ref={resize.ref} style={resize.style} data-resizing={resize.resizing || undefined} data-selection={props.selectionMode || undefined} data-repository-tree className={css.repository} aria-label={ru ? "Папки и тест-кейсы" : "Folders and test cases"}>
     <header ref={drop.setNodeRef} className={css.heading} data-drop={drop.isOver || undefined}>
       <button className={css.repositoryTitle} disabled={props.locked} title={ru ? "Показать все тест-кейсы" : "Show all test cases"}

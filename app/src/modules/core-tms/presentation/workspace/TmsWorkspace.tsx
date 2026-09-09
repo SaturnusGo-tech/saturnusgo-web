@@ -14,11 +14,14 @@ import { WorkspaceHeader } from "./WorkspaceHeader";
 import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
 import { useHistoryScroll } from "./history/useHistoryScroll";
+import motion from "./motion/motion.module.css";
+import "./motion/motion.css";
+import { transitionContent } from "./motion/transition/content-transition";
 import { usePageAppearance } from "./motion/usePageAppearance";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
-  const pageRef = usePageAppearance(model.view);
+  const pageRef = usePageAppearance([model.view, model.project?.id, model.selectedCaseId, model.selectedRunId, model.selectedRunItemId, model.selectedSuiteId, model.selectedDefectId, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -36,7 +39,9 @@ function LocalizedWorkspace() {
     });
   }
 
-  function changeView(next: typeof model.view) {
+  function changeView(next: typeof model.view) { transitionContent(() => selectView(next)); }
+
+  function selectView(next: typeof model.view) {
     if (next === "cases" && model.dialog !== "case") model.setSelectedCaseId("");
     if (model.selectedDefectId) model.clearDefectSelection();
     if (next === "runs") {
@@ -62,8 +67,7 @@ function LocalizedWorkspace() {
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebar}
         onCreateCase={() => {
-          changeView("cases");
-          model.openNewCase();
+          transitionContent(() => { selectView("cases"); model.openNewCase(); });
         }}
         onCreateDefect={() => model.setDialog("defect")}
         activeRunCount={model.activeProjectRuns.length}
@@ -84,7 +88,7 @@ function LocalizedWorkspace() {
               {t("workspace.demoNotice")}
             </div>
           )}
-          <div className={styles.stageContent} ref={pageRef}>
+          <div className={`${styles.stageContent} ${motion.content}`} ref={pageRef} data-workspace-content>
             <WorkspaceStage model={model} />
           </div>
         </main>

@@ -2,7 +2,7 @@
 .panes { position: relative; display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
 .panes .detail { position: relative; inset: auto; width: auto; min-width: 0; max-width: none; flex: 1; display: flex; border: 0; box-shadow: none; animation: none; transform: none; transition: none; }
 .panes[data-fullscreen] > [data-repository-tree] { display: none; }
-.empty { flex: 1; min-height: 200px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--cases-muted); text-align: center; }
+.empty { background: var(--cases-bg); flex: 1; min-height: 200px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--cases-muted); text-align: center; }
 .empty img { width: 240px; height: 160px; object-fit: contain; margin-bottom: 18px; }
 .empty h2 { margin: 0 0 8px; color: var(--cases-strong); font-size: 18px; font-weight: 550; letter-spacing: -.025em; }
 .empty p { margin: 0; max-width: 290px; font-size: 13px; line-height: 1.65; }

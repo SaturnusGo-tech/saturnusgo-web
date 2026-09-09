@@ -1,18 +1,25 @@
 .discussion { padding: 8px 0 25px; }
 .discussion > header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .discussion h2 { margin: 0; font-size: 15px; font-weight: 570; }
-.composer { overflow: hidden; border: 1px solid var(--line-strong); border-radius: 11px; }
-.composer:focus-within { border-color: var(--tms-focus-border, #999); box-shadow: 0 0 0 2px var(--tms-focus-ring, #8882); }
-.composer footer { display: flex; align-items: center; justify-content: flex-end; padding: 8px 11px; gap: 10px; }
-.composer footer span { margin-right: auto; font-size: 11px; color: var(--muted); }
+.composer { position: relative; overflow: visible; border: 1px solid var(--line); border-radius: 16px; transition: border-color 160ms ease; }
+.composer:focus-within { border-color: var(--tms-focus-border, #999); box-shadow: none; }
 .comments { margin: 22px 0 0; padding: 0; list-style: none; }
 .comments li { padding: 16px 0; }
 .comments li > div:first-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 11px; }
 .comments strong { font-size: 12px; font-weight: 550; }
 .comments time { color: var(--muted); font-size: 11px; }
 .comments p { margin: 9px 0 0; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
-.empty { color: var(--muted); font-size: 12px; line-height: 1.7; padding: 18px 0 0; }
-.empty span { display: block; margin-top: 3px; }
-.statusStrip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--muted); background: var(--control-hover); font-size: 12px; }
-.editor { padding: 10px 12px; }
+.statusStrip { border-radius: 15px 15px 0 0; display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--muted); background: var(--control-hover); font-size: 12px; }
+.editor { position: relative; padding: 0; }
+.discussion .composer .editor [data-editor-shell] { border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none !important; }
+.editor :global(.mdxeditor) { height: auto !important; min-height: 150px !important; background: transparent; }
+.editor :global(.mdxeditor-root-contenteditable) { height: auto !important; max-height: 320px; min-height: 112px; background: transparent !important; }
+.editor :global(.mdxeditor-toolbar) { background: transparent; border: 0; padding-inline: 12px; }
+.editor :global([contenteditable]) { min-height: 112px; padding: 12px 14px; background: transparent !important; outline: none !important; box-shadow: none !important; border: 0 !important; }
+.editor[data-has-body] :global([contenteditable]) { padding-bottom: 56px; }
+.editor .send { position: absolute; bottom: 12px; left: 12px; min-height: 30px; padding: 5px 11px; font-size: 12px; border-radius: 9px; }
+.feedback { position: absolute; bottom: 0; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) { .composer { transition: none; } }
 .limit { padding: 0 12px; color: var(--danger, #c74755); font-size: 12px; }
+
+.editor textarea { min-height: 112px; border: 0 !important; outline: none !important; box-shadow: none !important; background: transparent !important; }

@@ -99,3 +99,21 @@ test("case selection replaces the durable folder context even when its path was 
   app.render().selectRow({ testCase: app.items[0], folderPath: app.items[0].folderPath });
   assert.equal(app.props.selectedFolderId, "transfer"); assert.equal(app.props.selectedCaseId, "transfer-case"); app.dispose();
 });
+
+test("default expansion reveals ancestors but not cases, and manual collapse survives a resource refresh", () => {
+  const app = browserHarness();
+  let root = branches(app.renderTree()).find((row) => (row.props.node as FolderNode).folder.id === "pay")!;
+  assert.equal((root.props.expanded as Set<string>).has("pay"), true);
+  assert.equal((root.props.expanded as Set<string>).has("transfer"), false);
+  (root.props.onExpand as (id: string) => void)("pay");
+  root = branches(app.renderTree()).find((row) => (row.props.node as FolderNode).folder.id === "pay")!;
+  assert.equal((root.props.expanded as Set<string>).has("pay"), false);
+  app.props.folders!.items = [...app.props.folders!.items];
+  root = branches(app.renderTree()).find((row) => (row.props.node as FolderNode).folder.id === "pay")!;
+  assert.equal((root.props.expanded as Set<string>).has("pay"), false);
+  app.props.selectedCaseId = "transfer-case";
+  root = branches(app.renderTree()).find((row) => (row.props.node as FolderNode).folder.id === "pay")!;
+  assert.equal((root.props.expanded as Set<string>).has("pay"), true);
+  assert.equal((root.props.expanded as Set<string>).has("transfer"), true);
+  app.dispose();
+});

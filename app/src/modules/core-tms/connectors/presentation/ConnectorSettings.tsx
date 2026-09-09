@@ -1,4 +1,6 @@
 "use client";
+import { ContentSkeleton } from "../../presentation/common/skeleton/ContentSkeleton";
+import { transitionContent } from "../../presentation/workspace/motion/transition/content-transition";
 import { SwaggerConnectionPanel } from "./swagger/SwaggerConnectionPanel";
 import { useState } from "react";
 import { LoaderCircle, Save, RefreshCw } from "lucide-react";
@@ -19,12 +21,12 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
 }) {
   const [tab, setTab] = useState<ConnectorTab>(() => provider === "github" && typeof window !== "undefined"
     && (new URLSearchParams(window.location.search).has("analysisId") || new URLSearchParams(window.location.search).get("impact") === "1") ? "impact" : "connection");
-  const selectTab = (next: ConnectorTab) => {
+  const selectTab = (next: ConnectorTab) => transitionContent(() => {
     const url = new URL(window.location.href);
     if (next === "impact") url.searchParams.set("impact", "1");
     else { url.searchParams.delete("impact"); url.searchParams.delete("analysisId"); }
     window.history.replaceState(window.history.state, "", url); setTab(next);
-  };
+  });
   const state = useConnector({ workspaceId, projectId }, provider, ru, onSaved, tab === "activity");
   const project = state.snapshot?.catalog.projects.find((p) => p.id === projectId)?.name ?? projectId;
   const snapshot = state.snapshot;
@@ -34,7 +36,7 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
       <button type="button" className={styles.secondary} onClick={() => void (tab === "activity" && snapshot && !state.configurationReloadRequired ? state.refreshActivity() : state.load())}
         disabled={Boolean(state.pending)}><RefreshCw size={14} />{ru ? "Загрузить заново" : "Reload"}</button></div>}
     {state.notice && <div className={styles.notice} role="status">{state.notice}</div>}
-    {!snapshot && state.pending && <div className={styles.loading} role="status"><LoaderCircle size={22} />{ru ? "Загружаем настройки…" : "Loading settings…"}</div>}
+    {!snapshot && state.pending && <ContentSkeleton label={ru ? "Загрузка настроек" : "Loading settings"} />}
     {snapshot && <>
       {!canManage && <p className={styles.notice}>{ru ? "Режим просмотра. Управление доступно администратору или QA-менеджеру." : "Read-only. An administrator or QA manager can manage this integration."}</p>}
       {tab === "impact" && provider === "github" ? <ImpactWorkspace scope={{ workspaceId, projectId }} ru={ru}

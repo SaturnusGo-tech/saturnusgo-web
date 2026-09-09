@@ -40,6 +40,7 @@ export function componentHarness(initialHref = "https://tms.example/work/") {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
     }).outputText, { module, exports: module.exports, AbortController, JSON, URL, window, crypto: globalThis.crypto,
       require: (name: string) => name === "react" ? react : name === "react/jsx-runtime" ? { jsx, jsxs: jsx }
+        : name.endsWith("content-transition") ? { transitionContent: (update: () => void) => update() }
         : name.endsWith(".css") ? { default: proxy } : resolve(name) ?? proxy });
     return module.exports as T;
   }

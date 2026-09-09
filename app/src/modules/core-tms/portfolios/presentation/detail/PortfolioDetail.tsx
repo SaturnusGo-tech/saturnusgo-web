@@ -34,7 +34,7 @@ export function PortfolioDetail({ state, workspaceId, canManage, canManageAttach
           onClick={() => active ? state.setDialog("archive") : void state.transition()}>{active ? <PiArchive /> : <PiArrowCounterClockwise />}</button>
       </div>}
     </header>
-    <ResourceFeedback loading={state.portfolio.loading} error={state.portfolio.error} copy={copy} retry={state.portfolio.reload} />
+    <ResourceFeedback hasContent loading={state.portfolio.loading} error={state.portfolio.error} copy={copy} retry={state.portfolio.reload} />
     {!active && <p className={styles.status}>{copy.archived}</p>}
     <nav className={styles.tabs} aria-label={portfolio.name}>
         <button type="button" aria-current={tab === "about" ? "page" : undefined} onClick={() => setTab("about")}>{copy.aboutPortfolio}</button>
@@ -50,11 +50,11 @@ export function PortfolioDetail({ state, workspaceId, canManage, canManageAttach
       </> : <>
         <div className={styles.toolbar}><label className={styles.search} data-input-shell><input aria-label={copy.searchProject} placeholder={copy.searchProject} value={state.search} onChange={(event) => state.setSearch(event.target.value)} /></label>
           {canManage && active && <div className={styles.actions}>
-            <button type="button" className={styles.primary} onClick={state.createProject}><PiPlus />{copy.newProject}</button>
+            {(projects.length > 0 || Boolean(state.search)) && <button type="button" className={styles.primary} onClick={state.createProject}><PiPlus />{copy.newProject}</button>}
             <button type="button" className={styles.secondary} onClick={() => state.setDialog("attach")}><PiPlus />{copy.attach}</button>
           </div>}
         </div>
-        <ResourceFeedback loading={state.projects.loading} error={state.projects.error} copy={copy} retry={state.projects.reload} />
+        <ResourceFeedback hasContent={state.projects.items.length > 0} loading={state.projects.loading} error={state.projects.error} copy={copy} retry={state.projects.reload} />
         {projects.length > 0 && <CatalogTable portfolios={[]} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} />}
         {!projects.length && !state.projects.loading && !state.projects.error && <section className={styles.empty}>
           <h2>{state.search ? copy.noResults : copy.emptyPortfolio}</h2><p>{state.search ? copy.noResultsHint : copy.emptyPortfolioHint}</p>

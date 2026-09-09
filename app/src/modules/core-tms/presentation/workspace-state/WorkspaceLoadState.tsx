@@ -17,7 +17,7 @@ export function WorkspaceLoadState({
 }) {
   const { t } = useTmsLocale();
   if (!failure) {
-    return <TessiqLoader label={t("workspace.loading")} testId="workspace-loading" />;
+    return <TessiqLoader pane label={t("workspace.loading")} testId="workspace-loading" />;
   }
 
   const status = failure.detail.match(/status\s+(\d+)/i)?.[1];

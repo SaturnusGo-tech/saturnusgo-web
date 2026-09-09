@@ -1,3 +1,4 @@
+import { transitionContent } from "../../../presentation/workspace/motion/transition/content-transition";
 import { useEffect, useState } from "react";
 import { HISTORY_CHANGE, navigateWorkspace } from "../../../state/navigation/browser/workspace-history";
 
@@ -18,6 +19,6 @@ export function usePortfolioTab(portfolioId: string) {
     const url = new URL(window.location.href);
     if (url.searchParams.get("view") !== "portfolios" || url.searchParams.get("portfolioId") !== portfolioId) return;
     url.searchParams.set("portfolioTab", next);
-    navigateWorkspace(url.href); setTab(next);
+    transitionContent(() => { navigateWorkspace(url.href); setTab(next); });
   } };
 }

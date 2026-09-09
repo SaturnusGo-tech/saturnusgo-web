@@ -1,5 +1,7 @@
 "use client";
 
+import { transitionContent } from "../workspace/motion/transition/content-transition";
+import { ContentSkeleton } from "../common/skeleton/ContentSkeleton";
 import { Plus, Repeat2, Search, Trash2, Workflow } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -25,11 +27,11 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
     setEditingId(id);
     const current = await resource.open(id);
     if (!current) { setEditingId(null); return; }
-    setDraft({ title: current.current.title, items: current.current.items, changeNote: "" });
+    transitionContent(() => setDraft({ title: current.current.title, items: current.current.items, changeNote: "" }));
   };
   if (draft) return <SharedStepAttachmentEditor draft={draft} resource={resource}
     current={editingId ? resource.selected : null} ru={ru} onChange={setDraft}
-    onClose={() => { setDraft(null); setEditingId(null); resource.close(); }} />;
+    onClose={() => transitionContent(() => { setDraft(null); setEditingId(null); resource.close(); })} />;
 
   return <section className={styles.view}>
     <header className={styles.header}>
@@ -46,8 +48,7 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
         placeholder={ru ? "Поиск по названию" : "Search by title"} />
     </div>
     <div className={styles.list}>
-      {resource.status === "loading" && <div className={styles.state}><Repeat2 className={styles.spin} />
-        <strong>{ru ? "Загружаем общие шаги" : "Loading shared steps"}</strong></div>}
+      {resource.status === "loading" && !resource.items.length && <ContentSkeleton variant="list" label={ru ? "Загрузка общих шагов" : "Loading shared steps"} />}
       {resource.status === "error" && <div className={styles.state}><strong>{ru
         ? "Не удалось загрузить общие шаги" : "Could not load shared steps"}</strong>
         <button className={styles.secondaryButton} onClick={() => void resource.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>}
@@ -56,7 +57,7 @@ export function SharedStepsView({ resource }: { resource: Resource }) {
           <strong>{query ? (ru ? "Ничего не найдено" : "No matches")
             : (ru ? "Создайте первый общий шаг" : "Create the first shared step")}</strong>
           {!query && <button type="button" className={styles.secondaryButton}
-            onClick={() => setDraft(emptySharedStepDraft())}><Plus size={15} />{ru ? "Создать" : "Create"}</button>}
+            onClick={() => transitionContent(() => setDraft(emptySharedStepDraft()))}><Plus size={15} />{ru ? "Создать" : "Create"}</button>}
         </div>}
       {rows.map((item) => <div key={item.id} className={styles.row}>
         <button type="button" className={styles.rowOpen} onClick={() => void beginEdit(item.id)}>

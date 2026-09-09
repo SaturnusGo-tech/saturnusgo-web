@@ -1,3 +1,4 @@
+import { useDisclosureMotion } from "../../../presentation/common/disclosure/useDisclosureMotion";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useContext, useRef } from "react";
 import { PiCaretDown, PiCaretRight, PiDotsThree, PiFolderSimpleDuotone, PiFolderOpenDuotone } from "react-icons/pi";
@@ -19,6 +20,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
   const { node, depth, ru } = props;
   const folder = node.folder;
   const open = props.expanded.has(folder.id);
+  const motion = useDisclosureMotion(open);
   const childrenId = `repository-children-${folder.id}`;
   const checkbox = useRef<HTMLInputElement>(null);
   const disclosure = useRef<HTMLButtonElement>(null);
@@ -42,7 +44,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       </button>
       <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>
     </div>
-    {open && <div className={css.branchChildren}>
+    {motion.present && <div ref={(element) => { motion.ref.current = element; if (element) element.inert = !open; }} className={css.branchChildren} aria-hidden={!open || undefined}>
       <button type="button" className={css.branchGuide} aria-expanded="true" aria-controls={childrenId}
         aria-label={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`}
         title={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`} onClick={() => { disclosure.current?.focus(); props.onExpand(folder.id); }} />

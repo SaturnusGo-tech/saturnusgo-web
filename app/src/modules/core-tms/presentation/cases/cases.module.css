@@ -63,7 +63,7 @@
 
 :global(.dark) .repositoryColumn,
 :global(.dark) .repository { background: var(--tms-bg-sidebar); }
-:global(.dark) .detailPanel { --cases-bg: var(--tms-bg-panel); }
+:global(.dark) .detailPanel { --cases-bg: var(--tms-bg-canvas); }
 :global(.dark) .savedViewActive,
 :global(.dark) .repositoryCaseActive,
 :global(.dark) .caseTable .tableRowSelected td { background: var(--tms-bg-selected); }

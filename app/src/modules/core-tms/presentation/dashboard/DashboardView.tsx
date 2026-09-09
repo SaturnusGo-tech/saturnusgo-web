@@ -1,4 +1,5 @@
 "use client";
+import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, Plus, Pencil } from "lucide-react";
@@ -35,10 +36,10 @@ function DashboardWorkspace(props: DashboardViewProps) {
   const disabled = layout.saving || layout.retryPending;
   const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
   const edit = () => { layout.controller.edit(t("dashboardLayout.defaultName")); };
-  const openCatalog = () => {
+  const openCatalog = () => transitionContent(() => {
     if (!editing) edit();
     setCatalogScope(scope);
-  };
+  });
   const catalogOpen = editing && catalogScope === scope;
   const addButton = useRef<HTMLButtonElement>(null);
   const wasCatalogOpen = useRef(false);
@@ -51,7 +52,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
   if (catalogOpen) return <div key="catalog" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
     <WidgetCatalog dashboardName={board!.name} projectName={currentProject}
       renderPreview={key => <WidgetRenderer widget={key} model={model} onOpenRow={props.onOpenRow} />} selected={new Set(board!.widgets.map(widgetKey))}
-      onBack={() => setCatalogScope(null)}
+      onBack={() => transitionContent(() => setCatalogScope(null))}
       onAdd={(definitions) => layout.controller.add(definitions.map((definition) => createBoardWidget(definition, locale, crypto.randomUUID())))} />
   </div>;
   return <div key="dashboard" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">

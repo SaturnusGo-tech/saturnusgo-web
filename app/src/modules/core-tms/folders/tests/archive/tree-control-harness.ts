@@ -22,6 +22,7 @@ export function treeControl(path: string, exportName: string) {
     module, exports: module.exports,
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
+      if (name.endsWith("useDisclosureMotion")) return { useDisclosureMotion: (open: boolean) => ({ ref: { current: null }, present: open }) };
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useContext: () => ({ current: 0 }) };
       if (name === "@dnd-kit/core") return {
         useDraggable({ disabled }: { disabled: boolean }) {
