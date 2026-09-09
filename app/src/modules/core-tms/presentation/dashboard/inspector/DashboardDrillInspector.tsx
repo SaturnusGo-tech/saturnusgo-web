@@ -40,8 +40,12 @@ export function DashboardDrillInspector(props: Props) {
   const component = originFilter.componentIsEmpty ? "" : originFilter.component;
   const title = componentContext ? component === "" ? (ru ? "Без компонента" : "No component") : component ?? (ru ? "Все компоненты" : "All components") : props.origin.label;
   const total = props.page?.total ?? (props.page && !props.page.nextCursor ? props.page.rows.length : undefined);
-  const tabs = (["test_case", "run", "defect"] as const).map(id => ({ id, drill: relatedDashboardDrill(props.origin, id),
+  const displayTab = props.selected.filter.entity;
+  const tabOrigin = originFilter.entity === "run_item" ? { ...props.origin, id: `${props.origin.id}:component-scope`, filter: { entity: "test_case" as const, basis: "current" as const,
+    ...(originFilter.component !== undefined ? { component: originFilter.component } : {}), ...(originFilter.componentIsEmpty ? { componentIsEmpty: true } : {}) } } : props.origin;
+  const tabs: Array<{ id: string; drill: DashboardDrill | null; label: string }> = (["test_case", "run", "defect"] as const).map(id => ({ id, drill: relatedDashboardDrill(tabOrigin, id),
     label: t(id === "test_case" ? "dashboard.testCases" : id === "run" ? "dashboard.runs" : "dashboard.defects") }));
+  if (originFilter.entity === "run_item") tabs.splice(2, 0, { id: "run_item", drill: props.origin, label: ru ? "Проверки" : "Checks" });
   const chooseComponent = (next?: string) => props.onSelectComponent({ id: `component-context:${next ?? "all"}`, label: next ?? (ru ? "Все компоненты" : "All components"),
     projectId: props.origin.projectId ?? props.query.projectId, window: props.origin.window,
     filter: { entity: "test_case", basis: "current", ...(next === "" ? { componentIsEmpty: true } : next !== undefined ? { component: next } : {}) } });
@@ -51,8 +55,8 @@ export function DashboardDrillInspector(props: Props) {
     onBack={props.onClose} rail={componentContext ? <ComponentRail components={props.components} selected={component} onSelect={chooseComponent} /> : undefined}
     action={{ label: t(tab === "run" ? "dashboard.runs" : tab === "defect" ? "nav.reports" : "dashboard.testCases"), onClick: () => props.onOpenEntity(tab, props.selected) }}>
     {componentContext ? <nav className={styles.tabs} aria-label={t("dashboard.detailSections")}>
-      {tabs.map(item => <button type="button" key={item.id} disabled={!item.drill} aria-current={tab === item.id ? "page" : undefined}
-        onClick={() => item.drill && props.onSelectDrill(item.drill)}>{item.label}{tab === item.id && total !== undefined && <span>{total}</span>}</button>)}
+      {tabs.map(item => <button type="button" key={item.id} disabled={!item.drill} aria-current={displayTab === item.id ? "page" : undefined}
+        onClick={() => item.drill && props.onSelectDrill(item.drill)}>{item.label}{displayTab === item.id && total !== undefined && <span>{total}</span>}</button>)}
       {tab === "test_case" && canCreateRun && <button type="button" data-action disabled={!selection.size} onClick={() => props.onCreateRun([...selection])}><Plus size={14} />{ru ? "Создать прогон" : "Create run"}{selection.size > 0 && <span>{selection.size}</span>}</button>}
     </nav> : null}
     <DetailToolbar rows={props.page?.rows ?? []} filters={filters} onFilters={setFilters} sort={sort} onSort={setSort} partial={Boolean(props.page?.nextCursor)} />

@@ -23,7 +23,7 @@ export function DashboardDrillTable({ rows, prioritySort, onPrioritySort, onOpen
   if (!rows.length) return null;
   return <div className={styles.viewport}><table className={styles.table} data-entity={rows[0].entity}>
     <colgroup>{selectable && <col style={{ width: 28 }} />}<col /><col style={{ width: runs ? 195 : cases ? 80 : 115 }} /><col style={{ width: 105 }} />
-      {!runs && <col style={{ width: 103 }} />}{!cases && <col style={{ width: 85 }} />}<col style={{ width: 38 }} /></colgroup>
+      {!runs && <col style={{ width: 103 }} />}{!cases && <col style={{ width: 85 }} />}<col style={{ width: rows.some(row => row.links.some(link => safeUrl(link.url))) ? 64 : 38 }} /></colgroup>
     <thead><tr>{selectable && <th className={styles.check}><input type="checkbox" aria-label={ru ? "Выбрать показанные тест-кейсы" : "Select visible test cases"}
       checked={rows.every(row => selection!.has(row.id))} onChange={event => onSelection!(event.target.checked ? new Set([...selection!, ...rows.map(row => row.id)]) : new Set([...selection!].filter(id => !rows.some(row => row.id === id))))} /></th>}
       <th scope="col">{t(runs ? "dashboard.runs" : cases ? "dashboard.testCases" : "dashboard.defects")}</th>

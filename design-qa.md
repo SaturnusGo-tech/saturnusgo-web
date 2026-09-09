@@ -18,6 +18,6 @@ Intentional domain adaptations: existing Falcon priority icons are retained; no 
 
 Interaction checks: query filtering; facet reset; Escape restores filter-button focus; group collapse/reopen; component tabs; exact selected case IDs passed to run creation; reload restores the detail URL; back returns to the dashboard. Successful empty data renders a calm empty state. A simulated transport failure remains an explicit retryable error.
 
-Local fixture UI was used for dense, empty and failure states; the temporary harness was removed from the shipping app and retained only with QA artifacts. No production fixture route is published. Production verification and documentation screenshots are recorded in the release report.
+Local fixture UI was used for dense, empty and failure states; the temporary harness was removed from the shipping app and retained only with QA artifacts. No production fixture route is published. Production verification found a long component rail, which now scrolls independently and brings the selected component into view. Execution counts have their own Checks tab rather than being labelled as run counts. A real failed check opened its exact run and run-item URL. Production screenshots are recorded in the release report.
 
 Open P0/P1/P2 visual issues: none at the verified desktop viewport.

@@ -10,8 +10,9 @@ export function groupRunRecords(rows: DashboardDrillRow[], data: Bootstrap): Run
     if (!group) {
       const known = data.runs.find(run => run.id === row.runId && run.projectId === row.projectId);
       const title = row.runName ?? known?.name ?? row.detail;
+      const compact = compactRunTitle(title, row.project, known?.build ?? null);
       group = { key, rows: [], run: { ...row, entity: "run", id: row.runId ?? row.id, runItemId: undefined,
-        title: compactRunTitle(title, row.project, known?.build ?? null), key: known?.key ?? "",
+        title: compact === row.caseKey && known?.progress.total === 1 ? row.title : compact, key: known?.key ?? "",
         progress: known ? { total: known.progress.total, notRun: known.progress.counts.not_run, inProgress: known.progress.counts.in_progress,
           passed: known.progress.counts.passed, failed: known.progress.counts.failed, blocked: known.progress.counts.blocked, skipped: known.progress.counts.skipped } : undefined } };
       groups.set(key, group);
