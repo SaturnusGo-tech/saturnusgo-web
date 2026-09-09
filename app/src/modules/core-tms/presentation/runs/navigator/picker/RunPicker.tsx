@@ -1,6 +1,7 @@
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { RunNameMarquee } from "../RunNameMarquee";
 import styles from "../run-navigator.module.css";
 
@@ -17,6 +18,10 @@ type RunPickerProps = {
 };
 
 export function RunPicker(props: RunPickerProps) {
+  const { locale } = useTmsLocale();
+  const dates = new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-US", { dateStyle: "medium", timeStyle: "medium" });
+  const nameCounts = new Map<string, number>();
+  for (const run of props.visibleRuns) nameCounts.set(run.name, (nameCounts.get(run.name) ?? 0) + 1);
   const [open, setOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -105,7 +110,7 @@ export function RunPicker(props: RunPickerProps) {
           tabIndex={selected ? 0 : -1}
           onClick={() => { props.onSelectRun(run.id); close(true); }}
         >
-          <span><RunNameMarquee name={run.name} motion="interaction" /></span>
+          <span><RunNameMarquee name={run.name} motion="interaction" />{nameCounts.get(run.name)! > 1 && <small><time dateTime={run.createdAt}>{dates.format(new Date(run.createdAt))}</time></small>}</span>
           {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
         </button>;
       })}
