@@ -1,3 +1,4 @@
+import { useNavigationValue } from "../../../../state/navigation/context/useNavigationValue";
 import { useMemo, useState } from "react";
 import type { Bootstrap } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
@@ -19,7 +20,7 @@ export function WorkbenchDrillInspector({ model, data, scopeLabel, onOpenRow, on
   onOpenSection: (defects: boolean) => void; onBack: () => void;
 }) {
   const { locale, t } = useTmsLocale(); const ru = locale === "ru";
-  const [filters, setFilters] = useState(emptyDetailFilters); const [sort, setSort] = useState<DetailSort>("recent");
+  const [filters, setFilters] = useNavigationValue(`workbench:${data.workspace.id}:${model.drill?.kind}:filters`, emptyDetailFilters()); const [sort, setSort] = useNavigationValue<DetailSort>(`workbench:${data.workspace.id}:${model.drill?.kind}:sort`, "recent");
   const drill = model.drill; const queue = drill?.page?.queue;
   const allRows = useMemo(() => queue?.rows.map(item => ({ ...item.navigation,
     ...(item.navigation.entity === "run" ? { title: compactRunTitle(item.navigation.title, item.navigation.project, item.buildReference), progress: item.progress } : {}),

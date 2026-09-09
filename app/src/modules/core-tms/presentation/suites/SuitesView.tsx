@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { SuiteCatalogFilter, SuiteCatalogSort } from "../../suites/catalog/suite-catalog";
 import { SuiteCatalog } from "./catalog/SuiteCatalog";
@@ -17,9 +18,10 @@ type Props = {
 };
 
 export function SuitesView(props: Props) {
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<SuiteCatalogFilter>("all");
-  const [sort, setSort] = useState<SuiteCatalogSort>("updated");
+  const scope = `suites:${props.workspaceId}:${props.projectId}`;
+  const [query, setQuery] = useNavigationValue(`${scope}:query`, "");
+  const [filter, setFilter] = useNavigationValue<SuiteCatalogFilter>(`${scope}:filter`, "all");
+  const [sort, setSort] = useNavigationValue<SuiteCatalogSort>(`${scope}:sort`, "updated");
   const nav = useSuiteNavigation(props.workspaceId, props.projectId, props.onSelect);
   const container = useRef<HTMLDivElement>(null);
   const previous = useRef({ id: "", scroll: 0 });

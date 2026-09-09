@@ -1,3 +1,4 @@
+import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useEffect, useState, type MouseEvent } from "react";
 import { defaultArticleId, documentationLink, safeArticleId } from "./documentation-link";
 
@@ -14,7 +15,7 @@ export function useDocumentationNavigation() {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     const next = documentationLink(window.location.href, id);
-    if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== next) window.history.pushState(window.history.state, "", next);
+    if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== next) navigateWorkspace(next);
     setHref(window.location.href); setArticleId(id);
   };
   return { articleId, link, navigate };

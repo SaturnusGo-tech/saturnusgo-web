@@ -1,3 +1,4 @@
+import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import {
   ChevronsLeft,
   ChevronsRight,
@@ -59,11 +60,11 @@ export function Navigation({
   const navigate = (next: View) => {
     if (next === "suites" && view === "suites" && window.location.search.includes("suiteId=")) {
       const url = new URL(window.location.href); url.searchParams.delete("suiteId");
-      window.history.pushState(null, "", url); window.dispatchEvent(new PopStateEvent("popstate"));
+      navigateWorkspace(url.href); window.dispatchEvent(new PopStateEvent("popstate"));
     }
     if (next === "dashboard" && view === "dashboard" && window.location.search.includes("dashboardDetail=")) {
       const url = new URL(window.location.href); url.searchParams.delete("dashboardDetail");
-      window.history.pushState(null, "", url); window.dispatchEvent(new PopStateEvent("popstate"));
+      navigateWorkspace(url.href); window.dispatchEvent(new PopStateEvent("popstate"));
     }
     onChange(next);
   };

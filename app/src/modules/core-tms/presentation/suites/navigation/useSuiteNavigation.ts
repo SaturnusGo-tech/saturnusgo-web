@@ -1,8 +1,9 @@
+import { navigateWorkspace } from "../../../state/navigation/browser/workspace-history";
 import { useCallback, useEffect, useState } from "react";
 import { buildSuiteRoute, readSuiteRoute } from "../../../suites/navigation/suite-route";
 
 export function useSuiteNavigation(workspaceId: string, projectId: string, onSelect: (id: string) => void) {
-  const [id, setId] = useState<string | null>(null);
+  const [id, setId] = useState<string | null>(() => typeof window === "undefined" ? null : readSuiteRoute(window.location.href, workspaceId, projectId));
   useEffect(() => {
     const read = () => {
       const next = readSuiteRoute(window.location.href, workspaceId, projectId);
@@ -15,7 +16,7 @@ export function useSuiteNavigation(workspaceId: string, projectId: string, onSel
   }, [workspaceId, projectId, onSelect]);
   const navigate = useCallback((next: string | null) => {
     const href = buildSuiteRoute(window.location.href, workspaceId, projectId, next);
-    if (href !== window.location.href) window.history.pushState(null, "", href);
+    navigateWorkspace(href);
     setId(next);
     if (next) onSelect(next);
   }, [workspaceId, projectId, onSelect]);

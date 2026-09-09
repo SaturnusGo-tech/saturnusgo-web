@@ -1,6 +1,7 @@
 import { ArrowLeft, Layers, Pencil, Play, RotateCcw, Search, Tag, UserRound, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import { useNavigationValue } from "../../../state/navigation/context/useNavigationValue";
 import { matchesSuite } from "../../../helpers/suites/matchesSuite";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { formatCount } from "../../../localization/format/count";
@@ -16,8 +17,8 @@ type Props = {
 };
 export function SuiteDetail(props: Props) {
   const { locale, t } = useTmsLocale(); const ru = locale === "ru";
-  const [query, setQuery] = useState(""); const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { setQuery(""); heading.current?.focus({ preventScroll: true }); }, [props.suite?.id]);
+  const [query, setQuery] = useNavigationValue(`suite:${props.suite?.id}:query`, ""); const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [props.suite?.id]);
   const { suite, detail } = props;
   const cases = detail ? props.cases.filter(item => !item.archivedAt && item.projectId === detail.projectId && matchesSuite(item, detail)) : [];
   const terms = query.trim().toLocaleLowerCase(locale).split(/\s+/).filter(Boolean);

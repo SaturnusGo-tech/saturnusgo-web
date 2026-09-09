@@ -33,7 +33,7 @@ test("bug report detail uses case-like sections and media-first attachments", ()
 });
 
 test("the selected detail tab survives defect resource refreshes", () => {
-  assert.match(list, /const \[detailTab, setDetailTab\] = useState<DetailTab>\("overview"\)/);
+  assert.match(list, /const \[detailTab, setDetailTab\] = (?:useState|useNavigationValue)<DetailTab>\([^)]*"overview"\)/);
   assert.match(list, /tab=\{detailTab\}/);
   assert.match(list, /onTabChange=\{setDetailTab\}/);
   assert.doesNotMatch(detail, /useState<DetailTab>/);

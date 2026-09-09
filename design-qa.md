@@ -48,3 +48,12 @@ final result: passed
 Production acceptance found one archived member counted by the summary API. Catalog counts now prefer the authoritative resolved scope for matching suite/project/type/revision; unhydrated static counts explicitly describe saved membership. Added a regression with two stored members and one runnable case. Suite detail, browser back, configured scope and run builder use existing production entities.
 
 final result: passed
+
+## Suite launch and workspace history — 2026-09-09
+
+- Run drawer: inset rounded panel, neutral Falcon light/dark surfaces, compact scope summary and property rows, one fixed footer. Suite/case title supplies the default name; environment/build remain separate metadata. Current selection is shown after changing the source; an empty resolved suite is not described as still loading.
+- Navigation: shared native history entries preserve framework state and exact project/entity/drill URLs. Global Back/Forward controls, popstate restoration, per-entry search/filter state and scroll restoration. Cross-project navigation uses the same restoration boundary and workspace loader.
+- Browser QA with production components and isolated local data: filtered suite catalog → suite → case → linked run → Back → case → Back → same suite/search → Back → same catalog/filter → Forward. Verified suite switching updates name/count and summary after collapsing the chooser. Dark/Russian and light/English launch panels inspected.
+- Local API access: direct production requests rejected by CORS; attempted read-only proxy could not establish stable local authenticated access. Temporary proxy, auth prompt and preview fixtures removed from the shipped source. Production session verification follows deployment.
+- Verification: 409 adapter/domain tests pass, including 8 new navigation lifecycle cases; TypeScript and architecture checks pass. No backend schema changes. Repository lint command is an existing no-op.
+- Evidence: ../output/falcon-launch-navigation-20260909/ (screenshots and retained local harness, outside production routes).

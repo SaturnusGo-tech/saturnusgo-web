@@ -1,5 +1,6 @@
 "use client";
 
+import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
 import { Bug, CheckCircle2, ChevronDown, CircleDashed, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
@@ -10,9 +11,9 @@ import { PrioritySignal, prioritySignalRank } from "../cases/list/priority/Prior
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import surface from "./reports.module.css";
 
-export function ReportsView({ workspaceId, defects, runs, links, selectedDefectId, onSelectDefect,
+export function ReportsView({ workspaceId, projectId, defects, runs, links, selectedDefectId, onSelectDefect,
   selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun }: {
-  workspaceId?: string;
+  workspaceId?: string; projectId?: string;
   defects: Defect[];
   runs: TestRunSummary[];
   links: ExternalLink[];
@@ -24,9 +25,9 @@ export function ReportsView({ workspaceId, defects, runs, links, selectedDefectI
   onOpenRun: (runId: string, runItemId: string | null) => void;
 }) {
   const { locale, t } = useTmsLocale();
-  const [query, setQuery] = useState("");
-  const [detailTab, setDetailTab] = useState<DetailTab>("overview");
-  const [severitySort, setSeveritySort] = useState<"asc" | "desc" | null>(null);
+  const [query, setQuery] = useNavigationValue(`reports:${workspaceId}:${projectId}:query`, "");
+  const [detailTab, setDetailTab] = useNavigationValue<DetailTab>(`reports:${workspaceId}:${projectId}:tab`, "overview");
+  const [severitySort, setSeveritySort] = useNavigationValue<"asc" | "desc" | null>(`reports:${workspaceId}:${projectId}:sort`, null);
   const selectedDefect = defects.find((item) => item.id === selectedDefectId);
   const normalizedQuery = query.trim().toLocaleLowerCase(locale);
   const visibleDefects = useMemo(() => {

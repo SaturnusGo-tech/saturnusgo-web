@@ -1,4 +1,5 @@
 "use client";
+import { useNavigationValue } from "../../../state/navigation/context/useNavigationValue";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Bootstrap } from "../../../../../core/tms/contracts/legacy-contract";
@@ -26,7 +27,7 @@ type Props = {
 };
 export function DashboardDrillInspector(props: Props) {
   const { locale, t } = useTmsLocale(); const ru = locale === "ru";
-  const [filters, setFilters] = useState(emptyDetailFilters); const [sort, setSort] = useState<DetailSort>("recent");
+  const [filters, setFilters] = useNavigationValue(`drill:${props.query.projectId}:${props.selected.id}:filters`, emptyDetailFilters()); const [sort, setSort] = useNavigationValue<DetailSort>(`drill:${props.query.projectId}:${props.selected.id}:sort`, "recent");
   const [selection, setSelection] = useState(new Set<string>());
   const tab = activeDrillTab(props.selected.filter);
   const canCreateRun = props.data.meta.authorization.capabilities.includes("run:manage");

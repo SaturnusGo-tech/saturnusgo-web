@@ -1,0 +1,29 @@
+import { createNavigationHistory, navigationEntry } from "../history/history";
+export const HISTORY_CHANGE = "falcon:navigation";
+const ends = new Map<string, number>();
+const history = () => createNavigationHistory({
+  href: () => window.location.href, state: () => window.history.state,
+  replace: (state, href) => window.history.replaceState(state, "", href),
+  push: (state, href) => window.history.pushState(state, "", href),
+  changed: () => window.dispatchEvent(new Event(HISTORY_CHANGE)),
+  session: () => crypto.randomUUID(),
+  readEnd: session => {
+    try { return Number(window.sessionStorage.getItem(`falcon.navigation.${session}`)) || ends.get(session) || 0; }
+    catch { return ends.get(session) ?? 0; }
+  },
+  writeEnd: (session, index) => {
+    ends.set(session, index);
+    try { window.sessionStorage.setItem(`falcon.navigation.${session}`, String(index)); } catch { /* Browser history remains available without storage. */ }
+  },
+});
+export const navigateWorkspace = (href: string, replace = false, extra?: Record<string, unknown>) => history().write(href, replace, extra);
+export const initializeWorkspaceHistory = () => history().initialize();
+export const workspaceHistoryPosition = () => history().position();
+export const readNavigationContext = <T,>(key: string, fallback: T): T => typeof window === "undefined" ? fallback
+  : (navigationEntry(window.history.state)?.context[key] as T | undefined) ?? fallback;
+export const saveNavigationContext = (key: string, value: unknown) => history().context(key, value);
+
+export const visitWorkspace = (href: string) => {
+  navigateWorkspace(href);
+  window.dispatchEvent(new PopStateEvent("popstate", { state: window.history.state }));
+};

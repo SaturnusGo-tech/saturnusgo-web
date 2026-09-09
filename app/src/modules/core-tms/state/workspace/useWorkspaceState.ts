@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { CaseFilters, Dialog, View } from "../types/workspace";
 import { useWorkspaceBootstrap } from "./useWorkspaceBootstrap";
 import { useSelectedRunResource } from "../run-resource/useSelectedRunResource";
 import { buildWorkspaceDeepLink, readWorkspaceDeepLink } from "../navigation/workspace-deep-link";
-import { WorkspaceNavigationRestoration } from "../navigation/restoration/workspace-navigation-restoration";
+import { useWorkspaceHistory } from "../navigation/browser/useWorkspaceHistory";
+import { useNavigationValue } from "../navigation/context/useNavigationValue";
 import { buildCaseDeepLink, readCaseDeepLink } from "../../test-cases/navigation/case-deep-link";
 import { useSelectedSuiteResource } from "../workspace-resources/useSelectedSuiteResource";
 import { useCaseEditorState } from "../case-editor/useCaseEditorState";
@@ -27,27 +28,20 @@ export function useWorkspaceState() {
   const { data, setData, connection } = bootstrap;
   const [view, setView] = useState<View>("cases");
   const [projectId, setProjectId] = useState("");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useNavigationValue(`cases:${projectId}:query`, "");
   const [selectedCaseId, setSelectedCaseId] = useState("");
   const [selectedSuiteId, setSelectedSuiteId] = useState("");
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [selectedRunItemId, setSelectedRunItemId] = useState<string | null>(null);
-  const navigationRestoration = useRef(new WorkspaceNavigationRestoration());
-  const navigateToView = useCallback((next: View) => {
-    navigationRestoration.current.cancel(); setView(next);
-  }, []);
-  const canWriteNavigation = useCallback(() => navigationRestoration.current.canWrite({
-    workspaceId: data.workspace.id, projectId, view, runId: selectedRunId, caseId: selectedCaseId,
-  }), [data.workspace.id, projectId, view, selectedRunId, selectedCaseId]);
   const [dialog, setDialog] = useState<Dialog>(null);
   const caseEditor = useCaseEditorState(locale, () => {
     setDialog((current) => current === "case" ? null : current);
   });
-  const [selectedFolder, setSelectedFolder] = useState("/Unsorted");
+  const [selectedFolder, setSelectedFolder] = useNavigationValue(`cases:${projectId}:folder`, "/Unsorted");
   const [customFolders, setCustomFolders] = useState<Record<string, string[]>>(
     {},
   );
-  const [caseFilters, setCaseFilters] = useState<CaseFilters>(defaultFilters);
+  const [caseFilters, setCaseFilters] = useNavigationValue<CaseFilters>(`cases:${projectId}:filters`, defaultFilters);
   const [editingSuiteId, setEditingSuiteId] = useState<string | null>(null);
   const [runPresetCaseIds, setRunPresetCaseIds] = useState<string[]>([]);
   const [runPresetSuiteId, setRunPresetSuiteId] = useState("");
@@ -57,6 +51,12 @@ export function useWorkspaceState() {
   const selectedSuite = useSelectedSuiteResource(http, connection === "connected", selectedSuiteId);
   const runResource = useSelectedRunResource({ http, connection, projectId, selectedRunId,
     selectedRunItemId, setSelectedRunItemId, setData });
+
+  const history = useWorkspaceHistory({ workspaceId: data.workspace.id, projectId, view,
+    runId: selectedRunId, caseId: selectedCaseId, ready: connection === "connected" || connection === "demo",
+    setView, setCase: setSelectedCaseId, setRun: setSelectedRunId, setItem: setSelectedRunItemId,
+    closeDialog: () => setDialog(null), reload: bootstrap.retryBootstrap });
+  const canWriteNavigation = history.canWrite;
 
   useEffect(() => {
     if (connection !== "connected" && connection !== "demo") return;
@@ -75,7 +75,7 @@ export function useWorkspaceState() {
       ?? data.runs.find((item) => item.projectId === initialProjectId && item.status === "active" && !item.archivedAt)?.id
       ?? data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id ?? null;
     const initialView = destination.view ?? (linked.caseId ? "cases" : view);
-    navigationRestoration.current.begin({ workspaceId: data.workspace.id,
+    history.begin({ workspaceId: data.workspace.id,
       projectId: initialProjectId, view: initialView, runId: initialRunId, caseId: initialCase?.id ?? "" });
     setView(initialView);
     setProjectId(initialProjectId);
@@ -98,14 +98,14 @@ export function useWorkspaceState() {
       caseId: selected.id,
       projectId: selected.projectId,
     });
-    if (next !== window.location.href) window.history.replaceState(null, "", next);
+    history.write(next);
   }, [connection, data.testCases, data.workspace.id, selectedCaseId, view, canWriteNavigation]);
 
   useEffect(() => {
-    if (!canWriteNavigation() || connection !== "connected" || !projectId || (view === "cases" && selectedCaseId)) return;
+    if (!canWriteNavigation() || (connection !== "connected" && connection !== "demo") || !projectId || (view === "cases" && selectedCaseId)) return;
     const next = buildWorkspaceDeepLink(window.location.href, { workspaceId: data.workspace.id,
       projectId, view, runId: selectedRunId, runItemId: selectedRunItemId });
-    if (next !== window.location.href) window.history.replaceState(window.history.state, "", next);
+    history.write(next);
   }, [connection, projectId, view, selectedRunId, selectedRunItemId, selectedCaseId, data.workspace.id, canWriteNavigation]);
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export function useWorkspaceState() {
   }, [notice]);
 
   return {
-    ...bootstrap, data, setData, connection, view, setView: navigateToView, projectId, setProjectId,
+    ...bootstrap, data, setData, connection, view, setView: history.navigateView, projectId, setProjectId,
     query, setQuery, canWriteNavigation, selectedCaseId, setSelectedCaseId, selectedSuiteId,
     setSelectedSuiteId, selectedRunId, setSelectedRunId, selectedRunItemId,
     setSelectedRunItemId, dialog, setDialog, ...caseEditor, selectedFolder,

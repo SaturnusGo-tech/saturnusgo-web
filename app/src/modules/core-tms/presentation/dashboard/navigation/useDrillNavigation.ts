@@ -1,3 +1,4 @@
+import { navigateWorkspace, readNavigationContext, saveNavigationContext } from "../../../state/navigation/browser/workspace-history";
 import { useEffect, useRef } from "react";
 import type { DashboardDrill } from "../../../dashboards/model/dashboard-analytics";
 import type { WorkbenchKind } from "../../../dashboards/workbench/model/workbench";
@@ -6,12 +7,13 @@ import { drillHref, readDrillRoute, type DrillRoute } from "./drill-route";
 export function useDrillNavigation(model: DashboardModel) {
   const latest = useRef(model); latest.current = model;
   const pending = useRef<DrillRoute | null>(null);
-  const origin = useRef<{ widget: string; button: number; scroll: number } | null>(null);
+  const origin = useRef<{ widget: string; button: number; scroll: number } | null>(readNavigationContext("dashboard:origin", null));
   const remember = () => {
     if (document.querySelector("[data-dashboard-detail]")) return;
     const focused = document.activeElement; const widget = focused?.closest<HTMLElement>("[data-widget-id]");
     origin.current = { widget: widget?.dataset.widgetId ?? "", button: widget ? [...widget.querySelectorAll("button")].indexOf(focused as HTMLButtonElement) : 0,
       scroll: document.querySelector("[data-dashboard-workspace]")?.scrollTop ?? 0 };
+    saveNavigationContext("dashboard:origin", origin.current);
   };
   const restoreFocus = () => requestAnimationFrame(() => {
     const root = document.querySelector<HTMLElement>("[data-dashboard-workspace]"); if (!root || !origin.current) return;
@@ -36,8 +38,8 @@ export function useDrillNavigation(model: DashboardModel) {
   const push = (route: DrillRoute) => {
     remember(); const href = drillHref(window.location.href, route);
     if (href !== window.location.href) {
-      if (document.querySelector("[data-dashboard-detail]")) window.history.replaceState(window.history.state, "", href);
-      else window.history.pushState({ ...window.history.state, falconDashboardDetail: true }, "", href);
+      if (document.querySelector("[data-dashboard-detail]")) navigateWorkspace(href, true, { falconDashboardDetail: Boolean(window.history.state?.falconDashboardDetail) });
+      else navigateWorkspace(href, false, { falconDashboardDetail: true });
     }
     apply(route);
   };
@@ -49,7 +51,7 @@ export function useDrillNavigation(model: DashboardModel) {
   useEffect(() => { if (pending.current) apply(pending.current); }, [model.preferences.ready, model.query.period, model.workbench.filters.environmentId, model.workbench.filters.buildReference]);
   const close = () => {
     if (window.history.state?.falconDashboardDetail) window.history.back();
-    else { window.history.replaceState(window.history.state, "", drillHref(window.location.href, null)); apply(null); }
+    else { navigateWorkspace(drillHref(window.location.href, null), true); apply(null); }
   };
   return { close,
     openAnalytics: (drill: DashboardDrill) => push({ kind: "analytics", origin: drill, selected: drill, period: model.query.period }),

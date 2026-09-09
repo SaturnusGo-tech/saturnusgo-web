@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
+import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
 import shellStyles from "./tms-shell.module.css";
 
@@ -54,6 +55,7 @@ export function WorkspaceHeader({
         <Menu size={19} aria-hidden="true" />
       </button>
 
+      <HistoryControls />
       <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
           {t("header.project")}

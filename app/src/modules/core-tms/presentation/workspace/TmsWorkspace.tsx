@@ -13,11 +13,13 @@ import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
 import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
+import { useHistoryScroll } from "./history/useHistoryScroll";
 import { usePageAppearance } from "./motion/usePageAppearance";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
   const pageRef = usePageAppearance(model.view);
+  useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -36,7 +38,7 @@ function LocalizedWorkspace() {
 
   function changeView(next: typeof model.view) {
     if (next === "cases" && model.dialog !== "case") model.setSelectedCaseId("");
-    if (model.selectedDefectId) model.setSelectedDefectId(null);
+    if (model.selectedDefectId) model.clearDefectSelection();
     if (next === "runs") {
       const activeRun = model.activeProjectRuns[0];
       if (activeRun) {

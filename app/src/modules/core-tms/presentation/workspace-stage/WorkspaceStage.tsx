@@ -1,3 +1,4 @@
+import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { DocumentationEntry } from "../../documentation/presentation/DocumentationEntry";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -36,13 +37,13 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       const runId = row.runId ?? row.id;
       const runItemId = row.runItemId ?? null;
       if (row.projectId === model.project?.id) model.openRun(runId, runItemId);
-      else window.location.assign(buildWorkspaceDeepLink(window.location.href, {
+      else visitWorkspace(buildWorkspaceDeepLink(window.location.href, {
         workspaceId: model.data.workspace.id, projectId: row.projectId, view: "runs", runId, runItemId,
       }));
       return;
     }
     if (row.entity === "defect" && row.projectId !== model.project?.id) {
-      window.location.assign(buildDefectDeepLink(window.location.href, {
+      visitWorkspace(buildDefectDeepLink(window.location.href, {
         projectId: row.projectId, defectId: row.id,
       }));
       return;
@@ -142,7 +143,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} projectId={model.project.id}
     canManage={model.canManageIntegrations} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   return (
-    <ReportsView workspaceId={model.data.workspace.id}
+    <ReportsView workspaceId={model.data.workspace.id} projectId={model.projectId}
       defects={model.reportDefects}
       runs={model.projectRuns}
       links={model.projectLinks}

@@ -1,3 +1,4 @@
+import { navigateWorkspace } from "../navigation/browser/workspace-history";
 import { useCallback } from "react";
 import type { View } from "../types/workspace";
 import { openRunNavigation } from "./open-run-navigation";
@@ -12,7 +13,7 @@ export function useRunNavigation(input: {
   return useCallback((runId: string, runItemId: string | null = null) => {
     openRunNavigation({ workspaceId: input.workspaceId, projectId: input.projectId, runId, runItemId }, {
       href: window.location.href,
-      replace: (href) => window.history.replaceState(window.history.state, "", href),
+      replace: (href) => navigateWorkspace(href),
       clearDefect: input.clearDefectSelection,
       selectRun: input.setSelectedRunId,
       selectItem: input.setSelectedRunItemId,
