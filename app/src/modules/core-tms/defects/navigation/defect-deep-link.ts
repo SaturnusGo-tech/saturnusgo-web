@@ -19,7 +19,10 @@ export function buildDefectDeepLink(
   url.searchParams.delete(LEGACY_DEFECT_ID_PARAM);
   if (input.defectId) {
     url.hash = "";
-    for (const name of ["caseId", "runId", "runItemId", "integration"]) url.searchParams.delete(name);
+    const workspaceId = url.searchParams.get("workspaceId");
+    url.search = "";
+    if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
+    url.searchParams.set("projectId", input.projectId);
     url.searchParams.set("view", "reports");
     url.searchParams.set(DEFECT_ID_PARAM, input.defectId);
   } else {

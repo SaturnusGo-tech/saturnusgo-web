@@ -16,7 +16,7 @@ export function useWorkspaceHistory(input: Input) {
   const restoration = useRef(new WorkspaceNavigationRestoration());
   const replace = useRef(true);
   const begin = useCallback((selection: Selection) => { replace.current = true; restoration.current.begin(selection); }, []);
-  const navigateView = useCallback((view: View) => { restoration.current.cancel(); latest.current.setView(view); }, []);
+  const navigateView = useCallback((view: View) => { replace.current = false; restoration.current.cancel(); latest.current.setView(view); }, []);
   const canWrite = useCallback(() => restoration.current.canWrite(input), [input.workspaceId, input.projectId, input.view, input.runId, input.caseId]);
   const write = useCallback((href: string) => { const current = new URL(window.location.href); const next = new URL(href);
     const resolvingFirstItem = current.searchParams.get("view") === "runs" && next.searchParams.get("view") === "runs"
