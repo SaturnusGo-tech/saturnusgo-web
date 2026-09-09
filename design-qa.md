@@ -179,3 +179,25 @@ Final media acceptance: the official Recordly application saved both replacement
 Final local landing acceptance: all five final video sources passed manual Play, seek and fullscreen checks. The integration strip and 1600/1024/768/390/320 px layouts passed, including reduced motion; there were no JavaScript errors or failed Falcon asset responses. Evidence: `../output/falcon-player-youtrack-20260909/local-refinement-qa.json` and its desktop/mobile captures.
 
 final result: passed locally; production release checked separately
+
+
+## Guided cursor, real smoke run and deliberate covers — 2026-09-09
+
+This section supersedes the preceding revision's hidden-cursor compositions and random-frame posters. Scope is the three landing media triplets and their content/asset manifests: `runs` → `runs-smoke`, `defects-context` → `defects-guided`, `youtrack-workflow` → `youtrack-guided`. Player logic, scroll motion and run-loading behavior are unchanged in this revision.
+
+### Composition and factual content
+
+- The new smoke recording uses a dedicated suite, «Смоук релиза — обзор Falcon», containing 100 existing ready cases, HOST-TC-1 through HOST-TC-100. It opens the suite, shows the launch drawer, creates a real run and opens HOST-TC-8. The submitting state is retained, and progress stays 0/100 because no execution result is changed. The demonstration run is archived after recording; its presence in the real History view was checked and the active-run count returned to its prior value of four. The count belongs to this recorded scope, not to every Falcon project.
+- Both guided recordings show the actual Falcon/YouTrack context established in the preceding capture. Existing connection settings, routing and issue Stage are inspected; no token, route, tracker status or production execution result is changed for those flows.
+- Visible cursor motion and click ripples follow recorded coordinates. The integration composition includes six recorded clicks; the defect composition includes one. Smoke captures the four suite/launch/submit/case-selection clicks. Smooth camera focus is retained. Only the two cross-service YouTrack transitions dissolve for 200 ms; Falcon-local scenes and the smoke flow do not crossfade.
+- `youtrack-guided` delivery reports 42.7 seconds / 2,562 frames / 9,084,956 bytes. `defects-guided` reports 16.233333 seconds / 974 frames / 4,823,907 bytes. Both official exports are H.264, 1600 × 900 at 60 fps, silent. `runs-smoke` reports 29.233333 seconds / 1,754 frames / 5,701,731 bytes with the same format. All three triplets and covers are installed; final publication acceptance remains a separate check.
+
+### Covers
+
+The reviewed smoke and YouTrack covers are deliberate 16:9 HTML/CSS/SVG artwork in Falcon's existing graphite atmosphere, silver wing and Geist typography. They use the real Falcon/YouTrack marks, quiet technical linework, short titles and an empty center reserved for the real Play button. They contain no fabricated product UI, run statistics or baked playback button.
+
+The old defect poster was inspected: it showed a cropped execution view and an overlaid caption rather than a clean defect context. `defects-guided.webp` therefore uses a matching «Контекст дефекта / От ошибки к тесту» cover. The primary two source covers are `covers/smoke-run-cover.webp` and `covers/youtrack-cover.webp`; the third is `covers/defects-cover.webp`, all retained with editable sources under `../output/falcon-cursor-smoke-20260909/`.
+
+All three covers were inspected at a 920 px frame and 390/320 px viewport widths, with the actual 72/58 px Play control sizes. Headline/subtitle content stays outside the button, original marks retain their shape, and no horizontal page overflow was found. Source and previews are retained in `covers/preview-{1040,390,320}.png`; the following full media/browser acceptance must use the final installed files rather than these cover-only previews.
+
+Current local verification after all three exports/posters/captions were installed: 49/49 public/auth tests, 43/43 Worker tests, typecheck (exit 0) and the 607-file architecture check passed. Eleven runtime checks passed all five manual players with seeking/fullscreen, the eleven-brand strip, 1600/1024/768/390/320 px layouts and reduced motion, with zero reported errors. Evidence: `../output/falcon-cursor-smoke-20260909/local-refinement-qa.json`. Installed-cover and timeline browser acceptance are tracked separately. No build or production deployment result is claimed here.

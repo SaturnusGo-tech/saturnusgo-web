@@ -4,9 +4,9 @@ The public landing presents five recordings of the Falcon interface. Recordly 1.
 
 ## September 2026 refinement
 
-The current revision keeps the dashboard, case and run-builder recordings. It replaces both the earlier catalog/report-only YouTrack demonstration and the defect recording with new captures that show the existing connection, the actual linked YouTrack issue and the original failed execution. The replacement stems are `youtrack-workflow` and `defects-context`; their source frames and cursor telemetry are captured from the real interface. Both replacement exports were rendered by the official Recordly application and visually inspected. Publication remains a separate release-pipeline check.
+The current revision keeps the dashboard and case recordings. Three new stems identify the updated run, defect and integration demonstrations: `runs-smoke`, `defects-guided` and `youtrack-guided`. They use recorded interface frames, visible cursor motion and click ripples, composed with Recordly's approved Smooth camera. Dissolves are reserved for transitions between Falcon and YouTrack; navigation within Falcon does not crossfade.
 
-The preceding `youtrack-demo` revision was exported successfully by the official Recordly application: 2,302 frames at 60 fps, rendered with WebGPU, with `phase: saved`. Its duration was 38.3666667 seconds. Those figures describe the superseded clip, not the new `youtrack-workflow` export.
+The run and YouTrack posters are purpose-built title artwork rather than arbitrary screenshots. The defect poster uses the same cover system. Final media/browser acceptance and publication are recorded separately from source preparation; historical results below describe their named revisions.
 
 The video frame is capped at 920 px on desktop and fits the available width on smaller screens. Playback is manual for every video. Numbered chapter labels have been removed, and the page copy describes the product actions shown.
 
@@ -20,19 +20,33 @@ Keep the wording grounded in the Falcon guide: dashboard customization and drill
 
 ## Video assets
 
-Assets live in `public/falcon/landing/2026-09/`. Each demonstration has a silent H.264 MP4, a WebP poster extracted from its final export and Russian WebVTT descriptions. Update the poster, transcript and captions together whenever the recording changes.
+Assets live in `public/falcon/landing/2026-09/`. Each demonstration has a silent H.264 MP4, a WebP poster and Russian WebVTT descriptions. Dashboard/case posters come from their exports; the three replacements use deliberate title covers. Update the poster, transcript and captions together whenever the recording changes.
 
 | Asset stem | Flow | Duration / status |
 | --- | --- | --- |
 | `dashboard` | Current work, freshness values, runs and risks, defects, return | Existing recording, 23.25 s |
 | `cases` | Search for a case, open, expand, inspect steps, return | Existing recording, 23.43 s |
-| `runs` | Open a suite’s run builder, fill name/build, inspect type and scope | Existing recording, 21.42 s |
-| `defects-context` | Inspect HOST-BUG-019, its tracker backlink/context and the original run with the failed step | 15.333333 s, 920 frames |
-| `youtrack-workflow` | Inspect the existing connection and tag routing, open HOST-BUG-019 and the actual YouTrack issue, return to Falcon and open the original failed execution | 41.4 s, 2,484 frames |
+| `runs-smoke` | Open the dedicated 100-case smoke suite, configure and create a real run, inspect HOST-TC-8 at 0/100 | 29.233333 s, 1,754 frames |
+| `defects-guided` | Inspect HOST-BUG-019, its tracker backlink/context and the original run with the failed step | 16.233333 s, 974 frames |
+| `youtrack-guided` | Inspect the existing connection and tag routing, open HOST-BUG-019 and the actual YouTrack issue, return to Falcon and open the original failed execution | 42.7 s, 2,562 frames |
 
-The replacement public files use `youtrack-workflow.{mp4,webp,vtt}` and `defects-context.{mp4,webp,vtt}`. Keep the three representations in each set aligned with the final Recordly export. Both are H.264, 1600 × 900 at 60 fps. `youtrack-workflow.mp4` is 8,066,469 bytes with a poster at 2.4 seconds; `defects-context.mp4` is 3,687,953 bytes with a poster at 11.9 seconds. Their new names prevent cached copies of the earlier recordings from being reused. The earlier `defects.*`, `youtrack-demo.*` and catalog/Slack `integrations.*` sets are superseded for these two landing positions. For historical identification only, `youtrack-demo.mp4` was 3,957,757 bytes and used a poster at 13.8 seconds; do not apply those measurements or cue times to the replacements.
+The public replacement sets are `runs-smoke.{mp4,webp,vtt}`, `defects-guided.{mp4,webp,vtt}` and `youtrack-guided.{mp4,webp,vtt}`. Keep each video, transcript and caption timeline aligned with its final export. All three delivery reports confirm official Recordly saves, H.264 at 1600 × 900 / 60 fps and no audio: `runs-smoke.mp4` is 5,701,731 bytes; `youtrack-guided.mp4` is 9,084,956 bytes; `defects-guided.mp4` is 4,823,907 bytes. These values describe the delivered files, not production acceptance.
 
-The retained recordings use the owner’s authorized Umbrella Host QA project. The run-builder recording ends before submission. Those captures did not create runs, modify cases, change integration settings or send notifications.
+The replaced `runs.*`, `defects-context.*` and `youtrack-workflow.*` triplets have no remaining runtime consumers after the manifest/content update and were removed from public assets after all replacements were installed. Their editable historical masters remain outside the repository. Older `defects.*`, `youtrack-demo.*` and catalog/Slack `integrations.*` files are outside this three-triplet cleanup.
+
+The retained dashboard/case recordings use the owner's authorized Umbrella Host QA project and did not change cases or send notifications. The new smoke recording intentionally creates a real suite/run as described below; it must not be described as stopping before submission.
+
+### Smoke capture and data lifecycle
+
+A separate suite named **«Смоук релиза — обзор Falcon»** contains exactly 100 existing ready cases, `HOST-TC-1` through `HOST-TC-100`. This is a selected demonstration scope, not a claim that every project has 100 cases and not a set of newly generated tests.
+
+The recording opens this suite from the catalog, shows its 100-case composition and opens the run drawer. The drawer shows Host QA, local-current and the smoke type. Clicking «Запустить прогон» creates a real demonstration run; the recorded submitting state is preserved. The run opens at **0/100**, and `HOST-TC-8` is selected to show its description and steps. No step or case execution result is changed. After recording, the demonstration run is archived so it does not remain in the active QA queue. The suite retains its existing case references. Archive status was checked in the real History view; the active-run count returned to its prior value of four.
+
+### Designed poster covers
+
+`runs-smoke.webp` uses «Смоук релиза / От сьюта к прогону»; `youtrack-guided.webp` uses «Falcon × YouTrack / От дефекта к проверке». `defects-guided.webp` uses «Контекст дефекта / От ошибки к тесту». Each is a 1600 × 900 HTML/CSS/SVG composition with the existing Falcon graphite atmosphere, silver wing, Geist typography and a free center for the real Play control. The YouTrack mark is the existing catalog SVG. The suite/document paths are abstract illustrations, not simulated product UI or invented run results. No Play button is baked into the poster and no case count appears on a cover.
+
+Editable sources, dependency assets, render scripts and responsive previews live at `../output/falcon-cursor-smoke-20260909/covers/`. `smoke-run-cover.webp` and `youtrack-cover.webp` are the reviewed source covers; they map to the public poster names above. The earlier defect poster was a cropped run-step image with captions, so it is replaced with `defects-cover.webp` from this same system.
 
 ### YouTrack capture and factual boundaries
 
@@ -47,7 +61,7 @@ The new recording follows these real screens:
 
 These are inspections of an already configured connection. No new token is entered, no route is saved, no YouTrack status is changed, and no production run result is changed. A visible Stage is current recorded state, not evidence that the recording performed a synchronization or completed a retest. Token contents must remain masked in the source frames, the Recordly focus regions, the poster and the final export. No credentials belong in captions or transcripts.
 
-`defects-context` reuses captured chapters 03, 06 and 07 to show the report and its original execution context. The old empty-state flash must not remain in either replacement. Inspect the finished exports, including chapter transitions, before publishing to confirm masking, framing, readable issue/step context and the absence of loading artifacts.
+`defects-guided` reuses captured chapters 03, 06 and 07 to show the report and its original execution context. The old empty-state flash must not remain in either replacement. Inspect the finished exports, including chapter transitions, before publishing to confirm masking, framing, readable issue/step context and the absence of loading artifacts.
 
 ## Continuous background and motion
 
@@ -73,7 +87,7 @@ One accessible list describes the eleven brands. Any duplicate list used for a c
 
 ## Editable masters
 
-The original captures, cursor telemetry, scene timing, editable `.recordly` projects, full-quality exports and Recordly export reports are stored outside the deployed repository. Dashboard, cases and run-builder remain in use; the original defect master is retained for historical reference:
+The original captures, cursor telemetry, scene timing, editable `.recordly` projects, full-quality exports and Recordly export reports are stored outside the deployed repository. Dashboard and cases remain in use; the original run-builder and defect masters are retained for historical reference:
 
 `../output/falcon-landing-20260909/{dashboard,cases,runs,defects}-recordly/`
 
@@ -85,13 +99,17 @@ The preceding catalog/report-only YouTrack master is retained for historical ref
 
 This folder retains `source.mp4`, `source.mp4.cursor.json`, `scenes.json`, the editable `Falcon-youtrack.recordly` project, the full-quality `falcon-youtrack.mp4` export and `falcon-youtrack.mp4.report.json`. The report confirms a successful save of that earlier revision. Its compressed public files used `youtrack-demo.*`.
 
-The current capture and assembly workspace is:
+The current composition and delivery workspace is:
 
-`../output/falcon-player-youtrack-20260909/`
+`../output/falcon-cursor-smoke-20260909/`
 
-Real source frames and cursor telemetry live in `capture/<chapter>/`. `build-demo.mjs` validates the capture manifest, assembles the recorded frames and creates editable Recordly projects. The integration master is `youtrack-workflow-recordly/` with output ID `youtrack-workflow`; the shorter report/execution composition uses output ID `defects-context`. Read the workspace `README.md` for the capture contract and export commands.
+Each ID has a manifest and an editable master folder: `runs-smoke-recordly/`, `defects-guided-recordly/` and `youtrack-guided-recordly/`. Guided videos reuse the authorized real frames at `../output/falcon-player-youtrack-20260909/capture/<chapter>/`; the new smoke capture and its manifest are retained in the current workspace. `delivery.json` records each final file's measurements and the official Recordly report. Keep those files, the editable project, capture frames and cursor telemetry together.
 
-Assembly preserves recorded timing and maps actual cursor coordinates through the crop. Short chapter crossfades and authored native Recordly captions explain the visible actions; captions are not a transcript of audio because the recordings are silent. No product UI or cursor events are generated. Some source chapters contain no pointer telemetry, so both new compositions hide the synthetic cursor throughout rather than invent motion. The actual recorded UI focus/click changes remain visible. Source screenshots retain their capture cadence; 60 fps describes the final Recordly camera/caption composition, not the screenshot acquisition rate. After an official Recordly export, retain the report, `delivery.json`, representative review frames, editable project and source files together. Both final reports confirm `success: true`, `phase: saved`, modern pipeline and WebGPU rendering. Review checks covered masked token contents, all routing rows, whole-page YouTrack context, unobscured links/buttons at clicks, readable expected/actual results and the 200 ms service transitions. Native captions use a single compact row; the previous two-row setting incorrectly grouped neighboring chapter cues and was corrected before publication.
+The visible cursor follows actual recorded coordinates, and recorded clicks receive a ripple. No extra user action is invented to make the video appear interactive. The integration composition contains six recorded clicks and the defect composition one; the smoke flow records the suite, launch, submit and case-selection clicks. Chapters without recorded motion do not gain fabricated pointer gestures. Smooth camera focus preserves the recorded target positions through the crop.
+
+Only the transitions from Falcon to YouTrack and back use a 200 ms dissolve. The guided defect recording and the smoke flow have no service transitions and no dissolves. The original transient empty run frame is excluded from the guided source trim, while the application loading fix independently prevents that false state during live navigation. Real submitting/loading feedback remains visible where it belongs in the smoke flow.
+
+Source screenshots retain their capture cadence; 60 fps describes Recordly's camera/cursor/caption composition, not the screenshot acquisition rate. Native captions describe visible actions and clear before important clicks; they are not audio transcription because the videos are silent. Final review must include click alignment, masked token contents, routing, the YouTrack issue/Stage, readable expected/actual results and the completed smoke scope. Historical `youtrack-workflow-recordly/` and `defects-context-recordly/` masters remain in the preceding output workspace and are not the guided delivery files.
 
 The original output directory also retains `capture.mjs`, `normalize-source.mjs` and `export-demo.mjs`. FFmpeg assembles/normalizes real source frames, compresses the finished Recordly export and extracts posters. Recordly provides the approved zoom/cursor composition; its source code is not bundled into Falcon.
 
@@ -118,7 +136,7 @@ Archived deep links select History synchronously rather than showing the active-
 
 ## Verification
 
-Current run-loading validation, performed locally before export and deployment acceptance:
+Baseline validation of the preceding player/run-loading revision, before this cursor/smoke/cover replacement:
 
 | Check | Result |
 | --- | --- |
@@ -134,7 +152,7 @@ The browser harness uses the real run stage, resource hook, navigator, DTO mappe
 
 The timeline helper's eight regression cases passed, covering frame sampling, buffering, paused seeking, ending, pointer ownership, hidden pages, cleanup and invalid metadata. The seven existing manual-playback browser regressions also passed. A local browser sample recorded 120 distinct thumb values over 120 display frames, while only eight `timeupdate` events fired; maximum difference from sampled `currentTime` was 0.000146 seconds, with zero React commits during the playback sample. Mouse, keyboard and touch seeking, pause/end/restart, fullscreen and offscreen behavior were checked. These measurements are local observations, not a production performance guarantee.
 
-Timeline evidence and scripts are retained at `../output/falcon-player-timeline-20260909/`, including `timeline-browser-qa.json` and `manual-playback-qa.json`; reported page errors were empty. Independent changed-source review found no concrete P1/P2 issues. Recheck the controls against both final replacement media files after export. Neither the current local checks nor the earlier suites below establishes acceptance of newly exported media or production deployment.
+Timeline evidence and scripts are retained at `../output/falcon-player-timeline-20260909/`, including `timeline-browser-qa.json` and `manual-playback-qa.json`; reported page errors were empty. Independent changed-source review found no concrete P1/P2 issues. Recheck the controls against all three final replacement media files after export. Neither the current local checks nor the earlier suites below establishes acceptance of newly exported media or production deployment.
 
 Confirmed checks for the preceding media refinement (`dd56b5b4`), before the product-story and continuous-scroll changes:
 
@@ -157,6 +175,13 @@ Local verification of the product-story revision passed 41 public/auth tests, 41
 
 Real wheel events and native anchor navigation were tested separately at 1440, 1000, 768 and 390 px. This caught and corrected an independent body scroller that programmatic document scrolling did not expose. `scroll-owners-qa.mjs` covers the actual owner, a direct section hash before hydration, repeated movement, responsive owner changes and reduced-motion preferences. `scroll-motion-qa.mjs` separately measures spring continuity and the stationary central interval. Inspect the five introductions at desktop and mobile widths and recheck manual playback during those movements whenever their layout or motion changes.
 
-Run the broader `refinement-qa` browser checks against both the local server and the published public URL, without signing in or mutating data. They exercise all five videos, play/seek/fullscreen controls, responsive layouts and the integration strip. Record those browser results and deployment outcomes in the release report separately from the confirmed checks above. Versioned `youtrack-workflow.*` and `defects-context.*` filenames prevent older integration/defect media from being mistaken for the replacements.
+Run the broader `refinement-qa` browser checks against both the local server and the published public URL, without signing in or mutating data. They exercise all five videos, play/seek/fullscreen controls, responsive layouts and the integration strip. Record those browser results and deployment outcomes in the release report separately from the confirmed checks above. Versioned `runs-smoke.*`, `youtrack-guided.*` and `defects-guided.*` filenames prevent older media from being mistaken for the replacements.
 
-Current replacement-media acceptance: both MP4s fully decoded without errors and their final review frames passed. With the installed assets, all 49 public/auth tests passed. The local landing browser suite passed eleven checks covering all five manual players, seeking/fullscreen, the brand strip, 1600/1024/768/390/320 px layouts and reduced motion, with no page errors or failed asset requests. Evidence is retained in `../output/falcon-player-youtrack-20260909/local-refinement-qa.json`. Production release and response-byte verification are recorded separately after publication.
+Preceding `youtrack-workflow` / `defects-context` media acceptance: both MP4s fully decoded without errors and their final review frames passed. With the installed assets, all 49 public/auth tests passed. The local landing browser suite passed eleven checks covering all five manual players, seeking/fullscreen, the brand strip, 1600/1024/768/390/320 px layouts and reduced motion, with no page errors or failed asset requests. Evidence is retained in `../output/falcon-player-youtrack-20260909/local-refinement-qa.json`. Production release and response-byte verification are recorded separately after publication.
+
+
+Current cursor/smoke/cover local acceptance: all three replacement triplets are installed. The new revision passed 49/49 public/auth tests, 43/43 Worker tests, typecheck (exit 0) and the 607-file architecture check. Its eleven runtime checks passed all five manual players, seeking/fullscreen, the eleven-brand strip, 1600/1024/768/390/320 px layouts and reduced motion, with zero reported errors. Evidence is retained at `../output/falcon-cursor-smoke-20260909/local-refinement-qa.json`.
+
+All three covers were also visually checked in a 920 px frame and at 390/320 px viewport widths with the real Play control dimensions. Additional installed-cover and timeline browser checks are tracked separately. Build and production results are not claimed here; the release owner records them after those steps complete.
+
+Installed-cover verification passed for all three new posters before playback, with the real Play control visible and currentTime 0. The local timeline check again recorded 120 distinct positions in 120 display frames, with eight timeupdate events, zero React commits and no page errors; mouse, keyboard and touch seek, pause/end/restart and fullscreen passed. Current evidence is retained at `../output/falcon-cursor-smoke-20260909/local-cover-qa.json` and `timeline-browser-qa.json`. Production build and byte-for-byte release acceptance are recorded in the external release report after deployment.
