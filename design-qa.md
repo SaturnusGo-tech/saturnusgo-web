@@ -20,4 +20,6 @@ Interaction checks: query filtering; facet reset; Escape restores filter-button 
 
 Local fixture UI was used for dense, empty and failure states; the temporary harness was removed from the shipping app and retained only with QA artifacts. No production fixture route is published. Production verification found a long component rail, which now scrolls independently and brings the selected component into view. Execution counts have their own Checks tab rather than being labelled as run counts. A real failed check opened its exact run and run-item URL. Production screenshots are recorded in the release report.
 
+The final rail search height was measured at 36 px; remaining rail space is reserved for its independently scrolling navigation.
+
 Open P0/P1/P2 visual issues: none at the verified desktop viewport.

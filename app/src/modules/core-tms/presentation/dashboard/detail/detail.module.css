@@ -39,7 +39,7 @@
 .footer { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; min-height: 58px; }
 .rail { width: 226px; flex: 0 0 226px; padding: 29px 15px; border-right: 1px solid var(--line); background: var(--canvas); }
 .rail h2 { font-size: 13px; font-weight: 550; margin: 0 10px 23px; }
-.rail .search { margin-bottom: 15px; }
+.rail .search { margin-bottom: 15px; flex: 0 0 36px; }
 .rail nav { display: flex; flex-direction: column; gap: 5px; }
 .rail nav button { display: flex; align-items: center; gap: 10px; border: 0; border-radius: 7px; min-height: 35px; padding: 8px 10px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
 .rail nav button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
