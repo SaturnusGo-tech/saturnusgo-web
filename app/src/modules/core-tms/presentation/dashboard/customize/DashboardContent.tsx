@@ -7,9 +7,7 @@ import type { DashboardPeriod } from "../../../dashboards/model/dashboard-analyt
 import type { DashboardLayoutModel } from "../../../dashboards/layout/application/useDashboardLayout";
 import type { DashboardViewProps } from "../dashboard-view";
 import { widgetKey } from "../../../dashboards/layout/model/widget-catalog";
-import { DashboardDrillInspector } from "../inspector/DashboardDrillInspector";
 import { WorkbenchContextBar } from "../workbench/controls/WorkbenchContextBar";
-import { WorkbenchDrillInspector } from "../workbench/inspector/WorkbenchDrillInspector";
 import { WidgetGrid } from "./grid/WidgetGrid";
 import type { DashboardModel } from "./model/useDashboardModel";
 import { WidgetRenderer } from "./render/WidgetRenderer";
@@ -18,12 +16,10 @@ import { dashboardSections, widgetSection, sectionMoveTarget, sectionLabels } fr
 import surface from "../dashboard.module.css";
 import styles from "./layout.module.css";
 
-export function DashboardContent({ data, projectId, onOpenEntity, onOpenRow,
-  onCreateRun, layout, model }: DashboardViewProps & { layout: DashboardLayoutModel; model: DashboardModel }) {
+export function DashboardContent({ onOpenRow, layout, model }: DashboardViewProps & { layout: DashboardLayoutModel; model: DashboardModel }) {
   const { languageTag, t, locale } = useTmsLocale();
-  const { analytics, workbench, snapshot, preferences, query } = model;
+  const { analytics, workbench, snapshot, preferences } = model;
   const { period, filtersOpen } = preferences.value;
-  const currentProject = data.projects.find((project) => project.id === projectId)?.name ?? projectId;
   const updatedAt = snapshot ? new Intl.DateTimeFormat(languageTag, {
     day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
   }).format(new Date(snapshot.generatedAt)) : null;
@@ -59,16 +55,6 @@ export function DashboardContent({ data, projectId, onOpenEntity, onOpenRow,
       </section>)}
     </div>
     {updatedAt && <p className={surface.updatedAt}>{t("dashboard.historicalUpdated", { date: updatedAt })}</p>}
-    <WorkbenchDrillInspector model={workbench} onOpenRow={onOpenRow} />
-    {analytics.drill.selected && analytics.drill.origin && <DashboardDrillInspector
-      query={query} origin={analytics.drill.origin} selected={analytics.drill.selected} page={analytics.drill.page}
-      loading={analytics.drill.loading} error={analytics.drill.error}
-      scopeLabel={analytics.drill.origin.projectId
-        ? data.projects.find((item) => item.id === analytics.drill.origin?.projectId)?.name ?? currentProject
-        : currentProject}
-      onSelectDrill={analytics.selectRelatedDrill} onOpenEntity={onOpenEntity}
-      onOpenRow={onOpenRow} onCreateRun={onCreateRun}
-      onClose={analytics.closeDrill} onRetry={analytics.retryDrill} onLoadMore={analytics.loadMore}
-    />}
+
   </>;
 }

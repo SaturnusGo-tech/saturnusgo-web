@@ -1,33 +1,52 @@
+import { useMemo, useState } from "react";
+import type { Bootstrap } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import type { DashboardWorkbenchModel } from "../../../../dashboards/workbench/application/useDashboardWorkbench";
+import type { WorkbenchKind } from "../../../../dashboards/workbench/model/workbench";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
-import { Modal } from "../../../common/modal/Modal";
-import { WorkbenchStatus } from "../controls/WorkbenchStatus";
-import { WorkbenchRows } from "../rows/WorkbenchRows";
-import styles from "../workbench.module.css";
-
-export function WorkbenchDrillInspector({ model, onOpenRow }: {
-  model: DashboardWorkbenchModel; onOpenRow: (row: DashboardDrillRow) => void;
+import { DetailPage, DetailState, DetailFooter } from "../../detail/DetailPage";
+import { DetailToolbar, emptyDetailFilters, type DetailSort } from "../../detail/toolbar/DetailToolbar";
+import { sortDetailRows } from "../../detail/toolbar/sort-rows";
+import { filterDashboardRows } from "../../inspector/dashboard-drill-navigation";
+import { DashboardDrillTable } from "../../inspector/table/DashboardDrillTable";
+import { GroupedChecks } from "../../detail/groups/GroupedChecks";
+import { groupRunRecords } from "../../detail/groups/group-records";
+import { compactRunTitle } from "../rows/title/compact-run-title";
+import styles from "../../detail/detail.module.css";
+const checkTabs: WorkbenchKind[] = ["notRunItems", "inProgressItems", "outdatedItems", "runsWithoutBuild", "blockedItems"];
+export function WorkbenchDrillInspector({ model, data, scopeLabel, onOpenRow, onOpenSection, onBack }: {
+  model: DashboardWorkbenchModel; data: Bootstrap; scopeLabel: string; onOpenRow: (row: DashboardDrillRow) => void;
+  onOpenSection: (defects: boolean) => void; onBack: () => void;
 }) {
-  const { t } = useTmsLocale();
-  const drill = model.drill;
+  const { locale, t } = useTmsLocale(); const ru = locale === "ru";
+  const [filters, setFilters] = useState(emptyDetailFilters); const [sort, setSort] = useState<DetailSort>("recent");
+  const drill = model.drill; const queue = drill?.page?.queue;
+  const allRows = useMemo(() => queue?.rows.map(item => ({ ...item.navigation,
+    ...(item.navigation.entity === "run" ? { title: compactRunTitle(item.navigation.title, item.navigation.project, item.buildReference), progress: item.progress } : {}),
+  })) ?? [], [queue]);
+  const rows = useMemo(() => sortDetailRows(filterDashboardRows(allRows, filters), sort), [allRows, filters, sort]);
   if (!drill) return null;
-  const queue = drill.page?.queue;
-  return <Modal sheet adaptiveSheet title={t(`dashboardWorkbench.${drill.kind}`)}
-    subtitle={t("dashboardWorkbench.currentSnapshot")} onClose={model.closeDrill} panelClassName={styles.inspector}>
-    <div className={styles.drillBody} aria-busy={drill.loading}>
-      <WorkbenchStatus loading={drill.loading} error={drill.error} hasSnapshot={Boolean(drill.page)}
-        onRetry={model.retryDrill} />
-      {queue && <>
-        <div className={styles.drillCount}>
-          <span>{t("dashboardWorkbench.loadedRows", { shown: queue.rows.length, total: queue.total })}</span>
-          <button type="button" onClick={model.refreshDrill} disabled={drill.loading}>{t("dashboardWorkbench.refreshList")}</button>
-        </div>
-        <WorkbenchRows queue={queue} detail onOpenRow={(row) => { model.closeDrill(); onOpenRow(row); }} />
-        {drill.page?.nextCursor && !drill.error && <button type="button" className={styles.loadMore}
-          onClick={model.loadMore} disabled={drill.loading}>{t("dashboardWorkbench.loadMore")}</button>}
-        <p className={styles.truncation}>{t("dashboardWorkbench.livePages")}</p>
-      </>}
+  const checks = checkTabs.includes(drill.kind); const defects = ["openDefects", "readyForRetest"].includes(drill.kind);
+  const grouped = checks && drill.kind !== "runsWithoutBuild";
+  const labels: Partial<Record<WorkbenchKind, string>> = ru
+    ? { notRunItems: "Не начаты", inProgressItems: "Выполняются", outdatedItems: "Новые редакции", runsWithoutBuild: "Без сборки", blockedItems: "Заблокированы" }
+    : { notRunItems: "Not started", inProgressItems: "In progress", outdatedItems: "New revisions", runsWithoutBuild: "Without a build", blockedItems: "Blocked" };
+  const selectedContext = [scopeLabel, model.snapshot?.choices.environments.find(item => item.id === model.filters.environmentId)?.name, model.filters.buildReference].filter(Boolean).join(" · ");
+  return <DetailPage title={checks ? (ru ? "Актуальность проверок" : "Check freshness") : t(`dashboardWorkbench.${drill.kind}`)}
+    context={selectedContext} count={checks ? undefined : queue?.total} onBack={onBack}
+    action={{ label: ru ? defects ? "Открыть отчёты" : "Все прогоны" : defects ? "Open reports" : "All runs", onClick: () => onOpenSection(defects) }}>
+    {checks && <nav className={styles.tabs} aria-label={ru ? "Актуальность проверок" : "Check freshness"}>
+      {checkTabs.map(kind => <button type="button" key={kind} aria-current={drill.kind === kind ? "page" : undefined}
+        onClick={() => model.openDrill(kind)}>{labels[kind]}{model.snapshot && <span>{model.snapshot.queues[kind].total}</span>}</button>)}
+    </nav>}
+    <DetailToolbar rows={allRows} filters={filters} onFilters={setFilters} sort={sort} onSort={setSort} partial={Boolean(drill.page?.nextCursor)} />
+    <div aria-busy={drill.loading}>
+      <DetailState loading={drill.loading && !drill.page} error={drill.error ? t(`dashboardWorkbench.error.${drill.error.kind}`) : null}
+        empty={Boolean(queue) && !rows.length} filtered={Boolean(filters.query || Object.entries(filters).some(([key, value]) => key !== "query" && value.length))} onRetry={model.retryDrill} />
+      {grouped ? <GroupedChecks groups={groupRunRecords(rows, data)} onOpenRow={onOpenRow} />
+        : <DashboardDrillTable rows={rows} onOpenRow={onOpenRow} prioritySort={sort === "priority_desc" ? "desc" : sort === "priority_asc" ? "asc" : null}
+          onPrioritySort={() => setSort(value => value === "priority_desc" ? "priority_asc" : "priority_desc")} />}
     </div>
-  </Modal>;
+    {queue && <DetailFooter shown={rows.length} total={queue.total} more={Boolean(drill.page?.nextCursor) && !drill.error} loading={drill.loading} onMore={model.loadMore} />}
+  </DetailPage>;
 }

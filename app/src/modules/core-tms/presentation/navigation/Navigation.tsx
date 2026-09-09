@@ -56,6 +56,13 @@ export function Navigation({
   activeRunCount: number;
 }) {
   const { locale, t } = useTmsLocale();
+  const navigate = (next: View) => {
+    if (next === "dashboard" && view === "dashboard" && window.location.search.includes("dashboardDetail=")) {
+      const url = new URL(window.location.href); url.searchParams.delete("dashboardDetail");
+      window.history.pushState(null, "", url); window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+    onChange(next);
+  };
   return (
     <nav
       id="tms-navigation"
@@ -66,7 +73,7 @@ export function Navigation({
         <button
           type="button"
           className={shellStyles.brandButton}
-          onClick={() => onChange("dashboard")}
+          onClick={() => navigate("dashboard")}
           aria-label={t("header.dashboardAria")}
           title={t("header.dashboardAria")}
         >
@@ -93,7 +100,7 @@ export function Navigation({
               className={`${shellStyles.navigationItem} ${
                 active ? shellStyles.navigationItemActive : ""
               }`}
-              onClick={() => onChange(item.id)}
+              onClick={() => navigate(item.id)}
               disabled={disabled && item.id !== "help"}
               aria-label={accessibleLabel}
               aria-current={active ? "page" : undefined}

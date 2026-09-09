@@ -1,0 +1,16 @@
+.group { margin-bottom: 22px; }
+.group > header { display: flex; align-items: center; gap: 24px; min-height: 50px; border-bottom: 1px solid var(--line); }
+.toggle { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 8px 0; color: var(--ink); border: 0; background: transparent; text-align: left; cursor: pointer; }
+.toggle strong { font-size: 13px; font-weight: 550; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.toggle > span { color: var(--muted); font-size: 11px; }
+.toggle > svg { flex-shrink: 0; color: var(--muted); }
+.toggle > svg[data-closed="true"] { transform: rotate(-90deg); }
+.open { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; border: 0; border-radius: 6px; padding: 6px; background: transparent; cursor: pointer; white-space: nowrap; }
+.open:hover { color: var(--ink); background: var(--control-hover); }
+.rows { padding-left: 24px; }
+.row { display: flex; align-items: center; gap: 17px; width: 100%; min-height: 53px; padding: 10px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.row:hover { background: color-mix(in srgb, var(--control-hover) 65%, transparent); }
+.row strong { font-size: 13px; font-weight: 450; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.key { color: var(--muted); font-size: 11px; min-width: 74px; }
+.component { width: 125px; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media(max-width: 850px) { .group > header { gap: 8px; flex-wrap: wrap; } .toggle { flex-basis: 55%; } .component { display: none; } .rows { padding-left: 12px; } .row { gap: 10px; } }

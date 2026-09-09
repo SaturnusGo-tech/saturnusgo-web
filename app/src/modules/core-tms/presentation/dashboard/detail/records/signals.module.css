@@ -1,0 +1,15 @@
+.status { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px; background: var(--control); color: var(--muted); font-size: 11px; line-height: 1.25; white-space: nowrap; }
+.status:is([data-status="ready_for_retest"], [data-status="in_review"], [data-status="in_progress"], [data-status="active"]) { color: #8270b1; background: #a18acd18; }
+.status:is([data-status="blocked"], [data-status="failed"], [data-status="reopened"]) { color: var(--dash-danger); background: color-mix(in srgb, var(--dash-danger) 12%, transparent); }
+.status:is([data-status="passed"], [data-status="verified"], [data-status="completed"], [data-status="closed"]) { color: var(--dash-success); background: color-mix(in srgb, var(--dash-success) 12%, transparent); }
+:global(.dark) .status:is([data-status="ready_for_retest"], [data-status="in_review"], [data-status="in_progress"], [data-status="active"]) { color: #bfa8ec; background: #a18acd20; }
+.progress { display: flex; align-items: center; gap: 10px; min-width: 150px; max-width: 200px; }
+.progress > span { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress i { font-style: normal; opacity: .55; padding: 0 3px; }
+.track { height: 4px; flex: 1; display: flex; overflow: hidden; border-radius: 4px; background: var(--line); }
+.track span { height: 100%; }
+.track [data-kind="passed"] { background: var(--dash-success); }
+.track [data-kind="failed"] { background: var(--dash-danger); }
+.track [data-kind="blocked"] { background: var(--dash-warning); }
+.track [data-kind="inProgress"] { background: var(--dash-violet); }
+.track [data-kind="skipped"] { background: var(--dash-slate); }

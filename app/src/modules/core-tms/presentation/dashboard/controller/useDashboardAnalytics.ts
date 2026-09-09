@@ -14,6 +14,7 @@ type DrillState = {
   page: DashboardDrillPage | null;
   loading: boolean;
   error: boolean;
+  requestCursor?: string;
 };
 
 const EMPTY_DRILL: DrillState = { origin: null, selected: null, page: null, loading: false, error: false };
@@ -68,7 +69,7 @@ export function useDashboardAnalytics(
     drillController.current = controller;
     setDrill((current) => ({
       origin: current.origin ?? selected,
-      selected, page: cursor ? current.page : null, loading: true, error: false,
+      selected, page: cursor ? current.page : null, loading: true, error: false, requestCursor: cursor,
     }));
     void source.drill({ query, drill: selected, cursor, limit: 25 }, controller.signal)
       .then((page) => {
@@ -76,9 +77,10 @@ export function useDashboardAnalytics(
         setDrill((current) => {
           if (controller.signal.aborted || drillController.current !== controller || current.selected?.id !== selected.id) return current;
           return {
-            origin: current.origin ?? selected, selected, loading: false, error: false,
+            origin: current.origin ?? selected, selected, loading: false, error: false, requestCursor: cursor,
             page: cursor && current.page
-              ? { ...page, rows: [...current.page.rows, ...page.rows] }
+              ? { ...page, rows: [...new Map([...current.page.rows, ...page.rows].map(row =>
+                [JSON.stringify([row.projectId, row.entity, row.id]), row])).values()] }
               : page,
           };
         });
@@ -92,16 +94,16 @@ export function useDashboardAnalytics(
       });
   }, [queryKey, source]);
 
-  const openDrill = useCallback((selected: DashboardDrill) => {
-    setDrill({ origin: selected, selected: null, page: null, loading: false, error: false });
+  const openDrill = useCallback((selected: DashboardDrill, origin: DashboardDrill = selected) => {
+    setDrill({ origin, selected: null, page: null, loading: false, error: false });
     loadDrill(selected);
   }, [loadDrill]);
   const selectRelatedDrill = useCallback((selected: DashboardDrill) => {
     loadDrill(selected);
   }, [loadDrill]);
   const retryDrill = useCallback(() => {
-    if (drill.selected) loadDrill(drill.selected);
-  }, [drill.selected, loadDrill]);
+    if (drill.selected) loadDrill(drill.selected, drill.requestCursor);
+  }, [drill.selected, drill.requestCursor, loadDrill]);
   const loadMore = useCallback(() => {
     if (drill.selected && drill.page?.nextCursor && !drill.loading) {
       loadDrill(drill.selected, drill.page.nextCursor);

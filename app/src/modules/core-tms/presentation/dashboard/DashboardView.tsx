@@ -11,6 +11,8 @@ import { DashboardContent } from "./customize/DashboardContent";
 import { DashboardEmpty } from "./customize/empty/DashboardEmpty";
 import { WidgetCatalog } from "./customize/catalog/WidgetCatalog";
 import type { DashboardViewProps } from "./dashboard-view";
+import { DashboardDetail } from "./detail/route/DashboardDetail";
+import { useDrillNavigation } from "./navigation/useDrillNavigation";
 import surface from "./dashboard.module.css";
 import styles from "./customize/layout.module.css";
 import shell from "../../tms.module.css";
@@ -21,7 +23,10 @@ export function DashboardView(props: DashboardViewProps) {
 }
 function DashboardWorkspace(props: DashboardViewProps) {
   const { data, projectId } = props; const { t, locale } = useTmsLocale();
-  const model = useDashboardModel(props);
+  const sourceModel = useDashboardModel(props);
+  const navigation = useDrillNavigation(sourceModel);
+  const model = { ...sourceModel, analytics: { ...sourceModel.analytics, openDrill: navigation.openAnalytics, selectRelatedDrill: navigation.related },
+    workbench: { ...sourceModel.workbench, openDrill: navigation.openWorkbench } };
   const layout = useDashboardLayout({ workspaceId: data.workspace.id, projectId });
   const [catalogScope, setCatalogScope] = useState<string | null>(null);
   const scope = `${data.workspace.id}:${projectId}`;
@@ -42,6 +47,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
     if (!catalogOpen && wasCatalogOpen.current) addButton.current?.focus();
     wasCatalogOpen.current = catalogOpen;
   }, [catalogOpen]);
+  if (model.analytics.drill.selected || model.workbench.drill) return <DashboardDetail {...props} model={model} onBack={navigation.close} />;
   if (catalogOpen) return <div key="catalog" className={`${shell.pageScroll} ${surface.page} ${styles.page}`} data-dashboard-workspace="true">
     <WidgetCatalog dashboardName={board!.name} projectName={currentProject}
       renderPreview={key => <WidgetRenderer widget={key} model={model} onOpenRow={props.onOpenRow} />} selected={new Set(board!.widgets.map(widgetKey))}

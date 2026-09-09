@@ -1,8 +1,7 @@
-import { Search, SlidersHorizontal } from "lucide-react";
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../../localization/format/labels";
-import surface from "../../dashboard.module.css";
+import styles from "../../detail/detail.module.css";
 import type { DashboardLocalFilters } from "../dashboard-drill-navigation";
 
 type FacetKey = Exclude<keyof DashboardLocalFilters, "query">;
@@ -35,20 +34,17 @@ export function DashboardDrillFacets({ rows, value, onChange }: {
       [key]: selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option],
     });
   };
-  return <aside className={surface.drillFacets} aria-label={t("dashboard.refineList")}>
-    <h3><SlidersHorizontal size={14} />{t("dashboard.refineList")}{selectedCount > 0 && <span>{selectedCount}</span>}</h3>
-    <label className={surface.drillSearch}><span>{t("dashboard.searchRecords")}</span><div data-input-shell><Search size={14} /><input type="search" value={value.query}
-      onChange={(event) => onChange({ ...value, query: event.target.value })} placeholder={t("dashboard.searchPlaceholder")} /></div></label>
+  return <div aria-label={t("dashboard.refineList")}>
     {(["type", "project", "component", "status", "priority"] as const).map((key) => {
       const options = facetValues(rows, key);
       if (!options.length) return null;
-      return <fieldset key={key}><legend>{label(key)}</legend>{options.slice(0, 8).map(([option, count]) => <label key={option}>
+      return <fieldset key={key}><legend>{label(key)}</legend>{options.map(([option, count]) => <label key={option}>
         <input type="checkbox" checked={value[key].includes(option)} onChange={() => toggle(key, option)} />
         <span>{key === "project" || key === "component" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
       </label>)}</fieldset>;
     })}
-    {(Boolean(value.query) || selectedCount > 0) && <button type="button" onClick={() => onChange({
+    {(Boolean(value.query) || selectedCount > 0) && <button type="button" className={styles.quiet} onClick={() => onChange({
       query: "", project: [], type: [], component: [], status: [], priority: [],
     })}>{locale === "ru" ? "Сбросить уточнения" : "Reset refinements"}</button>}
-  </aside>;
+  </div>;
 }

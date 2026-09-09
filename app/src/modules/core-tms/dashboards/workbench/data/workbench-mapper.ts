@@ -23,7 +23,7 @@ function record(row: RecordScope, query: WorkbenchQuery, value: {
 
 const runRow = (run: Api["DashboardWorkbenchRun"], query: WorkbenchQuery): WorkbenchRow => ({
   navigation: { ...record(run, query, { id: run.id, key: run.key, title: run.name,
-    entity: "run", status: run.status }), runId: run.id },
+    entity: "run", status: run.status }), runId: run.id, progress: { ...run.progress } },
   environmentName: run.environmentName, buildReference: run.buildReference,
   updatedAt: run.updatedAt, progress: { ...run.progress },
 });
@@ -31,7 +31,8 @@ const runRow = (run: Api["DashboardWorkbenchRun"], query: WorkbenchQuery): Workb
 const itemRow = (item: Api["DashboardWorkbenchItem"], query: WorkbenchQuery): WorkbenchRow => ({
   navigation: { ...record(item, query, { id: item.id, key: `${item.runKey} · ${item.caseKey}`,
     title: item.title, entity: "run_item", status: item.status }),
-    runId: item.runId, runItemId: item.id, detail: item.runName },
+    runId: item.runId, runItemId: item.id, detail: item.runName, runName: item.runName,
+    caseKey: item.caseKey, testCaseId: item.testCaseId },
   environmentName: item.environmentName, buildReference: item.buildReference,
   updatedAt: item.updatedAt, attemptNo: item.attemptNo,
   snapshotRevisionNo: item.snapshotRevisionNo, currentRevisionNo: item.currentRevisionNo,

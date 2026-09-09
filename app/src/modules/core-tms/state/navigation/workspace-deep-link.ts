@@ -24,6 +24,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
 }) {
   const url = new URL(href); const integration = url.searchParams.get("integration");
   const analysisId = url.searchParams.get("analysisId"); const impact = url.searchParams.get("impact");
+  const detail = url.searchParams.get("dashboardDetail");
   const article = url.searchParams.get("article"); const section = url.hash;
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
   const sameScope = ["workspaceId", "projectId"].every((key) => {
@@ -33,6 +34,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   url.search = ""; url.hash = "";
   url.searchParams.set("workspaceId", input.workspaceId); url.searchParams.set("projectId", input.projectId);
   url.searchParams.set("view", input.view);
+  if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
   if (input.view === "help") {
     if (article && /^[a-z][a-z0-9-]{0,63}$/.test(article)) url.searchParams.set("article", article);
     if (/^#[a-z][a-z0-9-]{0,63}$/.test(section)) url.hash = section;

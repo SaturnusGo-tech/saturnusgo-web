@@ -109,7 +109,9 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           id: run.id, entity: "run" as const, projectId: run.projectId,
           key: run.key, title: run.name, project: projectLabel(run.projectId),
           detail: `${run.environment.name} · ${run.progress.executed}/${run.progress.total}`,
-          type: run.type,
+          type: run.type, progress: { total: run.progress.total, notRun: run.progress.counts.not_run,
+            inProgress: run.progress.counts.in_progress, passed: run.progress.counts.passed,
+            failed: run.progress.counts.failed, blocked: run.progress.counts.blocked, skipped: run.progress.counts.skipped },
           status: filter.outcome ? outcome(run) ?? run.status : run.status,
           occurredAt: filter.basis === "launched" ? run.startedAt ?? run.createdAt : run.completedAt ?? run.startedAt ?? run.createdAt,
           links: data.externalLinks.filter((link) => link.owner.kind === "run" && link.owner.runId === run.id && link.status === "active")

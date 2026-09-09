@@ -132,30 +132,23 @@ test("risk rows use one coverage bar and a distinct pass-rate score", () => {
   assert.match(styles, /\.coverageCell progress::-webkit-progress-value/);
 });
 
-test("analytics detail is an adaptive sheet with focused entity tabs", () => {
-  assert.match(modal, /sheet \? styles\.modalBackdropSheet/);
-  assert.match(modal, /sheet \? styles\.modalSheet/);
-  assert.match(inspector, /<Modal sheet adaptiveSheet/);
-  assert.doesNotMatch(inspector, /workspaceId|projectId\}|exactFilters|server filters/i);
-  assert.doesNotMatch(inspector, /humanFilters|loadedDistribution|dashboardFilterValues/);
+test("dashboard drill-downs use full pages and retain contextual navigation", () => {
+  assert.doesNotMatch(inspector, /<Modal|adaptiveSheet/);
+  assert.match(inspector, /<DetailPage/);
   assert.match(inspector, /onOpenEntity\(tab, props\.selected\)/);
   assert.match(inspector, /relatedDashboardDrill/);
-  assert.doesNotMatch(inspector, /id: "overview"|drillOverview|createRunFromLoaded/);
-  assert.match(inspector, /<AnimatedSelect/);
-  assert.match(styles, /\.drillSheetBody\s*\{[^}]*grid-template-columns: 268px minmax\(0, 1fr\)/s);
-  assert.match(styles, /\.drillTable\s*\{[^}]*min-width: 1000px/s);
-  assert.match(modal, /data-sheet-state/);
+  assert.match(inspector, /<ComponentRail/);
+  assert.match(inspector, /<GroupedChecks/);
+  assert.match(inspector, /<DetailToolbar/);
+  assert.match(inspector, /props\.onCreateRun\(\[\.\.\.selection\]\)/);
 });
 
-test("analytics listings use one sortable priority signal and calm active statuses", () => {
+test("analytics listings retain the priority signal and accessible navigation", () => {
   assert.match(drillTable, /<PrioritySignal priority=\{row\.priority\}/);
-  assert.match(drillTable, /className=\{surface\.prioritySortButton\}/);
-  assert.doesNotMatch(drillTable, /drillPriority/);
-  assert.match(inspector, /priority_desc/);
-  assert.match(inspector, /prioritySignalRank/);
-  assert.match(drillTable, /"not_run", "active"/);
-  assert.match(styles, /\.drillStatus\[data-status="active"\][^}]*background: #626872/s);
-  assert.match(styles, /\.entityIcon\[data-type="automated"\], \.entityIcon\[data-type="manual"\]/);
+  assert.match(drillTable, /className=\{styles\.prioritySortButton\}/);
+  assert.match(drillTable, /<DetailStatus status=\{row\.status\}/);
+  assert.match(drillTable, /aria-sort/);
+  assert.match(drillTable, /onOpenRow\(row\)/);
 });
 
 test("dashboard uses custom menus and theme-safe chart tooltips", () => {

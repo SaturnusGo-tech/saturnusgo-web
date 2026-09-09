@@ -1,0 +1,25 @@
+.viewport { overflow-x: auto; min-width: 0; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; min-width: 640px; }
+.table th { color: var(--muted); font-size: 11px; font-weight: 450; height: 38px; text-align: left; white-space: nowrap; }
+.table :is(th, td) { border-bottom: 1px solid var(--line); padding: 10px 15px; }
+.table :is(th, td):first-child { padding-left: 0; }
+.table :is(th, td):last-child { padding-right: 0; }
+.table td { height: 52px; color: var(--muted); white-space: nowrap; }
+.table tbody tr:hover { background: color-mix(in srgb, var(--control-hover) 65%, transparent); }
+.table .name { min-width: 0; }
+.table .name button { display: flex; align-items: center; gap: 15px; width: 100%; text-align: left; border: 0; background: transparent; padding: 5px 0; cursor: pointer; font: inherit; color: var(--ink); }
+.name strong { overflow: hidden; text-overflow: ellipsis; font-weight: 460; min-width: 0; }
+.key { color: var(--muted); font-size: 11px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.priority { display: flex; align-items: center; gap: 7px; font-size: 11px; }
+.prioritySortButton { display: flex; align-items: center; gap: 7px; border: 0; color: inherit; font: inherit; background: transparent; padding: 0; cursor: pointer; }
+.actions { display: flex; align-items: center; gap: 5px; }
+.actions :is(button, a) { display: grid; place-items: center; width: 25px; height: 29px; border: 0; background: transparent; color: var(--muted); border-radius: 5px; cursor: pointer; }
+.actions :is(button, a):hover { background: var(--control-hover); color: var(--ink); }
+.table .check { padding-right: 10px; width: 22px; }
+.check input { accent-color: var(--muted); cursor: pointer; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media(max-width: 1050px) { .table :is(th,td) { padding-inline: 9px; } .table .name button { gap: 9px; } .table .name { max-width: 390px; } }
+
+.table[data-entity="test_case"] .name button { flex-direction: column-reverse; align-items: flex-start; gap: 4px; }
+.table[data-entity="test_case"] .name strong { max-width: 100%; }
+.table[data-entity="test_case"] td { height: 65px; }

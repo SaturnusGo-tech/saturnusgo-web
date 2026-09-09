@@ -124,3 +124,22 @@ test("changing only the period hides values from the previous period on the firs
   assert.equal(firstNinetyDays.snapshot, null);
   assert.equal(firstNinetyDays.summaryLoading, true);
 });
+
+test("a failed next page retries its cursor, retaining records and suppressing overlaps", async () => {
+  const cursors: Array<string | undefined> = [];
+  const row = (id: string) => ({ id, projectId: "a", entity: "defect", key: id }) as DashboardDrillPage["rows"][number];
+  const source: DashboardAnalyticsSource = { summary: async () => snapshot("a"), drill: async request => {
+    cursors.push(request.cursor);
+    if (cursors.length === 1) return { rows: [row("first")], nextCursor: "page-2" };
+    if (cursors.length === 2) throw new Error("Transient failure");
+    return { rows: [row("first"), row("second")] };
+  } };
+  const hook = hookHarness(); const render = () => hook.render(data, query, source);
+  render().openDrill(selection); await tick(); render().loadMore(); await tick();
+  assert.equal(render().drill.page?.rows.length, 1);
+  assert.equal(render().drill.error, true);
+  render().retryDrill(); await tick();
+  assert.deepEqual(cursors, [undefined, "page-2", "page-2"]);
+  assert.equal(render().drill.page?.rows.map(row => row.id).join(","), "first,second");
+  assert.equal(render().drill.error, false);
+});

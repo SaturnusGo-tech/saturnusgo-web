@@ -27,7 +27,7 @@ export function mapRunDrill(envelope: Api["DashboardAnalyticsRunListEnvelope"],
     id: item.id, entity: "run" as const, projectId: item.projectId,
     key: item.key, title: item.name, project: project(projects, item.projectId),
     detail: `${item.type} · ${item.progress.total - item.progress.notRun}/${item.progress.total}`,
-    type: item.type,
+    type: item.type, progress: { ...item.progress },
     status: item.basis === "completed" ? item.outcome : item.status,
     occurredAt: item.sortAt, links: [],
   })), envelope.meta);
@@ -38,7 +38,7 @@ export function mapRunItemDrill(envelope: Api["DashboardAnalyticsRunItemListEnve
   return page(envelope.data.map((item) => ({
     id: `${item.runId}:${item.id}`, entity: "run_item" as const,
     projectId: item.projectId, runId: item.runId, runItemId: item.id,
-    key: `${item.runKey} · ${item.testCaseKey}`,
+    key: `${item.runKey} · ${item.testCaseKey}`, caseKey: item.testCaseKey, runName: item.runName,
     title: item.title, project: project(projects, item.projectId),
     detail: [item.runName, `#${item.attemptNo}`]
       .filter(Boolean).join(" · "),

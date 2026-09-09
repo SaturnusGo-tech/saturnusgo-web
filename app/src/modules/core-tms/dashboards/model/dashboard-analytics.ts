@@ -64,6 +64,10 @@ export type DashboardDrillRequest = {
 };
 
 export type DashboardDrillRow = {
+  runName?: string;
+  caseKey?: string;
+  testCaseId?: string;
+  progress?: { total: number; notRun: number; inProgress: number; passed: number; failed: number; blocked: number; skipped: number };
   id: string;
   entity: DashboardDrillFilter["entity"];
   projectId: string;

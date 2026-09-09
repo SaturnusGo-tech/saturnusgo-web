@@ -16,5 +16,5 @@ export function useDashboardPreferences(workspace: string, project: string) {
     try { window.localStorage.setItem(key, JSON.stringify(next)); } catch { setStored(false); }
     return { key, value: next };
   });
-  return { value, update, stored };
+  return { value, update, stored, ready: state.key === key };
 }
