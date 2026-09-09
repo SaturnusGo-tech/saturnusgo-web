@@ -15,6 +15,29 @@ const selection: DashboardDrill = { id: "runs:launched", label: "Launched", filt
 const snapshot = (projectId: string) => ({ query: { ...query, projectId } }) as DashboardSnapshot;
 const page = (id: string) => ({ rows: [{ id }] }) as DashboardDrillPage;
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
+
+test("retry replaces a failed drill with a successful empty page", async () => {
+  let calls = 0;
+  const empty: DashboardDrillPage = { rows: [], total: 0 };
+  const source: DashboardAnalyticsSource = {
+    summary: async () => snapshot("a"),
+    drill: async () => {
+      if (++calls === 1) throw new Error("Temporarily unavailable");
+      return empty;
+    },
+  };
+  const hook = hookHarness();
+  const render = () => hook.render(data, query, source);
+  render().openDrill(selection);
+  await tick();
+  assert.equal(render().drill.error, true, "a real failure must remain visible");
+  render().retryDrill();
+  await tick();
+  assert.equal(render().drill.error, false);
+  assert.equal(render().drill.loading, false);
+  assert.equal(render().drill.page, empty);
+  hook.unmount();
+});
 function fixture() {
   const summaries: Array<ReturnType<typeof deferred<DashboardSnapshot>> & { signal?: AbortSignal }> = [];
   const drills: Array<ReturnType<typeof deferred<DashboardDrillPage>> & { signal?: AbortSignal }> = [];

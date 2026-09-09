@@ -45,7 +45,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
         <h1>{defect.title}<span>#{defect.key}</span></h1>
         <p>
           <span className={surface.statusChip} data-status={defect.status}>
-            {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : <span aria-hidden="true" />}
+            {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
             {localizedLabel(locale, defect.status)}
           </span>
           <span>{t("reports.created")} <time dateTime={defect.createdAt}>{createdAt}</time></span>
@@ -81,7 +81,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
           <DetailSection title={t("reports.properties")}>
             <dl className={surface.propertyList}>
               <div><dt>{t("reports.status")}</dt><dd><span className={surface.statusChip} data-status={defect.status}>
-                {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : <span aria-hidden="true" />}
+                {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" /> : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
                 {localizedLabel(locale, defect.status)}
               </span></dd></div>
               <div><dt>{t("reports.severity")}</dt><dd><span className={surface.severityChip} data-level={defect.severity}>{localizedLabel(locale, defect.severity)}</span></dd></div>

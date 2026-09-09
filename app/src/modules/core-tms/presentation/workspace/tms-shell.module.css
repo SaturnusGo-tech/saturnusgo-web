@@ -227,7 +227,7 @@
   flex-direction: column;
   overflow: visible;
   color: var(--sidebar-text);
-  background: linear-gradient(160deg, #252a36 0%, #282936 34%, #292731 68%, #25232c 100%);
+  background: #0d0d0f;
   border-right: 1px solid var(--sidebar-border);
   will-change: width, flex-basis;
   transition:
@@ -768,27 +768,6 @@
   --control: #f5f5f7;
   --control-hover: #eeeef1;
   --action: #555eaa;
-}
-:global(:root:not(.dark)) .shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) .navigation {
-  --sidebar-border: #e5e5e9;
-  --sidebar-divider: #e5e5e9;
-  --sidebar-toggle-divider: #e5e5e9;
-  --sidebar-text: #333338;
-  --sidebar-soft: #55555d;
-  --sidebar-strong: #202025;
-  --sidebar-muted: #73737c;
-  --sidebar-wordmark: #252529;
-  --sidebar-active-ink: #252529;
-  --sidebar-active-icon: #484852;
-  --sidebar-toggle: #686870;
-  --sidebar-hover: #f0f0f3;
-  --sidebar-active: #eaeaee;
-  --sidebar-create: #ededf0;
-  --sidebar-create-hover: #e3e3e8;
-  background: #fafafa;
-}
-:global(:root:not(.dark)) .shell:has([data-dashboard-workspace], [data-documentation-workspace], [data-integration-workspace]) .tessiqMark {
-  background-image: url("../../assets/falcon/falcon-mark-on-light.png");
 }
 :global(.dark) .shell .header {
   background: var(--tms-bg-canvas);

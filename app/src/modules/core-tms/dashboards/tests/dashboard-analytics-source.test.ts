@@ -68,6 +68,24 @@ const data: Bootstrap = {
 
 const query = { workspaceId: "workspace", period: "30d" as const };
 
+test("empty HTTP drill pages remain successful for every dashboard entity", async () => {
+  const paths: string[] = [];
+  const http = { async get(path: string) {
+    paths.push(path);
+    return { data: [], meta: { nextCursor: null, total: 0 } };
+  } } as unknown as TmsHttpClient;
+  const source = createHttpDashboardAnalyticsSource(http, data);
+  for (const filter of [
+    { entity: "test_case", basis: "current" }, { entity: "run", basis: "launched" },
+    { entity: "run_item" }, { entity: "defect", basis: "current" },
+  ] as const) {
+    const empty = await source.drill({ query, drill: { id: filter.entity, label: filter.entity, filter } });
+    assert.deepEqual(empty.rows, []);
+    assert.equal(empty.nextCursor, undefined);
+  }
+  assert.equal(paths.length, 4);
+});
+
 test("bootstrap analytics produces workspace dimensions and exact project drills", async () => {
   const source = createBootstrapDashboardAnalyticsSource(data);
   const summary = await source.summary(query);

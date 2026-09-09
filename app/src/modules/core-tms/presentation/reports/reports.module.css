@@ -55,7 +55,7 @@
 .metrics span { height: 100%; display: inline-flex; align-items: center; gap: 5px; padding: 0 10px; color: var(--report-muted); border-right: 1px solid var(--report-border); font-size: 11px; white-space: nowrap; }
 .metrics span:last-child { border-right: 0; }
 .metrics b { color: var(--report-strong); font-size: 13px; font-weight: 650; }
-.newButton { height: 38px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; color: var(--report-on-primary); background: var(--report-primary); border: 1px solid var(--report-primary); border-radius: 5px; cursor: pointer; font-weight: 550; }
+.newButton.newButton { height: 38px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; color: var(--report-on-primary); background: var(--report-primary); border: 1px solid var(--report-primary); border-radius: 5px; cursor: pointer; font-weight: 550; }
 .newButton:hover { background: #2d67da; border-color: #2d67da; }
 .newButton:focus-visible { outline: 2px solid color-mix(in srgb, var(--report-primary) 45%, transparent); outline-offset: 2px; }
 
@@ -95,7 +95,8 @@
 .statusChip[data-status="reopened"] { color: #fff; background: #d73948; border-color: #b92132; }
 .statusChip[data-status="triaged"] { color: #fff; background: #7657d8; border-color: #6042bf; }
 .statusChip[data-status="in_progress"] { color: #fff; background: #2872da; border-color: #185db8; }
-.statusChip[data-status="ready_for_retest"] { color: #17202b; background: #f2b931; border-color: #d69d14; }
+.statusChip[data-status="ready_for_retest"] { color: #6340a1; background: #eee9ff; border-color: transparent; }
+:global(.dark) .statusChip[data-status="ready_for_retest"] { color: #d3bfff; background: #353044; }
 .statusChip[data-status="verified"], .statusChip[data-status="closed"] { color: #fff; background: #16884f; border-color: #08723e; }
 .severityChip[data-level="low"] { color: #14345e; background: #84b7ff; border-color: #5795eb; }
 .severityChip[data-level="medium"] { color: #fff; background: #3574f0; border-color: #235ec8; }

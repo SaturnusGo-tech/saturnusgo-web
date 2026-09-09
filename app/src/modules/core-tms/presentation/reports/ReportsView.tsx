@@ -102,7 +102,7 @@ export function ReportsView({ workspaceId, defects, runs, links, selectedDefectI
             <td><span className={surface.statusChip} data-status={defect.status}>
               {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" />
                 : defect.status === "verified" || defect.status === "closed" ? <CheckCircle2 size={13} aria-hidden="true" />
-                  : <span aria-hidden="true" />}
+                  : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
               {localizedLabel(locale, defect.status)}
             </span></td>
             <td>{defect.assigneeIdentityId || t("common.unassigned")}</td>

@@ -13,9 +13,11 @@ import styles from "../../tms.module.css";
 import { WorkspaceHeader } from "./WorkspaceHeader";
 import { VerificationQueueControl } from "../../runs/verification/presentation/queue/VerificationQueueControl";
 import shellStyles from "./tms-shell.module.css";
+import { usePageAppearance } from "./motion/usePageAppearance";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
+  const pageRef = usePageAppearance(model.view);
   const { t } = useTmsLocale();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -80,7 +82,7 @@ function LocalizedWorkspace() {
               {t("workspace.demoNotice")}
             </div>
           )}
-          <div className={styles.stageContent}>
+          <div className={styles.stageContent} ref={pageRef}>
             <WorkspaceStage model={model} />
           </div>
         </main>
