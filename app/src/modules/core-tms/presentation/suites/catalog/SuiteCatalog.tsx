@@ -1,6 +1,6 @@
 import { ChevronRight, Layers, Play, Plus, Search, Tag, UserRound, X } from "lucide-react";
 import type { Suite, SuiteSummary } from "../../../../../core/tms/contracts/legacy-contract";
-import { filterSuiteCatalog, suiteCatalogCount, type SuiteCatalogFilter, type SuiteCatalogSort } from "../../../suites/catalog/suite-catalog";
+import { filterSuiteCatalog, hasResolvedSuiteCount, suiteCatalogCount, type SuiteCatalogFilter, type SuiteCatalogSort } from "../../../suites/catalog/suite-catalog";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { formatCount } from "../../../localization/format/count";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
@@ -46,7 +46,7 @@ export function SuiteCatalog(props: Props) {
             <Layers size={21} strokeWidth={1.6} aria-hidden="true" /><span><strong>{suite.name}</strong>{suite.description.trim() && <small>{suite.description.trim()}</small>}{suite.status === "archived" && <small>{ru ? "В архиве" : "Archived"}</small>}</span>
           </button></td>
           <td><span className={styles.mode}>{suite.type === "dynamic" ? <Tag size={15} aria-hidden="true" /> : <UserRound size={15} aria-hidden="true" />}{suite.type === "dynamic" ? (ru ? "По тегам" : "By tags") : (ru ? "Вручную" : "Manual")}</span></td>
-          <td className={styles.number}><span title={count === null ? (ru ? "Состав рассчитывается по тегам при открытии сьюта и запуске" : "Tag-based scope is resolved when opening or running the suite") : undefined}>{count === null ? "—" : count.toLocaleString(locale)}</span></td>
+          <td className={styles.number}><span title={count === null ? (ru ? "Состав рассчитывается по тегам при открытии сьюта и запуске" : "Tag-based scope is resolved when opening or running the suite") : !hasResolvedSuiteCount(suite, props.detail) ? (ru ? "Сохранённый состав. Доступные для запуска кейсы уточняются при открытии сьюта." : "Saved membership. Runnable cases are resolved when opening the suite.") : undefined}>{count === null ? "—" : count.toLocaleString(locale)}</span></td>
           <td className={styles.date}><time dateTime={suite.updatedAt}>{date.format(new Date(suite.updatedAt))}</time></td>
           <td><div className={styles.actions}>
             {props.canRun && <button type="button" className={styles.iconButton} aria-label={`${ru ? "Запустить сьют" : "Run suite"}: ${suite.name}`} title={ru ? "Запустить прогон" : "Start run"} disabled={suite.status === "archived"} onClick={event => { event.stopPropagation(); props.onRun(suite.id); }}><Play size={18} strokeWidth={1.6} /></button>}

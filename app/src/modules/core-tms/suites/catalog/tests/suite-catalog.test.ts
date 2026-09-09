@@ -32,3 +32,11 @@ test("tag-based summary zero is unknown until the matching detail resolves it", 
  assert.equal(suiteCatalogCount(dynamic,{...detail,projectId:"project-other"}),null);
  assert.equal(suiteCatalogCount(sample({caseCount:0}),detail),0);
 });
+test("resolved static scope excludes archived members after hydration", () => {
+ const suite = sample({caseCount:2});
+ const detail: Suite = {...suite,caseIds:["active","archived"],filter:{},resolvedCaseCount:1};
+ assert.equal(suiteCatalogCount(suite,null),2);
+ assert.equal(suiteCatalogCount(suite,detail),1);
+ assert.equal(suiteCatalogCount(suite,{...detail,resolvedCaseCount:0}),0);
+ assert.equal(suiteCatalogCount(suite,{...detail,updatedAt:"2026-09-08T10:00:00Z"}),2);
+});

@@ -44,3 +44,7 @@ Selected target: option 2, classic full-width catalog. The generated reference a
 Open P0/P1/P2 visual issues: none in tested states.
 
 final result: passed
+
+Production acceptance found one archived member counted by the summary API. Catalog counts now prefer the authoritative resolved scope for matching suite/project/type/revision; unhydrated static counts explicitly describe saved membership. Added a regression with two stored members and one runnable case. Suite detail, browser back, configured scope and run builder use existing production entities.
+
+final result: passed

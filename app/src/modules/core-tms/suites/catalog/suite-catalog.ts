@@ -15,8 +15,13 @@ export function filterSuiteCatalog(suites: readonly SuiteSummary[], query: strin
   });
 }
 
+export function hasResolvedSuiteCount(suite: SuiteSummary, detail: Suite | null): detail is Suite {
+  return detail?.id === suite.id && detail.projectId === suite.projectId
+    && detail.type === suite.type && detail.updatedAt === suite.updatedAt;
+}
+
 export function suiteCatalogCount(suite: SuiteSummary, detail: Suite | null) {
-  if (suite.type === "static") return suite.caseCount;
-  // A dynamic summary counts explicit members, not cases resolved by its tags.
-  return detail?.id === suite.id && detail.projectId === suite.projectId ? detail.resolvedCaseCount : null;
+  // The list counts stored memberships; resolved scope excludes archived cases.
+  if (hasResolvedSuiteCount(suite, detail)) return detail.resolvedCaseCount;
+  return suite.type === "static" ? suite.caseCount : null;
 }
