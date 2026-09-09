@@ -114,8 +114,8 @@
 .sortField select:focus,
 .filterField select:focus,
 .scopeSearch:focus-within {
-  border-color: #0c66e4;
-  box-shadow: 0 0 0 2px rgb(12 102 228 / 16%);
+  border-color: var(--tms-focus-border);
+  box-shadow: 0 0 0 2px var(--tms-focus-ring);
 }
 
 .nameField { grid-column: 1 / 2; }
@@ -335,7 +335,7 @@
 :global(.dark) :is(.sectionHeading h3, .scopeSummary strong, .scopeStatus strong, .caseRow b, .caseSelected b) { color: var(--ink); }
 :global(.dark) :is(.sectionHeading p, .targetGrid label, .sourceField, .sortField, .filterField, .scopeSummary small, .scopeSummary em, .scopeStatus, .caseRow small, .caseSelected small, .caseRow em, .caseSelected em, .emptyCases, .selectedPreview, .footer) { color: var(--muted); }
 :global(.dark) :is(.targetGrid input, .targetGrid select, .sourceField select, .sortField select, .filterField select, .scopeSearch, .filterButton, .filterActive) { color: var(--ink); background: var(--control); border-color: var(--line-strong); }
-:global(.dark) :is(.targetGrid input, .targetGrid select, .sourceField select, .sortField select, .filterField select, .scopeSearch):focus { border-color: var(--teal); box-shadow: 0 0 0 2px rgb(122 208 190 / 16%); }
+:global(.dark) :is(.targetGrid input, .targetGrid select, .sourceField select, .sortField select, .filterField select, .scopeSearch):focus { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 :global(.dark) .filterActive { color: var(--teal); background: var(--control-hover); border-color: var(--teal); }
 :global(.dark) .filterActive b { color: #101b24; background: var(--teal); }
 :global(.dark) :is(.sectionHeading > button, .scopeStatus button, .resetFilters, .caseRow strong, .caseSelected strong) { color: var(--teal); }
@@ -435,7 +435,7 @@
 .sourceField select:focus,
 .sortField select:focus,
 .filterField select:focus,
-.scopeSearch:focus-within { border-color: var(--builder-primary); box-shadow: 0 0 0 2px rgb(53 116 240 / 30%); }
+.scopeSearch:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 
 .sourceField { width: min(340px, 100%); margin-bottom: 10px; }
 .runPanel :is(.targetGrid, .sourceField, .sortField, .filterField) [aria-haspopup="listbox"] {

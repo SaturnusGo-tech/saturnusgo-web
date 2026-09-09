@@ -7,6 +7,7 @@ import { CaseTypeIcon } from "../../cases/list/CaseBadges";
 import { PrioritySignal, prioritySignalRank } from "../../cases/list/priority/PrioritySignal";
 import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
+import { RunListTabs } from "./tabs/RunListTabs";
 import { RunPicker } from "./picker/RunPicker";
 
 export type RunListMode = "active" | "archived";
@@ -58,21 +59,7 @@ export function RunNavigator({
 
   return (
     <aside className={styles.navigator} aria-label={t("runs.current")}>
-      <div className={styles.viewSwitch} role="tablist" aria-label={t("runs.listMode")}>
-        {(["active", "archived"] as const).map((value) => (
-          <button
-            className={mode === value ? styles.viewActive : styles.viewTab}
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={mode === value}
-            onClick={() => onModeChange(value)}
-          >
-            {value === "active" ? t("runs.activeList") : t("runs.archiveHistory")}
-            <span>{value === "active" ? activeCount : archivedCount}</span>
-          </button>
-        ))}
-      </div>
+      <RunListTabs mode={mode} activeCount={activeCount} archivedCount={archivedCount} onChange={onModeChange} />
 
       <RunPicker
         visibleRuns={visibleRuns}
@@ -86,22 +73,16 @@ export function RunNavigator({
         onCreate={onCreate}
       />
 
-      {!selectedRun ? (
-        <div className={styles.emptyHistory}>
-          <strong>{emptyLabel}</strong>
-          <p>{mode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")}</p>
-        </div>
-      ) : (
+      {selectedRun && (
         <>
           <header className={styles.summary}>
             <div className={styles.summaryMeta}>
-              <strong>{selectedRun.key}</strong>
+              <span>{locale === "ru" ? "Прогресс" : "Progress"}</span>
               <span>{selectedRun.progress.executed} / {selectedRun.itemCount}</span>
             </div>
             <div className={styles.progressTrack} aria-label={t("runs.percentComplete", { percent: selectedRun.progress.percent })}>
               <span style={{ width: `${selectedRun.progress.percent}%` }} />
             </div>
-            <p><span>{selectedRun.environment.name}</span><span>{selectedRun.build}</span></p>
             {selectedRun.archivedAt ? (
               <div className={styles.archivedActions}>
                 <span><Archive size={14} /> {t("runs.archivedOn", {
@@ -118,7 +99,7 @@ export function RunNavigator({
 
           <div className={styles.itemsToolbar}>
             <div><strong>{locale === "ru" ? "Тест-кейсы" : "Test cases"}</strong><span>{items.length}</span></div>
-            <label>
+            <label data-input-shell>
               <Search size={14} aria-hidden="true" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={locale === "ru" ? "Поиск кейсов в ране" : "Search cases in run"} placeholder={locale === "ru" ? "Поиск по названию или ID" : "Search title or ID"} />
             </label>

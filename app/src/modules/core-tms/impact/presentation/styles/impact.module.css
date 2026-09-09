@@ -9,7 +9,7 @@
 .root button:disabled { opacity: .55; cursor: default; }
 .root .primary { background: #3159ba; border-color: #3159ba; color: #fff; }
 .root .primary:hover { background: #284da9; }
-.root button:focus-visible, .root a:focus-visible, .root input:focus-visible, .root select:focus-visible, .root textarea:focus-visible { outline: 2px solid #678ced; outline-offset: 3px; }
+.root button:focus-visible, .root a:focus-visible, .root input:focus-visible, .root select:focus-visible, .root textarea:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 3px; }
 .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--tms-border, #dfe1e6); padding-bottom: 10px; }
 .tabs button[aria-pressed="true"] { background: var(--tms-bg-selected, #e9edf7); border-color: #7a8cbd; }
 .list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }

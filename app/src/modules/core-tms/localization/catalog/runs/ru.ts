@@ -1,8 +1,8 @@
 import type { RunMessages } from "./en";
 
 export const ruRunMessages = {
-  "runs.noActive": "Нет активного тест-рана",
-  "runs.noActiveHint": "Выберите сьют и запустите смоук-, регресс-, приёмочный или разовый ран.",
+  "runs.noActive": "Пока нет активных прогонов",
+  "runs.noActiveHint": "Соберите тест-кейсы в прогон, чтобы пройти проверки и сохранить результаты.",
   "runs.start": "Запустить тест-ран",
   "runs.current": "Текущий тест-ран",
   "runs.openRunList": "Выбрать тест-ран",
@@ -11,8 +11,8 @@ export const ruRunMessages = {
   "runs.listMode": "Вид списка ранов",
   "runs.activeList": "Активные",
   "runs.archiveHistory": "История",
-  "runs.noArchived": "Архив ранов пуст",
-  "runs.noArchivedHint": "Убранные из активного списка раны появятся здесь вместе с результатами и материалами.",
+  "runs.noArchived": "История появится здесь",
+  "runs.noArchivedHint": "Архивные прогоны сохраняют результаты проверок и вложения.",
   "runs.archivedOn": "В архиве с {date}",
   "runs.restoreAction": "Вернуть в активные",
   "runs.restored": "{key} возвращён в активный список",

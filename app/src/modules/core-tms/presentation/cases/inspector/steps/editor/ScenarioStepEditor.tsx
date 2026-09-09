@@ -87,7 +87,7 @@ export function ScenarioStepEditor(props: Props) {
       onDuplicate={props.onDuplicate} onRemove={props.onRemove} /></div>
     <div className={css.actionLines}>
       {(collapsed ? lines.slice(0, 1) : lines).map((line, lineIndex) => <div
-        className={`${css.actionLine} ${lineIndex === 0 ? css.primaryLine : css.nestedLine}`}
+        data-input-shell className={`${css.actionLine} ${lineIndex === 0 ? css.primaryLine : css.nestedLine}`}
         key={`${props.step.id}-${lineIndex}`}>
         {lineIndex === 0 && <button type="button" className={css.collapseButton}
           aria-expanded={!collapsed}
@@ -117,7 +117,7 @@ export function ScenarioStepEditor(props: Props) {
       </div>}
     </div>
 
-    {!collapsed && <div className={css.expectedBlock}>
+    {!collapsed && <div className={css.expectedBlock} data-input-shell>
       <span className={css.expectedLabel}>{props.ru ? "Ожидаемый результат" : "Expected result"}</span>
       <ScenarioTextInput
         id={`scenario-${props.step.id}-expected`}
@@ -131,7 +131,7 @@ export function ScenarioStepEditor(props: Props) {
       {!props.attachmentScope && <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} />}
     </div>}
 
-    {!collapsed && (props.step.testData || (!props.attachmentScope && dataAttachments.pending.length > 0)) && <div className={css.optionalData}>
+    {!collapsed && (props.step.testData || (!props.attachmentScope && dataAttachments.pending.length > 0)) && <div className={css.optionalData} data-input-shell>
       <ScenarioTextInput
         value={props.step.testData ?? ""}
         label={`${props.ru ? "Тестовые данные шага" : "Test data for step"} ${props.order}`}

@@ -102,7 +102,7 @@ export function SuiteDialog({ projectId, cases, suite, suiteEtag, offline, onClo
         <header className={dialog.hero}>
           <span className={dialog.eyebrow}>{ru ? "Тест-сьют" : "Test suite"}</span>
           {editingSection === "name" ? <div className={dialog.titleEditor}>
-            <input required autoFocus value={name} onChange={(event) => setName(event.target.value)} aria-label={copy.name} />
+            <input data-inline-title required autoFocus value={name} onChange={(event) => setName(event.target.value)} aria-label={copy.name} />
             <EditorActions />
           </div> : <div className={dialog.titleLine}>
             <h1>{name.trim() || copy.name}</h1>

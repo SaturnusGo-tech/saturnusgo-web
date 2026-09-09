@@ -5187,36 +5187,52 @@
   }
 }
 
-/* Shared Falcon controls: one focus surface, including composite search fields. */
+/* Text controls own one focus surface. Composite controls mark the outer shell;
+   their native editors stay transparent in every interaction state. */
 .app {
   --radius-control: 8px;
   --radius-modal: 18px;
   --tms-focus-border: #89898f;
   --tms-focus-ring: rgb(113 113 122 / 16%);
+  --tms-input-hover-border: #aaaab0;
 }
 :global(.dark) .app {
   --tms-focus-border: #75757d;
   --tms-focus-ring: rgb(161 161 170 / 15%);
+  --tms-input-hover-border: #5a5a62;
 }
-.app :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([data-inline-title]):not([data-input-shell] input):not(.searchField input):not(.tableSearch input):is(:focus, :focus-visible) {
+.app :is(input, textarea, select):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="hidden"], [data-inline-title], :disabled):not([data-input-shell] *, .searchField *, .tableSearch *, [data-editor-shell] textarea):hover {
+  border-color: var(--tms-input-hover-border) !important;
+}
+.app :is(input, textarea, select):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="hidden"], [data-inline-title]):not([data-input-shell] *, .searchField *, .tableSearch *, [data-editor-shell] textarea):is(:focus, :focus-visible) {
   outline: 0 !important;
   border-color: var(--tms-focus-border) !important;
   box-shadow: 0 0 0 2px var(--tms-focus-ring) !important;
 }
-.app :is(.searchField, .tableSearch, [data-input-shell]):focus-within {
+.app :is(.searchField, .tableSearch, [data-input-shell], [data-editor-shell]) {
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.app :is(.searchField, .tableSearch, [data-input-shell], [data-editor-shell]):hover {
+  border-color: var(--tms-input-hover-border) !important;
+}
+.app :is(.searchField, .tableSearch, [data-input-shell], [data-editor-shell]):focus-within {
   outline: 0 !important;
   border-color: var(--tms-focus-border) !important;
   box-shadow: 0 0 0 2px var(--tms-focus-ring) !important;
 }
-.app :is(.searchField, .tableSearch, [data-input-shell]) input,
-.app :is(.searchField, .tableSearch, [data-input-shell]) input:is(:focus, :focus-visible) {
+.app [data-editor-shell] :is(textarea, [contenteditable="true"]),
+.app :is(.searchField, .tableSearch, [data-input-shell]) :is(input, textarea),
+.app :is(.searchField, .tableSearch, [data-input-shell]) :is(input, textarea):is(:hover, :focus, :focus-visible, :active) {
   outline: 0 !important;
   border: 0 !important;
   box-shadow: none !important;
   background: transparent !important;
 }
-.app input[data-inline-title], .app input[data-inline-title]:is(:focus, :focus-visible) {
-  background: transparent !important; outline: 0 !important; box-shadow: none !important;
+.app :is(input, textarea)[data-inline-title], .app :is(input, textarea)[data-inline-title]:is(:hover, :focus, :focus-visible) {
+  background: transparent !important; border-color: transparent !important; outline: 0 !important; box-shadow: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app :is(.searchField, .tableSearch, [data-input-shell], [data-editor-shell]) { transition: none; }
 }
 .app .modal:not(.modalDrawer):not(.modalSheet) {
   border-radius: var(--radius-modal);

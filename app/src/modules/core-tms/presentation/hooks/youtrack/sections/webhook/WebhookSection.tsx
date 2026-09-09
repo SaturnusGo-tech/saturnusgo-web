@@ -64,7 +64,7 @@ function WebhookValue({ label, value, type = "text", copied, copy, action, onCop
 }) {
   return <div className={surface.field}>
     <span>{label}</span>
-    <span className={surface.webhookValue}>
+    <span className={surface.webhookValue} data-input-shell>
       <input type={type} value={value} readOnly spellCheck={false} aria-label={label} />
       {action}
       <button type="button" onClick={onCopy} aria-label={`${copy.copyValue}: ${label}`}>

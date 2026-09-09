@@ -71,7 +71,7 @@ export function ConnectionSection({
               </aside> : null}
             </span>
           </span>
-          <span className={surface.tokenField}>
+          <span className={surface.tokenField} data-input-shell>
             <input
               id="youtrack-token"
               type={showToken ? "text" : "password"}

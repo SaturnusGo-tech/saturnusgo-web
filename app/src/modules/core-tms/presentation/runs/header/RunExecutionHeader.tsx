@@ -51,7 +51,7 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
   return (
     <header className={runStyles.header}>
       <div className={runStyles.utilityRow}>
-        <div className={runStyles.runContext}><strong>{run.key}</strong><span>{locale === "ru" ? `Кейс ${itemIndex + 1} из ${itemCount}` : `Case ${itemIndex + 1} of ${itemCount}`}</span></div>
+        <div className={runStyles.runContext}><span>{locale === "ru" ? `Кейс ${itemIndex + 1} из ${itemCount}` : `Case ${itemIndex + 1} of ${itemCount}`}</span></div>
         <div className={runStyles.headerActions} ref={actionsRef}>
           {canStart && <button type="button" className={styles.primaryButton} disabled={startPending || archivePending} onClick={onStart} data-testid="start-existing-run"><Play size={16} />{startPending ? (locale === "ru" ? "Запускаем…" : "Starting…") : (locale === "ru" ? "Начать прогон" : "Start run")}</button>}
           <button className={`${styles.iconButton} ${runStyles.headerIconButton}`} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>

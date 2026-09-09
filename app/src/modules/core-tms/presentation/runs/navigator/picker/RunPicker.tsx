@@ -105,7 +105,7 @@ export function RunPicker(props: RunPickerProps) {
           tabIndex={selected ? 0 : -1}
           onClick={() => { props.onSelectRun(run.id); close(true); }}
         >
-          <span><RunNameMarquee name={run.name} motion="interaction" /><small>{run.key}</small></span>
+          <span><RunNameMarquee name={run.name} motion="interaction" /></span>
           {selected ? <Check size={15} aria-hidden="true" /> : <span className={styles.optionMarker} />}
         </button>;
       })}

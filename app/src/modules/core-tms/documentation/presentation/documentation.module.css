@@ -39,7 +39,7 @@
 .searchField { display: flex; align-items: center; gap: 7px; min-height: 35px; margin: 0 1px 22px; padding: 0 8px; background: var(--docs-panel); border: 1px solid var(--docs-line); border-radius: 6px; color: var(--docs-muted); }
 .searchField > svg { flex-shrink: 0; }
 .searchField input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--docs-ink); font-size: 11px; padding: 8px 0; outline: 0 !important; }
-.searchField:focus-within { border-color: var(--docs-focus); box-shadow: 0 0 0 1px var(--docs-focus); }
+.searchField:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .searchField input::placeholder { color: var(--docs-muted); }
 .searchField input::-webkit-search-cancel-button { display: none; }
 .searchField kbd { font-family: inherit; border: 1px solid var(--docs-line); padding: 0 5px; border-radius: 3px; font-size: 10px; }

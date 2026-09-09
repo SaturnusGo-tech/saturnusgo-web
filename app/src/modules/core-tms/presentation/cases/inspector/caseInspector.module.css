@@ -58,7 +58,7 @@
 .compactFields label > span, .compactFields .markdownControl > span, .railFields label > span, .editStep .markdownControl > span { color: var(--cases-muted); font-size: 10px; font-weight: 500; }
 .compactFields > label > :is(textarea, input), .railFields input { width: 100%; min-height: 36px; padding: 7px 9px; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 4px; font: inherit; outline: 0; }
 .compactFields > label > textarea { min-height: 72px; resize: vertical; }
-.compactFields > label > :is(textarea, input):focus, .railFields input:focus { border-color: var(--cases-primary); box-shadow: 0 0 0 1px color-mix(in srgb, var(--cases-primary) 18%, transparent); }
+.compactFields > label > :is(textarea, input):focus, .railFields input:focus { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .wideField { grid-column: 1 / -1; }
 .compactSummary, .railFacts { display: grid; grid-template-columns: 1fr; gap: 5px; margin: 0; }
 .compactSummary > div { min-width: 0; margin-bottom: 8px; }

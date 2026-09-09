@@ -120,9 +120,9 @@
   opacity: .76;
 }
 
-.lineInput:hover,
-.expectedInput:hover,
-.dataInput:hover {
+.actionLine:hover,
+.expectedBlock:hover,
+.optionalData:hover {
   background: color-mix(in srgb, var(--cases-hover) 54%, transparent);
 }
 

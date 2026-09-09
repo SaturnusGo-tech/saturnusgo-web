@@ -18,7 +18,7 @@
 .root button, .root input, .root select { font: inherit; }
 .root button { cursor: pointer; }
 .root button:disabled { cursor: default; opacity: .55; }
-.root :is(button, input, select, a):focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.root :is(button, input, select, a):focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 3px; }
 .root a { color: var(--c-accent); text-decoration: none; }
 .root a:hover { text-decoration: underline; }
 .topbar { position: sticky; top: 0; z-index: 3; min-height: 56px; display: flex; align-items: center;

@@ -426,7 +426,7 @@
   border-radius: 4px;
 }
 
-.searchBox:focus-within { border-color: var(--cases-primary); box-shadow: 0 0 0 1px var(--cases-primary); }
+.searchBox:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .searchBox input { min-width: 0; flex: 1; color: var(--cases-text); background: transparent; border: 0; outline: 0; }
 .searchBox input::placeholder { color: var(--cases-faint); }
 .searchBox > button { width: 22px; height: 22px; display: grid; place-items: center; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 3px; cursor: pointer; }
@@ -456,7 +456,7 @@
 .filterPanel select,
 .filterPanel label > input:not([type="checkbox"]) { width: 100%; height: 32px; padding: 0 8px; color: var(--cases-text); background: var(--cases-raised); border: 1px solid var(--cases-control-border); border-radius: 4px; outline: 0; }
 .filterPanel select:focus,
-.filterPanel label > input:focus { border-color: var(--cases-primary); box-shadow: 0 0 0 1px var(--cases-primary); }
+.filterPanel label > input:focus { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .checkboxLabel { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .checkboxLabel input { width: 15px; height: 15px; margin: 0; accent-color: var(--cases-primary); }
 

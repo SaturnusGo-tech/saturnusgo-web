@@ -1,4 +1,4 @@
-import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, Play, PlayCircle, X, XCircle } from "lucide-react";
+import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
@@ -8,13 +8,14 @@ import { useAttachmentClient } from "../../attachments/presentation/context/Atta
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { EmptyState } from "../common/empty/EmptyState";
 import { FormError } from "../common/error/FormError";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
+import { RunScopeEmpty } from "./empty/RunScopeEmpty";
+import { RunListEmpty } from "./empty/RunListEmpty";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
@@ -113,9 +114,10 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
     onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
     archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
   />;
-  if (selectedRun && selectedIsVisible && !selectedItem && selectedRun.itemCount === 0) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><EmptyState icon={<PlayCircle size={36} />} title={locale === "ru" ? "В составе пока нет тестов" : "No tests in this scope yet"} text={locale === "ru" ? "Откройте Impact Analysis выше, чтобы проверить предложение и добавить тесты перед запуском." : "Open Impact Analysis above to review the proposal and add tests before starting."} /></div></div>;
+  if (selectedRun && selectedIsVisible && !selectedItem && selectedRun.itemCount === 0) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
   if (selectedRun && selectedIsVisible && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
-  if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><EmptyState icon={<PlayCircle size={36} />} title={listMode === "archived" ? t("runs.noArchived") : t("runs.noActive")} text={listMode === "archived" ? t("runs.noArchivedHint") : t("runs.noActiveHint")} action={listMode === "active" ? <button className={styles.primaryButton} onClick={onCreate} data-testid="new-run"><Play size={16} /> {t("runs.start")}</button> : undefined} /></div></div>;
+  if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={runStyles.shell} data-testid="runs-view"><RunListEmpty mode={listMode} activeCount={runs.filter((run) => !run.archivedAt).length}
+      archivedCount={runs.filter((run) => Boolean(run.archivedAt)).length} onModeChange={changeListMode} onCreate={onCreate} /></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");

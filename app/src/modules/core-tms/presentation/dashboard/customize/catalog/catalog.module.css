@@ -14,7 +14,7 @@
 .heading p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .search { display: flex; align-items: center; gap: 10px; width: 300px; flex: 0 1 300px; padding: 10px 13px; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 80%, var(--control)); border-radius: 8px; color: var(--muted); }
 .catalog .search input[type="search"] { min-width: 0; width: 100%; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 12px; outline: 0; box-shadow: none; }
-.search:focus-within { border-color: var(--store-blue); outline: 2px solid color-mix(in srgb, var(--store-blue) 12%, transparent); }
+.search:focus-within { border-color: var(--tms-focus-border); outline: 2px solid var(--tms-focus-border); }
 .search svg { flex-shrink: 0; }
 .layout { display: grid; grid-template-columns: 176px minmax(0, 1fr) minmax(300px, .65fr); gap: 22px; align-items: start; }
 .sidebar { position: sticky; top: 20px; padding: 0 18px 0 0; border-right: 1px solid var(--line); min-height: 420px; }

@@ -105,7 +105,7 @@ export function MarkdownField(props: Props) {
   if (draftProblem && draftProblem.fieldKey === props.attachmentKey) {
     attachmentProblem = draftProblem.message;
   }
-  return <div className={css.field} data-color-mode={colorMode} role="group" aria-label={props.label}
+  return <div className={css.field} data-editor-shell data-color-mode={colorMode} role="group" aria-label={props.label}
     onPasteCapture={(event) => {
       if (!addFiles) return;
       const files = filesFromClipboard(event.clipboardData);

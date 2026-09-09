@@ -52,7 +52,7 @@ function DashboardWorkspace(props: DashboardViewProps) {
     <header className={styles.header}>
       <div className={styles.heading}>
         <span className={styles.eyebrow}>{currentProject}<span> / </span>{t("dashboard.analyticsTitle")}</span>
-        {editing ? <input className={styles.name} aria-label={t("dashboardLayout.name")} maxLength={200}
+        {editing ? <input data-inline-title className={styles.name} aria-label={t("dashboardLayout.name")} maxLength={200}
           value={layout.draft!.name} disabled={disabled || layout.failure === "conflict"} onChange={(event) => layout.controller.rename(event.target.value)} />
           : <h1>{board?.name ?? t("dashboard.analyticsTitle")}</h1>}
         {editing && <p>{t("dashboardLayout.editHint")}</p>}

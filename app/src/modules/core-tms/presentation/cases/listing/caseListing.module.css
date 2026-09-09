@@ -55,7 +55,7 @@
   border-radius: 4px;
 }
 
-.inputShell:focus-within { border-color: var(--cases-primary); box-shadow: none; }
+.inputShell:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .inputShell input { min-width: 0; flex: 1; color: var(--cases-text); background: transparent; border: 0; outline: 0; font-size: 13px; font-weight: 400; }
 .controls .inputShell input:focus-visible { outline: 0; box-shadow: none; }
 .inputShell input::placeholder { color: var(--cases-faint); }
@@ -147,7 +147,7 @@
 .compactTag input,
 .facetSearch input { min-width: 0; height: 26px; padding: 0 7px; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; outline: 0; }
 .compactTag input:focus,
-.facetSearch:focus-within { border-color: var(--cases-primary); box-shadow: none; }
+.facetSearch:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
 .checkboxMark { width: 14px; height: 14px; display: grid; place-items: center; flex: 0 0 14px !important; color: var(--cases-on-primary); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; }
 [aria-checked="true"] > .checkboxMark { background: var(--cases-primary); border-color: var(--cases-primary); }
 .resetButton { justify-content: center; margin-top: 3px; color: var(--cases-link) !important; border-top: 1px solid var(--cases-row-border) !important; border-radius: 0 !important; font-size: 10px; }

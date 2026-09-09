@@ -78,8 +78,6 @@
 .header { flex: 0 0 auto; border-bottom: 1px solid var(--runs-border); }
 .utilityRow { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 14px 7px 24px; }
 .runContext { min-width: 0; display: flex; align-items: center; gap: 8px; color: var(--runs-muted); font-size: 12px; }
-.runContext strong { overflow: hidden; color: var(--runs-muted); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
-.runContext strong::after { margin-left: 8px; color: var(--runs-border-strong); content: "·"; }
 .headerActions { position: relative; display: flex; align-items: center; gap: 4px; }
 .headerIconButton { width: 30px !important; min-height: 30px !important; padding: 0 !important; border-radius: 4px !important; }
 .archiveButton { color: var(--runs-muted) !important; }
