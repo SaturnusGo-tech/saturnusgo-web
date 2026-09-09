@@ -93,3 +93,29 @@ Intentional adaptations: real Falcon recordings replace the generated mock inter
 Verification completed before release: 40 public/auth tests, 413 existing adapter/domain tests, 41 Worker/release tests; TypeScript and architecture checks passed. The existing lint script is a no-op. Build and production browser acceptance are enforced during the release process.
 
 No open P0/P1/P2 findings in the inspected states. No further visual change is required before release.
+
+## Landing refinement — continuous background and manual demonstrations — 2026-09-09
+
+The user's requested changes supersede the earlier large-video, numbered-chapter and automatic-playback choices. Source before/after comparison: `../output/falcon-landing-refinement-20260909/landing-refinement-comparison.png`, 3200 × 900 (1600 × 900 per side, DPR 1). The original wing, Falcon typography and existing real interface recordings remain the visual basis. The official Astra page was reviewed for restrained section transitions and a continuous atmospheric canvas; its content and product branding were not copied.
+
+- A generated 1672 × 941 dark atmosphere covers the page continuously. Transparent sections and a masked hero remove the former background boundary. The footer reuses the same wing mirrored to the left.
+- All five players are capped at 920 px and have an explicit central Play button. No autoplay, loop or automatic resume remains. Seeking, fullscreen, text descriptions and timed captions remain available.
+- Numbered chapters and repeated promotional supporting notes are removed. Headings and descriptions name the actual Falcon workflows.
+- Eleven existing service marks form one continuous strip. GitLab, Jenkins and TeamCity are explicitly marked «Скоро». A pause button, hover on the brand window and document visibility control motion; reduced-motion mode shows one wrapped static list.
+- One new YouTrack recording follows the catalog → linked report → linked execution → return. Recordly's approved Smooth composition rendered 2302 frames at 60 fps (38.3667 seconds). The public poster is taken at 13.8 seconds. No connection settings, credentials, report edits or outgoing notifications are part of this capture.
+- Section reveals use 34 px of movement over 0.8 seconds without scale, blur or scroll trapping. Reduced-motion preferences suppress decorative movement.
+
+### Findings and verification
+
+- [P2, resolved] The initial footer wordmark and description overlapped bright feathers. The artwork now fades before the metadata row, and the wordmark is white. `independent-footer-fixed-1600.png`, `independent-footer-fixed-390.png` and `independent-footer-fixed-320.png` confirm contrast while preserving the large left wing.
+- [P1, resolved] An early Play click could arrive before React listeners were ready. Controls now become actionable after hydration. Effect cleanup also preserves the explicit request through development StrictMode setup replay while cancelling playback on actual unmount. All five normal-motion players then passed explicit playback, seek and fullscreen checks.
+- [P2, resolved] At 320 px with reduced motion the static integration list retained its moving track's intrinsic width. The static group now takes the available width and wraps, retaining all eleven brands without horizontal overflow.
+- The seven playback lifecycle checks cover initial pause, a delayed MP4 request with Play→Pause, keyboard operation, offscreen/visibility pause without resume, natural ending without looping and explicit replay. A separate failed-request check verifies retry recovery remains paused until Play.
+- Independent 1600/390/320 px screenshots found no horizontal overflow or console errors. Full responsive QA additionally covers 768 and 1024 px. `independent-layout.json`, `manual-playback-qa.json`, `retry-qa.json` and the refinement browser report are retained with the screenshots outside the deployed repository.
+- Verification: 41 public/auth tests, 413 existing adapter/domain tests and 43 Worker/release tests pass; TypeScript and the 606-file TMS architecture check pass. The repository lint script is still a no-op. Static build and production acceptance are performed by the existing release pipeline.
+
+No open P0/P1/P2 visual findings in the inspected states.
+
+Final local browser acceptance: `local-refinement-qa.json` passed all five manual-play/seek/fullscreen checks, marquee pause/resume and 1600/1024/768/390/320 px layouts, including reduced-motion wrapping. Console errors and failed Falcon asset requests: none.
+
+final result: passed

@@ -23,29 +23,25 @@ export function FalconLanding() {
           id="product"
           aria-labelledby="overview-title"
         >
-          <ProductVideo demo={demos.dashboard} priority />
           <Reveal className={styles.overviewCopy}>
-            <p className={styles.eyebrow}>Вся работа над качеством</p>
-            <h2 id="overview-title">
-              Понимайте, что проверить.
-              <br />
-              <span>И что уже проверено.</span>
-            </h2>
+            <h2 id="overview-title">Дашборд проекта</h2>
             <p>
-              Соберите дашборд под свой проект. Перейдите от показателя к нужным
-              кейсам, прогонам или дефектам — и вернитесь к тому же месту.
+              Добавьте нужные виджеты. Следите за прогонами, дефектами и
+              проверками, которые требуют внимания.
             </p>
+          </Reveal>
+          <Reveal className={styles.videoReveal}>
+            <ProductVideo demo={demos.dashboard} priority />
           </Reveal>
         </section>
         <nav className={styles.chapterNav} aria-label="Возможности Falcon">
-          {workflow.map((item, index) => (
+          {workflow.map((item) => (
             <a key={item.id} href={`#${item.id}`}>
-              <span>0{index + 1}</span>
               {item.label}
             </a>
           ))}
         </nav>
-        {workflow.map((item, index) => (
+        {workflow.map((item) => (
           <section
             key={item.id}
             className={styles.workflowSection}
@@ -53,28 +49,19 @@ export function FalconLanding() {
             aria-labelledby={`${item.id}-title`}
           >
             <Reveal className={styles.sectionHeading}>
-              <p className={styles.eyebrow}>
-                0{index + 1} / {item.label}
-              </p>
               <div>
                 <h2 id={`${item.id}-title`}>{item.title}</h2>
                 <p>{item.description}</p>
               </div>
             </Reveal>
-            <ProductVideo demo={demos[item.id]} />
-            <div className={styles.sectionNotes}>
-              {item.points.map((point) => (
-                <div key={point.title}>
-                  <h3>{point.title}</h3>
-                  <p>{point.text}</p>
-                </div>
-              ))}
-            </div>
+            <Reveal className={styles.videoReveal}>
+              <ProductVideo demo={demos[item.id]} />
+            </Reveal>
           </section>
         ))}
         <FalconIntegrations />
         <section className={styles.faq} aria-labelledby="faq-title">
-          <h2 id="faq-title">Перед первым проектом</h2>
+          <h2 id="faq-title">Вопросы о Falcon</h2>
           <div>
             <details>
               <summary>С чего начать работу в Falcon?</summary>
@@ -112,17 +99,24 @@ export function FalconLanding() {
         </section>
       </main>
       <footer className={styles.footer}>
-        <div className={styles.footerCta}>
-          <p className={styles.eyebrow}>Следующий релиз начинается здесь</p>
+        <img
+          className={styles.footerWing}
+          src="/falcon/landing/2026-09/falcon-wing.webp"
+          alt=""
+          aria-hidden="true"
+          width={1672}
+          height={941}
+          loading="lazy"
+        />
+        <Reveal className={styles.footerCta}>
           <h2>
-            Дайте качеству
-            <br />
-            своё пространство.
+            Начать работу
+            <br />в Falcon
           </h2>
           <Link className={styles.primaryButton} href="/signup/">
             Создать аккаунт <ArrowRight size={17} aria-hidden="true" />
           </Link>
-        </div>
+        </Reveal>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
           <span>Управление тестированием</span>

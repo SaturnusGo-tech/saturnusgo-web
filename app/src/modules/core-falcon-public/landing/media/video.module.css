@@ -3,6 +3,7 @@
   min-width: 0;
 }
 .frame {
+  --controls-height: 50px;
   position: relative;
   overflow: hidden;
   border-radius: 18px;
@@ -18,7 +19,7 @@
   background: #111114;
 }
 .controls {
-  height: 50px;
+  height: var(--controls-height);
   display: flex;
   align-items: center;
   gap: 15px;
@@ -102,7 +103,7 @@
 }
 .error {
   position: absolute;
-  inset: 0 0 50px;
+  inset: 0 0 var(--controls-height);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -124,17 +125,17 @@
   background: #0b0c0e;
 }
 .frame:fullscreen .video {
-  max-height: calc(100vh - 50px);
+  max-height: calc(100vh - var(--controls-height));
   flex: 1;
   min-height: 0;
 }
 @media (max-width: 700px) {
   .frame {
+    --controls-height: 44px;
     border-radius: 10px;
   }
   .controls {
     gap: 8px;
-    height: 44px;
     padding: 0 8px;
   }
   .silent {
@@ -152,5 +153,67 @@
   }
   .transcript summary {
     white-space: nowrap;
+  }
+}
+
+.playOverlay {
+  position: absolute;
+  inset: 0 0 var(--controls-height);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: #07080a18;
+}
+.playButton {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid #ffffff45;
+  color: #fff;
+  background: #202126e6;
+  box-shadow: 0 6px 24px #0005;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background-color 160ms,
+    border-color 160ms;
+}
+.playButton:hover {
+  background: #34363cf2;
+  border-color: #ffffff80;
+}
+.playButton > svg:not(.spinner) {
+  margin-left: 3px;
+}
+.playButton:focus-visible,
+.controls button:focus-visible,
+.controls input:focus-visible,
+.error button:focus-visible {
+  outline: 2px solid #e2e3e7;
+  outline-offset: 4px;
+}
+.spinner {
+  animation: loading 900ms linear infinite;
+}
+@keyframes loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 700px) {
+  .playButton {
+    width: 58px;
+    height: 58px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playButton {
+    transition: none;
+  }
+  .spinner {
+    animation: none;
   }
 }

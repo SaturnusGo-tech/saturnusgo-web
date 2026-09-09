@@ -1,6 +1,6 @@
 "use client";
-import { Maximize2, Pause, Play, RotateCcw } from "lucide-react";
-import { useId } from "react";
+import { LoaderCircle, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
+import { useId, useRef } from "react";
 import type { ProductDemo } from "../content/demos";
 import { useProductPlayback } from "./useProductPlayback";
 import styles from "./video.module.css";
@@ -16,6 +16,7 @@ export function ProductVideo({
 }) {
   const player = useProductPlayback();
   const id = useId();
+  const playbackControl = useRef<HTMLButtonElement>(null);
   return (
     <figure className={styles.figure} aria-labelledby={id}>
       <div className={styles.frame} ref={player.frame}>
@@ -26,15 +27,14 @@ export function ProductVideo({
           src={player.load ? demo.src : undefined}
           preload={player.load ? "metadata" : "none"}
           muted
-          loop
           playsInline
           aria-label={demo.title}
           aria-describedby={`${id}-description`}
-          onLoadedData={player.ready}
           onLoadedMetadata={player.onMetadata}
           onTimeUpdate={player.onTime}
           onPlay={player.onPlay}
           onPause={player.onPause}
+          onEnded={player.onEnded}
           onError={player.onError}
         >
           {player.load && (
@@ -46,6 +46,33 @@ export function ProductVideo({
             />
           )}
         </video>
+        {!player.playing && !player.failed && (
+          <div className={styles.playOverlay}>
+            <button
+              className={styles.playButton}
+              disabled={!player.interactive}
+              onClick={() => {
+                player.toggle();
+                playbackControl.current?.focus({ preventScroll: true });
+              }}
+              aria-label={
+                player.starting
+                  ? `Отменить запуск: ${demo.title}`
+                  : `Воспроизвести видео: ${demo.title}`
+              }
+            >
+              {player.starting ? (
+                <LoaderCircle
+                  size={25}
+                  className={styles.spinner}
+                  aria-hidden="true"
+                />
+              ) : (
+                <Play size={25} fill="currentColor" aria-hidden="true" />
+              )}
+            </button>
+          </div>
+        )}
         {priority && <link rel="preload" as="image" href={demo.poster} />}
         {player.failed && (
           <div className={styles.error} role="status">
@@ -61,15 +88,16 @@ export function ProductVideo({
           aria-label={`Управление видео: ${demo.title}`}
         >
           <button
+            ref={playbackControl}
             onClick={player.toggle}
             aria-label={
-              player.playing
+              player.playing || player.starting
                 ? `Пауза: ${demo.title}`
                 : `Смотреть: ${demo.title}`
             }
-            disabled={player.failed}
+            disabled={!player.interactive || player.failed}
           >
-            {player.playing ? (
+            {player.playing || player.starting ? (
               <Pause size={17} fill="currentColor" aria-hidden="true" />
             ) : (
               <Play size={17} fill="currentColor" aria-hidden="true" />
@@ -92,6 +120,7 @@ export function ProductVideo({
           />
           <span className={styles.silent}>Без звука</span>
           <button
+            disabled={!player.interactive}
             aria-label={`На весь экран: ${demo.title}`}
             onClick={() => {
               const video = player.video.current as

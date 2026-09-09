@@ -109,9 +109,11 @@ write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }
-for (const id of ["dashboard", "cases", "runs", "defects", "integrations"]) {
+if (process.env.OMIT_ATMOSPHERE !== "1") write("out/falcon/landing/2026-09/atmosphere.webp", "falcon atmosphere\\n");
+for (const id of ["dashboard", "cases", "runs", "defects", "youtrack-demo"]) {
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
+    if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack-demo" && extension === "mp4") continue;
     write("out/falcon/landing/2026-09/" + id + "." + extension, "demo asset\\n");
   }
 }
@@ -181,6 +183,14 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     "falcon wing\n",
   );
   assert.equal(
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09/atmosphere.webp"), "utf8"),
+    "falcon atmosphere\n",
+  );
+  assert.equal(
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09/youtrack-demo.mp4"), "utf8"),
+    "demo asset\n",
+  );
+  assert.equal(
     readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
     "CURRENT TMS\n",
   );
@@ -236,6 +246,24 @@ test("fails closed when a required video is missing", (context) => {
   const result = deploy(fixture, "--publish", { OMIT_VIDEO: "1" });
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*runs\.mp4/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+test("fails closed when the continuous backdrop is missing", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_ATMOSPHERE: "1" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*atmosphere\.webp/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+test("fails closed when the current integration demonstration is missing", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_INTEGRATION_VIDEO: "1" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*youtrack-demo\.mp4/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
