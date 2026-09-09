@@ -23,3 +23,5 @@ Local fixture UI was used for dense, empty and failure states; the temporary har
 The final rail search height was measured at 36 px; remaining rail space is reserved for its independently scrolling navigation.
 
 Open P0/P1/P2 visual issues: none at the verified desktop viewport.
+
+A production component-to-runs check exposed an unsupported launched/component query. Related component history now uses the documented completed-run basis, labels that scope explicitly, and rejects obsolete incompatible deep links before querying. The adapter regression covers named and empty components, valid empty data, and unscoped launch history.

@@ -8,7 +8,7 @@ import styles from "./walkthrough.module.css";
 export function ArticleWalkthrough({ block }: { block: WalkthroughBlock }) {
   const [selected, setSelected] = useState<number | null>(null);
   return <div className={styles.root}>
-    <p className={styles.intro}>Пошаговый пример в учебном проекте Falcon Guide.
+    <p className={styles.intro}>Пошаговый пример работы в Falcon.
       Нажмите на снимок, чтобы рассмотреть интерфейс.</p>
     <ol className={styles.sequence} aria-label={block.title}>
       {block.steps.map((step, index) => <li key={step.image.src} className={styles.step}>

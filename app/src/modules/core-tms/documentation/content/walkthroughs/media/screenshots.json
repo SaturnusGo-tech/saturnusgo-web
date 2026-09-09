@@ -203,14 +203,6 @@
     "width": 1087,
     "height": 814
   },
-  "dashboard-v2-12-drill": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-13-run": {
-    "width": 1087,
-    "height": 814
-  },
   "dashboard-v3-02-catalog": {
     "width": 1280,
     "height": 720
@@ -274,5 +266,25 @@
   "settings-04-edit-project": {
     "width": 1087,
     "height": 814
+  },
+  "dashboard-v4-01-component": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-02-selection": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-03-builder": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-04-defects": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-05-runs": {
+    "width": 1359,
+    "height": 1018
   }
 }
