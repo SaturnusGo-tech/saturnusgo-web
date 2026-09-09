@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
 import {
   formatTmsMutationFailure,
@@ -36,9 +36,15 @@ export function useCaseBulkActions(
   const operation = useRef<PendingOperation | null>(null);
   const inFlight = useRef<Promise<BulkCaseMutationResult> | null>(null);
   const ru = locale === "ru";
+  const scope = JSON.stringify([state.data.workspace.id, derived.project?.id, state.view, state.connection]);
+  const latest = useRef({ scope, caseId: state.selectedCaseId });
+  latest.current = { scope, caseId: state.selectedCaseId };
+  const mounted = useRef(false);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
 
-  async function refreshSafely(projectId: string) {
-    try { await state.loadProject(projectId); } catch {}
+  async function refreshSafely(projectId: string, isCurrent: () => boolean) {
+    if (!isCurrent()) return;
+    try { await state.refreshProject(projectId); } catch {}
   }
 
   async function execute(
@@ -61,6 +67,12 @@ export function useCaseBulkActions(
         ? "Массовое изменение доступно только при подключении к TMS."
         : "Bulk updates require a TMS connection." };
     }
+    const navigationCurrent = state.captureProjectNavigationGuard();
+    const isCurrent = () => mounted.current && latest.current.scope === scope && navigationCurrent();
+    const stale: BulkCaseMutationResult = { ok: false, message: ru
+      ? "Контекст изменился. Обновите список перед следующим действием."
+      : "The context changed. Refresh the list before the next action." };
+    if (!isCurrent()) return stale;
     const ids = Array.from(new Set(caseIds));
     if (ids.length === 0 || ids.length > MAX_CASE_BULK_MUTATION_ITEMS) {
       return { ok: false, message: ru
@@ -70,7 +82,7 @@ export function useCaseBulkActions(
     const byId = new Map(derived.projectCases.map((item) => [item.id, item]));
     const targets = ids.map((id) => byId.get(id));
     if (targets.some((item) => !item || item.archivedAt || !item.etag)) {
-      await refreshSafely(project.id);
+      await refreshSafely(project.id, isCurrent);
       return { ok: false, message: ru
         ? "Состав или версии кейсов изменились. Список обновлён — проверьте выбор и повторите."
         : "Case scope or versions changed. The list was refreshed; review the selection and retry." };
@@ -84,14 +96,15 @@ export function useCaseBulkActions(
         items,
         patch,
       }, operation.current.key);
+      operation.current = null;
+      if (!isCurrent()) return stale;
       state.setData((current) => ({
         ...current,
         testCases: reconcileCaseSummaries(current.testCases, result.items),
       }));
-      if (result.items.some((item) => item.id === state.selectedCaseId)) {
+      if (result.items.some((item) => item.id === latest.current.caseId)) {
         state.retrySelectedCaseDetail();
       }
-      operation.current = null;
       notify(ru
         ? `Обновлено: ${result.updatedCount}; без изменений: ${result.unchangedCount}.`
         : `Updated: ${result.updatedCount}; unchanged: ${result.unchangedCount}.`);
@@ -99,8 +112,9 @@ export function useCaseBulkActions(
     } catch (error) {
       const failure = toTmsMutationFailure(error);
       if (shouldRefreshAfterBulkFailure(failure.code)) {
-        await refreshSafely(project.id);
+        await refreshSafely(project.id, isCurrent);
       }
+      if (!isCurrent()) return stale;
       const fallback = ru
         ? "Не удалось изменить выбранные тест-кейсы."
         : "The selected test cases could not be updated.";

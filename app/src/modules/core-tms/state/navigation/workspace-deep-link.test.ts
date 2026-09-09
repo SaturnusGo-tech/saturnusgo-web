@@ -107,11 +107,16 @@ test("retired integration testing links open the repository without changing con
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=hooks&integration=swagger"), { view: "hooks", runId: null });
 });
 
-test("catalog details survive project changes inside their workspace but never cross workspace boundaries", () => {
-  for (const selector of ["portfolioId", "catalogProjectId"]) {
-    const previous = `https://tms.example/work/?workspaceId=w&projectId=p&view=portfolios&${selector}=detail`;
-    const input = { workspaceId: "w", projectId: "other-project", view: "portfolios" as const, runId: null };
-    assert.equal(new URL(buildWorkspaceDeepLink(previous, input)).searchParams.get(selector), "detail");
-    assert.equal(new URL(buildWorkspaceDeepLink(previous, { ...input, workspaceId: "other-workspace" })).searchParams.get(selector), null);
-  }
+test("portfolio detail survives project changes, while embedded project detail follows the active project", () => {
+  const base = "https://tms.example/work/?workspaceId=w&projectId=p&view=portfolios";
+  const input = { workspaceId: "w", projectId: "other-project", view: "portfolios" as const, runId: null };
+  const portfolio = `${base}&portfolioId=detail`;
+  assert.equal(new URL(buildWorkspaceDeepLink(portfolio, input)).searchParams.get("portfolioId"), "detail");
+  assert.equal(new URL(buildWorkspaceDeepLink(portfolio, { ...input, workspaceId: "other-workspace" })).searchParams.get("portfolioId"), null);
+  const project = `${base}&catalogProjectId=p`;
+  assert.equal(new URL(buildWorkspaceDeepLink(project, { ...input, projectId: "p" })).searchParams.get("catalogProjectId"), "p");
+  assert.equal(new URL(buildWorkspaceDeepLink(project, input)).searchParams.get("catalogProjectId"), null);
+  const activating = `${base}&catalogProjectId=other-project`;
+  assert.equal(new URL(buildWorkspaceDeepLink(activating, input)).searchParams.get("catalogProjectId"), "other-project");
+  assert.equal(new URL(buildWorkspaceDeepLink(activating, { ...input, workspaceId: "other-workspace" })).searchParams.get("catalogProjectId"), null);
 });

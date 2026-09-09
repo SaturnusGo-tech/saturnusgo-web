@@ -19,7 +19,9 @@ export async function getPortfolio(http: TmsHttpClient, id: string, signal?: Abo
 
 export async function savePortfolio(http: TmsHttpClient, workspaceId: string, draft: PortfolioDraft, current: { id: string; etag: string | null } | null, operationKey: string, signal?: AbortSignal) {
   if (current && !current.etag) throw new Error("Portfolio ETag is required.");
-  const fields = { name: draft.name.trim(), description: draft.description.trim(), responsibleIdentityId: draft.responsibleIdentityId };
+  const fields = { name: draft.name.trim(), description: draft.description.trim(), responsibleIdentityId: draft.responsibleIdentityId,
+    ...(draft.workflowPhase !== undefined ? { workflowPhase: draft.workflowPhase } : {}),
+    ...(draft.checklist !== undefined ? { checklist: draft.checklist.map((item) => ({ ...item, text: item.text.trim() })) } : {}) };
   const body = current ? fields satisfies Api["PortfolioPatchRequest"] : { workspaceId, ...fields } satisfies Api["PortfolioCreateRequest"];
   const result = await http.mutateResource<Api["Portfolio"]>(current ? `/portfolios/${encodeURIComponent(current.id)}` : "/portfolios",
     current ? "PATCH" : "POST", body, { idempotencyKey: operationKey, ifMatch: current?.etag ?? undefined, signal });

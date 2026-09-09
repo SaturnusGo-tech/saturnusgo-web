@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PiFolderSimpleLight, PiMagnifyingGlass } from "react-icons/pi";
+import { PiFolderSimpleDuotone, PiMagnifyingGlass } from "react-icons/pi";
 import { formatTmsMutationFailure, type TmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
 import { Modal } from "../../../presentation/common/modal/Modal";
 import { FormError } from "../../../presentation/common/error/FormError";
@@ -24,7 +24,7 @@ export function AttachProjectDialog({ workspaceId, copy, pending, error, onAttac
         <ResourceFeedback loading={page.loading} error={page.error} copy={copy} retry={page.reload} />
         <fieldset className={styles.choices}><legend className={styles.srOnly}>{copy.choose}</legend>
           {items.map((project) => <label key={project.id} className={styles.choice} data-selected={selected === project.id}>
-            <PiFolderSimpleLight size={25} aria-hidden="true" /><span>{project.name}<small>{project.key}</small></span>
+            <PiFolderSimpleDuotone size={20} aria-hidden="true" /><span>{project.name}<small>{project.key}</small></span>
             <input type="radio" name="project" value={project.id} checked={selected === project.id} disabled={pending} onChange={() => setSelected(project.id)} />
           </label>)}
         </fieldset>

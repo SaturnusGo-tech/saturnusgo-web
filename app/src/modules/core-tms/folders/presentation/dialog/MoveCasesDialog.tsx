@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PiArrowBendDownRightDuotone } from "react-icons/pi";
 import { Modal } from "../../../presentation/common/modal/Modal";
 import { ParentFolderPicker } from "../../../presentation/dialogs/folder/parent/ParentFolderPicker";
+import { FolderBreadcrumb } from "../../../presentation/dialogs/folder/breadcrumb/FolderBreadcrumb";
 import type { FolderResource } from "../../model/folder";
 import shared from "../../../tms.module.css";
 import css from "../styles/dialog.module.css";
@@ -22,9 +23,9 @@ export function MoveCasesDialog({ resource, ids, ru, onClose, onMoved }: {
     <div className={css.body}>
       <p>{ru ? `Выбрано кейсов: ${ids.length}. История, связи и результаты прогонов сохранятся.` : `${ids.length} cases selected. History, links and run results stay with each case.`}</p>
       <label className={css.label}>{ru ? "Куда переместить" : "Destination"}</label>
-      <ParentFolderPicker value={target} options={options} label={ru ? "Папка назначения" : "Destination folder"}
+      <ParentFolderPicker inline value={target} options={options} label={ru ? "Папка назначения" : "Destination folder"}
         searchLabel={ru ? "Найти папку" : "Find folder"} emptyLabel={ru ? "Папки не найдены" : "No matching folders"} onChange={setTarget} />
-      <div className={css.destination}><PiArrowBendDownRightDuotone size={20} /><span>{target === "/" ? (ru ? "Без папки" : "Unfiled") : target.split("/").filter(Boolean).join(" / ")}</span></div>
+      <div className={css.destination}><PiArrowBendDownRightDuotone size={20} /><span><FolderBreadcrumb path={target} root={ru ? "Без папки" : "Unfiled"} /></span></div>
       {error && <p role="alert" className={css.error}>{error}</p>}
     </div>
     <footer className={css.footer}><button className={shared.textButton} disabled={resource.busy} onClick={onClose}>{ru ? "Отмена" : "Cancel"}</button>

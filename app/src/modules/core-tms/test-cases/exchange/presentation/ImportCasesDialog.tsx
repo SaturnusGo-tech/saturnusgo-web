@@ -61,7 +61,7 @@ export function ImportCasesDialog(props: ImportCasesDialogProps) {
         <span>{copy.done}: {state.completed} / {total}</span>
         {state.busy && total > 0 && <progress value={state.attempted} max={total} aria-label={copy.processed} />}
       </div>}
-      {(state.locked || state.plan) && <p className={css.hint}>{copy.partialRule}</p>}
+      {(state.phase === "partial" || state.phase === "stopped") && <p className={css.hint}>{copy.partialRule}</p>}
       {state.error && <p role="alert" className={css.error}>{state.error}</p>}
       {state.failed.length > 0 && <details className={css.failures}><summary>{copy.errors}: {state.failed.length}</summary>
         <ul>{state.failed.map((item, index) => <li key={index}><strong>{item.sourceKey}</strong> — {item.message}</li>)}</ul>

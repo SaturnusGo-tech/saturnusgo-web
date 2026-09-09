@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { assertLazyMarkdownLoading } from "./markdown/markdown-loading";
 
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
@@ -25,7 +26,6 @@ const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.met
 test("markdown fields use a client-only WYSIWYG editor with an interactive loading fallback", () => {
   assert.match(source, /dynamic\([\s\S]*ssr: false/);
   assert.match(source, /loading: \(\) => <MarkdownEditorLoadingFallback/);
-  assert.match(source, /void loadMarkdownEditor\(\)/);
   assert.match(source, /className=\{css\.editorLoadingInput\}/);
   assert.match(source, /value=\{state\.value\}/);
   assert.match(source, /onChange=\{\(event\) => state\.onChange\(event\.target\.value\)\}/);
@@ -44,6 +44,8 @@ test("markdown fields use a client-only WYSIWYG editor with an interactive loadi
   assert.doesNotMatch(initialized, /diffSourcePlugin|DiffSourceToggleWrapper/);
   assert.doesNotMatch(source, /preview="(?:edit|live)"/);
 });
+
+test("read-only Markdown defers editor loading until edit and preserves real import failures", assertLazyMarkdownLoading);
 
 test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", () => {
   assert.match(initialized, /suppressHtmlProcessing/);

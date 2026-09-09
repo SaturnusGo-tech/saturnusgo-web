@@ -1,0 +1,28 @@
+.controls { position: relative; z-index: 8; display: grid; gap: 9px; margin: 0 7px 15px; }
+.search { min-width: 0; height: 35px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--cases-row-border); border-radius: 10px; color: var(--cases-muted); background: var(--cases-raised); }
+.search:focus-within { border-color: var(--cases-control-border); box-shadow: 0 0 0 2px color-mix(in srgb, var(--cases-control-border) 25%, transparent); }
+.search input { width: 100%; min-width: 0; color: var(--cases-text); background: transparent; border: 0; outline: none; font: inherit; font-size: 12px; }
+.controls .search input:focus-visible { outline: none !important; box-shadow: none; }
+.search > svg { flex-shrink: 0; }
+.search > button { display: grid; place-items: center; padding: 0; width: 20px; height: 24px; border-radius: 6px; }
+.tools { display: flex; align-items: center; gap: 3px; }
+.controls .tool, .controls .create { height: 31px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 7px; border-radius: 8px; font-size: 11px; white-space: nowrap; }
+.controls .tool { color: var(--cases-secondary-text); }
+.controls .tool:hover, .controls .tool[aria-pressed=true], .controls .tool[aria-expanded=true] { background: var(--cases-hover); }
+.controls .tool[data-active] { color: var(--cases-link); }
+.tool b { font-size: 10px; }
+.controls .create { margin-left: auto; background: var(--cases-primary); color: #fff; padding-inline: 9px; }
+.controls .create:hover:not(:disabled) { background: #2d68dc; }
+.create > :is(span,svg) { color: #fff; }
+.filter { position: relative; }
+.filter > div { left: -86px; right: auto; max-width: min(300px, calc(100vw - 40px)); border-radius: 13px; box-shadow: 0 10px 30px #0002; }
+.filter > div button { border-radius: 8px; }
+.ql > div > label { border-radius: 9px; }
+.ql > div > div { max-width: calc(100vw - 40px); border-radius: 12px; }
+.selection { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.selection button { padding: 3px 0; color: var(--cases-link); font-size: 11px; }
+.selection button:hover { text-decoration: underline; }
+.controls { container: repository-controls / inline-size; }
+.filter { position: static; }
+.filter > div { left: 0; top: calc(100% + 5px); width: 100%; }
+@container repository-controls (max-width: 245px) { .tools .tool > span { display: none; } }

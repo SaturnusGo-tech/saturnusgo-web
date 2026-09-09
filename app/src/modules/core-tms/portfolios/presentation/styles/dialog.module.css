@@ -15,7 +15,7 @@
 .footer { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-shrink: 0; padding: 17px 25px; border-top: 1px solid var(--line); background: var(--paper); }
 .footer button, .loadMore { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 8px 13px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink); background: var(--paper); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
 .footer button:hover, .loadMore:hover { background: var(--control-hover); }
-.footer .primary { background: var(--action); color: #fff; border-color: var(--action); }
+.footer .primary { background: var(--action); color: #fff !important; border-color: var(--action); }
 .footer .primary:hover { background: var(--yt-primary-hover, var(--action)); border-color: var(--yt-primary-hover, var(--action)); }
 .panel button:disabled, .panel input:disabled, .panel textarea:disabled { opacity: .55; cursor: default; }
 .panel button:focus-visible, .choice input:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 3px; }
@@ -25,7 +25,7 @@
 .choices { display: grid; gap: 6px; max-height: 300px; overflow-y: auto; margin: 0; padding: 0; border: 0; }
 .choice { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); cursor: pointer; }
 .choice:hover, .choice[data-selected=true] { background: var(--control-hover); border-color: var(--line-strong); }
-.choice > svg { color: var(--muted); flex-shrink: 0; }
+.choice > svg { color: #7c9abb; flex-shrink: 0; }
 .choice > span { flex: 1; display: grid; gap: 4px; font-size: 13px; }
 .choice small { color: var(--muted); font-size: 11px; }
 .choice input { accent-color: var(--action); width: 15px; height: 15px; }

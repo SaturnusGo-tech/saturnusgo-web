@@ -74,6 +74,9 @@
     },
     {
       "name": "Repository folders"
+    },
+    {
+      "name": "Organization discussion"
     }
   ],
   "paths": {
@@ -3708,12 +3711,27 @@
           "Attachments"
         ],
         "summary": "List private attachment metadata",
-        "description": "Returns bounded metadata for every lifecycle state, including deleted tombstones retained for history. Object keys and provider details are never exposed.",
+        "description": "Returns bounded metadata for every lifecycle state, including deleted tombstones retained for history. Object keys and provider details are never exposed. Exactly one projectId or portfolioId is required; portfolio lists are always restricted to that portfolio. Archived organization files remain readable.",
         "operationId": "listAttachments",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
-            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Exactly one projectId or portfolioId is required."
+          },
+          {
+            "name": "portfolioId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Portfolio-only scope. The exact portfolio owner filter is inferred; a provided owner must match."
           },
           {
             "$ref": "#/components/parameters/Cursor"
@@ -8801,6 +8819,200 @@
         "x-tms-concurrency": "per-item-required",
         "description": "Up to 1000 unique case IDs with strong per-case ETags. All targets are authorized and checked before any write. IDs, content revisions, run snapshots, links and history remain unchanged. Moving to targetFolderId=null removes folder membership while retaining the case at the repository root. Archives never hard-delete."
       }
+    },
+    "/projects/{projectId}/comments": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "List project discussion newest first",
+        "operationId": "listProjectComments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires project:read in the selected workspace. Cursor binds workspace, target type and target ID. Archived targets remain readable."
+      },
+      "post": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "Append a project discussion comment",
+        "operationId": "createProjectComment",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/OrganizationCommentCreate"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires project:manage and active workspace, target, identity and membership. Append-only with same-transaction safe audit metadata. Identical retried requests replay for 24 hours, including after target archival; reusing a key for another target or body returns 409. No HTML interpretation."
+      }
+    },
+    "/portfolios/{portfolioId}/comments": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/PortfolioIdPath"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "List portfolio discussion newest first",
+        "operationId": "listPortfolioComments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires project:read in the selected workspace. Cursor binds workspace, target type and target ID. Archived targets remain readable."
+      },
+      "post": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "Append a portfolio discussion comment",
+        "operationId": "createPortfolioComment",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/OrganizationCommentCreate"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires project:manage and active workspace, target, identity and membership. Append-only with same-transaction safe audit metadata. Identical retried requests replay for 24 hours, including after target archival; reusing a key for another target or body returns 409. No HTML interpretation."
+      }
     }
   },
   "components": {
@@ -9529,6 +9741,16 @@
           "application/merge-patch+json": {
             "schema": {
               "$ref": "#/components/schemas/PortfolioPatchRequest"
+            }
+          }
+        }
+      },
+      "OrganizationCommentCreate": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrganizationCommentCreateRequest"
             }
           }
         }
@@ -11040,6 +11262,42 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/PortfolioEnvelope"
+            }
+          }
+        }
+      },
+      "OrganizationCommentListResponse": {
+        "description": "A bounded page of append-only comments ordered newest first.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrganizationCommentListEnvelope"
+            }
+          }
+        }
+      },
+      "OrganizationCommentResponse": {
+        "description": "New or idempotently replayed append-only comment.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrganizationCommentEnvelope"
             }
           }
         }
@@ -12578,7 +12836,9 @@
           "shared_step_revision",
           "run",
           "run_attempt",
-          "defect"
+          "defect",
+          "project",
+          "portfolio"
         ]
       },
       "PageMeta": {
@@ -14499,7 +14759,10 @@
           "updatedAt",
           "portfolioId",
           "responsibleIdentityId",
-          "rowVersion"
+          "rowVersion",
+          "testingPlan",
+          "workflowPhase",
+          "checklist"
         ],
         "properties": {
           "id": {
@@ -14560,6 +14823,17 @@
           "rowVersion": {
             "type": "integer",
             "minimum": 1
+          },
+          "testingPlan": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Persisted testing plan, independent of project description. Defaults to an empty string."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -14614,6 +14888,17 @@
                 "type": "null"
               }
             ]
+          },
+          "testingPlan": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Persisted testing plan, independent of project description. Defaults to an empty string."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -14655,6 +14940,17 @@
                 "type": "null"
               }
             ]
+          },
+          "testingPlan": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Persisted testing plan, independent of project description. Defaults to an empty string."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -20583,6 +20879,12 @@
           },
           {
             "$ref": "#/components/schemas/DefectAttachmentOwner"
+          },
+          {
+            "$ref": "#/components/schemas/ProjectAttachmentOwner"
+          },
+          {
+            "$ref": "#/components/schemas/PortfolioAttachmentOwner"
           }
         ],
         "discriminator": {
@@ -20592,7 +20894,9 @@
             "shared_step_revision": "#/components/schemas/SharedStepRevisionAttachmentOwner",
             "run": "#/components/schemas/RunAttachmentOwner",
             "run_attempt": "#/components/schemas/RunAttemptAttachmentOwner",
-            "defect": "#/components/schemas/DefectAttachmentOwner"
+            "defect": "#/components/schemas/DefectAttachmentOwner",
+            "project": "#/components/schemas/ProjectAttachmentOwner",
+            "portfolio": "#/components/schemas/PortfolioAttachmentOwner"
           }
         }
       },
@@ -20623,7 +20927,15 @@
             "$ref": "#/components/schemas/Identifier"
           },
           "projectId": {
-            "$ref": "#/components/schemas/Identifier"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null only for a portfolio-owned attachment. The owner carries its portfolioId."
           },
           "owner": {
             "$ref": "#/components/schemas/AttachmentOwner"
@@ -20831,7 +21143,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "projectId",
           "owner",
           "kind",
           "originalFilename",
@@ -20865,8 +21176,34 @@
           "sha256": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
+          },
+          "portfolioId": {
+            "$ref": "#/components/schemas/Identifier"
           }
-        }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "projectId"
+            ],
+            "not": {
+              "required": [
+                "portfolioId"
+              ]
+            }
+          },
+          {
+            "required": [
+              "portfolioId"
+            ],
+            "not": {
+              "required": [
+                "projectId"
+              ]
+            }
+          }
+        ],
+        "description": "Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner."
       },
       "AttachmentUploadIntent": {
         "type": "object",
@@ -24018,7 +24355,9 @@
           "responsibleIdentityId",
           "rowVersion",
           "archivedAt",
-          "projectCount"
+          "projectCount",
+          "workflowPhase",
+          "checklist"
         ],
         "properties": {
           "id": {
@@ -24073,6 +24412,12 @@
             "type": "integer",
             "minimum": 0,
             "description": "Count of active projects currently associated with this portfolio; aggregated for at most 100 portfolio IDs per request."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -24105,6 +24450,12 @@
               }
             ],
             "description": "An active member in this workspace, or null. Assignment does not alter membership or permissions."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -24131,6 +24482,12 @@
               }
             ],
             "description": "An active member in this workspace, or null. Assignment does not alter membership or permissions."
+          },
+          "workflowPhase": {
+            "$ref": "#/components/schemas/OrganizationWorkflowPhase"
+          },
+          "checklist": {
+            "$ref": "#/components/schemas/OrganizationChecklist"
           }
         }
       },
@@ -24652,6 +25009,193 @@
             "$ref": "#/components/schemas/RepositoryFolderArchiveCasesResult"
           }
         }
+      },
+      "OrganizationComment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "body",
+          "author",
+          "createdAt",
+          "workspaceId",
+          "targetType",
+          "targetId"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000,
+            "description": "Trimmed plain text. Render escaped; HTML is not interpreted. Author display name is captured at creation."
+          },
+          "author": {
+            "$ref": "#/components/schemas/OrganizationCommentAuthor"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "project",
+              "portfolio"
+            ]
+          },
+          "targetId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "OrganizationCommentAuthor": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "displayName"
+        ],
+        "properties": {
+          "identityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "OrganizationCommentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OrganizationComment"
+          }
+        }
+      },
+      "OrganizationCommentListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/OrganizationComment"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
+      },
+      "OrganizationCommentCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "ProjectAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "projectId"
+        ],
+        "properties": {
+          "kind": {
+            "const": "project"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "PortfolioAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "portfolioId"
+        ],
+        "properties": {
+          "kind": {
+            "const": "portfolio"
+          },
+          "portfolioId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "OrganizationWorkflowPhase": {
+        "type": "string",
+        "enum": [
+          "new",
+          "in_progress",
+          "in_review",
+          "done",
+          "on_hold"
+        ],
+        "description": "Work phase, independent of active/archived lifecycle. New entities default to new."
+      },
+      "OrganizationChecklistItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "completed"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "description": "Stable item identity, unique within this checklist."
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Trimmed task text."
+          },
+          "completed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OrganizationChecklist": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "$ref": "#/components/schemas/OrganizationChecklistItem"
+        },
+        "description": "Ordered checklist with unique stable item IDs. PATCH replaces the entire checklist under the entity ETag. Defaults to an empty list."
       }
     }
   }

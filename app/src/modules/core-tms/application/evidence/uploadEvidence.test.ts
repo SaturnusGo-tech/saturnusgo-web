@@ -13,7 +13,7 @@ test("uploads evidence through private intents with stable retry keys", async ()
       uploads.push(input);
       return {
         id: `attachment-${uploads.length}`,
-        projectId: input.projectId,
+        projectId: input.projectId ?? null,
         owner: input.owner,
         kind: input.kind,
         originalFilename: input.file.name,

@@ -27,7 +27,8 @@ export function CaseBulkActionBar(props: {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const overLimit = props.selectedCount > props.mutationLimit;
-  const mutationDisabled = pending || props.externalBusy || overLimit || !props.mutationEnabled;
+  const busy = pending || Boolean(props.externalBusy);
+  const mutationDisabled = busy || overLimit || !props.mutationEnabled;
   const mutationHint = overLimit
     ? (ru ? `За один раз можно изменить до ${props.mutationLimit} кейсов` : `You can update up to ${props.mutationLimit} cases at once`)
     : !props.mutationEnabled
@@ -68,27 +69,26 @@ export function CaseBulkActionBar(props: {
   }
 
   return (
-    <div ref={root} className={styles.bulkBar} role="region" aria-label={ru ? "Действия с выбранными тест-кейсами" : "Selected test case actions"}>
-      <strong>{ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}</strong>
-      <div className={styles.bulkActionsViewport}>
-        {props.onMove && <button type="button" disabled={pending || props.externalBusy} onClick={props.onMove}><PiArrowBendDownRightDuotone size={17} />{ru ? "Переместить" : "Move"}</button>}
-        {props.onRemove && <button type="button" disabled={pending || props.externalBusy} onClick={props.onRemove}><PiFolderSimpleMinusDuotone size={17} />{ru ? "Убрать из папки" : "Unfile"}</button>}
-        {props.onArchive && <button type="button" disabled={pending || props.externalBusy} onClick={props.onArchive}><Archive size={15} />{ru ? "В архив" : "Archive"}</button>}
-        <button type="button" className={styles.bulkRun} disabled={pending} onClick={props.onCreateRun} aria-label={ru ? "Создать тест-ран" : "Create test run"}>
-          <Play size={13} aria-hidden="true" />
-          <span className={styles.bulkLongLabel}>{ru ? "Создать тест-ран" : "Create test run"}</span>
-          <span className={styles.bulkShortLabel} aria-hidden="true">{ru ? "Ран" : "Run"}</span>
-        </button>
-        <div className={styles.bulkHint} title={mutationHint}>
-          <BulkActionMenu id="bulk-lifecycle" label={pending ? (ru ? "Сохранение…" : "Saving…") : (ru ? "Изменить статус" : "Change status")} compactLabel={pending ? "…" : (ru ? "Статус" : "Status")} open={menu === "lifecycle"} disabled={mutationDisabled} options={lifecycleOptions} onToggle={() => setMenu((current) => current === "lifecycle" ? null : "lifecycle")} onClose={() => setMenu(null)} onSelect={(value) => mutate(() => props.onChangeLifecycle(value))} />
-        </div>
-        <div className={styles.bulkHint} title={mutationHint}>
-          <BulkActionMenu id="bulk-priority" label={ru ? "Изменить приоритет" : "Change priority"} compactLabel={ru ? "Приоритет" : "Priority"} open={menu === "priority"} disabled={mutationDisabled} options={priorityOptions} onToggle={() => setMenu((current) => current === "priority" ? null : "priority")} onClose={() => setMenu(null)} onSelect={(value) => mutate(() => props.onChangePriority(value))} />
-        </div>
-      </div>
-      <span className={styles.bulkSpacer} />
+    <div ref={root} className={styles.bulkBar} role="region" aria-label={ru ? "Действия с выбранными тест-кейсами" : "Selected test case actions"} aria-busy={busy || undefined}>
+      <strong className={styles.bulkCount} title={ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}>
+        {ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}
+      </strong>
+      {props.onMove && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onMove} aria-label={ru ? "Переместить выбранные кейсы" : "Move selected cases"}>
+        <PiArrowBendDownRightDuotone size={17} aria-hidden="true" /><span>{ru ? "Переместить" : "Move"}</span>
+      </button>}
+      <button type="button" className={styles.bulkPrimary} disabled={busy} onClick={props.onCreateRun}><Play size={15} /><span>{ru ? "Создать тест-ран" : "Create test run"}</span></button>
+      <BulkActionMenu id="bulk-lifecycle" label={ru ? "Изменить статус" : "Change status"} compactLabel={ru ? "Статус" : "Status"} icon={<FilePenLine size={15} />}
+        open={menu === "lifecycle"} disabled={mutationDisabled} hint={mutationHint} options={lifecycleOptions}
+        onToggle={() => setMenu((value) => value === "lifecycle" ? null : "lifecycle")} onClose={() => setMenu(null)}
+        onSelect={(value) => void mutate(() => props.onChangeLifecycle(value))} />
+      <BulkActionMenu id="bulk-priority" label={ru ? "Изменить приоритет" : "Change priority"} compactLabel={ru ? "Приоритет" : "Priority"} icon={<AlertTriangle size={15} />}
+        open={menu === "priority"} disabled={mutationDisabled} hint={mutationHint} options={priorityOptions}
+        onToggle={() => setMenu((value) => value === "priority" ? null : "priority")} onClose={() => setMenu(null)}
+        onSelect={(value) => void mutate(() => props.onChangePriority(value))} />
+      {props.onRemove && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onRemove}><PiFolderSimpleMinusDuotone size={17} /><span>{ru ? "Убрать из папки" : "Unfile"}</span></button>}
+      {props.onArchive && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onArchive}><Archive size={15} /><span>{ru ? "В архив" : "Archive"}</span></button>}
+      <button type="button" className={styles.bulkClose} disabled={busy} onClick={props.onClear} aria-label={ru ? "Снять выделение" : "Clear selection"}><X size={17} aria-hidden="true" /></button>
       {error && <span className={styles.bulkError} role="alert">{error}</span>}
-      <button type="button" className={styles.bulkClose} disabled={pending} onClick={props.onClear} aria-label={ru ? "Снять выделение" : "Clear selection"}><X size={17} /></button>
     </div>
   );
 }

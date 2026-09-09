@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { loadProjectCatalog } from "../../../projects/catalog/application/list-projects";
@@ -14,13 +14,16 @@ export type PortfoliosViewProps = {
   workspaceId: string;
   offline: boolean;
   canManage?: boolean;
+  canManageAttachments?: boolean;
+  canReadAttachments?: boolean;
   route?: PortfolioRoute;
   onNavigate?: (route: PortfolioRoute) => void;
-  onOpenCases: (projectId: string) => void;
+  onActivateProject: (projectId: string) => Promise<boolean>;
+  projectCases: ReactNode;
   onProjectCreated: (project: Project) => void;
   onProjectUpdated: (project: Project, etag: string | null) => void;
 };
-type Dialog = null | "portfolio-create" | "portfolio-edit" | "project-create" | "project-edit" | "attach" | "archive";
+type Dialog = null | "portfolio-edit" | "project-edit" | "attach" | "archive";
 
 export function usePortfoliosView(props: PortfoliosViewProps) {
   const http = useTmsHttpClient();
@@ -31,7 +34,7 @@ export function usePortfoliosView(props: PortfoliosViewProps) {
   const [search, setSearch] = useState("");
   const [dialog, setDialog] = useState<Dialog>(null);
   const [notice, setNotice] = useState<"project" | "portfolio" | null>(null);
-  const resourceId = route.kind === "catalog" ? "" : route.id;
+  const resourceId = "id" in route ? route.id : "";
   const scope = `${props.workspaceId}:${route.kind}:${resourceId}`;
   useEffect(() => { setDialog(null); setSearch(""); setStatus("active"); }, [scope]);
   const enabled = Boolean(props.workspaceId) && !props.offline;
@@ -42,7 +45,7 @@ export function usePortfoliosView(props: PortfoliosViewProps) {
     (cursor, signal) => loadProjectCatalog(http, { workspaceId: props.workspaceId, status,
       portfolioId: route.kind === "portfolio" ? route.id : undefined, unassigned: route.kind === "catalog" && tab === "unassigned" }, cursor, signal));
   const project = useResource(`${scope}:project`, enabled && route.kind === "project", (signal) => loadCatalogProject(http, resourceId, signal));
-  const portfolioId = route.kind === "portfolio" ? route.id : project.data?.data.portfolioId;
+  const portfolioId = route.kind === "portfolio" ? route.id : route.kind === "project-create" ? route.portfolioId : project.data?.data.portfolioId;
   const portfolio = useResource<PortfolioResource>(`${props.workspaceId}:portfolio:${portfolioId ?? ""}`, enabled && Boolean(portfolioId),
     (signal) => getPortfolio(http, portfolioId!, signal));
 
@@ -72,11 +75,17 @@ export function usePortfoliosView(props: PortfoliosViewProps) {
   }
   function created(value: Project) {
     props.onProjectCreated(value); setDialog(null); refresh();
-    navigate({ kind: "project", id: value.id }); props.onOpenCases(value.id);
+    navigate({ kind: "project", id: value.id });
   }
+  function acceptProject(value: Project, etag: string | null) { project.accept({ data: value, etag }); props.onProjectUpdated(value, etag); }
   function updated(value: Project, etag: string | null) {
     props.onProjectUpdated(value, etag); setDialog(null); refresh(); setNotice("project");
   }
+  function createProject() { navigate({ kind: "project-create", ...(portfolioId ? { portfolioId } : {}) }); }
+  function cancelEditor() {
+    if (dialog) setDialog(null);
+    else navigate(route.kind === "project-create" && route.portfolioId ? { kind: "portfolio", id: route.portfolioId } : { kind: "catalog" });
+  }
   return { route, tab, setTab, status, setStatus, search, setSearch, dialog, setDialog, notice,
-    portfolioList, projects, project, portfolio, command, navigate, refresh, save, transition, attach, created, updated };
+    portfolioList, projects, project, portfolio, command, navigate, refresh, save, transition, attach, created, updated, acceptProject, createProject, cancelEditor };
 }

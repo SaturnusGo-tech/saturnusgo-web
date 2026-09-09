@@ -4,6 +4,7 @@ import type {
   AttachmentMetadataResource,
   AttachmentMimeType,
   AttachmentOwner,
+  AttachmentScope,
   AttachmentReadAccess,
   CreateAttachmentAccessInput,
   RemovePrivateAttachmentInput,
@@ -20,8 +21,7 @@ export interface PendingAttachmentUpload {
   readonly maxBytes: number;
 }
 
-export interface CreateUploadIntentInput {
-  readonly projectId: string;
+export type CreateUploadIntentInput = AttachmentScope & {
   readonly owner: AttachmentOwner;
   readonly kind: AttachmentKind;
   readonly originalFilename: string;

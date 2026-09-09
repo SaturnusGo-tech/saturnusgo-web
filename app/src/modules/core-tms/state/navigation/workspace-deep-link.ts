@@ -1,3 +1,4 @@
+import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { isProvider } from "../../connectors/model/connector-types";
 import { workspaceViews, type View } from "../types/workspace";
 
@@ -27,6 +28,10 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const detail = url.searchParams.get("dashboardDetail");
   const portfolioId = url.searchParams.get("portfolioId");
   const catalogProjectId = url.searchParams.get("catalogProjectId");
+  const organizationCreate = url.searchParams.get("organizationCreate");
+  const projectTab = url.searchParams.get("projectTab");
+  const portfolioTab = url.searchParams.get("portfolioTab");
+  const embeddedCases = isProjectCaseContext(href, input.projectId);
   const folderId = url.searchParams.get("folderId");
   const suiteId = url.searchParams.get("suiteId");
   const article = url.searchParams.get("article"); const section = url.hash;
@@ -40,10 +45,14 @@ export function buildWorkspaceDeepLink(href: string, input: {
   url.searchParams.set("workspaceId", input.workspaceId); url.searchParams.set("projectId", input.projectId);
   url.searchParams.set("view", input.view);
   if (input.view === "portfolios" && sameWorkspace) {
+    if (organizationCreate === "portfolio" || organizationCreate === "project") url.searchParams.set("organizationCreate", organizationCreate);
+    if (sameScope && projectTab && /^[a-z-]{1,30}$/.test(projectTab)) url.searchParams.set("projectTab", projectTab);
     if (portfolioId && /^[A-Za-z0-9._:-]{1,128}$/.test(portfolioId)) url.searchParams.set("portfolioId", portfolioId);
-    if (catalogProjectId && /^[A-Za-z0-9._:-]{1,128}$/.test(catalogProjectId)) url.searchParams.set("catalogProjectId", catalogProjectId);
+    if (portfolioId && (portfolioTab === "about" || portfolioTab === "projects")) url.searchParams.set("portfolioTab", portfolioTab);
+    if ((sameScope || catalogProjectId === input.projectId) && catalogProjectId
+      && /^[A-Za-z0-9._:-]{1,128}$/.test(catalogProjectId)) url.searchParams.set("catalogProjectId", catalogProjectId);
   }
-  if (input.view === "cases" && sameScope && folderId && /^[A-Za-z0-9._:-]{1,128}$/.test(folderId)) url.searchParams.set("folderId", folderId);
+  if ((input.view === "cases" || (input.view === "portfolios" && embeddedCases)) && sameScope && folderId && /^[A-Za-z0-9._:-]{1,128}$/.test(folderId)) url.searchParams.set("folderId", folderId);
   if (input.view === "suites" && sameScope && suiteId && /^[A-Za-z0-9._:-]{1,128}$/.test(suiteId)) url.searchParams.set("suiteId", suiteId);
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
   if (input.view === "help") {

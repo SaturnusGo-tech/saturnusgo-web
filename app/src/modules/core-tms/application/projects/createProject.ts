@@ -4,7 +4,9 @@ import { toTmsMutationFailure, type TmsMutationFailure } from "../../../../core/
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { createProjectResource, updateProjectResource } from "../../projects/data/project-api";
 
-type Fields = { name: string; key: string; description: string; portfolioId?: string | null; responsibleIdentityId?: string | null };
+import type { OrganizationPatch } from "../../portfolios/management/model/organization";
+
+type Fields = OrganizationPatch & { name: string; key: string; description: string; testingPlan?: string; portfolioId?: string | null; responsibleIdentityId?: string | null };
 type Result = { ok: true; project: Project; etag: string | null } | { ok: false; reason: "project"; failure: TmsMutationFailure };
 
 export async function createProject(input: Fields & {
@@ -14,6 +16,9 @@ export async function createProject(input: Fields & {
   const payload = {
     workspaceId: input.workspaceId, key: input.key.trim().toUpperCase(), name: input.name.trim(),
     description: input.description.trim(), portfolioId: input.portfolioId ?? null,
+    testingPlan: input.testingPlan?.trim() ?? "",
+    ...(input.workflowPhase !== undefined ? { workflowPhase: input.workflowPhase } : {}),
+    ...(input.checklist !== undefined ? { checklist: input.checklist.map((item) => ({ ...item, text: item.text.trim() })) } : {}),
     responsibleIdentityId: input.responsibleIdentityId ?? null,
   } satisfies components["schemas"]["ProjectCreateRequest"];
   try {
@@ -32,6 +37,9 @@ export async function updateProject(input: Fields & {
   if (!input.etag) throw new Error("Project ETag is required for update.");
   const body = {
     name: input.name.trim(), description: input.description.trim(),
+    ...(input.workflowPhase !== undefined ? { workflowPhase: input.workflowPhase } : {}),
+    ...(input.checklist !== undefined ? { checklist: input.checklist.map((item) => ({ ...item, text: item.text.trim() })) } : {}),
+    ...(input.testingPlan !== undefined ? { testingPlan: input.testingPlan.trim() } : {}),
     ...(input.portfolioId !== undefined ? { portfolioId: input.portfolioId } : {}),
     ...(input.responsibleIdentityId !== undefined ? { responsibleIdentityId: input.responsibleIdentityId } : {}),
   } satisfies components["schemas"]["ProjectPatchRequest"];

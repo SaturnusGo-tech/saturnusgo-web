@@ -25,6 +25,9 @@ const en = {
   countLoaded: "Loaded", noPortfolio: "Without portfolio", change: "Edit details", projectSaved: "Project saved",
   portfolioSaved: "Portfolio saved", refresh: "Refresh", memberMore: "Load more people", portfolioMore: "Load more portfolios",
   optionsError: "Could not load the available choices.", unknownPerson: "Assigned member", unknownPortfolio: "Current portfolio",
+  properties: "Properties", overview: "Overview", testingPlan: "Testing plan", planPlaceholder: "Describe the scope, priorities and acceptance criteria…",
+  projectName: "Project name", portfolioTitle: "Portfolio name", descriptionPlaceholder: "Describe the purpose and expected outcome…",
+  projectActivationError: "Could not open this project's test repository.", planEmpty: "Add the scope, priorities and acceptance criteria for testing.",
 };
 
 const ru: typeof en = {
@@ -52,6 +55,9 @@ const ru: typeof en = {
   countLoaded: "Загружено", noPortfolio: "Без портфеля", change: "Изменить данные", projectSaved: "Проект сохранён",
   portfolioSaved: "Портфель сохранён", refresh: "Обновить", memberMore: "Загрузить ещё участников", portfolioMore: "Загрузить ещё портфелей",
   optionsError: "Не удалось загрузить варианты выбора.", unknownPerson: "Назначенный участник", unknownPortfolio: "Текущий портфель",
+  properties: "Свойства", overview: "Обзор", testingPlan: "План тестирования", planPlaceholder: "Опишите область проверок, приоритеты и критерии приёмки…",
+  projectName: "Название проекта", portfolioTitle: "Название портфеля", descriptionPlaceholder: "Опишите цель работы и ожидаемый результат…",
+  projectActivationError: "Не удалось открыть репозиторий тест-кейсов этого проекта.", planEmpty: "Добавьте область проверок, приоритеты и критерии приёмки.",
 };
 
 export type PortfolioCopy = typeof en;

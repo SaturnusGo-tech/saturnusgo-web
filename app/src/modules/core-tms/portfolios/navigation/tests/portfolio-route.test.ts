@@ -17,3 +17,15 @@ test("untrusted and unrelated route values cannot select a resource", () => {
   assert.deepEqual(readPortfolioRoute("https://tms.example.test/?view=cases&portfolioId=one"), { kind: "catalog" });
   assert.deepEqual(readPortfolioRoute("https://tms.example.test/?view=portfolios&portfolioId=%3Cscript%3E"), { kind: "catalog" });
 });
+
+test("full-page creation survives reload and discards previous project detail selection", () => {
+  const base = "https://tms.example.test/work/?workspaceId=one&view=portfolios&catalogProjectId=old&projectTab=cases&folderId=old-folder";
+  const portfolio = portfolioRouteUrl(base, { kind: "portfolio-create" });
+  assert.deepEqual(readPortfolioRoute(portfolio), { kind: "portfolio-create" });
+  const project = portfolioRouteUrl(base, { kind: "project-create", portfolioId: "portfolio-one" });
+  assert.deepEqual(readPortfolioRoute(project), { kind: "project-create", portfolioId: "portfolio-one" });
+  const params = new URL(project).searchParams;
+  assert.equal(params.get("workspaceId"), "one");
+  for (const key of ["catalogProjectId", "projectTab", "folderId"]) assert.equal(params.get(key), null);
+  assert.deepEqual(readPortfolioRoute("https://tms.example.test/?view=portfolios&organizationCreate=project&portfolioId=%3Cscript%3E"), { kind: "project-create" });
+});

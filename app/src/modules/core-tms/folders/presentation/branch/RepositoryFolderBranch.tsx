@@ -1,6 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useContext, useRef, type CSSProperties } from "react";
-import { PiCaretDown, PiCaretRight, PiDotsThree, PiFolderDuotone, PiFolderOpenDuotone } from "react-icons/pi";
+import { useContext, useRef } from "react";
+import { PiCaretDown, PiCaretRight, PiDotsThree, PiFolderSimpleDuotone, PiFolderOpenDuotone } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderNode } from "../../model/tree";
 import type { RepositoryFolder } from "../../model/folder";
@@ -19,31 +19,39 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
   const { node, depth, ru } = props;
   const folder = node.folder;
   const open = props.expanded.has(folder.id);
+  const childrenId = `repository-children-${folder.id}`;
   const checkbox = useRef<HTMLInputElement>(null);
-  const selectedCount = node.caseIds.filter((id) => props.selected.has(id)).length;
+  const disclosure = useRef<HTMLButtonElement>(null);
+  const selectedCount = node.selectableCaseIds.filter((id) => props.selected.has(id)).length;
   const drop = useDroppable({ id: `folder:${folder.id}`, data: { folderId: folder.id }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
   const drag = useDraggable({ id: `drag-folder:${folder.id}`, data: { kind: "folder", folderId: folder.id, name: folder.name }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
   const suppress = useContext(DragClickContext);
-  return <li>
+  return <li className={css.branch} data-depth={depth}>
     <div ref={drop.setNodeRef} className={css.folderRow} data-selected={(props.selectedFolderId ? props.selectedFolderId === folder.id : !folder.archivedAt && props.selectedFolder === folder.path) || undefined}
-      data-drop={drop.isOver || undefined} style={{ "--depth": depth, opacity: drag.isDragging ? .4 : 1 } as CSSProperties}>
-      <button type="button" className={css.disclosure} aria-expanded={open} aria-label={`${open ? (ru ? "Свернуть" : "Collapse") : (ru ? "Раскрыть" : "Expand")} ${folder.name}`}
+      data-drop={drop.isOver || undefined} style={{ opacity: drag.isDragging ? .4 : 1 }}>
+      <button ref={disclosure} type="button" className={css.disclosure} aria-expanded={open} aria-controls={open ? childrenId : undefined}
+        aria-label={`${open ? (ru ? "Свернуть" : "Collapse") : (ru ? "Раскрыть" : "Expand")} ${folder.name}`}
         onClick={() => props.onExpand(folder.id)}>{open ? <PiCaretDown /> : <PiCaretRight />}</button>
-      <input type="checkbox" ref={(element) => { checkbox.current = element; if (element) element.indeterminate = selectedCount > 0 && selectedCount < node.caseIds.length; }}
-        checked={node.caseIds.length > 0 && selectedCount === node.caseIds.length} disabled={props.locked || !props.canManage || !node.caseIds.length || Boolean(folder.archivedAt)}
-        aria-label={`${ru ? "Выбрать кейсы папки" : "Select folder cases"} ${folder.name}`} onChange={() => props.onScope(node.caseIds)} />
-      <button ref={drag.setNodeRef} {...drag.attributes} {...drag.listeners} type="button" className={css.folderName} title={folder.path}
+      <input type="checkbox" ref={(element) => { checkbox.current = element; if (element) element.indeterminate = selectedCount > 0 && selectedCount < node.selectableCaseIds.length; }}
+        checked={node.selectableCaseIds.length > 0 && selectedCount === node.selectableCaseIds.length} disabled={props.locked || !props.canManage || !node.selectableCaseIds.length || Boolean(folder.archivedAt)}
+        aria-label={`${ru ? "Выбрать кейсы папки" : "Select folder cases"} ${folder.name}`} onChange={() => props.onScope(node.selectableCaseIds)} />
+      <button ref={drag.setNodeRef} {...drag.attributes} {...drag.listeners} type="button" className={css.folderName} title={folder.name}
         disabled={props.locked} aria-disabled={props.locked || undefined}
         onClick={() => { if (!props.locked && Date.now() > suppress.current) { props.onFolder(folder.path, folder.id); if (!open) props.onExpand(folder.id); } }}>
-        {open ? <PiFolderOpenDuotone size={19} /> : <PiFolderDuotone size={19} />}<span>{folder.name}</span><small>{node.caseIds.length}</small>
+        {open ? <PiFolderOpenDuotone size={18} /> : <PiFolderSimpleDuotone size={18} />}<span>{folder.name}</span><small>{node.caseIds.length}</small>
       </button>
       <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>
     </div>
-    {open && <ul className={css.children}>
+    {open && <div className={css.branchChildren}>
+      <button type="button" className={css.branchGuide} aria-expanded="true" aria-controls={childrenId}
+        aria-label={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`}
+        title={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`} onClick={() => { disclosure.current?.focus(); props.onExpand(folder.id); }} />
+      <ul id={childrenId} className={css.children}>
       {node.children.map((child) => <RepositoryFolderBranch key={child.folder.id} {...props} node={child} depth={depth + 1} />)}
       {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
         locked={props.locked} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
-      {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder} style={{ paddingLeft: 42 + depth * 16 }}>{ru ? "Папка пуста" : "Empty folder"}</li>}
-    </ul>}
+      {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder}>{ru ? "Папка пуста" : "Empty folder"}</li>}
+      </ul>
+    </div>}
   </li>;
 }

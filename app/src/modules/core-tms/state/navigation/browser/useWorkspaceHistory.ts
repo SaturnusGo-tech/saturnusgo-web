@@ -1,3 +1,4 @@
+import { isProjectCaseContext } from "../../../test-cases/navigation/project/project-case-context";
 import { useCallback, useEffect, useRef } from "react";
 import { readWorkspaceDeepLink } from "../workspace-deep-link";
 import { readCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
@@ -32,7 +33,7 @@ export function useWorkspaceHistory(input: Input) {
       const workspaceId = new URL(window.location.href).searchParams.get("workspaceId") ?? current.workspaceId;
       const projectId = linked.projectId ?? current.projectId;
       const view = target.view ?? "cases";
-      const caseId = view === "cases" ? linked.caseId ?? "" : "";
+      const caseId = view === "cases" || isProjectCaseContext(window.location.href, projectId) ? linked.caseId ?? "" : "";
       // Guard URL effects before updating React, including asynchronous project reloads.
       begin({ workspaceId, projectId, view, runId: target.runId, caseId });
       current.closeDialog();

@@ -29,6 +29,7 @@ export function useCasesViewController(
   const [viewMode, setViewMode] = useState<CaseListViewMode>("list");
   const [groupBy, setGroupBy] = useState<CaseGroupBy>("none");
   const [selectionMode, setSelectionMode] = useState(false);
+  const [repositoryArchived, setRepositoryArchived] = useState(false);
   const [facetFilters, setFacetFilters] = useState<CaseFacetFilters>({ folders: [], components: [] });
   const workspaceRef = useRef<HTMLDivElement>(null);
   const inspectorResize = useCaseInspectorResize(workspaceRef);
@@ -40,21 +41,25 @@ export function useCasesViewController(
   const folderEmpty = Boolean(props.folders?.items.some((folder) => folder.id === props.selectedFolderId && !folder.archivedAt)
     && !allRows.some(({ testCase }) => folderScope.includes(testCase)));
   const baseRows = useMemo(() => filterCaseRows(allRows.filter(({ testCase }) => (
-    (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
+    (props.folders || props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
     && (props.filters.type === "all" || testCase.type === props.filters.type)
     && (props.filters.priority === "all" || testCase.priority === props.filters.priority)
     && (props.filters.lifecycle === "all" || testCase.lifecycle === props.filters.lifecycle)
     && (!props.filters.tag.trim() || testCase.tags.some((tag) => (
       tag.toLocaleLowerCase().includes(props.filters.tag.trim().toLocaleLowerCase())
     )))
-  )), { titleQuery: props.query }), [allRows, props.filters, props.query, folderScope.archived]);
+  )), { titleQuery: props.query }), [allRows, props.folders, props.filters, props.query, folderScope.archived]);
   const facetOptions = useMemo(
     () => resolveDependentCaseFacets(baseRows, facetFilters),
     [baseRows, facetFilters],
   );
-  const rows = useMemo(() => sortCaseRows(filterCaseRows(baseRows.filter(({ testCase }) => !props.folders || folderScope.includes(testCase)), {
+  const matchingRows = useMemo(() => sortCaseRows(filterCaseRows(baseRows, {
     qlQuery, facets: facetFilters,
-  }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort, props.folders, folderScope]);
+  }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort]);
+  const rows = useMemo(() => matchingRows.filter(({ testCase }) => (!props.folders || folderScope.includes(testCase))
+    && (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)), [matchingRows, props.folders, folderScope, props.filters.includeArchived]);
+  const treeFiltered = Boolean(props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length
+    || props.filters.type !== "all" || props.filters.priority !== "all" || props.filters.lifecycle !== "all" || props.filters.tag.trim());
   const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
     !testCase.archivedAt && Boolean(testCase.etag)
   )), [allRows]);
@@ -63,8 +68,8 @@ export function useCasesViewController(
     [selectableRows],
   );
   const selectableVisibleRows = useMemo(
-    () => rows.filter(({ testCase }) => selectableIds.has(testCase.id)),
-    [rows, selectableIds],
+    () => rows.filter(({ testCase }) => !repositoryArchived && selectableIds.has(testCase.id)),
+    [rows, selectableIds, repositoryArchived],
   );
   const bulkSelection = useCaseBulkSelection(selectableRows, selectableVisibleRows);
   const totalCount = allRows.filter(({ testCase }) => props.filters.includeArchived || folderScope.archived || !testCase.archivedAt).length;
@@ -114,19 +119,22 @@ export function useCasesViewController(
   }
   function selectRow(row: CaseListRow) {
     if (props.editor) return;
-    if (row.folderPath !== props.selectedFolder) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
+    if (row.folderPath !== props.selectedFolder || (row.testCase.folderId ?? "") !== (props.selectedFolderId ?? "")) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
     props.onSelectCase(row.testCase.id);
     setDetailOpen(true);
   }
-  function createCase(folderPath = props.selectedFolder) {
-    if (folderScope.archived) return;
+  function createCase(folderPath?: string) {
+    const path = folderPath ?? props.selectedFolder;
+    const explicitFolderMissing = folderPath !== undefined && Boolean(props.folders) && path !== "/"
+      && !props.folders!.items.some((folder) => folder.path === path && !folder.archivedAt);
+    if (folderPath === undefined ? folderScope.archived : explicitFolderMissing) return;
     if (props.editor) {
       document.getElementById("case-editor-actions")?.focus();
       return;
     }
     setDetailOpen(true);
     setDetailFullscreen(false);
-    props.onNew(folderPath || "/");
+    props.onNew(path || "/");
   }
   function closeInspector() {
     props.editor?.onCancel();
@@ -147,9 +155,9 @@ export function useCasesViewController(
     workspaceRef, inspectorResize, filterOpen, setFilterOpen, detailFullscreen,
     setDetailFullscreen, inspectorOpen: (detailOpen && Boolean(props.testCase)) || Boolean(props.editor), sort,
     toggleSort, qlQuery, setQlQuery, viewMode, setViewMode, groupBy, setGroupBy,
-    facetFilters, setFacetFilters, facetOptions, rows, countLabel, estimateLabel,
+    facetFilters, setFacetFilters, facetOptions, rows, matchingRows, treeFiltered, countLabel, estimateLabel,
     selectRow, createCase, closeInspector, selectionMode, toggleSelectionMode,
-    bulkSelection, selectableIds,
-    selectableCount: selectableRows.length,
+    bulkSelection, selectableIds, setRepositoryArchived,
+    selectableCount: selectableRows.length, selectableVisibleCount: selectableVisibleRows.length,
   };
 }

@@ -1,0 +1,18 @@
+.discussion { padding: 8px 0 25px; }
+.discussion > header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.discussion h2 { margin: 0; font-size: 15px; font-weight: 570; }
+.composer { overflow: hidden; border: 1px solid var(--line-strong); border-radius: 11px; }
+.composer:focus-within { border-color: var(--tms-focus-border, #999); box-shadow: 0 0 0 2px var(--tms-focus-ring, #8882); }
+.composer footer { display: flex; align-items: center; justify-content: flex-end; padding: 8px 11px; gap: 10px; }
+.composer footer span { margin-right: auto; font-size: 11px; color: var(--muted); }
+.comments { margin: 22px 0 0; padding: 0; list-style: none; }
+.comments li { padding: 16px 0; }
+.comments li > div:first-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 11px; }
+.comments strong { font-size: 12px; font-weight: 550; }
+.comments time { color: var(--muted); font-size: 11px; }
+.comments p { margin: 9px 0 0; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty { color: var(--muted); font-size: 12px; line-height: 1.7; padding: 18px 0 0; }
+.empty span { display: block; margin-top: 3px; }
+.statusStrip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--muted); background: var(--control-hover); font-size: 12px; }
+.editor { padding: 10px 12px; }
+.limit { padding: 0 12px; color: var(--danger, #c74755); font-size: 12px; }

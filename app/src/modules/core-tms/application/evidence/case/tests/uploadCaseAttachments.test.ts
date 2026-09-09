@@ -9,7 +9,7 @@ test("uploads case and step files with exact revision ownership", async () => {
   const client = {
     async upload(input: UploadPrivateAttachmentInput) {
       uploads.push(input);
-      return { id: `attachment-${uploads.length}`, projectId: input.projectId,
+      return { id: `attachment-${uploads.length}`, projectId: input.projectId ?? null,
         owner: input.owner, kind: input.kind, originalFilename: input.file.name,
         mimeType: input.mimeType, trustedExtension: "png", byteSize: input.file.size,
         sha256: null, status: "ready", createdAt: "2026-09-02T00:00:00Z",

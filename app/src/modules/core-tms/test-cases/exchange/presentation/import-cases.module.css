@@ -1,31 +1,31 @@
-.dialog { width: min(740px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 24px !important; overflow: auto; }
+.dialog { width: min(780px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 24px !important; overflow: auto; }
 .body { padding: 6px 26px 20px; }
-.fileArea { display: flex; align-items: center; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--control-hover); }
-.fileArea > svg { color: var(--muted); flex-shrink: 0; }
+.fileArea { display: flex; align-items: center; gap: 14px; padding: 12px 2px; border: 0; border-radius: 0; background: transparent; }
+.fileArea > svg { color: #7c97d1; flex-shrink: 0; }
 .fileArea > div { flex: 1; min-width: 0; display: grid; gap: 6px; }
 .fileArea strong { font-size: 13px; font-weight: 550; overflow-wrap: anywhere; }
 .fileArea span { color: var(--muted); font-size: 11px; }
 .fileArea button, .footer button { border-radius: 11px !important; min-height: 36px; font-size: 12px; }
 .hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.destination { margin: 22px 0 0; border: 0; padding: 0; min-width: 0; }
+.destination { margin: 14px 0 0; border: 0; padding: 0; min-width: 0; }
 .destination legend { margin-bottom: 10px; padding: 0; font-size: 12px; font-weight: 550; }
 .destination:disabled { opacity: .7; }
-.counts { display: flex; gap: 26px; flex-wrap: wrap; margin: 23px 0; }
+.counts { display: flex; gap: 26px; flex-wrap: wrap; margin: 18px 0; }
 .counts > div { display: grid; gap: 8px; }
 .counts dt { color: var(--muted); font-size: 11px; }
-.counts dd { font-size: 22px; letter-spacing: -.5px; font-weight: 500; margin: 0; }
-.preview { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
-.previewHeading { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.counts dd { font-size: 17px; letter-spacing: -.3px; font-weight: 500; margin: 0; }
+.preview { border: 0; border-radius: 0; overflow: hidden; }
+.previewHeading { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 2px; border-bottom: 0; }
 .previewHeading strong { font-size: 12px; font-weight: 550; }
 .previewHeading span { color: var(--muted); font-size: 11px; }
 .tree, .treeChildren { list-style: none; padding: 0; margin: 0; }
 .tree { max-height: 290px; padding: 8px; overflow: auto; }
-.treeChildren { padding-left: 22px; margin-left: 10px; border-left: 1px solid var(--line); }
-.folderRow { width: 100%; display: flex; gap: 8px; align-items: center; border: 0; background: transparent; color: inherit; padding: 8px; border-radius: 9px; cursor: pointer; text-align: left; font: inherit; font-size: 12px; }
+.treeChildren { padding-left: 18px; margin-left: 8px; border-left: 0; }
+.folderRow { width: 100%; display: flex; gap: 8px; align-items: center; border: 0; background: transparent; color: inherit; padding: 8px; border-radius: 9px; margin-block: 3px; cursor: pointer; text-align: left; font: inherit; font-size: 12px; }
 .folderRow:disabled { opacity: 1; cursor: default; }
 .folderRow:hover { background: var(--control-hover); }
 .folderRow > span, .caseRow > span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
-.folderIcon { color: #8f9fbb; flex-shrink: 0; }
+.folderIcon { color: #7c97d1; flex-shrink: 0; }
 .folderRow small { color: var(--green); font-size: 10px; white-space: nowrap; }
 .folderRow small[data-existing="true"] { color: var(--muted); }
 .chevron { color: var(--muted); transition: transform .15s ease; flex-shrink: 0; }
@@ -45,6 +45,6 @@
 .failures { font-size: 12px; color: var(--red); margin-top: 14px; }
 .failures summary { cursor: pointer; }
 .failures li { margin-top: 7px; overflow-wrap: anywhere; }
-.footer { display: flex; justify-content: flex-end; gap: 10px; padding: 18px 26px; border-top: 1px solid var(--line); }
+.footer { display: flex; justify-content: flex-end; gap: 10px; padding: 10px 26px 22px; border-top: 0; }
 @media (max-width: 600px) { .body { padding-inline: 18px; } .fileArea { flex-wrap: wrap; } .fileArea > div { min-width: 160px; } .fileArea > button { width: 100%; } .counts { gap: 18px; } .footer { padding-inline: 18px; } .previewHeading span { display: none; } }
 @media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }

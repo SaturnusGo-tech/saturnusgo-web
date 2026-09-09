@@ -26,6 +26,12 @@ const operationKeyPattern = /^[A-Za-z0-9._:-]{9,115}$/;
 const digestPattern = /^[a-f0-9]{64}$/;
 
 function validFile(input: UploadPrivateAttachmentInput): void {
+  if (Boolean(input.projectId) === Boolean(input.portfolioId)
+    || input.owner.kind === "portfolio" && input.owner.portfolioId !== input.portfolioId
+    || input.owner.kind !== "portfolio" && !input.projectId
+    || input.owner.kind === "project" && input.owner.projectId !== input.projectId) {
+    throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment owner does not match its scope.");
+  }
   if (!Number.isSafeInteger(input.file.size) || input.file.size < 1) {
     throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment must not be empty.");
   }
@@ -53,7 +59,7 @@ export function createPrivateAttachmentClient(
       if (!digestPattern.test(sha256)) {
         throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment digest provider returned an invalid digest.");
       }
-      const identity = JSON.stringify([input.projectId, input.owner, input.kind, input.mimeType, input.file.name, sha256]);
+      const identity = JSON.stringify([input.projectId, input.portfolioId, input.owner, input.kind, input.mimeType, input.file.name, sha256]);
       const previous = finalizations.get(operationKey);
       if (previous) {
         if (previous.identity !== identity) throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment operation key was reused.");
@@ -62,7 +68,7 @@ export function createPrivateAttachmentClient(
         return metadata;
       }
       const created = await dependencies.transport.createUploadIntent({
-        projectId: input.projectId,
+        ...(input.portfolioId ? { portfolioId: input.portfolioId } : { projectId: input.projectId! }),
         owner: input.owner,
         kind: input.kind,
         originalFilename: input.file.name,

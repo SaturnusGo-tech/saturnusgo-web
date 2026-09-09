@@ -1,10 +1,11 @@
-import { PiFolderDuotone as Folder, PiFolderPlusDuotone as FolderPlus } from "react-icons/pi";
+import { PiFolderSimpleDuotone as Folder, PiFolderPlusDuotone as FolderPlus } from "react-icons/pi";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { Field } from "../../common/field/Field";
 import { Modal } from "../../common/modal/Modal";
 import { ParentFolderPicker } from "./parent/ParentFolderPicker";
+import { FolderBreadcrumb } from "./breadcrumb/FolderBreadcrumb";
 import { getFolderDialogCopy } from "./copy";
 import shared from "../../../tms.module.css";
 import styles from "./FolderDialog.module.css";
@@ -29,18 +30,18 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated, ini
   return <Modal title={editing ? (locale === "ru" ? "Настроить папку" : "Edit folder") : copy.title} onClose={onClose} panelClassName={styles.dialog}>
     <form className={styles.form} onSubmit={submit}>
       <div className={styles.body}>
-        <p className={styles.subtitle}>{copy.subtitle}</p>
+
         <div className={styles.fields}>
           <Field label={copy.name} wide>
             <input required maxLength={120} disabled={busy} autoFocus data-autofocus value={name} onChange={(event) => setName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="folder-name" />
           </Field>
           <div className={shared.formField} role="group" aria-label={copy.parent}><span>{copy.parent}</span>
-            <ParentFolderPicker label={copy.parent} searchLabel={copy.searchParent} emptyLabel={copy.noFolders} value={parent} options={parents} onChange={setParent} />
+            <ParentFolderPicker inline label={copy.parent} searchLabel={copy.searchParent} emptyLabel={copy.noFolders} value={parent} options={parents} onChange={setParent} />
           </div>
         </div>
         <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
           <Folder size={16} aria-hidden="true" />
-          <span><small>{copy.path}</small><strong>{path}</strong>{duplicate && <em>{copy.duplicate}</em>}</span>
+          <span><small>{copy.path}</small><strong><FolderBreadcrumb path={name.trim() ? path : parent} root={copy.root} /></strong>{duplicate && <em>{copy.duplicate}</em>}</span>
         </div>
       </div>
       {!validParent && <p role="alert" className={styles.error}>{locale === "ru" ? "Выберите существующую родительскую папку." : "Select an existing parent folder."}</p>}

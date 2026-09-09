@@ -39,7 +39,7 @@ export function createAttachmentHttpTransport(
     },
     async createUploadIntent(input: CreateUploadIntentInput) {
       const body: IntentRequestDto = {
-        projectId: input.projectId, owner: input.owner, kind: input.kind,
+        ...(input.portfolioId ? { portfolioId: input.portfolioId } : { projectId: input.projectId! }), owner: input.owner, kind: input.kind,
         originalFilename: input.originalFilename, mimeType: input.mimeType,
         byteSize: input.byteSize, sha256: input.sha256,
       };

@@ -115,7 +115,7 @@ test("toolbar keeps subtle focus and editor-locked create actions", () => {
   assert.match(toolbar, /role="menuitem"/); assert.match(toolbar, /Выбрать тест-кейсы|Select test cases/);
   assert.match(toolbar, /aria-pressed=\{props\.selectionMode\}/); assert.match(table, /props\.selectionMode \? <CaseSelectionHeader/); assert.match(table, /props\.selectionMode && <CaseSelectionCheckbox/);
   assert.match(css, /\.selectionColumn \{ width: 0; transition:/); assert.match(css, /\.selectionMode \.selectionColumn \{ width: 34px; \}/);
-  assert.match(bulkCss, /animation: bulkBarReveal 220ms/); assert.match(bulkCss, /clip-path: inset\(0 0 100% 0\)/);
+  assert.match(bulkCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{\s*\.bulkBar\s*\{\s*animation:\s*none/);
   assert.match(css, /\.filterActive \{ position: relative;/); assert.match(css, /\.filterActive b \{[^}]*position: absolute;[^}]*border-radius: 999px/s);
   assert.match(toolbar, /aria-hidden="true">\{activeFilterCount\}/);
 });

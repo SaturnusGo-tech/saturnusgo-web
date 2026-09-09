@@ -4,7 +4,7 @@ import { createTmsHttpClient } from "../../../../core/tms/transport/http";
 import { createProject, updateProject } from "./createProject";
 
 const project = { id: "project-1", workspaceId: "workspace-1", key: "PAY", name: "Payments", description: "Payment checks", status: "active" as const,
-  portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", rowVersion: 2, createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z" };
+  testingPlan: "Acceptance criteria", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", rowVersion: 2, createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z" };
 
 function client(requests: { url: string; init?: RequestInit }[]) {
   return createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "test.token.value",
@@ -16,11 +16,11 @@ function client(requests: { url: string; init?: RequestInit }[]) {
 test("creating a project is one command and does not require or create an environment", async () => {
   const requests: { url: string; init?: RequestInit }[] = [];
   const result = await createProject({ http: client(requests), workspaceId: "workspace-1", name: " Payments ", key: " pay ",
-    description: " Payment checks ", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", offline: false, operationKey: "stable-project-operation" });
+    description: " Payment checks ", testingPlan: " Acceptance criteria ", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", offline: false, operationKey: "stable-project-operation" });
   assert.equal(result.ok, true);
   assert.equal(requests.length, 1);
   assert.ok(requests[0].url.endsWith("/projects"));
-  assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { workspaceId: "workspace-1", name: "Payments", key: "PAY", description: "Payment checks", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1" });
+  assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { workspaceId: "workspace-1", name: "Payments", key: "PAY", description: "Payment checks", testingPlan: "Acceptance criteria", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1" });
   assert.equal(new Headers(requests[0].init?.headers).get("Idempotency-Key"), "stable-project-operation");
   if (result.ok) { assert.equal(result.project.portfolioId, "portfolio-1"); assert.equal(result.etag, '"project:project-1:2"'); }
 });
@@ -45,6 +45,15 @@ test("editing metadata retains the immutable key and protects concurrent changes
   assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { name: "Updated", description: "Checks", portfolioId: null, responsibleIdentityId: null });
   assert.equal(new Headers(requests[0].init?.headers).get("If-Match"), '"project:project-1:1"');
   assert.equal(result.etag, '"project:project-1:2"');
+});
+
+test("editing can clear the testing plan independently from the description", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  await updateProject({ http: client(requests), project, etag: '"project:project-1:1"', offline: false,
+    name: project.name, key: project.key, description: project.description, testingPlan: " ", operationKey: "stable-project-update" });
+  const body = JSON.parse(String(requests[0].init?.body));
+  assert.equal(body.description, project.description); assert.equal(body.testingPlan, "");
+  assert.equal(new Headers(requests[0].init?.headers).get("If-Match"), '"project:project-1:1"');
 });
 
 test("missing update version never sends a mutation", async () => {

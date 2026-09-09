@@ -17,7 +17,8 @@ test("archived branches show real case counts and permit opening while drag and 
     expanded: new Set([folder.id]), selected: new Set(), onFolder: (...args: unknown[]) => opened.push(args) });
   assert.deepEqual(elements(result, "small").map((item) => item.props.children), [3]);
   assert.equal(elements(result, "CaseLeaf").length, 3);
-  const open = elements(result, "button").find((item) => item.props.title === folder.path)!;
+  const open = elements(result, "button").find((item) => elements(item, "span").some((label) => label.props.children === folder.name));
+  assert.ok(open, "The archived folder remains reachable by its visible name");
   assert.equal(open.props.disabled, false);
   assert.equal(open.props["aria-disabled"], undefined);
   (open.props.onClick as () => void)();

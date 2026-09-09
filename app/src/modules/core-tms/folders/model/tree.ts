@@ -1,14 +1,15 @@
 import type { TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "./folder";
 
-export type FolderNode = { folder: RepositoryFolder; children: FolderNode[]; cases: TestCaseSummary[]; caseIds: string[] };
-export function buildFolderTree(folders: readonly RepositoryFolder[], cases: readonly TestCaseSummary[], archived = false) {
+export type FolderNode = { folder: RepositoryFolder; children: FolderNode[]; cases: TestCaseSummary[]; caseIds: string[]; selectableCaseIds: string[] };
+export function buildFolderTree(folders: readonly RepositoryFolder[], cases: readonly TestCaseSummary[], archived = false, includeArchived = false) {
   const nodes = new Map<string, FolderNode>();
   const byPath = new Map<string, FolderNode>();
   for (const folder of folders) {
-    if (Boolean(folder.archivedAt) !== archived) continue;
-    const node: FolderNode = { folder, children: [], cases: [], caseIds: [] };
-    nodes.set(folder.id, node); byPath.set(folder.path, node);
+    if (!(includeArchived && !archived) && Boolean(folder.archivedAt) !== archived) continue;
+    const node: FolderNode = { folder, children: [], cases: [], caseIds: [], selectableCaseIds: [] };
+    nodes.set(folder.id, node);
+    if (!byPath.has(folder.path) || !folder.archivedAt) byPath.set(folder.path, node);
   }
   const roots: FolderNode[] = [];
   for (const node of nodes.values()) {
@@ -17,7 +18,7 @@ export function buildFolderTree(folders: readonly RepositoryFolder[], cases: rea
   }
   const unfiled: TestCaseSummary[] = [];
   for (const item of cases) {
-    if (Boolean(item.archivedAt) !== archived) continue;
+    if (!(includeArchived && !archived) && Boolean(item.archivedAt) !== archived) continue;
     const node = item.folderId ? nodes.get(item.folderId) : byPath.get(item.folderPath);
     if (node) node.cases.push(item); else if (!item.folderId && item.folderPath === "/") unfiled.push(item);
   }
@@ -25,6 +26,8 @@ export function buildFolderTree(folders: readonly RepositoryFolder[], cases: rea
     node.children.sort((a, b) => a.folder.name.localeCompare(b.folder.name, undefined, { numeric: true }));
     node.cases.sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true }));
     node.caseIds = [...node.cases.map((item) => item.id), ...node.children.flatMap(collect)];
+    node.selectableCaseIds = node.folder.archivedAt ? [] : [...node.cases.filter((item) => !item.archivedAt && item.etag).map((item) => item.id),
+      ...node.children.flatMap((child) => child.selectableCaseIds)];
     return node.caseIds;
   }
   roots.sort((a, b) => a.folder.name.localeCompare(b.folder.name, undefined, { numeric: true })).forEach(collect);

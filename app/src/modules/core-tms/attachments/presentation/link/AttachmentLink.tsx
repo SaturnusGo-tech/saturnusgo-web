@@ -10,8 +10,10 @@ import {
 import { AttachmentMediaFrame } from "./AttachmentMediaFrame";
 import styles from "./attachmentLink.module.css";
 
-export function AttachmentLink({ attachmentId, presentation = "link", variant = "scenario", onDetach }: {
+export function AttachmentLink({ attachmentId, presentation = "link", variant = "scenario", onDetach, canRemove = true, disposition = "inline" }: {
   attachmentId: string;
+  canRemove?: boolean;
+  disposition?: "inline" | "attachment";
   onDetach?: () => void;
   presentation?: "link" | "media";
   variant?: "scenario" | "gallery";
@@ -67,7 +69,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
     setOpening(true);
     setFailed(false);
     try {
-      const access = await readCache.createAccess({ attachmentId, disposition: "inline" });
+      const access = await readCache.createAccess({ attachmentId, disposition });
       if (Object.keys(access.headers).length > 0) throw new Error("Unsupported signed headers");
       window.open(access.url, "_blank", "noopener,noreferrer");
     } catch {
@@ -78,7 +80,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
   }
 
   async function remove() {
-    if (!resource || removing || !window.confirm(t("attachments.removeConfirm"))) return;
+    if (!canRemove || !resource || removing || !window.confirm(t("attachments.removeConfirm"))) return;
     setRemoving(true);
     setFailed(false);
     try {
@@ -114,7 +116,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
       loading={opening}
       removing={removing}
       onOpen={() => void open()}
-      onRemove={onDetach ?? (resource.metadata.owner.kind === "shared_step_revision" ? undefined : () => void remove())}
+      onRemove={canRemove ? onDetach ?? (resource.metadata.owner.kind === "shared_step_revision" ? undefined : () => void remove()) : undefined}
       onExpandedChange={(expanded) => { if (expanded) setPreviewRequested(true); }}
     />;
   }
@@ -123,7 +125,7 @@ export function AttachmentLink({ attachmentId, presentation = "link", variant = 
     <button type="button" onClick={() => void open()} disabled={opening}>
       <Paperclip size={14} />{resource.metadata.originalFilename}
     </button>
-    {(onDetach || resource.metadata.owner.kind !== "shared_step_revision") && <button type="button" onClick={onDetach ?? (() => void remove())} disabled={removing}
+    {canRemove && (onDetach || resource.metadata.owner.kind !== "shared_step_revision") && <button type="button" onClick={onDetach ?? (() => void remove())} disabled={removing}
       aria-label={`${t("common.remove")} ${resource.metadata.originalFilename}`} title={t("common.remove")}>
       <Trash2 size={13} />
     </button>}

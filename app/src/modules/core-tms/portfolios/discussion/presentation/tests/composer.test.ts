@@ -1,0 +1,24 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { componentHarness, invoke, nodes } from "../../../tests/support/component-harness";
+import { discussionCopy } from "../../model/copy";
+import { organizationCopy } from "../../../management/model/copy";
+import type { OrganizationDiscussion } from "../OrganizationDiscussion";
+test("discussion composes and reads through the canonical Markdown field with status above the composer", async () => {
+  const h = componentHarness(); const posts: string[] = []; const phases: string[] = [];
+  const view = h.load<{ OrganizationDiscussion: typeof OrganizationDiscussion }>(new URL("../OrganizationDiscussion.tsx", import.meta.url), (name) => {
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
+    if (name.endsWith("discussion/model/copy") || name === "../model/copy") return { discussionCopy };
+    if (name.endsWith("management/model/copy")) return { organizationCopy };
+    if (name.endsWith("useDiscussion")) return { useDiscussion: () => ({ items: [], command: {}, post: async (body: string) => { posts.push(body); return true; } }) };
+  });
+  const props = { workspaceId: "w", targetType: "project" as const, targetId: "p", canPost: true, workflowPhase: "in_progress" as const, phaseDisabled: false, onPhaseChange: (phase: string) => phases.push(phase) };
+  const render = () => nodes(h.render(() => view.OrganizationDiscussion(props)));
+  let all = render(); assert.equal(all.some((node) => node.type === "textarea"), false);
+  const status = all.find((node) => node.type === "WorkflowSelect")!;
+  assert.equal(status.props.value, "in_progress"); invoke(status, "onChange", "in_review"); assert.deepEqual(phases, ["in_review"]);
+  const editor = all.find((node) => node.type === "MarkdownField")!;
+  assert.equal(all.indexOf(status) < all.indexOf(editor), true); invoke(editor, "onChange", "**Проверено**: возврат работает.");
+  all = render(); await invoke(all.find((node) => node.type === "form")!, "onSubmit", { preventDefault() {} });
+  assert.deepEqual(posts, ["**Проверено**: возврат работает."]);
+});

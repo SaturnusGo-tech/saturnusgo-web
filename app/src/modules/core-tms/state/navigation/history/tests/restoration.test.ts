@@ -5,6 +5,7 @@ import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { WorkspaceNavigationRestoration } from "../../restoration/workspace-navigation-restoration";
 import { readWorkspaceDeepLink, buildWorkspaceDeepLink } from "../../workspace-deep-link";
+import { isProjectCaseContext } from "../../../../test-cases/navigation/project/project-case-context";
 import { readCaseDeepLink } from "../../../../test-cases/navigation/case-deep-link";
 import { buildDefectDeepLink } from "../../../../defects/navigation/defect-deep-link";
 import type { useWorkspaceHistory } from "../../browser/useWorkspaceHistory";
@@ -21,6 +22,7 @@ function harness() {
     require(name: string) {
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useCallback: (callback: unknown) => callback, useEffect: (callback: () => void) => effects.push(callback) };
       if (name.endsWith("workspace-deep-link")) return { readWorkspaceDeepLink };
+      if (name.endsWith("project-case-context")) return { isProjectCaseContext };
       if (name.endsWith("case-deep-link")) return { readCaseDeepLink };
       if (name.endsWith("workspace-navigation-restoration")) return { WorkspaceNavigationRestoration };
       if (name === "./workspace-history") return { initializeWorkspaceHistory: () => {}, navigateWorkspace: (next: string, replace: boolean) => { href = next; writes.push({ href, replace }); } };

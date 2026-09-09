@@ -45,6 +45,7 @@ function harness() {
     };
     if (name === "react/jsx-runtime") return { jsx: (type: unknown, props: unknown) => ({ type, props }) };
     if (name.endsWith("usePortfolioRoute")) return { usePortfolioRoute: () => ({ route: { kind: "catalog" }, navigate() {} }) };
+    if (name.endsWith("WorkspaceCasesStage")) return { WorkspaceCasesStage: "WorkspaceCasesStage" };
     if (name.endsWith("PortfoliosView")) return { PortfoliosView: "PortfoliosView" };
     throw new Error(`Unexpected import ${name}`);
   }
@@ -74,7 +75,12 @@ function harness() {
   const stage = compile<typeof import("../../../presentation/workspace-stage/portfolios/WorkspacePortfoliosStage")>(
     "../../../presentation/workspace-stage/portfolios/WorkspacePortfoliosStage.tsx");
   const rendered = stage.WorkspacePortfoliosStage({ model: model as unknown as Parameters<typeof stage.WorkspacePortfoliosStage>[0]["model"] });
-  const open = rendered.props.onOpenCases as (id: string) => Promise<void>;
+  const activate = rendered.props.onActivateProject as (id: string) => Promise<boolean>;
+  const open = async (id: string) => {
+    if (!await activate(id)) return;
+    const current = derive(state);
+    screens.push({ project: current.project?.id, cases: current.projectCases.map((item) => item.id) });
+  };
   return { metadata, collections, screens, memory, open, data: () => slots[0] as Bootstrap, state, derive };
 }
 

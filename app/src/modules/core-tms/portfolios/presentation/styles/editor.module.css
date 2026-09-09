@@ -1,0 +1,27 @@
+.editor { min-height: 500px; }
+.titleField { flex: 1; min-width: 200px; }
+.titleField input { width: 100%; padding: 0 0 5px; border: 0; border-radius: 0; background: transparent !important; color: var(--ink); font: inherit; font-size: clamp(23px, 2vw, 29px); font-weight: 620; line-height: 1.35; letter-spacing: -.5px; }
+.titleField input::placeholder { color: var(--muted); opacity: .75; }
+.titleField input:hover, .titleField input:active, .titleField input:focus, .titleField input:focus-visible { outline: none !important; border: 0; box-shadow: none !important; }
+.activeTab { display: inline-flex; padding: 12px 0; border-bottom: 2px solid var(--action); color: var(--ink); font-size: 13px; font-weight: 550; }
+.mainFields { display: grid; align-content: start; gap: 25px; }
+.markdownSection { min-width: 0; }
+.markdownSection > header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.markdownSection h2 { margin: 0; font-size: 14px; font-weight: 560; }
+.editText { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 28px; height: 28px; padding: 4px 6px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+.editText:hover { color: var(--ink); background: var(--control-hover); }
+.editText svg { width: 16px; height: 16px; }
+.markdownContent { min-height: 48px; line-height: 1.8; }
+.markdownContent > p { margin: 0; color: var(--muted); font-size: 13px; }
+.limit { color: var(--danger, #c74755); font-size: 12px; }
+.properties { padding-top: 4px; }
+.property { display: grid; grid-template-columns: minmax(80px, .8fr) minmax(0, 1.2fr); align-items: center; gap: 8px 12px; margin-bottom: 18px; font-size: 12px; }
+.property > span { color: var(--muted); }
+.property > input { min-width: 0; width: 100%; border: 0; border-radius: 8px; padding: 8px 6px; color: var(--ink); background: transparent !important; font: inherit; }
+.property > div { min-width: 0; }
+.property > div > button[aria-haspopup="listbox"] { min-height: 32px; border: 0; border-radius: 8px; background: transparent; padding: 6px; font-size: 12px; box-shadow: none; }
+.property > div > button[aria-haspopup="listbox"]:hover { background: var(--control-hover); }
+.property > button { grid-column: 2; }
+.note { margin: -7px 0 23px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.note code { font: inherit; white-space: nowrap; }
+@media(max-width:700px) { .titleField { min-width: 0; } .titleField input { font-size: 23px; } .mainFields { gap: 20px; } }

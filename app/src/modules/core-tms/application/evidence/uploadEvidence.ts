@@ -1,6 +1,6 @@
 import type { PrivateAttachmentClient } from "../../attachments/application/private-attachment-client";
 import type {
-  AttachmentKind, AttachmentMetadata, AttachmentMimeType, AttachmentOwner,
+  AttachmentScope, AttachmentKind, AttachmentMetadata, AttachmentMimeType, AttachmentOwner,
 } from "../../attachments/domain/attachment";
 
 const supported = new Set<AttachmentMimeType>([
@@ -30,9 +30,8 @@ function kind(mime: AttachmentMimeType, file: File): AttachmentKind {
   return "file";
 }
 
-export async function uploadEvidence(input: {
+export async function uploadEvidence(input: AttachmentScope & {
   client: PrivateAttachmentClient;
-  projectId: string;
   owner: AttachmentOwner;
   files: File[];
   operationKeyPrefix: string;
@@ -44,7 +43,7 @@ export async function uploadEvidence(input: {
     input.signal?.throwIfAborted();
     const mime = mimeType(file);
     uploaded.push(await input.client.upload({
-      projectId: input.projectId,
+      ...(input.portfolioId ? { portfolioId: input.portfolioId } : { projectId: input.projectId! }),
       owner: input.owner,
       kind: kind(mime, file),
       mimeType: mime,

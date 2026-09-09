@@ -1,3 +1,5 @@
+import { portfolioRouteUrl } from "../../portfolios/navigation/portfolio-route";
+import { navigateWorkspace } from "../navigation/browser/workspace-history";
 import { useState } from "react";
 import type {
   Environment,
@@ -52,7 +54,9 @@ export function useWorkspaceResourceActions(
 
   function openNewProject() {
     closeResourceEditors();
-    state.setDialog("project");
+    state.setDialog(null);
+    navigateWorkspace(portfolioRouteUrl(window.location.href, { kind: "project-create" }));
+    state.setView("portfolios");
   }
 
   function openNewEnvironment() {

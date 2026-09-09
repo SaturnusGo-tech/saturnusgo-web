@@ -124,6 +124,6 @@
 @container case-inspector (max-width: 430px) {
   .compactFields, .railFields { grid-template-columns: 1fr; }
   .wideField { grid-column: auto; }
-  .caseByline { display: grid; gap: 3px; }
+  .caseByline { display: grid; justify-items: start; gap: 3px; }
   .attachmentPicker label { align-items: center; flex-direction: row; }
 }

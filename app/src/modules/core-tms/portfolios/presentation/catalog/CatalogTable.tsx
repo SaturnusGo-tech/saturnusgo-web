@@ -1,4 +1,4 @@
-import { PiBriefcaseLight, PiCaretRight, PiFolderSimpleLight } from "react-icons/pi";
+import { PiBriefcaseDuotone, PiCaretRight, PiFolderSimpleDuotone } from "react-icons/pi";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { formatCount } from "../../../localization/format/count";
@@ -16,7 +16,7 @@ export function CatalogTable({ portfolios, projects, workspaceId, copy, onNaviga
     <tbody>
       {portfolios.map((item) => <tr key={`portfolio:${item.id}`}>
         <td><button type="button" className={styles.rowLink} onClick={() => onNavigate({ kind: "portfolio", id: item.id })}>
-          <PiBriefcaseLight size={26} aria-hidden="true" /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
+          <PiBriefcaseDuotone className={styles.portfolioIcon} size={18} aria-hidden="true" /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
         </button></td>
         <td className={styles.quiet}>{formatCount(locale, item.projectCount, ["project", "projects"], ["проект", "проекта", "проектов"])}</td>
         <td><ResponsibleName workspaceId={workspaceId} identityId={item.responsibleIdentityId} /></td>
@@ -24,7 +24,7 @@ export function CatalogTable({ portfolios, projects, workspaceId, copy, onNaviga
       </tr>)}
       {projects.map((item) => <tr key={`project:${item.id}`}>
         <td><button type="button" className={styles.rowLink} onClick={() => onNavigate({ kind: "project", id: item.id })}>
-          <PiFolderSimpleLight size={28} aria-hidden="true" /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
+          <PiFolderSimpleDuotone className={styles.projectIcon} size={18} aria-hidden="true" /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
         </button></td>
         <td><code className={styles.key}>{item.key}</code></td>
         <td><ResponsibleName workspaceId={workspaceId} identityId={item.responsibleIdentityId ?? null} /></td>

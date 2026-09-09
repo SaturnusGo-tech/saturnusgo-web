@@ -53,7 +53,8 @@
 .app button,
 .app label { -webkit-tap-highlight-color: transparent; }
 
-.app button { color: inherit; }
+/* Inheritance is a baseline; component button classes own their foreground. */
+:where(.app) button { color: inherit; }
 
 .authPage {
   grid-template-rows: minmax(0, 1fr);

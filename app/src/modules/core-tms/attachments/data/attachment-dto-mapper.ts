@@ -12,6 +12,8 @@ type AccessDto = components["schemas"]["AttachmentAccess"];
 
 function owner(dto: AttachmentDto["owner"]): AttachmentOwner {
   switch (dto.kind) {
+    case "project": return { kind: dto.kind, projectId: dto.projectId };
+    case "portfolio": return { kind: dto.kind, portfolioId: dto.portfolioId };
     case "test_case_revision":
       return { kind: dto.kind, caseId: dto.caseId, revisionNo: dto.revisionNo, stepId: dto.stepId };
     case "shared_step_revision":

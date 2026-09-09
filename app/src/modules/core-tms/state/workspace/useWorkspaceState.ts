@@ -1,3 +1,4 @@
+import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { useEffect, useState } from "react";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -71,7 +72,7 @@ export function useWorkspaceState() {
       ? remembered!
       : (active[0]?.id ?? "");
     const initialCase = resolveSelectedCase(data.testCases, initialProjectId,
-      !destination.view || destination.view === "cases" ? linked.caseId : null);
+      !destination.view || destination.view === "cases" || isProjectCaseContext(window.location.href, initialProjectId) ? linked.caseId : null);
     const initialRunId = destination.runId
       ?? data.runs.find((item) => item.projectId === initialProjectId && item.status === "active" && !item.archivedAt)?.id
       ?? data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id ?? null;
@@ -91,19 +92,20 @@ export function useWorkspaceState() {
   }, [bootstrap.generation]);
 
   useEffect(() => {
-    if (!canWriteNavigation() || view !== "cases" || (connection !== "connected" && connection !== "demo") || !selectedCaseId) return;
-    const selected = data.testCases.find((item) => item.id === selectedCaseId);
+    if (!canWriteNavigation() || (view !== "cases" && !isProjectCaseContext(window.location.href, projectId)) || (connection !== "connected" && connection !== "demo") || !selectedCaseId) return;
+    const selected = data.testCases.find((item) => item.id === selectedCaseId && item.projectId === projectId);
     if (!selected) return;
     const next = buildCaseDeepLink(window.location.href, {
       workspaceId: data.workspace.id,
       caseId: selected.id,
       projectId: selected.projectId,
-    });
+      folderId: selected.folderId ?? (selected.folderPath === "/" ? null : undefined),
+    }, { preserveProjectContext: view === "portfolios" });
     history.write(next);
-  }, [connection, data.testCases, data.workspace.id, selectedCaseId, view, canWriteNavigation]);
+  }, [connection, data.testCases, data.workspace.id, projectId, selectedCaseId, view, canWriteNavigation]);
 
   useEffect(() => {
-    if (!canWriteNavigation() || (connection !== "connected" && connection !== "demo") || !projectId || (view === "cases" && selectedCaseId)) return;
+    if (!canWriteNavigation() || (connection !== "connected" && connection !== "demo") || !projectId || ((view === "cases" || isProjectCaseContext(window.location.href, projectId)) && selectedCaseId)) return;
     const next = buildWorkspaceDeepLink(window.location.href, { workspaceId: data.workspace.id,
       projectId, view, runId: selectedRunId, runItemId: selectedRunItemId });
     history.write(next);

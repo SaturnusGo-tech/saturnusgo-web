@@ -1,0 +1,8 @@
+.extras { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: start; gap: 0 20px; margin: -2px 0 14px; }
+.extras > section { display: contents; }
+.extras [data-organization-files] > :first-child { grid-column: 1; grid-row: 1; }
+.extras [data-organization-files] > :not(:first-child) { grid-column: 1 / -1; }
+.extras [data-organization-checklist] > button { grid-column: 2; grid-row: 1; justify-self: start; margin-left: 0; }
+.extras [data-organization-checklist] > div { grid-column: 1 / -1; }
+.extras[data-persisted="false"] > p { grid-column: 1; padding-top: 6px; }
+@media(max-width:600px) { .extras { column-gap: 12px; } .extras[data-persisted="false"] { grid-template-columns: 1fr; row-gap: 9px; } .extras[data-persisted="false"] [data-organization-checklist] > button { grid-column: 1; grid-row: auto; margin-left: -8px; } }

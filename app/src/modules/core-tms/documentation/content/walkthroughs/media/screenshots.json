@@ -207,10 +207,6 @@
     "width": 1536,
     "height": 1024
   },
-  "organization-folder-05-import-preview": {
-    "width": 1536,
-    "height": 1024
-  },
   "organization-folder-06-archive": {
     "width": 1536,
     "height": 1024
@@ -314,5 +310,21 @@
   "workspace-v2-02-environment": {
     "width": 1280,
     "height": 720
+  },
+  "organization-05-portfolio-create": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-06-markdown-edit": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-07-workflow": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-05-import": {
+    "width": 1536,
+    "height": 1024
   }
 }

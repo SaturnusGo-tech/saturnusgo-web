@@ -10,6 +10,9 @@ export function useProjectForm(input: { workspaceId: string; project?: Project; 
   const [name, setName] = useState(input.project?.name ?? "");
   const [key, setKey] = useState(input.project?.key ?? "");
   const [description, setDescription] = useState(input.project?.description ?? "");
+  const [workflowPhase, setWorkflowPhase] = useState(input.project?.workflowPhase ?? "new");
+  const [checklist, setChecklist] = useState(input.project?.checklist ?? []);
+  const [testingPlan, setTestingPlan] = useState(input.project?.testingPlan ?? "");
   const [portfolioId, setPortfolioId] = useState(input.project?.portfolioId ?? input.portfolioId ?? null);
   const [responsibleIdentityId, setResponsibleIdentityId] = useState(input.project?.responsibleIdentityId ?? null);
   const [pending, setPending] = useState(false);
@@ -17,7 +20,7 @@ export function useProjectForm(input: { workspaceId: string; project?: Project; 
   const active = useRef<AbortController | null>(null);
   const operation = useRef<PendingOperation | null>(null);
   useEffect(() => () => active.current?.abort(), []);
-  const fields = { name, key, description, portfolioId, responsibleIdentityId };
+  const fields = { name, key, description, testingPlan, portfolioId, responsibleIdentityId, workflowPhase: workflowPhase ?? "new", checklist: checklist ?? [] };
   function updateName(next: string) {
     setName(next);
     if (!input.project && (!key || key === name.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase())) {
@@ -48,6 +51,8 @@ export function useProjectForm(input: { workspaceId: string; project?: Project; 
     }
   }
   const modified = !input.project || name.trim() !== input.project.name || description.trim() !== (input.project.description ?? "")
+    || workflowPhase !== (input.project.workflowPhase ?? "new") || JSON.stringify(checklist) !== JSON.stringify(input.project.checklist ?? [])
+    || testingPlan.trim() !== (input.project.testingPlan ?? "")
     || portfolioId !== (input.project.portfolioId ?? null) || responsibleIdentityId !== (input.project.responsibleIdentityId ?? null);
-  return { ...fields, updateName, setKey, setDescription, setPortfolioId, setResponsibleIdentityId, pending, error, modified, save };
+  return { ...fields, setWorkflowPhase, setChecklist, updateName, setKey, setDescription, setTestingPlan, setPortfolioId, setResponsibleIdentityId, pending, error, modified, save };
 }

@@ -32,8 +32,8 @@ function harness(loaded: boolean, submitting = false) {
   });
   const model = { data, ...result, setSelectedFolder: () => events.push("folder"), setSelectedCaseId: () => events.push("case"),
     setView: () => events.push("show-cases"), connection: "connected" };
-  const component = stage.WorkspacePortfoliosStage({ model }) as { props: { onOpenCases: (projectId: string) => Promise<void> } };
-  return { events, choose: result.chooseProject, open: component.props.onOpenCases };
+  const component = stage.WorkspacePortfoliosStage({ model }) as { props: { onActivateProject: (projectId: string) => Promise<boolean> } };
+  return { events, choose: result.chooseProject, open: component.props.onActivateProject };
 }
 
 test("failed catalog project load leaves the previous view and selections intact", async () => {
@@ -50,10 +50,9 @@ test("case submission prevents catalog navigation without clearing the editor", 
   assert.deepEqual(h.events, []);
 });
 
-test("successful catalog project load commits project selection before opening cases", async () => {
+test("successful catalog project activation commits its scope without leaving the project page", async () => {
   const h = harness(true);
   await h.open("project-b");
   assert.ok(h.events.indexOf("setProjectId") >= 0);
-  assert.ok(h.events.indexOf("setProjectId") < h.events.indexOf("show-cases"));
-  assert.equal(h.events[h.events.length - 1], "show-cases");
+  assert.equal(h.events.includes("show-cases"), false);
 });

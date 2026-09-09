@@ -9,6 +9,9 @@ export type Project = {
   key: string;
   name: string;
   description?: string;
+  testingPlan?: string;
+  workflowPhase?: "new" | "in_progress" | "in_review" | "done" | "on_hold";
+  checklist?: readonly Readonly<{ id: string; text: string; completed: boolean }>[];
   status?: "active" | "archived";
   portfolioId?: string | null;
   responsibleIdentityId?: string | null;

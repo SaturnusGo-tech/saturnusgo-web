@@ -1220,7 +1220,7 @@ export interface paths {
         };
         /**
          * List private attachment metadata
-         * @description Returns bounded metadata for every lifecycle state, including deleted tombstones retained for history. Object keys and provider details are never exposed.
+         * @description Returns bounded metadata for every lifecycle state, including deleted tombstones retained for history. Object keys and provider details are never exposed. Exactly one projectId or portfolioId is required; portfolio lists are always restricted to that portfolio. Archived organization files remain readable.
          */
         get: operations["listAttachments"];
         put?: never;
@@ -2541,6 +2541,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/comments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List project discussion newest first
+         * @description Requires project:read in the selected workspace. Cursor binds workspace, target type and target ID. Archived targets remain readable.
+         */
+        get: operations["listProjectComments"];
+        put?: never;
+        /**
+         * Append a project discussion comment
+         * @description Requires project:manage and active workspace, target, identity and membership. Append-only with same-transaction safe audit metadata. Identical retried requests replay for 24 hours, including after target archival; reusing a key for another target or body returns 409. No HTML interpretation.
+         */
+        post: operations["createProjectComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}/comments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List portfolio discussion newest first
+         * @description Requires project:read in the selected workspace. Cursor binds workspace, target type and target ID. Archived targets remain readable.
+         */
+        get: operations["listPortfolioComments"];
+        put?: never;
+        /**
+         * Append a portfolio discussion comment
+         * @description Requires project:manage and active workspace, target, identity and membership. Append-only with same-transaction safe audit metadata. Identical retried requests replay for 24 hours, including after target archival; reusing a key for another target or body returns 409. No HTML interpretation.
+         */
+        post: operations["createPortfolioComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2870,7 +2928,7 @@ export interface components {
         /** @description Stable workspace-scoped integration route id. android, ios, and backend remain valid legacy values. On defect representations and mutations, a null target remains Falcon-only under a v1 configuration and means automatic matcher-then-default routing only after an administrator explicitly saves configurationVersion 2. */
         DefectIntegrationTarget: string;
         /** @enum {string} */
-        AttachmentOwnerKind: "test_case_revision" | "shared_step_revision" | "run" | "run_attempt" | "defect";
+        AttachmentOwnerKind: "test_case_revision" | "shared_step_revision" | "run" | "run_attempt" | "defect" | "project" | "portfolio";
         PageMeta: {
             limit: number;
             hasMore: boolean;
@@ -3286,6 +3344,10 @@ export interface components {
             portfolioId: components["schemas"]["Identifier"] | null;
             responsibleIdentityId: components["schemas"]["Identifier"] | null;
             rowVersion: number;
+            /** @description Persisted testing plan, independent of project description. Defaults to an empty string. */
+            testingPlan: string;
+            workflowPhase: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist: components["schemas"]["OrganizationChecklist"];
         };
         ProjectCreateRequest: {
             workspaceId: components["schemas"]["Identifier"];
@@ -3295,6 +3357,10 @@ export interface components {
             description?: components["schemas"]["LongText"];
             portfolioId?: components["schemas"]["Identifier"] | null;
             responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+            /** @description Persisted testing plan, independent of project description. Defaults to an empty string. */
+            testingPlan?: string;
+            workflowPhase?: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist?: components["schemas"]["OrganizationChecklist"];
         };
         ProjectPatchRequest: {
             name?: string;
@@ -3302,6 +3368,10 @@ export interface components {
             description?: components["schemas"]["LongText"];
             portfolioId?: components["schemas"]["Identifier"] | null;
             responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+            /** @description Persisted testing plan, independent of project description. Defaults to an empty string. */
+            testingPlan?: string;
+            workflowPhase?: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist?: components["schemas"]["OrganizationChecklist"];
         };
         ProjectEnvelope: {
             data: components["schemas"]["Project"];
@@ -4585,11 +4655,12 @@ export interface components {
             revisionNo: number;
             stepId: components["schemas"]["Identifier"];
         };
-        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["SharedStepRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"];
+        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["SharedStepRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"] | components["schemas"]["ProjectAttachmentOwner"] | components["schemas"]["PortfolioAttachmentOwner"];
         /** @description Private object metadata. Bucket, object key, provider details, and reusable public URLs are never exposed. */
         Attachment: {
             id: components["schemas"]["Identifier"];
-            projectId: components["schemas"]["Identifier"];
+            /** @description Null only for a portfolio-owned attachment. The owner carries its portfolioId. */
+            projectId: components["schemas"]["Identifier"] | null;
             owner: components["schemas"]["AttachmentOwner"];
             kind: components["schemas"]["AttachmentKind"];
             originalFilename: string;
@@ -4609,15 +4680,17 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         } & (components["schemas"]["AttachmentMediaIdentity"] & unknown & unknown & unknown & unknown & unknown);
+        /** @description Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner. */
         AttachmentUploadIntentCreateRequest: {
-            projectId: components["schemas"]["Identifier"];
+            projectId?: components["schemas"]["Identifier"];
             owner: components["schemas"]["AttachmentOwner"];
             kind: components["schemas"]["AttachmentKind"];
             originalFilename: string;
             mimeType: components["schemas"]["AttachmentMimeType"];
             byteSize: number;
             sha256: string;
-        };
+            portfolioId?: components["schemas"]["Identifier"];
+        } & (unknown | unknown);
         AttachmentUploadIntent: {
             intentId: components["schemas"]["Identifier"];
             attachmentId: components["schemas"]["Identifier"];
@@ -5268,6 +5341,8 @@ export interface components {
             archivedAt: components["schemas"]["Timestamp"] | null;
             /** @description Count of active projects currently associated with this portfolio; aggregated for at most 100 portfolio IDs per request. */
             projectCount: number;
+            workflowPhase: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist: components["schemas"]["OrganizationChecklist"];
         };
         PortfolioCreateRequest: {
             workspaceId: components["schemas"]["Identifier"];
@@ -5275,12 +5350,16 @@ export interface components {
             description?: components["schemas"]["LongText"];
             /** @description An active member in this workspace, or null. Assignment does not alter membership or permissions. */
             responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+            workflowPhase?: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist?: components["schemas"]["OrganizationChecklist"];
         };
         PortfolioPatchRequest: {
             name?: string;
             description?: components["schemas"]["LongText"];
             /** @description An active member in this workspace, or null. Assignment does not alter membership or permissions. */
             responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+            workflowPhase?: components["schemas"]["OrganizationWorkflowPhase"];
+            checklist?: components["schemas"]["OrganizationChecklist"];
         };
         PortfolioEnvelope: {
             data: components["schemas"]["Portfolio"];
@@ -5387,6 +5466,62 @@ export interface components {
         RepositoryFolderArchiveCasesEnvelope: {
             data: components["schemas"]["RepositoryFolderArchiveCasesResult"];
         };
+        OrganizationComment: {
+            id: components["schemas"]["Identifier"];
+            /** @description Trimmed plain text. Render escaped; HTML is not interpreted. Author display name is captured at creation. */
+            body: string;
+            author: components["schemas"]["OrganizationCommentAuthor"];
+            createdAt: components["schemas"]["Timestamp"];
+            workspaceId: components["schemas"]["Identifier"];
+            /** @enum {string} */
+            targetType: "project" | "portfolio";
+            targetId: components["schemas"]["Identifier"];
+        };
+        OrganizationCommentAuthor: {
+            identityId: components["schemas"]["Identifier"];
+            displayName: string;
+        };
+        OrganizationCommentEnvelope: {
+            data: components["schemas"]["OrganizationComment"];
+        };
+        OrganizationCommentListEnvelope: {
+            data: components["schemas"]["OrganizationComment"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        OrganizationCommentCreateRequest: {
+            body: string;
+            workspaceId: components["schemas"]["Identifier"];
+        };
+        ProjectAttachmentOwner: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "project";
+            projectId: components["schemas"]["Identifier"];
+        };
+        PortfolioAttachmentOwner: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "portfolio";
+            portfolioId: components["schemas"]["Identifier"];
+        };
+        /**
+         * @description Work phase, independent of active/archived lifecycle. New entities default to new.
+         * @enum {string}
+         */
+        OrganizationWorkflowPhase: "new" | "in_progress" | "in_review" | "done" | "on_hold";
+        OrganizationChecklistItem: {
+            /** @description Stable item identity, unique within this checklist. */
+            id: string;
+            /** @description Trimmed task text. */
+            text: string;
+            completed: boolean;
+        };
+        /** @description Ordered checklist with unique stable item IDs. PATCH replaces the entire checklist under the entity ETag. Defaults to an empty list. */
+        OrganizationChecklist: components["schemas"]["OrganizationChecklistItem"][];
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -6321,6 +6456,28 @@ export interface components {
                 "application/json": components["schemas"]["PortfolioEnvelope"];
             };
         };
+        /** @description A bounded page of append-only comments ordered newest first. */
+        OrganizationCommentListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["OrganizationCommentListEnvelope"];
+            };
+        };
+        /** @description New or idempotently replayed append-only comment. */
+        OrganizationCommentResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["OrganizationCommentEnvelope"];
+            };
+        };
     };
     parameters: {
         /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -6550,6 +6707,11 @@ export interface components {
         PortfolioPatch: {
             content: {
                 "application/merge-patch+json": components["schemas"]["PortfolioPatchRequest"];
+            };
+        };
+        OrganizationCommentCreate: {
+            content: {
+                "application/json": components["schemas"]["OrganizationCommentCreateRequest"];
             };
         };
     };
@@ -8445,9 +8607,11 @@ export interface operations {
     };
     listAttachments: {
         parameters: {
-            query: {
-                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
-                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            query?: {
+                /** @description Exactly one projectId or portfolioId is required. */
+                projectId?: components["schemas"]["Identifier"];
+                /** @description Portfolio-only scope. The exact portfolio owner filter is inferred; a provided owner must match. */
+                portfolioId?: components["schemas"]["Identifier"];
                 /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
                 cursor?: components["parameters"]["Cursor"];
                 /** @description Requested page size. */
@@ -10857,6 +11021,112 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProjectComments: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["OrganizationCommentListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createProjectComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["OrganizationCommentCreate"];
+        responses: {
+            201: components["responses"]["OrganizationCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPortfolioComments: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["OrganizationCommentListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createPortfolioComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["OrganizationCommentCreate"];
+        responses: {
+            201: components["responses"]["OrganizationCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };

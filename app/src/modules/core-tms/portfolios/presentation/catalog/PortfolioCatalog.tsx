@@ -1,4 +1,4 @@
-import { PiBriefcaseLight, PiMagnifyingGlass, PiPlus } from "react-icons/pi";
+import { PiMagnifyingGlass, PiPlus } from "react-icons/pi";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import type { PortfolioCopy } from "../../model/copy";
 import type { PortfolioTab } from "../../model/portfolio";
@@ -18,8 +18,8 @@ export function PortfolioCatalog({ state, workspaceId, canManage, copy }: { stat
   return <>
     <header className={styles.heading}><div><h1>{copy.title}</h1></div>
       <div className={styles.actions}>
-        {canManage && <><button type="button" className={styles.secondary} onClick={() => state.setDialog("project-create")}><PiPlus />{copy.newProject}</button>
-          <button type="button" className={styles.primary} onClick={() => state.setDialog("portfolio-create")}><PiPlus />{copy.newPortfolio}</button></>}
+        {canManage && <><button type="button" className={styles.secondary} onClick={state.createProject}><PiPlus />{copy.newProject}</button>
+          <button type="button" className={styles.primary} onClick={() => state.navigate({ kind: "portfolio-create" })}><PiPlus />{copy.newPortfolio}</button></>}
       </div>
     </header>
     <nav className={styles.tabs} aria-label={copy.title}>{tabs.map((tab) => <button type="button" key={tab.id} aria-current={state.tab === tab.id ? "page" : undefined}
@@ -31,12 +31,11 @@ export function PortfolioCatalog({ state, workspaceId, canManage, copy }: { stat
     <ResourceFeedback copy={copy} loading={loading} error={state.portfolioList.error ?? state.projects.error} retry={state.refresh} />
     {!empty && <CatalogTable portfolios={portfolios} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} />}
     {empty && !loading && !state.portfolioList.error && !state.projects.error && <section className={styles.empty}>
-      <PiBriefcaseLight size={56} aria-hidden="true" /><h2>{query ? copy.noResults : copy.emptyTitle}</h2>
+      <h2>{query ? copy.noResults : copy.emptyTitle}</h2>
       <p>{query ? copy.noResultsHint : copy.emptyHint}</p>
-      {canManage && !query && <button type="button" className={styles.primary} onClick={() => state.setDialog("portfolio-create")}><PiPlus />{copy.newPortfolio}</button>}
+      {canManage && !query && <button type="button" className={styles.primary} onClick={() => state.navigate({ kind: "portfolio-create" })}><PiPlus />{copy.newPortfolio}</button>}
     </section>}
-    <footer className={styles.listFooter}><span>{copy.countLoaded}: {state.portfolioList.items.length + state.projects.items.length}</span>
-      {hasMore && <button type="button" className={styles.secondary} disabled={loading} onClick={() => { state.portfolioList.loadMore(); state.projects.loadMore(); }}>{copy.loadMore}</button>}
-    </footer>
+    {hasMore && <footer className={styles.listFooter}><button type="button" className={styles.secondary} disabled={loading}
+      onClick={() => { state.portfolioList.loadMore(); state.projects.loadMore(); }}>{copy.loadMore}</button></footer>}
   </>;
 }

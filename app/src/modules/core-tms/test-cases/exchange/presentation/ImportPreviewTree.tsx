@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { PiListChecks } from "react-icons/pi";
 import type { ImportPlan } from "../model/import-plan";
 import type { ImportCopy } from "../localization/import-copy";
 import { ImportFolderBranch } from "./tree/ImportFolderBranch";
@@ -11,7 +11,7 @@ export function ImportPreviewTree({ plan, copy }: { plan: ImportPlan; copy: Impo
       {plan.folders.filter((folder) => folder.parentPath === "/").map((folder) =>
         <ImportFolderBranch key={folder.path} folder={folder} plan={plan} level={0} copy={copy} />)}
       {plan.rootCaseIndices.map((index) => <li key={index} className={css.caseRow}>
-        <FileText size={15} aria-hidden="true" /><span>{plan.document.testCases[index]?.title}</span>
+        <PiListChecks size={16} aria-hidden="true" /><span>{plan.document.testCases[index]?.title}</span>
       </li>)}
     </ul>
   </div>;

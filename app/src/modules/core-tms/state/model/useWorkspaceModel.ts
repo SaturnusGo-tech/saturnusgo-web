@@ -35,7 +35,7 @@ export function useWorkspaceModel() {
   const caseBulk = useCaseBulkActions(state, derived, workspace.notify);
   const capabilities = state.data.meta.authorization.capabilities;
   const caseCollaboration = useCaseCollaboration({
-    active: state.view === "cases",
+    active: state.view === "cases" || state.view === "portfolios",
     connected: state.connection === "connected",
     projectId: derived.project?.id ?? "",
     caseId: derived.selectedCase?.id ?? "",

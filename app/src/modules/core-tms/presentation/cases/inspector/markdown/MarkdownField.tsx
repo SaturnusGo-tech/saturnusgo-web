@@ -2,7 +2,7 @@
 
 import MDEditor from "@uiw/react-md-editor/nohighlight";
 import dynamic from "next/dynamic";
-import { createContext, useCallback, useContext, useEffect } from "react";
+import { createContext, useCallback, useContext } from "react";
 import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
 import { filesFromClipboard } from "../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -81,9 +81,6 @@ export function MarkdownField(props: Props) {
       props.attachmentKey, files, props.attachmentStepId,
     );
   }, [addFilesToDraft, props.attachmentKey, props.attachmentStepId]);
-  useEffect(() => {
-    void loadMarkdownEditor();
-  }, []);
   if (!props.onChange) {
     if (!props.value.trim()) {
       return <p className={css.empty}>{props.emptyLabel}</p>;

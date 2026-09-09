@@ -15,7 +15,12 @@ export type AttachmentMimeType =
   | "application/gzip"
   | "application/octet-stream";
 
+export type AttachmentScope = { readonly projectId: string; readonly portfolioId?: never }
+  | { readonly projectId?: never; readonly portfolioId: string };
+
 export type AttachmentOwner =
+  | { readonly kind: "project"; readonly projectId: string }
+  | { readonly kind: "portfolio"; readonly portfolioId: string }
   | { readonly kind: "shared_step_revision"; readonly sharedStepId: string; readonly revisionNo: number; readonly stepId: string }
   | { readonly kind: "test_case_revision"; readonly caseId: string; readonly revisionNo: number; readonly stepId?: string }
   | { readonly kind: "run"; readonly runId: string }
@@ -30,7 +35,7 @@ export type AttachmentOwner =
 
 export interface AttachmentMetadata {
   readonly id: string;
-  readonly projectId: string;
+  readonly projectId: string | null;
   readonly owner: AttachmentOwner;
   readonly kind: AttachmentKind;
   readonly originalFilename: string;
@@ -56,8 +61,7 @@ export interface AttachmentReadAccess {
   readonly expiresAt: string;
 }
 
-export interface UploadPrivateAttachmentInput {
-  readonly projectId: string;
+export type UploadPrivateAttachmentInput = AttachmentScope & {
   readonly owner: AttachmentOwner;
   readonly kind: AttachmentKind;
   readonly mimeType: AttachmentMimeType;

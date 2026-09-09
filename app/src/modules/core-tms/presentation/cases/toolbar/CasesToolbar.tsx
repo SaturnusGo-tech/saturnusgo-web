@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { PiCheck as Check, PiCaretDown as ChevronDown, PiFilePlusLight as FilePlus2, PiFunnelSimple as Filter,
   PiFolderPlusLight as FolderPlus, PiList as List, PiTreeStructure as ListTree, PiDotsThree as MoreHorizontal,
   PiMagnifyingGlass as Search, PiCheckSquareLight as SquareCheckBig, PiX as X, PiFolderSimpleLight } from "react-icons/pi";
+import { FolderBreadcrumb } from "../../dialogs/folder/breadcrumb/FolderBreadcrumb";
 import type { TmsLocale } from "../../../localization/model/locale";
 import type { CaseFilters } from "../../../state/types/workspace";
 import { dynamicGroupBy, type CaseFacetFilters, type CaseFacetOptions, type CaseGroupBy, type CaseListViewMode } from "../model/caseListModel";
@@ -87,7 +88,7 @@ export function CasesToolbar(props: Props) {
   return <div ref={rootRef} className={props.repositoryMode ? repositoryStyles.repository : undefined}>
     <div className={`${styles.controls} ${props.repositoryMode ? repositoryStyles.controls : ""}`}>
       {props.repositoryMode && <div className={repositoryStyles.context}>
-        <span className={repositoryStyles.folder} title={props.selectedFolder || folderLabel}><PiFolderSimpleLight size={18} aria-hidden="true" /><span>{folderLabel}</span></span>
+        <span className={repositoryStyles.folder} title={props.selectedFolder || folderLabel}><PiFolderSimpleLight size={18} aria-hidden="true" /><FolderBreadcrumb path={props.selectedFolder} root={folderLabel} /></span>
         <span className={repositoryStyles.meta}>{props.countLabel}<i />{props.estimateLabel ?? (ru ? "Оценка не указана" : "Estimate not specified")}</span>
       </div>}
       <div className={`${styles.searchLine} ${props.repositoryMode ? repositoryStyles.searchLine : ""}`}>
