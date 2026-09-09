@@ -1,3 +1,5 @@
+import { useFolderNavigation } from "../../folders/navigation/useFolderNavigation";
+import { useWorkspaceFolders } from "../../folders/state/workspace/useWorkspaceFolders";
 import { useEffect } from "react";
 import { useCaseActions } from "../case-actions/useCaseActions";
 import { useRunActions } from "../run-actions/useRunActions";
@@ -18,6 +20,8 @@ import { useWorkspaceVerification } from "../../runs/verification/state/workspac
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
   const derived = useWorkspaceDerived(state);
+  const folders = useWorkspaceFolders(state, derived);
+  const selectRepositoryFolder = useFolderNavigation(state, folders);
   const workspace = useWorkspaceActions(state);
   const resources = useWorkspaceResourceActions(
     state,
@@ -64,9 +68,11 @@ export function useWorkspaceModel() {
     ? [...derived.projectDefects, selectedDefect] : derived.projectDefects;
   return {
     ...state,
+    folders,
     ...derived,
     ...workspace,
     ...resources,
+    selectFolder: selectRepositoryFolder,
     ...cases,
     ...runs,
     ...runArchive,

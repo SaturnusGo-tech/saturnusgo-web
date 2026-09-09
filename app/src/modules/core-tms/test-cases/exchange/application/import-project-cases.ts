@@ -43,32 +43,38 @@ function body(projectId: string, item: PortableTestCase): Api["TestCaseCreateReq
   };
 }
 
-async function importOne(http: TmsHttpClient, projectId: string, item: PortableTestCase) {
-  const request = body(projectId, item);
-  const key = `case_import_${await digest(JSON.stringify(request))}`;
-  await http.mutateResource<Api["TestCase"]>("/test-cases", "POST", request, { idempotencyKey: key });
-}
-
 export async function importProjectCases(
   http: TmsHttpClient,
   projectId: string,
   document: TestCaseExchangeDocument,
   progress?: (value: TestCaseImportProgress) => void,
+  options: Readonly<{ signal?: AbortSignal; successfulIndices?: readonly number[] }> = {},
 ): Promise<TestCaseImportResult> {
-  const failed: { sourceKey: string; message: string }[] = [];
-  let completed = 0;
+  const successful = new Set(options.successfulIndices ?? []);
+  const failed: { sourceKey: string; index: number; message: string }[] = [];
+  let attempted = successful.size;
+  const occurrences = new Map<string, number>();
   for (const [index, item] of document.testCases.entries()) {
+    const request = body(projectId, item);
+    const canonical = JSON.stringify(request);
+    const occurrence = occurrences.get(canonical) ?? 0;
+    occurrences.set(canonical, occurrence + 1);
+    if (successful.has(index)) continue;
+    if (options.signal?.aborted) break;
     try {
-      await importOne(http, projectId, item);
+      const key = `case_import_${await digest(occurrence ? JSON.stringify({ request, occurrence }) : canonical)}`;
+      options.signal?.throwIfAborted();
+      await http.mutateResource<Api["TestCase"]>("/test-cases", "POST", request,
+        { idempotencyKey: key, signal: options.signal });
+      successful.add(index);
     } catch (error) {
-      failed.push({
-        sourceKey: item.sourceKey ?? `item-${index + 1}`,
-        message: error instanceof Error ? error.message : "Import failed.",
-      });
-    } finally {
-      completed += 1;
-      progress?.({ completed, total: document.testCases.length });
+      if (options.signal?.aborted) break;
+      failed.push({ index, sourceKey: item.sourceKey ?? `item-${index + 1}`,
+        message: error instanceof Error ? error.message : "Import failed." });
     }
+    attempted += 1;
+    progress?.({ completed: successful.size, attempted, total: document.testCases.length });
   }
-  return { completed, failed };
+  return { completed: successful.size, attempted, successfulIndices: [...successful],
+    cancelled: options.signal?.aborted ?? false, failed };
 }

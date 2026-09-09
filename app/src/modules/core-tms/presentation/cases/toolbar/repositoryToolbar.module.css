@@ -1,0 +1,23 @@
+.repository { container-type: inline-size; }
+.repository .controls { gap: 12px; padding: 17px 18px 15px; }
+.context { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; min-width: 0; }
+.folder { min-width: 0; display: flex; align-items: center; gap: 8px; color: var(--cases-strong); font-size: 13px; font-weight: 550; }
+.folder > svg { color: var(--cases-muted); flex-shrink: 0; }
+.folder > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.meta { margin-left: auto; color: var(--cases-muted); font-size: 11px; white-space: nowrap; }
+.meta i { display: inline-block; width: 1px; height: 10px; margin: 0 9px; background: var(--cases-border); vertical-align: -1px; }
+.searchLine { gap: 8px; flex-wrap: wrap; }
+.searchLine > label { flex: 1 1 180px; }
+.searchLine > button, .searchLine > div > button, .searchLine > label { height: 34px; border-radius: 7px; }
+.searchLine > label { padding-inline: 10px; }
+.searchLine > label input { font-size: 12px; }
+.searchLine > button { gap: 6px; }
+.qlToggle { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 34px; padding: 0 8px; border: 1px solid var(--cases-control-border); border-radius: 7px; background: var(--cases-control); color: var(--cases-secondary-text); font: inherit; font-size: 11px; cursor: pointer; }
+.qlToggle:hover, .qlToggle[aria-expanded=true] { color: var(--cases-strong); background: var(--cases-hover-strong); }
+.qlToggle:focus-visible, .searchLine button:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 2px; }
+.activeQuery { width: 5px; height: 5px; border-radius: 50%; background: var(--cases-primary); }
+.qlLine { display: flex; align-items: center; gap: 8px; }
+.qlLine > div { flex: 1; min-width: 0; }
+.qlLine > button { flex-shrink: 0; border-radius: 7px; }
+@container (max-width: 680px) { .selectionLabel { display: none; } }
+@container (max-width: 480px) { .repository .controls { padding: 13px 12px; } .meta { margin-left: 0; } .context { align-items: flex-start; flex-direction: column; } .searchLine > label { flex-basis: 100%; } }

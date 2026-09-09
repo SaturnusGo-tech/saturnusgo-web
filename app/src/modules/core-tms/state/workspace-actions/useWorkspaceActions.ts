@@ -5,13 +5,13 @@ export function useWorkspaceActions(
 ) {
   const notify = (message: string) => state.setNotice(message);
 
-  async function chooseProject(nextProjectId: string) {
-    if (state.isCaseSubmitting()) return;
+  async function chooseProject(nextProjectId: string): Promise<boolean> {
+    if (state.isCaseSubmitting()) return false;
     const remote = state.connection === "demo"
       ? null
       : await state.loadProject(nextProjectId);
-    if (state.isCaseSubmitting()) return;
-    if (state.connection !== "demo" && !remote) return;
+    if (state.isCaseSubmitting()) return false;
+    if (state.connection !== "demo" && !remote) return false;
     window.localStorage.setItem("tms.project.v1", nextProjectId);
     state.setProjectId(nextProjectId);
     const testCases = remote?.testCases ?? state.data.testCases;
@@ -22,7 +22,8 @@ export function useWorkspaceActions(
     );
     state.resetCaseEditor(nextCase?.folderPath ?? "/Unsorted");
     state.setSelectedCaseId("");
-    state.setSelectedFolder(nextCase?.folderPath ?? "/Unsorted");
+    state.setSelectedFolder("");
+    state.setSelectedFolderId("");
     state.setSelectedSuiteId(
       suites.find((item) => item.projectId === nextProjectId)?.id ??
         "",
@@ -43,6 +44,7 @@ export function useWorkspaceActions(
       tag: "",
       includeArchived: false,
     });
+    return true;
   }
 
   function selectFolder(folderPath: string) {

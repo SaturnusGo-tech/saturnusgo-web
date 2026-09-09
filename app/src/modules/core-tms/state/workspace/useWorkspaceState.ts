@@ -37,7 +37,8 @@ export function useWorkspaceState() {
   const caseEditor = useCaseEditorState(locale, () => {
     setDialog((current) => current === "case" ? null : current);
   });
-  const [selectedFolder, setSelectedFolder] = useNavigationValue(`cases:${projectId}:folder`, "/Unsorted");
+  const [selectedFolder, setSelectedFolder] = useNavigationValue(`cases:${projectId}:folder`, "");
+  const [selectedFolderId, setSelectedFolderId] = useNavigationValue(`cases:${projectId}:folderId`, "");
   const [customFolders, setCustomFolders] = useState<Record<string, string[]>>(
     {},
   );
@@ -80,7 +81,7 @@ export function useWorkspaceState() {
     setView(initialView);
     setProjectId(initialProjectId);
     setSelectedCaseId(initialCase?.id ?? "");
-    setSelectedFolder(initialCase?.folderPath ?? "/Unsorted");
+    setSelectedFolder(initialCase?.folderPath ?? "");
     setSelectedSuiteId(
       data.suites.find((item) => item.projectId === initialProjectId)?.id ?? "",
     );
@@ -146,7 +147,7 @@ export function useWorkspaceState() {
     query, setQuery, canWriteNavigation, selectedCaseId, setSelectedCaseId, selectedSuiteId,
     setSelectedSuiteId, selectedRunId, setSelectedRunId, selectedRunItemId,
     setSelectedRunItemId, dialog, setDialog, ...caseEditor, selectedFolder,
-    setSelectedFolder, customFolders, setCustomFolders, caseFilters,
+    setSelectedFolder, selectedFolderId, setSelectedFolderId, customFolders, setCustomFolders, caseFilters,
     setCaseFilters, editingSuiteId, setEditingSuiteId, runPresetCaseIds,
     setRunPresetCaseIds, runPresetSuiteId, setRunPresetSuiteId, notice,
     setNotice, collapsedFolders, setCollapsedFolders,

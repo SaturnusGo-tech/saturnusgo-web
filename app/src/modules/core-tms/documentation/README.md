@@ -37,12 +37,13 @@ No additional service, CMS, credentials or package dependencies are required.
 
 `content/walkthroughs/` describes numbered sequences with an instruction,
 actual UI screenshot, expected outcome and descriptive alt text per step.
-Capture real Falcon UI using neutral data in the isolated Falcon Guide project.
+Capture real Falcon UI using neutral data in the isolated Falcon Guide project
+or a disposable guide workspace for workspace-level features.
 Do not generate or retouch interface controls, expose credentials, or capture
 customer records. Clearly label hypothetical defects and unsaved setup forms.
 
 Store JPEG captures under `public/falcon/docs/<edition>/`. The current edition
-was captured on 8 September 2026. `media/screenshots.json` records each image's
+was captured on 8–9 September 2026. `media/screenshots.json` records each image's
 intrinsic dimensions; `screenshotStep` restricts references to this inventory.
 When replacing captures, update dimensions and provenance together. The visual
 catalog tests check JPEG headers, size limits, coverage and discoverability.

@@ -39,6 +39,70 @@
     "width": 1087,
     "height": 814
   },
+  "dashboard-v2-01-empty": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-v2-05-size": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-v2-10-runs": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-v2-11-library": {
+    "width": 1087,
+    "height": 814
+  },
+  "dashboard-v3-02-catalog": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-03-preview": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-04-edit": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-06-remove": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-07-overview": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-08-freshness": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v3-09-context": {
+    "width": 1280,
+    "height": 720
+  },
+  "dashboard-v4-01-component": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-02-selection": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-03-builder": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-04-defects": {
+    "width": 1359,
+    "height": 1018
+  },
+  "dashboard-v4-05-runs": {
+    "width": 1359,
+    "height": 1018
+  },
   "defect-01-failed-step": {
     "width": 1087,
     "height": 814
@@ -111,6 +175,46 @@
     "width": 1087,
     "height": 814
   },
+  "organization-01-catalog": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-02-portfolio": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-03-project-dialog": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-04-project-overview": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-01-tree": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-02-create": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-03-selection": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-04-move": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-05-import-preview": {
+    "width": 1536,
+    "height": 1024
+  },
+  "organization-folder-06-archive": {
+    "width": 1536,
+    "height": 1024
+  },
   "run-01-library": {
     "width": 1280,
     "height": 720
@@ -124,6 +228,22 @@
     "height": 720
   },
   "run-04-started": {
+    "width": 1087,
+    "height": 814
+  },
+  "settings-01-general": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings-02-appearance": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings-03-exchange": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings-04-edit-project": {
     "width": 1087,
     "height": 814
   },
@@ -159,18 +279,6 @@
     "width": 1087,
     "height": 814
   },
-  "trello-01-connection": {
-    "width": 1087,
-    "height": 814
-  },
-  "trello-02-events": {
-    "width": 1087,
-    "height": 814
-  },
-  "workspace-03-project": {
-    "width": 1087,
-    "height": 814
-  },
   "swagger-01-connection": {
     "width": 1087,
     "height": 814
@@ -187,61 +295,17 @@
     "width": 1087,
     "height": 814
   },
-  "dashboard-v2-01-empty": {
+  "trello-01-connection": {
     "width": 1087,
     "height": 814
   },
-  "dashboard-v2-05-size": {
+  "trello-02-events": {
     "width": 1087,
     "height": 814
   },
-  "dashboard-v2-10-runs": {
+  "workspace-03-project": {
     "width": 1087,
     "height": 814
-  },
-  "dashboard-v2-11-library": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v3-02-catalog": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-03-preview": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-04-edit": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-06-remove": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-07-overview": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-08-freshness": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-09-context": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-01-general": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-02-appearance": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-03-exchange": {
-    "width": 1280,
-    "height": 720
   },
   "workspace-v2-01-settings": {
     "width": 1280,
@@ -250,41 +314,5 @@
   "workspace-v2-02-environment": {
     "width": 1280,
     "height": 720
-  },
-  "folder-01-name": {
-    "width": 1280,
-    "height": 720
-  },
-  "folder-02-parent": {
-    "width": 1280,
-    "height": 720
-  },
-  "folder-03-path": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-04-edit-project": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v4-01-component": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-02-selection": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-03-builder": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-04-defects": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-05-runs": {
-    "width": 1359,
-    "height": 1018
   }
 }

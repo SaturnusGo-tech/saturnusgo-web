@@ -167,7 +167,7 @@ export function CaseQlAutocomplete(props: QlProps) {
     props.onQuery(`${props.query.slice(0, start)}${replacement}`); setOpen(true);
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Escape") { setOpen(false); return; }
+    if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); return; }
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault(); setOpen(true);
       setActiveIndex((current) => Math.max(0, Math.min(renderedSuggestions.length - 1, current + (event.key === "ArrowDown" ? 1 : -1))));

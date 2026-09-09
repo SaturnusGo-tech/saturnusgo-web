@@ -868,3 +868,5 @@
   max-width: none;
   margin-inline: 0;
 }
+
+@media(max-width:650px) { .workspace:has([aria-label="Folders and test cases"]), .workspace:has([aria-label="Папки и тест-кейсы"]) { flex-direction: column; } }

@@ -22,7 +22,7 @@ const summary: Api["TestCaseRevisionSummary"] = {
 };
 const caseSummary = (id: number): Api["TestCaseSummary"] => ({
   id: `case-${id}`, projectId: "project-1", key: `HOST-TC-${id}`,
-  folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "automated",
+  folderId: null, folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "automated",
   lifecycle: "ready", priority: "medium", component: "Host", ownerIdentityId: null,
   tags: ["Host", "Ui"], estimatedMinutes: 2, revisionCount: 1, archivedAt: null,
   createdAt: time, updatedAt: time, etag: `"case-${id}:1"`,
@@ -47,8 +47,29 @@ test("test-case collection follows every cursor page", async () => {
   assert.deepEqual(result.items.map((item) => item.key), ["HOST-TC-240", "HOST-TC-239", "HOST-TC-238"]);
   assert.equal(new URL(urls[0]!).searchParams.get("cursor"), null);
   assert.equal(new URL(urls[1]!).searchParams.get("cursor"), "page-2");
+  assert.ok(urls.every((url) => new URL(url).searchParams.get("includeArchived") === "true"));
   assert.equal(result.meta.hasMore, false);
   assert.equal(result.meta.limit, 2);
+});
+
+test("workspace case collection retains archived identities and ETags beside active cases", async () => {
+  const archived = [1, 2, 3].map((id) => ({ ...caseSummary(id), folderId: "archived-folder", archivedAt: time }));
+  let calls = 0;
+  const http = createTmsHttpClient({
+    apiBase: "https://api.example.test/api/v1", accessToken: async () => "token",
+    fetch: (async (url) => {
+      calls++;
+      const includeArchived = new URL(String(url)).searchParams.get("includeArchived") === "true";
+      return new Response(JSON.stringify({ data: [caseSummary(4), ...(includeArchived ? archived : [])],
+        meta: { limit: 100, hasMore: false, nextCursor: null } }), { status: 200 });
+    }) as typeof fetch,
+  });
+  const result = await listTestCases(http, "project-1");
+  assert.equal(calls, 1);
+  assert.deepEqual(result.items.filter((item) => item.archivedAt).map((item) => [item.id, item.folderId, item.etag]), [
+    ["case-1", "archived-folder", '"case-1:1"'], ["case-2", "archived-folder", '"case-2:1"'], ["case-3", "archived-folder", '"case-3:1"'],
+  ]);
+  assert.deepEqual(result.items.filter((item) => !item.archivedAt).map((item) => item.id), ["case-4"]);
 });
 
 test("test-case pagination stops before another request when cancelled", async () => {
@@ -99,7 +120,7 @@ test("create serializes automated type while preserving normalized arbitrary tag
     async mutateResource(path: string, _method: string, body: unknown, options?: TmsMutationOptions) {
       requests.push({ path, body, options });
       return { data: {
-        id: "case-1", projectId: "project-1", key: "HOST-TC-1", folderPath: "/Host",
+        id: "case-1", projectId: "project-1", key: "HOST-TC-1", folderId: null, folderPath: "/Host",
         currentRevision: 3, current: revision, revisionCount: 3, linkIds: [], archivedAt: null,
         createdAt: time, updatedAt: time,
       }, etag: '"case-1:3"' };

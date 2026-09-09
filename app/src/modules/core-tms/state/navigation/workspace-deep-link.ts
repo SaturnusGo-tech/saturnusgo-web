@@ -25,9 +25,13 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const url = new URL(href); const integration = url.searchParams.get("integration");
   const analysisId = url.searchParams.get("analysisId"); const impact = url.searchParams.get("impact");
   const detail = url.searchParams.get("dashboardDetail");
+  const portfolioId = url.searchParams.get("portfolioId");
+  const catalogProjectId = url.searchParams.get("catalogProjectId");
+  const folderId = url.searchParams.get("folderId");
   const suiteId = url.searchParams.get("suiteId");
   const article = url.searchParams.get("article"); const section = url.hash;
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
+  const sameWorkspace = !url.searchParams.get("workspaceId") || url.searchParams.get("workspaceId") === input.workspaceId;
   const sameScope = ["workspaceId", "projectId"].every((key) => {
     const previous = url.searchParams.get(key);
     return !previous || previous === input[key as "workspaceId" | "projectId"];
@@ -35,6 +39,11 @@ export function buildWorkspaceDeepLink(href: string, input: {
   url.search = ""; url.hash = "";
   url.searchParams.set("workspaceId", input.workspaceId); url.searchParams.set("projectId", input.projectId);
   url.searchParams.set("view", input.view);
+  if (input.view === "portfolios" && sameWorkspace) {
+    if (portfolioId && /^[A-Za-z0-9._:-]{1,128}$/.test(portfolioId)) url.searchParams.set("portfolioId", portfolioId);
+    if (catalogProjectId && /^[A-Za-z0-9._:-]{1,128}$/.test(catalogProjectId)) url.searchParams.set("catalogProjectId", catalogProjectId);
+  }
+  if (input.view === "cases" && sameScope && folderId && /^[A-Za-z0-9._:-]{1,128}$/.test(folderId)) url.searchParams.set("folderId", folderId);
   if (input.view === "suites" && sameScope && suiteId && /^[A-Za-z0-9._:-]{1,128}$/.test(suiteId)) url.searchParams.set("suiteId", suiteId);
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
   if (input.view === "help") {

@@ -1,0 +1,58 @@
+import type { TmsLocale } from "../../localization/model/locale";
+
+const en = {
+  title: "Portfolios and projects", all: "All", portfolios: "Portfolios", unassigned: "Without portfolio",
+  newPortfolio: "New portfolio", editPortfolio: "Edit portfolio", newProject: "Create project", editProject: "Edit project",
+  search: "Search by name", searchProject: "Find a project", name: "Name", description: "Description",
+  responsible: "Responsible", none: "Not assigned", optional: "Optional", projects: "Projects", project: "Project",
+  portfolio: "Portfolio", aboutPortfolio: "About portfolio", aboutProject: "About project", cases: "Test cases",
+  openCases: "Open test cases", key: "Key", created: "Created", updated: "Updated", active: "Active", archived: "Archived",
+  archive: "Archive", restore: "Restore", cancel: "Cancel", save: "Save changes", saving: "Saving…", creating: "Creating…",
+  createPortfolio: "Create portfolio", portfolioHint: "Bring related projects together.",
+  portfolioName: "Payment platform", portfolioDescription: "Describe what these projects have in common…",
+  addLater: "You can add projects after creating the portfolio.", attach: "Add existing project", attachAction: "Add project",
+  attachHint: "Choose a project without a portfolio. Its test cases and history stay with the project.",
+  attachEmpty: "There are no available projects.", attachEmptyHint: "Create a project or remove an existing project from its portfolio first.",
+  emptyTitle: "Organize your projects", emptyHint: "Create a portfolio to group related projects, or start with a project.",
+  emptyPortfolio: "No projects in this portfolio yet", emptyPortfolioHint: "Create a project or add an existing one.",
+  noResults: "No matches", noResultsHint: "Try a different name or load more results.",
+  loadMore: "Load more", loading: "Loading…", retry: "Try again", loadError: "Could not load the catalog.",
+  saveError: "Could not save changes. Try again.", offline: "Connect to the server to manage portfolios and projects.",
+  permission: "You do not have permission to change this resource.", readonly: "Read-only access",
+  noDescription: "No description yet", checksTitle: "Test repository", checksHint: "Organize checks in folders, create test cases and import your existing repository.",
+  archiveHint: "The portfolio will move to the archive. Its projects and their test cases will stay available.",
+  archiveTitle: "Archive portfolio?", choose: "Choose a project", status: "Status", back: "Back to catalog",
+  countLoaded: "Loaded", noPortfolio: "Without portfolio", change: "Edit details", projectSaved: "Project saved",
+  portfolioSaved: "Portfolio saved", refresh: "Refresh", memberMore: "Load more people", portfolioMore: "Load more portfolios",
+  optionsError: "Could not load the available choices.", unknownPerson: "Assigned member", unknownPortfolio: "Current portfolio",
+};
+
+const ru: typeof en = {
+  title: "Портфели и проекты", all: "Все", portfolios: "Портфели", unassigned: "Без портфеля",
+  newPortfolio: "Новый портфель", editPortfolio: "Изменить портфель", newProject: "Создать проект", editProject: "Изменить проект",
+  search: "Поиск по названию", searchProject: "Найти проект", name: "Название", description: "Описание",
+  responsible: "Ответственный", none: "Не назначен", optional: "Необязательно", projects: "Проекты", project: "Проект",
+  portfolio: "Портфель", aboutPortfolio: "О портфеле", aboutProject: "О проекте", cases: "Тест-кейсы",
+  openCases: "Открыть тест-кейсы", key: "Ключ", created: "Создан", updated: "Обновлён", active: "Активные", archived: "В архиве",
+  archive: "В архив", restore: "Восстановить", cancel: "Отмена", save: "Сохранить изменения", saving: "Сохранение…", creating: "Создание…",
+  createPortfolio: "Создать портфель", portfolioHint: "Объедините связанные проекты.",
+  portfolioName: "Платёжный шлюз", portfolioDescription: "Что объединяет проекты в этом портфеле…",
+  addLater: "Проекты можно добавить после создания портфеля.", attach: "Добавить существующий", attachAction: "Добавить проект",
+  attachHint: "Выберите проект без портфеля. Его тест-кейсы и история останутся в проекте.",
+  attachEmpty: "Нет доступных проектов", attachEmptyHint: "Создайте проект или сначала уберите существующий проект из его портфеля.",
+  emptyTitle: "Объедините работу над проектами", emptyHint: "Создайте портфель для связанных проектов или начните с отдельного проекта.",
+  emptyPortfolio: "В портфеле пока нет проектов", emptyPortfolioHint: "Создайте новый проект или добавьте существующий.",
+  noResults: "Ничего не найдено", noResultsHint: "Измените название или загрузите больше результатов.",
+  loadMore: "Загрузить ещё", loading: "Загрузка…", retry: "Повторить", loadError: "Не удалось загрузить каталог.",
+  saveError: "Не удалось сохранить изменения. Повторите попытку.", offline: "Подключитесь к серверу, чтобы управлять портфелями и проектами.",
+  permission: "Недостаточно прав для изменения этого объекта.", readonly: "Только просмотр",
+  noDescription: "Описание пока не добавлено", checksTitle: "База проверок", checksHint: "Распределяйте проверки по папкам, создавайте тест-кейсы и импортируйте готовую базу.",
+  archiveHint: "Портфель переместится в архив. Его проекты и тест-кейсы останутся доступны.",
+  archiveTitle: "Архивировать портфель?", choose: "Выберите проект", status: "Статус", back: "Вернуться в каталог",
+  countLoaded: "Загружено", noPortfolio: "Без портфеля", change: "Изменить данные", projectSaved: "Проект сохранён",
+  portfolioSaved: "Портфель сохранён", refresh: "Обновить", memberMore: "Загрузить ещё участников", portfolioMore: "Загрузить ещё портфелей",
+  optionsError: "Не удалось загрузить варианты выбора.", unknownPerson: "Назначенный участник", unknownPortfolio: "Текущий портфель",
+};
+
+export type PortfolioCopy = typeof en;
+export const portfolioCopy = (locale: TmsLocale): PortfolioCopy => locale === "ru" ? ru : en;

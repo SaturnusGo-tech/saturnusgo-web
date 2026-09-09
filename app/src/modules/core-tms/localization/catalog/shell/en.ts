@@ -31,6 +31,7 @@ export const enShellMessages = {
   "common.unassigned": "Unassigned",
   "attachments.removeConfirm": "Remove this attachment? The private file will be deleted and only an audit tombstone will remain.",
   "nav.ariaLabel": "Falcon sections",
+  "nav.portfolios": "Portfolios & projects",
   "nav.dashboard": "Dashboard",
   "nav.cases": "Test cases",
   "nav.sharedSteps": "Shared steps",

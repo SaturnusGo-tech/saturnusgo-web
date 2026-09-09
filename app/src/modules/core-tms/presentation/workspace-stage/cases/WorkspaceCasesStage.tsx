@@ -3,11 +3,14 @@ import { CasesView } from "../../cases/CasesView";
 
 export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
   return <CasesView key={model.project!.id}
+    folders={model.folders}
+    onImport={() => model.setDialog("import-cases")}
     query={model.query}
     onQuery={model.setQuery}
     testCases={model.projectCases}
     groups={model.folderGroups}
     selectedFolder={model.selectedFolder}
+    selectedFolderId={model.selectedFolderId}
     onSelectFolder={model.selectFolder}
     selectedCaseId={model.selectedCase?.id ?? ""}
     onSelectCase={(id) => {
@@ -41,7 +44,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
       mode: model.editing ? "edit" : "create",
       value: model.caseDraft,
       folderPath: model.caseFolderPath,
-      folders: model.folderGroups.map(([folderName]) => folderName),
+      folders: model.folders.items.filter((folder) => !folder.archivedAt).map((folder) => folder.path),
       components: Array.from(new Set(
         model.projectCases.map((testCase) => testCase.component).filter(Boolean),
       )).sort(),

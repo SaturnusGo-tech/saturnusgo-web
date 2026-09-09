@@ -118,7 +118,7 @@ test("project switching resets editors only after a successful load", () => {
     new URL("../../workspace-stage/cases/WorkspaceCasesStage.tsx", import.meta.url),
     "utf8",
   );
-  const failureGuard = actionsSource.indexOf('if (state.connection !== "demo" && !remote) return;');
+  const failureGuard = actionsSource.indexOf('if (state.connection !== "demo" && !remote) return false;');
   const reset = actionsSource.indexOf("state.resetCaseEditor(");
 
   assert.ok(failureGuard >= 0);

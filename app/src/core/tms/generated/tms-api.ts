@@ -342,7 +342,7 @@ export interface paths {
         head?: never;
         /**
          * Update a project
-         * @description Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH.
+         * @description Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH. portfolioId assigns an existing active same-workspace portfolio; null unassigns. This changes only the project association and never copies cases, changes project identity, or grants permissions. Concurrent assignments use the project version.
          */
         patch: operations["updateProject"];
         trace?: never;
@@ -2285,6 +2285,262 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portfolios": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List portfolios in a workspace
+         * @description Workspace-scoped bounded collection, ordered by name and ID. Cursor is bound to workspace and status. Reading requires project:read; writes require project:manage.
+         */
+        get: operations["listPortfolios"];
+        put?: never;
+        /** Create a portfolio */
+        post: operations["createPortfolio"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        /** Get a portfolio */
+        get: operations["getPortfolio"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a portfolio
+         * @description Archives this organizational portfolio. Projects, cases, and workspace permissions are unchanged. New assignments to an archived portfolio are rejected; existing associations can be removed through project PATCH.
+         */
+        delete: operations["archivePortfolio"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a portfolio
+         * @description Updates mutable fields on an active portfolio. Archive and restore are explicit lifecycle operations; archived portfolios reject PATCH.
+         */
+        patch: operations["updatePortfolio"];
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived portfolio */
+        post: operations["restorePortfolio"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/members": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List active workspace members for responsible person selection
+         * @description Requires workspace:read. Returns only active memberships and active identities in this workspace. Search matches name or email; cursor is bound to workspace and search, ordered by display name and identity ID. No role or permission mutation.
+         */
+        get: operations["listWorkspaceMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        /** List durable folders by stable ID */
+        get: operations["listRepositoryFolders"];
+        put?: never;
+        /** Create an empty folder */
+        post: operations["createRepositoryFolder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/{folderId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Read a folder */
+        get: operations["getRepositoryFolder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rename or move a folder and its subtree atomically */
+        patch: operations["updateRepositoryFolder"];
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/{folderId}/archive": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive a folder tree
+         * @description Empty mode rejects nonempty folders. Tree archive preserves IDs, revisions, runs and links. Restore reactivates only descendants and cases archived by this folder operation; pre-existing archives remain archived. Name collisions fail atomically.
+         */
+        post: operations["archiveRepositoryFolder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/{folderId}/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a folder tree
+         * @description Empty mode rejects nonempty folders. Tree archive preserves IDs, revisions, runs and links. Restore reactivates only descendants and cases archived by this folder operation; pre-existing archives remain archived. Name collisions fail atomically.
+         */
+        post: operations["restoreRepositoryFolder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/move-cases": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move explicit test cases atomically
+         * @description Up to 1000 unique case IDs with strong per-case ETags. All targets are authorized and checked before any write. IDs, content revisions, run snapshots, links and history remain unchanged. Moving to targetFolderId=null removes folder membership while retaining the case at the repository root. Archives never hard-delete.
+         */
+        post: operations["moveRepositoryFolderCases"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/archive-cases": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive explicit test cases atomically
+         * @description Up to 1000 unique case IDs with strong per-case ETags. All targets are authorized and checked before any write. IDs, content revisions, run snapshots, links and history remain unchanged. Moving to targetFolderId=null removes folder membership while retaining the case at the repository root. Archives never hard-delete.
+         */
+        post: operations["archiveRepositoryFolderCases"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3027,6 +3283,9 @@ export interface components {
             status: components["schemas"]["EntityStatus"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            portfolioId: components["schemas"]["Identifier"] | null;
+            responsibleIdentityId: components["schemas"]["Identifier"] | null;
+            rowVersion: number;
         };
         ProjectCreateRequest: {
             workspaceId: components["schemas"]["Identifier"];
@@ -3034,11 +3293,15 @@ export interface components {
             name: string;
             slug?: string;
             description?: components["schemas"]["LongText"];
+            portfolioId?: components["schemas"]["Identifier"] | null;
+            responsibleIdentityId?: components["schemas"]["Identifier"] | null;
         };
         ProjectPatchRequest: {
             name?: string;
             slug?: string;
             description?: components["schemas"]["LongText"];
+            portfolioId?: components["schemas"]["Identifier"] | null;
+            responsibleIdentityId?: components["schemas"]["Identifier"] | null;
         };
         ProjectEnvelope: {
             data: components["schemas"]["Project"];
@@ -3226,6 +3489,7 @@ export interface components {
             archivedAt: string | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            folderId: components["schemas"]["Identifier"] | null;
         };
         TestCaseCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -3416,6 +3680,7 @@ export interface components {
             etag: components["schemas"]["TestCaseStrongEtag"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            folderId: components["schemas"]["Identifier"] | null;
         };
         TestCaseRevisionSummary: {
             revision: number;
@@ -3451,6 +3716,8 @@ export interface components {
             lifecycle?: components["schemas"]["TestCaseLifecycle"][];
             folderPathPrefix?: string;
             text?: string;
+            /** @description Stable folder reference. Once resolved, folderPathPrefix follows this folder across rename/reparent. The referenced folder must be active and project-scoped. */
+            folderId?: components["schemas"]["Identifier"];
         };
         SuiteSummary: {
             id: components["schemas"]["Identifier"];
@@ -4987,6 +5254,139 @@ export interface components {
         ImpactRepositoryEnvelope: {
             data: components["schemas"]["ImpactRepository"];
         };
+        Portfolio: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            name: string;
+            description: components["schemas"]["LongText"];
+            status: components["schemas"]["EntityStatus"];
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            /** @description An active member in this workspace, or null. Assignment does not alter membership or permissions. */
+            responsibleIdentityId: components["schemas"]["Identifier"] | null;
+            rowVersion: number;
+            archivedAt: components["schemas"]["Timestamp"] | null;
+            /** @description Count of active projects currently associated with this portfolio; aggregated for at most 100 portfolio IDs per request. */
+            projectCount: number;
+        };
+        PortfolioCreateRequest: {
+            workspaceId: components["schemas"]["Identifier"];
+            name: string;
+            description?: components["schemas"]["LongText"];
+            /** @description An active member in this workspace, or null. Assignment does not alter membership or permissions. */
+            responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+        };
+        PortfolioPatchRequest: {
+            name?: string;
+            description?: components["schemas"]["LongText"];
+            /** @description An active member in this workspace, or null. Assignment does not alter membership or permissions. */
+            responsibleIdentityId?: components["schemas"]["Identifier"] | null;
+        };
+        PortfolioEnvelope: {
+            data: components["schemas"]["Portfolio"];
+        };
+        PortfolioListEnvelope: {
+            data: components["schemas"]["Portfolio"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        WorkspaceMemberDirectoryEntry: {
+            identityId: components["schemas"]["Identifier"];
+            displayName: string;
+            email: string | null;
+        };
+        WorkspaceMemberDirectoryEnvelope: {
+            data: components["schemas"]["WorkspaceMemberDirectoryEntry"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        RepositoryFolder: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            parentId: components["schemas"]["Identifier"] | null;
+            name: string;
+            path: string;
+            rowVersion: number;
+            /** Format: date-time */
+            archivedAt: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            etag: string;
+        };
+        RepositoryFolderEnvelope: {
+            data: components["schemas"]["RepositoryFolder"];
+        };
+        RepositoryFolderListResponse: {
+            data: components["schemas"]["RepositoryFolder"][];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
+        };
+        RepositoryFolderCreateRequest: {
+            name: string;
+            parentId?: components["schemas"]["Identifier"] | null;
+        };
+        RepositoryFolderPatchRequest: {
+            name?: string;
+            parentId?: components["schemas"]["Identifier"] | null;
+        };
+        RepositoryFolderArchiveRequest: {
+            /**
+             * @default empty
+             * @enum {string}
+             */
+            mode: "empty" | "tree";
+        };
+        RepositoryFolderMoveCasesRequest: {
+            targetFolderId: components["schemas"]["Identifier"] | null;
+            items: {
+                id: components["schemas"]["Identifier"];
+                ifMatch: components["schemas"]["TestCaseStrongEtag"];
+            }[];
+        };
+        RepositoryFolderMoveCasesResult: {
+            items: {
+                id: components["schemas"]["Identifier"];
+                folderId: components["schemas"]["Identifier"] | null;
+                folderPath: string;
+                currentRevision: number;
+                etag: components["schemas"]["TestCaseStrongEtag"];
+                updatedAt: components["schemas"]["Timestamp"];
+                /** Format: date-time */
+                archivedAt: string | null;
+                changed: boolean;
+            }[];
+            updatedCount: number;
+            unchangedCount: number;
+        };
+        RepositoryFolderArchiveCasesRequest: {
+            items: {
+                id: components["schemas"]["Identifier"];
+                ifMatch: components["schemas"]["TestCaseStrongEtag"];
+            }[];
+        };
+        RepositoryFolderArchiveCasesResult: {
+            items: {
+                id: components["schemas"]["Identifier"];
+                folderId: components["schemas"]["Identifier"] | null;
+                folderPath: string;
+                currentRevision: number;
+                etag: components["schemas"]["TestCaseStrongEtag"];
+                updatedAt: components["schemas"]["Timestamp"];
+                /** Format: date-time */
+                archivedAt: string | null;
+                changed: boolean;
+            }[];
+            updatedCount: number;
+            unchangedCount: number;
+        };
+        RepositoryFolderMoveCasesEnvelope: {
+            data: components["schemas"]["RepositoryFolderMoveCasesResult"];
+        };
+        RepositoryFolderArchiveCasesEnvelope: {
+            data: components["schemas"]["RepositoryFolderArchiveCasesResult"];
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -5898,6 +6298,29 @@ export interface components {
                 "application/json": components["schemas"]["ConnectorDisconnectEnvelope"];
             };
         };
+        /** @description A page of portfolios ordered by key then ID. */
+        PortfolioListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["PortfolioListEnvelope"];
+            };
+        };
+        /** @description Portfolio representation. Strong ETag format is "portfolio:<id>:<rowVersion>". */
+        PortfolioResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["PortfolioEnvelope"];
+            };
+        };
     };
     parameters: {
         /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -5944,6 +6367,7 @@ export interface components {
         ExternalLinkStatusQuery: components["schemas"]["ExternalLinkStatus"];
         DashboardIdPath: components["schemas"]["Identifier"];
         EntityStatusQuery: components["schemas"]["EntityStatus"];
+        PortfolioIdPath: components["schemas"]["Identifier"];
     };
     requestBodies: {
         ProjectCreate: {
@@ -6116,6 +6540,16 @@ export interface components {
         DashboardPatch: {
             content: {
                 "application/merge-patch+json": components["schemas"]["DashboardPatchRequest"];
+            };
+        };
+        PortfolioCreate: {
+            content: {
+                "application/json": components["schemas"]["PortfolioCreateRequest"];
+            };
+        };
+        PortfolioPatch: {
+            content: {
+                "application/merge-patch+json": components["schemas"]["PortfolioPatchRequest"];
             };
         };
     };
@@ -6476,6 +6910,10 @@ export interface operations {
                 cursor?: components["parameters"]["Cursor"];
                 /** @description Requested page size. */
                 limit?: components["parameters"]["Limit"];
+                /** @description Filter by one portfolio in the requested workspace. Mutually exclusive with unassigned. Cursor includes this filter. */
+                portfolioId?: components["schemas"]["Identifier"];
+                /** @description Return only projects without a portfolio. Mutually exclusive with portfolioId. */
+                unassigned?: "true";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -6511,6 +6949,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
@@ -6792,6 +7231,9 @@ export interface operations {
                 type?: "manual" | "checklist" | "automated";
                 component?: string;
                 tag?: string[];
+                /** @description Stable folder ID; root selects cases without a folder. Omit for all folders. */
+                folderId?: string;
+                includeDescendants?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -9876,6 +10318,546 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
+        };
+    };
+    listPortfolios: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                status?: components["parameters"]["EntityStatusQuery"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["PortfolioListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createPortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["PortfolioCreate"];
+        responses: {
+            201: components["responses"]["PortfolioResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getPortfolio: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["PortfolioResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archivePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["PortfolioResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updatePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["PortfolioPatch"];
+        responses: {
+            200: components["responses"]["PortfolioResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restorePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["PortfolioResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listWorkspaceMembers: {
+        parameters: {
+            query?: {
+                /** @description Resolve a single active member within this workspace. Cursor includes this filter. */
+                identityId?: components["schemas"]["Identifier"];
+                search?: string;
+                cursor?: string;
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded active-member page. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceMemberDirectoryEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listRepositoryFolders: {
+        parameters: {
+            query?: {
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                includeArchived?: boolean;
+                /** @description Omit to list all folders; root selects top-level folders. Otherwise filter immediate children by stable parent ID. */
+                parentId?: string;
+                search?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createRepositoryFolder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepositoryFolderCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized repository result. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRepositoryFolder: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateRepositoryFolder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepositoryFolderPatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveRepositoryFolder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepositoryFolderArchiveRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreRepositoryFolder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    moveRepositoryFolderCases: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepositoryFolderMoveCasesRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderMoveCasesEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveRepositoryFolderCases: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepositoryFolderArchiveCasesRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized repository result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RepositoryFolderArchiveCasesEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
         };
     };
 }

@@ -10,7 +10,7 @@ const timestamps = { createdAt: "2026-08-28T00:00:00Z", updatedAt: "2026-08-28T0
 
 test("maps bounded case summaries without fabricating revision content", () => {
   const dto: Api["TestCaseSummary"] = {
-    id: "case-1", projectId: "project-1", key: "UH-TC-1", folderPath: "/Smoke",
+    id: "case-1", projectId: "project-1", key: "UH-TC-1", folderId: null, folderPath: "/Smoke",
     currentRevision: 3, title: "Sign in", type: "automated", lifecycle: "ready",
     priority: "critical", component: "Auth", ownerIdentityId: null,
     tags: ["smoke", "ci.backend"], estimatedMinutes: 5, revisionCount: 3, archivedAt: null,
@@ -32,7 +32,7 @@ test("maps full case detail with case links and immutable current revision", () 
     createdBy: "identity-1", createdAt: timestamps.createdAt,
   };
   const detail = mapTestCase({
-    id: "case-1", projectId: "project-1", key: "UH-TC-1", folderPath: "/Smoke",
+    id: "case-1", projectId: "project-1", key: "UH-TC-1", folderId: null, folderPath: "/Smoke",
     currentRevision: 3, current, revisionCount: 3, linkIds: ["link-1"],
     archivedAt: null, ...timestamps,
   });

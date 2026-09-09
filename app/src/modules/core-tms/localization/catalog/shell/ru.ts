@@ -33,6 +33,7 @@ export const ruShellMessages = {
   "common.unassigned": "Не назначен",
   "attachments.removeConfirm": "Удалить это вложение? Приватный файл будет удалён, останется только запись для аудита.",
   "nav.ariaLabel": "Разделы Falcon",
+  "nav.portfolios": "Портфели и проекты",
   "nav.dashboard": "Дашборд",
   "nav.cases": "Тест-кейсы",
   "nav.sharedSteps": "Общие шаги",

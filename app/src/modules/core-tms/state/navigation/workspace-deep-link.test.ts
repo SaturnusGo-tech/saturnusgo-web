@@ -106,3 +106,12 @@ test("retired integration testing links open the repository without changing con
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=api"), { view: "api", runId: null });
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=hooks&integration=swagger"), { view: "hooks", runId: null });
 });
+
+test("catalog details survive project changes inside their workspace but never cross workspace boundaries", () => {
+  for (const selector of ["portfolioId", "catalogProjectId"]) {
+    const previous = `https://tms.example/work/?workspaceId=w&projectId=p&view=portfolios&${selector}=detail`;
+    const input = { workspaceId: "w", projectId: "other-project", view: "portfolios" as const, runId: null };
+    assert.equal(new URL(buildWorkspaceDeepLink(previous, input)).searchParams.get(selector), "detail");
+    assert.equal(new URL(buildWorkspaceDeepLink(previous, { ...input, workspaceId: "other-workspace" })).searchParams.get(selector), null);
+  }
+});

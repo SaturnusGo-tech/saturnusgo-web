@@ -1,4 +1,4 @@
-.panel { width: min(560px, calc(100vw - 32px)); }
+.panel.panel { border-radius: 20px; width: min(560px, calc(100vw - 32px)); }
 .panel > .form { padding: 0; overflow: hidden; min-height: 0; display: flex; flex-direction: column; }
 .body { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 0 24px 26px; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 .intro { margin: 0 0 2px; color: var(--muted); font-size: 13px; line-height: 1.65; }
@@ -19,12 +19,6 @@
 .projectKey code { padding: 4px 7px; color: var(--ink); background: var(--control-hover); border-radius: 5px; font-size: 11px; user-select: all; }
 .hint { margin: -12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .hint code { color: var(--ink); white-space: nowrap; }
-.environment { display: grid; gap: 20px; border-top: 1px solid var(--line); padding-top: 22px; }
-.environment header { display: flex; align-items: flex-start; gap: 10px; color: var(--muted); }
-.environment header > svg { margin-top: 2px; }
-.environment h3 { margin: 0; color: var(--ink); font-size: 13px; font-weight: 550; }
-.environment p { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.environmentFields { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 16px; }
 .actions { flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 24px; background: var(--paper); border-top: 1px solid var(--line); }
 .actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 13px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
 .actions button:hover { background: var(--control-hover); }
@@ -33,5 +27,10 @@
 .actions button:disabled { cursor: default; opacity: .5; }
 .spin { animation: project-saving 800ms linear infinite; }
 @keyframes project-saving { to { transform: rotate(360deg); } }
-@media (max-width: 520px) { .panel { width: calc(100vw - 24px); } .body { padding-inline: 18px; } .identityFields, .environmentFields { grid-template-columns: 1fr; gap: 18px; } .actions { padding-inline: 18px; } }
+@media (max-width: 520px) { .panel.panel { border-radius: 20px; width: calc(100vw - 24px); } .body { padding-inline: 18px; } .identityFields { grid-template-columns: 1fr; gap: 18px; } .actions { padding-inline: 18px; } }
 @media (prefers-reduced-motion: reduce) { .field input, .field textarea { transition: none; } .spin { animation: none; } }
+
+.note { display: flex; gap: 9px; align-items: center; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.note svg { flex-shrink: 0; }
+.inlineAction { justify-self: start; border: 0; padding: 2px 0; background: none; color: var(--muted); cursor: pointer; text-align: left; font: inherit; font-size: 11px; }
+.field input:focus-visible, .field textarea:focus-visible { border-color: var(--tms-focus-border); box-shadow: 0 0 0 3px var(--tms-focus-ring); }

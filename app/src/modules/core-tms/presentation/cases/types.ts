@@ -1,3 +1,4 @@
+import type { FolderResource } from "../../folders/model/folder";
 import type {
   Activity,
   TestCaseRevision,
@@ -10,12 +11,15 @@ import type { CaseCollaborationViewModel } from "./collaboration/model";
 import type { SharedStep, SharedStepSummary } from "../../shared-steps/model/shared-step";
 
 export type CasesViewProps = {
+  folders?: FolderResource;
+  onImport?: () => void;
   query: string;
   onQuery: (value: string) => void;
   testCases: TestCaseSummary[];
   groups: Array<[string, TestCaseSummary[]]>;
   selectedFolder: string;
-  onSelectFolder: (folder: string) => void;
+  selectedFolderId?: string;
+  onSelectFolder: (folder: string, id?: string) => void;
   selectedCaseId: string;
   onSelectCase: (id: string) => void;
   testCase?: TestCaseSummary;

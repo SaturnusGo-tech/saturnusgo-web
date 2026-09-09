@@ -13,12 +13,13 @@ export async function createProjectResource(
   http: TmsHttpClient,
   body: Api["ProjectCreateRequest"],
   idempotencyKey: string,
+  signal?: AbortSignal,
 ) {
   const resource = await http.mutateResource<Api["Project"]>(
     "/projects",
     "POST",
     body,
-    { idempotencyKey },
+    { idempotencyKey, signal },
   );
   return { data: mapProject(resource.data), etag: resource.etag };
 }
@@ -29,9 +30,10 @@ export async function updateProjectResource(
   body: Api["ProjectPatchRequest"],
   etag: string,
   idempotencyKey: string,
+  signal?: AbortSignal,
 ) {
   const resource = await http.mutateResource<Api["Project"]>(
-    `/projects/${projectId}`, "PATCH", body, { ifMatch: etag, idempotencyKey },
+    `/projects/${projectId}`, "PATCH", body, { ifMatch: etag, idempotencyKey, signal },
   );
   return { data: mapProject(resource.data), etag: resource.etag };
 }
@@ -42,11 +44,12 @@ export async function transitionProjectResource(
   operation: "archive" | "restore",
   etag: string,
   idempotencyKey: string,
+  signal?: AbortSignal,
 ) {
   const path = operation === "restore" ? `/projects/${projectId}/restore` : `/projects/${projectId}`;
   const method = operation === "restore" ? "POST" : "DELETE";
   const resource = await http.mutateResource<Api["Project"]>(
-    path, method, undefined, { ifMatch: etag, idempotencyKey },
+    path, method, undefined, { ifMatch: etag, idempotencyKey, signal },
   );
   return { data: mapProject(resource.data), etag: resource.etag };
 }

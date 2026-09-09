@@ -10,6 +10,11 @@ export type Project = {
   name: string;
   description?: string;
   status?: "active" | "archived";
+  portfolioId?: string | null;
+  responsibleIdentityId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  rowVersion?: number;
 };
 
 export type Environment = {
@@ -28,6 +33,7 @@ export type TestCaseSummary = {
   projectId: string;
   key: string;
   folderPath: string;
+  folderId?: string | null;
   currentRevision: number;
   title: string;
   type: TestCaseRevision["type"];

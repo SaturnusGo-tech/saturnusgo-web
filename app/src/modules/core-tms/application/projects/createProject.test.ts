@@ -3,66 +3,53 @@ import test from "node:test";
 import { createTmsHttpClient } from "../../../../core/tms/transport/http";
 import { createProject, updateProject } from "./createProject";
 
-test("default-environment failure never performs an unsafe project rollback", async () => {
-  const calls: Array<{ url: string; init: RequestInit }> = [];
-  const http = createTmsHttpClient({
-    apiBase: "https://api.example.test/api/v1",
-    accessToken: async () => "header.payload.signature",
-    fetch: (async (resource, init = {}) => {
-      const url = String(resource);
-      calls.push({ url, init });
-      if (url.endsWith("/projects")) {
-        return new Response(JSON.stringify({ data: {
-          id: "project-1", workspaceId: "workspace-1", key: "TMS", slug: "tms",
-          name: "TMS", description: "Manual QA", status: "active",
-          createdAt: "2026-08-28T00:00:00.000Z", updatedAt: "2026-08-28T00:00:00.000Z",
-        } }), { status: 201, headers: { "content-type": "application/json", etag: '"project:project-1:1"' } });
-      }
-      return new Response(JSON.stringify({ error: {
-        code: "CONFLICT", message: "Environment exists", requestId: "request-1",
-      } }), { status: 409, headers: { "content-type": "application/json" } });
-    }) as typeof fetch,
-  });
+const project = { id: "project-1", workspaceId: "workspace-1", key: "PAY", name: "Payments", description: "Payment checks", status: "active" as const,
+  portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", rowVersion: 2, createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z" };
 
-  const result = await createProject({
-    http, workspaceId: "workspace-1", name: "TMS", key: "tms", description: "Manual QA",
-    environmentName: "Local", baseUrl: "http://localhost:3000", offline: false,
-    locale: "en", operationKey: "workspace-project-operation",
-  });
+function client(requests: { url: string; init?: RequestInit }[]) {
+  return createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "test.token.value",
+    fetch: (async (url, init) => { requests.push({ url: String(url), init });
+      return new Response(JSON.stringify({ data: project }), { status: 200, headers: { "content-type": "application/json", etag: '"project:project-1:2"' } });
+    }) as typeof fetch });
+}
 
-  assert.deepEqual(result, {
-    ok: false,
-    reason: "environment",
-    failure: {
-      message: "Environment exists",
-      code: "CONFLICT",
-      requestId: "request-1",
-    },
-  });
-  assert.equal(calls.length, 2);
-  assert.equal(calls.some(({ init }) => init.method === "DELETE"), false);
-  assert.equal(new Headers(calls[0].init.headers).get("idempotency-key"), "workspace-project-operation:project");
-  assert.equal(new Headers(calls[1].init.headers).get("idempotency-key"), "workspace-project-operation:environment");
+test("creating a project is one command and does not require or create an environment", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  const result = await createProject({ http: client(requests), workspaceId: "workspace-1", name: " Payments ", key: " pay ",
+    description: " Payment checks ", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1", offline: false, operationKey: "stable-project-operation" });
+  assert.equal(result.ok, true);
+  assert.equal(requests.length, 1);
+  assert.ok(requests[0].url.endsWith("/projects"));
+  assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { workspaceId: "workspace-1", name: "Payments", key: "PAY", description: "Payment checks", portfolioId: "portfolio-1", responsibleIdentityId: "identity-1" });
+  assert.equal(new Headers(requests[0].init?.headers).get("Idempotency-Key"), "stable-project-operation");
+  if (result.ok) { assert.equal(result.project.portfolioId, "portfolio-1"); assert.equal(result.etag, '"project:project-1:2"'); }
 });
 
-test("editing project metadata retains its permanent key and uses optimistic concurrency", async () => {
-  const project = { id: "project-1", workspaceId: "workspace-1", key: "HOST", slug: "host",
-    name: "Host", description: "", status: "active" as const,
-    createdAt: "2026-09-09T00:00:00.000Z", updatedAt: "2026-09-09T00:00:00.000Z" };
-  let request: RequestInit | undefined;
-  const http = createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "test-token",
-    fetch: (async (_url, init) => {
-      request = init;
-      return new Response(JSON.stringify({ data: { ...project, ...JSON.parse(String(init?.body)) } }), {
-        status: 200, headers: { "content-type": "application/json", etag: '\"project:project-1:2\"' },
-      });
-    }) as typeof fetch,
-  });
-  const result = await updateProject({ http, project, etag: '\"project:project-1:1\"', offline: false,
-    name: "  Umbrella Host  ", description: "  Product QA  ", key: "UNUSED", operationKey: "edit-project-operation" });
-  assert.deepEqual(JSON.parse(String(request?.body)), { name: "Umbrella Host", description: "Product QA" });
-  assert.equal(new Headers(request?.headers).get("if-match"), '\"project:project-1:1\"');
-  assert.equal(new Headers(request?.headers).get("idempotency-key"), "edit-project-operation");
-  assert.equal(result.data.key, "HOST");
-  assert.equal(result.etag, '\"project:project-1:2\"');
+test("standalone projects send explicit unassigned metadata", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  await createProject({ http: client(requests), workspaceId: "workspace-1", name: "Payments", key: "PAY", description: "", offline: false, operationKey: "stable-project-operation" });
+  const body = JSON.parse(String(requests[0].init?.body));
+  assert.equal(body.portfolioId, null); assert.equal(body.responsibleIdentityId, null);
+});
+
+test("offline project creation cannot fabricate a local production project", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  const result = await createProject({ http: client(requests), workspaceId: "workspace-1", name: "Payments", key: "PAY", description: "", offline: true, operationKey: "stable-project-operation" });
+  assert.equal(result.ok, false); assert.equal(requests.length, 0);
+});
+
+test("editing metadata retains the immutable key and protects concurrent changes", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  const result = await updateProject({ http: client(requests), project, etag: '"project:project-1:1"', offline: false,
+    name: " Updated ", key: "IGNORED", description: " Checks ", portfolioId: null, responsibleIdentityId: null, operationKey: "stable-project-update" });
+  assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { name: "Updated", description: "Checks", portfolioId: null, responsibleIdentityId: null });
+  assert.equal(new Headers(requests[0].init?.headers).get("If-Match"), '"project:project-1:1"');
+  assert.equal(result.etag, '"project:project-1:2"');
+});
+
+test("missing update version never sends a mutation", async () => {
+  const requests: { url: string; init?: RequestInit }[] = [];
+  await assert.rejects(updateProject({ http: client(requests), project, etag: null, offline: false,
+    name: "Updated", key: "PAY", description: "Checks", operationKey: "stable-project-update" }), /ETag/);
+  assert.equal(requests.length, 0);
 });

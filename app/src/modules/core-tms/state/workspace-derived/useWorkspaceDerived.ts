@@ -12,7 +12,7 @@ export function useWorkspaceDerived(
 ) {
   const projects = state.data.projects;
   const project =
-    projects.find((item) => item.id === state.projectId) ?? projects[0];
+    projects.find((item) => item.id === state.projectId) ?? (state.projectId ? undefined : projects[0]);
   const projectCases = state.data.testCases.filter(
     (item) => item.projectId === project?.id,
   );

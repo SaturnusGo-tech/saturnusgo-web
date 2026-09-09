@@ -1,3 +1,4 @@
+import { PiFolderSimpleMinusDuotone, PiArrowBendDownRightDuotone } from "react-icons/pi";
 import { AlertTriangle, Archive, CheckCircle2, FilePenLine, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -10,6 +11,7 @@ type Lifecycle = TestCaseRevision["lifecycle"];
 type Priority = TestCaseRevision["priority"];
 
 export function CaseBulkActionBar(props: {
+  onMove?: () => void; onRemove?: () => void; onArchive?: () => void; externalBusy?: boolean;
   locale: TmsLocale;
   selectedCount: number;
   mutationLimit: number;
@@ -25,7 +27,7 @@ export function CaseBulkActionBar(props: {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const overLimit = props.selectedCount > props.mutationLimit;
-  const mutationDisabled = pending || overLimit || !props.mutationEnabled;
+  const mutationDisabled = pending || props.externalBusy || overLimit || !props.mutationEnabled;
   const mutationHint = overLimit
     ? (ru ? `За один раз можно изменить до ${props.mutationLimit} кейсов` : `You can update up to ${props.mutationLimit} cases at once`)
     : !props.mutationEnabled
@@ -69,6 +71,9 @@ export function CaseBulkActionBar(props: {
     <div ref={root} className={styles.bulkBar} role="region" aria-label={ru ? "Действия с выбранными тест-кейсами" : "Selected test case actions"}>
       <strong>{ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}</strong>
       <div className={styles.bulkActionsViewport}>
+        {props.onMove && <button type="button" disabled={pending || props.externalBusy} onClick={props.onMove}><PiArrowBendDownRightDuotone size={17} />{ru ? "Переместить" : "Move"}</button>}
+        {props.onRemove && <button type="button" disabled={pending || props.externalBusy} onClick={props.onRemove}><PiFolderSimpleMinusDuotone size={17} />{ru ? "Убрать из папки" : "Unfile"}</button>}
+        {props.onArchive && <button type="button" disabled={pending || props.externalBusy} onClick={props.onArchive}><Archive size={15} />{ru ? "В архив" : "Archive"}</button>}
         <button type="button" className={styles.bulkRun} disabled={pending} onClick={props.onCreateRun} aria-label={ru ? "Создать тест-ран" : "Create test run"}>
           <Play size={13} aria-hidden="true" />
           <span className={styles.bulkLongLabel}>{ru ? "Создать тест-ран" : "Create test run"}</span>

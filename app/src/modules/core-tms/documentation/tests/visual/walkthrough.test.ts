@@ -27,7 +27,7 @@ function jpegDimensions(bytes: Buffer) {
 
 test("practical guide articles contain complete, captioned screenshot sequences", () => {
   for (const id of ["create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run",
-    "workspace", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"]) {
+    "workspace", "portfolios", "organize-cases", "import-export", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger"]) {
     assert.ok(flows.some(({ article }) => article.id === id), id);
   }
   for (const { article, block } of flows) {

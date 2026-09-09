@@ -1,3 +1,4 @@
+import { ImportCasesDialog } from "../../test-cases/exchange/presentation/ImportCasesDialog";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
@@ -19,11 +20,10 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
         projectEtag={model.projectEditor?.etag}
         offline={model.connection === "demo"}
         onClose={close}
-        onCreated={(createdProject, environment) => {
+        onCreated={(createdProject) => {
           model.setData((current) => ({
             ...current,
             projects: [...current.projects, createdProject],
-            environments: [...current.environments, environment],
           }));
           model.chooseProject(createdProject.id);
           model.setProjectId(createdProject.id);
@@ -40,26 +40,25 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.dialog === "import-cases" && model.project) return <ImportCasesDialog project={model.project}
+    workspaceId={model.data.workspace.id} folders={model.folders.items}
+    initialFolderId={model.folders.items.find((folder) => folder.path === model.selectedFolder && !folder.archivedAt)?.id ?? null}
+    onClose={close} onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />;
   if (model.dialog === "folder" && model.project) {
     return (
       <FolderDialog
-        existing={model.folderGroups.map(([folderName]) => folderName)}
+        existing={model.folders.items.filter((folder) => !folder.archivedAt).map((folder) => folder.path)}
         selectedParent={model.selectedFolder}
-        onClose={close}
-        onCreated={(folderPath) => {
-          model.setCustomFolders((current) => ({
-            ...current,
-            [model.project!.id]: Array.from(
-              new Set([...(current[model.project!.id] ?? []), folderPath]),
-            ),
-          }));
-          model.setSelectedFolder(folderPath);
-          model.setSelectedCaseId("");
-          model.setCollapsedFolders((current) =>
-            current.filter((item) => item !== folderPath),
-          );
-          close();
-          model.notify(t("actions.folderCreated", { path: folderPath }));
+        busy={model.folders.busy} error={model.folders.error}
+        onClose={() => { if (!model.folders.busy) close(); }}
+        onCreated={async (folderPath) => {
+          const parts = folderPath.split("/").filter(Boolean); const name = parts.pop()!;
+          const parentPath = `/${parts.join("/")}`;
+          const parent = model.folders.items.find((folder) => folder.path === parentPath && !folder.archivedAt);
+          const result = await model.folders.create(name, parent?.id ?? null);
+          if (!result) return;
+          model.selectFolder(result.path, result.id); model.setSelectedCaseId(""); close();
+          model.notify(t("actions.folderCreated", { path: result.path }));
         }}
       />
     );

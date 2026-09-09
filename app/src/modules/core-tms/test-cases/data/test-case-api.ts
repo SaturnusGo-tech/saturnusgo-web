@@ -54,7 +54,7 @@ export async function listTestCases(http: TmsHttpClient, projectId: string, sign
   let meta: Api["PageMeta"] = { limit: LIST_PAGE_SIZE, hasMore: false, nextCursor: null };
   for (let page = 0; page < LIST_PAGE_LIMIT; page += 1) {
     signal?.throwIfAborted();
-    const query = new URLSearchParams({ projectId, limit: String(LIST_PAGE_SIZE) });
+    const query = new URLSearchParams({ projectId, includeArchived: "true", limit: String(LIST_PAGE_SIZE) });
     if (cursor) query.set("cursor", cursor);
     const envelope = await http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${query}`, signal);
     items.push(...envelope.data);

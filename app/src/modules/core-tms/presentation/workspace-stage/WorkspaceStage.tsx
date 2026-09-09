@@ -1,3 +1,4 @@
+import { WorkspacePortfoliosStage } from "./portfolios/WorkspacePortfoliosStage";
 import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { DocumentationEntry } from "../../documentation/presentation/DocumentationEntry";
@@ -65,6 +66,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
   if (!model.project) {
     return (
       <ProjectOnboarding

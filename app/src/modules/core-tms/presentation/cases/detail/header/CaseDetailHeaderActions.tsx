@@ -29,6 +29,8 @@ export function CaseDetailHeaderActions(props: Props) {
   const menuButton = useRef<HTMLButtonElement>(null);
   const ru = props.locale === "ru";
   const item = props.testCase;
+  const archived = Boolean(item?.archivedAt);
+  const restoreTitle = ru ? "Сначала восстановите тест-кейс" : "Restore the test case first";
   useEffect(() => {
     setCopied(null);
     setMenuOpen(false);
@@ -67,8 +69,8 @@ export function CaseDetailHeaderActions(props: Props) {
         : (ru ? "Карточка тест-кейса" : "Test case")}</span>
     </div>
     <div className={inspector.headerActions}>
-      {!props.creating && <button type="button" disabled={props.editorOpen}
-        className={inspector.headerTextButton} onClick={props.onRunCase}>
+      {!props.creating && <button type="button" disabled={props.editorOpen || archived} title={archived ? restoreTitle : undefined}
+        className={inspector.headerTextButton} onClick={() => { if (!archived) props.onRunCase(); }}>
         <Play size={14} />{ru ? "Запустить" : "Run"}</button>}
       {!props.creating && <button type="button" disabled={props.editorOpen}
         className={inspector.headerTextButton} onClick={props.onArchive}>
@@ -95,7 +97,8 @@ export function CaseDetailHeaderActions(props: Props) {
             setMenuOpen(false);
             void copy(buildCaseDeepLink(window.location.href, { caseId: item.id, projectId: item.projectId }), "link");
           }}>{copied === "link" ? <Check size={14} /> : <Link2 size={14} />}{ru ? "Копировать ссылку" : "Copy link"}</button>}
-          <button type="button" role="menuitem" onClick={() => {
+          <button type="button" role="menuitem" disabled={archived} title={archived ? restoreTitle : undefined} onClick={() => {
+            if (archived) return;
             setMenuOpen(false);
             props.onClone();
           }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>

@@ -1,18 +1,16 @@
+import { CasesRepositoryList } from "./workspace/CasesRepositoryList";
+import { RepositoryDragContext } from "../../folders/presentation/dnd/RepositoryDragContext";
 import { useEffect, useRef } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
-import { CasesTable } from "./list/CasesTable";
 import {
   CASE_INSPECTOR_MAX,
   CASE_INSPECTOR_MIN,
 } from "./split/useCaseInspectorResize";
-import { CasesToolbar } from "./toolbar/CasesToolbar";
-import { CaseBulkActionBar } from "./bulk/action/CaseBulkActionBar";
 import type { CasesViewProps } from "./types";
 import { useCasesViewController } from "./view/useCasesViewController";
 import styles from "./cases.module.css";
-import { MAX_CASE_BULK_MUTATION_ITEMS } from "../../../../core/tms/contracts/test-cases/bulk-case-contract";
 
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
@@ -20,15 +18,16 @@ export function CasesView(props: CasesViewProps) {
   const detailPanelRef = useRef<HTMLElement>(null);
   const listPaneRef = useRef<HTMLElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-  const focusEditorActions = () => document.getElementById("case-editor-actions")?.focus();
 
   useEffect(() => {
     if (!view.inspectorOpen || !view.inspectorResize.overlay) return;
     const panel = detailPanelRef.current;
     const list = listPaneRef.current;
+    const tree = view.workspaceRef.current?.querySelector<HTMLElement>("[data-repository-tree]");
     returnFocusRef.current = document.activeElement instanceof HTMLElement
       ? document.activeElement : null;
     if (list) list.inert = true;
+    if (tree) tree.inert = true;
     panel?.focus();
     function trapFocus(event: KeyboardEvent) {
       if (event.key !== "Tab" || !panel) return;
@@ -48,81 +47,20 @@ export function CasesView(props: CasesViewProps) {
     return () => {
       window.removeEventListener("keydown", trapFocus);
       if (list) list.inert = false;
+      if (tree) tree.inert = false;
       const target = returnFocusRef.current;
       returnFocusRef.current = null;
       if (target?.isConnected) requestAnimationFrame(() => target.focus());
     };
   }, [view.inspectorOpen, view.inspectorResize.overlay]);
 
-  return <div
+  const content = <div
     ref={view.workspaceRef}
     style={view.inspectorResize.style}
     className={`${styles.workspace} ${view.inspectorResize.resizing ? styles.workspaceResizing : ""}`}
     data-testid="cases-view"
   >
-    <section ref={listPaneRef} className={styles.listPane} data-bulk-active={view.bulkSelection.selectedIds.length > 0 || undefined} aria-label={locale === "ru" ? "Список тест-кейсов" : "Test case list"}>
-      <CasesToolbar
-        locale={locale}
-        query={props.query}
-        countLabel={view.countLabel}
-        estimateLabel={view.estimateLabel}
-        filters={props.filters}
-        filterOpen={view.filterOpen}
-        selectedFolder={props.selectedFolder}
-        qlQuery={view.qlQuery}
-        viewMode={view.viewMode}
-        groupBy={view.groupBy}
-        facetFilters={view.facetFilters}
-        facetOptions={view.facetOptions}
-        selectionMode={view.selectionMode}
-        onQuery={props.onQuery}
-        onQlQuery={view.setQlQuery}
-        onViewMode={view.setViewMode}
-        onGroupBy={view.setGroupBy}
-        onFacetFilters={view.setFacetFilters}
-        onSelectionMode={view.toggleSelectionMode}
-        onFilters={props.onFilters}
-        onFilterOpen={() => view.setFilterOpen((value) => !value)}
-        onNew={view.createCase}
-        onNewFolder={props.onNewFolder}
-        interactionLocked={Boolean(props.editor)}
-        onLockedInteraction={focusEditorActions}
-      />
-      <CasesTable
-        locale={locale}
-        rows={view.rows}
-        selectedCaseId={props.selectedCaseId}
-        sort={view.sort}
-        viewMode={view.viewMode}
-        groupBy={view.groupBy}
-        interactionLocked={Boolean(props.editor)}
-        onLockedInteraction={focusEditorActions}
-        onSort={view.toggleSort}
-        onSelect={view.selectRow}
-        onCreate={() => view.createCase()}
-        selectedIds={view.bulkSelection.selected}
-        selectableIds={view.selectableIds}
-        selectedCount={view.bulkSelection.selectedIds.length}
-        selectableCount={view.selectableCount}
-        visibleCoverage={view.bulkSelection.visibleCoverage}
-        selectionMode={view.selectionMode}
-        onToggleCase={view.bulkSelection.toggleOne}
-        onToggleScope={view.bulkSelection.toggleScope}
-        onSelectVisible={view.bulkSelection.selectVisible}
-        onSelectAll={view.bulkSelection.selectAll}
-        onClearSelection={view.bulkSelection.clear}
-      />
-      {view.bulkSelection.selectedIds.length > 0 && !props.editor && <CaseBulkActionBar
-        locale={locale}
-        selectedCount={view.bulkSelection.selectedIds.length}
-        mutationLimit={MAX_CASE_BULK_MUTATION_ITEMS}
-        mutationEnabled={props.bulkMutationEnabled}
-        onClear={view.bulkSelection.clear}
-        onCreateRun={() => props.onRunCases(view.bulkSelection.selectedIds)}
-        onChangeLifecycle={(value) => props.onBulkChangeLifecycle(view.bulkSelection.selectedIds, value)}
-        onChangePriority={(value) => props.onBulkChangePriority(view.bulkSelection.selectedIds, value)}
-      />}
-    </section>
+    <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} />
     {view.inspectorOpen && !view.detailFullscreen && <div
       {...view.inspectorResize.handleProps}
       className={styles.detailResizeHandle}
@@ -178,4 +116,5 @@ export function CasesView(props: CasesViewProps) {
           />}
     </aside>}
   </div>;
+  return props.folders ? <RepositoryDragContext resource={props.folders} selected={view.bulkSelection.selected} ru={locale === "ru"} locked={Boolean(props.editor) || props.folders.busy}>{content}</RepositoryDragContext> : content;
 }

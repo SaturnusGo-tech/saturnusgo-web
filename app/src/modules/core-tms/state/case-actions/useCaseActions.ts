@@ -49,6 +49,7 @@ export function useCaseActions(
     }));
     state.setSelectedCaseId(testCase.id);
     state.setSelectedFolder(testCase.folderPath);
+    state.setSelectedFolderId(testCase.folderId ?? (testCase.folderPath === "/" ? "root" : ""));
     state.setSelectedCaseDetail(testCase);
     state.setSelectedCaseEtag(etag);
   }
@@ -63,7 +64,7 @@ export function useCaseActions(
   }
 
   function openEditCase() {
-    if (state.isCaseSubmitting() || !derived.selectedRevision) return;
+    if (state.isCaseSubmitting() || !derived.selectedRevision || derived.selectedCase?.archivedAt) return;
     caseOperation.current = null;
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
@@ -73,6 +74,7 @@ export function useCaseActions(
 
   async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = []) {
     event.preventDefault();
+    if (state.editing && derived.selectedCase?.archivedAt) return;
     if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
     const input = {
       projectId: derived.project.id,
@@ -145,7 +147,7 @@ export function useCaseActions(
   }
 
   async function cloneCase() {
-    if (!derived.selectedCase) return;
+    if (!derived.selectedCase || derived.selectedCase.archivedAt) return;
     try {
       if (state.connection === "demo") throw new Error("demo clone unavailable");
       const result = await cloneTestCase(http, derived.selectedCase.id, crypto.randomUUID());

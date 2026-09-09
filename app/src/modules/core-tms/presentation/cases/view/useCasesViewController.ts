@@ -1,3 +1,4 @@
+import { repositoryScope } from "../../../folders/model/selection/folder-scope";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCount } from "../../../localization/format/count";
 import type { TmsLocale } from "../../../localization/model/locale";
@@ -35,22 +36,25 @@ export function useCasesViewController(
   const allRows = useMemo<CaseListRow[]>(() => props.testCases.map((testCase) => ({
     testCase, folderPath: testCase.folderPath,
   })), [props.testCases]);
+  const folderScope = useMemo(() => repositoryScope(props.folders?.items ?? [], props.selectedFolderId, props.selectedFolder), [props.folders?.items, props.selectedFolderId, props.selectedFolder]);
+  const folderEmpty = Boolean(props.folders?.items.some((folder) => folder.id === props.selectedFolderId && !folder.archivedAt)
+    && !allRows.some(({ testCase }) => folderScope.includes(testCase)));
   const baseRows = useMemo(() => filterCaseRows(allRows.filter(({ testCase }) => (
-    (props.filters.includeArchived || !testCase.archivedAt)
+    (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
     && (props.filters.type === "all" || testCase.type === props.filters.type)
     && (props.filters.priority === "all" || testCase.priority === props.filters.priority)
     && (props.filters.lifecycle === "all" || testCase.lifecycle === props.filters.lifecycle)
     && (!props.filters.tag.trim() || testCase.tags.some((tag) => (
       tag.toLocaleLowerCase().includes(props.filters.tag.trim().toLocaleLowerCase())
     )))
-  )), { titleQuery: props.query }), [allRows, props.filters, props.query]);
+  )), { titleQuery: props.query }), [allRows, props.filters, props.query, folderScope.archived]);
   const facetOptions = useMemo(
     () => resolveDependentCaseFacets(baseRows, facetFilters),
     [baseRows, facetFilters],
   );
-  const rows = useMemo(() => sortCaseRows(filterCaseRows(baseRows, {
+  const rows = useMemo(() => sortCaseRows(filterCaseRows(baseRows.filter(({ testCase }) => !props.folders || folderScope.includes(testCase)), {
     qlQuery, facets: facetFilters,
-  }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort]);
+  }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort, props.folders, folderScope]);
   const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
     !testCase.archivedAt && Boolean(testCase.etag)
   )), [allRows]);
@@ -63,8 +67,9 @@ export function useCasesViewController(
     [rows, selectableIds],
   );
   const bulkSelection = useCaseBulkSelection(selectableRows, selectableVisibleRows);
-  const totalLabel = formatCount(locale, allRows.length, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
-  const countLabel = rows.length === allRows.length
+  const totalCount = allRows.filter(({ testCase }) => props.filters.includeArchived || folderScope.archived || !testCase.archivedAt).length;
+  const totalLabel = formatCount(locale, totalCount, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
+  const countLabel = rows.length === totalCount
     ? totalLabel
     : `${rows.length} ${locale === "ru" ? "из" : "of"} ${totalLabel}`;
   const allEstimated = rows.length > 0 && rows.every((row) => row.testCase.estimatedMinutes !== null);
@@ -109,18 +114,19 @@ export function useCasesViewController(
   }
   function selectRow(row: CaseListRow) {
     if (props.editor) return;
-    if (row.folderPath !== props.selectedFolder) props.onSelectFolder(row.folderPath);
+    if (row.folderPath !== props.selectedFolder) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
     props.onSelectCase(row.testCase.id);
     setDetailOpen(true);
   }
   function createCase(folderPath = props.selectedFolder) {
+    if (folderScope.archived) return;
     if (props.editor) {
       document.getElementById("case-editor-actions")?.focus();
       return;
     }
     setDetailOpen(true);
     setDetailFullscreen(false);
-    props.onNew(folderPath);
+    props.onNew(folderPath || "/");
   }
   function closeInspector() {
     props.editor?.onCancel();
@@ -136,6 +142,8 @@ export function useCasesViewController(
   }
 
   return {
+    folderArchived: folderScope.archived,
+    folderEmpty,
     workspaceRef, inspectorResize, filterOpen, setFilterOpen, detailFullscreen,
     setDetailFullscreen, inspectorOpen: (detailOpen && Boolean(props.testCase)) || Boolean(props.editor), sort,
     toggleSort, qlQuery, setQlQuery, viewMode, setViewMode, groupBy, setGroupBy,

@@ -1,3 +1,4 @@
+import { PiBriefcaseDuotone } from "react-icons/pi";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import {
   ChevronsLeft,
@@ -25,6 +26,7 @@ const navigationItems: Array<{
   labelKey: TmsMessageKey;
   icon: ReactNode;
 }> = [
+  { id: "portfolios", labelKey: "nav.portfolios", icon: <PiBriefcaseDuotone size={21} /> },
   { id: "dashboard", labelKey: "nav.dashboard", icon: <LayoutDashboard size={20} /> },
   { id: "cases", labelKey: "nav.cases", icon: <FolderKanban size={20} /> },
   { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Repeat2 size={20} /> },
@@ -66,6 +68,9 @@ export function Navigation({
       const url = new URL(window.location.href); url.searchParams.delete("dashboardDetail");
       navigateWorkspace(url.href); window.dispatchEvent(new PopStateEvent("popstate"));
     }
+    if (next === "portfolios" && view === "portfolios") {
+      const url = new URL(window.location.href); url.searchParams.delete("portfolioId"); url.searchParams.delete("catalogProjectId"); navigateWorkspace(url.href);
+    }
     onChange(next);
   };
   return (
@@ -92,7 +97,7 @@ export function Navigation({
       <div className={shellStyles.navigationItems}>
         {navigationItems.map((item) => {
           const label = t(item.labelKey);
-          const active = (!disabled || item.id === "help") && view === item.id;
+          const active = (!disabled || item.id === "help" || item.id === "portfolios") && view === item.id;
           const runActive = item.id === "runs" && activeRunCount > 0;
           const accessibleLabel = runActive
             ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}`
@@ -106,7 +111,7 @@ export function Navigation({
                 active ? shellStyles.navigationItemActive : ""
               }`}
               onClick={() => navigate(item.id)}
-              disabled={disabled && item.id !== "help"}
+              disabled={disabled && item.id !== "help" && item.id !== "portfolios"}
               aria-label={accessibleLabel}
               aria-current={active ? "page" : undefined}
               title={collapsed ? label : undefined}

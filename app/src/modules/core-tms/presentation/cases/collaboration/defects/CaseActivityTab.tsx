@@ -74,7 +74,7 @@ export function CaseActivityTab(props: Props) {
         defect={defect}
         model={props.model}
         onOpenDefect={props.onOpenDefect}
-        onRunCase={props.onRunCase}
+        onRunCase={props.testCase?.archivedAt ? undefined : props.onRunCase}
       />)}</div>}
       {props.model.defects.status === "ready"
         && (props.model.defects.hasMore || props.model.defects.loadMoreFailed)

@@ -44,14 +44,19 @@ export type TestCaseExchangeDocument = Readonly<{
   project: Readonly<{ key: string; name: string }>;
   metadata?: Readonly<Record<string, unknown>>;
   testCases: readonly PortableTestCase[];
+  folders?: readonly string[];
 }>;
 
 export type TestCaseImportProgress = Readonly<{
   completed: number;
+  attempted: number;
   total: number;
 }>;
 
 export type TestCaseImportResult = Readonly<{
   completed: number;
-  failed: readonly Readonly<{ sourceKey: string; message: string }>[];
+  attempted: number;
+  successfulIndices: readonly number[];
+  cancelled: boolean;
+  failed: readonly Readonly<{ sourceKey: string; index: number; message: string }>[];
 }>;

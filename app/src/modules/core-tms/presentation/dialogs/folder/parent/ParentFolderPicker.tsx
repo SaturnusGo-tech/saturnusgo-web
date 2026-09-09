@@ -1,5 +1,7 @@
-import { Check, ChevronDown, Folder, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "lucide-react";
+import { PiFolderDuotone as Folder } from "react-icons/pi";
 import { useId, useRef, useState } from "react";
+import { sortFolderOptions } from "./folder-options";
 import css from "./parent-folder-picker.module.css";
 
 export function ParentFolderPicker({ value, options, label, searchLabel, emptyLabel, onChange }: {
@@ -12,7 +14,7 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const search = useRef<HTMLInputElement>(null);
-  const visible = options.filter((option) => option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const visible = sortFolderOptions(options).filter((option) => option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   function close() { setOpen(false); trigger.current?.focus(); }
   function buttons() { return Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []); }
   return <div className={css.picker} ref={root} onKeyDown={(event) => {

@@ -1,3 +1,4 @@
+import { DraggableCaseRow } from "../../../folders/presentation/table/DraggableCaseRow";
 import { Fragment, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, ListChecks, Search } from "lucide-react";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
@@ -22,6 +23,10 @@ type Props = {
   viewMode?: CaseListViewMode;
   groupBy?: CaseGroupBy;
   interactionLocked?: boolean;
+  repositoryEmpty?: boolean;
+  folderArchived?: boolean;
+  folderEmpty?: boolean;
+  dragEnabled?: boolean;
   onLockedInteraction?: () => void;
   selectedIds: ReadonlySet<string>;
   selectableIds: ReadonlySet<string>;
@@ -78,13 +83,13 @@ export function CasesTable(props: Props) {
   }
 
   if (props.rows.length === 0) return <div className={styles.empty}>
-    <Search size={20} />
-    <strong>{ru ? "Тест-кейсы не найдены" : "No test cases found"}</strong>
-    <span>{ru ? "Измените поиск, QL-запрос или фильтры." : "Adjust search, QL query, or filters."}</span>
-    <button className={styles.secondaryButton} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} onClick={() => {
+    {props.repositoryEmpty || props.folderEmpty ? <ListChecks size={20} /> : <Search size={20} />}
+    <strong>{props.folderArchived ? (ru ? "В архивной папке нет подходящих кейсов" : "No matching cases in this archived folder") : props.folderEmpty ? (ru ? "В папке пока нет тест-кейсов" : "This folder has no test cases yet") : props.repositoryEmpty ? (ru ? "В проекте пока нет тест-кейсов" : "This project has no test cases yet") : (ru ? "Тест-кейсы не найдены" : "No test cases found")}</strong>
+    <span>{props.folderArchived ? (ru ? "Измените поиск или фильтры. Чтобы добавить кейс, восстановите папку или выберите активную." : "Adjust search or filters. Restore this folder or select an active folder to add a case.") : props.folderEmpty ? (ru ? "Создайте первый кейс в этой папке или импортируйте JSON." : "Create the first case in this folder or import JSON.") : props.repositoryEmpty ? (ru ? "Создайте первый кейс или импортируйте JSON через репозиторий." : "Create your first case or import JSON from the repository.") : (ru ? "Измените поиск, QL-запрос или фильтры." : "Adjust search, QL query, or filters.")}</span>
+    {!props.folderArchived && <button className={styles.secondaryButton} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} onClick={() => {
       if (props.interactionLocked) props.onLockedInteraction?.();
       else props.onCreate();
-    }}><ListChecks size={14} />{ru ? "Создать кейс" : "Create case"}</button>
+    }}><ListChecks size={14} />{ru ? "Создать кейс" : "Create case"}</button>}
   </div>;
 
   return <div className={`${styles.tableScroll} ${props.selectedCount > 0 ? styles.tableScrollBulkActive : ""}`}>
@@ -137,7 +142,7 @@ export function CasesTable(props: Props) {
             const selected = item.id === props.selectedCaseId;
             const bulkSelected = props.selectedIds.has(item.id);
             const selectable = props.selectableIds.has(item.id);
-            return <tr key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} data-bulk-selected={bulkSelected || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
+            return <DraggableCaseRow caseId={item.id} dragEnabled={Boolean(props.dragEnabled && !props.interactionLocked && selectable)} key={item.id} data-case-row data-case-id={item.id} data-interaction-locked={props.interactionLocked || undefined} data-bulk-selected={bulkSelected || undefined} className={selected ? styles.selectedRow : ""} aria-selected={selected} aria-disabled={props.interactionLocked || undefined} title={props.interactionLocked ? lockedTitle : undefined} tabIndex={tabStopId === item.id ? 0 : -1}
               onClick={() => props.interactionLocked ? props.onLockedInteraction?.() : props.onSelect(row)} onKeyDown={(event) => {
                 if (event.target instanceof Element && event.target.closest("input, button, a, select, textarea")) return;
                 if (props.interactionLocked && ["Enter", " ", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
@@ -154,7 +159,7 @@ export function CasesTable(props: Props) {
               <td className={styles.titleCell}><strong title={`${item.title}\n${row.folderPath}`}>{item.title}</strong></td>
               <td className={styles.truncate} title={localizedComponentLabel(props.locale, item.component)}>{localizedComponentLabel(props.locale, item.component) || "—"}</td>
               <td className={styles.estimateCell}>{item.estimatedMinutes === null ? "—" : `${item.estimatedMinutes} ${ru ? "мин" : "min"}`}</td>
-            </tr>;
+            </DraggableCaseRow>;
           })}
         </Fragment>;
       })}</tbody>

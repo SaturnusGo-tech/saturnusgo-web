@@ -28,9 +28,10 @@ export function CaseInspectorContent({
   const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
   const snapshots = useRef<Partial<Record<InspectorSection, TestCaseRevision>>>({});
   const folderSnapshots = useRef<Partial<Record<InspectorSection, string>>>({});
-  const value = editor?.value ?? visible;
   const editorMode = editor?.mode;
   const creating = editorMode === "create";
+  const readOnly = Boolean(archived) && !creating;
+  const value = readOnly ? visible : editor?.value ?? visible;
   useEffect(() => { setVisible(copyInspectorRevision(revision)); }, [revision]);
   useEffect(() => {
     if (editor) return;
@@ -39,6 +40,7 @@ export function CaseInspectorContent({
     folderSnapshots.current = {};
   }, [editor]);
   function begin(section: InspectorSection) {
+    if (readOnly) return;
     if (snapshots.current[section]) return;
     snapshots.current[section] = copyInspectorRevision(value);
     folderSnapshots.current[section] = editor?.folderPath ?? "";
@@ -46,7 +48,7 @@ export function CaseInspectorContent({
     if (!editor) onRequestEdit();
   }
   function patch(next: Partial<TestCaseRevision>) {
-    if (editor) editor.onChange({ ...editor.value, ...next });
+    if (editor && !readOnly) editor.onChange({ ...editor.value, ...next });
   }
   function cancel(section: InspectorSection) {
     const snapshot = snapshots.current[section];
@@ -74,16 +76,16 @@ export function CaseInspectorContent({
   }
   const controls = (section: InspectorSection) => ({
     section,
-    editing: creating || editing.has(section),
+    editing: !readOnly && (creating || editing.has(section)),
     persistentEditing: creating,
     ru,
     onEdit: begin,
     onCancel: cancel,
     onSave: saveSection,
-    disabled: editor?.submitting,
+    disabled: readOnly || editor?.submitting,
   });
   const sectionEditing = (section: InspectorSection) => (
-    Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
+    !readOnly && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
   if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
     editor={editor} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
@@ -121,7 +123,7 @@ export function CaseInspectorContent({
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} {...controls("properties")}>
         <CaseMetadataControls locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
-          autoFocus={!creating} showLabels onChange={editor?.onChange} />
+          autoFocus={!creating} showLabels onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} {...controls("details")}>
         <InspectorDetails revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />

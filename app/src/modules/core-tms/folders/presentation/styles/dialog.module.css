@@ -1,0 +1,13 @@
+.dialog { width: min(540px, calc(100vw - 32px)) !important; max-height: min(740px, calc(100dvh - 48px)); border-radius: 22px !important; overflow: auto; }
+.body { padding: 8px 26px 26px; }
+.body > p { color: var(--tms-text-muted, #777b83); font-size: 13px; line-height: 1.7; margin: 0 0 22px; }
+.label { display: block; font-size: 12px; font-weight: 550; margin-bottom: 9px; }
+.destination { display: flex; align-items: center; gap: 10px; padding-top: 20px; color: var(--tms-text-secondary, #747a88); font-size: 12px; overflow-wrap: anywhere; }
+.destination svg { flex-shrink: 0; color: #8295b9; }
+.footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 18px 26px; border-top: 1px solid var(--tms-border, #e5e6e8); }
+.footer button { min-height: 35px; border-radius: 10px !important; }
+.error { color: #c56d6d !important; margin-top: 14px !important; }
+.actions { display: grid; gap: 5px; }
+.actions > button { display: flex; align-items: center; gap: 12px; border: 0; border-radius: 11px; min-height: 42px; padding: 8px 10px; font: inherit; font-size: 13px; color: inherit; background: transparent; text-align: left; cursor: pointer; }
+.actions > button:hover { background: var(--tms-bg-hover, #f2f3f5); }
+.actions svg { width: 20px; height: 20px; color: #8796b1; }

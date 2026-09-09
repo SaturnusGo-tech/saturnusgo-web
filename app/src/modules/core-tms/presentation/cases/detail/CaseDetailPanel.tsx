@@ -55,9 +55,10 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const headerReturnFocus = useRef<"title" | null>(null);
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
+  const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);
   const editorWasOpen = useRef(editorOpen);
-  const revision = props.editor?.value ?? props.revision;
+  const revision = archived ? props.revision : props.editor?.value ?? props.revision;
   const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
   const formatDate = (value: string) => new Intl.DateTimeFormat(props.languageTag, {
     day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
@@ -84,10 +85,13 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   }, [editorOpen]);
 
   function beginHeaderEdit(section: "title") {
+    if (archived) return;
     headerReturnFocus.current = section;
     setHeaderEditing(section);
     if (!props.editor) props.onEdit();
   }
+  const requestEdit = () => { if (!archived) props.onEdit(); };
+  const runCase = () => { if (!archived) props.onRunCase(); };
 
   function cancelEditor() {
     if (props.editor?.submitting) return;
@@ -110,7 +114,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={`${inspector.createActions} ${creating ? inspector.creationFooter : ""}`}>
     {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}
     <button type="button" disabled={props.editor.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>
-    <button type="submit" form={formId} disabled={props.editor.submitting || Boolean(problem)}>{props.editor.submitting ? (ru ? "Сохранение…" : "Saving…") : creating ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>
+    <button type="submit" form={formId} disabled={archived || props.editor.submitting || Boolean(problem)}>{props.editor.submitting ? (ru ? "Сохранение…" : "Saving…") : creating ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>
   </div>;
 
   return <div
@@ -132,7 +136,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         creating={creating}
         editorOpen={editorOpen}
         fullscreen={props.fullscreen}
-        onRunCase={props.onRunCase}
+        onRunCase={runCase}
         onToggleFullscreen={props.onToggleFullscreen}
         onClone={props.onClone}
         onArchive={props.onArchive}
@@ -143,7 +147,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>}
       <div className={inspector.titleRow}>
         {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}
-        {props.editor && (creating || headerEditing === "title") ? <input data-inline-title autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
+        {!archived && props.editor && (creating || headerEditing === "title") ? <input data-inline-title autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
           <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
           {props.testCase && <p className={inspector.caseByline}>
             <LifecycleBadge locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
@@ -151,16 +155,16 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
             <span>{ru ? "Обновлён" : "Updated"} {formatDate(props.testCase.updatedAt)}</span>
           </p>}
         </div>}
-        {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
+        {!creating && headerEditing !== "title" && <button ref={titleEditButton} type="button" disabled={archived || props.editor?.submitting} className={inspector.iconButton} onClick={() => beginHeaderEdit("title")} aria-label={ru ? "Изменить название" : "Edit title"}><Pencil size={14} /></button>}
       </div>
       {!creating && editorActions}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
         fileCount={attachmentIds.length} activityCount={caseActivity.length} onActive={setTab} />}
     </header>
-    <CaseAttachmentDraftProvider locale={props.locale} enabled={Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
-    <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (!props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
+    <CaseAttachmentDraftProvider locale={props.locale} enabled={!archived && Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
+    <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (archived || !props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
-        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={Boolean(props.testCase?.archivedAt)} editor={props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={props.onEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} attachmentIds={attachmentIds} linkIds={props.linkIds} activity={caseActivity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={props.onRunCase} />}
+        {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={archived} editor={archived ? undefined : props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={requestEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} attachmentIds={attachmentIds} linkIds={props.linkIds} activity={caseActivity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={runCase} />}
       </div>
     </form>
     {creating && editorActions}

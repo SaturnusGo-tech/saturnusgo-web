@@ -22,7 +22,7 @@ type Props = {
   defect: CaseLinkedDefect;
   model: CaseCollaborationViewModel;
   onOpenDefect: (defectId: string) => void;
-  onRunCase: () => void;
+  onRunCase?: () => void;
 };
 
 export function CaseDefectRecord(props: Props) {
@@ -135,7 +135,7 @@ export function CaseDefectRecord(props: Props) {
     </div>}
     {!terminal && <footer className={css.verification}>
       {blocked && <p>{blocked}</p>}
-      {defect.fixConfirmationBlockedReason === "retest_required" && model.canConfirmFix && <button
+      {defect.fixConfirmationBlockedReason === "retest_required" && model.canConfirmFix && props.onRunCase && <button
         type="button" className={css.retestButton} onClick={props.onRunCase}
       ><Play size={13} />{ru ? "Запустить повторную проверку" : "Run retest"}</button>}
       <button

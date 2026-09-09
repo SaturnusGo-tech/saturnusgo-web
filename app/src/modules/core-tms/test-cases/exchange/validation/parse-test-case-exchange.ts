@@ -9,9 +9,10 @@ import {
   type TestCaseExchangeDocument,
 } from "../model/test-case-exchange";
 
+import { validateImportFolderPath } from "./folder-path";
+
 type JsonObject = Record<string, unknown>;
 const TAG = /^[a-z0-9][a-z0-9._-]{0,63}$/;
-const FOLDER = /^\/(?:[^/]+(?:\/[^/]+)*)?$/;
 
 function object(value: unknown, path: string): JsonObject {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -80,8 +81,9 @@ function testCase(
     ? ["manual", "checklist"] as const
     : ["manual", "checklist", "automated"] as const;
   const type = choice(item.type ?? "manual", `testCases[${index}].type`, types);
-  const folderPath = text(item.folderPath ?? "/", `testCases[${index}].folderPath`, 500, true);
-  if (!FOLDER.test(folderPath)) throw new Error(`testCases[${index}].folderPath is invalid.`);
+  const folderPath = item.folderPath ?? "/";
+  if (typeof folderPath !== "string") throw new Error(`testCases[${index}].folderPath must be a string.`);
+  validateImportFolderPath(folderPath);
   const tags = Array.isArray(item.tags)
     ? item.tags.map((tag, tagIndex) => text(tag, `testCases[${index}].tags[${tagIndex}]`, 64, true))
     : [];
@@ -126,6 +128,14 @@ export function parseTestCaseExchange(source: string): TestCaseExchangeDocument 
   if (!Array.isArray(document.testCases) || document.testCases.length > TEST_CASE_IMPORT_LIMIT) {
     throw new Error(`testCases must contain at most ${TEST_CASE_IMPORT_LIMIT} items.`);
   }
+  if (document.folders !== undefined && (!Array.isArray(document.folders) || document.folders.length > 2_000)) {
+    throw new Error("folders must contain at most 2,000 paths.");
+  }
+  const folders = document.folders === undefined ? undefined : (document.folders as unknown[]).map((path, index) => {
+    if (typeof path !== "string") throw new Error(`folders[${index}] must be a path string.`);
+    return validateImportFolderPath(path);
+  });
+  if (folders && new Set(folders).size !== folders.length) throw new Error("Folder paths must be unique.");
   const testCases = document.testCases.map((value, index) => (
     testCase(value, index, schemaVersion)
   ));
@@ -136,6 +146,6 @@ export function parseTestCaseExchange(source: string): TestCaseExchangeDocument 
     exportedAt: text(document.exportedAt, "exportedAt", 64, true),
     project: { key: text(project.key, "project.key", 128, true), name: text(project.name, "project.name", 200, true) },
     metadata: document.metadata === undefined ? undefined : object(document.metadata, "metadata"),
-    testCases,
+    testCases, folders,
   };
 }

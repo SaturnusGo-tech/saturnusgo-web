@@ -49,6 +49,7 @@ export async function exportProjectCases(
   http: TmsHttpClient,
   project: Readonly<{ id: string; key: string; name: string }>,
   signal?: AbortSignal,
+  folders?: readonly string[],
 ): Promise<TestCaseExchangeDocument> {
   const ids = await caseIds(http, project.id, signal);
   const testCases: PortableTestCase[] = [];
@@ -63,6 +64,6 @@ export async function exportProjectCases(
     schemaVersion: TEST_CASE_EXCHANGE_SCHEMA,
     exportedAt: new Date().toISOString(),
     project: { key: project.key, name: project.name },
-    testCases,
+    testCases, ...(folders === undefined ? {} : { folders }),
   };
 }
