@@ -11,7 +11,6 @@ export function useProductPlayback() {
   const [interactive, setInteractive] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [starting, setStarting] = useState(false);
-  const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [failed, setFailed] = useState(false);
 
@@ -91,7 +90,6 @@ export function useProductPlayback() {
     setStarting(true);
     if (target.ended) {
       target.currentTime = 0;
-      setPosition(0);
     }
     if (target.getAttribute("src")) play();
     else setLoad(true);
@@ -104,13 +102,13 @@ export function useProductPlayback() {
     interactive,
     playing,
     starting,
-    position,
     duration,
     failed,
     toggle,
     retry: () => {
       pause();
       setFailed(false);
+      setDuration(0);
       setLoad(true);
       video.current?.load();
     },
@@ -126,7 +124,6 @@ export function useProductPlayback() {
       if (video.current?.paused) pause();
     },
     onEnded: pause,
-    onTime: () => setPosition(video.current?.currentTime ?? 0),
     onMetadata: () =>
       setDuration(
         Number.isFinite(video.current?.duration) ? video.current!.duration : 0,
@@ -134,13 +131,6 @@ export function useProductPlayback() {
     onError: () => {
       pause();
       setFailed(true);
-    },
-    seek: (time: number) => {
-      if (video.current && duration > 0) {
-        const next = Math.min(duration, Math.max(0, time));
-        video.current.currentTime = next;
-        setPosition(next);
-      }
     },
   };
 }

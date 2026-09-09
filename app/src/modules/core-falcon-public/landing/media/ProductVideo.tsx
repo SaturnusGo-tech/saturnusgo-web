@@ -3,10 +3,9 @@ import { LoaderCircle, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
 import { useId, useRef } from "react";
 import type { ProductDemo } from "../content/demos";
 import { useProductPlayback } from "./useProductPlayback";
+import { useProductTimeline } from "./useProductTimeline";
+import { formatPlaybackTime } from "./playback-timeline";
 import styles from "./video.module.css";
-function time(value: number) {
-  return `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2, "0")}`;
-}
 export function ProductVideo({
   demo,
   priority = false,
@@ -15,6 +14,7 @@ export function ProductVideo({
   priority?: boolean;
 }) {
   const player = useProductPlayback();
+  const timeline = useProductTimeline(player.video);
   const id = useId();
   const playbackControl = useRef<HTMLButtonElement>(null);
   return (
@@ -31,7 +31,7 @@ export function ProductVideo({
           aria-label={demo.title}
           aria-describedby={`${id}-description`}
           onLoadedMetadata={player.onMetadata}
-          onTimeUpdate={player.onTime}
+          onDurationChange={player.onMetadata}
           onPlay={player.onPlay}
           onPause={player.onPause}
           onEnded={player.onEnded}
@@ -104,19 +104,24 @@ export function ProductVideo({
             )}
           </button>
           <span className={styles.time}>
-            {time(player.position)}
-            <span> / {time(player.duration)}</span>
+            <span ref={timeline.elapsed}>0:00</span>
+            <span className={styles.duration}>
+              {" "}
+              / {formatPlaybackTime(player.duration)}
+            </span>
           </span>
           <input
             type="range"
+            ref={timeline.range}
             min={0}
             max={player.duration || 1}
-            step={0.1}
-            value={player.position}
-            disabled={!player.duration}
+            step="any"
+            defaultValue={0}
+            disabled={!player.duration || player.failed}
             aria-label={`Позиция видео: ${demo.title}`}
-            aria-valuetext={`${time(player.position)} из ${time(player.duration)}`}
-            onChange={(event) => player.seek(Number(event.target.value))}
+            onPointerDown={timeline.beginScrub}
+            onKeyDown={timeline.onKeyDown}
+            onChange={(event) => timeline.seek(event.target.valueAsNumber)}
           />
           <span className={styles.silent}>Без звука</span>
           <button

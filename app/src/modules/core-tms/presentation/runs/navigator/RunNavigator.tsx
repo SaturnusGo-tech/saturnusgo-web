@@ -9,6 +9,7 @@ import { statusIcon } from "../../status/executionStatus";
 import styles from "./run-navigator.module.css";
 import { RunListTabs } from "./tabs/RunListTabs";
 import { RunPicker } from "./picker/RunPicker";
+import { runScopeState } from "../state/run-view-state";
 
 export type RunListMode = "active" | "archived";
 
@@ -17,6 +18,7 @@ type RunNavigatorProps = {
   cases: TestCaseSummary[];
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
+  scopeLoading: boolean;
   selectedItemId: string | null;
   mode: RunListMode;
   archivePending?: boolean;
@@ -28,7 +30,7 @@ type RunNavigatorProps = {
 };
 
 export function RunNavigator({
-  runs, cases, selectedRun, items, selectedItemId, mode,
+  runs, cases, selectedRun, items, scopeLoading, selectedItemId, mode,
   archivePending = false, onModeChange, onSelectRun, onSelectItem,
   onCreate, onRestore,
 }: RunNavigatorProps) {
@@ -98,7 +100,7 @@ export function RunNavigator({
           </header>
 
           <div className={styles.itemsToolbar}>
-            <div><strong>{locale === "ru" ? "Тест-кейсы" : "Test cases"}</strong><span>{items.length}</span></div>
+            <div><strong>{locale === "ru" ? "Тест-кейсы" : "Test cases"}</strong><span>{scopeLoading ? "—" : items.length}</span></div>
             <label data-input-shell>
               <Search size={14} aria-hidden="true" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={locale === "ru" ? "Поиск кейсов в ране" : "Search cases in run"} placeholder={locale === "ru" ? "Поиск по названию или ID" : "Search title or ID"} />
@@ -115,7 +117,10 @@ export function RunNavigator({
             <span>{locale === "ru" ? "Тест-кейс" : "Test case"}</span>
             <span>{t("runs.status")}</span>
           </div>
-          <div className={styles.items} role="table" aria-label={locale === "ru" ? "Тест-кейсы выбранного рана" : "Selected run test cases"}>
+          <div className={styles.items} role="table" aria-busy={scopeLoading} aria-label={locale === "ru" ? "Тест-кейсы выбранного рана" : "Selected run test cases"}>
+            {scopeLoading && <div className={styles.itemsLoading} role="status" aria-label={t("common.loading")} data-testid="run-scope-loading">
+              {[0, 1, 2, 3].map((row) => <div key={row} aria-hidden="true"><i /><span /><span /></div>)}
+            </div>}
             {visibleItems.map((item, index) => {
               const testCase = caseById.get(item.caseId);
               return (
@@ -139,7 +144,7 @@ export function RunNavigator({
                 <span className={`${styles.executionBadge} ${styles[`execution_${item.status}`]}`} role="cell">{item.status === "not_run" ? <CircleDashed size={16} /> : statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
               </button>
             )})}
-            {visibleItems.length === 0 && <div className={styles.itemsEmpty}><Search size={18} /><span>{locale === "ru" ? "Кейсы не найдены" : "No cases found"}</span></div>}
+            {runScopeState(scopeLoading, visibleItems.length) === "empty" && <div className={styles.itemsEmpty}><Search size={18} /><span>{locale === "ru" ? "Кейсы не найдены" : "No cases found"}</span></div>}
           </div>
         </>
       )}

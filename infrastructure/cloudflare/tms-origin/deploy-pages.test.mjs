@@ -110,10 +110,10 @@ if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }
 if (process.env.OMIT_ATMOSPHERE !== "1") write("out/falcon/landing/2026-09/atmosphere.webp", "falcon atmosphere\\n");
-for (const id of ["dashboard", "cases", "runs", "defects", "youtrack-demo"]) {
+for (const id of ["dashboard", "cases", "runs", "defects-context", "youtrack-workflow"]) {
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
-    if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack-demo" && extension === "mp4") continue;
+    if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack-workflow" && extension === "mp4") continue;
     write("out/falcon/landing/2026-09/" + id + "." + extension, "demo asset\\n");
   }
 }
@@ -187,7 +187,7 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     "falcon atmosphere\n",
   );
   assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09/youtrack-demo.mp4"), "utf8"),
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09/youtrack-workflow.mp4"), "utf8"),
     "demo asset\n",
   );
   assert.equal(
@@ -263,7 +263,7 @@ test("fails closed when the current integration demonstration is missing", (cont
   const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
   const result = deploy(fixture, "--publish", { OMIT_INTEGRATION_VIDEO: "1" });
   assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*youtrack-demo\.mp4/);
+  assert.match(result.stderr, /Required public asset is missing.*youtrack-workflow\.mp4/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 

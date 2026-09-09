@@ -89,6 +89,12 @@
 :global(.dark) .execution_not_run { color: #f1f3f5; background: #4b5058; border-color: #6b717b; }
 :global(.dark) .execution_skipped { color: #fff; background: #7042b5; border-color: #976de0; }
 .itemsEmpty { min-height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: var(--runs-muted); font-size: 12px; }
+.itemsLoading { padding: 0 14px; animation: run-items-loading 1.4s ease-in-out infinite alternate; }
+.itemsLoading > div { min-height: 48px; display: grid; grid-template-columns: 16px 66px minmax(0, 1fr); align-items: center; gap: 16px; border-bottom: 1px solid var(--runs-row-border); }
+.itemsLoading i, .itemsLoading span { display: block; height: 9px; border-radius: 5px; background: var(--runs-hover); }
+.itemsLoading i { width: 14px; height: 14px; border-radius: 4px; }
+.itemsLoading > div:nth-child(even) > span:last-child { width: 72%; }
+@keyframes run-items-loading { from { opacity: .45; } to { opacity: .9; } }
 
 @container runs-shell (max-width: 960px) {
   .itemColumns, .item, .itemActive { grid-template-columns: 30px 34px 78px minmax(0, 1fr); }
@@ -102,6 +108,7 @@
 @keyframes run-picker-enter { from { opacity: 0; transform: translateY(-5px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes run-name-pan { 0%, 14% { transform: translateX(0); } 86%, 100% { transform: translateX(calc(-1 * var(--run-name-distance))); } }
 @media (prefers-reduced-motion: reduce) {
+  .itemsLoading { animation: none; }
   .pickerTrigger > svg, .progressTrack > span, .prioritySortButton svg { transition: none; }
   .pickerMenu { animation: none; }
   .runNameAlways[data-overflow="true"], .pickerOption:hover .runNameOnInteraction[data-overflow="true"], .pickerOption:focus-visible .runNameOnInteraction[data-overflow="true"], .pickerOptionActive:hover .runNameOnInteraction[data-overflow="true"], .pickerOptionActive:focus-visible .runNameOnInteraction[data-overflow="true"] { animation: none; }

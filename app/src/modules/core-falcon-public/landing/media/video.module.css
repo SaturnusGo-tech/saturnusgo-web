@@ -54,7 +54,7 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.time > span {
+.duration {
   color: #9c9da3;
 }
 .controls input {

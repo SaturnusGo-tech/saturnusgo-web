@@ -56,6 +56,6 @@ export function useSelectedRunResource({ http, connection, projectId, selectedRu
   return { runItems: ready ? runItems : [], setRunItems, selectedRunEtag: ready ? selectedRunEtag : null,
     setSelectedRunEtag, selectedRunItemDetail: ready ? selectedRunItemDetail : null,
     setSelectedRunItemDetail, selectedRunItemEtag: ready ? selectedRunItemEtag : null, setSelectedRunItemEtag,
-    runResourceError: failed, runResourceLoading: connection === "connected" && Boolean(selectedRunId)
+    runResourceReady: ready, runResourceError: failed, runResourceLoading: connection === "connected" && Boolean(selectedRunId)
       && (!ready || runResourceLoading) && !failed, retryRunResource };
 }

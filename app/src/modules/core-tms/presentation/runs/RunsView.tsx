@@ -16,6 +16,7 @@ import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLi
 import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
 import { RunScopeEmpty } from "./empty/RunScopeEmpty";
 import { RunListEmpty } from "./empty/RunListEmpty";
+import { resolveRunListMode, runListSelection, runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
@@ -28,6 +29,7 @@ type RunsViewProps = {
   cases: TestCaseSummary[];
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
+  scopeLoading: boolean;
   selectedItem: RunItem | null;
   progress: number;
   onSelectRun: (id: string) => void;
@@ -45,11 +47,11 @@ type RunsViewProps = {
   onRestore: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-
-export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onComplete, canExecute, canStart, startPending, startError, onStart, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
+export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items, scopeLoading, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onComplete, canExecute, canStart, startPending, startError, onStart, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const attachments = useAttachmentClient();
-  const [listMode, setListMode] = useState<RunListMode>("active");
+  const [listSelection, setListSelection] = useState(() => runListSelection(selectedRun));
+  const listMode = resolveRunListMode(listSelection, selectedRun);
   const [evidence, setEvidence] = useState<string[]>([]);
   const [evidenceError, setEvidenceError] = useState("");
   const [reporting, setReporting] = useState(false);
@@ -61,9 +63,6 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
     setEvidenceError("");
     evidenceOperation.current = null;
   }, [selectedItem?.id, selectedRun?.id]);
-  useEffect(() => {
-    if (selectedRun) setListMode(selectedRun.archivedAt ? "archived" : "active");
-  }, [selectedRun?.archivedAt, selectedRun?.id]);
   const runWritable = Boolean(selectedRun && !selectedRun.archivedAt && selectedRun.status === "active");
   const editScope = JSON.stringify([selectedRun?.id, selectedItem?.id, selectedItem?.activeAttemptNo]);
   const currentEditScope = useRef(editScope); currentEditScope.current = editScope;
@@ -103,18 +102,19 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
   }
   const selectedIsVisible = Boolean(selectedRun && (listMode === "archived" ? selectedRun.archivedAt : !selectedRun.archivedAt));
   function changeListMode(mode: RunListMode) {
-    setListMode(mode);
+    setListSelection(runListSelection(selectedRun, mode));
     const next = runs.find((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
     if (next && next.id !== selectedRun?.id) onSelectRun(next.id);
   }
   const runNavigator = <RunNavigator
     runs={runs} cases={cases} selectedRun={selectedIsVisible ? selectedRun : null}
     items={selectedIsVisible ? items : []} selectedItemId={selectedIsVisible ? selectedItem?.id ?? null : null}
+    scopeLoading={scopeLoading}
     mode={listMode} onModeChange={changeListMode}
     onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
     archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
   />;
-  if (selectedRun && selectedIsVisible && !selectedItem && selectedRun.itemCount === 0) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
+  if (selectedRun && selectedIsVisible && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
   if (selectedRun && selectedIsVisible && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={runStyles.shell} data-testid="runs-view"><RunListEmpty mode={listMode} activeCount={runs.filter((run) => !run.archivedAt).length}
       archivedCount={runs.filter((run) => Boolean(run.archivedAt)).length} onModeChange={changeListMode} onCreate={onCreate} /></div>;

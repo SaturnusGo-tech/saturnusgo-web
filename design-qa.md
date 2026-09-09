@@ -141,3 +141,41 @@ Final real-scroll acceptance: `scroll-owners-qa.json` passes wheel movement, dir
 The final broader local browser suite was rerun after these fixes: eleven checks pass, no page errors or failed Falcon asset requests. The mobile recapture shows fully readable text and an intact player. No open P0/P1/P2 findings remain in the tested states.
 
 final result: passed
+
+
+## Player timeline, run loading and real YouTrack workflow — 2026-09-09
+
+Current status: implementation, isolated run-loading QA and both official Recordly exports are verified locally. Published-site acceptance follows the existing release pipeline.
+
+### Intended result and scope
+
+The existing atmospheric landing, 640 px reading columns, 920 px manual players and continuous scroll motion remain the visual basis. This revision changes the playback timeline and the content of two recordings. It also fixes the live Falcon run-loading flash that was visible in the earlier media; it does not redesign the run workspace or alter execution results.
+
+- The slider follows the real media clock on animation frames while playback advances, without the former 0.1-second quantization. Elapsed text and accessible value text remain synchronized. Buffering/seek/pause/end/hidden states stop the frame loop; unmount removes listeners and callbacks.
+- Native pointer dragging owns the thumb until release/cancellation. Keyboard controls retain bounded one-second arrow seeks, five-second Page Up/Down seeks and Home/End. Manual Play, no loop, offscreen pause and no automatic resume remain unchanged.
+- A selected run with unresolved items shows neutral skeleton rows and a loading count marker. A missing summary uses the centered Falcon loader. Only a successful empty response renders the actual empty state. Archived deep links enter History immediately.
+
+### New recordings and factual boundaries
+
+The integration composition is a real-interface capture of the existing YouTrack URL/masked token, tag-to-project routing, Falcon `HOST-BUG-019`, the linked YouTrack issue `umbrellandroid-7` with steps/current Stage, its Falcon backlink, and the original run's failed step. It does not create a connection, save routing, change a YouTrack status, send a notification or modify a production test result. Caption wording must describe inspection of existing state rather than claim that the recording performed a sync or approved a fix. Masking must hold in every source frame, zoom region, poster and export.
+
+`youtrack-workflow.{mp4,webp,vtt}` replaces the earlier catalog/report-only `youtrack-demo.*` set. `defects-context.{mp4,webp,vtt}` replaces `defects.*` and composes capture chapters 03, 06 and 07 to show report → return/context → original failed execution without the old empty-state flash. Source frames and cursor telemetry live under `../output/falcon-player-youtrack-20260909/capture/`; editable masters and export reports belong in the corresponding `*-recordly/` folders, including `youtrack-workflow-recordly/`. The root release task checks the official exports and installs the versioned public assets. Final dimensions, durations, frame counts, file sizes and poster timestamps must come from those exports, not the preceding revision.
+
+### Findings and confirmed checks
+
+- [P2, resolved] Run items started as an empty array while a resource request was pending, but presentation discarded that distinction when a summary already existed. A stale zero-count summary could additionally select the scope-empty view. Resource readiness now reaches the navigator and scope renderer, preventing false “Кейсы не найдены” / empty-scope messages before an authoritative response.
+- [P2, resolved] Archived run selection was deferred to an effect, allowing a transient active-run empty view. The list mode now follows the selected run/archive identity synchronously while preserving an explicitly chosen tab for the same run.
+- The isolated runtime browser suite passed 4/4 scenarios at 1600 × 900: delayed items with initial `itemCount: 0`, an archived deep link, a genuine empty response and an initially unknown summary. MutationObserver recorded zero false empty DOM frames before responses; nonempty cases resolved to both the list and actual step with no intermediate empty frame. History was selected on the first archived render.
+- The screenshots were inspected with canonical Falcon dark tokens. Neutral skeleton fill was also verified from computed style. Evidence: `run-loading-qa/{active,archived,empty,missing-summary}-{pending,resolved}.png` and `run-loading-qa/results.json` beneath the current output directory. These local GET fixtures exercise the actual stage/hook/navigator/mappers and do not create a production fixture route or mutate production data.
+- Focused run navigator/scope regressions: 13/13 passed. Existing adapter/domain suite with five added regressions: 418/418 passed. Worker/release checks after content/manifest changes: 43/43 passed. Typecheck and the 607-file architecture check passed. Independent changed timeline helper review found no concrete P1/P2 issues.
+- Eight timeline unit tests and seven manual-playback browser regressions passed. The local timeline sample produced 120 distinct thumb values over 120 display frames, against eight `timeupdate` events, with a maximum sampled clock difference of 0.000146 seconds and zero React commits during playback. Mouse/keyboard/touch seek, pause/end/restart, fullscreen and offscreen behavior were exercised. This is local browser evidence, not a production performance guarantee; the replacement exports still need media acceptance. Reports: `../output/falcon-player-timeline-20260909/timeline-browser-qa.json` and `manual-playback-qa.json`, with no reported page errors.
+
+The earlier “passed” sections remain historical evidence for their own revisions. Final media and local browser acceptance are recorded below; production deployment is verified separately.
+
+Final media acceptance: the official Recordly application saved both replacement exports with the modern/WebGPU pipeline. `youtrack-workflow` is 41.4 seconds / 2,484 frames / 8,066,469 bytes; `defects-context` is 15.333333 seconds / 920 frames / 3,687,953 bytes. Both are 1600 × 900 H.264 at 60 fps. Their posters are extracted at 2.4 and 11.9 seconds respectively. All seven integration and three defect chapter review frames were inspected, including pre-click and post-caption frames.
+
+[P2, resolved during export review] Recordly grouped neighboring captions when configured for two rows. Single-row native captions now stay within their own chapter. The whole YouTrack page remains unzoomed so the issue title, steps and Stage fit together. A smaller caption with a lower inset preserves the failed step’s actual result. Credentials remain masked, click targets are visible, and the old loading frame at capture time 4,173 ms is excluded by the preceding chapter’s 3,900 ms trim. New exports use 200 ms dissolves between real captured screens, with no generated product UI or invented pointer motion. Both replacement MP4/WebP/VTT sets are installed; all 49 public/auth tests pass.
+
+Final local landing acceptance: all five final video sources passed manual Play, seek and fullscreen checks. The integration strip and 1600/1024/768/390/320 px layouts passed, including reduced motion; there were no JavaScript errors or failed Falcon asset responses. Evidence: `../output/falcon-player-youtrack-20260909/local-refinement-qa.json` and its desktop/mobile captures.
+
+final result: passed locally; production release checked separately

@@ -32,7 +32,7 @@ test("Falcon landing keeps direct login, signup and accessible chapter navigatio
 });
 
 test("every landing demonstration has a real MP4, poster and timed text", () => {
-  assert.equal(demos.integrations.src, "/falcon/landing/2026-09/youtrack-demo.mp4");
+  assert.equal(demos.integrations.src, "/falcon/landing/2026-09/youtrack-workflow.mp4");
   assert.equal(Object.keys(demos).length, 5);
   for (const { id, src, poster: posterPath, captions: captionsPath } of Object.values(demos)) {
     const video = readFileSync(resolve(root, `public${src}`));

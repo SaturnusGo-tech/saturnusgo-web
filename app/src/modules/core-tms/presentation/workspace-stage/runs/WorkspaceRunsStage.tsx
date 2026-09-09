@@ -3,6 +3,7 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { RunsView } from "../../runs/RunsView";
 import { useImpactList } from "../../../impact/application/list/useImpactList";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
+import { TessiqLoader } from "../../common/loading/TessiqLoader";
 export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   const { t, locale } = useTmsLocale();
   const impactScope = { workspaceId: model.data.workspace.id, projectId: model.project?.id ?? "" };
@@ -13,8 +14,9 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
     <p>{locale === "ru" ? "Не удалось открыть выбранный прогон. Проверьте доступ и повторите загрузку." : "The selected run could not be opened. Check access and retry."}</p>
     <button type="button" onClick={model.retryRunResource}>{locale === "ru" ? "Повторить" : "Retry"}</button>
   </div>;
-  if (model.runResourceLoading && !model.selectedRun) return <p role="status">
-    {locale === "ru" ? "Загружаем выбранный прогон…" : "Loading the selected run…"}</p>;
+  const scopeLoading = model.connection === "connected" && Boolean(model.selectedRun || model.selectedRunId)
+    && !model.runResourceReady;
+  if (scopeLoading && !model.selectedRun) return <TessiqLoader pane label={t("common.loading")} testId="run-resource-loading" />;
   return (
     <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
@@ -26,6 +28,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         cases={model.projectCases}
         selectedRun={model.selectedRun}
         items={model.runItems}
+        scopeLoading={scopeLoading}
         selectedItem={model.selectedRunItem}
         progress={model.executionProgress}
         onSelectRun={(id) => {
