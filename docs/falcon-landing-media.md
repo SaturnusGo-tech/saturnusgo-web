@@ -8,6 +8,14 @@ The refinement keeps the dashboard, case, run-builder and defect recordings. It 
 
 The video frame is capped at 920 px on desktop and fits the available width on smaller screens. Playback is manual for every video. Numbered chapter labels have been removed, and the page copy describes the product actions shown.
 
+## Product story between demonstrations
+
+Five introductions explain the workflow before their respective videos: choosing a project and dashboard context, maintaining cases and shared steps, running a scope against a build, recording a defect with its execution context, and returning to verification through tracker integration. Each introduction contains a small topic label, a heading and two paragraphs in a reading column capped at 640 px. The video beneath it retains its separate 920 px maximum width.
+
+`ProductStory.tsx` renders the same semantic structure for every introduction. Copy lives in `overviewStory`, `workflow` and `integrationStory` in `content/demos.ts`; transcripts remain separate from this product explanation. The introductions describe existing capabilities, while the recordings show specific examples rather than every operation mentioned in the text. For example, the case recording inspects one case; the supporting prose also explains reusable shared steps and their attachments.
+
+Keep the wording grounded in the Falcon guide: dashboard customization and drilldowns, case/shared-step authoring, run snapshots and execution, defect creation from a failed step, retest status mapping, Slack events and Confluence run reports. Do not imply that linking an arbitrary URL creates a managed tracker connection or that a ready-for-QA status confirms a passed retest.
+
 ## Video assets
 
 Assets live in `public/falcon/landing/2026-09/`. Each demonstration has a silent H.264 MP4, a WebP poster extracted from its final export and Russian WebVTT descriptions. Update the poster, transcript and captions together whenever the recording changes.
@@ -34,7 +42,11 @@ The four retained recordings use the owner’s authorized Umbrella Host QA proje
 
 The texture is edge-blendable rather than a guaranteed seamless tile. Fixed coverage avoids a visible vertical repeat. Keep decorative layers noninteractive and hidden from accessibility APIs.
 
-Section reveals use a modest 34 px movement over 0.8 seconds. Reduced-motion preferences disable decorative movement. The page remains readable without waiting for animations.
+Section motion follows the current scroll position every time a section enters or leaves the viewport; it is no longer a once-only, timed reveal. `useLandingScrollProgress` observes a stable outer wrapper and the actual scrolling container. It accounts for body becoming an independent scroller when the mobile shell changes HTML overflow and rebinds when viewport resizing changes that container. Framer Motion maps that progress through a spring, while the inner layer moves without changing the layout used to measure its progress.
+
+Media moves from 72 px below its resting position to 0, remains still through the central viewing interval, then moves up to −32 px as it leaves. Its opacity stays at 1, and its scale never changes. Text uses the smaller 34 → 0 → −14 px movement with a restrained opacity change and the same stationary center. The hero wing follows its own 0 → 90 px scroll displacement. These values describe positional ranges, not a fixed-duration entrance animation.
+
+Scrolling remains native; section links retain real URL anchors and use smooth browser scrolling on either the document or body when motion is allowed. Reduced-motion preferences remove the decorative transformations and smooth scrolling, including when that preference changes while the page is open. The page renders readable content before hydration and without waiting for motion. The video player remains independent: scrolling never starts or resumes a video, and the existing offscreen/hidden-document pause behavior is retained.
 
 ## Integration brand strip
 
@@ -69,7 +81,7 @@ The original output directory retains `capture.mjs`, `normalize-source.mjs` and 
 
 ## Verification
 
-Confirmed checks for this refinement:
+Confirmed checks for the preceding media refinement (`dd56b5b4`), before the product-story and continuous-scroll changes:
 
 | Check | Result |
 | --- | --- |
@@ -84,6 +96,10 @@ Independent layout inspection covered 1600, 390 and 320 px viewports. All five p
 
 `npm run test:tms-auth` checks public navigation and media integrity. `npm run test:tms-worker` covers byte ranges, content types, required assets and deployment gates. Browser verification must cover all five final media files, their real dimensions and durations, manual playback, seeking, fullscreen, error recovery, reduced motion, FAQ links, and 320/390/768/1600 px layouts.
 
-For this refinement, explicitly verify that videos remain paused on initial load and after returning from offscreen or a hidden document, do not loop at the end, and start only after Play. Check the integration strip’s pause control, reduced-motion behavior and «Скоро» labels. Inspect the fixed atmosphere and mirrored footer wing at desktop and mobile widths.
+For each revision, explicitly verify that videos remain paused on initial load and after returning from offscreen or a hidden document, do not loop at the end, and start only after Play. Check the integration strip’s pause control, reduced-motion behavior and «Скоро» labels. Inspect the fixed atmosphere and mirrored footer wing at desktop and mobile widths.
+
+Local verification of the product-story revision passed 41 public/auth tests, 413 adapter/domain tests, typecheck and the 606-file architecture check. The browser suite passed all five manual-play/seek/fullscreen checks, the brand strip and 1600/1024/768/390/320 px layouts. Seven playback lifecycle checks and failed-media retry passed separately. Current evidence is retained under `../output/falcon-landing-story-20260909/`; these local results do not establish production deployment.
+
+Real wheel events and native anchor navigation were tested separately at 1440, 1000, 768 and 390 px. This caught and corrected an independent body scroller that programmatic document scrolling did not expose. `scroll-owners-qa.mjs` covers the actual owner, a direct section hash before hydration, repeated movement, responsive owner changes and reduced-motion preferences. `scroll-motion-qa.mjs` separately measures spring continuity and the stationary central interval. Inspect the five introductions at desktop and mobile widths and recheck manual playback during those movements whenever their layout or motion changes.
 
 Run the broader `refinement-qa` browser checks against both the local server and the published public URL, without signing in or mutating data. They exercise all five videos, play/seek/fullscreen controls, responsive layouts and the integration strip. Record those browser results and deployment outcomes in the release report separately from the confirmed checks above. New filenames for the YouTrack clip prevent cached `integrations.*` media from being mistaken for the replacement.

@@ -1,7 +1,8 @@
 import { ProductVideo } from "./media/ProductVideo";
-import { demos } from "./content/demos";
+import { demos, integrationStory } from "./content/demos";
 import { Reveal } from "./motion/Reveal";
 import { IntegrationMarquee } from "./motion/IntegrationMarquee";
+import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
 export function FalconIntegrations() {
   return (
@@ -10,14 +11,9 @@ export function FalconIntegrations() {
       id="integrations"
       aria-labelledby="integrations-title"
     >
-      <Reveal className={styles.sectionHeading}>
-        <div>
-          <h2 id="integrations-title">Интеграции</h2>
-          <p>Подключайте трекеры задач, сборки и уведомления команды.</p>
-        </div>
-      </Reveal>
+      <ProductStory story={integrationStory} headingId="integrations-title" />
       <IntegrationMarquee />
-      <Reveal className={styles.videoReveal}>
+      <Reveal className={styles.videoReveal} variant="media">
         <ProductVideo demo={demos.integrations} />
       </Reveal>
     </section>

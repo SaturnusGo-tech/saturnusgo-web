@@ -5,8 +5,9 @@ import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, workflow } from "./content/demos";
+import { demos, workflow, overviewStory } from "./content/demos";
 import { Reveal } from "./motion/Reveal";
+import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
 
 export function FalconLanding() {
@@ -23,14 +24,8 @@ export function FalconLanding() {
           id="product"
           aria-labelledby="overview-title"
         >
-          <Reveal className={styles.overviewCopy}>
-            <h2 id="overview-title">Дашборд проекта</h2>
-            <p>
-              Добавьте нужные виджеты. Следите за прогонами, дефектами и
-              проверками, которые требуют внимания.
-            </p>
-          </Reveal>
-          <Reveal className={styles.videoReveal}>
+          <ProductStory story={overviewStory} headingId="overview-title" />
+          <Reveal className={styles.videoReveal} variant="media">
             <ProductVideo demo={demos.dashboard} priority />
           </Reveal>
         </section>
@@ -48,13 +43,8 @@ export function FalconLanding() {
             id={item.id}
             aria-labelledby={`${item.id}-title`}
           >
-            <Reveal className={styles.sectionHeading}>
-              <div>
-                <h2 id={`${item.id}-title`}>{item.title}</h2>
-                <p>{item.description}</p>
-              </div>
-            </Reveal>
-            <Reveal className={styles.videoReveal}>
+            <ProductStory story={item} headingId={`${item.id}-title`} />
+            <Reveal className={styles.videoReveal} variant="media">
               <ProductVideo demo={demos[item.id]} />
             </Reveal>
           </section>

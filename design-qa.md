@@ -119,3 +119,25 @@ No open P0/P1/P2 visual findings in the inspected states.
 Final local browser acceptance: `local-refinement-qa.json` passed all five manual-play/seek/fullscreen checks, marquee pause/resume and 1600/1024/768/390/320 px layouts, including reduced-motion wrapping. Console errors and failed Falcon asset requests: none.
 
 final result: passed
+
+## Landing product story and scroll continuity — 2026-09-09
+
+Source context: the production landing at `dd56b5b4` and the user's request for meaningful explanation between recordings. The official Astra landing was inspected in the browser for its alternation of a narrow reading column and wider media. Its content, branding and product claims are not reused.
+
+Combined comparison: `../output/falcon-landing-story-20260909/story-comparison.png` (2880 × 1000, old production left and local implementation right, each 1440 × 1000 CSS px, DPR 1, same cases chapter). The page retains the existing graphite atmosphere, wing, Geist Sans typography and all five approved Recordly exports. Text now uses a 640 px reading column, a topic label, a 32–42 px heading and two 16–17 px paragraphs before each 920 px player. Separate introductions explain project context, reusable cases, build-specific execution, defect evidence and verification after a tracker fix.
+
+The new motion follows scroll progress through a damped spring, with a stable outer measurement wrapper and an inner transformed layer. It repeats in either direction. Players never scale or fade; the central viewing interval has zero displacement so controls stay still. Text has smaller movement. Manual playback, seeking, fullscreen and offscreen pause remain independent from decorative movement.
+
+### Findings and validation
+
+- [P1, resolved after real-wheel review] Mobile CSS makes body a real scroll container, while the initial hook excluded body unconditionally. Programmatic document scrolling passed but ordinary wheel scrolling left visible text at opacity 0.6 and its initial offset. The hook now distinguishes body overflow propagation from an independent body scroller and rebinds after viewport resizing. Scoped smooth-anchor behavior also applies to body, with a reduced-motion override. A real wheel on the 390 px page now changes the media position and settles visible text at opacity 1. `story-mobile-cases-fixed.png` confirms the corrected contrast and spacing.
+- Desktop before/after comparison confirms readable hierarchy, consistent margins and unchanged product assets. The five introductions were checked against the Falcon guide; tracker wording refers to configured connectors, not arbitrary external URLs.
+- Local public/auth tests: 41/41. Existing adapter/domain tests: 413/413. Typecheck and the 606-file architecture check pass. The repository lint command is a no-op.
+- Browser checks pass for all five players (Play, seek, fullscreen), the eleven-brand strip with three planned connectors, and 1600/1024/768/390/320 px layouts without horizontal overflow. Seven playback lifecycle regressions and failed-media retry pass. The real-scroll matrix is recorded separately from programmatic scrolling checks.
+- Evidence, scripts and captures are retained outside the deployed source under `../output/falcon-landing-story-20260909/`. Production acceptance follows the existing source → Pages → Worker release process.
+
+Final real-scroll acceptance: `scroll-owners-qa.json` passes wheel movement, direct pre-hydration hashes and native anchors at 1440/1000/768/390 px. The 390 px body scroller moves the player from 34.69 px to 0 at the viewing center, then to −31.92 px on exit and back to 0 on return; its anchor navigation has 23 intermediate positions. Resizing 1440 → 390 → 1440 rebinds HTML/body correctly. Live reduced motion explicitly resets every inner transform and opacity and switches body scrolling to auto. The earlier undefined style retained offscreen transforms; that issue is corrected in both Reveal and the hero.
+
+The final broader local browser suite was rerun after these fixes: eleven checks pass, no page errors or failed Falcon asset requests. The mobile recapture shows fully readable text and an intact player. No open P0/P1/P2 findings remain in the tested states.
+
+final result: passed

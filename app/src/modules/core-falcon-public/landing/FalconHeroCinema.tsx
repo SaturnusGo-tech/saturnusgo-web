@@ -1,22 +1,23 @@
 "use client";
 import { ArrowDown, Play } from "lucide-react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 import styles from "./landing.module.css";
+import {
+  useLandingMotionEnabled,
+  useLandingScrollProgress,
+} from "./motion/useLandingScrollProgress";
 
 export function FalconHeroCinema() {
   const section = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: section,
-    offset: ["start start", "end start"],
+  const motionEnabled = useLandingMotionEnabled();
+  const progress = useLandingScrollProgress(section, motionEnabled, "hero");
+  const smoothProgress = useSpring(progress, {
+    stiffness: 140,
+    damping: 28,
+    mass: 0.45,
   });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const y = useTransform(smoothProgress, [0, 1], [0, 90]);
   return (
     <section
       ref={section}
@@ -31,7 +32,7 @@ export function FalconHeroCinema() {
         width={1672}
         height={941}
         fetchPriority="high"
-        style={reduced ? undefined : { y }}
+        style={motionEnabled ? { y } : { y: 0 }}
       />
       <div className={styles.heroInner}>
         <p className={styles.eyebrow}>Falcon / Управление тестированием</p>

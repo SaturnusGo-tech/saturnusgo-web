@@ -78,6 +78,7 @@ html[data-falcon-public="1"] {
 html[data-falcon-public="1"] body {
   min-height: 100dvh;
   background: #fffefa;
+  scroll-behavior: smooth;
 }
 
 html.dark[data-falcon-public="1"] { color-scheme: dark; }
@@ -93,7 +94,8 @@ html[data-falcon-public="1"] #app-main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-falcon-public="1"] {
+  html[data-falcon-public="1"],
+  html[data-falcon-public="1"] body {
     scroll-behavior: auto;
   }
 }
