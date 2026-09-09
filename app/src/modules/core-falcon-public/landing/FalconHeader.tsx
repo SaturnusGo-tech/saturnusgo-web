@@ -8,9 +8,17 @@ export function FalconHeader() {
     <header className={styles.header}>
       <div className={styles.headerInner}>
         <FalconBrand inverse />
+        <nav className={styles.headerNav} aria-label="Навигация по лендингу">
+          <a href="#product">Продукт</a>
+          <a href="#integrations">Интеграции</a>
+        </nav>
         <div className={styles.headerActions}>
-          <Link className={styles.loginButton} href={TMS_ADMIN_LOGIN_PATH}>Войти</Link>
-          <Link className={styles.primaryButton} href="/signup/">Создать аккаунт</Link>
+          <Link className={styles.loginButton} href={TMS_ADMIN_LOGIN_PATH}>
+            Войти
+          </Link>
+          <Link className={styles.primaryButton} href="/signup/">
+            Создать аккаунт
+          </Link>
         </div>
       </div>
     </header>

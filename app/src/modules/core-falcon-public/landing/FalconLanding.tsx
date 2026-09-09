@@ -4,175 +4,134 @@ import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
+import { ProductVideo } from "./media/ProductVideo";
+import { demos, workflow } from "./content/demos";
+import { Reveal } from "./motion/Reveal";
 import styles from "./landing.module.css";
 
 export function FalconLanding() {
   return (
     <div className={styles.page}>
+      <a className={styles.skipLink} href="#product">
+        К содержанию
+      </a>
       <FalconHeader />
       <main>
         <FalconHeroCinema />
-
-        <section className={`${styles.editorialScene} ${styles.caseScene}`} id="platform">
-          <div className={styles.editorialInner}>
-            <div className={styles.editorialCopy}>
-              <SectionIntro
-                label="Тест-кейсы"
-                title="Создавайте тест-кейсы и обновляйте сценарии"
-                text="Добавляйте описание, предусловия, сценарий, общие шаги, теги и вложения. Указывайте статус, приоритет, тип и оценку времени."
-              />
-            </div>
-            <ProductFrame
-              src="/falcon/landing/case-repository.jpg"
-              alt="Список тест-кейсов и открытая карточка выбранного кейса"
-              width={2174}
-              height={1628}
-              mobileSrc="/falcon/landing/case-repository-mobile.jpg"
-              mobileWidth={780}
-              mobileHeight={1400}
-              className={styles.caseProduct}
-            />
-          </div>
+        <section
+          className={styles.overview}
+          id="product"
+          aria-labelledby="overview-title"
+        >
+          <ProductVideo demo={demos.dashboard} priority />
+          <Reveal className={styles.overviewCopy}>
+            <p className={styles.eyebrow}>Вся работа над качеством</p>
+            <h2 id="overview-title">
+              Понимайте, что проверить.
+              <br />
+              <span>И что уже проверено.</span>
+            </h2>
+            <p>
+              Соберите дашборд под свой проект. Перейдите от показателя к нужным
+              кейсам, прогонам или дефектам — и вернитесь к тому же месту.
+            </p>
+          </Reveal>
         </section>
-
-        <section className={`${styles.editorialScene} ${styles.runScene}`} id="automation">
-          <div className={styles.editorialInner}>
-            <div className={styles.editorialCopy}>
-              <SectionIntro
-                label="Тест-раны"
-                title="Собирайте тест-раны и фиксируйте результаты"
-                text="Выбирайте нужные тест-кейсы, окружение и сборку. Во время прогона отмечайте результат каждого кейса."
-              />
+        <nav className={styles.chapterNav} aria-label="Возможности Falcon">
+          {workflow.map((item, index) => (
+            <a key={item.id} href={`#${item.id}`}>
+              <span>0{index + 1}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        {workflow.map((item, index) => (
+          <section
+            key={item.id}
+            className={styles.workflowSection}
+            id={item.id}
+            aria-labelledby={`${item.id}-title`}
+          >
+            <Reveal className={styles.sectionHeading}>
+              <p className={styles.eyebrow}>
+                0{index + 1} / {item.label}
+              </p>
+              <div>
+                <h2 id={`${item.id}-title`}>{item.title}</h2>
+                <p>{item.description}</p>
+              </div>
+            </Reveal>
+            <ProductVideo demo={demos[item.id]} />
+            <div className={styles.sectionNotes}>
+              {item.points.map((point) => (
+                <div key={point.title}>
+                  <h3>{point.title}</h3>
+                  <p>{point.text}</p>
+                </div>
+              ))}
             </div>
-            <ProductFrame
-              src="/falcon/landing/run-builder.jpg"
-              alt="Форма создания прогона с выбором тест-кейсов"
-              width={2560}
-              height={1440}
-              mobileSrc="/falcon/landing/run-builder-mobile.jpg"
-              mobileWidth={780}
-              mobileHeight={1400}
-              className={styles.runProduct}
-            />
-          </div>
-        </section>
-
-        <section className={`${styles.editorialScene} ${styles.defectScene}`} id="defects">
-          <div className={styles.editorialInner}>
-            <div className={styles.editorialCopy}>
-              <SectionIntro
-                label="Дефекты"
-                title="Регистрируйте дефекты во время тестирования"
-                text="Создавайте баг-репорт из тест-рана, добавляйте описание и вложения. В карточке дефекта доступны связанные тест-кейс и тест-ран."
-              />
-            </div>
-            <ProductFrame
-              src="/falcon/landing/case-defect-link.jpg"
-              alt="Список дефектов и открытая карточка баг-репорта"
-              width={2560}
-              height={1440}
-              mobileSrc="/falcon/landing/case-defect-link-mobile.jpg"
-              mobileWidth={780}
-              mobileHeight={1400}
-              className={styles.defectProduct}
-            />
-          </div>
-        </section>
-
+          </section>
+        ))}
         <FalconIntegrations />
-
-        <section className={`${styles.editorialScene} ${styles.analyticsScene}`} id="analytics">
-          <div className={styles.editorialInner}>
-            <div className={styles.editorialCopy}>
-              <SectionIntro
-                label="Аналитика"
-                title="Отслеживайте состояние тестирования на дашборде"
-                text="Смотрите результаты тест-ранов, покрытие, дефекты и показатели по компонентам. Применяйте фильтры по проекту и периоду."
-              />
-            </div>
-            <ProductFrame
-              src="/falcon/landing/analytics-dashboard.jpg"
-              alt="Дашборд проекта с показателями тестирования"
-              width={2560}
-              height={1440}
-              mobileSrc="/falcon/landing/analytics-dashboard-mobile.jpg"
-              mobileWidth={780}
-              mobileHeight={1400}
-              className={styles.analyticsProduct}
-            />
+        <section className={styles.faq} aria-labelledby="faq-title">
+          <h2 id="faq-title">Перед первым проектом</h2>
+          <div>
+            <details>
+              <summary>С чего начать работу в Falcon?</summary>
+              <p>
+                Создайте аккаунт и рабочее пространство, добавьте проект, затем
+                первый тест-кейс. Руководство внутри Falcon показывает каждый
+                шаг: от структуры репозитория до результатов прогона.
+              </p>
+            </details>
+            <details>
+              <summary>Можно перенести существующие тест-кейсы?</summary>
+              <p>
+                Да. В репозитории кейсов доступны импорт и экспорт.
+                Поддерживаемые форматы и требования к полям описаны в разделе
+                «Помощь» вашего рабочего пространства.
+              </p>
+            </details>
+            <details>
+              <summary>Как команда проверяет исправленные дефекты?</summary>
+              <p>
+                Укажите связанные кейсы в баг-репорте. Когда дефект перейдёт на
+                проверку, кнопка «Проверить исправления» откроет прогон с
+                соответствующими сценариями.
+              </p>
+            </details>
+            <details>
+              <summary>Дашборд одинаковый для всех проектов?</summary>
+              <p>
+                Каждый проект настраивается отдельно. Добавляйте нужные виджеты
+                из библиотеки, меняйте их порядок и группируйте данные по
+                контексту работы.
+              </p>
+            </details>
           </div>
         </section>
       </main>
-
-      <footer className={styles.footer} id="security">
+      <footer className={styles.footer}>
         <div className={styles.footerCta}>
-          <h2>Создайте рабочее пространство</h2>
-          <div>
-            <p>После регистрации добавьте первый проект и тест-кейсы.</p>
-            <Link className={styles.lightButton} href="/signup/">
-              Создать аккаунт <ArrowRight size={18} aria-hidden="true" />
-            </Link>
-          </div>
+          <p className={styles.eyebrow}>Следующий релиз начинается здесь</p>
+          <h2>
+            Дайте качеству
+            <br />
+            своё пространство.
+          </h2>
+          <Link className={styles.primaryButton} href="/signup/">
+            Создать аккаунт <ArrowRight size={17} aria-hidden="true" />
+          </Link>
         </div>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
-          <div>
-            <Link href="/signup/">Создать аккаунт</Link>
-            <Link href="/cloud-login/">Войти в пространство</Link>
-          </div>
-          <span>© {new Date().getFullYear()} Falcon</span>
+          <span>Управление тестированием</span>
+          <Link href="/cloud-login/">
+            Войти в пространство <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+          <small>© {new Date().getFullYear()} Falcon</small>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function ProductFrame(props: {
-  readonly src: string;
-  readonly alt: string;
-  readonly width: number;
-  readonly height: number;
-  readonly priority?: boolean;
-  readonly className?: string;
-  readonly mobileSrc?: string;
-  readonly mobileWidth?: number;
-  readonly mobileHeight?: number;
-}) {
-  return (
-    <figure className={`${styles.productFrame} ${props.className ?? ""}`}>
-      <picture>
-        {props.mobileSrc && props.mobileWidth && props.mobileHeight && (
-          <source
-            media="(max-width: 780px)"
-            srcSet={props.mobileSrc}
-            width={props.mobileWidth}
-            height={props.mobileHeight}
-          />
-        )}
-        <img
-          src={props.src}
-          alt={props.alt}
-          width={props.width}
-          height={props.height}
-          loading={props.priority ? "eager" : "lazy"}
-          fetchPriority={props.priority ? "high" : "auto"}
-          decoding="async"
-        />
-      </picture>
-    </figure>
-  );
-}
-
-function SectionIntro(props: {
-  readonly label: string;
-  readonly title: string;
-  readonly text: string;
-}) {
-  return (
-    <div className={styles.sectionIntro}>
-      <p className={styles.sectionLabel}>{props.label}</p>
-      <h2>{props.title}</h2>
-      <p className={styles.sectionLead}>{props.text}</p>
     </div>
   );
 }

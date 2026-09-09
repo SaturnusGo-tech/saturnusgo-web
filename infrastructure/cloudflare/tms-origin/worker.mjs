@@ -119,6 +119,8 @@ function hasExpectedContentType(pathname, response) {
     return contentType.startsWith("font/") || contentType.startsWith("application/font-");
   }
   if (extension === "txt") return contentType.startsWith("text/plain");
+  if (extension === "mp4") return contentType.startsWith("video/mp4");
+  if (extension === "vtt") return contentType.startsWith("text/vtt");
   return false;
 }
 

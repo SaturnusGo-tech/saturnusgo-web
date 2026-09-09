@@ -67,7 +67,11 @@ async function fetchRequired(fetchImpl, url, description, expectedType) {
             : ["json", "map", "webmanifest"].includes(extension)
               ? contentType.startsWith("application/json")
                 || contentType.startsWith("application/manifest+json")
-              : false;
+              : extension === "mp4"
+                ? contentType.startsWith("video/mp4")
+                : extension === "vtt"
+                  ? contentType.startsWith("text/vtt")
+                  : false;
     if (!valid) {
       throw new Error(`${description} returned unexpected content-type ${contentType || "missing"}`);
     }

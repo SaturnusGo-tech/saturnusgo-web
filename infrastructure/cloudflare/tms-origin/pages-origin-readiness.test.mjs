@@ -23,6 +23,8 @@ function successfulFetch(requests) {
     }
     if (/\.(?:js|mjs)$/.test(url.pathname)) return response("asset", "application/javascript");
     if (/\.jpe?g$/.test(url.pathname)) return response("asset", "image/jpeg");
+    if (/\.mp4$/.test(url.pathname)) return response("asset", "video/mp4");
+    if (/\.vtt$/.test(url.pathname)) return response("WEBVTT\n", "text/vtt");
     return response("asset", "image/png");
   };
 }
@@ -38,6 +40,8 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.deepEqual(result.checkedRoutes, ["/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/cases.mp4"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/cases.vtt"));
   assert.ok(requests.every(({ url }) => url.protocol === "https:"));
   assert.ok(requests.every(({ url }) => url.searchParams.get("falcon_release") === sourceSha));
   assert.ok(requests.every(({ options }) => options.redirect === "error"));

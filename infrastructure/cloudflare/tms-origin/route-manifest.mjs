@@ -23,17 +23,10 @@ export const publicAssetPrefixes = Object.freeze([
 export const requiredPublicAssets = Object.freeze([
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
-  "/falcon/landing/analytics-dashboard.jpg",
-  "/falcon/landing/analytics-dashboard-mobile.jpg",
-  "/falcon/landing/cinematic-ambient.webp",
-  "/falcon/landing/case-defect-link.jpg",
-  "/falcon/landing/case-defect-link-mobile.jpg",
-  "/falcon/landing/case-repository.jpg",
-  "/falcon/landing/case-repository-mobile.jpg",
-  "/falcon/landing/run-builder.jpg",
-  "/falcon/landing/run-builder-mobile.jpg",
-  "/falcon/landing/run-detail.jpg",
-  "/falcon/landing/run-detail-mobile.jpg",
+  "/falcon/landing/2026-09/falcon-wing.webp",
+  ...["dashboard", "cases", "runs", "defects", "integrations"].flatMap((id) =>
+    ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09/${id}.${extension}`),
+  ),
 ]);
 
 export const publicMetadataFiles = Object.freeze([

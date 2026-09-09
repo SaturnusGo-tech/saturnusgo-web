@@ -1,0 +1,156 @@
+.figure {
+  margin: 0;
+  min-width: 0;
+}
+.frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #111114;
+  border: 1px solid #2e2f33;
+  box-shadow: 0 24px 90px #0005;
+}
+.video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #111114;
+}
+.controls {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 16px;
+  border-top: 1px solid #292a2e;
+  background: #121315;
+  color: #f4f4f5;
+}
+.controls button,
+.error button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 36px;
+  border-radius: 7px;
+}
+.controls button:hover {
+  background: #27282b;
+}
+.controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.time > span {
+  color: #9c9da3;
+}
+.controls input {
+  flex: 1;
+  min-width: 30px;
+  height: 4px;
+  accent-color: #c6cad4;
+  cursor: pointer;
+  opacity: 0.85;
+}
+.silent {
+  font-size: 11px;
+  color: #9c9da3;
+  white-space: nowrap;
+}
+.caption {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 3px 0;
+  font-size: 13px;
+  color: #96989e;
+}
+.caption strong {
+  font-size: 14px;
+  font-weight: 500;
+  color: #dfdfe2;
+}
+.caption p {
+  line-height: 1.6;
+  margin: 6px 0 0;
+}
+.transcript {
+  max-width: 420px;
+  text-align: right;
+  font-size: 12px;
+}
+.transcript summary {
+  cursor: pointer;
+  color: #b5b6bc;
+}
+.transcript p {
+  text-align: left;
+  padding: 12px 0;
+}
+.error {
+  position: absolute;
+  inset: 0 0 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0c0d10ee;
+  color: #eee;
+}
+.error button {
+  border: 1px solid #444;
+  padding: 4px 15px;
+  border-radius: 100px;
+}
+.frame:fullscreen {
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #0b0c0e;
+}
+.frame:fullscreen .video {
+  max-height: calc(100vh - 50px);
+  flex: 1;
+  min-height: 0;
+}
+@media (max-width: 700px) {
+  .frame {
+    border-radius: 10px;
+  }
+  .controls {
+    gap: 8px;
+    height: 44px;
+    padding: 0 8px;
+  }
+  .silent {
+    display: none;
+  }
+  .caption {
+    padding-top: 13px;
+    gap: 12px;
+  }
+  .caption p {
+    font-size: 12px;
+  }
+  .transcript {
+    max-width: 50%;
+  }
+  .transcript summary {
+    white-space: nowrap;
+  }
+}

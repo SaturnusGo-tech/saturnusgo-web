@@ -106,19 +106,15 @@ write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
-write("out/falcon/landing/analytics-dashboard.jpg", "analytics\\n");
-write("out/falcon/landing/analytics-dashboard-mobile.jpg", "analytics mobile\\n");
 if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
-  write("out/falcon/landing/cinematic-ambient.webp", "cinematic ambient\\n");
+  write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }
-write("out/falcon/landing/case-defect-link.jpg", "defect link\\n");
-write("out/falcon/landing/case-defect-link-mobile.jpg", "defect link mobile\\n");
-write("out/falcon/landing/case-repository.jpg", "case repository\\n");
-write("out/falcon/landing/case-repository-mobile.jpg", "case repository mobile\\n");
-write("out/falcon/landing/run-builder.jpg", "run builder\\n");
-write("out/falcon/landing/run-builder-mobile.jpg", "run builder mobile\\n");
-write("out/falcon/landing/run-detail.jpg", "run detail\\n");
-write("out/falcon/landing/run-detail-mobile.jpg", "run detail mobile\\n");
+for (const id of ["dashboard", "cases", "runs", "defects", "integrations"]) {
+  for (const extension of ["mp4", "webp", "vtt"]) {
+    if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
+    write("out/falcon/landing/2026-09/" + id + "." + extension, "demo asset\\n");
+  }
+}
 write("out/falcon/landing/hero.webp", "falcon hero\\n");
 `;
   write(join(bin, "npm"), npmStub);
@@ -181,8 +177,8 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
   );
   assert.equal(readFileSync(join(fixture.pages, "falcon/landing/hero.webp"), "utf8"), "falcon hero\n");
   assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/cinematic-ambient.webp"), "utf8"),
-    "cinematic ambient\n",
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09/falcon-wing.webp"), "utf8"),
+    "falcon wing\n",
   );
   assert.equal(
     readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
@@ -230,8 +226,17 @@ test("fails closed when the cinematic landing asset is absent", (context) => {
   const result = deploy(fixture, "--publish", { OMIT_CINEMATIC_ASSET: "1" });
 
   assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*cinematic-ambient\.webp/);
+  assert.match(result.stderr, /Required public asset is missing.*falcon-wing\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
+});
+
+test("fails closed when a required video is missing", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_VIDEO: "1" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*runs\.mp4/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
 test("fails closed unless the Pages checkout is on main", (context) => {

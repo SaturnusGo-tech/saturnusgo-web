@@ -9,6 +9,36 @@ function mockFetch(context, implementation) {
   globalThis.fetch = implementation;
 }
 
+test("streams landing video byte ranges without forwarding account credentials", async (context) => {
+  mockFetch(context, async (request) => {
+    assert.equal(request.url, "https://www.saturnusgo.com/falcon/landing/2026-09/cases.mp4");
+    assert.equal(request.headers.get("range"), "bytes=0-3");
+    assert.equal(request.headers.has("cookie"), false);
+    assert.equal(request.headers.has("authorization"), false);
+    return new Response(new Uint8Array([0, 1, 2, 3]), { status: 206, headers: {
+      "content-type": "video/mp4", "content-range": "bytes 0-3/128", "content-length": "4",
+      "accept-ranges": "bytes",
+    } });
+  });
+  const result = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.mp4", {
+    headers: { range: "bytes=0-3", cookie: "private=1", authorization: "Bearer private" },
+  }));
+  assert.equal(result.status, 206);
+  assert.equal(result.headers.get("content-range"), "bytes 0-3/128");
+  assert.deepEqual([...new Uint8Array(await result.arrayBuffer())], [0, 1, 2, 3]);
+});
+
+test("serves timed captions and rejects HTML disguised as a video", async (context) => {
+  mockFetch(context, async (request) => request.url.endsWith(".vtt")
+    ? new Response("WEBVTT\n", { headers: { "content-type": "text/vtt; charset=utf-8" } })
+    : new Response("<html>Not a video</html>", { headers: { "content-type": "text/html" } }));
+  const captions = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.vtt"));
+  assert.equal(captions.status, 200);
+  assert.equal(await captions.text(), "WEBVTT\n");
+  const video = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.mp4"));
+  assert.equal(video.status, 404);
+});
+
 test("serves the Falcon landing from the isolated Pages namespace", async (context) => {
   mockFetch(context, async (request) => {
     assert.equal(request.url, "https://www.saturnusgo.com/tms-origin/index.html?utm_source=test");

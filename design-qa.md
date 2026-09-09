@@ -59,3 +59,37 @@ final result: passed
 - Evidence: ../output/falcon-launch-navigation-20260909/ (screenshots and retained local harness, outside production routes).
 
 Production follow-up: the suite → case → suite/catalog flow retained both search inputs. Found and corrected two additional history edge cases: explicit navigation after an intra-view popstate must push, and defect URLs must discard dashboard/suite/article parameters before being pushed. Regression tests cover both.
+
+## Public landing and Recordly demonstrations — 2026-09-09
+
+final result: passed
+
+Source visual truth: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-db7b484e-bae8-4343-9ffa-50e55f3ab73a.png` (1024 × 1536). The user separately approved the Smooth Recordly motion sample. Official Astra reference capture, all recordings and QA evidence are retained in `../output/falcon-landing-20260909/`.
+
+Implementation: `http://localhost:4531/`, Russian public page, graphite theme, no sign-in required. Full comparison capture: `local-comparison-final-full.png`, 1024 CSS px wide, 900 px viewport height, deviceScaleFactor 1; first 1536 px compared at 1:1 density with the source. Full-view combined evidence: `landing-comparison-final.png` (2048 × 1536, source left, implementation right). Focused combined evidence: `landing-typography-comparison.png` (2048 × 380). No browser chrome or density mismatch is included in either comparison.
+
+Intentional adaptations: real Falcon recordings replace the generated mock interface; the product is not represented by fictional charts. Silent playback has no volume button. Signup says “Создать аккаунт” to match its actual destination. Descriptions name existing functionality rather than the mock's generic promotional statements. The generated decorative wing is preserved as a real image, and the existing Falcon logo and service marks are used.
+
+### Findings, fixes and recapture history
+
+- [P1, resolved] Lazy video sources could remain on their poster after scrolling to the next chapter. The visibility observer ran before React attached the source. Playback now synchronizes after source attachment, and visible players request metadata. All five real files subsequently loaded and played; retry and reduced-motion manual playback passed.
+- [P2, resolved] In the first 1024 px comparison the hero was too tall and its headline too small, delaying the product demonstration. Set a 680 px hero at 1001–1200 px and a 64 px desktop headline minimum. Compare `landing-comparison.png` with `landing-comparison-final.png`: the two-line hierarchy and product transition now retain the source composition.
+- [P2, resolved] At a mobile chapter anchor the absolute header remained over the content because it lacked a positioned landing ancestor. The landing now establishes its own containing block. `local-mobile-cases.png` and an explicit bounding-box assertion confirm that the header scrolls away.
+- [P2, resolved] The 320 px header compressed the space between brand and login. A narrow breakpoint reduces only the brand mark, wordmark and action gap. The recaptured `local-320-hero.png` preserves separation without hiding either destination.
+- [P2, resolved] The initial run poster captured a partially typed build identifier. The final poster comes from the completed form at 20 seconds, showing the title, scope and launch action together.
+
+### Fidelity surfaces
+
+- Fonts: existing Geist Sans, verified computed family; normal/medium optical weights, tight two-line desktop display heading, readable 13–17 px controls/body. Mobile copy wraps within its column; no clipped heading or action. The source's approximate body type is adapted to existing Falcon typography.
+- Spacing: restrained full-width chapters, large real product media and plain three-column supporting notes. No repeated feature-card grid or scroll trap. At 320/390 px supporting notes stack; 768/1024/1600 px preserve their intended hierarchy. Borders and radii belong to the video frame, not every text block.
+- Color: graphite #0b0c0e, near-white headings, muted gray text, neutral focus outlines. White primary actions retain dark labels; real product state colors remain inside the recordings.
+- Images: generated silver wing matches the source direction; no substitute CSS drawing. Recordly export reports confirm five real 1600 × 900, 60 fps files. MP4 compression affects delivery only, and WebP posters are extracted from the final exports. No old product screenshots appear on the landing.
+- Copy: all five flows have accurate titles and plain-text explanations. The run video describes configuration before launch. Only the eight available connectors are advertised; upcoming services are not presented as released capabilities.
+
+### Interaction and responsive verification
+
+`local-qa.json` records successful playback of all five assets; pause persistence across scrolling; offscreen pause; seek; fullscreen; expandable FAQ; signup destination; 320/390/768 px overflow checks; reduced-motion autoplay suppression with explicit playback; failed-request retry. Console/page errors and failed Falcon asset requests were empty. Desktop captures use 1600 × 900; mobile captures use 390/320 × 844. Mobile checks are browser viewport tests, not claims of physical-device testing.
+
+Verification completed before release: 40 public/auth tests, 413 existing adapter/domain tests, 41 Worker/release tests; TypeScript and architecture checks passed. The existing lint script is a no-op. Build and production browser acceptance are enforced during the release process.
+
+No open P0/P1/P2 findings in the inspected states. No further visual change is required before release.

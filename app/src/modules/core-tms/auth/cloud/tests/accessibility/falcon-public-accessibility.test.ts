@@ -16,90 +16,39 @@ test("Falcon public routes keep their Russian document language", () => {
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon public header keeps direct auth actions without feature navigation", () => {
-  const source = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/landing/FalconHeader.tsx",
-  ), "utf8");
-  const styles = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/landing/landing.module.css",
-  ), "utf8");
-
-  assert.match(source, /<FalconBrand inverse \/>/);
-  assert.match(source, /href=\{TMS_ADMIN_LOGIN_PATH\}>Войти<\/Link>/);
-  assert.match(source, /href="\/signup\/">Создать аккаунт<\/Link>/);
-  assert.doesNotMatch(source, /const navigation/);
-  assert.doesNotMatch(source, /falcon-mobile-menu/);
-  assert.doesNotMatch(source, /aria-modal/);
-  assert.doesNotMatch(source, />Кейсы<|>Прогоны<|>Дефекты<|>Аналитика</);
-  assert.match(styles, /\.headerInner\s*\{[^}]*width: 100%;[^}]*padding: 0 24px 0 12px/s);
-  assert.match(styles, /\.primaryButton\s*\{[^}]*border-radius: 999px/s);
+test("Falcon landing keeps direct login, signup and accessible chapter navigation", () => {
+  const header = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconHeader.tsx"), "utf8");
+  const landing = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconLanding.tsx"), "utf8");
+  assert.match(header, /href=\{TMS_ADMIN_LOGIN_PATH\}/);
+  assert.match(header, /href="\/signup\/"/);
+  assert.match(header, /aria-label="Навигация по лендингу"/);
+  assert.match(landing, /href="#product">\s*К содержанию/);
+  assert.match(landing, /aria-labelledby="overview-title"/);
+  assert.match(landing, /aria-label="Возможности Falcon"/);
+  assert.doesNotMatch(landing, /analytics-dashboard\.jpg|case-repository\.jpg|run-builder\.jpg/);
 });
 
-test("Falcon landing uses plain product labels and marks future integrations honestly", () => {
-  const hero = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/landing/FalconHeroCinema.tsx",
-  ), "utf8");
-  const landing = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/landing/FalconLanding.tsx",
-  ), "utf8");
-  const integrations = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/landing/FalconIntegrations.tsx",
-  ), "utf8");
-
-  assert.match(hero, /Система управления ручным тестированием/);
-  assert.match(hero, /Создавайте тест-кейсы, проводите тест-раны, регистрируйте дефекты/);
-  assert.doesNotMatch(hero, /href="\/signup\/"/);
-  assert.doesNotMatch(hero, /Создать аккаунт/);
-  for (const title of [
-    "Создавайте тест-кейсы и обновляйте сценарии",
-    "Собирайте тест-раны и фиксируйте результаты",
-    "Регистрируйте дефекты во время тестирования",
-    "Отслеживайте состояние тестирования на дашборде",
-  ]) {
-    assert.match(landing, new RegExp(`title="${title}"`));
+test("every landing demonstration has a real MP4, poster and timed text", () => {
+  for (const id of ["dashboard", "cases", "runs", "defects", "integrations"]) {
+    const base = resolve(root, `public/falcon/landing/2026-09/${id}`);
+    const video = readFileSync(`${base}.mp4`);
+    assert.equal(video.subarray(4, 8).toString(), "ftyp", `${id}: invalid MP4`);
+    assert.ok(video.length > 100_000, `${id}: empty recording`);
+    assert.ok(video.length < 20_000_000, `${id}: landing video exceeds budget`);
+    const poster = readFileSync(`${base}.webp`);
+    assert.equal(poster.subarray(8, 12).toString(), "WEBP");
+    const captions = readFileSync(`${base}.vtt`, "utf8");
+    assert.ok(captions.startsWith("WEBVTT\n"));
+    assert.match(captions, /\d\d:\d\d:\d\d\.\d{3} --> \d\d:\d\d:\d\d\.\d{3}/);
   }
+});
 
-  for (const staleCopy of [
-    "Тест-кейсы, прогоны и дефекты с общей историей",
-    "Сценарий читается с первого взгляда",
-    "Ревизия фиксируется в момент запуска",
-    "Дефект уходит в YouTrack",
-    "Метрика ведёт к причине",
-    "Перенесите первый сценарий в Falcon",
-    "Кейс изменился. Старый прогон — нет.",
-    "Сценарий не отрывается от результата",
-    "Шаги, подшаги и ожидаемый результат",
-    "Прогон не переписывается задним числом",
-    "Баг-репорт начинается с неуспешного шага",
-    "Любую цифру можно раскрыть",
-  ]) {
-    assert.equal(`${hero}\n${landing}\n${integrations}`.includes(staleCopy), false);
+test("landing describes available connectors without advertising planned services", () => {
+  const source = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconIntegrations.tsx"), "utf8");
+  for (const service of ["YouTrack", "Jira", "Linear", "Trello", "GitHub", "Slack", "Confluence", "Swagger"]) {
+    assert.ok(source.includes(service));
   }
-
-  assert.match(integrations, /План интеграций/);
-  assert.match(integrations, /Перечисленные интеграции запланированы/);
-  for (const service of [
-    "YouTrack",
-    "Jira",
-    "Slack",
-    "Confluence",
-    "Trello",
-    "GitHub",
-    "GitLab",
-    "Jenkins",
-    "TeamCity",
-    "Linear",
-    "Sentry",
-  ]) {
-    assert.match(integrations, new RegExp(`name: "${service}"`));
-  }
-  assert.match(integrations, /REST API и вебхуки/);
-
+  assert.doesNotMatch(source, /запланированы|План интеграций|Sentry/);
   const youTrackMark = resolve(root, "public/falcon/integrations/youtrack.svg");
   assert.equal(existsSync(youTrackMark), true);
   assert.ok(statSync(youTrackMark).size > 0);
