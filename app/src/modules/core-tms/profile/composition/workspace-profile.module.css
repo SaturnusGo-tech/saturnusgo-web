@@ -1,0 +1,18 @@
+.profile.profile {
+  --admin-bg: var(--paper);
+  --admin-surface: var(--paper);
+  --admin-text: var(--ink);
+  --admin-muted: var(--muted);
+  --admin-line: var(--line);
+  --admin-hover: var(--control-hover);
+  --admin-blue: var(--action);
+  display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 32px clamp(20px, 4vw, 56px) 48px;
+  color: var(--ink);
+  background: var(--paper);
+}
+.content { width: min(100%, 880px); margin-inline: auto; }
+.profile :global(#security) { scroll-margin-top: 24px; }

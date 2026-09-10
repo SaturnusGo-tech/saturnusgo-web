@@ -1,3 +1,4 @@
+import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
@@ -60,6 +61,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     } else model.openDefect(row.id);
   }
   if (!companyViewAvailable(model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (model.view === "profile") return session?.kind === "managed" ? <WorkspaceProfile />
+    : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
   if (model.connection === "loading" || model.connection === "error") {
     return (

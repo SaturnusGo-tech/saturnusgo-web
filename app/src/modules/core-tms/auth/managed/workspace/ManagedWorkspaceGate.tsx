@@ -14,6 +14,7 @@ import { TmsAuthState } from "../../presentation/state/TmsAuthState";
 export function ManagedWorkspaceGate({ children, session, logout }: {
   readonly children: ReactNode; readonly session: SignedInCompanySession; readonly logout: () => Promise<void>;
 }) {
+  const [profile, updateProfile] = useState({ name: session.identity.name, hasAvatar: session.identity.hasAvatar, version: 0 });
   const [ready, setReady] = useState(false);
   const apiBase = `${window.location.origin}/api/v1`;
   const http = useMemo(() => createAuthenticatedTmsHttpClient({ apiBase, credentials: "include" }), [apiBase]);
@@ -31,8 +32,8 @@ export function ManagedWorkspaceGate({ children, session, logout }: {
     setReady(true);
   }, [session.workspaceId, session.audience]);
   if (!ready) return <TmsAuthState kind="loading" />;
-  return <TmsSessionProvider value={{ kind: "managed", subject: session.identity.id, label: session.identity.name,
-    companyCapabilities: session.capabilities, profilePath: "/profile/", hasAvatar: session.identity.hasAvatar, avatarLoader,
+  return <TmsSessionProvider value={{ kind: "managed", subject: session.identity.id, label: profile.name,
+    companyCapabilities: session.capabilities, profilePath: "/testcases/umbrella-home/work/?view=profile", hasAvatar: profile.hasAvatar, avatarVersion: profile.version, updateProfile, avatarLoader,
     administrationPath: session.identity.role === "workspace_admin" ? "/admin/" : undefined, signOut: logout }}>
     <TmsHttpClientProvider client={http}><AttachmentClientProvider client={attachments}>{children}</AttachmentClientProvider></TmsHttpClientProvider>
   </TmsSessionProvider>;

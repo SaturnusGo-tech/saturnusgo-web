@@ -1,4 +1,5 @@
 "use client";
+import { ProfileLink } from "../../../profile/presentation/ProfileLink";
 import { Building2, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -34,7 +35,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
         setAnchor(anchor || !rect ? null : { left: Math.max(12, Math.min(rect.right + 10, window.innerWidth - 270)),
           bottom: Math.max(16, Math.min(window.innerHeight - rect.bottom, window.innerHeight - 290)) });
       }}>
-      <ManagedAvatarImage className={shell.avatar} name={session.label} hasAvatar={Boolean(session.hasAvatar)} load={session.avatarLoader} />
+      <ManagedAvatarImage className={shell.avatar} name={session.label} hasAvatar={Boolean(session.hasAvatar)} load={session.avatarLoader} version={session.avatarVersion} />
     </button>
     {anchor && createPortal(<div ref={menu} className={styles.menu} role="menu" aria-label={ru ? "Профиль" : "Profile"}
       style={anchor} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node) && event.relatedTarget !== trigger.current) setAnchor(null); }}
@@ -48,8 +49,8 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
         items[next]?.focus();
       }}>
       <div className={styles.name}>{session.label}</div>
-      <a role="menuitem" href={session.profilePath ?? "/profile/"}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</a>
-      <a role="menuitem" href={`${session.profilePath ?? "/profile/"}#security`}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</a>
+      <ProfileLink role="menuitem" onClick={() => setAnchor(null)}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</ProfileLink>
+      <ProfileLink role="menuitem" section="security" onClick={() => setAnchor(null)}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</ProfileLink>
       {session.administrationPath && <a role="menuitem" href={session.administrationPath}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</a>}
       <button role="menuitem" type="button" disabled={pending} onClick={() => {
         setFailed(false); setPending(true);

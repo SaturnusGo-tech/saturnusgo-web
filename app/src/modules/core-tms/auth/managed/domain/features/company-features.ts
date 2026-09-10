@@ -4,6 +4,6 @@ const required: Partial<Record<View, string>> = { dashboard: "analytics", api: "
 
 /** This adapts the server's entitlements for navigation; every API still authorizes independently. */
 export function companyViewAvailable(view: View, capabilities?: readonly string[]): boolean {
-  if (capabilities === undefined || view === "help" || view === "config") return true;
+  if (capabilities === undefined || view === "help" || view === "config" || view === "profile") return true;
   return capabilities.includes("core") && (!required[view] || capabilities.includes(required[view]));
 }
