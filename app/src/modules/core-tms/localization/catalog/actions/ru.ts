@@ -6,7 +6,7 @@ export const ruActionMessages = {
   "api.statusError": "TMS API вернул статус {status}.",
   "actions.workspaceConnected": "Рабочее пространство подключено",
   "actions.caseRevisionSaveError": "Не удалось сохранить новую ревизию",
-  "actions.caseCreateError": "Не удалось создать тест-кейс",
+  "actions.caseCreateError": "Не удалось создать тест-кейс. Введённые данные сохранены в форме. Попробуйте ещё раз.",
   "actions.caseRevisionSaved": "Новая ревизия тест-кейса сохранена",
   "actions.caseCreated": "Тест-кейс создан",
   "actions.caseCloneError": "Не удалось клонировать тест-кейс",

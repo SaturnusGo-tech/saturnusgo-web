@@ -188,3 +188,9 @@ test("reuses one idempotency key only while the operation payload is unchanged",
   assert.equal(retry.key, first.key);
   assert.equal(changed.key, "operation-2");
 });
+
+test("internal failures use localized action guidance and retain support correlation", () => {
+  const error = new TmsApiError("The test-case operation could not be completed.", 500, "request-case", "INTERNAL_ERROR");
+  assert.equal(formatTmsMutationFailure(toTmsMutationFailure(error), "Не удалось создать тест-кейс."),
+    "Не удалось создать тест-кейс. [INTERNAL_ERROR · requestId=request-case]");
+});

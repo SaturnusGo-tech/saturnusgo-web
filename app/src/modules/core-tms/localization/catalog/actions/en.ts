@@ -4,7 +4,7 @@ export const enActionMessages = {
   "api.statusError": "The TMS API returned status {status}.",
   "actions.workspaceConnected": "Workspace connected",
   "actions.caseRevisionSaveError": "Could not save the new revision",
-  "actions.caseCreateError": "Could not create the test case",
+  "actions.caseCreateError": "Could not create the test case. Your entries are still in the form. Please try again.",
   "actions.caseRevisionSaved": "New test case revision saved",
   "actions.caseCreated": "Test case created",
   "actions.caseCloneError": "Could not clone the test case",

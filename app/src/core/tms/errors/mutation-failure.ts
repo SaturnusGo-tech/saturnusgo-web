@@ -25,6 +25,6 @@ export function formatTmsMutationFailure(
     failure.code,
     failure.requestId ? `requestId=${failure.requestId}` : null,
   ].filter((value): value is string => Boolean(value));
-  const message = failure.message ?? fallback;
+  const message = failure.code === "INTERNAL_ERROR" ? fallback : failure.message ?? fallback;
   return diagnostics.length > 0 ? `${message} [${diagnostics.join(" · ")}]` : message;
 }
