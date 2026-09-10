@@ -37,7 +37,7 @@ export function CompanyDetail({ id, client, onBack }: { readonly id: string; rea
     <header className={styles.heading}><div><h1>{company.name}</h1><div className={styles.meta}><StatusBadge status={company.status} /><span>{company.domain?.hostname}</span></div></div>
         {company.domain?.status === "active" && company.status === "active" && <a className={styles.button} href={`https://${company.domain.hostname}/admin/`} target="_blank" rel="noopener noreferrer">{copy.openFalcon}<ArrowUpRight size={16} /></a>}
       </header>
-      {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
+      {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} platform onConfirmed={command.clearError} />
         : command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
       <div className={styles.sections} key={company.version}>
         <section className={styles.section}><h2>{copy.address}</h2><div className={styles.meta}><span>{company.domain?.hostname}</span><StatusBadge status={company.domain?.status === "active" ? "verified" : company.domain?.status ?? "reserved"} /></div>

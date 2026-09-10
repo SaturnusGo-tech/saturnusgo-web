@@ -47,14 +47,16 @@ export function CompanyOwnerAccess({ company, client, pending, onChange }: {
   return <section className={styles.section}>
     <h2>{locale === "ru" ? "Главный администратор" : "Primary administrator"}</h2>
     {owner.loading || !owner.value ? <ResourceState loading={owner.loading} error={owner.error} retry={owner.refresh} /> : <>
-      <div className={styles.rowTitle}><span className={styles.avatar} aria-hidden="true">{owner.value.name.slice(0, 2).toUpperCase()}</span>
-        <span><strong>{owner.value.name}</strong><span className={styles.hint}>{owner.value.email}</span></span><StatusBadge status={owner.value.status} member /></div>
-      <div className={styles.actions}><button className={styles.button} disabled={disabled} onClick={() => setConfirmation("reset")}>{copy.resetPassword}</button></div>
-      {confirmation === "reset" && <div className={styles.confirmation}>
+      <div className={styles.ownerIdentity}><span className={styles.avatar} aria-hidden="true">{owner.value.name.slice(0, 2).toUpperCase()}</span>
+        <div className={styles.ownerDetails}><strong>{owner.value.name}</strong><span>{owner.value.email}</span>
+          <span>{copy.login}: <b>{owner.value.login}</b></span></div><StatusBadge status={owner.value.status} member /></div>
+      {!confirmation && <div className={styles.actions}><button className={styles.button} disabled={disabled} onClick={() => setConfirmation("reset")}>{copy.resetPassword}</button></div>}
+      {confirmation === "reset" && command.error !== "REAUTHENTICATION_REQUIRED" && <div className={styles.confirmation}>
+        <h3>{copy.resetPassword}</h3>
         <p>{locale === "ru" ? "Новый временный пароль будет показан один раз. Все текущие сеансы администратора завершатся." : "The new temporary password is shown once. All administrator sessions will end."}</p>
-        <div className={styles.actions}><label className={styles.checks}><input type="checkbox" checked={resetMfa} disabled={disabled} onChange={(event) => setResetMfa(event.target.checked)} />
-          {locale === "ru" ? "Также сбросить второй фактор" : "Also reset the second factor"}</label></div>
-        <div className={styles.actions}><button className={styles.primary} disabled={disabled} onClick={() => void reset()}>{copy.confirm}</button>
+        {owner.value.mfaEnabled && <label className={styles.checkLine}><input type="checkbox" checked={resetMfa} disabled={disabled} onChange={(event) => setResetMfa(event.target.checked)} />
+          {locale === "ru" ? "Также сбросить второй фактор" : "Also reset the second factor"}</label>}
+        <div className={styles.actions}><button className={styles.primary} disabled={disabled} onClick={() => void reset()}>{copy.resetPassword}</button>
           <button className={styles.button} disabled={disabled} onClick={() => setConfirmation(null)}>{copy.cancel}</button></div>
       </div>}
       {candidates.length > 0 && <div className={styles.actions}>
@@ -73,7 +75,8 @@ export function CompanyOwnerAccess({ company, client, pending, onChange }: {
     </>}
     {owner.value && owner.error && <ResourceState loading={false} error={owner.error} retry={owner.refresh} />}
     {administrators.error && <ResourceState loading={false} error={administrators.error} retry={administrators.refresh} />}
-    {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
+    {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} platform submitLabel={copy.resetPassword}
+      onCancel={() => { command.clearError(); setConfirmation(null); }} onConfirmed={reset} />
       : command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
   </section>;
 }
