@@ -1,3 +1,4 @@
+import { ImportNormalizationReview } from "./normalization/ImportNormalizationReview";
 import { CheckCircle2, FileJson, LoaderCircle, Upload } from "lucide-react";
 import { useRef } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -18,7 +19,7 @@ export type ImportCasesDialogProps = Readonly<{
 export function ImportCasesDialog(props: ImportCasesDialogProps) {
   const { locale } = useTmsLocale();
   const copy = importCopy[locale];
-  const state = useImportCases(props);
+  const state = useImportCases({ ...props, locale });
   const input = useRef<HTMLInputElement>(null);
   const total = state.document?.testCases.length ?? 0;
   const hasContent = total > 0 || (state.plan?.folders.length ?? 0) > 0;
@@ -38,6 +39,7 @@ export function ImportCasesDialog(props: ImportCasesDialogProps) {
           <button type="button" className={styles.secondaryButton} disabled={state.locked || !state.context || state.phase === "reading"}
             onClick={() => input.current?.click()}><Upload size={15} />{state.fileName ? copy.replace : copy.choose}</button>
         </div>
+        <ImportNormalizationReview state={state.external} document={state.document} ru={locale === "ru"} />
         {state.phase === "reading" && <p className={css.hint} role="status">{copy.reading}</p>}
         {state.context && <fieldset className={css.destination} disabled={state.locked}>
           <legend>{copy.destination}</legend>
@@ -72,7 +74,7 @@ export function ImportCasesDialog(props: ImportCasesDialogProps) {
       <button type="button" className={styles.secondaryButton} onClick={state.busy ? state.stop : close}>
         {state.busy ? copy.stop : state.phase === "success" ? copy.close : copy.cancel}</button>
       {state.phase !== "success" && <button type="button" className={styles.primaryButton}
-        disabled={state.busy || !state.plan || !hasContent || state.phase === "reading" || !state.context}
+        disabled={state.busy || (state.external.active && !state.external.reviewed) || !state.plan || !hasContent || state.phase === "reading" || !state.context}
         onClick={() => void state.start()}>{state.busy && <LoaderCircle size={15} className={styles.spin} />}
         {state.locked ? copy.retry : copy.start}</button>}
     </footer>

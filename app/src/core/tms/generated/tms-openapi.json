@@ -4834,7 +4834,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -13132,6 +13132,176 @@
           "$ref": "#/components/parameters/XRequestId"
         }
       ]
+    },
+    "/test-case-import/inspect": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "inspectExternalTestCaseImport",
+        "tags": [
+          "Test cases"
+        ],
+        "summary": "Inspect external test case JSON without saving cases",
+        "description": "Requires test_case:manage in the target project workspace. Explicit OpenRouter conversion; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportInspectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportInspectResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Source or model mapping is invalid; no product records are created",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI provider unavailable or configured request budget exhausted",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test-case-import/normalize": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "normalizeExternalTestCaseImport",
+        "tags": [
+          "Test cases"
+        ],
+        "summary": "Normalize external test case JSON without saving cases",
+        "description": "Requires test_case:manage in the target project workspace. Explicit OpenRouter conversion; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportNormalizeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportNormalizeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Source or model mapping is invalid; no product records are created",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI provider unavailable or configured request budget exhausted",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -18736,7 +18906,11 @@
           "NOTIFICATION_LINK_PENDING",
           "NOTIFICATION_SUBSCRIPTION_INVALID",
           "NOTIFICATION_LIMIT_REACHED",
-          "NOTIFICATION_CONFLICT"
+          "NOTIFICATION_CONFLICT",
+          "IMPORT_SOURCE_INVALID",
+          "IMPORT_MAPPING_INVALID",
+          "IMPORT_LIMIT_EXCEEDED",
+          "IMPORT_AI_UNAVAILABLE"
         ]
       },
       "ValidationIssue": {
@@ -29425,7 +29599,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -30047,7 +30221,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -30149,7 +30323,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -30958,6 +31132,294 @@
             "required": [
               "url",
               "expiresIn"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ImportSourceRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "value": {},
+          "context": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "path",
+          "value",
+          "context"
+        ]
+      },
+      "ImportInspectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "source": {}
+        },
+        "required": [
+          "projectId",
+          "source"
+        ]
+      },
+      "ImportInspectResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "records": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ImportSourceRecord"
+                },
+                "maxItems": 2000
+              },
+              "selectors": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "maxItems": 40
+              }
+            },
+            "required": [
+              "records",
+              "selectors"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ImportNormalizeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ru",
+              "en"
+            ]
+          },
+          "folders": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 100
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportSourceRecord"
+            },
+            "maxItems": 30,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "projectId",
+          "locale",
+          "folders",
+          "records"
+        ]
+      },
+      "ImportNormalizedContent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "description": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "preconditions": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "checklist",
+              "automated"
+            ],
+            "default": "manual"
+          },
+          "lifecycle": {
+            "$ref": "#/components/schemas/TestCaseLifecycle"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "component": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+            }
+          },
+          "estimatedMinutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "testData": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/schemas/TestStepInput"
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItemInput"
+            }
+          },
+          "changeNote": {
+            "$ref": "#/components/schemas/ShortText"
+          }
+        }
+      },
+      "ImportNormalizedCase": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourcePath": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "folderPath": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "content": {
+            "$ref": "#/components/schemas/ImportNormalizedContent"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "INCOMPLETE_STEPS",
+                "SOURCE_FIELDS_PRESERVED",
+                "NO_COMPLETE_PROCEDURE"
+              ]
+            },
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "sourcePath",
+          "folderPath",
+          "content",
+          "warnings"
+        ]
+      },
+      "ImportNormalizationIssue": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourcePath": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "IMPORT_SOURCE_INVALID",
+              "IMPORT_MAPPING_INVALID",
+              "IMPORT_LIMIT_EXCEEDED",
+              "IMPORT_AI_UNAVAILABLE"
+            ]
+          }
+        },
+        "required": [
+          "sourcePath",
+          "code"
+        ]
+      },
+      "ImportNormalizeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "cases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ImportNormalizedCase"
+                },
+                "maxItems": 30
+              },
+              "issues": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ImportNormalizationIssue"
+                },
+                "maxItems": 30
+              }
+            },
+            "required": [
+              "cases",
+              "issues"
             ]
           }
         },

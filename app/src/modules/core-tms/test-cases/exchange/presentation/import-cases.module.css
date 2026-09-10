@@ -1,5 +1,6 @@
-.dialog { width: min(780px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 24px !important; overflow: auto; }
-.body { padding: 6px 26px 20px; }
+.dialog { width: min(780px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 24px !important; overflow: hidden !important; }
+.dialog > header { flex-shrink: 0; }
+.body { min-height: 0; overflow: auto; flex: 1 1 auto; padding: 6px 26px 20px; }
 .fileArea { display: flex; align-items: center; gap: 14px; padding: 12px 2px; border: 0; border-radius: 0; background: transparent; }
 .fileArea > svg { color: #7c97d1; flex-shrink: 0; }
 .fileArea > div { flex: 1; min-width: 0; display: grid; gap: 6px; }
@@ -45,6 +46,6 @@
 .failures { font-size: 12px; color: var(--red); margin-top: 14px; }
 .failures summary { cursor: pointer; }
 .failures li { margin-top: 7px; overflow-wrap: anywhere; }
-.footer { display: flex; justify-content: flex-end; gap: 10px; padding: 10px 26px 22px; border-top: 0; }
+.footer { flex-shrink: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 10px 26px 22px; border-top: 0; }
 @media (max-width: 600px) { .body { padding-inline: 18px; } .fileArea { flex-wrap: wrap; } .fileArea > div { min-width: 160px; } .fileArea > button { width: 100%; } .counts { gap: 18px; } .footer { padding-inline: 18px; } .previewHeading span { display: none; } }
 @media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }

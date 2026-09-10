@@ -1,3 +1,4 @@
+import { useExternalImport } from "../normalization/use-external-import";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsHttpClient } from "../../../../auth/http/TmsHttpClientContext";
@@ -12,7 +13,7 @@ import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange
 type Phase = "loading" | "idle" | "reading" | "ready" | "folders" | "importing" | "partial" | "success" | "stopped";
 type Context = Awaited<ReturnType<typeof loadImportContext>>;
 export function useImportCases(props: Readonly<{ project: Project; folders: readonly RepositoryFolder[];
-  workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown> }>) {
+  locale?: "ru" | "en"; workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown> }>) {
   const http = useTmsHttpClient();
   const [context, setContext] = useState<Context | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
@@ -31,6 +32,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
   const scopeGeneration = useRef(0);
   const successful = useRef<readonly number[]>([]);
   const running = useRef(false);
+  const external = useExternalImport(http, props.project, props.locale ?? "ru", context?.folders.map(f => f.path) ?? [], value => { setDocument(value); setPhase("ready"); });
   const imported = useRef(props.onImported);
   imported.current = props.onImported;
   useEffect(() => {
@@ -44,14 +46,14 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
     setLocked(false); setCompleted(0); setAttempted(0); setFailed([]);
     const abort = new AbortController();
     controller.current = abort;
-    setPhase("loading"); setError(""); setContext(null);
+    setPhase("loading"); setError(""); setContext(null); setDocument(null);
     const workspaceId = props.workspaceId ?? props.folders[0]?.workspaceId;
     loadImportContext(http, props.project.id, abort.signal,
       workspaceId ? { workspaceId, folders: props.folders } : undefined).then((value) => {
       if (abort.signal.aborted) return;
       setContext(value);
       const initial = value.folders.find((folder) => folder.id === props.initialFolderId && !folder.archivedAt);
-      setDestination(initial?.path ?? "/"); setPhase(document ? "ready" : "idle");
+      setDestination(initial?.path ?? "/"); setPhase("idle");
     }).catch((failure: unknown) => {
       if (!abort.signal.aborted) { setError(failure instanceof Error ? failure.message : "Unable to load folders."); setPhase("idle"); }
     });
@@ -65,11 +67,19 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
   async function selectFile(file: File | undefined) {
     if (!file || locked || running.current) return;
     const generation = ++fileGeneration.current;
+    external.reset();
     setDocument(null); setFileName(file.name); setError(""); setFailed([]); setPhase("reading");
     setCompleted(0); setAttempted(0); successful.current = [];
     try {
       if (file.size > TEST_CASE_IMPORT_BYTES) throw new Error("JSON ≤ 5 MB");
-      const parsed = parseTestCaseExchange(await file.text());
+      const text = await file.text();
+      const raw: unknown = JSON.parse(text.replace(/^\uFEFF/, ""));
+      if (!alive.current || generation !== fileGeneration.current) return;
+      const schema = typeof raw === "object" && raw !== null && "schemaVersion" in raw ? raw.schemaVersion : null;
+      if (schema !== "saturnusgo.tms.test-cases.v1" && schema !== "saturnusgo.tms.test-cases.v2") {
+        external.reset(raw); setPhase("idle"); return;
+      }
+      const parsed = parseTestCaseExchange(text);
       if (!alive.current || generation !== fileGeneration.current) return;
       setDocument(parsed); setPhase("ready");
     } catch (failure) {
@@ -79,7 +89,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
     }
   }
   async function start() {
-    if (!preview.plan || !context || running.current) return;
+    if (!preview.plan || !context || running.current || external.busy || (external.active && !external.reviewed)) return;
     const plan = preview.plan;
     const generation = scopeGeneration.current;
     const current = () => alive.current && generation === scopeGeneration.current;
@@ -115,8 +125,8 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
       }
     }
   }
-  return { context, phase, error: error || preview.message, document, fileName, destination,
+  return { context, phase, external, error: error || preview.message, document, fileName, destination,
     setDestination, completed, attempted, failed, locked, plan: preview.plan,
-    busy: phase === "folders" || phase === "importing", selectFile, start,
-    stop: () => controller.current?.abort(), retryContext: () => setReload((value) => value + 1) };
+    busy: external.busy || phase === "folders" || phase === "importing", selectFile, start,
+    stop: () => { controller.current?.abort(); external.stop(); }, retryContext: () => setReload((value) => value + 1) };
 }
