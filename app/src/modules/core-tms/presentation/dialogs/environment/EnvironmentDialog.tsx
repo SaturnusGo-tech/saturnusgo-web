@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Check, Globe2, Plus } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Environment } from "../../../../../core/tms/contracts/legacy-contract";
@@ -8,11 +8,11 @@ import {
 } from "../../../application/environments/createEnvironment";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { Field } from "../../common/field/Field";
 import { FormError } from "../../common/error/FormError";
 import { Modal } from "../../common/modal/Modal";
 import { getEnvironmentDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
+import css from "./environment.module.css";
 
 type Props = {
   projectId: string;
@@ -56,5 +56,48 @@ export function EnvironmentDialog({
     }
     catch { setError(true); setSubmitting(false); }
   }
-  return <Modal title={environment ? copy.editTitle : copy.title} subtitle={copy.subtitle} onClose={onClose}><form onSubmit={submit}><div className={styles.formGrid}><Field label={copy.name} wide><input required value={name} onChange={(event) => setName(event.target.value)} /></Field><Field label={copy.key}><input required value={key} onChange={(event) => setKey(event.target.value)} /></Field><Field label={copy.baseUrl}><input required type="url" value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></Field><Field label={copy.description} wide><textarea value={description} onChange={(event) => setDescription(event.target.value)} /></Field></div>{error && <FormError message={copy.error} />}<div className={styles.modalFooter}><button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button><button className={styles.primaryButton} disabled={submitting || !name.trim() || !key.trim() || !baseUrl.trim()}><Plus size={16} /> {submitting ? copy.creating : environment ? copy.save : copy.create}</button></div></form></Modal>;
+  return <Modal title={environment ? copy.editTitle : copy.title} subtitle={copy.subtitle}
+    panelClassName={css.dialog} onClose={onClose}>
+    <form className={css.form} onSubmit={submit} aria-busy={submitting}>
+      <div className={css.body}>
+        <div className={css.identity}>
+          <label className={css.field}><span>{copy.name}</span>
+            <span className={css.inputShell} data-input-shell>
+              <input required data-autofocus value={name} placeholder={copy.namePlaceholder}
+                onChange={(event) => setName(event.target.value)} />
+            </span>
+          </label>
+          <label className={css.field}><span>{copy.key}</span>
+            <span className={css.inputShell} data-input-shell>
+              <input required value={key} placeholder="STAGING" autoCapitalize="characters" spellCheck={false}
+                onChange={(event) => setKey(event.target.value)} />
+            </span>
+          </label>
+        </div>
+        <label className={css.field}><span>{copy.baseUrl}</span>
+          <span className={css.inputShell} data-input-shell>
+            <Globe2 size={16} aria-hidden="true" />
+            <input required type="url" value={baseUrl} placeholder="https://staging.example.com"
+              autoCapitalize="none" autoCorrect="off" spellCheck={false}
+              onChange={(event) => setBaseUrl(event.target.value)} />
+          </span>
+        </label>
+        <label className={css.field}><span>{copy.description}<small>{copy.optional}</small></span>
+          <span className={css.inputShell} data-input-shell>
+            <textarea value={description} rows={3} placeholder={copy.descriptionPlaceholder}
+              onChange={(event) => setDescription(event.target.value)} />
+          </span>
+        </label>
+        {error && <FormError message={copy.error} />}
+      </div>
+      <footer className={css.footer}>
+        <button type="button" className={css.cancel} onClick={onClose}>{copy.cancel}</button>
+        <button type="submit" className={styles.primaryButton}
+          disabled={submitting || !name.trim() || !key.trim() || !baseUrl.trim()}>
+          {environment ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
+          {submitting ? copy.creating : environment ? copy.save : copy.create}
+        </button>
+      </footer>
+    </form>
+  </Modal>;
 }

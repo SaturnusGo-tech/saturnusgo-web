@@ -1,0 +1,40 @@
+.dialog.dialog {
+  width: min(540px, calc(100vw - 32px));
+  border: 1px solid var(--line) !important;
+  border-radius: 22px !important;
+  color: var(--ink);
+  background: var(--paper) !important;
+  box-shadow: 0 24px 80px #0003;
+}
+.dialog.dialog > header { background: transparent !important; border: 0; }
+.dialog.dialog > header p { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 7px; }
+.dialog > .form { min-height: 0; padding: 0; overflow: auto; }
+.body { display: grid; gap: 20px; padding: 6px 24px 24px; }
+.identity { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .65fr); gap: 16px; }
+.field { display: flex; flex-direction: column; min-width: 0; gap: 8px; color: var(--ink); font-size: 13px; }
+.field > span:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.field small { color: var(--muted); font-size: 11px; font-weight: 400; }
+.dialog .inputShell {
+  display: flex; align-items: center; min-width: 0; gap: 8px;
+  border: 1px solid var(--line); border-radius: 11px !important;
+  background: var(--control); overflow: hidden;
+}
+.inputShell > svg { flex-shrink: 0; margin-left: 12px; color: var(--muted); }
+.dialog .inputShell :is(input, textarea) {
+  display: block; width: 100%; min-width: 0; min-height: 42px; padding: 10px 12px;
+  color: var(--ink); font: inherit; line-height: 1.5; border-radius: inherit;
+  outline: none; border: 0; box-shadow: none; background: transparent;
+}
+.inputShell > svg + input { padding-left: 0; }
+.dialog .inputShell textarea { resize: vertical; min-height: 94px; max-height: 240px; }
+.inputShell :is(input, textarea)::placeholder { color: var(--muted); opacity: .72; }
+.footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 24px 24px; background: transparent; }
+.dialog .footer button { min-height: 38px; height: auto; border-radius: 10px; padding: 9px 14px; font-size: 13px; }
+.cancel { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.cancel:hover { color: var(--ink); background: var(--control-hover); }
+.dialog .footer button:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 3px; }
+@media (max-width: 480px) {
+  .identity { grid-template-columns: minmax(0, 1fr); }
+  .body { padding-inline: 20px; gap: 16px; }
+  .footer { padding-inline: 20px; flex-wrap: wrap; }
+}

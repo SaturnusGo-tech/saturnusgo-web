@@ -65,6 +65,8 @@ export const enShellMessages = {
   "header.createProjectToBegin": "Create a project to begin",
   "header.environment": "Environment",
   "header.build": "Build",
+  "header.editEnvironment": "Edit environment",
+  "header.openBuild": "Open test run and build",
   "header.apiConnected": "TMS API connected",
   "header.developmentDemo": "Development demo",
   "header.apiUnavailable": "TMS API unavailable",

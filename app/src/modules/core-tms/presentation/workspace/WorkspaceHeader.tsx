@@ -8,6 +8,7 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
+import { transitionContent } from "./motion/transition/content-transition";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -22,13 +23,23 @@ export function WorkspaceHeader({
   const { languageTag, t } = useTmsLocale();
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
-  const activeEnvironment =
-    model.selectedRun?.environment.name ??
-    model.projectEnvironments.find((item) => item.isDefault)?.name ??
-    model.projectEnvironments[0]?.name ??
-    "—";
-  const activeBuild =
-    model.selectedRun?.build ?? (model.project ? "local-current" : "—");
+  const environment = model.selectedRun
+    ? model.projectEnvironments.find((item) => item.id === model.selectedRun?.environment.id)
+    : model.projectEnvironments.find((item) => item.isDefault && item.status === "active") ??
+      model.projectEnvironments.find((item) => item.status === "active");
+  const activeEnvironment = environment?.name ?? model.selectedRun?.environment.name ?? "—";
+  const build = model.selectedRun?.build?.trim();
+  const activeBuild = !build || /^local[- ]current$/i.test(build) ? "—" : build;
+  function editEnvironment() {
+    if (environment) void model.openEditEnvironment(environment.id);
+    else model.openNewEnvironment();
+  }
+  function openBuild() {
+    transitionContent(() => {
+      if (model.selectedRun) model.openRun(model.selectedRun.id);
+      else model.setView("runs");
+    });
+  }
   const now = new Date();
   const today = now.toLocaleDateString(languageTag, {
     day: "2-digit",
@@ -74,20 +85,22 @@ export function WorkspaceHeader({
       </div>}
 
       {model.view !== "portfolios" && model.view !== "profile" && model.project && <div className={shellStyles.headerMeta}>
-        <div className={shellStyles.headerMetaItem} title={`${t("header.environment")}: ${activeEnvironment}`}>
+        <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
+          title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />
           <span>
             <small>{t("header.environment")}</small>
             <strong>{activeEnvironment}</strong>
           </span>
-        </div>
-        <div className={shellStyles.headerMetaItem} title={`${t("header.build")}: ${activeBuild}`}>
+        </button>
+        <button type="button" className={shellStyles.headerMetaItem} onClick={openBuild} disabled={!workspaceReady}
+          title={t("header.openBuild")} aria-label={`${t("header.openBuild")}: ${activeBuild}`}>
           <GitBranch size={15} aria-hidden="true" />
           <span>
             <small>{t("header.build")}</small>
             <strong>{activeBuild}</strong>
           </span>
-        </div>
+        </button>
         <div className={shellStyles.headerClock} title={`${weekday}, ${today} ${localTime}`}>
           <CalendarDays size={15} aria-hidden="true" />
           <span>

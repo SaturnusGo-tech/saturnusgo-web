@@ -67,6 +67,8 @@ export const ruShellMessages = {
   "header.createProjectToBegin": "Сначала создайте проект",
   "header.environment": "Окружение",
   "header.build": "Сборка",
+  "header.editEnvironment": "Настроить окружение",
+  "header.openBuild": "Открыть прогон и сборку",
   "header.apiConnected": "TMS API подключён",
   "header.developmentDemo": "Демо-режим разработки",
   "header.apiUnavailable": "TMS API недоступен",
