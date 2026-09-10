@@ -7,6 +7,7 @@ import { CommentThread } from "../threads/CommentThread";
 import { commentTree } from "../threads/comment-tree";
 import { useCommentAncestors } from "../ancestry/useCommentAncestors";
 import { ExpandingComment } from "../expansion/ExpandingComment";
+import { useCommentNavigation } from "../navigation/useCommentNavigation";
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel } from "../model";
 import css from "../caseCollaboration.module.css";
@@ -16,30 +17,11 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
   useCommentAncestors(caseId, model);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [composer, setComposer] = useState<{ reply?: TestCaseComment } | null>(null);
-  const [navigationError, setNavigationError] = useState(false);
-  const requested = useRef("");
+  const { failedId, reveal } = useCommentNavigation(caseId, model, () => setCollapsed(new Set()));
   const composerRef = useRef<HTMLDivElement>(null);
   const currentCase = useRef(caseId); currentCase.current = caseId;
   const motion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" as const : "smooth" as const;
-  async function reveal(id: string) {
-    setNavigationError(false); setCollapsed(new Set());
-    if (!document.getElementById(`comment-${id}`) && !await model.revealComment?.(id)) {
-      if (currentCase.current === caseId) setNavigationError(true);
-      return;
-    }
-    requestAnimationFrame(() => {
-      if (currentCase.current !== caseId) return;
-      const element = document.getElementById(`comment-${id}`);
-      element?.scrollIntoView({ block: "center", behavior: motion() }); element?.focus({ preventScroll: true });
-    });
-  }
-  useEffect(() => { setComposer(null); setCollapsed(new Set()); setNavigationError(false); requested.current = ""; }, [caseId]);
-  useEffect(() => {
-    if (model.comments.status !== "ready") return;
-    const id = new URL(window.location.href).searchParams.get("commentId");
-    if (!id || requested.current === id || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(id)) return;
-    requested.current = id; void reveal(id);
-  }, [caseId, model.comments.status]);
+  useEffect(() => { setComposer(null); setCollapsed(new Set()); }, [caseId]);
   useEffect(() => {
     if (composer && !composer.reply) composerRef.current?.scrollIntoView({ block: "nearest", behavior: motion() });
   }, [composer]);
@@ -61,7 +43,8 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
     {model.comments.status === "ready" && <>
       {model.canComment && <div ref={composerRef}><ExpandingComment>{composer && !composer.reply ? editor
         : <button type="button" className={css.commentPrompt} disabled={model.commentSubmitting || Boolean(model.changingCommentId)} onClick={() => setComposer({})}><MessageSquare size={14} />{ru ? "Написать комментарий…" : "Write a comment…"}</button>}</ExpandingComment></div>}
-      {navigationError && <p className={css.inlineError} role="alert">{ru ? "Не удалось открыть исходный комментарий. Попробуйте ещё раз." : "Could not open the original comment. Please retry."}</p>}
+      {failedId && <div className={css.pagination} role="alert"><span>{ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded."}</span>
+        <button type="button" onClick={() => void reveal(failedId)}>{ru ? "Повторить" : "Retry"}</button></div>}
       {commentTree(model.comments.items).map(node => <CommentThread key={node.comment.id} node={node} ru={ru} languageTag={languageTag}
         model={model} collapsed={collapsed} toggle={id => setCollapsed(old => { const next = new Set(old); if (next.has(id)) next.delete(id); else next.add(id); return next; })}
         onReply={reply => { setComposer({ reply }); setCollapsed(old => { const next = new Set(old); next.delete(reply.id); return next; }); }}

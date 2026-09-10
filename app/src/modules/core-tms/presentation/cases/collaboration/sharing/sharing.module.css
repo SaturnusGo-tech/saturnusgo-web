@@ -1,0 +1,2 @@
+.fallback { padding: 5px 9px; width: 240px; max-width: 65vw; font-size: 11px; color: var(--cases-secondary-text); }
+.fallback input { box-sizing: border-box; width: 100%; margin-top: 7px; padding: 7px 9px; border: 1px solid var(--cases-control-border); border-radius: 9px; background: var(--cases-bg); color: var(--cases-text); font: inherit; }

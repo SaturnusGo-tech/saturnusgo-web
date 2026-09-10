@@ -6,6 +6,7 @@ import { useWorkspacePeople } from "../../../../workspace/members/context/Worksp
 import { MarkdownField } from "../../inspector/markdown/MarkdownField";
 import { CommentMenu } from "../menu/CommentMenu";
 import { CommentComposer } from "../composer/CommentComposer";
+import { buildCommentLink } from "../../../../test-cases/navigation/comments/comment-link";
 import type { TestCaseComment } from "../../../../test-cases/collaboration/model/test-case-collaboration";
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel, activityActorLabel } from "../model";
@@ -28,6 +29,7 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
         <time dateTime={comment.createdAt}>{time.format(new Date(comment.createdAt))}</time>
         {comment.editedAt && !comment.deletedAt && <small title={time.format(new Date(comment.editedAt))}>{ru ? "изменён" : "edited"}</small>}
         <CommentMenu ru={ru} canEdit={Boolean(comment.canEdit && model.changeComment)}
+          shareLink={() => buildCommentLink(window.location.href, { ...comment, workspaceId: people.workspaceId })}
           canDelete={Boolean(comment.canDelete && model.changeComment)} canReply={model.canComment && !comment.deletedAt}
           disabled={pending} onEdit={() => { setEditing(comment); setConfirming(false); }}
           onDelete={() => { setConfirming(true); setEditing(null); }} onReply={() => onReply(comment)} />

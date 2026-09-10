@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Ellipsis, Pencil, Reply, Trash2 } from "lucide-react";
 import css from "./comment-menu.module.css";
-export function CommentMenu({ ru, canEdit, canDelete, canReply, disabled, onEdit, onDelete, onReply }: {
+import { CommentShareItem } from "../sharing/CommentShareItem";
+export function CommentMenu({ ru, canEdit, canDelete, canReply, disabled, onEdit, onDelete, onReply, shareLink }: {
   ru: boolean; canEdit: boolean; canDelete: boolean; canReply: boolean; disabled: boolean;
   onEdit: () => void; onDelete: () => void; onReply: () => void;
+  shareLink: () => string;
 }) {
   const [open, setOpen] = useState(false);
   const [opensUp, setOpensUp] = useState(false);
@@ -28,7 +30,6 @@ export function CommentMenu({ ru, canEdit, canDelete, canReply, disabled, onEdit
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
-  if (!canEdit && !canDelete && !canReply) return null;
   const choose = (action: () => void) => { setOpen(false); trigger.current?.focus(); action(); };
   return <div className={css.root} ref={root} onKeyDown={(event) => {
     if (event.key === "Escape") { event.stopPropagation(); setOpen(false); trigger.current?.focus(); }
@@ -44,6 +45,7 @@ export function CommentMenu({ ru, canEdit, canDelete, canReply, disabled, onEdit
     <button type="button" ref={trigger} className={css.trigger} disabled={disabled} aria-haspopup="menu"
       aria-expanded={open} aria-label={ru ? "Действия с комментарием" : "Comment actions"} onClick={() => setOpen(!open)}><Ellipsis size={17} /></button>
     {open && <div className={css.menu} role="menu" data-side={opensUp ? "up" : "down"}>
+      <CommentShareItem ru={ru} link={shareLink} />
       {canReply && <button type="button" role="menuitem" onClick={() => choose(onReply)}><Reply size={14} />{ru ? "Ответить" : "Reply"}</button>}
       {canEdit && <button type="button" role="menuitem" onClick={() => choose(onEdit)}><Pencil size={14} />{ru ? "Изменить" : "Edit"}</button>}
       {canDelete && <button type="button" role="menuitem" className={css.danger} onClick={() => choose(onDelete)}><Trash2 size={14} />{ru ? "Удалить" : "Delete"}</button>}

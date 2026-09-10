@@ -187,7 +187,7 @@
 .commentsSection { border-top: 0; padding-bottom: 64px; }
 .commentsHeading { border-bottom: 0; }
 .commentPrompt { border-radius: 12px; border-color: transparent; }
-.comment { border-bottom: 0; margin: 3px 0; scroll-margin: 18px; }
+.comment { border-bottom: 0; margin: 3px 0; scroll-margin: 18px; border-radius: 12px; }
 .comment:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: -2px; border-radius: 12px; }
 .commentContent { min-width: 0; }
 .comment header { justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 7px; }
