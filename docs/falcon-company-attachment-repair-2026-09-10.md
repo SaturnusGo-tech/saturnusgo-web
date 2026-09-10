@@ -21,3 +21,9 @@ Provider reference: https://developers.cloudflare.com/r2/buckets/cors/ . Presign
 The saved attachment rendering regression failed before the UI fix and passed afterward. It covers photographs and other files, switching between viewing and editing, empty steps and shared-step non-duplication. Attachment transport/orchestration tests passed, including finalization retry, expiry and credential isolation. Typecheck, architecture and generated API contract checks passed.
 
 Production browser storage evidence and the previous CORS configuration are retained under `../output/falcon-attachments-20260910/`. Browser probes exercise actual storage with an isolated test document; they do not impersonate an authenticated Falcon user or prove a user draft was saved.
+
+## Production publication
+
+Published source `834267a6cbc6c6318a4c92faabcb19d04336a73e` through Pages artifact `8ea43c25` and Worker version `83bb77a9-852e-4ef8-9ae5-893528c2b10f` at 100% traffic. All six company domain bindings were preserved. The live Umbrella document references the new case bundle; its bytes match the built artifact (SHA-256 `7b4c405f86670cf6add01ebd196cf00fbc6ac4300e57947f34cd6ba22f6cd737`).
+
+Eighteen focused scenario/upload tests, seven attachment client tests, twelve real PostgreSQL/API tests and all 53 deployment tests passed. Static production build passed. Untrusted-origin PUT preflight still returns 403. Existing file contents and user case records were not modified by the repair. Files whose upload failed before reaching storage must be attached again.
