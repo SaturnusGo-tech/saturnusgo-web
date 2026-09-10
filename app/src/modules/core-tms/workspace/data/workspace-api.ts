@@ -66,6 +66,7 @@ export async function loadWorkspace(
     activity: summary.recentActivity.map((entry) => ({
       id: entry.id,
       actor: entry.actor,
+      actorIdentityId: entry.actorIdentityId ?? null,
       action: entry.action,
       entityKey: entry.entityKey,
       createdAt: entry.createdAt,

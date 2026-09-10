@@ -139,6 +139,7 @@ export type Dashboard = {
 export type Activity = {
   id: string;
   actor: string;
+  actorIdentityId?: string | null;
   action: string;
   entityKey: string | null;
   createdAt: string;

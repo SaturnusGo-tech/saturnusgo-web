@@ -5780,6 +5780,8 @@ export interface components {
             };
             requestId: string;
             createdAt: components["schemas"]["Timestamp"];
+            /** @description Stable identity of the event author; null for system or legacy events. */
+            actorIdentityId?: string | null;
         };
         ActivityListEnvelope: {
             data: components["schemas"]["ActivityEvent"][];

@@ -1,3 +1,4 @@
+import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { AlertCircle, Bug, FileClock, RotateCw } from "lucide-react";
 import type { Activity, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { activityLabel } from "../../../../localization/activity/label";
@@ -104,7 +105,7 @@ export function CaseActivityTab(props: Props) {
         <b>{caseActivity.length}</b>
       </header>
       {caseActivity.slice(0, 20).map((entry) => <div className={styles.activityRecord} key={entry.id}>
-        <span aria-hidden="true">{activityActorLabel(entry.actor).slice(0, 1).toUpperCase()}</span>
+        <MemberAvatar identityId={entry.actorIdentityId ?? null} name={activityActorLabel(entry.actor)} />
         <div>
           <strong>{activityLabel(props.locale, entry.action)}</strong>
           <small>{activityActorLabel(entry.actor)} · {formatTime(entry.createdAt, props.languageTag)}</small>

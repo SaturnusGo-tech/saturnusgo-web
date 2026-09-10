@@ -1,21 +1,23 @@
-/* A shell row reserves space: neither the launcher nor its edge tab covers a case. */
+/* Floating controls never reserve workspace height or cover it with a backdrop. */
 .dock {
-  position: relative;
-  min-width: 0;
-  height: calc(84px + env(safe-area-inset-bottom));
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  width: min(360px, 100vw);
+  height: calc(90px + env(safe-area-inset-bottom));
   overflow: hidden;
-  background: var(--paper);
-  transition: height 360ms cubic-bezier(.22, .72, .2, 1);
+  pointer-events: none;
 }
-:global(.dark) .dock { background: var(--tms-bg-canvas); }
-.dock[data-collapsed="true"] { height: calc(44px + env(safe-area-inset-bottom)); }
 .launcher {
+  pointer-events: auto;
   position: absolute;
   right: calc(20px + env(safe-area-inset-right));
   bottom: calc(24px + env(safe-area-inset-bottom));
   transition: transform 360ms cubic-bezier(.22, .72, .2, 1), opacity 240ms ease;
 }
-.dock[data-collapsed="true"] .launcher { transform: translateX(calc(100% + 52px)); opacity: 0; pointer-events: none; }
+.dock[data-collapsed="true"] .launcher {
+  pointer-events: auto; transform: translateX(calc(100% + 52px)); opacity: 0; pointer-events: none; }
 .start.start {
   min-height: 36px;
   display: inline-flex;
@@ -72,3 +74,5 @@
   .dock, .launcher, .start, .close, .restore { transition: none !important; animation: none !important; }
   .spinner { animation: none; }
 }
+
+@media (max-width: 760px) { .dock { bottom: 58px; } }

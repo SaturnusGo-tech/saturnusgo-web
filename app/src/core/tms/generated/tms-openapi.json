@@ -26477,6 +26477,13 @@
           },
           "createdAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "actorIdentityId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Stable identity of the event author; null for system or legacy events."
           }
         }
       },

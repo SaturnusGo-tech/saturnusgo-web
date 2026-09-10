@@ -21,7 +21,7 @@
   min-height: 0;
   flex: 1 1 auto;
   display: grid;
-  grid-template-rows: 52px minmax(0, 1fr) auto;
+  grid-template-rows: 52px minmax(0, 1fr);
   overflow: hidden;
   background: var(--paper);
 }
@@ -662,7 +662,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   .workspaceColumn {
     width: 100%;
     height: calc(100dvh - 58px);
-    grid-template-rows: 52px minmax(0, 1fr) auto;
+    grid-template-rows: 52px minmax(0, 1fr);
   }
 
   .mobileNavigationButton {
