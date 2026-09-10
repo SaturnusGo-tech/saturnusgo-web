@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { POSTMAN_WEB_URL, swaggerWorkspaceUrl } from "../model";
+import { swaggerWorkspaceUrl } from "../model";
 import { authorizeSwaggerRequest } from "../renderer/swagger-request-policy";
 test("Swagger navigation preserves workspace/project and removes unrelated selections", () => {
   const url = new URL(swaggerWorkspaceUrl("https://tms.saturnusgo.com/work/?workspaceId=w&projectId=p&caseId=c&view=cases&runId=r&article=abc", "hooks"));
@@ -20,4 +20,3 @@ test("Swagger API calls cannot target Falcon, its identity provider or online va
   const request = { url: "https://api.company.com/v1/orders", credentials: "include", headers: { Authorization: "Bearer api-credential" } };
   assert.deepEqual(authorizeSwaggerRequest(request, "https://tms.saturnusgo.com"), { ...request, credentials: "omit" });
 });
-test("Postman stays an external tool", () => assert.equal(new URL(POSTMAN_WEB_URL).origin, "https://web.postman.co"));

@@ -1,5 +1,6 @@
 "use client";
 
+import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -57,6 +58,7 @@ function LocalizedWorkspace() {
 
   return (
     <WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
+    <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected"}>
     <div
       className={`${styles.app} ${shellStyles.shell}`}
       data-sidebar={sidebarCollapsed ? "collapsed" : "expanded"}
@@ -103,7 +105,7 @@ function LocalizedWorkspace() {
         </div>
       )}
       <WorkspaceDialogs model={model} />
-    </div></WorkspacePeopleProvider>
+    </div></WorkspaceConnectorProvider></WorkspacePeopleProvider>
   );
 }
 

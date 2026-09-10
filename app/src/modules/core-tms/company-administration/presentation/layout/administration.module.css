@@ -3,6 +3,8 @@
   --admin-line:#e5e5ed; --admin-hover:#f0f1f5; --admin-blue:#386eec;
   --access-text:var(--admin-text); --access-muted:var(--admin-muted); --access-line:var(--admin-line); --access-input:var(--admin-surface);
   --text:var(--admin-text); --text-primary:var(--admin-text); --text-secondary:var(--admin-muted); --surface:var(--admin-surface); --border:var(--admin-line);
+  --ink:var(--admin-text); --muted:var(--admin-muted); --paper:var(--admin-surface); --control:var(--admin-surface); --nav-raised:var(--admin-surface);
+  --line:var(--admin-line); --line-strong:var(--admin-line); --control-hover:var(--admin-hover); --tms-focus-border:var(--admin-muted); --tms-focus-ring:rgb(128 128 128 / 15%);
   display:flex; min-height:100dvh; color:var(--admin-text); background:var(--admin-bg);
   font:14px/1.5 var(--font-geist-sans),Inter,system-ui,sans-serif;
 }

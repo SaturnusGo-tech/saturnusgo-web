@@ -2,11 +2,11 @@
 import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { ContentSkeleton } from "../common/skeleton/ContentSkeleton";
 import dynamic from "next/dynamic";
-import { FileJson2, RefreshCw, Send, Settings2 } from "lucide-react";
+import { FileJson2, RefreshCw, Settings2 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { Scope } from "../../connectors/model/connector-types";
 import { useSwaggerSpecification } from "../../connectors/application/swagger/useSwaggerSpecification";
-import { POSTMAN_WEB_URL, swaggerWorkspaceUrl } from "./model";
+import { swaggerWorkspaceUrl } from "./model";
 import surface from "./api-testing.module.css";
 const SwaggerDocument = dynamic(() => import("./renderer/SwaggerDocument"), {
   ssr: false, loading: () => <ContentSkeleton label="Swagger" />,
@@ -23,7 +23,6 @@ export function ApiTestingView({ scope, canManage }: { scope: Scope; canManage: 
     </div></header>
     <nav className={surface.toolTabs} aria-label={t("apiTesting.toolsLabel")}>
       <button className={surface.toolTabActive} type="button" aria-current="page">Swagger</button>
-      <a className={surface.toolTab} href={POSTMAN_WEB_URL} target="_blank" rel="noopener noreferrer"><Send size={15} />Postman</a>
       {state.specification && <span className={surface.meta}>{state.specification.operationCount} {ru ? "операций" : "operations"} · OpenAPI {state.specification.format}</span>}
     </nav>
     <div className={surface.webview}>

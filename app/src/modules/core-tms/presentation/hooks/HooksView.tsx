@@ -12,7 +12,7 @@ import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { YouTrackConfiguration } from "../../youtrack/model/youtrack-settings";
 import { ConnectorSettings } from "../../connectors/presentation/ConnectorSettings";
-import { useConnectorCatalog } from "../../connectors/application/catalog/useConnectorCatalog";
+import { useWorkspaceConnectors } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { isProvider, type Provider } from "../../connectors/model/connector-types";
 import { IntegrationCatalog } from "./catalog/IntegrationCatalog";
 import surface from "./hooks.module.css";
@@ -32,7 +32,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const [statusFailed, setStatusFailed] = useState(false);
   const [configurationFailed, setConfigurationFailed] = useState(false);
   const [reload, setReload] = useState(0);
-  const connectors = useConnectorCatalog(workspaceId, reload);
+  const connectors = useWorkspaceConnectors();
   const open = (target: "catalog" | "youtrack" | Provider) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
@@ -40,7 +40,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     if (target === "catalog") url.searchParams.delete("integration"); else url.searchParams.set("integration", target);
     window.history.replaceState(window.history.state, "", url);
   });
-  const refresh = useCallback(() => setReload((value) => value + 1), []);
+  const refresh = useCallback(() => { setReload((value) => value + 1); connectors.refresh(); }, [connectors.refresh]);
 
   useEffect(() => {
     const controller = new AbortController();

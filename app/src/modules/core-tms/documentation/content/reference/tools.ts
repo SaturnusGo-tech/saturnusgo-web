@@ -2,12 +2,12 @@ import { note, paragraph, section, steps, type DocArticle } from "../../model/ar
 export const toolsArticle: DocArticle = {
   id: "api-testing", title: "API Testing", group: "reference",
   description: "Откройте спецификацию API проекта и выполняйте запросы через Swagger.",
-  keywords: ["API Testing", "Swagger", "Postman", "OpenAPI", "контракт"], related: ["create-test-case", "integration-overview", "swagger"],
+  keywords: ["API Testing", "Swagger", "OpenAPI", "контракт"], related: ["create-test-case", "integration-overview", "swagger"],
   sections: [
     section("setup", "Подключить API проекта", steps(
       ["Проверьте проект", "Подключение Swagger и его спецификация относятся к выбранному проекту."],
       ["Настройте источник", "Откройте Хуки → Swagger. Укажите прямую HTTPS-ссылку на OpenAPI JSON/YAML и при необходимости авторизацию для чтения спецификации."],
-      ["Откройте спецификацию", "Перейдите в API Testing из глобального сайдбара. Здесь доступны Swagger проекта и ссылка на Postman."])),
+      ["Откройте спецификацию", "После подключения Swagger в хуках раздел API Testing появится в сайдбаре выбранного проекта. Здесь доступна его спецификация OpenAPI."])),
     section("api", "Выполнить запрос", paragraph("Найдите endpoint в Swagger, проверьте сервер и параметры запроса. Если сам API требует авторизацию, используйте **Authorize**. Доступ к спецификации и авторизация запросов — разные настройки."),
       note("Внешний инструмент", "Для Execute ваш API должен разрешать CORS с адреса Falcon. Запросы и их результаты не превращаются автоматически в выполненные раны Falcon — зафиксируйте проверку и материалы в соответствующем сценарии.")),
     section("cases", "Сохранить проверку", paragraph("Для повторяемого сценария создайте обычный тест-кейс: опишите входные данные, запрос и ожидаемый ответ. Включите его в тест-сьют или ран. Ранее созданные интеграционные кейсы доступны в общей базе тест-кейсов.")),

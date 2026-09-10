@@ -1,3 +1,4 @@
+import { useWorkspaceConnectors } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { PiBriefcaseDuotone } from "react-icons/pi";
@@ -63,7 +64,9 @@ export function Navigation({
 }) {
   const { locale, t } = useTmsLocale();
   const session = useOptionalTmsSession();
-  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities);
+  const { swaggerConnected } = useWorkspaceConnectors();
+  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities) &&
+    (candidate !== "api" || swaggerConnected);
   const navigate = (next: View) => {
     if (next === "suites" && view === "suites" && window.location.search.includes("suiteId=")) {
       const url = new URL(window.location.href); url.searchParams.delete("suiteId");

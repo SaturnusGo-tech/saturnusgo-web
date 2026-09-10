@@ -5,6 +5,7 @@ import { TmsApiError } from "../../../../core/tms/transport/http";
 import { connectorApi } from "../data/connector-api";
 import { connectionDraft } from "../model/connector-draft";
 import type { Scope, Provider, Snapshot, Discovery, ConnectionInput } from "../model/connector-types";
+import { useWorkspaceConnectors } from "./context/WorkspaceConnectorContext";
 import { connectorError } from "./connector-errors";
 import { ConnectorRequestOwner } from "./requests/connector-request-owner";
 import { ConnectorActivityFreshness } from "./activity/connector-activity-freshness";
@@ -14,6 +15,7 @@ import { republishReport } from "./republish/republish-report";
 export function useConnector(scope: Scope, provider: Provider, russian: boolean, onSaved: () => void,
   activityActive: boolean) {
   const http = useTmsHttpClient();
+  const catalog = useWorkspaceConnectors();
   const api = useMemo(() => connectorApi(http), [http]);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [draft, setDraft] = useState(() => connectionDraft(provider, null));
@@ -73,6 +75,7 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
     signal.throwIfAborted();
     setDraft(connectionDraft(provider, saved.data));
     setSnapshot((current) => current ? { ...current, connection: saved.data, etag: saved.etag } : current);
+    catalog.update(stableScope, provider, saved.data);
     onSaved();
     setNotice(russian ? "Настройки сохранены." : "Settings saved.");
     const updated = await api.load(stableScope, provider, signal);
@@ -81,6 +84,7 @@ export function useConnector(scope: Scope, provider: Provider, russian: boolean,
   const disconnect = () => act("disconnect", async (signal) => {
     if (!snapshot?.etag) throw new Error("Missing version");
     await api.disconnect(stableScope, provider, snapshot.etag, signal);
+    signal.throwIfAborted(); catalog.update(stableScope, provider, null);
     const updated = await api.load(stableScope, provider, signal);
     signal.throwIfAborted(); publishSnapshot(updated); setDraft(connectionDraft(provider, null)); setDiscovery(null);
     onSaved(); setNotice(russian ? "Подключение отсоединено. Созданные записи сохранены." : "Disconnected. Existing records are preserved.");
