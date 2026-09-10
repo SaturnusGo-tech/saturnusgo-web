@@ -184,7 +184,7 @@
 @keyframes history-pulse { 50% { opacity:.45; } }
 @media(prefers-reduced-motion:reduce) { .historySkeleton i { animation:none; } }
 /* Discussion stays in the document flow, with actions at the end of each message. */
-.commentsSection { border-top: 0; }
+.commentsSection { border-top: 0; padding-bottom: 64px; }
 .commentsHeading { border-bottom: 0; }
 .commentPrompt { border-radius: 12px; border-color: transparent; }
 .comment { border-bottom: 0; margin: 3px 0; scroll-margin: 18px; }
