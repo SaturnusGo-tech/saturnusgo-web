@@ -67,7 +67,7 @@ export function WorkspaceHeader({
       </button>
 
       <HistoryControls />
-      {(model.view === "portfolios" || model.view === "profile") || !model.project ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
+      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || !model.project ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
           {t("header.project")}
         </span>
@@ -84,7 +84,7 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.view !== "portfolios" && model.view !== "profile" && model.project && <div className={shellStyles.headerMeta}>
+      {model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && model.project && <div className={shellStyles.headerMeta}>
         <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
           title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />

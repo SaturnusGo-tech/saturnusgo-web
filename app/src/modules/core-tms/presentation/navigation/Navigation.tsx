@@ -139,6 +139,8 @@ export function Navigation({
         disabled={disabled}
         settingsActive={!disabled && view === "config"}
         helpActive={view === "help"}
+        notificationsActive={view === "notifications"}
+        onOpenNotifications={() => onChange("notifications")}
         onCreateCase={onCreateCase}
         onCreateDefect={onCreateDefect}
         onOpenSettings={() => onChange("config")}

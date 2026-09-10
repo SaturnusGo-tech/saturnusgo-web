@@ -1,7 +1,7 @@
 import type { TestCaseRevision } from "../../../../core/tms/contracts/legacy-contract";
 
 export const workspaceViews = [
-  "portfolios", "dashboard", "cases", "shared-steps", "api", "suites", "config", "runs", "hooks", "reports", "help", "profile",
+  "portfolios", "dashboard", "cases", "shared-steps", "api", "suites", "config", "runs", "hooks", "reports", "help", "profile", "notifications",
 ] as const;
 export type View = typeof workspaceViews[number];
 

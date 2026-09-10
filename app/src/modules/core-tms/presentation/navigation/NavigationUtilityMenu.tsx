@@ -7,6 +7,8 @@ export function NavigationUtilityMenu({
   disabled,
   settingsActive,
   helpActive,
+  notificationsActive,
+  onOpenNotifications,
   onCreateCase,
   onCreateDefect,
   onOpenSettings,
@@ -15,6 +17,8 @@ export function NavigationUtilityMenu({
   disabled: boolean;
   settingsActive: boolean;
   helpActive: boolean;
+  notificationsActive: boolean;
+  onOpenNotifications: () => void;
   onCreateCase: () => void;
   onCreateDefect: () => void;
   onOpenSettings: () => void;
@@ -110,7 +114,7 @@ export function NavigationUtilityMenu({
         <span className={shellStyles.navigationIcon} aria-hidden="true"><CircleHelp size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.help")}</span>
       </button>
-      <button type="button" className={shellStyles.navigationUtilityButton} data-placeholder="true">
+      <button type="button" className={`${shellStyles.navigationUtilityButton} ${notificationsActive ? shellStyles.navigationUtilityButtonActive : ""}`} onClick={onOpenNotifications} aria-current={notificationsActive ? "page" : undefined}>
         <span className={shellStyles.navigationIcon} aria-hidden="true"><Bell size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.notifications")}</span>
       </button>

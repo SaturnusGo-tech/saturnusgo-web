@@ -1,3 +1,4 @@
+import { WorkspaceNotifications } from "../../notifications/composition/WorkspaceNotifications";
 import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
@@ -74,6 +75,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "notifications") return <WorkspaceNotifications key={model.data.workspace.id} workspaceId={model.data.workspace.id}/>;
   if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
   if (!model.project) {
     return (
