@@ -10,5 +10,7 @@ export async function listProjectCatalog(http: TmsHttpClient, filter: ProjectCat
   else if (filter.unassigned) query.set("unassigned", "true");
   if (cursor) query.set("cursor", cursor);
   const result = await http.get<components["schemas"]["ProjectListEnvelope"]>(`/projects?${query}`, signal);
+  if (result.data.some(project => project.workspaceId !== filter.workspaceId)) throw new Error("Project scope does not match this workspace.");
+  if (result.meta.hasMore && !result.meta.nextCursor) throw new Error("Project pagination cursor is missing.");
   return { items: result.data.map(mapProject), nextCursor: result.meta.hasMore ? result.meta.nextCursor : null };
 }

@@ -1,5 +1,6 @@
 import type { components } from "../../../../core/tms/generated/tms-api";
-import type { Bootstrap, Project } from "../../../../core/tms/contracts/legacy-contract";
+import { loadAllWorkspaceProjects } from "../../projects/catalog/application/list-projects";
+import type { Bootstrap } from "../../../../core/tms/contracts/legacy-contract";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { listDefects } from "../../defects/data/defect-api";
 import { listEnvironments } from "../../environments/data/environment-api";
@@ -9,15 +10,6 @@ import { listSuites } from "../../suites/data/suite-api";
 import { listTestCases } from "../../test-cases/data/test-case-api";
 
 type Api = components["schemas"];
-
-function mapProject(project: Api["ProjectSummary"]): Project {
-  return {
-    id: project.id,
-    key: project.key,
-    name: project.name,
-    status: project.status,
-  };
-}
 
 export async function loadProjectCollections(
   http: TmsHttpClient,
@@ -55,7 +47,7 @@ export async function loadWorkspace(
     `/bootstrap?${parameters.toString()}`, signal,
   );
   const summary = envelope.data;
-  const projects = summary.projects.map(mapProject);
+  const projects = await loadAllWorkspaceProjects(http, summary.workspace.id, signal);
   const project = projects.find((item) => item.id === preferredProjectId && item.status !== "archived")
     ?? projects.find((item) => item.status !== "archived");
   const collections = project

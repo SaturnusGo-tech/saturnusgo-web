@@ -12,7 +12,7 @@ import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange
 
 type Phase = "loading" | "idle" | "reading" | "ready" | "folders" | "importing" | "partial" | "success" | "stopped";
 type Context = Awaited<ReturnType<typeof loadImportContext>>;
-export function useImportCases(props: Readonly<{ project: Project; folders: readonly RepositoryFolder[];
+export function useImportCases(props: Readonly<{ project: Project; folders?: readonly RepositoryFolder[];
   locale?: "ru" | "en"; workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown> }>) {
   const http = useTmsHttpClient();
   const [context, setContext] = useState<Context | null>(null);
@@ -47,7 +47,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders: read
     const abort = new AbortController();
     controller.current = abort;
     setPhase("loading"); setError(""); setContext(null); setDocument(null);
-    const workspaceId = props.workspaceId ?? props.folders[0]?.workspaceId;
+    const workspaceId = props.workspaceId ?? props.folders?.[0]?.workspaceId;
     loadImportContext(http, props.project.id, abort.signal,
       workspaceId ? { workspaceId, folders: props.folders } : undefined).then((value) => {
       if (abort.signal.aborted) return;

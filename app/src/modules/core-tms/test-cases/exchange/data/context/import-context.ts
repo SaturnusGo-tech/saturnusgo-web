@@ -5,7 +5,7 @@ import type { RepositoryFolder } from "../../../../folders/model/folder";
 
 type Api = components["schemas"];
 export async function loadImportContext(http: TmsHttpClient, projectId: string, signal: AbortSignal,
-  known?: Readonly<{ workspaceId: string; folders: readonly RepositoryFolder[] }>) {
+  known?: Readonly<{ workspaceId: string; folders?: readonly RepositoryFolder[] }>) {
   const workspaceId = known?.workspaceId ?? (await http.getResource<Api["Project"]>(
     `/projects/${encodeURIComponent(projectId)}`, signal)).data.workspaceId;
   const scope = { workspaceId, projectId };
