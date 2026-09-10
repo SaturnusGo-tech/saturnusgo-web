@@ -6761,7 +6761,7 @@ export interface components {
             };
         };
         /** @enum {string} */
-        NotificationCategory: "runs" | "defects" | "cases" | "suites" | "integrations";
+        NotificationCategory: "runs" | "defects" | "cases" | "suites" | "integrations" | "assignments";
         NotificationPreferences: {
             categories: components["schemas"]["NotificationCategory"][];
             /** @enum {string} */

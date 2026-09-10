@@ -4,6 +4,7 @@ import type { NotificationCategory } from "../domain/notifications";
 import { NotificationChannels } from "./NotificationChannels";
 import styles from "./notifications.module.css";
 const categories: readonly [NotificationCategory, string, string][] = [
+  ["assignments", "Назначения", "Assignments"],
   ["runs", "Прогоны", "Runs"],
   ["defects", "Дефекты", "Defects"],
   ["cases", "Тест-кейсы", "Test cases"],

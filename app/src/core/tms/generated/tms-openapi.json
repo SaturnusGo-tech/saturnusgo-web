@@ -4834,7 +4834,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -29897,7 +29897,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -30519,7 +30519,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -30621,7 +30621,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -31112,7 +31112,8 @@
           "defects",
           "cases",
           "suites",
-          "integrations"
+          "integrations",
+          "assignments"
         ]
       },
       "NotificationPreferences": {
@@ -31121,7 +31122,7 @@
         "properties": {
           "categories": {
             "type": "array",
-            "maxItems": 5,
+            "maxItems": 6,
             "items": {
               "$ref": "#/components/schemas/NotificationCategory"
             }

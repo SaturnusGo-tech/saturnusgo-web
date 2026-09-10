@@ -12,15 +12,13 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
 }) {
   const [body, setBody] = useState(initial?.body ?? "");
   const [mentions, setMentions] = useState<string[]>(initial?.mentions ?? []);
-  const [telegram, setTelegram] = useState(false);
   const [slack, setSlack] = useState(false);
   const catalog = useWorkspaceConnectors();
   const slackConnected = catalog.connections.some((c) => c.projectId === projectId && c.provider === "slack" && c.enabled);
   async function submit() {
     if (pending || !body.trim() || body.length > 10_000) return;
     await onSubmit({ body, parentId: reply?.id ?? null, mentions,
-      notifyChannels: mentions.length ? [...(telegram ? ["telegram" as const] : []),
-        ...(slack && slackConnected ? ["slack" as const] : [])] : [] });
+      notifyChannels: mentions.length && slack && slackConnected ? ["slack"] : [] });
   }
   return <div className={css.composer} aria-busy={pending || undefined} onKeyDown={(event) => {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !event.nativeEvent.isComposing) {
@@ -34,11 +32,9 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
         label={ru ? "Текст комментария" : "Comment text"} onChange={setBody} />
       <CommentMentions value={mentions} onChange={setMentions} ru={ru} />
       {mentions.length > 0 && <div className={css.channels}>
-        <span>{ru ? "Уведомить:" : "Notify:"}</span>
-        <label><input type="checkbox" checked={telegram} onChange={(e) => setTelegram(e.target.checked)} />Telegram</label>
         <label title={!slackConnected ? (ru ? "Подключите Slack в интеграциях проекта" : "Connect Slack in project integrations") : undefined}>
           <input type="checkbox" checked={slack && slackConnected} disabled={!slackConnected} onChange={(e) => setSlack(e.target.checked)} />{ru ? "Канал Slack проекта" : "Project Slack channel"}</label>
-        {telegram && <small>{ru ? "Тем, кто подключил бота и включил уведомления о тест-кейсах." : "For teammates who connected the bot and enabled test case notifications."}</small>}
+        <small>{ru ? "Упомянутые сотрудники получат уведомление в подключённых каналах." : "Mentioned teammates are notified through their connected channels."}</small>
       </div>}
     </div>
     {body.length > 10_000 && <p role="alert">{ru ? "Максимум 10 000 символов" : "Maximum 10,000 characters"}</p>}
