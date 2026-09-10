@@ -23,3 +23,13 @@ The test case author was removed from the top of the overview. It now uses the s
 - Browser assertions verify the bar is blue, animated and located below the filename, and the three attribution labels are ordered together. Light and dark screenshots were reviewed.
 
 Browser evidence is under `../output/falcon-upload-progress-20260910/` from the workspace root. The fixture uses the real case save hook, panel, draft provider, step editor, attachment components and application pipeline; server/storage responses and unrelated page sections are isolated. This is not an authenticated production upload test.
+
+## Production publication
+
+- Application source: `36ce1eaa5a3e7994a448d324802b1285962d3e55`.
+- Pages publication: `652c6661`.
+- Worker version: `fbf4cb10-fe34-4b74-8e22-273b446998a9`, deployed at 100% traffic.
+- All 53 deployment checks passed; existing domain bindings preserved.
+- TMS, Umbrella, SaturnusGo and Binibit returned HTTP 200 and the new workspace bundle with SHA-256 `2fc68be8f96ee8c58411a1d5a053b2674fbc7a808717150f1aa9a755296b9928`, identical to the built artifact containing the attachment save correction.
+- Darwin continues to return the pre-existing company-address HTTP 404, including its authentication entrypoint. This was not counted as a successful application smoke check and no company activation was changed by this release.
+- Live delivery evidence: `output/falcon-upload-progress-20260910/production.json` at the workspace root.
