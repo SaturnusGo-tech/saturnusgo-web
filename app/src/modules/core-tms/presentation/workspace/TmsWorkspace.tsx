@@ -96,8 +96,8 @@ function LocalizedWorkspace() {
             <WorkspaceStage model={model} />
           </div>
         </main>
+        <VerificationQueueControl state={model.verification} workspaceId={model.data.workspace.id} />
       </div>
-      <VerificationQueueControl state={model.verification} />
       {model.notice && (
         <div className={styles.toast} role="status" aria-live="polite">
           <CheckCircle2 size={17} />
