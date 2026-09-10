@@ -1,5 +1,7 @@
 # Falcon landing media
 
+> Historical record: the recordings and acceptance results below describe the 9 September revision. All six current videos, the commercial flow and current verification are documented in [Falcon commercial landing — 10 September](falcon-commercial-landing-2026-09-10.md). None of the older video paths below is referenced by the current landing.
+
 The public landing presents five recordings of the Falcon interface. Recordly 1.4.0 for macOS provides the Smooth preset, 1.25× focus regions, cursor smoothing and click feedback. The first sample’s motion was approved on 9 September 2026. Browser automation captures the real interface and pointer events; Recordly composes the final motion. Generated images are used only as decorative backgrounds, never as product UI.
 
 ## September 2026 refinement

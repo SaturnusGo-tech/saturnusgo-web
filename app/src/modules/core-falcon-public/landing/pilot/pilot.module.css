@@ -1,0 +1,9 @@
+.section { width: min(920px, calc(100% - 96px)); margin: 20px auto 120px; padding: 60px 0 0; }
+.label { color: #9faabc; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 22px; }
+.section h2 { max-width: 660px; font-size: clamp(30px, 3.2vw, 42px); font-weight: 450; line-height: 1.2; letter-spacing: -.035em; margin: 0; text-wrap: balance; }
+.points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 44px 0 32px; }
+.points h3 { font-size: 16px; font-weight: 500; line-height: 1.4; margin: 0 0 12px; }
+.points p { font-size: 15px; line-height: 1.7; color: #b2bbc9; margin: 0; }
+.contact { display: inline-flex; gap: 10px; align-items: center; font-size: 14px; color: #d6e7ff !important; padding: 10px 0; }
+.contact:hover { color: white !important; }
+@media(max-width:700px) { .section { width: calc(100% - 44px); margin-bottom: 70px; padding-top: 35px; } .points { grid-template-columns: 1fr; gap: 26px; margin-top: 32px; } }

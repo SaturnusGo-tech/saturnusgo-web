@@ -669,3 +669,13 @@
     display: none;
   }
 }
+.pilotLead { max-width: 410px; font-size: 16px; line-height: 1.7; color: #b9c3d2; margin: -8px 0 28px; }
+.telegramHandle { color: #9faebe; font-size: 12px; margin: 18px 0 0; }
+.footer { scroll-margin-top: 30px; }
+.hero h1 { font-size: clamp(54px, 5.05vw, 78px); }
+@media(max-width:700px) {
+  .hero h1 { font-size: clamp(36px, 7.8vw, 52px); }
+  .pilotLead { margin-left: auto; font-size: 15px; }
+  .headerActions { gap: 14px; }
+  .footerCta h2 { font-size: 39px; }
+}

@@ -10,11 +10,13 @@ export function FalconHeader() {
         <nav className={styles.headerNav} aria-label="Навигация по лендингу">
           <a href="#product">Продукт</a>
           <a href="#integrations">Интеграции</a>
+          <a href="#pilot">Пилот</a>
         </nav>
         <div className={styles.headerActions}>
-          <Link className={styles.primaryButton} href="/cloud-login/">
-            Войти в компанию
+          <Link className={styles.loginButton} href="/cloud-login/">
+            Войти
           </Link>
+          <a className={styles.primaryButton} href="#pilot">Обсудить пилот</a>
         </div>
       </div>
     </header>

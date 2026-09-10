@@ -40,11 +40,11 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.deepEqual(result.checkedRoutes, ["/sandbox/", "/admin/", "/profile/", "/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/cases.mp4"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/cases.vtt"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-commercial/cases.mp4"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-commercial/cases.vtt"));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/atmosphere.webp"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/youtrack-guided.mp4"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/youtrack-guided.vtt"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-commercial/youtrack.mp4"));
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-commercial/youtrack.vtt"));
   assert.equal(result.checkedAssets.includes("/falcon/landing/2026-09/integrations.mp4"), false);
   assert.ok(requests.every(({ url }) => url.protocol === "https:"));
   assert.ok(requests.every(({ url }) => url.searchParams.get("falcon_release") === sourceSha));

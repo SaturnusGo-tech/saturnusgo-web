@@ -217,3 +217,27 @@
     animation: none;
   }
 }
+
+.cover {
+  position: absolute;
+  inset: 0 0 var(--controls-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6%;
+  pointer-events: none;
+  background: linear-gradient(90deg, #0c1018 0%, #0c1018ee 28%, #0c10188c 55%, #0c101829 100%);
+  color: #f4f5f8;
+}
+.cover > span { font-size: 10px; letter-spacing: .18em; color: #a4b3cd; }
+.cover > div { max-width: 55%; }
+.cover strong { display: block; font-size: clamp(23px, 3.1vw, 42px); line-height: 1.1; letter-spacing: -.035em; font-weight: 550; }
+.cover p { margin: 15px 0 0; font-size: clamp(11px, 1.15vw, 15px); color: #aeb7c8; line-height: 1.5; }
+.frame[data-cover="true"] .playOverlay { display: flex; justify-content: flex-end; align-items: center; padding-right: 15%; background: none; }
+@media (max-width: 600px) {
+  .cover { padding: 6%; }
+  .cover > span { font-size: 8px; }
+  .cover strong { font-size: 21px; }
+  .cover p { margin-top: 8px; font-size: 10px; }
+  .frame[data-cover="true"] .playOverlay { padding-right: 10%; }
+}

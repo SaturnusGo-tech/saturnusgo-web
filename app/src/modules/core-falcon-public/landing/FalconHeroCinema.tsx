@@ -37,14 +37,14 @@ export function FalconHeroCinema() {
       <div className={styles.heroInner}>
         <p className={styles.eyebrow}>Falcon / Управление тестированием</p>
         <h1 id="falcon-hero-title">
-          Тест-кейсы,
+          Выпускайте продукт.
           <br />
-          прогоны и дефекты.
+          Знайте, что проверено.
         </h1>
         <p className={styles.heroLead}>
-          Планируйте проверки, фиксируйте результаты
-          <br className={styles.desktopBreak} /> и проверяйте исправления вместе
-          с командой.
+          От первого тест-кейса до проверки исправления.
+          <br className={styles.desktopBreak} /> Весь цикл тестирования в одном
+          рабочем пространстве.
         </p>
         <a href="#product" className={styles.watchLink}>
           <span>

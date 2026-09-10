@@ -5,7 +5,8 @@ import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, workflow, overviewStory } from "./content/demos";
+import { demos, workflow, overviewStory, resultsStory } from "./content/demos";
+import { PilotSection } from "./pilot/PilotSection";
 import { Reveal } from "./motion/Reveal";
 import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
@@ -26,7 +27,7 @@ export function FalconLanding() {
         >
           <ProductStory story={overviewStory} headingId="overview-title" />
           <Reveal className={styles.videoReveal} variant="media">
-            <ProductVideo demo={demos.dashboard} priority />
+            <ProductVideo demo={demos.projects} priority />
           </Reveal>
         </section>
         <nav className={styles.chapterNav} aria-label="Возможности Falcon">
@@ -50,15 +51,22 @@ export function FalconLanding() {
           </section>
         ))}
         <FalconIntegrations />
+        <section className={styles.workflowSection} id="results" aria-labelledby="results-title">
+          <ProductStory story={resultsStory} headingId="results-title" />
+          <Reveal className={styles.videoReveal} variant="media">
+            <ProductVideo demo={demos.dashboard} />
+          </Reveal>
+        </section>
+        <PilotSection />
         <section className={styles.faq} aria-labelledby="faq-title">
-          <h2 id="faq-title">Вопросы о Falcon</h2>
+          <h2 id="faq-title">Перед началом работы</h2>
           <div>
             <details>
-              <summary>С чего начать работу в Falcon?</summary>
+              <summary>Как начать пилот?</summary>
               <p>
-                Создайте аккаунт и рабочее пространство, добавьте проект, затем
-                первый тест-кейс. Руководство внутри Falcon показывает каждый
-                шаг: от структуры репозитория до результатов прогона.
+                Напишите в Telegram @bysieger. Обсудим ваш продукт, размер команды,
+                нужные интеграции и условия пилота. После согласования создадим
+                пространство компании и выдадим доступ администратору.
               </p>
             </details>
             <details>
@@ -78,17 +86,17 @@ export function FalconLanding() {
               </p>
             </details>
             <details>
-              <summary>Дашборд одинаковый для всех проектов?</summary>
+              <summary>Как сотрудники получают доступ?</summary>
               <p>
-                Каждый проект настраивается отдельно. Добавляйте нужные виджеты
-                из библиотеки, меняйте их порядок и группируйте данные по
-                контексту работы.
+                Администратор компании добавляет сотрудников в своей панели
+                и назначает им роли. Команда входит в Falcon по адресу компании.
+                Количество доступных мест согласуем перед началом пилота.
               </p>
             </details>
           </div>
         </section>
       </main>
-      <footer className={styles.footer}>
+      <footer className={styles.footer} id="pilot">
         <img
           className={styles.footerWing}
           src="/falcon/landing/2026-09/falcon-wing.webp"
@@ -100,12 +108,15 @@ export function FalconLanding() {
         />
         <Reveal className={styles.footerCta}>
           <h2>
-            Начать работу
-            <br />в Falcon
+            Проверим Falcon
+            <br />на ваших задачах.
           </h2>
-          <Link className={styles.primaryButton} href="/cloud-login/">
-            Войти в компанию <ArrowRight size={17} aria-hidden="true" />
-          </Link>
+          <p className={styles.pilotLead}>Расскажите о продукте и команде. Обсудим демонстрацию,
+            перенос проверок и условия пилота.</p>
+          <a className={styles.primaryButton} href="https://t.me/bysieger" target="_blank" rel="noopener noreferrer">
+            Написать в Telegram <ArrowRight size={17} aria-hidden="true" />
+          </a>
+          <p className={styles.telegramHandle}>@bysieger · напрямую основателю Falcon</p>
         </Reveal>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />

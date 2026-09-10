@@ -1,6 +1,6 @@
 "use client";
 import { LoaderCircle, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
-import { useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 import type { ProductDemo } from "../content/demos";
 import { useProductPlayback } from "./useProductPlayback";
 import { useProductTimeline } from "./useProductTimeline";
@@ -16,10 +16,11 @@ export function ProductVideo({
   const player = useProductPlayback();
   const timeline = useProductTimeline(player.video);
   const id = useId();
+  const [hasPlayed, setHasPlayed] = useState(false);
   const playbackControl = useRef<HTMLButtonElement>(null);
   return (
     <figure className={styles.figure} aria-labelledby={id}>
-      <div className={styles.frame} ref={player.frame}>
+      <div className={styles.frame} ref={player.frame} data-cover={!hasPlayed}>
         <video
           ref={player.video}
           className={styles.video}
@@ -32,7 +33,7 @@ export function ProductVideo({
           aria-describedby={`${id}-description`}
           onLoadedMetadata={player.onMetadata}
           onDurationChange={player.onMetadata}
-          onPlay={player.onPlay}
+          onPlay={() => { setHasPlayed(true); player.onPlay(); }}
           onPause={player.onPause}
           onEnded={player.onEnded}
           onError={player.onError}
@@ -46,6 +47,12 @@ export function ProductVideo({
             />
           )}
         </video>
+        {!hasPlayed && !player.failed && (
+          <div className={styles.cover} aria-hidden="true">
+            <span>FALCON / В РАБОТЕ</span>
+            <div><strong>{demo.title}</strong><p>{demo.description}</p></div>
+          </div>
+        )}
         {!player.playing && !player.failed && (
           <div className={styles.playOverlay}>
             <button
