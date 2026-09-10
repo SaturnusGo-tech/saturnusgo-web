@@ -1,3 +1,4 @@
+import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { Layers, Play, ChevronDown, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -38,6 +39,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, selec
   const presetCase = initialIds.length === 1 ? cases.find((item) => item.id === initialIds[0]) : undefined;
   const fastCase = Boolean(presetCase && !initialSuite);
   const initialType: TestRunSummary["type"] = initialIds.length ? "ad_hoc" : "smoke";
+  const [assigneeIdentityId, setAssignee] = useState<string | null>(null);
   const [suiteId, setSuiteId] = useState(initialSuite?.id ?? "");
   const [caseIds, setCaseIds] = useState<string[]>(initialIds);
   const [builderOpen, setBuilderOpen] = useState(!fastCase && !initialSuite);
@@ -79,9 +81,9 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, selec
     const environment = environments.find((item) => item.id === environmentId);
     if (!environment) return;
     setSubmitting(true); setError("");
-    const signature = JSON.stringify({ projectId: project.id, environmentId, suiteId: selectedSuite?.id ?? null, caseIds: selectedSuite ? [] : caseIds, name, type, build });
+    const signature = JSON.stringify({ assigneeIdentityId, projectId: project.id, environmentId, suiteId: selectedSuite?.id ?? null, caseIds: selectedSuite ? [] : caseIds, name, type, build });
     operation.current = resolvePendingOperation(operation.current, signature);
-    const result = await createRun({ http, project, environment, suite: selectedSuite, caseIds, name, type, build, offline, operationKey: operation.current.key });
+    const result = await createRun({ http, project, environment, suite: selectedSuite, caseIds, name, type, build, offline, assigneeIdentityId, operationKey: operation.current.key });
     if (!result.ok) { setError(formatTmsMutationFailure(result.failure, copy.createError)); setSubmitting(false); return; }
     onCreated(result.run);
   }
@@ -111,6 +113,7 @@ export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, selec
       <div className={styles.body}>
         <section className={styles.nameSection}><label className={styles.nameField}><span>{copy.name}</span><span data-input-shell className={styles.inputShell}><input required value={name} onChange={(event) => { setNameEdited(true); setName(event.target.value); }} /></span></label></section>
         {scopeSection}{targetSection}
+        <section className={styles.section}><h3>{locale === "ru" ? "Ответственный" : "Responsible"}</h3><ResponsiblePicker workspaceId={data.workspace.id} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} /></section>
         <p className={styles.resultHint}>{copy.targetHint}</p>
       </div>
       <footer className={styles.footer}><span className={!hasSelection ? styles.footerWarning : ""}>{hasSelection ? `${copy.selected}: ${countLabel(selectionCount)}` : selectedSuite && suiteCount === null && !suiteError ? copy.resolvingSuite : copy.selectionRequired}</span><div><button type="button" className={styles.cancelButton} onClick={onClose}>{copy.cancel}</button><button className={styles.startButton} data-testid="start-run" disabled={submitting || !environmentId || !name.trim() || !hasSelection}><Play size={16} />{submitting ? copy.starting : copy.startRun}</button></div></footer>

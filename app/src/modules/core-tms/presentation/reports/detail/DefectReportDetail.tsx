@@ -1,4 +1,5 @@
 "use client";
+import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 
 import {
   ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, PlayCircle, X,
@@ -92,7 +93,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
           <DetailSection title={t("reports.location")}>
             <dl className={surface.propertyList}>
               <div><dt>{t("reports.component")}</dt><dd>{localizedComponentLabel(locale, defect.component) || "—"}</dd></div>
-              <div><dt>{t("reports.assignee")}</dt><dd>{defect.assigneeIdentityId || t("common.unassigned")}</dd></div>
+              <div><dt>{t("reports.assignee")}</dt><dd>{workspaceId ? <ResponsibleName workspaceId={workspaceId} identityId={defect.assigneeIdentityId} /> : t("common.unassigned")}</dd></div>
               <div><dt>{t("reports.integration")}</dt><dd>{defect.integrationTarget ? "YouTrack" :
                 locale === "ru" ? "Интеграции проекта" : "Project integrations"}</dd></div>
             </dl>

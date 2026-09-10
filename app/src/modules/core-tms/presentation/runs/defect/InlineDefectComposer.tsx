@@ -1,3 +1,4 @@
+import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { Bug, Paperclip, RefreshCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -46,6 +47,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const componentOptions = Array.from(new Set([item.snapshot.component, ...components].map((value) => value.trim()).filter(Boolean)));
   if (componentOptions.length === 0) componentOptions.push("Core product");
   const [title, setTitle] = useState(observed);
+  const [assigneeIdentityId, setAssignee] = useState<string | null>(null);
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [priority, setPriority] = useState<Defect["priority"]>("high");
   const [component, setComponent] = useState(componentOptions[0]);
@@ -81,7 +83,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
     setError("");
     const payload: Omit<Defect, "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId, title, description: `${description}\n\n${t("inlineDefect.reproSection")}:\n${repro}`,
-      severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId: null,
+      severity, priority, status: "open", reproducibility: "Always", assigneeIdentityId,
       component, integrationTarget: routing.target,
       labels: defectClientLabels(true), runId: run.id, runItemId: item.id,
       stepId: step.id, expectedResult: localizedStep.expectedResult, actualResult: observed,
@@ -108,6 +110,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
             <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={componentChoices} /></Field>
             <Field label={copy.routingLabel} wide><AnimatedSelect label={copy.routingLabel} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
               {!offline && <small>{copy.routingHint}</small>}{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
+            <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} />
             <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
           </div>
         </section>

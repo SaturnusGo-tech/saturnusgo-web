@@ -1,3 +1,4 @@
+import { CaseAuthor } from "../../../test-cases/attribution/presentation/CaseAuthor";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import type { CaseInspectorEditor } from "../inspector/model";
 import type { TmsLocale } from "../../../localization/model/locale";
@@ -30,6 +31,7 @@ export function CaseOverview({
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
 }) {
   return <>
+    {testCaseId && <CaseAuthor caseId={testCaseId} />}
     <CaseInspectorContent
       locale={locale}
       revision={revision}

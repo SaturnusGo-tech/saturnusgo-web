@@ -1,0 +1,1 @@
+.avatar { display:inline-grid; place-items:center; width:24px; height:24px; flex-shrink:0; border-radius:50%; background:color-mix(in srgb,var(--action,#537ddd) 13%,transparent); color:var(--ink); font-size:10px; font-weight:550; vertical-align:middle; }

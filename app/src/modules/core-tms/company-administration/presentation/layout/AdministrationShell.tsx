@@ -7,9 +7,12 @@ import type { ReactNode } from "react";
 import type { SignedInCompanySession } from "../../../auth/managed/domain/managed-access";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
+import type { AdministrationRoute } from "../../application/navigation/useAdministrationNavigation";
+import "../../../presentation/workspace/motion/motion.css";
 import styles from "./administration.module.css";
 
-export function AdministrationShell({ children, section, page, session, logout }: {
+export function AdministrationShell({ children, section, page, session, logout, onNavigate }: {
+  readonly onNavigate: (route: AdministrationRoute) => void;
   readonly page?: "company" | "audit"; readonly children: ReactNode; readonly section: "sandbox" | "admin" | "profile";
   readonly session: SignedInCompanySession; readonly logout: () => Promise<void>;
 }) {
@@ -22,7 +25,19 @@ export function AdministrationShell({ children, section, page, session, logout }
       <a className={styles.brand} href={session.audience === "platform" ? "/sandbox/" : "/testcases/umbrella-home/work/"}>
         <img src="/falcon/falcon-mark-light.png" alt="" />Falcon
       </a>
-      <nav className={styles.nav} aria-label={copy.admin}>
+      <nav className={styles.nav} aria-label={copy.admin} onClick={(event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = (event.target as Element).closest("a");
+        if (!link) return;
+        const url = new URL(link.href);
+        if (url.origin !== window.location.origin) return;
+        const target = url.pathname.split("/")[1];
+        if (target !== section && !(session.audience === "platform" && (target === "sandbox" || target === "profile"))) return;
+        if (target !== "sandbox" && target !== "admin" && target !== "profile") return;
+        event.preventDefault();
+        const next = url.searchParams.get("page");
+        onNavigate({ section: target, id: null, creating: false, ...(next === "audit" || next === "company" ? { page: next } : {}) });
+      }}>
         {session.audience === "platform" ? <a href="/sandbox/" aria-current={section === "sandbox" && !page ? "page" : undefined}><Building2 size={17} />{copy.companies}</a>
           : session.identity.role === "workspace_admin" && <a href="/admin/" aria-current={section === "admin" && !page ? "page" : undefined}><UsersRound size={17} />{copy.employees}</a>}
         {session.audience === "tenant" && session.identity.role === "workspace_admin" && <a href="/admin/?page=company" aria-current={section === "admin" && page === "company" ? "page" : undefined}><Building2 size={17} />{copy.companyDetails}</a>}

@@ -11,3 +11,11 @@ html[data-falcon-transition]::view-transition-new(falcon-content) { animation: d
   html[data-falcon-transition]::view-transition-group(*) { animation-duration: 0s !important; }
   html[data-falcon-transition]::view-transition-old(*), html[data-falcon-transition]::view-transition-new(*) { animation: none !important; }
 }
+/* Same-origin document changes retain the previous rendered frame while the next page arrives. */
+@view-transition { navigation: auto; }
+html:not([data-falcon-transition])::view-transition-old(root) { animation: dissolve-out 160ms ease-out both; }
+html:not([data-falcon-transition])::view-transition-new(root) { animation: dissolve-in 200ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html::view-transition-old(root), html::view-transition-new(root) { animation: none !important; }
+}

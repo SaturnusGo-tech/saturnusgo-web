@@ -1,4 +1,5 @@
 "use client";
+import { ResponsibleName } from "../../workspace/members/presentation/ResponsibleName";
 
 import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
 import { Bug, CheckCircle2, ChevronDown, CircleDashed, Search } from "lucide-react";
@@ -106,7 +107,7 @@ export function ReportsView({ workspaceId, projectId, defects, runs, links, sele
                   : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
               {localizedLabel(locale, defect.status)}
             </span></td>
-            <td>{defect.assigneeIdentityId || t("common.unassigned")}</td>
+            <td>{workspaceId ? <ResponsibleName workspaceId={workspaceId} identityId={defect.assigneeIdentityId} /> : t("common.unassigned")}</td>
           </tr>)}</tbody>
         </table>
       </div>

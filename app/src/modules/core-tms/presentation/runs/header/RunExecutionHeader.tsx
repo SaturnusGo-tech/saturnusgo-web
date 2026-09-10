@@ -1,3 +1,5 @@
+import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
+import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
 import { Copy, Play, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -19,6 +21,7 @@ type Props = {
 };
 
 export function RunExecutionHeader({ run, item, canArchive, archivePending, itemIndex, itemCount, onArchive, canStart, startPending, onStart }: Props) {
+  const { workspaceId, offline } = useWorkspacePeople();
   const { locale, t } = useTmsLocale();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -77,6 +80,7 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
           <span className={`${runStyles.executionBadge} ${runStyles[`execution_${item.status}`]}`}>{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
           <span>{t("cases.revision", { revision: item.revision })}</span>
           <span>{run.name}</span>
+          <ResponsibleName workspaceId={workspaceId} identityId={item.assigneeIdentityId} offline={offline} />
         </div>
       </div>
     </header>

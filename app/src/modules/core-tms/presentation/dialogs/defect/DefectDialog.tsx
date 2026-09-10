@@ -1,11 +1,8 @@
+import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { Bug, Image as ImageIcon, Paperclip, X } from "lucide-react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useEffect, useState, type FormEvent } from "react";
-import type {
-  Defect,
-  RunItem,
-  TestRunSummary,
-} from "../../../../../core/tms/contracts/legacy-contract";
+import type { Defect, RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { createDefect } from "../../../application/defects/createDefect";
 import { describeDefectCreateError } from "../../../application/defects/describeDefectCreateError";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
@@ -62,6 +59,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   const [actual, setActual] = useState(
     attempt?.actualResult ?? copy.defaultActual,
   );
+  const [assigneeIdentityId, setAssignee] = useState<string | null>(null);
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
   const [component, setComponent] = useState(componentOptions[0] ?? fallbackComponent);
@@ -103,7 +101,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
       priority: severity,
       status: "open",
       reproducibility,
-      assigneeIdentityId: null,
+      assigneeIdentityId,
       component,
       integrationTarget: routing.target,
       labels: defectClientLabels(occurrence !== null),
@@ -162,6 +160,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
               { value: "Once", label: copy.once },
             ]} />
           </div>
+          <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} />
           <Field label={copy.description} wide>
             <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} />
           </Field>

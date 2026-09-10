@@ -1,3 +1,4 @@
+import { MemberAvatar } from "../../../workspace/members/avatar/MemberAvatar";
 import { ContentSkeleton } from "../../../presentation/common/skeleton/ContentSkeleton";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
@@ -44,7 +45,7 @@ export function OrganizationDiscussion({ canPost, workflowPhase = "new", phaseDi
     {state.error && <div className={shared.error}><FormError message={formatTmsMutationFailure(state.error, copy.loadError)} />
       <button type="button" className={shared.secondary} onClick={state.reload}>{copy.retry}</button></div>}
     <ol className={css.comments}>{state.items.map((item) => <li key={item.id}>
-      <div><strong>{item.author.displayName}</strong><time dateTime={item.createdAt}>{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt))}</time></div>
+      <div><MemberAvatar identityId={item.author.identityId} name={item.author.displayName} /><strong>{item.author.displayName}</strong><time dateTime={item.createdAt}>{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt))}</time></div>
       <MarkdownField label={copy.label} value={item.body} allowAttachments={false} />
     </li>)}</ol>
     {state.cursor && <button type="button" className={shared.textButton} disabled={state.loading} onClick={state.loadMore}>{copy.more}</button>}

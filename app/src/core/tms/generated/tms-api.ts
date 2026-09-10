@@ -2376,7 +2376,7 @@ export interface paths {
         };
         /**
          * List active workspace members for responsible person selection
-         * @description Requires workspace:read. Returns only active memberships and active identities in this workspace. Search matches name or email; cursor is bound to workspace and search, ordered by display name and identity ID. No role or permission mutation.
+         * @description Requires workspace:read. Returns only active memberships and active identities for selection. An exact identityId lookup also resolves former or suspended members for historical attribution within this workspace; it does not grant assignment eligibility. Search matches name or email; cursor is bound to workspace and search, ordered by display name and identity ID. No role or permission mutation.
          */
         get: operations["listWorkspaceMembers"];
         put?: never;

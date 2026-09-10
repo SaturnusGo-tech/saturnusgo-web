@@ -26,6 +26,7 @@ export async function createRun(input: {
   build: string;
   offline: boolean;
   operationKey: string;
+  assigneeIdentityId?: string | null;
 }): Promise<Result> {
   if (input.offline) {
     return {
@@ -47,6 +48,7 @@ export async function createRun(input: {
       build: input.build,
       configuration: {},
       startImmediately: true,
+      ...(input.assigneeIdentityId ? { assigneeIdentityId: input.assigneeIdentityId } : {}),
       ...scope,
     }, input.operationKey);
     return { ok: true, run: created.data };

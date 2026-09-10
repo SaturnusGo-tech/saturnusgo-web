@@ -63,7 +63,7 @@ test("successful run creation accepts the POST resource without a follow-up GET"
   let writes = 0;
   let reads = 0;
   const http = {
-    async mutateResource() { writes += 1; return { data: runDto, etag: '"run-1:1"' }; },
+    async mutateResource(_path: string, _method: string, body: { assigneeIdentityId?: string }) { assert.equal(body.assigneeIdentityId, "identity-1"); writes += 1; return { data: runDto, etag: '"run-1:1"' }; },
     async getResource() { reads += 1; throw new Error("unexpected GET"); },
   } as unknown as TmsHttpClient;
 
@@ -73,7 +73,7 @@ test("successful run creation accepts the POST resource without a follow-up GET"
     environment: { id: "environment-1", projectId: "project-1", key: "QA", name: "QA",
       baseUrl: "https://example.test", description: "", isDefault: true },
     caseIds: ["case-1"], name: "Smoke", type: "smoke", build: "42", offline: false,
-    operationKey: "create-key",
+    operationKey: "create-key", assigneeIdentityId: "identity-1",
   });
 
   assert.equal(writes, 1);

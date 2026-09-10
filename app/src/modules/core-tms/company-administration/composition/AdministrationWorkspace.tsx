@@ -18,11 +18,12 @@ import { CreateMember } from "../presentation/members/CreateMember";
 import { MemberDetail } from "../presentation/member-detail/MemberDetail";
 import { ProfilePage } from "../presentation/profile-page/ProfilePage";
 
-export function AdministrationWorkspace({ session, logout, section }: {
+export function AdministrationWorkspace({ session, logout, section: initialSection }: {
   readonly session: SignedInCompanySession; readonly logout: () => Promise<void>; readonly section: "sandbox" | "admin" | "profile";
 }) {
   const client = useMemo(() => createAdministrationClient(createAuthenticatedTmsHttpClient({ apiBase: `${window.location.origin}/api/v1`, credentials: "include" })), []);
   const { route, navigate } = useAdministrationNavigation();
+  const section = route.section ?? initialSection;
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
   const onOpen = (id: string) => navigate({ id, creating: false });
@@ -30,7 +31,7 @@ export function AdministrationWorkspace({ session, logout, section }: {
   const onCreate = () => navigate({ id: null, creating: true });
   const forbidden = (section === "sandbox" && session.audience !== "platform")
     || (section === "admin" && (session.audience !== "tenant" || session.identity.role !== "workspace_admin"));
-  return <AdministrationShell section={section} page={route.page} session={session} logout={logout}>
+  return <AdministrationShell onNavigate={navigate} section={section} page={route.page} session={session} logout={logout}>
     {forbidden ? <p>{copy.noPermission}</p> : section === "profile" ? <ProfilePage client={client} />
       : route.page === "audit" ? <AdministrationJournal client={client} platform={session.audience === "platform"} />
       : section === "admin" && route.page === "company" ? <CompanyOverview client={client} />

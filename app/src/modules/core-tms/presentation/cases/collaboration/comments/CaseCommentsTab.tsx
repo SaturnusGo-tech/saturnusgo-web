@@ -1,3 +1,4 @@
+import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { AlertCircle, MessageSquare, RotateCw, Send } from "lucide-react";
 import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -84,7 +85,7 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
       {model.comments.items.length === 0
         ? <div className={css.commentsEmpty}>{ru ? "Комментариев пока нет" : "No comments yet"}</div>
         : model.comments.items.map((comment) => <article className={css.comment} key={comment.id}>
-            <span aria-hidden="true">{activityActorLabel(comment.author.displayName).slice(0, 1).toUpperCase()}</span>
+            <MemberAvatar identityId={comment.author.identityId} name={activityActorLabel(comment.author.displayName)} />
             <div>
               <header><strong>{activityActorLabel(comment.author.displayName)}</strong><time dateTime={comment.createdAt}>
                 {formatTime(comment.createdAt, languageTag)}
