@@ -163,3 +163,6 @@
 }
 
 @media (max-width: 520px) { .controls { width: 100%; } }
+
+.menu:popover-open { position:fixed; inset:auto; margin:0; left:var(--menu-left); top:var(--menu-top); min-width:var(--menu-width); max-width:min(220px,calc(100vw - 24px)); }
+.menu::backdrop { background:transparent; pointer-events:none; }

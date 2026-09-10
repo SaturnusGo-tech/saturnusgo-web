@@ -1,0 +1,2 @@
+.expansion { min-width: 0; }
+.expansion[data-moving="true"] { overflow: clip; }

@@ -77,3 +77,14 @@
   .footer > div { margin-left:auto; }
   .filterGrid { grid-template-columns:minmax(0,1fr); }
 }
+
+.runPanel.runPanel { animation: run-enter 280ms cubic-bezier(.2,.7,.2,1) both!important; }
+.runPanel.runPanel.closing { animation: run-exit 240ms cubic-bezier(.4,0,.7,.3) both!important; pointer-events:none; }
+.scopeSection, .assigneeSection { border-bottom:0; }
+.assigneeSection { display:flex; flex-direction:column; gap:12px; padding-top:20px; }
+.assigneeSection h3 { margin:0; font-size:12px; font-weight:550; color:var(--muted); }
+.caseSummary { padding:11px 13px; border-radius:12px; }
+.caseSummary strong { font-size:13px; }
+@keyframes run-enter { from { transform:translateX(calc(100% + 24px)); } to { transform:translateX(0); } }
+@keyframes run-exit { from { transform:var(--run-exit-from,translateX(0)); } to { transform:translateX(calc(100% + 24px)); } }
+@media(prefers-reduced-motion:reduce) { .runPanel.runPanel, .runPanel.runPanel.closing { animation:none!important; } }

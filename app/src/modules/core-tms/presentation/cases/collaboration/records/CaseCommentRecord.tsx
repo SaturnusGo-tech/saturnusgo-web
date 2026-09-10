@@ -10,9 +10,9 @@ import type { TestCaseComment } from "../../../../test-cases/collaboration/model
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel, activityActorLabel } from "../model";
 import css from "../caseCollaboration.module.css";
-export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, onParent }: {
+export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, onParent, nested = false }: {
   comment: TestCaseComment; ru: boolean; languageTag: string; model: CaseCollaborationViewModel;
-  onReply: (comment: TestCaseComment) => void; onParent: (id: string) => void;
+  nested?: boolean; onReply: (comment: TestCaseComment) => void; onParent: (id: string) => void;
 }) {
   const [editing, setEditing] = useState<TestCaseComment | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -32,7 +32,7 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
           disabled={pending} onEdit={() => { setEditing(comment); setConfirming(false); }}
           onDelete={() => { setConfirming(true); setEditing(null); }} onReply={() => onReply(comment)} />
       </header>
-      {comment.parentId && <button className={css.replyReference} type="button" onClick={() => onParent(comment.parentId!)}><Reply size={12} />
+      {comment.parentId && !nested && <button className={css.replyReference} type="button" onClick={() => onParent(comment.parentId!)}><Reply size={12} />
         {parent ? parent.deletedAt ? (ru ? "Ответ на удалённый комментарий" : "Reply to a deleted comment")
           : `${ru ? "Ответ" : "Reply to"} ${parent.author.displayName}` : (ru ? "Показать исходный комментарий" : "Show original comment")}</button>}
       {editing ? <CommentComposer key={comment.id} ru={ru} projectId={comment.projectId} initial={editing}

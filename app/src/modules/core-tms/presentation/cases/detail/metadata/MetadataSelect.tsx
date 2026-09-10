@@ -2,6 +2,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import styles from "./caseMetadata.module.css";
+import { useMetadataPopover } from "./popover/useMetadataPopover";
 import { nextMetadataOption } from "./navigation/nextMetadataOption";
 
 export type MetadataOption<T extends string> = {
@@ -30,6 +31,8 @@ export function MetadataSelect<T extends string>({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const menuId = useId();
+  const menuRef = useRef<HTMLDivElement>(null);
+  useMetadataPopover(open, triggerRef, menuRef);
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
   const selected = options[selectedIndex] ?? options[0];
 
@@ -44,7 +47,7 @@ export function MetadataSelect<T extends string>({
 
   function focusOption(index: number) {
     setActiveIndex(index);
-    requestAnimationFrame(() => optionRefs.current[index]?.focus());
+    requestAnimationFrame(() => optionRefs.current[index]?.focus({ preventScroll: true }));
   }
 
   function openAt(index: number) {
@@ -99,6 +102,8 @@ export function MetadataSelect<T extends string>({
       </button>
       <div
         id={menuId}
+        ref={menuRef}
+        popover="manual"
         className={styles.menu}
         role="listbox"
         aria-label={label}

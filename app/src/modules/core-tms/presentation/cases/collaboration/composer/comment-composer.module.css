@@ -11,3 +11,7 @@
 .channels label { display: flex; align-items: center; gap: 5px; }
 .channels small { flex-basis: 100%; color: var(--cases-muted); }
 .error { color: #db6872; font-size: 12px; }
+
+.composer { animation: composer-reveal 180ms ease-out; }
+@keyframes composer-reveal { from { opacity:0; } to { opacity:1; } }
+@media(prefers-reduced-motion:reduce) { .composer { animation:none; } }

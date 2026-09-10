@@ -7,7 +7,7 @@
 .headerActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .headerTextButton { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--cases-secondary-text); background: transparent; border: 1px solid var(--cases-control-border); border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color 160ms ease, color 160ms ease; }
 .headerTextButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
-.headerActions .headerRunButton { background: #3475ed; color: #fff; border-color: transparent; }
+.headerActions .headerRunButton { min-height: 28px; padding-inline: 9px; gap: 5px; font-size: 11px; border-radius: 10px; background: #3475ed; color: #fff; border-color: transparent; }
 .headerActions .headerRunButton:hover:not(:disabled) { background: #2d68dc; color: #fff; }
 .headerActions .headerRunButton svg { color: inherit; }
 .headerActions .headerQuarantineButton { min-height: 28px; padding-inline: 9px; gap: 5px; font-size: 11px; border-color: transparent; border-radius: 10px; background: color-mix(in srgb, var(--cases-text) 7%, var(--cases-bg)); color: var(--cases-secondary-text); }
