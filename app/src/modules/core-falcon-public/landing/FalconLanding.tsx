@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { SiTelegram } from "react-icons/si";
 import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
@@ -62,10 +63,10 @@ export function FalconLanding() {
           <h2 id="faq-title">Перед началом работы</h2>
           <div>
             <details>
-              <summary>Как начать пилот?</summary>
+              <summary>Как подключить Falcon?</summary>
               <p>
-                Напишите в Telegram @bysieger. Обсудим ваш продукт, размер команды,
-                нужные интеграции и условия пилота. После согласования создадим
+                Свяжитесь с нами в Telegram. Обсудим размер команды,
+                нужные интеграции и условия подключения. После согласования создадим
                 пространство компании и выдадим доступ администратору.
               </p>
             </details>
@@ -90,13 +91,13 @@ export function FalconLanding() {
               <p>
                 Администратор компании добавляет сотрудников в своей панели
                 и назначает им роли. Команда входит в Falcon по адресу компании.
-                Количество доступных мест согласуем перед началом пилота.
+                Количество сотрудников определяется условиями подключения.
               </p>
             </details>
           </div>
         </section>
       </main>
-      <footer className={styles.footer} id="pilot">
+      <footer className={styles.footer} id="contact">
         <img
           className={styles.footerWing}
           src="/falcon/landing/2026-09/falcon-wing.webp"
@@ -108,15 +109,15 @@ export function FalconLanding() {
         />
         <Reveal className={styles.footerCta}>
           <h2>
-            Проверим Falcon
-            <br />на ваших задачах.
+            Обсудим
+            <br />подключение Falcon.
           </h2>
-          <p className={styles.pilotLead}>Расскажите о продукте и команде. Обсудим демонстрацию,
-            перенос проверок и условия пилота.</p>
+          <p className={styles.pilotLead}>Напишите нам в Telegram. Ответим на вопросы о продукте,
+            интеграциях и условиях подключения.</p>
           <a className={styles.primaryButton} href="https://t.me/bysieger" target="_blank" rel="noopener noreferrer">
-            Написать в Telegram <ArrowRight size={17} aria-hidden="true" />
+            <SiTelegram size={18} aria-hidden="true" /> Связаться с нами
           </a>
-          <p className={styles.telegramHandle}>@bysieger · напрямую основателю Falcon</p>
+          <p className={styles.telegramHandle}>Telegram · @bysieger</p>
         </Reveal>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
