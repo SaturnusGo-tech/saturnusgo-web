@@ -22,3 +22,11 @@ connections, cancelled stale responses, tenant switching, failures and missing e
 The actual CreateMember component was inspected in a temporary local browser fixture in
 both themes; selecting Observer worked and both menus were opaque. The fixture was removed.
 Production build and rollout evidence follows after publication.
+
+Production: source `bf0e566cec15a93bd4465506426d9f3d283456a4`; optimized static build
+passed. Pages `4444b715`; Worker `9120a00c-5ce6-4246-a77d-e1fbf469ff57` deployed at
+100% with all six company domain bindings preserved. All 22 workspace entry scripts
+matched the reviewed output byte-for-byte on Umbrella and SaturnusGo. The administration
+stylesheet matched on Sandbox and SaturnusGo. A separate production browser tab reached
+the Umbrella sign-in screen; authenticated production UI interaction was not performed.
+No employee accounts or live Swagger connections were created or changed during QA.
