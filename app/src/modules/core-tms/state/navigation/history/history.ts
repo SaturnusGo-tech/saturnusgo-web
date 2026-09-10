@@ -3,6 +3,7 @@ export type HistoryPort = {
   href: () => string; state: () => Record<string, unknown> | null;
   replace: (state: Record<string, unknown>, href: string) => void;
   push: (state: Record<string, unknown>, href: string) => void;
+  saveContext?: (entry: NavigationEntry) => void;
   changed: () => void; session: () => string;
   readEnd: (session: string) => number; writeEnd: (session: string, index: number) => void;
 };
@@ -39,7 +40,9 @@ export function createNavigationHistory(port: HistoryPort) {
       const context = { ...entry.context, [key]: value };
       // UI state only; cap retained screen contexts when exploring large workspaces.
       const keys = Object.keys(context); keys.slice(0, Math.max(0, keys.length - 80)).forEach(key => delete context[key]);
-      port.replace({ ...port.state(), falconNavigation: { ...entry, context } }, port.href());
+      const next = { ...entry, context };
+      if (port.saveContext) port.saveContext(next);
+      else port.replace({ ...port.state(), falconNavigation: next }, port.href());
     },
     position() {
       const entry = initialize();
