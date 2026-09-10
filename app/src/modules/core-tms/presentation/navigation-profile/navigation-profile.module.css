@@ -15,3 +15,18 @@
 .profile[data-collapsed="true"] .name { display:none; }
 @media(max-width:760px) { .profile { width:48px; padding:8px; } .name { display:none; } }
 @media(prefers-reduced-motion:reduce) { .profile { transition:none; } }
+
+.admin {
+  display:flex; align-items:center; gap:11px; flex-shrink:0; min-height:40px;
+  margin:4px 10px 0; padding:9px 16px; border-radius:12px;
+  color:var(--sidebar-strong); text-decoration:none; font-size:13px;
+  transition:background-color 150ms ease;
+}
+.admin:visited, .admin span { color:var(--sidebar-strong); }
+.admin svg { flex-shrink:0; color:var(--sidebar-muted); }
+.admin:hover { background:var(--sidebar-hover); }
+.admin:focus-visible { outline:2px solid var(--sidebar-muted); outline-offset:2px; }
+.admin[data-collapsed="true"] { width:48px; padding:9px; justify-content:center; }
+.admin[data-collapsed="true"] span { display:none; }
+@media(max-width:760px) { .admin { width:48px; padding:9px; justify-content:center; } .admin span { display:none; } }
+@media(prefers-reduced-motion:reduce) { .admin { transition:none; } }
