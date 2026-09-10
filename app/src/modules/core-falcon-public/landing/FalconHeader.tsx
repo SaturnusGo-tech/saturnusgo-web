@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { TMS_ADMIN_LOGIN_PATH } from "../../core-tms/auth/navigation/tms-auth-route";
 import { FalconBrand } from "../shared/FalconBrand";
 import styles from "./landing.module.css";
 
@@ -13,11 +12,8 @@ export function FalconHeader() {
           <a href="#integrations">Интеграции</a>
         </nav>
         <div className={styles.headerActions}>
-          <Link className={styles.loginButton} href={TMS_ADMIN_LOGIN_PATH}>
-            Войти
-          </Link>
-          <Link className={styles.primaryButton} href="/signup/">
-            Создать аккаунт
+          <Link className={styles.primaryButton} href="/cloud-login/">
+            Войти в компанию
           </Link>
         </div>
       </div>

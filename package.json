@@ -19,7 +19,7 @@
     "prepare:pages": "bash scripts/deploy_pages.sh --prepare",
     "deploy:tms-worker": "bash scripts/deploy_tms_worker.sh --publish",
     "prepare:tms-worker": "bash scripts/deploy_tms_worker.sh --prepare",
-    "test:tms-worker": "node --test infrastructure/cloudflare/tms-origin/worker.test.mjs infrastructure/cloudflare/tms-origin/pages-origin-readiness.test.mjs infrastructure/cloudflare/tms-origin/deploy-pages.test.mjs infrastructure/cloudflare/tms-origin/deploy-worker.test.mjs",
+    "test:tms-worker": "node --test infrastructure/cloudflare/tms-origin/worker.test.mjs infrastructure/cloudflare/tms-origin/pages-origin-readiness.test.mjs infrastructure/cloudflare/tms-origin/deploy-pages.test.mjs infrastructure/cloudflare/tms-origin/deploy-worker.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-api.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-document.test.mjs infrastructure/cloudflare/tms-origin/deployment/tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
     "architecture:tms": "node scripts/check-tms-architecture.mjs",
     "test:tms-auth": "tsx --test app/src/core/tms/transport/http.test.ts app/src/modules/core-tms/auth/application/*.test.ts app/src/modules/core-tms/auth/cloud/tests/*.test.ts app/src/modules/core-tms/auth/cloud/tests/accessibility/*.test.ts app/src/modules/core-tms/auth/config/*.test.ts app/src/modules/core-tms/auth/navigation/*.test.ts app/src/modules/core-falcon-public/landing/media/tests/*.test.ts",
@@ -28,7 +28,8 @@
     "sync:tms-contract": "node scripts/sync-tms-contract.mjs && npm run generate:tms-contract",
     "generate:tms-contract": "openapi-typescript ${TMS_OPENAPI_PATH:-app/src/core/tms/generated/tms-openapi.json} -o app/src/core/tms/generated/tms-api.ts",
     "check:tms-contract": "npm run generate:tms-contract && git diff --exit-code -- app/src/core/tms/generated/tms-api.ts",
-    "test:tms-organization": "tsx --test app/src/modules/core-tms/folders/tests/*.test.ts app/src/modules/core-tms/portfolios/navigation/tests/*.test.ts app/src/modules/core-tms/projects/catalog/tests/*.test.ts app/src/modules/core-tms/portfolios/tests/*.test.ts app/src/modules/core-tms/workspace/members/tests/*.test.ts app/src/modules/core-tms/test-cases/exchange/tests/folders/*.test.ts app/src/modules/core-tms/test-cases/exchange/tests/preparation/*.test.ts app/src/modules/core-tms/state/workspace/requests/tests/*.test.ts app/src/modules/core-tms/state/workspace-actions/tests/*.test.ts app/src/modules/core-tms/state/navigation/browser/tests/*.test.ts app/src/modules/core-tms/folders/state/workspace/tests/*.test.ts app/src/modules/core-tms/state/case-actions/tests/*.test.ts app/src/modules/core-tms/presentation/dialogs/folder/parent/tests/*.test.ts app/src/modules/core-tms/folders/tests/archive/*.test.ts app/src/modules/core-tms/presentation/cases/inspector/tests/archive/*.test.ts app/src/modules/core-tms/folders/presentation/dnd/tests/*.test.ts app/src/modules/core-tms/folders/presentation/dnd/tests/sensor/*.test.ts app/src/modules/core-tms/presentation/cases/bulk/action/tests/*.test.ts app/src/modules/core-tms/test-cases/navigation/project/tests/*.test.ts app/src/modules/core-tms/state/navigation/browser/tests/project/*.test.ts app/src/modules/core-tms/folders/navigation/tests/*.test.ts app/src/modules/core-tms/state/workspace/tests/project-navigation/*.test.ts app/src/modules/core-tms/presentation/dialogs/folder/parent/tree/tests/*.test.ts app/src/modules/core-tms/folders/presentation/resize/tests/*.test.ts app/src/modules/core-tms/portfolios/discussion/tests/*.test.ts app/src/modules/core-tms/portfolios/state/project/tests/*.test.ts app/src/modules/core-tms/portfolios/presentation/editor/tests/*.test.ts app/src/modules/core-tms/portfolios/navigation/portfolio/*.test.ts app/src/modules/core-tms/presentation/cases/inspector/tests/focus/*.test.ts app/src/modules/core-tms/state/case-bulk/tests/*.test.ts app/src/modules/core-tms/folders/tests/threaded/*.test.ts app/src/modules/core-tms/portfolios/management/tests/*.test.ts app/src/modules/core-tms/portfolios/attachments/tests/*.test.ts app/src/modules/core-tms/presentation/cases/browser/tests/*.test.ts app/src/modules/core-tms/portfolios/management/presentation/tests/*.test.ts app/src/modules/core-tms/portfolios/discussion/presentation/tests/*.test.ts app/src/modules/core-tms/presentation/cases/browser/focus/tests/*.test.ts app/src/modules/core-tms/presentation/workspace/motion/tests/*.test.ts"
+    "test:tms-organization": "tsx --test app/src/modules/core-tms/folders/tests/*.test.ts app/src/modules/core-tms/portfolios/navigation/tests/*.test.ts app/src/modules/core-tms/projects/catalog/tests/*.test.ts app/src/modules/core-tms/portfolios/tests/*.test.ts app/src/modules/core-tms/workspace/members/tests/*.test.ts app/src/modules/core-tms/test-cases/exchange/tests/folders/*.test.ts app/src/modules/core-tms/test-cases/exchange/tests/preparation/*.test.ts app/src/modules/core-tms/state/workspace/requests/tests/*.test.ts app/src/modules/core-tms/state/workspace-actions/tests/*.test.ts app/src/modules/core-tms/state/navigation/browser/tests/*.test.ts app/src/modules/core-tms/folders/state/workspace/tests/*.test.ts app/src/modules/core-tms/state/case-actions/tests/*.test.ts app/src/modules/core-tms/presentation/dialogs/folder/parent/tests/*.test.ts app/src/modules/core-tms/folders/tests/archive/*.test.ts app/src/modules/core-tms/presentation/cases/inspector/tests/archive/*.test.ts app/src/modules/core-tms/folders/presentation/dnd/tests/*.test.ts app/src/modules/core-tms/folders/presentation/dnd/tests/sensor/*.test.ts app/src/modules/core-tms/presentation/cases/bulk/action/tests/*.test.ts app/src/modules/core-tms/test-cases/navigation/project/tests/*.test.ts app/src/modules/core-tms/state/navigation/browser/tests/project/*.test.ts app/src/modules/core-tms/folders/navigation/tests/*.test.ts app/src/modules/core-tms/state/workspace/tests/project-navigation/*.test.ts app/src/modules/core-tms/presentation/dialogs/folder/parent/tree/tests/*.test.ts app/src/modules/core-tms/folders/presentation/resize/tests/*.test.ts app/src/modules/core-tms/portfolios/discussion/tests/*.test.ts app/src/modules/core-tms/portfolios/state/project/tests/*.test.ts app/src/modules/core-tms/portfolios/presentation/editor/tests/*.test.ts app/src/modules/core-tms/portfolios/navigation/portfolio/*.test.ts app/src/modules/core-tms/presentation/cases/inspector/tests/focus/*.test.ts app/src/modules/core-tms/state/case-bulk/tests/*.test.ts app/src/modules/core-tms/folders/tests/threaded/*.test.ts app/src/modules/core-tms/portfolios/management/tests/*.test.ts app/src/modules/core-tms/portfolios/attachments/tests/*.test.ts app/src/modules/core-tms/presentation/cases/browser/tests/*.test.ts app/src/modules/core-tms/portfolios/management/presentation/tests/*.test.ts app/src/modules/core-tms/portfolios/discussion/presentation/tests/*.test.ts app/src/modules/core-tms/presentation/cases/browser/focus/tests/*.test.ts app/src/modules/core-tms/presentation/workspace/motion/tests/*.test.ts",
+    "test:tms-managed": "tsx --test app/src/modules/core-tms/auth/managed/tests/state/*.test.tsx app/src/modules/core-tms/company-administration/tests/state/*.test.tsx app/src/modules/core-tms/company-administration/tests/data/*.test.ts app/src/modules/core-falcon-public/company-entry/tests/*.test.ts app/src/modules/core-tms/auth/managed/tests/features/*.test.ts"
   },
   "dependencies": {
     "@auth0/auth0-react": "2.24.1",
@@ -44,7 +45,6 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@tanstack/react-query": "^5.85.5",
     "@uiw/react-md-editor": "4.1.2",
-    "@web3modal/wagmi": "^5.1.11",
     "class-variance-authority": "^0.7.1",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.12",
@@ -61,8 +61,7 @@
     "recharts": "3.10.1",
     "swagger-ui-react": "5.32.15",
     "tw-animate-css": "^1.3.7",
-    "viem": "^2.34.0",
-    "wagmi": "^2.16.5"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
@@ -70,14 +69,25 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "19.1.10",
     "@types/react-dom": "^19.1.7",
+    "@types/react-test-renderer": "18.3.1",
     "@types/swagger-ui-react": "5.18.0",
     "autoprefixer": "^10.4.21",
     "openapi-typescript": "7.13.0",
     "patch-package": "8.0.1",
     "postcss": "^8.5.6",
+    "react-test-renderer": "18.3.1",
     "tailwindcss": "^4.1.12",
     "tsx": "4.23.12",
     "typescript": "5.9.2",
     "wrangler": "4.129.0"
+  },
+  "overrides": {
+    "js-yaml": "4.3.2",
+    "next": {
+      "postcss": "8.5.28"
+    },
+    "miniflare": {
+      "sharp": "0.35.4"
+    }
   }
 }

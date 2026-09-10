@@ -1,5 +1,6 @@
 "use client";
 
+import { ManagedProfileMenu } from "../profile-menu/ManagedProfileMenu";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -21,6 +22,7 @@ export function TmsSessionControl() {
     setFailed(false);
     void session.signOut().catch(() => setFailed(true));
   };
+  if (session.kind === "managed") return <ManagedProfileMenu session={session} />;
   return (
     <div className={styles.authSession}>
       {failed && <span role="alert" className={styles.srOnly}>{t("auth.logoutError")}</span>}

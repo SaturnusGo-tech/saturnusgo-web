@@ -1,12 +1,18 @@
 "use client";
 
+import type { ManagedAvatarLoader } from "../../managed/domain/managed-avatar";
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 
 export interface TmsSessionIdentity {
-  readonly kind: "admin" | "cloud";
+  readonly kind: "admin" | "cloud" | "managed";
   readonly label: string;
   readonly subject: string | null;
+  readonly profilePath?: string;
+  readonly administrationPath?: string;
+  readonly hasAvatar?: boolean;
+  readonly companyCapabilities?: readonly string[];
+  readonly avatarLoader?: ManagedAvatarLoader;
   readonly signOut: () => Promise<void>;
 }
 
@@ -27,3 +33,5 @@ export function useTmsSession(): TmsSessionIdentity {
   if (!value) throw new Error("TMS session control is outside its authentication provider.");
   return value;
 }
+
+export function useOptionalTmsSession(): TmsSessionIdentity | null { return useContext(Context); }

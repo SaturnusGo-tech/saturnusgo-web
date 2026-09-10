@@ -5,6 +5,7 @@ export const RELEASE_EVIDENCE_PATH = `${ORIGIN_NAMESPACE}/release.json`;
 export const APP_PATH = "/testcases/umbrella-home/work/";
 
 export const publicRoutes = Object.freeze([
+  ...["sandbox", "admin", "profile"].map((name) => Object.freeze({ publicPath: `/${name}/`, artifactPath: `${name}/index.html`, required: true })),
   Object.freeze({ publicPath: "/", artifactPath: "index.html", required: true }),
   Object.freeze({ publicPath: "/signup/", artifactPath: "signup/index.html", required: true }),
   Object.freeze({

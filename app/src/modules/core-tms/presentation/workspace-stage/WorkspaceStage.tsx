@@ -1,3 +1,6 @@
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
+import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
+import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
 import { WorkspacePortfoliosStage } from "./portfolios/WorkspacePortfoliosStage";
 import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -20,6 +23,7 @@ import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
+  const session = useOptionalTmsSession();
   async function selectDrillProject(projectId?: string) {
     if (projectId && projectId !== model.project?.id) await model.chooseProject(projectId);
   }
@@ -55,6 +59,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
     } else model.openDefect(row.id);
   }
+  if (!companyViewAvailable(model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
   if (model.connection === "loading" || model.connection === "error") {
     return (

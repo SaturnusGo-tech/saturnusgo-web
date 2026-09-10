@@ -18,6 +18,9 @@
     },
     {
       "cloudSession": []
+    },
+    {
+      "managedTenant": []
     }
   ],
   "tags": [
@@ -452,11 +455,11 @@
           "422": {
             "$ref": "#/components/responses/AnalyticsLimitExceeded"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -553,11 +556,11 @@
           "422": {
             "$ref": "#/components/responses/AnalyticsLimitExceeded"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -591,42 +594,58 @@
         "tags": [
           "Cloud auth"
         ],
-        "summary": "Register an isolated personal Falcon tenant",
-        "description": "Creates one local cloud identity, an unverified profile, a personal workspace, owner membership, default project and environment, and an opaque cookie session atomically. Explicit acceptance of the current server-controlled terms version is required and recorded. No email or phone verification is claimed. Replays require the same email-scoped key, canonical non-secret payload, matching profile, and valid password. Tenant resources converge idempotently; each successful credential-validated replay rotates to a fresh opaque cookie session without persisting a raw token.",
+        "summary": "Public registration is disabled",
+        "description": "Always returns REGISTRATION_DISABLED and never creates an identity, workspace, or session. Contact a company administrator for access.",
         "operationId": "registerCloudAccount",
         "security": [],
-        "x-tms-idempotency": "required",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/CloudRegistration"
-        },
+        "x-tms-idempotency": "not-applicable",
+        "parameters": [],
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/CloudRegistrationResponse"
-          },
-          "201": {
-            "$ref": "#/components/responses/CloudRegistrationResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
           "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
+            "description": "Public registration is disabled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "requestId"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "const": "REGISTRATION_DISABLED"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/cloud-auth/login": {
@@ -924,14 +943,14 @@
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -4285,11 +4304,11 @@
           "422": {
             "$ref": "#/components/responses/AnalyticsLimitExceeded"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -4423,11 +4442,11 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -4550,11 +4569,11 @@
           "422": {
             "$ref": "#/components/responses/AnalyticsLimitExceeded"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -4649,11 +4668,11 @@
           "422": {
             "$ref": "#/components/responses/AnalyticsLimitExceeded"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -4792,11 +4811,11 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "503": {
-            "$ref": "#/components/responses/AnalyticsUnavailable"
-          },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/AnalyticsUnavailable"
           }
         }
       }
@@ -6547,6 +6566,9 @@
           }
         ],
         "responses": {
+          "202": {
+            "$ref": "#/components/responses/ConnectorAcceptedResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -6582,9 +6604,6 @@
           },
           "503": {
             "$ref": "#/components/responses/ConnectorUnavailable"
-          },
-          "202": {
-            "$ref": "#/components/responses/ConnectorAcceptedResponse"
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -7871,14 +7890,14 @@
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -7987,6 +8006,9 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -8007,9 +8029,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           }
         }
       }
@@ -8043,6 +8062,9 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -8063,9 +8085,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           }
         }
       }
@@ -9013,6 +9032,3493 @@
         },
         "description": "Requires project:manage and active workspace, target, identity and membership. Append-only with same-transaction safe audit metadata. Identical retried requests replay for 24 hours, including after target archival; reusing a key for another target or body returns 409. No HTML interpretation."
       }
+    },
+    "/auth/entrypoint": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "getManagedEntrypoint",
+        "operationId": "getManagedEntrypoint",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedEntrypoint"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "loginManagedAccount",
+        "operationId": "loginManagedAccount",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedStageResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/session": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "getManagedSession",
+        "operationId": "getManagedSession",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedSession"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "logoutManagedSession",
+        "operationId": "logoutManagedSession",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "204": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/auth/password/first": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "completeManagedFirstPassword",
+        "operationId": "completeManagedFirstPassword",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedStageResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedFirstPasswordRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/mfa/enroll": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "prepareManagedMfa",
+        "operationId": "prepareManagedMfa",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedMfaEnrollment"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/auth/mfa/verify": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "verifyManagedMfa",
+        "operationId": "verifyManagedMfa",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedMfaResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedCodeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/mfa/recovery": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "recoverManagedMfa",
+        "operationId": "recoverManagedMfa",
+        "security": [],
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedMfaResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedCodeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/companies": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listManagedCompanies",
+        "summary": "List companies managed by the operator",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded company list",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Company"
+                      },
+                      "maxItems": 100
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createManagedCompany",
+        "summary": "Create a company, primary administrator and domain job atomically",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyDraft"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company created; temporary password returned once and never persisted in the receipt. A replay returns null; use administrator reset if the original response was lost. Domain remains unavailable until provisioning is verified.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "company": {
+                          "$ref": "#/components/schemas/Company"
+                        },
+                        "temporaryPassword": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "company",
+                        "temporaryPassword"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Company created; temporary password returned once and never persisted in the receipt. A replay returns null; use administrator reset if the original response was lost. Domain remains unavailable until provisioning is verified.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "company": {
+                          "$ref": "#/components/schemas/Company"
+                        },
+                        "temporaryPassword": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "company",
+                        "temporaryPassword"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
+    },
+    "/company/members": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listCompanyMembers",
+        "summary": "List employees of the current company",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyMember"
+                      },
+                      "maxItems": 100
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createCompanyMember",
+        "summary": "Reserve a seat and create an employee with an expiring initial password",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMemberMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMemberMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyMemberDraft"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/company/members/{identityId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "identityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getCompanyMember",
+        "summary": "Read an employee of the current company",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMember"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit."
+      },
+      "patch": {
+        "operationId": "changeCompanyMember",
+        "summary": "Update, block, revoke or reset an employee account",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMemberMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyMemberChange"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/domain-check": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Managed access"
+        ],
+        "summary": "Verify HTTPS route for an assigned company domain",
+        "operationId": "verifyCompanyDomainReadiness",
+        "security": [],
+        "description": "Gateway-signed request required. The challenge proof binds the exact registered hostname and tenant, including while provisioning. It does not authorize access or activate a company.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyDomainReadiness"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "challenge",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{48}$"
+            }
+          }
+        ]
+      }
+    },
+    "/platform/companies/{workspaceId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getPlatformCompany",
+        "summary": "Read company details",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires an authenticated operator session on the configured Sandbox hostname. The operation rechecks operator access and row version inside its audit transaction. Company administrators cannot use platform routes."
+      },
+      "patch": {
+        "operationId": "changePlatformCompany",
+        "summary": "Change company details, limits, lifecycle, owner or retry its domain",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires an authenticated operator session on the configured Sandbox hostname. The operation rechecks operator access and row version inside its audit transaction. Company administrators cannot use platform routes. Ownership transfer, archival and primary administrator recovery require authentication within ten minutes. Otherwise REAUTHENTICATION_REQUIRED (403); call /profile/reauthenticate and retry the unchanged command.",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyChange"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getManagedProfile",
+        "summary": "Read own profile and security availability",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedProfile"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only the current fully authenticated identity on its verified hostname. No client identity or tenant selector. Password changes revoke all prior sessions and require the current password plus an unused MFA factor when enabled."
+      },
+      "patch": {
+        "operationId": "updateManagedProfile",
+        "summary": "Update own display name and phone",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedIdentity"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only the current fully authenticated identity on its verified hostname. No client identity or tenant selector. Password changes revoke all prior sessions and require the current password plus an unused MFA factor when enabled.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedProfileDetails"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/profile/password": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "changeManagedPassword",
+        "summary": "Change own password and rotate the current session",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Rotated host-only Secure HttpOnly SameSite=Lax session. Raw token is never returned in JSON."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "expiresAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only the current fully authenticated identity on its verified hostname. No client identity or tenant selector. Password changes revoke all prior sessions and require the current password plus an unused MFA factor when enabled.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedPasswordChange"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/profile/sessions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listManagedSessions",
+        "summary": "List own unexpired sessions",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ManagedDeviceSession"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only the current fully authenticated identity on its verified hostname. No client identity or tenant selector. Password changes revoke all prior sessions and require the current password plus an unused MFA factor when enabled.",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ]
+      }
+    },
+    "/profile/sessions/{sessionId}/revoke": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "sessionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "post": {
+        "operationId": "revokeManagedSession",
+        "summary": "Revoke an own session",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Secure, HttpOnly, SameSite=Lax, Path=/, no Domain attribute; logout expires it."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only the current fully authenticated identity on its verified hostname. No client identity or tenant selector. Password changes revoke all prior sessions and require the current password plus an unused MFA factor when enabled.",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/platform/companies/{workspaceId}/administrators": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listPlatformCompanyAdministrators",
+        "summary": "List company administrators for owner recovery and transfer",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyMember"
+                      },
+                      "maxItems": 100
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires a current Sandbox operator session. Bounded company account metadata; no access to project content.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/platform/companies/{workspaceId}/owner-access": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "post": {
+        "operationId": "recoverPlatformCompanyOwner",
+        "summary": "Reset the primary administrator access after operator identity verification",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMemberMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Issues a generated password valid for 72 hours, revokes sessions and optionally resets MFA. The current primary owner identity and its If-Match version must match. Replay never returns the password again. A tenant administrator cannot invoke this operation. Ownership transfer, archival and primary administrator recovery require authentication within ten minutes. Otherwise REAUTHENTICATION_REQUIRED (403); call /profile/reauthenticate and retry the unchanged command.",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "identityId",
+                  "resetMfa"
+                ],
+                "properties": {
+                  "identityId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                  },
+                  "resetMfa": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/companies/{workspaceId}/owner": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getPlatformCompanyOwner",
+        "summary": "Read the current primary company administrator",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyMember"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires an authenticated operator session on the configured Sandbox hostname. The operation rechecks operator access and row version inside its audit transaction. Company administrators cannot use platform routes."
+      }
+    },
+    "/profile/avatar": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getProfileAvatar",
+        "summary": "Get own photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarGrant"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private."
+      },
+      "post": {
+        "operationId": "changeProfileAvatar",
+        "summary": "Change own photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedAvatarUpload"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required"
+      },
+      "delete": {
+        "operationId": "removeProfileAvatar",
+        "summary": "Remove own photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/company/members/{identityId}/avatar": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "identityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getMemberAvatar",
+        "summary": "Get company member photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarGrant"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private."
+      },
+      "post": {
+        "operationId": "changeMemberAvatar",
+        "summary": "Change company member photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedAvatarUpload"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required"
+      },
+      "delete": {
+        "operationId": "removeMemberAvatar",
+        "summary": "Remove company member photo",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagedAvatarVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Verified tenant scope and full session required. A colleague may read a photo in the same company. Only the owner, authorized company administrator or the user themselves can change it. Platform identities can access only their own photo. All storage objects are private.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/company/audit": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getCompanyAudit",
+        "summary": "Read the administrative journal",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded company list",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/AdministrationEvent"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "description": "Bounded chronological administrative events only. No credentials, storage grants or tenant content. Each request revalidates the current operator or company administrator. Cursor is the last returned event ID."
+      }
+    },
+    "/platform/audit": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getPlatformAudit",
+        "summary": "Read the administrative journal",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded company list",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/AdministrationEvent"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "description": "Bounded chronological administrative events only. No credentials, storage grants or tenant content. Each request revalidates the current operator or company administrator. Cursor is the last returned event ID."
+      }
+    },
+    "/platform/companies/{workspaceId}/audit": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getPlatformCompanyAudit",
+        "summary": "Read the administrative journal",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded company list",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/AdministrationEvent"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nextCursor"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "description": "Bounded chronological administrative events only. No credentials, storage grants or tenant content. Each request revalidates the current operator or company administrator. Cursor is the last returned event ID."
+      }
+    },
+    "/company": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getOwnCompany",
+        "summary": "Read own company details, capabilities and seat usage",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Only a fully authenticated company administrator. Tenant identity comes from the verified hostname and session, never from client selectors.",
+        "parameters": []
+      }
+    },
+    "/platform/company-options": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getCompanyProvisioningOptions",
+        "summary": "Read the configured company domain suffix",
+        "tags": [
+          "Platform administration"
+        ],
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "domainSuffix": {
+                          "type": "string",
+                          "maxLength": 253
+                        }
+                      },
+                      "required": [
+                        "domainSuffix"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Fully authenticated platform operators only. Authoritative installation options, never derived from a browser hostname."
+      }
+    },
+    "/profile/reauthenticate": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "reauthenticateManagedSession",
+        "summary": "Confirm the current session with a password and unused second factor",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          },
+          {
+            "managedPlatform": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Rotated host-only Secure HttpOnly SameSite=Lax session. Raw token is never returned in JSON."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "expiresAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Rechecks the current password and MFA factor, rotates only the current session and records a fresh authentication time. Sensitive company ownership and owner recovery commands require authentication within ten minutes. Recovery codes and TOTP steps cannot be reused. Does not change the password or other device sessions.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagedReauthentication"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
     }
   },
   "components": {
@@ -9028,6 +12534,18 @@
         "in": "cookie",
         "name": "__Host-falcon_cloud_session",
         "description": "Opaque host-only HttpOnly Secure SameSite=Lax session. Cookie-authenticated mutations additionally require an exact configured Origin."
+      },
+      "managedTenant": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_tenant_session",
+        "description": "Opaque host-only session accepted only through the verified same-origin gateway. Tenant and platform sessions are separate."
+      },
+      "managedPlatform": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_platform_session",
+        "description": "Opaque host-only session accepted only through the verified same-origin gateway. Tenant and platform sessions are separate."
       }
     },
     "parameters": {
@@ -11298,6 +14816,21 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/OrganizationCommentEnvelope"
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "A required dependency is temporarily unavailable; retry the same idempotent command.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
             }
           }
         }
@@ -25182,7 +28715,8 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 500,
-            "description": "Trimmed task text."
+            "description": "Trimmed task text.",
+            "pattern": "^[^\\u0000]*$"
           },
           "completed": {
             "type": "boolean"
@@ -25196,6 +28730,1273 @@
           "$ref": "#/components/schemas/OrganizationChecklistItem"
         },
         "description": "Ordered checklist with unique stable item IDs. PATCH replaces the entire checklist under the entity ETag. Defaults to an empty list."
+      },
+      "ManagedAuthStage": {
+        "type": "string",
+        "enum": [
+          "password_change",
+          "mfa_enrollment",
+          "mfa_challenge",
+          "authenticated"
+        ]
+      },
+      "ManagedEntrypoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "tenant"
+            ]
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "accessContact": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email"
+          }
+        },
+        "required": [
+          "name",
+          "hostname",
+          "audience",
+          "available",
+          "accessContact"
+        ]
+      },
+      "ManagedLoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "login": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "login",
+          "password"
+        ]
+      },
+      "ManagedFirstPasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "ManagedCodeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 64,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "ManagedStageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stage": {
+            "$ref": "#/components/schemas/ManagedAuthStage"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "stage",
+          "expiresAt"
+        ]
+      },
+      "ManagedMfaResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stage": {
+            "$ref": "#/components/schemas/ManagedAuthStage"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recoveryCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "description": "Returned once on MFA enrollment. Store privately; subsequent logins return an empty array."
+          }
+        },
+        "required": [
+          "stage",
+          "expiresAt",
+          "recoveryCodes"
+        ]
+      },
+      "ManagedMfaEnrollment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "secret": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "secret",
+          "uri"
+        ]
+      },
+      "ManagedIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "workspace_admin",
+              "qa_manager",
+              "tester",
+              "reporter",
+              "viewer",
+              null
+            ]
+          },
+          "owner": {
+            "type": "boolean"
+          },
+          "hasAvatar": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "login",
+          "email",
+          "emailVerified",
+          "phone",
+          "role",
+          "owner",
+          "hasAvatar",
+          "version"
+        ]
+      },
+      "ManagedSession": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authenticated": {
+                "const": false
+              },
+              "stage": {
+                "const": "anonymous"
+              }
+            },
+            "required": [
+              "authenticated",
+              "stage"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authenticated": {
+                "const": false
+              },
+              "stage": {
+                "enum": [
+                  "password_change",
+                  "mfa_enrollment",
+                  "mfa_challenge"
+                ]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "authenticated",
+              "stage",
+              "expiresAt"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authenticated": {
+                "const": true
+              },
+              "stage": {
+                "const": "authenticated"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "audience": {
+                "enum": [
+                  "platform",
+                  "tenant"
+                ]
+              },
+              "workspaceId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "identity": {
+                "$ref": "#/components/schemas/ManagedIdentity"
+              },
+              "capabilities": {
+                "type": "array",
+                "maxItems": 5,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "core",
+                    "integrations",
+                    "api_testing",
+                    "automation",
+                    "analytics"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "authenticated",
+              "stage",
+              "expiresAt",
+              "audience",
+              "workspaceId",
+              "identity",
+              "capabilities"
+            ]
+          }
+        ]
+      },
+      "CompanyLegal": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "legalName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "countryCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "legalForm": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "taxId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "registrationId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "taxBranchId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "legalAddress": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "legalName",
+          "countryCode",
+          "legalForm",
+          "taxId",
+          "registrationId",
+          "taxBranchId",
+          "legalAddress"
+        ]
+      },
+      "CompanyCapability": {
+        "type": "string",
+        "enum": [
+          "core",
+          "integrations",
+          "api_testing",
+          "automation",
+          "analytics"
+        ]
+      },
+      "CompanyDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 48,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "legal": {
+            "$ref": "#/components/schemas/CompanyLegal"
+          },
+          "accessContactEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "maxMembers": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompanyCapability"
+            },
+            "minItems": 1,
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "administrator": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "login": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^(?:|\\+[1-9][0-9]{7,14})$"
+              },
+              "temporaryPassword": {
+                "type": "string",
+                "minLength": 12,
+                "maxLength": 256,
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "name",
+              "login",
+              "email"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "slug",
+          "legal",
+          "accessContactEmail",
+          "maxMembers",
+          "capabilities",
+          "administrator"
+        ]
+      },
+      "Company": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 48,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "legal": {
+            "$ref": "#/components/schemas/CompanyLegal"
+          },
+          "accessContactEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "maxMembers": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompanyCapability"
+            },
+            "minItems": 1,
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "workspaceId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "status": {
+            "enum": [
+              "provisioning",
+              "active",
+              "suspended",
+              "archived"
+            ]
+          },
+          "occupiedSeats": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ownerIdentityId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "domain": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "hostname": {
+                    "type": "string",
+                    "maxLength": 253
+                  },
+                  "status": {
+                    "enum": [
+                      "reserved",
+                      "provisioning",
+                      "verifying",
+                      "active",
+                      "failed",
+                      "retired"
+                    ]
+                  },
+                  "errorCode": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "hostname",
+                  "status",
+                  "errorCode"
+                ]
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "name",
+          "slug",
+          "legal",
+          "accessContactEmail",
+          "maxMembers",
+          "capabilities",
+          "workspaceId",
+          "status",
+          "occupiedSeats",
+          "ownerIdentityId",
+          "domain",
+          "version",
+          "createdAt"
+        ]
+      },
+      "CompanyMember": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identityId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^(?:|\\+[1-9][0-9]{7,14})$"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "workspace_admin",
+              "qa_manager",
+              "tester",
+              "reporter",
+              "viewer"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "blocked",
+              "revoked"
+            ]
+          },
+          "owner": {
+            "type": "boolean"
+          },
+          "hasAvatar": {
+            "type": "boolean"
+          },
+          "mfaEnabled": {
+            "type": "boolean"
+          },
+          "activationExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "identityId",
+          "name",
+          "login",
+          "email",
+          "phone",
+          "emailVerified",
+          "role",
+          "status",
+          "owner",
+          "hasAvatar",
+          "mfaEnabled",
+          "activationExpiresAt",
+          "version",
+          "createdAt"
+        ]
+      },
+      "CompanyMemberDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^(?:|\\+[1-9][0-9]{7,14})$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "workspace_admin",
+              "qa_manager",
+              "tester",
+              "reporter",
+              "viewer"
+            ]
+          },
+          "temporaryPassword": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+          }
+        },
+        "required": [
+          "name",
+          "login",
+          "email",
+          "role"
+        ]
+      },
+      "CompanyMemberChange": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "details"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "login": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 320
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^(?:|\\+[1-9][0-9]{7,14})$"
+              }
+            },
+            "required": [
+              "kind",
+              "name",
+              "login",
+              "email",
+              "phone"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "role"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "workspace_admin",
+                  "qa_manager",
+                  "tester",
+                  "reporter",
+                  "viewer"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "role"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "status"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "blocked",
+                  "revoked"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "status"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "reset_password"
+              },
+              "temporaryPassword": {
+                "type": "string",
+                "minLength": 12,
+                "maxLength": 256,
+                "writeOnly": true,
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+              },
+              "resetMfa": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          }
+        ]
+      },
+      "CompanyMemberMutation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "member": {
+            "$ref": "#/components/schemas/CompanyMember"
+          },
+          "temporaryPassword": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Returned only by first successful create/reset response; not stored in idempotency receipts."
+          }
+        },
+        "required": [
+          "member",
+          "temporaryPassword"
+        ]
+      },
+      "CompanyDomainReadiness": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hostname",
+          "challenge",
+          "proof"
+        ],
+        "properties": {
+          "hostname": {
+            "type": "string"
+          },
+          "challenge": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{48}$"
+          },
+          "proof": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "CompanyChange": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "details"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "legal": {
+                "$ref": "#/components/schemas/CompanyLegal"
+              },
+              "accessContactEmail": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "required": [
+              "kind",
+              "name",
+              "legal",
+              "accessContactEmail"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "capacity"
+              },
+              "maxMembers": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CompanyCapability"
+                },
+                "minItems": 1,
+                "maxItems": 5,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "kind",
+              "maxMembers",
+              "capabilities"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "status"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "suspended",
+                  "archived"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "status"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "owner"
+              },
+              "identityId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "kind",
+              "identityId"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "retry_domain"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          }
+        ]
+      },
+      "ManagedProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "workspace_admin",
+              "qa_manager",
+              "tester",
+              "reporter",
+              "viewer",
+              null
+            ]
+          },
+          "owner": {
+            "type": "boolean"
+          },
+          "hasAvatar": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "mfaEnabled": {
+            "type": "boolean"
+          },
+          "emailChangeAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "login",
+          "email",
+          "emailVerified",
+          "phone",
+          "role",
+          "owner",
+          "hasAvatar",
+          "version",
+          "mfaEnabled",
+          "emailChangeAvailable"
+        ]
+      },
+      "ManagedProfileDetails": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^(?:|\\+[1-9][0-9]{7,14})$"
+          }
+        },
+        "required": [
+          "name",
+          "phone"
+        ]
+      },
+      "ManagedPasswordChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 256
+          },
+          "secondFactor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "totp",
+                  "recovery"
+                ]
+              },
+              "code": {
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "kind",
+              "code"
+            ]
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "ManagedDeviceSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "userAgent": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "password_change",
+              "mfa_enrollment",
+              "mfa_challenge",
+              "authenticated"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "current",
+          "userAgent",
+          "stage",
+          "createdAt",
+          "expiresAt"
+        ]
+      },
+      "ManagedAvatarUpload": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "imageBase64": {
+            "type": "string",
+            "minLength": 16,
+            "maxLength": 1398104,
+            "contentEncoding": "base64",
+            "description": "JPEG, PNG or static WebP; decoded source at most 1 MiB and 16 megapixels. Re-encoded without metadata."
+          }
+        },
+        "required": [
+          "imageBase64"
+        ]
+      },
+      "ManagedAvatarVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "ManagedAvatarGrant": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "url",
+          "expiresAt"
+        ],
+        "description": "Private photo access valid for 60 seconds. Null when no photo is set. Never persist or cache the signed URL."
+      },
+      "AdministrationEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "actorName": {
+            "type": "string"
+          },
+          "targetName": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "actorName",
+          "targetName",
+          "occurredAt",
+          "requestId",
+          "status"
+        ]
+      },
+      "ManagedReauthentication": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "secondFactor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "totp",
+                  "recovery"
+                ]
+              },
+              "code": {
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "kind",
+              "code"
+            ]
+          }
+        },
+        "required": [
+          "currentPassword"
+        ]
       }
     }
   }

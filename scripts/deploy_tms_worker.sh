@@ -66,7 +66,7 @@ node "$readiness_script" --source-sha "$expected_sha"
 if [[ "$mode" == "--prepare" ]]; then
   (
     cd "$worker_dir"
-    "$wrangler_bin" deploy --config wrangler.toml --dry-run
+    "$wrangler_bin" versions upload --config wrangler.toml --keep-vars --dry-run
   )
   printf 'Worker release prepared (no deployment):\n  source_sha=%s\n  wrangler=%s\n' \
     "$actual_sha" "$installed_wrangler_version"
@@ -101,8 +101,9 @@ run_wrangler() {
 deployment_output=$(mktemp)
 deployment_status=$(mktemp)
 auth_preflight=$(mktemp)
+domain_snapshot=$(mktemp)
 cleanup_evidence() {
-  rm -f "$deployment_output" "$deployment_status" "$auth_preflight"
+  rm -f "$deployment_output" "$deployment_status" "$auth_preflight" "$domain_snapshot"
 }
 trap cleanup_evidence EXIT
 
@@ -116,12 +117,27 @@ if [[ "$worker_auth_mode" == "oauth" ]]; then
   fi
 fi
 
+# Credentials flow only through a pipe; the snapshot contains domain bindings, never tokens.
+run_wrangler auth token --json | node "$worker_dir/deployment/verify-domain-bindings.mjs" snapshot "$domain_snapshot"
 (
   cd "$worker_dir"
-  run_wrangler deploy \
+  run_wrangler versions upload \
     --config wrangler.toml \
+    --keep-vars \
     --message "Falcon TMS ${actual_sha}"
 ) 2>&1 | tee "$deployment_output"
+version_id=$(sed -nE 's/^Worker Version ID: ([0-9a-f-]{36})[[:space:]]*$/\1/p' "$deployment_output")
+[[ "$version_id" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]] || {
+  echo "Upload did not return one exact Worker version ID; traffic was not changed." >&2
+  exit 15
+}
+(
+  cd "$worker_dir"
+  run_wrangler versions deploy "${version_id}@100%" --config wrangler.toml --yes \
+    --message "Falcon TMS ${actual_sha}"
+)
+# Versions deployment does not reconcile triggers. New company domains can appear during release.
+run_wrangler auth token --json | node "$worker_dir/deployment/verify-domain-bindings.mjs" verify "$domain_snapshot"
 (
   cd "$worker_dir"
   run_wrangler deployments status --config wrangler.toml

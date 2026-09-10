@@ -2,7 +2,7 @@ import { bullets, note, paragraph, section, steps, table, type DocArticle } from
 import { settingsWalkthrough } from "../walkthroughs/settings/access";
 export const referenceArticles: DocArticle[] = [
   { id: "permissions", title: "Доступ и настройки", group: "reference", description: "Проверьте роль, доступ к проекту и параметры интерфейса перед изменением данных.",
-    keywords: ["права", "роль", "admin", "403", "тема", "язык", "доступ", "вход"], related: ["workspace", "integration-overview"],
+    keywords: ["права", "роль", "admin", "403", "тема", "язык", "доступ", "вход"], related: ["company-access", "company-administration", "workspace", "integration-overview"],
     sections: [
       section("permissions", "Если действие недоступно", steps(
         ["Проверьте контекст", "Сверьте аккаунт и выбранный проект. Ссылка на запись не выдаёт права на её просмотр."],

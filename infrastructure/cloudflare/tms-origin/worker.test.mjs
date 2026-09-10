@@ -79,7 +79,7 @@ test("adds a restrictive browser policy when the static origin supplies none", a
     headers: { "content-type": "text/html; charset=utf-8" },
   }));
 
-  const response = await worker.fetch(new Request("https://tms.saturnusgo.com/signup/"));
+  const response = await worker.fetch(new Request("https://tms.saturnusgo.com/cloud-login/"));
   const policy = response.headers.get("content-security-policy");
   assert.match(policy, /default-src 'self'/);
   assert.match(policy, /frame-ancestors 'none'/);
@@ -88,7 +88,7 @@ test("adds a restrictive browser policy when the static origin supplies none", a
 });
 
 test("canonicalizes public routes and preserves their query", async () => {
-  for (const route of ["signup", "cloud-login", "login"]) {
+  for (const route of ["cloud-login", "login"]) {
     const response = await worker.fetch(new Request(
       `https://tms.saturnusgo.com/${route}?returnTo=%2Ftestcases%2Fumbrella-home%2Fwork%2F`,
     ));
@@ -118,7 +118,7 @@ test("upgrades the canonical host to HTTPS before routing without contacting ori
   assert.equal(fetches, 0);
 });
 
-test("maps registration, cloud login and route data without exposing the namespace", async (context) => {
+test("maps login and route data without exposing the namespace", async (context) => {
   const requested = [];
   mockFetch(context, async (request) => {
     requested.push(request.url);
@@ -132,13 +132,11 @@ test("maps registration, cloud login and route data without exposing the namespa
     });
   });
 
-  await worker.fetch(new Request("https://tms.saturnusgo.com/signup/"));
   await worker.fetch(new Request("https://tms.saturnusgo.com/signup/index.txt?_rsc=one"));
   await worker.fetch(new Request("https://tms.saturnusgo.com/cloud-login/"));
   await worker.fetch(new Request("https://tms.saturnusgo.com/login/"));
 
   assert.deepEqual(requested, [
-    "https://www.saturnusgo.com/tms-origin/signup/index.html",
     "https://www.saturnusgo.com/tms-origin/signup/index.txt?_rsc=one",
     "https://www.saturnusgo.com/tms-origin/cloud-login/index.html",
     "https://www.saturnusgo.com/tms-origin/login/index.html",
@@ -250,7 +248,7 @@ test("does not relay upstream server errors through the TMS origin", async (cont
     headers: { "content-type": "text/html; charset=utf-8" },
   }));
 
-  const response = await worker.fetch(new Request("https://tms.saturnusgo.com/signup/"));
+  const response = await worker.fetch(new Request("https://tms.saturnusgo.com/cloud-login/"));
   assert.equal(response.status, 404);
   assert.equal(response.headers.get("content-type"), "text/plain; charset=utf-8");
   assert.equal(await response.text(), "Not found");
@@ -272,7 +270,7 @@ test("fails closed when an origin route or asset has the wrong MIME type", async
     status: 200,
     headers: { "content-type": "text/plain; charset=utf-8" },
   }));
-  const route = await worker.fetch(new Request("https://tms.saturnusgo.com/signup/"));
+  const route = await worker.fetch(new Request("https://tms.saturnusgo.com/cloud-login/"));
   assert.equal(route.status, 404);
 });
 
@@ -312,4 +310,16 @@ test("rejects unapproved hosts, paths, namespace access and unsafe methods", asy
     })),
   ]);
   assert.deepEqual(responses.map(({ status }) => status), [404, 404, 404, 404, 404]);
+});
+
+ test("retired public registration always redirects to company entry without fetching a signup document", async (context) => {
+  let fetches = 0;
+  mockFetch(context, async () => { fetches++; throw new Error("Must not fetch retired registration"); });
+  for (const pathname of ["/signup", "/signup/"]) {
+    const response = await worker.fetch(new Request(`https://tms.saturnusgo.com${pathname}?returnTo=https%3A%2F%2Fevil.test`));
+    assert.equal(response.status, 302);
+    assert.equal(new URL(response.headers.get("location")).pathname, "/cloud-login/");
+    assert.equal(new URL(response.headers.get("location")).hostname, "tms.saturnusgo.com");
+  }
+  assert.equal(fetches, 0);
 });

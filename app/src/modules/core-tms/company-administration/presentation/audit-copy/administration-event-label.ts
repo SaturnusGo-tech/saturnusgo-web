@@ -1,0 +1,31 @@
+const labels: Record<string, readonly [string, string]> = {
+  "company.created": ["Компания создана", "Company created"],
+  "company.details_changed": ["Изменены данные компании", "Company details updated"],
+  "company.capacity_changed": ["Изменены лимиты и возможности", "Capacity and capabilities updated"],
+  "company.owner_changed": ["Передано управление компанией", "Company ownership transferred"],
+  "company.owner_access_reset": ["Восстановлен доступ главного администратора", "Primary administrator access reset"],
+  "company.status_changed": ["Изменён статус компании", "Company status changed"],
+  "company.retry_domain_changed": ["Повторное подключение адреса", "Domain connection retried"],
+  "company.domain_active": ["Адрес компании подключён", "Company domain connected"],
+  "member.created": ["Добавлен сотрудник", "Person added"],
+  "member.details": ["Изменены данные сотрудника", "Person details updated"],
+  "member.role": ["Изменена роль сотрудника", "Person role updated"],
+  "member.status": ["Изменён доступ сотрудника", "Person access updated"],
+  "member.reset_password": ["Выдан временный пароль", "Temporary password issued"],
+  "member.revoke_sessions": ["Завершены сеансы сотрудника", "Person sessions ended"],
+  "profile.details_changed": ["Изменён профиль", "Profile updated"],
+  "profile.password_changed": ["Изменён пароль", "Password changed"],
+  "profile.avatar_changed": ["Изменена фотография", "Profile photo updated"],
+  "profile.avatar_removed": ["Фотография удалена", "Profile photo removed"],
+  "profile.session_revoked": ["Завершён сеанс", "Session ended"],
+  "access.login": ["Вход в Falcon", "Signed in to Falcon"],
+  "access.logout": ["Выход из Falcon", "Signed out of Falcon"],
+  "access.password_changed": ["Установлен пароль", "Password set"],
+  "access.mfa_enrolled": ["Подключён второй фактор", "Two-step sign-in enabled"],
+  "access.mfa_verified": ["Подтверждён второй фактор", "Second factor verified"],
+  "operator.bootstrapped": ["Создан оператор Falcon", "Falcon operator created"],
+  "operator.recovered": ["Восстановлен доступ оператора", "Operator access recovered"],
+};
+export function administrationEventLabel(action: string, locale: "ru" | "en"): string {
+  return labels[action]?.[locale === "ru" ? 0 : 1] ?? (locale === "ru" ? "Обновление доступа" : "Access updated");
+}

@@ -1,0 +1,38 @@
+export function accessCopy(locale: "ru" | "en") {
+  return locale === "ru" ? {
+    loginTitle: "Войти в Falcon", login: "Логин или email", password: "Пароль", signIn: "Войти",
+    showPassword: "Показать пароль", company: "Компания", sandbox: "Sandbox · Управление Falcon",
+    accessHelp: "За доступом или сбросом пароля обратитесь к администратору компании.",
+    unavailable: "Доступ пока недоступен", unavailableBody: "Адрес ещё подключается или доступ компании приостановлен.",
+    unknown: "Не удалось открыть вход", retry: "Повторить", cancel: "Вернуться ко входу",
+    firstTitle: "Установите свой пароль", firstBody: "Временный пароль действует только для первого входа.",
+    newPassword: "Новый пароль", confirmPassword: "Повторите пароль", savePassword: "Сохранить пароль",
+    passwordHint: "От 12 до 128 символов.", passwordMismatch: "Пароли не совпадают.",
+    mfaTitle: "Подтвердите вход", mfaBody: "Введите код из приложения аутентификации.",
+    enrollTitle: "Защитите свой аккаунт", enrollBody: "Для администраторов требуется двухэтапный вход. Добавьте Falcon в приложение аутентификации.",
+    prepare: "Настроить аутентификатор", code: "Код подтверждения", recoveryCode: "Резервный код", verify: "Подтвердить",
+    useRecovery: "Использовать резервный код", useTotp: "Использовать приложение", qr: "QR-код для аутентификатора",
+    qrHint: "Отсканируйте QR-код или введите этот ключ вручную.", codesTitle: "Сохраните резервные коды",
+    codesBody: "Каждый код работает один раз и поможет войти, если телефон недоступен. Повторно эти коды не показываются.",
+    savedCodes: "Я сохранил коды в безопасном месте", continue: "Продолжить", copy: "Скопировать коды", copied: "Скопировано",
+    loading: "Открываем Falcon", wrongAudience: "Этот раздел находится на другом адресе.",
+  } : {
+    loginTitle: "Sign in to Falcon", login: "Username or email", password: "Password", signIn: "Sign in",
+    showPassword: "Show password", company: "Company", sandbox: "Sandbox · Falcon administration",
+    accessHelp: "Contact your company administrator for access or a password reset.",
+    unavailable: "Access is not available yet", unavailableBody: "The address is being connected or company access is suspended.",
+    unknown: "Could not open sign-in", retry: "Try again", cancel: "Back to sign-in",
+    firstTitle: "Set your password", firstBody: "Your temporary password is only used for the first sign-in.",
+    newPassword: "New password", confirmPassword: "Confirm password", savePassword: "Save password",
+    passwordHint: "Between 12 and 128 characters.", passwordMismatch: "The passwords do not match.",
+    mfaTitle: "Confirm sign-in", mfaBody: "Enter the code from your authenticator app.",
+    enrollTitle: "Secure your account", enrollBody: "Administrators use two-step sign-in. Add Falcon to your authenticator app.",
+    prepare: "Set up authenticator", code: "Verification code", recoveryCode: "Recovery code", verify: "Verify",
+    useRecovery: "Use a recovery code", useTotp: "Use authenticator app", qr: "Authenticator QR code",
+    qrHint: "Scan the QR code or enter this key manually.", codesTitle: "Save your recovery codes",
+    codesBody: "Each code works once and lets you sign in if your phone is unavailable. These codes are only shown now.",
+    savedCodes: "I saved the codes in a safe place", continue: "Continue", copy: "Copy codes", copied: "Copied",
+    loading: "Opening Falcon", wrongAudience: "This section is available at a different address.",
+  };
+}
+export type AccessCopy = ReturnType<typeof accessCopy>;

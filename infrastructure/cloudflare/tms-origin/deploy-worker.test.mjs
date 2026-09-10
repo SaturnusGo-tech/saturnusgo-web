@@ -69,7 +69,7 @@ printf 'wrangler %s\\n' "$*" >> "$CALL_LOG"
 if [[ "\${TEST_EXPECT_OAUTH:-}" == "YES" && -n "\${CLOUDFLARE_API_TOKEN:-}\${CF_API_TOKEN:-}\${CLOUDFLARE_API_KEY:-}\${CF_API_KEY:-}" ]]; then exit 90; fi
 if [[ "\${1:-}" == "deployments" && "\${TEST_STATUS_FAIL:-}" == "YES" ]]; then exit 91; fi
 if [[ "\${1:-}" == "deployments" ]]; then echo "Current Version ID: fixture-version"; fi
-if [[ "\${1:-}" == "deploy" && "$*" != *"--dry-run"* ]]; then echo "Version ID: fixture-version"; fi
+if [[ "\${1:-} \${2:-}" == "versions upload" && "$*" != *"--dry-run"* ]]; then echo "Worker Version ID: 11111111-2222-4333-8444-555555555555"; fi
 `, true);
 
   mkdirSync(source, { recursive: true });
@@ -105,7 +105,7 @@ test("prepare binds to a clean reviewed SHA and runs tests and HTTPS readiness b
   assert.deepEqual(calls, [
     "npm run test:tms-worker",
     `node ${fixture.source}/infrastructure/cloudflare/tms-origin/verify-pages-origin-readiness.mjs --source-sha ${fixture.sourceSha}`,
-    "wrangler deploy --config wrangler.toml --dry-run",
+    "wrangler versions upload --config wrangler.toml --keep-vars --dry-run",
   ]);
   assert.match(result.stdout, /Worker release prepared \(no deployment\)/);
   assert.match(result.stdout, new RegExp(`source_sha=${fixture.sourceSha}`));
@@ -148,9 +148,12 @@ test("publish deploys only after gates and prints version evidence", (context) =
 
   assert.equal(result.status, 0, result.stderr);
   const calls = readFileSync(fixture.callLog, "utf8");
-  assert.match(calls, /npm run test:tms-worker[\s\S]*node .*verify-pages-origin-readiness[\s\S]*wrangler deploy --config wrangler\.toml --message/);
+  assert.match(calls, /npm run test:tms-worker[\s\S]*node .*verify-pages-origin-readiness[\s\S]*wrangler versions upload --config wrangler\.toml --keep-vars --message/);
+  assert.match(calls, /wrangler versions deploy 11111111-2222-4333-8444-555555555555@100% --config wrangler\.toml --yes/);
+  assert.match(calls, /verify-domain-bindings\.mjs snapshot[\s\S]*versions upload[\s\S]*versions deploy[\s\S]*verify-domain-bindings\.mjs verify/);
+  assert.doesNotMatch(calls, /wrangler (?:deploy |triggers )/);
   assert.match(calls, /wrangler deployments status --config wrangler\.toml/);
-  assert.match(result.stdout, /Version ID: fixture-version/);
+  assert.match(result.stdout, /Worker Version ID: 11111111-2222-4333-8444-555555555555/);
   assert.match(result.stdout, /Worker production release evidence/);
   assert.match(result.stdout, /deploy_output_sha256=[0-9a-f]{64}/);
   assert.doesNotMatch(`${result.stdout}${result.stderr}`, /fixture-secret/);
@@ -165,7 +168,7 @@ test("explicit OAuth mode verifies configured Worker access before publishing wi
   });
   assert.equal(result.status, 0, result.stderr);
   const calls = readFileSync(fixture.callLog, "utf8");
-  assert.match(calls, /verify-pages-origin-readiness[\s\S]*wrangler deployments status --config wrangler\.toml\nwrangler deploy --config/);
+  assert.match(calls, /verify-pages-origin-readiness[\s\S]*wrangler deployments status --config wrangler\.toml[\s\S]*wrangler versions upload --config/);
   assert.equal(calls.match(/wrangler deployments status/g)?.length, 2);
   assert.match(result.stdout, /auth_mode=oauth/);
   assert.doesNotMatch(`${result.stdout}${result.stderr}`, /unused-token|unused-key/);

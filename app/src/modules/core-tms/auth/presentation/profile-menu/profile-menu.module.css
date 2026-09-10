@@ -1,0 +1,8 @@
+.menu { position:fixed; z-index:180; width:254px; padding:8px; border-radius:16px; background:#202026; color:#ebebf0; box-shadow:0 12px 45px #0005,0 0 0 1px #ffffff12; font:13px/1.5 var(--font-geist-sans),system-ui,sans-serif; animation:appear 140ms ease-out; }
+.name { padding:10px 12px 13px; color:#a4a4b4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.menu a,.menu button { display:flex; width:100%; align-items:center; gap:10px; border:0; border-radius:9px; background:transparent; color:inherit; font:inherit; text-decoration:none; cursor:pointer; padding:10px 12px; margin:3px 0; text-align:left; }
+.menu a:hover,.menu button:hover,.menu :focus-visible { background:#303038; outline:none; }
+.menu button:disabled { opacity:.5; }
+.error { color:#e3a4ac; font-size:12px; margin:10px 12px; }
+@keyframes appear { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
+@media(prefers-reduced-motion:reduce) { .menu { animation:none; } }

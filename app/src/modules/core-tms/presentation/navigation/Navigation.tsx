@@ -1,3 +1,5 @@
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
+import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { PiBriefcaseDuotone } from "react-icons/pi";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import {
@@ -59,6 +61,8 @@ export function Navigation({
   activeRunCount: number;
 }) {
   const { locale, t } = useTmsLocale();
+  const session = useOptionalTmsSession();
+  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities);
   const navigate = (next: View) => {
     if (next === "suites" && view === "suites" && window.location.search.includes("suiteId=")) {
       const url = new URL(window.location.href); url.searchParams.delete("suiteId");
@@ -83,7 +87,7 @@ export function Navigation({
         <button
           type="button"
           className={shellStyles.brandButton}
-          onClick={() => navigate("dashboard")}
+          onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
           aria-label={t("header.dashboardAria")}
           title={t("header.dashboardAria")}
         >
@@ -95,7 +99,7 @@ export function Navigation({
       </div>
 
       <div className={shellStyles.navigationItems}>
-        {navigationItems.map((item) => {
+        {navigationItems.filter((item) => available(item.id)).map((item) => {
           const label = t(item.labelKey);
           const active = (!disabled || item.id === "help" || item.id === "portfolios") && view === item.id;
           const runActive = item.id === "runs" && activeRunCount > 0;

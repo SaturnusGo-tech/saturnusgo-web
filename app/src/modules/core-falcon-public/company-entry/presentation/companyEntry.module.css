@@ -1,0 +1,26 @@
+.page { min-height:100dvh; background:#101113; color:#f3f4f6; font-family:var(--font-geist-sans),Arial,sans-serif; }
+.header { max-width:1280px; margin:auto; padding:28px 36px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.header > a:last-child { display:inline-flex; gap:8px; align-items:center; color:#a3a6b0; text-decoration:none; font-size:14px; border-radius:8px; }
+.header > a:last-child:hover { color:#fff; }
+.content { width:min(440px,calc(100% - 48px)); margin:clamp(56px,15vh,180px) auto 0; padding-bottom:80px; }
+.caption { color:#8a8e99; font-size:11px; font-weight:600; letter-spacing:.15em; }
+.content h1 { font-size:clamp(28px,4vw,34px); font-weight:540; letter-spacing:-.035em; line-height:1.2; margin:15px 0 14px; }
+.lead { color:#b6b8c1; font-size:15px; line-height:1.65; margin:0 0 32px; }
+.label { display:block; color:#d6d8df; font-size:13px; margin-bottom:9px; }
+.field { display:flex; align-items:center; padding:0 14px; min-height:48px; gap:2px; border-radius:13px; background:#1a1c21; border:1px solid #34373f; transition:border-color 160ms ease,box-shadow 160ms ease; }
+.field:hover { border-color:#5b5e69; }
+.field:focus-within { border-color:#a3a6b0; box-shadow:0 0 0 3px rgb(175 180 194 / 12%); }
+.page .field input { width:100%; min-width:0; height:46px; padding:0; border:0; outline:0; box-shadow:none; background:transparent; color:inherit; font:inherit; font-size:15px; border-radius:0; }
+.page .field input:is(:hover,:focus,:focus-visible) { background:transparent; border:0; outline:0; box-shadow:none; }
+.field input::placeholder { color:#767b88; }
+.field > span { color:#898e9b; font-size:13px; white-space:nowrap; }
+.hint,.error { font-size:12px; line-height:1.6; margin:10px 0 22px; }
+.hint { color:#898e9b; }
+.error { color:#f4a6aa; }
+.page .submit { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:44px; border:0; border-radius:13px; background:#3479ed; color:#fff; font:inherit; font-size:14px; font-weight:550; cursor:pointer; transition:background 150ms ease; }
+.page .submit svg { color:#fff; }
+.submit:hover { background:#4487f4; }
+.support { color:#8e929e; font-size:13px; line-height:1.7; margin:26px 0 0; }
+.page :is(button,a):focus-visible { outline:2px solid #b3b7c2; outline-offset:4px; }
+@media(max-width:500px) { .header { padding:22px 24px; } .field > span { font-size:11px; } }
+@media(prefers-reduced-motion:reduce) { .field,.submit { transition:none; } }

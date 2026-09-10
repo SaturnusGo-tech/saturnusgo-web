@@ -5,6 +5,7 @@ import test from "node:test";
 import ts from "typescript";
 import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import { buildWorkspaceDeepLink, readWorkspaceDeepLink } from "../../navigation/workspace-deep-link";
+import { companyViewAvailable } from "../../../auth/managed/domain/features/company-features";
 import { openRunNavigation } from "../open-run-navigation";
 
 type Row = { entity: "run" | "run_item" | "defect"; projectId: string; id: string; runId?: string; runItemId?: string };
@@ -35,6 +36,8 @@ function harness() {
     window: { location: { get href() { return href; }, assign(next: string) { href = next; events.push("assign"); } } },
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
+      if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+      if (name.endsWith("company-features")) return { companyViewAvailable };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
       if (name.endsWith("workspace-history")) return { visitWorkspace: (next: string) => { href = next; events.push("navigate"); } };
       if (name.endsWith("workspace-deep-link")) return { buildWorkspaceDeepLink };

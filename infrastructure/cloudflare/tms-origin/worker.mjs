@@ -8,6 +8,9 @@ import {
   TMS_HOST,
 } from "./route-manifest.mjs";
 import { serveDocsAudio } from "./audio/response.mjs";
+import { companyHost } from "./gateway/company-host.mjs";
+import { proxyCompanyApi } from "./gateway/proxy-company-api.mjs";
+import { verifyCompanyDocument, unavailableCompanyDocument } from "./gateway/company-document.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -71,9 +74,15 @@ function redirectToCanonicalPath(url, pathname) {
   return secureResponse(Response.redirect(url.toString(), 302));
 }
 
-function secureResponse(response) {
+function secureResponse(response, managed = false) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  if (managed) {
+    headers.set("content-security-policy", CONTENT_SECURITY_POLICY.replace(
+      "https://api.tms.saturnusgo.com https://dev-4v1srvqwzp1m7cdl.us.auth0.com ", ""));
+    headers.set("referrer-policy", "same-origin");
+    headers.set("x-robots-tag", "noindex, nofollow");
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -159,7 +168,7 @@ function publicPathForOrigin(pathname) {
     : route.publicPath;
 }
 
-async function proxyToPublicSite(request, incoming, originPath) {
+async function proxyToPublicSite(request, incoming, originPath, managed = false) {
   const upstream = new URL(originPath + incoming.search, SOURCE_ORIGIN);
   if (incoming.pathname.startsWith(APP_PATH)) {
     for (const parameter of AUTH_CALLBACK_PARAMETERS) upstream.searchParams.delete(parameter);
@@ -167,7 +176,7 @@ async function proxyToPublicSite(request, incoming, originPath) {
   const headers = new Headers();
   for (const name of FORWARDED_HEADERS) {
     const value = request.headers.get(name);
-    if (value) headers.set(name, value);
+    if (value && !(managed && ["if-modified-since", "if-none-match"].includes(name))) headers.set(name, value);
   }
 
   const upstreamResponse = await fetch(new Request(upstream.toString(), {
@@ -186,7 +195,7 @@ async function proxyToPublicSite(request, incoming, originPath) {
       : null;
     if (!publicPath) return secureResponse(new Response("Bad gateway", { status: 502 }));
     redirected.protocol = "https:";
-    redirected.hostname = TMS_HOST;
+    redirected.hostname = incoming.hostname;
     redirected.port = "";
     redirected.pathname = publicPath;
     responseHeaders.set("location", redirected.toString());
@@ -196,26 +205,40 @@ async function proxyToPublicSite(request, incoming, originPath) {
     return notFoundResponse();
   }
 
-  return secureResponse(new Response(upstreamResponse.body, {
+  let body = upstreamResponse.body;
+  if (managed && responseHeaders.get("content-type")?.startsWith("text/html") && request.method !== "HEAD") {
+    const html = await upstreamResponse.text();
+    body = new Response(html.replace(/<head(\s[^>]*)?>/i, '$&<meta name="falcon-access" content="managed">')).body;
+    responseHeaders.delete("content-length"); responseHeaders.delete("content-encoding");
+  }
+  if (managed) {
+    responseHeaders.set("cache-control", "private, no-store, no-transform");
+    responseHeaders.delete("etag"); responseHeaders.delete("last-modified");
+  }
+  return secureResponse(new Response(body, {
     status: upstreamResponse.status,
     statusText: upstreamResponse.statusText,
     headers: responseHeaders,
-  }));
+  }), managed);
 }
 
 export default {
   async fetch(request, env) {
     const incoming = new URL(request.url);
-    if (incoming.hostname !== TMS_HOST) return notFoundResponse();
+    const audience = companyHost(incoming.hostname, env);
+    if (incoming.hostname !== TMS_HOST && !audience) return notFoundResponse();
     if (incoming.protocol === "http:") {
       incoming.protocol = "https:";
       return secureResponse(Response.redirect(incoming.toString(), 308));
     }
-    if (incoming.protocol !== "https:") return notFoundResponse();
+    if (incoming.protocol !== "https:" || incoming.port) return notFoundResponse();
     // The Pages origin may decode an encoded separator after the allowlist check. Keep the
     // public surface canonical so an allowed prefix cannot be turned into an origin traversal.
     if (incoming.pathname.includes("%") || incoming.pathname.includes("\\")) {
       return notFoundResponse();
+    }
+    if (incoming.pathname.startsWith("/api/v1/")) {
+      return audience ? secureResponse(await proxyCompanyApi(request, env, audience), true) : notFoundResponse();
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
       return secureResponse(await serveDocsAudio(request, env?.DOCS_AUDIO));
@@ -223,10 +246,21 @@ export default {
     if (!["GET", "HEAD"].includes(request.method)) {
       return notFoundResponse();
     }
+    const documentRequest = incoming.pathname === "/" || incoming.pathname === APP_PATH || incoming.pathname === APP_PATH_NO_SLASH
+      || incoming.pathname === `${APP_PATH}index.txt` || routeForRequestPath(incoming.pathname) || canonicalPublicPath(incoming.pathname);
+    if (audience && documentRequest) {
+      const verified = await verifyCompanyDocument(request, env, audience);
+      if (!verified.ok) return secureResponse(unavailableCompanyDocument(verified.status, request.method === "HEAD"), true);
+      if (incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
+        return redirectToCanonicalPath(incoming, audience === "platform" ? "/sandbox/" : APP_PATH);
+      }
+    }
+    if (!audience && /^\/(sandbox|admin|profile)(?:\/|$)/.test(incoming.pathname)) return notFoundResponse();
+    if (["/signup", "/signup/"].includes(incoming.pathname)) return redirectToCanonicalPath(incoming, "/cloud-login/");
     const canonicalPath = canonicalPublicPath(incoming.pathname);
     if (canonicalPath) return redirectToCanonicalPath(incoming, canonicalPath);
     const originPath = originPathFor(incoming.pathname);
     if (!originPath) return notFoundResponse();
-    return proxyToPublicSite(request, incoming, originPath);
+    return proxyToPublicSite(request, incoming, originPath, Boolean(audience && documentRequest));
   },
 };

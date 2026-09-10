@@ -19,11 +19,11 @@ test("Falcon public routes keep their Russian document language", () => {
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon landing keeps direct login, signup and accessible chapter navigation", () => {
+test("Falcon landing has one company login action and accessible chapter navigation", () => {
   const header = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconHeader.tsx"), "utf8");
   const landing = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconLanding.tsx"), "utf8");
-  assert.match(header, /href=\{TMS_ADMIN_LOGIN_PATH\}/);
-  assert.match(header, /href="\/signup\/"/);
+  assert.match(header, /href="\/cloud-login\/"/);
+  assert.doesNotMatch(header + landing, /href="\/signup\/"|Создать аккаунт/);
   assert.match(header, /aria-label="Навигация по лендингу"/);
   assert.match(landing, /href="#product">\s*К содержанию/);
   assert.match(landing, /aria-labelledby="overview-title"/);
@@ -84,13 +84,10 @@ test("video markup requires manual playback and exposes labeled player controls"
   assert.match(source, /<summary>Что в видео<\/summary>/);
 });
 
-test("Falcon auth controls use a solid high-contrast focus indicator", () => {
-  const styles = readFileSync(resolve(
-    root,
-    "app/src/modules/core-falcon-public/auth/cloudAuth.module.css",
-  ), "utf8");
-
-  assert.match(styles, /\.page :focus-visible \{ outline: 3px solid #171717; outline-offset: 3px; \}/);
-  assert.match(styles, /\.password:focus-within \{[^}]*outline: 3px solid #171717/s);
-  assert.doesNotMatch(styles, /:focus(?:-visible|-within)?[^}]*outline:\s*0/);
+test("company entry uses one rounded input surface with neutral outer focus", () => {
+  const styles = readFileSync(resolve(root,
+    "app/src/modules/core-falcon-public/company-entry/presentation/companyEntry.module.css"), "utf8");
+  assert.match(styles, /\.field:focus-within/);
+  assert.match(styles, /border-radius:13px/);
+  assert.match(styles, /prefers-reduced-motion/);
 });

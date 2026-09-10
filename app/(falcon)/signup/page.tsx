@@ -1,23 +1,12 @@
 import type { Metadata } from "next";
-import { CloudAuthScreen } from "../../src/modules/core-falcon-public";
+import { CompanyEntryScreen } from "../../src/modules/core-falcon-public";
 
 export const metadata: Metadata = {
-  title: { absolute: "Создать пространство — Falcon" },
-  description: "Регистрация личного рабочего пространства Falcon.",
-  openGraph: {
-    title: "Создать пространство — Falcon",
-    description: "Регистрация личного рабочего пространства Falcon.",
-    url: "https://tms.saturnusgo.com/signup/",
-    siteName: "Falcon",
-  },
-  twitter: {
-    card: "summary",
-    title: "Создать пространство — Falcon",
-    description: "Регистрация личного рабочего пространства Falcon.",
-  },
+  title: { absolute: "Войти в компанию — Falcon" },
+  description: "Вход в Falcon по адресу вашей компании.",
   robots: { index: false, follow: false },
 };
 
 export default function Page() {
-  return <CloudAuthScreen mode="register" />;
+  return <CompanyEntryScreen redirectSignup />;
 }

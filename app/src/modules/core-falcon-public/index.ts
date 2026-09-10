@@ -1,2 +1,2 @@
 export { FalconLanding } from "./landing/FalconLanding";
-export { CloudAuthScreen } from "./auth/CloudAuthScreen";
+export { CompanyEntryScreen } from "./company-entry/presentation/CompanyEntryScreen";

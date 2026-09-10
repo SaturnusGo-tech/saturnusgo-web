@@ -326,5 +326,29 @@
   "organization-folder-05-import": {
     "width": 1536,
     "height": 1024
+  },
+  "company-login": {
+    "width": 1280,
+    "height": 720
+  },
+  "company-mfa": {
+    "width": 1280,
+    "height": 720
+  },
+  "company-profile": {
+    "width": 1280,
+    "height": 720
+  },
+  "company-members": {
+    "width": 1280,
+    "height": 720
+  },
+  "company-member-create": {
+    "width": 1280,
+    "height": 720
+  },
+  "company-member-detail": {
+    "width": 1280,
+    "height": 720
   }
 }

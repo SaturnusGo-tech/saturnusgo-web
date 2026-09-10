@@ -103,15 +103,15 @@ export function FalconLanding() {
             Начать работу
             <br />в Falcon
           </h2>
-          <Link className={styles.primaryButton} href="/signup/">
-            Создать аккаунт <ArrowRight size={17} aria-hidden="true" />
+          <Link className={styles.primaryButton} href="/cloud-login/">
+            Войти в компанию <ArrowRight size={17} aria-hidden="true" />
           </Link>
         </Reveal>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
           <span>Управление тестированием</span>
           <Link href="/cloud-login/">
-            Войти в пространство <ArrowRight size={14} aria-hidden="true" />
+            Войти в компанию <ArrowRight size={14} aria-hidden="true" />
           </Link>
           <small>© {new Date().getFullYear()} Falcon</small>
         </div>

@@ -1,3 +1,4 @@
+import { companyAccessArticles } from "./access/company-access";
 import { swaggerArticle } from "./integrations/swagger/swagger";
 import { portfoliosArticle } from "./organization/portfolios";
 import { gettingStarted } from "./start/getting-started";
@@ -27,7 +28,7 @@ export const docGroups = [
   { id: "reference", title: "Справочник" },
 ] as const;
 export const docArticles: readonly DocArticle[] = [
-  ...gettingStarted, portfoliosArticle, dashboardArticle, ...caseAuthoring, ...caseOrganization,
+  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
   ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,
