@@ -1,7 +1,7 @@
 import { articles, bullets, note, paragraph, section, steps, table, warning, type DocArticle } from "../../../model/article";
 export const integrationOverview: DocArticle = {
   id: "integration-overview", title: "Как работают интеграции", group: "integrations", description: "Соедините проверки, разработку и коммуникацию: настройка подключения, события, обратная связь и журнал доставки.",
-  keywords: ["интеграции", "хуки", "webhook", "подключить", "сервисы"], related: ["slack", "github", "integration-troubleshooting"],
+  keywords: ["интеграции", "хуки", "webhook", "подключить", "сервисы"], related: ["notifications", "slack", "github", "integration-troubleshooting"],
   sections: [
     section("available", "Что доступно сейчас", table(["Сервис", "Ценность в Falcon", "Статус"],
       ["Swagger / OpenAPI", "Спецификация API проекта и интерактивные запросы", "Доступен"],
