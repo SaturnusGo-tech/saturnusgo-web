@@ -13,7 +13,11 @@ void test("one catalog controls project-specific Swagger visibility, mutations a
   Object.assign(globalThis, { React });
   const pending: { path: string; signal: AbortSignal; resolve: (data: { data: Connection[] }) => void;
     reject: (error: Error) => void }[] = [];
-  const http = { get: (path: string, signal: AbortSignal) => new Promise((resolve, reject) =>
+  const configurationPaths: string[] = [];
+  const http = { getResource: async (path: string) => {
+    configurationPaths.push(path);
+    return { data: new URL(path, "https://falcon.test").searchParams.get("projectId") === "p" ? connection : null, etag: "v1" };
+  }, get: (path: string, signal: AbortSignal) => new Promise((resolve, reject) =>
     pending.push({ path, signal, resolve, reject })) } as unknown as TmsHttpClient;
   let current!: ReturnType<typeof useWorkspaceConnectors>;
   function Probe() { current = useWorkspaceConnectors(); return null; }
@@ -57,6 +61,12 @@ void test("one catalog controls project-specific Swagger visibility, mutations a
     assert.equal(current.swaggerConnected, false); assert.equal(pending.length, requests);
     await act(async () => renderer.update(<Harness capabilities={["core"]} />));
     assert.equal(current.swaggerConnected, false); assert.equal(pending.length, requests);
+    await act(async () => renderer.update(<Harness capabilities={["core", "api_testing"]} />));
+    assert.equal(current.swaggerConnected, true); assert.equal(pending.length, requests);
+    assert.deepEqual(configurationPaths, ["/integrations/connectors/swagger/configuration?workspaceId=w&projectId=p"]);
+    await act(async () => renderer.update(<Harness project="empty" capabilities={["core", "api_testing"]} />));
+    assert.equal(current.swaggerConnected, false);
+    assert.equal(configurationPaths[1], "/integrations/connectors/swagger/configuration?workspaceId=w&projectId=empty");
   } finally {
     await act(async () => renderer?.unmount());
     if (original) Object.defineProperty(globalThis, "React", original); else Reflect.deleteProperty(globalThis, "React");

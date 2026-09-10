@@ -4,7 +4,8 @@ The API Testing sidebar entry now requires an enabled Swagger connection in the 
 workspace and project as well as the existing company entitlement. A single workspace
 catalog owns the connection state for both the sidebar and Hooks. Saving, disabling or
 disconnecting a connector updates that catalog immediately; subsequent refreshes reconcile
-it with the server. Initial loading, errors and disconnected workspaces do not expose the
+it with the server. API-only company plans read the scoped Swagger configuration without
+requesting the general integrations catalog. Initial loading, errors and disconnected workspaces do not expose the
 entry. Switching projects cannot reuse another project's Swagger visibility.
 
 Removed the external Postman tab and updated the Swagger/API Testing help articles.

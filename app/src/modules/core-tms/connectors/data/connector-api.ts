@@ -12,6 +12,8 @@ export const connectorApi = (http: TmsHttpClient) => ({
   async list(workspaceId: string, signal?: AbortSignal): Promise<Connection[]> {
     return (await http.get<{ data: Connection[] }>(`${base}?${new URLSearchParams({ workspaceId })}`, signal)).data;
   },
+  configuration: (scope: Scope, provider: Provider, signal: AbortSignal) =>
+    http.getResource<Connection | null>(path(scope, provider, "configuration"), signal),
   async load(scope: Scope, provider: Provider, signal: AbortSignal): Promise<Snapshot> {
     signal.throwIfAborted();
     const [configuration, catalog, activity, webhook] = await Promise.all([
