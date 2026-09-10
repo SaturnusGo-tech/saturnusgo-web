@@ -100,7 +100,7 @@ export function useWorkspaceState() {
       caseId: selected.id,
       projectId: selected.projectId,
       folderId: selected.folderId ?? (selected.folderPath === "/" ? null : undefined),
-    }, { preserveProjectContext: view === "portfolios" });
+    }, { preserveProjectContext: view === "portfolios", preserveCommentSelection: true });
     history.write(next);
   }, [connection, data.testCases, data.workspace.id, projectId, selectedCaseId, view, canWriteNavigation]);
 
