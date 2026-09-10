@@ -1,3 +1,4 @@
+import { useCaseHistory } from "../../../../test-cases/history/state/useCaseHistory";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { AlertCircle, Bug, FileClock, RotateCw } from "lucide-react";
 import type { Activity, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -21,8 +22,9 @@ type Props = {
 
 export function CaseActivityTab(props: Props) {
   const ru = props.locale === "ru";
-  const caseActivity = caseActivityForKey(props.activity, props.testCase?.key);
-  const empty = props.model.defects.status === "ready"
+  const history = useCaseHistory(props.testCase, caseActivityForKey(props.activity, props.testCase?.key));
+  const caseActivity = history.items;
+  const empty = !history.loading && !history.error && props.model.defects.status === "ready"
     && !props.model.defects.refreshFailed
     && props.model.defects.items.length === 0 && caseActivity.length === 0;
 
@@ -31,6 +33,8 @@ export function CaseActivityTab(props: Props) {
   </div>;
 
   return <div className={styles.contextList}>
+    {history.loading && <div role="status" aria-label={ru ? "Загрузка истории" : "Loading history"} aria-busy="true" className={css.historySkeleton}><i /><i /><i /></div>}
+    {history.error && <div role="alert" className={css.refreshError}>{ru ? "Не удалось загрузить историю." : "Could not load history."}<button type="button" onClick={history.retry}>{ru ? "Повторить" : "Retry"}</button></div>}
     {(props.model.defects.status !== "ready" || props.model.defects.items.length > 0
       || props.model.defects.refreshFailed) && <section aria-labelledby="case-defect-history-title">
       <header className={css.groupHeading}>
@@ -104,13 +108,14 @@ export function CaseActivityTab(props: Props) {
         </strong></span>
         <b>{caseActivity.length}</b>
       </header>
-      {caseActivity.slice(0, 20).map((entry) => <div className={styles.activityRecord} key={entry.id}>
+      {caseActivity.map((entry) => <div className={styles.activityRecord} key={entry.id}>
         <MemberAvatar identityId={entry.actorIdentityId ?? null} name={activityActorLabel(entry.actor)} />
         <div>
           <strong>{activityLabel(props.locale, entry.action)}</strong>
           <small>{activityActorLabel(entry.actor)} · {formatTime(entry.createdAt, props.languageTag)}</small>
         </div>
       </div>)}
+      {history.nextCursor && <button type="button" disabled={history.loading} onClick={history.loadMore}>{ru ? "Загрузить ещё" : "Load more"}</button>}
     </section>}
   </div>;
 }

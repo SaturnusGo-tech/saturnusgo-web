@@ -178,3 +178,8 @@
 }
 
 @keyframes collaboration-spin { to { transform: rotate(360deg); } }
+
+.historySkeleton { display:grid; gap:10px; padding:12px 0; }
+.historySkeleton i { height:32px; border-radius:8px; background:var(--control); animation:history-pulse 1.4s ease-in-out infinite; }
+@keyframes history-pulse { 50% { opacity:.45; } }
+@media(prefers-reduced-motion:reduce) { .historySkeleton i { animation:none; } }

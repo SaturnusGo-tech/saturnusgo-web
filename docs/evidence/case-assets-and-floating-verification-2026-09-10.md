@@ -12,3 +12,8 @@ Validation: 25 evidence/launcher tests, typecheck and architecture pass. Actual 
 in Chromium and WebKit at desktop and 390px mobile widths, light/dark, full workspace height,
 transparent fixed dock, hide/restore, focus, reload persistence, bulk/empty gating and reduced motion.
 The backend release preserves test-case assets across revisions and recovers missing current links.
+
+Live verification found that history depended on the last 20 project events. Attachment reads
+can evict revisions from that window. The history tab now queries the existing tenant/project/
+case-scoped activity endpoint with 50-item pagination, cancellation, skeleton and retry states.
+16 collaboration/history tests pass, including exact identity preservation and scope rejection.
