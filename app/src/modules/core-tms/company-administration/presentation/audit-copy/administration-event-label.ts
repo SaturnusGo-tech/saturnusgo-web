@@ -6,10 +6,11 @@ const labels: Record<string, readonly [string, string]> = {
   "company.owner_access_reset": ["Восстановлен доступ главного администратора", "Primary administrator access reset"],
   "company.status_changed": ["Изменён статус компании", "Company status changed"],
   "company.retry_domain_changed": ["Повторное подключение адреса", "Domain connection retried"],
-  "company.domain_active": ["Адрес компании подключён", "Company domain connected"],
+  "company.domain_activated": ["Адрес компании подключён", "Company domain connected"],
   "member.created": ["Добавлен сотрудник", "Person added"],
   "member.details": ["Изменены данные сотрудника", "Person details updated"],
   "member.role": ["Изменена роль сотрудника", "Person role updated"],
+  "member.ownership": ["Передано управление компанией", "Company ownership transferred"],
   "member.status": ["Изменён доступ сотрудника", "Person access updated"],
   "member.reset_password": ["Выдан временный пароль", "Temporary password issued"],
   "member.revoke_sessions": ["Завершены сеансы сотрудника", "Person sessions ended"],
@@ -22,9 +23,11 @@ const labels: Record<string, readonly [string, string]> = {
   "access.logout": ["Выход из Falcon", "Signed out of Falcon"],
   "access.password_changed": ["Установлен пароль", "Password set"],
   "access.mfa_enrolled": ["Подключён второй фактор", "Two-step sign-in enabled"],
+  "access.mfa_prepared": ["Начата настройка второго фактора", "Two-step sign-in setup started"],
+  "identity.session_reauthenticated": ["Повторно подтверждён вход", "Identity confirmed again"],
   "access.mfa_verified": ["Подтверждён второй фактор", "Second factor verified"],
-  "operator.bootstrapped": ["Создан оператор Falcon", "Falcon operator created"],
-  "operator.recovered": ["Восстановлен доступ оператора", "Operator access recovered"],
+  "platform.operator_create": ["Создан оператор Falcon", "Falcon operator created"],
+  "platform.operator_recover": ["Восстановлен доступ оператора", "Operator access recovered"],
 };
 export function administrationEventLabel(action: string, locale: "ru" | "en"): string {
   return labels[action]?.[locale === "ru" ? 0 : 1] ?? (locale === "ru" ? "Обновление доступа" : "Access updated");

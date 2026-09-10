@@ -29540,6 +29540,22 @@
             "required": [
               "kind"
             ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "ownership"
+                ]
+              }
+            },
+            "description": "Transfer company ownership to this active administrator with MFA. Requires the current owner and authentication within 10 minutes. Both accounts must sign in again."
           }
         ]
       },

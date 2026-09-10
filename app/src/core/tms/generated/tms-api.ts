@@ -6398,6 +6398,9 @@ export interface components {
             temporaryPassword?: string;
             /** @default false */
             resetMfa: boolean;
+        } | {
+            /** @enum {string} */
+            kind: "ownership";
         };
         CompanyMemberMutation: {
             member: components["schemas"]["CompanyMember"];
