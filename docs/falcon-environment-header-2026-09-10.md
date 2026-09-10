@@ -19,3 +19,9 @@ TypeScript, TMS architecture and generated contract checks passed. Eight environ
 Fixture HTTP and surrounding workspace dependencies are isolated; UI saves use the existing offline application path. This verifies browser behavior, not an authenticated production database write. API DTO behavior is covered by the transport test. Safari compatibility was checked with WebKit, not the installed Safari application.
 
 Browser scripts, screenshots and machine-readable results: `../output/falcon-environment-20260910/` from the workspace root.
+
+## Publication
+
+Source `b7f8d32e7304581a1b67411ff6c195288a05d72b` was published as Pages commit `8eeb8a6b` and Worker version `487f6320-b88b-4bc0-8d57-97f8da5289d4` at 100% traffic. All 53 deployment tests passed; all six custom domain bindings were preserved.
+
+The legacy TMS, Umbrella, SaturnusGo and Binibit documents return 200, reference the new workspace bundle and serve matching bytes (SHA-256 `8312d8ef30d81491290d8f19dc00d2c890849ed22363001ebea9b2393e714373`). Darwin's company entrypoint currently returns 404 and its document displays the corresponding unavailable-company page. It is not counted as a successful application smoke check; this patch does not change company activation or routing.
