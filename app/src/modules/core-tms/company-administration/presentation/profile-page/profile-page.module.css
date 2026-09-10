@@ -1,0 +1,13 @@
+.back, .security {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 0; border-radius: 12px; background: transparent;
+  color: var(--admin-text); font: inherit; cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.back { padding: 8px 10px; margin: 0 0 18px -10px; color: var(--admin-muted); }
+.security { justify-self: start; padding: 12px 14px; margin-left: -14px; }
+.security > svg { color: var(--admin-muted); }
+.security > svg:last-child { margin-left: 18px; }
+.back:hover, .security:hover { background: var(--admin-hover); }
+.back:focus-visible, .security:focus-visible { outline: 2px solid var(--admin-muted); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .back, .security { transition: none; } }

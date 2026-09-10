@@ -36,3 +36,11 @@ test("profile navigation does not copy arbitrary redirects, invalid scope or adm
   assert.equal(url.origin, origin);
   assert.deepEqual(Object.fromEntries(url.searchParams), {view:"profile"});
 });
+
+
+test("opening profile from its password screen returns to personal details", () => {
+  const url = new URL(workspaceProfileUrl(`${work}?workspaceId=w&projectId=p&view=profile#security`), origin);
+  assert.equal(url.hash, "");
+  assert.equal(url.searchParams.get("projectId"), "p");
+  assert.equal(new URL(workspaceProfileUrl(url.href, "security"), origin).hash, "#security");
+});
