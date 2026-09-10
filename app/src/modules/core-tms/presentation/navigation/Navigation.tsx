@@ -22,6 +22,7 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { View } from "../../state/types/workspace";
 import shellStyles from "../workspace/tms-shell.module.css";
 import { NavigationUtilityMenu } from "./NavigationUtilityMenu";
+import { NavigationProfile } from "../navigation-profile/NavigationProfile";
 
 const navigationItems: Array<{
   id: View;
@@ -140,6 +141,8 @@ export function Navigation({
         onOpenSettings={() => onChange("config")}
         onOpenHelp={() => onChange("help")}
       />
+
+      <NavigationProfile collapsed={collapsed} />
 
       <button
         type="button"

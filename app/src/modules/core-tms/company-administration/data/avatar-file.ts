@@ -1,11 +1,9 @@
-import { AdministrationError } from "../domain/administration";
+import { prepareAvatarImage } from "./image/prepare-avatar-image";
 
 export async function avatarFileBase64(file: Blob, signal: AbortSignal): Promise<string> {
-  if (file.size < 12 || file.size > 1_048_576 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    throw new AdministrationError("INVALID_AVATAR");
-  }
+  const image = await prepareAvatarImage(file, signal);
   signal.throwIfAborted();
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  const bytes = new Uint8Array(await image.arrayBuffer());
   signal.throwIfAborted();
   let binary = "";
   for (let offset = 0; offset < bytes.length; offset += 8192) binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
