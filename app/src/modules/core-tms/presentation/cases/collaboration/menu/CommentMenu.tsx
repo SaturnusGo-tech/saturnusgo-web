@@ -14,7 +14,7 @@ export function CommentMenu({ ru, canEdit, canDelete, canReply, disabled, onEdit
     const position = () => {
       const bounds = trigger.current?.getBoundingClientRect();
       const height = root.current?.querySelector<HTMLElement>('[role="menu"]')?.offsetHeight ?? 120;
-      if (bounds) setOpensUp(innerHeight - bounds.bottom < height + 12 && bounds.top > height + 12);
+      if (bounds) setOpensUp(bounds.top > height + 12 && (bounds.top > innerHeight / 2 || innerHeight - bounds.bottom < height + 12));
     };
     position();
     window.addEventListener("resize", position);
