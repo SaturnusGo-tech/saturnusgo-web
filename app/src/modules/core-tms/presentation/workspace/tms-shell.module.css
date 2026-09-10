@@ -84,6 +84,7 @@
   gap: 8px;
 }
 
+.workspaceName,
 .projectEyebrow {
   flex: 0 0 auto;
   color: var(--muted);

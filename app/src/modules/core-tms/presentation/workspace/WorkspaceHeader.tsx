@@ -56,7 +56,7 @@ export function WorkspaceHeader({
       </button>
 
       <HistoryControls />
-      {model.view === "portfolios" ? <div className={shellStyles.projectContext}><span className={shellStyles.projectEyebrow}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
+      {model.view === "portfolios" || !model.project ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
           {t("header.project")}
         </span>
@@ -73,7 +73,7 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.view !== "portfolios" && <div className={shellStyles.headerMeta}>
+      {model.view !== "portfolios" && model.project && <div className={shellStyles.headerMeta}>
         <div className={shellStyles.headerMetaItem} title={`${t("header.environment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />
           <span>

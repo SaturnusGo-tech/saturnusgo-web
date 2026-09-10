@@ -75,7 +75,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (!model.project) {
     return (
       <ProjectOnboarding
-        loading={false}
+        canCreate={model.data.meta.authorization.capabilities.includes("project:manage")}
         onCreate={model.openNewProject}
       />
     );

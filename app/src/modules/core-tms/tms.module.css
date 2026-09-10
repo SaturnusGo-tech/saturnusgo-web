@@ -2162,11 +2162,6 @@
 .inlineDefect::before { background: #9daab4; }
 .inlineDefectHeader svg { color: #75504d; }
 
-.onboarding { height: 100%; overflow: auto; display: grid; place-items: center; padding: 36px; background: var(--canvas); }
-.onboardingPanel { width: min(920px, 100%); padding: 44px; background: #fff; border: 1px solid var(--line-strong); border-radius: var(--radius-panel); box-shadow: 0 12px 35px rgb(34 57 71 / 8%); }
-.onboardingEyebrow { color: #245f7d; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.onboardingPanel h1 { max-width: 620px; margin: 10px 0 10px; font-size: clamp(30px, 4vw, 44px); line-height: 1.08; letter-spacing: -.035em; }
-.onboardingPanel > p { max-width: 700px; margin: 0 0 24px; color: #536574; font-size: 16px; line-height: 1.6; }
 .tessiqLoader {
   width: 100%;
   height: 100%;
@@ -2207,15 +2202,6 @@
 :global(.dark) .app .workspaceLoaderMark {
   background-image: url("./assets/falcon/falcon-loader-on-dark.png");
 }
-.onboardingSteps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 36px; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
-.onboardingSteps > div { min-width: 0; min-height: 168px; display: grid; grid-template-columns: 1fr auto; align-content: start; gap: 8px; padding: 20px; border-right: 1px solid var(--line); }
-.onboardingSteps > div:last-child { border-right: 0; }
-.onboardingSteps > div > span { color: #738491; font-size: 11px; font-weight: 750; }
-.onboardingSteps svg { color: #245f7d; }
-.onboardingSteps strong,
-.onboardingSteps small { grid-column: 1 / -1; }
-.onboardingSteps strong { margin-top: 8px; font-size: 15px; }
-.onboardingSteps small { color: #5a6b78; line-height: 1.5; }
 
 /* Restrained shape hierarchy: rounded shells, structured rows, and true pills only. */
 .toolbarPopover,
@@ -2430,11 +2416,6 @@
     min-width: 760px;
     grid-template-columns: 100px minmax(240px, 1.5fr) 120px 140px 160px;
   }
-  .onboarding { padding: 24px; }
-  .onboardingPanel { padding: 32px; }
-  .onboardingSteps { grid-template-columns: 1fr; }
-  .onboardingSteps > div { min-height: 126px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .onboardingSteps > div:last-child { border-bottom: 0; }
 }
 
 @media (max-width: 680px) {
@@ -2489,10 +2470,6 @@
   .configProject .inlineActions > button { flex: 1 1 132px; }
   .configPanel { align-items: flex-start; flex-direction: column; gap: 12px; }
   .inlineDefectHeader { align-items: flex-start; flex-wrap: wrap; }
-  .onboarding { padding: 16px 12px 76px; }
-  .onboardingPanel { padding: 24px 20px; }
-  .onboardingPanel h1 { font-size: 31px; }
-  .onboardingSteps { margin-top: 28px; }
 }
 
 /* Creation flows use a single calm, independently scrollable right drawer. */
@@ -4696,7 +4673,6 @@
 /* The hierarchy is made with dividers, not floating cards. */
 .app :is(
   .authPanel,
-  .onboardingPanel,
   .panel,
   .metricCard,
   .environmentCard,
