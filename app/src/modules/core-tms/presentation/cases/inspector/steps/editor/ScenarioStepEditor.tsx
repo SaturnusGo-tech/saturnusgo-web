@@ -6,6 +6,7 @@ import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-co
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import {
   ScenarioAttachmentControls,
+  SavedScenarioAttachments,
   useScenarioAttachments,
 } from "../support/ScenarioAttachments";
 import { ScenarioTextInput } from "./ScenarioTextInput";
@@ -147,6 +148,7 @@ export function ScenarioStepEditor(props: Props) {
     </div>}
     {!collapsed && props.attachmentScope && <ScenarioAttachmentControls
       fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />}
+    {!collapsed && !props.attachmentScope && <SavedScenarioAttachments ids={props.step.attachmentIds} />}
     {!collapsed && props.attachments}
   </article>;
 }
