@@ -47,3 +47,19 @@ When changing a film, update its MP4, poster, VTT, description and transcript to
 - FFprobe verified all six exports at 1600 × 900 / 60 fps. Current interface frames and cursor/zoom framing were visually reviewed.
 
 Evidence: `evidence/player-qa.json`, `evidence/media-check.json`, landing screenshots and the Recordly export reports in the output directory. These are local results; publication and live checks are recorded separately after release.
+
+## Production acceptance
+
+Published on 10 September 2026 at https://tms.saturnusgo.com/.
+
+- Frontend source: `79950e683c0357489caff44c89585ddc55c5bbe7`.
+- Pages artifact commit: `bdf9c0e4f2eb42905575c797d8944d05ee39690f`.
+- Worker version: `1afe1693-9057-46c0-b4b6-1e448236df37`, 100% traffic at 14:37:50 UTC.
+- Static export completed all 65 routes. The release guard found no local API URLs or legacy mixed-case routes in the output.
+- Versioned Worker publication preserved all six existing company domain bindings.
+- All 18 public MP4/WebP/VTT responses matched the source files byte-for-byte and had the expected MIME types. All six video byte-range requests returned 206 with the requested 1,024 bytes.
+- Live browser verification passed for all six manual players, keyboard seeking and smooth timeline updates, with no page errors or failed media requests. Mobile 390 px and reduced-motion checks passed without horizontal overflow.
+- The first film was additionally played in the Codex in-app WebKit browser; the recorded interface and advancing media control were visible.
+- Full FFmpeg decoding of all six delivered videos completed with zero decode errors.
+
+Production evidence remains under `../output/falcon-commercial-20260910/evidence/`: `live-release.json`, `player-qa-production.log`, `player-qa-production.json`, `media-decode.json` and the captured release logs. The preserved `player-qa-local.json` identifies the separate local acceptance run. Capture services and the isolated demo database were stopped after recording.
