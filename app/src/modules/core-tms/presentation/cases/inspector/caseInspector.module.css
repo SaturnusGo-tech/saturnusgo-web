@@ -5,8 +5,14 @@
 .caseIdentity { min-width: 0; display: flex; align-items: center; }
 .caseKey { overflow: hidden; color: var(--cases-muted); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .headerActions { display: flex; align-items: center; gap: 6px; }
-.headerTextButton { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--cases-secondary-text); background: transparent; border: 1px solid var(--cases-control-border); border-radius: 5px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.headerTextButton { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: var(--cases-secondary-text); background: transparent; border: 1px solid var(--cases-control-border); border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color 160ms ease, color 160ms ease; }
 .headerTextButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
+.headerActions .headerRunButton { background: #3475ed; color: #fff; border-color: transparent; }
+.headerActions .headerRunButton:hover:not(:disabled) { background: #2d68dc; color: #fff; }
+.headerActions .headerRunButton svg { color: inherit; }
+.headerActions .headerQuarantineButton { min-height: 28px; padding-inline: 9px; gap: 5px; font-size: 11px; border-color: transparent; border-radius: 10px; background: color-mix(in srgb, var(--cases-text) 7%, var(--cases-bg)); color: var(--cases-secondary-text); }
+.headerActions .headerQuarantineButton:hover:not(:disabled) { background: var(--cases-hover); }
+@media(prefers-reduced-motion:reduce) { .headerTextButton { transition: none; } }
 .headerTextButton:disabled { cursor: default; opacity: .45; }
 .iconButton { width: 30px; height: 30px; display: inline-grid; place-items: center; flex: 0 0 auto; padding: 0; color: var(--cases-muted); background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
 .iconButton:hover { color: var(--cases-strong); background: var(--cases-hover); border-color: var(--cases-border); }

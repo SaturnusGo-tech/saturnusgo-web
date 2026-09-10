@@ -47,7 +47,7 @@
 .folderName small { color: var(--cases-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
 .menuButton { width: 21px; flex: 0 0 21px; opacity: 0; }
 .folderRow:hover .menuButton, .folderRow:focus-within .menuButton { opacity: 1; }
-.folderRow input, .leaf input { width: 14px; height: 14px; flex: 0 0 14px; margin: 0; accent-color: #647ec5; opacity: 0; cursor: pointer; }
+.folderRow input, .leaf input { width: 14px; height: 14px; flex: 0 0 14px; margin: 0; accent-color: #647ec5; opacity: 0; cursor: pointer; transition: opacity 220ms cubic-bezier(.22,.61,.36,1); }
 .folderRow:hover input, .folderRow:focus-within input, .leaf:hover input, .leaf:focus-within input, .repository input:checked, .repository input:indeterminate { opacity: 1; }
 .folderRow input:disabled { visibility: hidden; }
 .leaf { min-height: 43px; align-items: start; }
@@ -72,6 +72,7 @@
 .repository :is(button,input):focus-visible { outline: 2px solid var(--cases-control-border) !important; outline-offset: 2px; }
 @keyframes breathe { to { opacity: .35; } }
 @media(prefers-reduced-motion:reduce) { .skeleton i { animation: none; } }
+@media(prefers-reduced-motion:reduce) { .folderRow input, .leaf input { transition: none; } }
 
 @media(max-width:650px) { .repository { width: 100%; flex-basis: auto; max-height: 260px; border-right: 0; border-bottom: 1px solid var(--cases-row-border); } .resizeHandle { display: none; } .heading { padding-bottom: 5px; } .hint { display: none; } .treeHeading { padding-top: 6px; } }
 

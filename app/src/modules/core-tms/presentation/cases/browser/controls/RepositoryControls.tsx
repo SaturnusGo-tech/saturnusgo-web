@@ -21,11 +21,15 @@ export function RepositoryControls({ props, view, locale }: {
     + Number(props.filters.includeArchived) + view.facetFilters.folders.length + view.facetFilters.components.length;
   function closeFilters() { view.setFilterOpen(false); filterButton.current?.focus(); }
   return <div className={css.controls} data-case-popover-root>
+    <div className={css.searchRow}>
     <label className={css.search} data-input-shell><PiMagnifyingGlass size={16} aria-hidden="true" />
       <input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
         aria-label={ru ? "Поиск по ID, названию, папке, компоненту или тегу" : "Search by ID, title, folder, component, or tag"} />
       {props.query && <button type="button" onClick={() => props.onQuery("")} aria-label={ru ? "Очистить поиск" : "Clear search"}><PiX size={14} /></button>}
     </label>
+      <button type="button" className={css.create} disabled={locked || view.folderArchived} onClick={() => view.createCase()}
+        title={view.folderArchived ? (ru ? "Выберите активную папку" : "Select an active folder") : undefined}><PiPlus size={15} /><span>{ru ? "Новый кейс" : "New case"}</span></button>
+    </div>
     <div className={css.tools}>
       <button type="button" className={css.tool} disabled={locked} aria-pressed={view.selectionMode} onClick={view.toggleSelectionMode}
         aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"} title={ru ? "Выбрать тест-кейсы" : "Select test cases"}><PiCheckSquare size={16} /><span>{ru ? "Выбрать" : "Select"}</span></button>
@@ -38,15 +42,16 @@ export function RepositoryControls({ props, view, locale }: {
         {view.filterOpen && <CaseFilterMenu locale={locale} filters={props.filters} facets={view.facetFilters} options={view.facetOptions}
           onFilters={props.onFilters} onFacets={view.setFacetFilters} onClose={closeFilters} />}
       </div>
-      <button type="button" className={css.create} disabled={locked || view.folderArchived} onClick={() => view.createCase()}
-        title={view.folderArchived ? (ru ? "Выберите активную папку" : "Select an active folder") : undefined}><PiPlus size={15} /><span>{ru ? "Новый кейс" : "New case"}</span></button>
+      <div className={css.selection} data-open={view.selectionMode || undefined} aria-hidden={!view.selectionMode}
+        ref={(element) => { if (element) element.inert = !view.selectionMode; }}>
+        <div className={css.selectionActions}>
+          <button type="button" disabled={locked || !view.selectableVisibleCount} onClick={view.bulkSelection.selectVisible}>{ru ? "Выбрать в папке" : "Select in folder"}</button>
+          <button type="button" disabled={locked || !view.selectableCount} onClick={view.bulkSelection.selectAll}>{ru ? "Выбрать все" : "Select all"}</button>
+        </div>
+      </div>
     </div>
     {qlOpen && <div ref={qlRef} id={qlId} className={css.ql} onKeyDown={(event) => { if (event.key === "Escape" && !event.defaultPrevented) {
       event.preventDefault(); event.stopPropagation(); setQlOpen(false); qlButton.current?.focus();
     } }}><CaseQlAutocomplete locale={locale} query={view.qlQuery} folders={view.facetOptions.folders} components={view.facetOptions.components} onQuery={view.setQlQuery} /></div>}
-    {view.selectionMode && <div className={css.selection}>
-      <button type="button" disabled={locked || !view.selectableVisibleCount} onClick={view.bulkSelection.selectVisible}>{ru ? "Выбрать в папке" : "Select in folder"}</button>
-      <button type="button" disabled={locked || !view.selectableCount} onClick={view.bulkSelection.selectAll}>{ru ? "Выбрать все" : "Select all"}</button>
-    </div>}
   </div>;
 }

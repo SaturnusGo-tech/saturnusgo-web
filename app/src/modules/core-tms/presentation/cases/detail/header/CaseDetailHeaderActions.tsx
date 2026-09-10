@@ -70,12 +70,12 @@ export function CaseDetailHeaderActions(props: Props) {
     </div>
     <div className={inspector.headerActions}>
       {!props.creating && <button type="button" disabled={props.editorOpen || archived} title={archived ? restoreTitle : undefined}
-        className={inspector.headerTextButton} onClick={() => { if (!archived) props.onRunCase(); }}>
+        className={`${inspector.headerTextButton} ${inspector.headerRunButton}`} onClick={() => { if (!archived) props.onRunCase(); }}>
         <Play size={14} />{ru ? "Запустить" : "Run"}</button>}
       {!props.creating && <button type="button" disabled={props.editorOpen}
-        className={inspector.headerTextButton} onClick={props.onArchive}>
+        className={`${inspector.headerTextButton} ${inspector.headerQuarantineButton}`} onClick={props.onArchive}>
         {item?.archivedAt ? <RotateCcw size={14} /> : <Archive size={14} />}
-        {item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Архивировать" : "Archive")}
+        {item?.archivedAt ? (ru ? "Восстановить" : "Restore") : (ru ? "Карантин" : "Quarantine")}
       </button>}
       {!props.creating && <div ref={menuRoot} className={inspector.headerActionMenuRoot}
         onKeyDown={(event) => {
