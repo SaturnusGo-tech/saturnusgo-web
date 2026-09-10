@@ -52,6 +52,7 @@ export function browserHarness() {
   } as unknown as CasesViewProps;
   const bulk = h.load<{ useCaseBulkSelection: typeof useCaseBulkSelection }>(new URL("../../bulk/selection-hook/useCaseBulkSelection.ts", import.meta.url), () => selection);
   const controller = h.load<{ useCasesViewController: typeof useCasesViewController }>(new URL("../../view/useCasesViewController.ts", import.meta.url), (name) => {
+    if (name.endsWith("content-transition")) return { transitionContent: (update: () => void) => update() };
     if (name.endsWith("folder-scope")) return scope;
     if (name.endsWith("caseListModel")) return model;
     if (name.endsWith("format/count")) return { formatCount };

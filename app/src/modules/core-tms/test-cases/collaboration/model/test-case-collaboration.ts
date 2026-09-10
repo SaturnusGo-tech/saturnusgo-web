@@ -10,6 +10,8 @@ export type TestCaseComment = {
   body: string;
   author: { identityId: string; displayName: string };
   createdAt: string;
+  version?: number; editedAt?: string | null; deletedAt?: string | null;
+  parentId?: string | null; mentions?: string[]; canEdit?: boolean; canDelete?: boolean;
 };
 
 export type CaseRetestEvidence = {
@@ -98,6 +100,7 @@ export type CaseCollaborationResource<T> = {
 };
 
 export type CaseCollaborationFailure =
+  | "invalid_mentions" | "missing_parent" | "channel_unavailable"
   | "forbidden" | "stale" | "retest_required" | "youtrack_required"
   | "youtrack_workflow_guard" | "youtrack_not_ready"
   | "invalid_transition" | "unknown";

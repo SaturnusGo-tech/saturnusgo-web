@@ -1,0 +1,13 @@
+.composer { padding: 10px 14px; color: var(--cases-text); }
+.composer [data-editor-shell] { border-radius: 12px; }
+.composer > div > div:first-child { margin-bottom: 8px; }
+.composer footer { display: flex; justify-content: flex-end; gap: 7px; padding-top: 7px; }
+.composer footer button, .reply button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--cases-secondary-text); border-radius: 10px; min-height: 30px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.composer footer .send { color: white; background: #3475ed; }
+.composer button:disabled { opacity: .5; cursor: default; }
+.reply { display: flex; align-items: center; gap: 7px; color: var(--cases-secondary-text); font-size: 12px; padding: 4px 0 8px; }
+.reply button { margin-left: auto; }
+.channels { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; padding: 8px 0 2px; font-size: 11px; color: var(--cases-secondary-text); }
+.channels label { display: flex; align-items: center; gap: 5px; }
+.channels small { flex-basis: 100%; color: var(--cases-muted); }
+.error { color: #db6872; font-size: 12px; }

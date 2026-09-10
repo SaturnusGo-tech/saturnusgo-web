@@ -1,3 +1,4 @@
+import { transitionContent } from "../../workspace/motion/transition/content-transition";
 import { repositoryScope } from "../../../folders/model/selection/folder-scope";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCount } from "../../../localization/format/count";
@@ -119,9 +120,11 @@ export function useCasesViewController(
   }
   function selectRow(row: CaseListRow) {
     if (props.editor) return;
-    if (row.folderPath !== props.selectedFolder || (row.testCase.folderId ?? "") !== (props.selectedFolderId ?? "")) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
-    props.onSelectCase(row.testCase.id);
-    setDetailOpen(true);
+    transitionContent(() => {
+      if (row.folderPath !== props.selectedFolder || (row.testCase.folderId ?? "") !== (props.selectedFolderId ?? "")) props.onSelectFolder(row.folderPath, row.testCase.folderId ?? undefined);
+      props.onSelectCase(row.testCase.id);
+      setDetailOpen(true);
+    });
   }
   function createCase(folderPath?: string) {
     const path = folderPath ?? props.selectedFolder;

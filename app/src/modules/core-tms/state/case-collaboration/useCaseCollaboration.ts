@@ -1,3 +1,5 @@
+import { useCommentChanges } from "../comment-changes/useCommentChanges";
+import type { CommentDraft } from "../../test-cases/collaboration/model/drafts/comment-draft";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { resolvePendingOperation, type PendingOperation } from "../../../../core/tms/idempotency/pending-operation";
 import { TmsApiError } from "../../../../core/tms/transport/http";
@@ -22,16 +24,8 @@ type Input = {
 
 const commentKey = (comment: TestCaseComment) => comment.id;
 const defectKey = (defect: CaseLinkedDefect) => defect.occurrence.id;
-export const DEFECT_VISIBLE_REFRESH_INTERVAL = 30_000;
-type IntervalApi = { set: (callback: () => void, delay: number) => unknown;
-  clear: (timer: unknown) => void };
-export function scheduleVisibleDefectRefresh(refresh: () => void, timers: IntervalApi = {
-  set: (callback, delay) => setInterval(callback, delay),
-  clear: (timer) => clearInterval(timer as ReturnType<typeof setInterval>),
-}) {
-  const timer = timers.set(refresh, DEFECT_VISIBLE_REFRESH_INTERVAL);
-  return () => timers.clear(timer);
-}
+import { scheduleVisibleDefectRefresh } from "../defect-refresh/visible-defect-refresh";
+export { scheduleVisibleDefectRefresh, DEFECT_VISIBLE_REFRESH_INTERVAL } from "../defect-refresh/visible-defect-refresh";
 
 export function useCaseCollaboration(input: Input) {
   const http = useTmsHttpClient();
@@ -116,10 +110,10 @@ export function useCaseCollaboration(input: Input) {
   }, [available, defectPages.refresh, defectPages.resource.refreshing,
     defectPages.resource.status, input.active, scopeKey]);
 
-  const addComment = useCallback(async (rawBody: string) => {
+  const addComment = useCallback(async (rawBody: string, options: Omit<CommentDraft, "body"> = {}) => {
     const body = rawBody.trim();
     if (!available || !input.canComment || !body || commentSubmitting) return false;
-    const signature = JSON.stringify({ projectId: input.projectId, caseId: input.caseId, body });
+    const signature = JSON.stringify({ projectId: input.projectId, caseId: input.caseId, body, ...options });
     const operation = resolvePendingOperation(commentOperation.current, signature);
     const epoch = scopeEpoch.current;
     commentOperation.current = operation;
@@ -127,7 +121,7 @@ export function useCaseCollaboration(input: Input) {
     setCommentFailure(null);
     try {
       const created = await createTestCaseComment(
-        http, input.projectId, input.caseId, body, operation.key,
+        http, input.projectId, input.caseId, body, operation.key, options,
       );
       if (currentScope.current !== scopeKey || scopeEpoch.current !== epoch) return false;
       commentPages.updateItems((items) => upsertNewestComment(items, created));
@@ -183,7 +177,10 @@ export function useCaseCollaboration(input: Input) {
     }
   }, [available, confirmingOccurrenceId, defectPages.refresh, http, input.canConfirmFix, scopeKey]);
 
+  const changes = useCommentChanges({ projectId: input.projectId, caseId: input.caseId,
+    updateItems: commentPages.updateItems, refresh: commentPages.refresh });
   return {
+    ...changes, commentProjectId: input.projectId,
     comments: commentPages.resource, defects: defectPages.resource,
     canComment: input.canComment && available, canConfirmFix: input.canConfirmFix && available,
     commentSubmitting,

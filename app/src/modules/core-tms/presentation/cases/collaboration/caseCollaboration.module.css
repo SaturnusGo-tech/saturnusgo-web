@@ -183,3 +183,27 @@
 .historySkeleton i { height:32px; border-radius:8px; background:var(--control); animation:history-pulse 1.4s ease-in-out infinite; }
 @keyframes history-pulse { 50% { opacity:.45; } }
 @media(prefers-reduced-motion:reduce) { .historySkeleton i { animation:none; } }
+/* Discussion stays in the document flow, with actions at the end of each message. */
+.commentsSection { border-top: 0; }
+.commentsHeading { border-bottom: 0; }
+.commentPrompt { border-radius: 12px; border-color: transparent; }
+.comment { border-bottom: 0; margin: 3px 0; scroll-margin: 18px; }
+.comment:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: -2px; border-radius: 12px; }
+.commentContent { min-width: 0; }
+.comment header { justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 7px; }
+.comment header small { color: var(--cases-muted); font-size: 10px; }
+.refreshComments { margin-left: auto; display: grid; place-items: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: 9px; color: var(--cases-muted); cursor: pointer; }
+.refreshComments:hover { background: var(--cases-hover); }
+.replyReference { display: flex; align-items: center; gap: 6px; padding: 5px 0; border: 0; color: var(--cases-secondary-text); background: transparent; font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+.deletedComment { color: var(--cases-muted); font-size: 12px; font-style: italic; }
+.mentionedPeople { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
+.mentionedPeople > span { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cases-secondary-text); }
+.confirmDelete { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 8px 0; font-size: 12px; }
+.confirmDelete button { min-height: 28px; padding: 4px 9px; border: 0; border-radius: 9px; color: var(--cases-secondary-text); background: var(--cases-hover); cursor: pointer; }
+.confirmDelete button:last-of-type { color: #db6872; }
+.commentSkeleton { display: grid; gap: 8px; padding: 18px 14px; }
+.commentSkeleton span { height: 10px; width: 80%; background: var(--cases-hover); border-radius: 5px; animation: comment-pulse 1.4s ease-in-out infinite alternate; }
+.commentSkeleton span:first-child { width: 28%; height: 13px; }
+.commentSkeleton span:last-child { width: 55%; }
+@keyframes comment-pulse { from { opacity: .5; } to { opacity: 1; } }
+@media(prefers-reduced-motion:reduce) { .commentSkeleton span { animation: none; } }

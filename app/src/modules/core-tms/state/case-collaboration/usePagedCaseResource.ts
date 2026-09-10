@@ -186,6 +186,9 @@ export function usePagedCaseResource<T>(input: Input<T>) {
 
 export function classifyCollaborationFailure(error: unknown): CaseCollaborationFailure {
   if (!(error instanceof TmsApiError)) return "unknown";
+  if (error.code === "VALIDATION_ERROR" && error.validationField === "mentions") return "invalid_mentions";
+  if (error.code === "VALIDATION_ERROR" && error.validationField === "parentId") return "missing_parent";
+  if (error.code === "VALIDATION_ERROR" && error.validationField === "notifyChannels") return "channel_unavailable";
   if (error.status === 403) return "forbidden";
   if (error.status === 412) return "stale";
   if (error.code.startsWith("RETEST_")) return "retest_required";

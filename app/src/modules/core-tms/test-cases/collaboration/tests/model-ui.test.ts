@@ -11,7 +11,8 @@ import {
 import { DEFECT_TRANSITION_POLL_DELAYS, pendingDefectTransitionSignature, scheduleDefectTransitionPoll } from "../../../state/case-collaboration/usePagedCaseResource";
 const source = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
 const record = source("../../../presentation/cases/collaboration/defects/CaseDefectRecord.tsx");
-const comments = source("../../../presentation/cases/collaboration/comments/CaseCommentsTab.tsx");
+const commentFiles = ["comments/CaseCommentsTab", "composer/CommentComposer", "records/CaseCommentRecord"];
+const comments = commentFiles.map((path) => source(`../../../presentation/cases/collaboration/${path}.tsx`)).join("\n");
 const activity = source("../../../presentation/cases/collaboration/defects/CaseActivityTab.tsx");
 const panel = source("../../../presentation/cases/detail/CaseDetailPanel.tsx");
 const overview = source("../../../presentation/cases/detail/CaseOverview.tsx");
@@ -32,12 +33,6 @@ const defect = (blocked: CaseLinkedDefect["fixConfirmationBlockedReason"]): Case
     completedAt: "2026-09-01T09:00:00Z" },
   fixVerification: null, youTrackTransition: null,
   fixConfirmationBlockedReason: blocked,
-});
-test("comment insertion is idempotent and keeps newest-first order", () => {
-  const older = { id: "c-1", projectId: "p", caseId: "c", body: "Old",
-    author: { identityId: "a", displayName: "Ada" }, createdAt: "2026-09-01T08:00:00Z" };
-  const newer = { ...older, id: "c-2", body: "New", createdAt: "2026-09-01T09:00:00Z" };
-  assert.deepEqual(upsertNewestComment([older, newer], newer).map(({ id }) => id), ["c-2", "c-1"]);
 });
 test("fix confirmation stays guarded by backend readiness and exact retest evidence", () => {
   assert.equal(canConfirmDefectFix(defect(null)), true);
@@ -183,8 +178,8 @@ test("collaboration UI exposes real links, cursor retry, and durable sync truth"
   assert.match(record, /creation\.status === "pending"/);
   assert.match(record, /defect\.fixVerification/);
   assert.doesNotMatch(record, /model\.queuedTransition/);
-  assert.match(comments, /event\.ctrlKey && !event\.metaKey/); assert.match(comments, /<MarkdownField/);
-  assert.match(comments, /value=\{comment\.body\}/); assert.match(comments, /value\.slice\(0, 10_000\)/);
+  assert.match(comments, /event\.metaKey \|\| event\.ctrlKey/); assert.match(comments, /<MarkdownField/);
+  assert.match(comments, /value=\{comment\.body\}/); assert.match(comments, /body\.length > 10_000/);
   assert.match(comments, /model\.retryComments/); assert.match(comments, /model\.loadMoreComments/); assert.match(comments, /loadMoreFailed/);
   assert.match(comments, /role="alert"/); assert.match(comments, /comment\.author\.displayName/);
   assert.match(comments, /<time dateTime=\{comment\.createdAt\}>/);

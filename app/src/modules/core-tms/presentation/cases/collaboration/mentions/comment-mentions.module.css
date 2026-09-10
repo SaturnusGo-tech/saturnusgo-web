@@ -1,0 +1,13 @@
+.root { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.add, .chip button { display: inline-flex; align-items: center; gap: 5px; border: 0; border-radius: 8px; color: var(--cases-secondary-text); background: transparent; font: inherit; font-size: 12px; cursor: pointer; min-height: 26px; }
+.add:hover, .chip button:hover { background: var(--cases-hover); }
+.chip { display: inline-flex; align-items: center; gap: 5px; color: var(--cases-text); background: var(--cases-hover); border-radius: 20px; padding: 2px 6px 2px 3px; font-size: 11px; }
+.chip > span:first-child { width: 20px; height: 20px; }
+.picker { position: absolute; left: 0; top: calc(100% + 6px); z-index: 65; width: min(300px, 100%); min-width: 220px; padding: 7px; border: 1px solid var(--cases-control-border); border-radius: 13px; background: var(--cases-bg); box-shadow: 0 14px 35px #0002; }
+.search { display: flex; align-items: center; gap: 7px; padding: 7px; border-radius: 8px; background: var(--cases-control); }
+.search input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--cases-text); outline: none; font: inherit; font-size: 12px; }
+.options { max-height: 240px; overflow: auto; padding-top: 4px; }
+.options button { display: flex; align-items: center; gap: 8px; border: 0; border-radius: 8px; width: 100%; background: transparent; color: var(--cases-text); text-align: left; padding: 6px; cursor: pointer; }
+.options button:hover, .options button:focus-visible { background: var(--cases-hover); }
+.options small { display: block; color: var(--cases-muted); }
+.picker p { font-size: 11px; color: var(--cases-muted); padding: 5px; }

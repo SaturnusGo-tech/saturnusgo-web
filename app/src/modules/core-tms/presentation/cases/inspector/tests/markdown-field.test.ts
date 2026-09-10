@@ -18,7 +18,8 @@ const section = readFileSync(new URL("../section/InspectorSectionView.tsx", impo
 const steps = readFileSync(new URL("../steps/InspectorSteps.tsx", import.meta.url), "utf8");
 const scenarioStep = readFileSync(new URL("../steps/editor/ScenarioStepEditor.tsx", import.meta.url), "utf8");
 const scenarioInput = readFileSync(new URL("../steps/editor/ScenarioTextInput.tsx", import.meta.url), "utf8");
-const comments = readFileSync(new URL("../../collaboration/comments/CaseCommentsTab.tsx", import.meta.url), "utf8");
+const comments = readFileSync(new URL("../../collaboration/comments/CaseCommentsTab.tsx", import.meta.url), "utf8")
+  + readFileSync(new URL("../../collaboration/composer/CommentComposer.tsx", import.meta.url), "utf8");
 const detailActions = readFileSync(new URL("../../detail/header/CaseDetailHeaderActions.tsx", import.meta.url), "utf8");
 const select = readFileSync(new URL("../../../common/select/AnimatedSelect.tsx", import.meta.url), "utf8");
 const modal = readFileSync(new URL("../../../common/modal/Modal.tsx", import.meta.url), "utf8");
@@ -101,7 +102,7 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.doesNotMatch(detailActions, /aria-label=\{ru \? "Клонировать"|SlidersHorizontal/);
   assert.doesNotMatch(detailPanel, /testCase\??\.folderPath/);
   assert.doesNotMatch(detailPanel, /className=\{inspector\.titleMark\}/);
-  assert.match(comments, /!composerOpen[\s\S]*commentPrompt/);
+  assert.match(comments, /composer[\s\S]*commentPrompt/);
   assert.match(comments, /compact[\s\S]*autoFocus/);
   assert.doesNotMatch(comments, /comments\.items\.length\}/);
   assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--cases-muted\) !important/);

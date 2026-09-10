@@ -43,7 +43,7 @@
 .overviewLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, 32%); align-items: start; gap: 28px; padding: 24px; }
 .primaryColumn, .sideRail { min-width: 0; display: grid; align-content: start; gap: 22px; }
 .sideRail { gap: 18px; }
-.section { min-width: 0; animation: inspectorSectionIn 150ms cubic-bezier(.2, .72, .3, 1) both; }
+.section { min-width: 0; }
 .section > header { min-height: 28px; display: flex; align-items: center; gap: 7px; padding: 0 0 8px; }
 .section > header h3 { margin: 0; color: var(--cases-strong); font-size: 14px; font-weight: 650; line-height: 1.3; }
 .section > header .iconButton { margin-left: auto; opacity: .45; }
@@ -118,7 +118,6 @@
 .creationFooter .validationMessage { margin-right: auto; }
 .validationMessage { color: #b4494f; font-size: 10px; line-height: 1.3; }
 
-@keyframes inspectorSectionIn { from { opacity: .72; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .section { animation: none; } .sectionBody { transition: none; } }
 @container case-inspector (max-width: 620px) {
   .overviewLayout { grid-template-columns: 1fr; gap: 22px; padding: 20px 18px; }

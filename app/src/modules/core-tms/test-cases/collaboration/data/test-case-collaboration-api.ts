@@ -27,10 +27,11 @@ export async function createTestCaseComment(
   caseId: string,
   body: string,
   idempotencyKey: string,
+  options: Omit<import("../model/drafts/comment-draft").CommentDraft, "body"> = {},
 ) {
   const resource = await http.mutateResource<Api["TestCaseComment"]>(
     `/test-cases/${caseId}/comments`, "POST",
-    { projectId, body } satisfies Api["TestCaseCommentCreateRequest"],
+    { projectId, body, ...options } satisfies Api["TestCaseCommentCreateRequest"],
     { idempotencyKey },
   );
   return mapComment(resource.data);
@@ -54,6 +55,7 @@ export async function confirmDefectFix(
   http: TmsHttpClient,
   defect: CaseLinkedDefect,
   idempotencyKey: string,
+  options: Omit<import("../model/drafts/comment-draft").CommentDraft, "body"> = {},
 ) {
   if (!defect.eligibleRetest) throw new Error("Retest evidence is required.");
   const {
