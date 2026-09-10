@@ -61,12 +61,15 @@ export interface AttachmentReadAccess {
   readonly expiresAt: string;
 }
 
+export type AttachmentUploadPhase = "preparing" | "uploading" | "finalizing" | "ready" | "error";
+
 export type UploadPrivateAttachmentInput = AttachmentScope & {
   readonly owner: AttachmentOwner;
   readonly kind: AttachmentKind;
   readonly mimeType: AttachmentMimeType;
   readonly file: File;
   readonly operationKey: string;
+  readonly onProgress?: (phase: AttachmentUploadPhase) => void;
   readonly requestId?: string;
   readonly signal?: AbortSignal;
 }

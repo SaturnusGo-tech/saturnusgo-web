@@ -7,6 +7,7 @@ import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
 import { filesFromClipboard } from "../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { useCaseAttachmentDraft } from "../attachments/CaseAttachmentDraftContext";
+import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
 
 type Props = {
@@ -81,22 +82,17 @@ export function MarkdownField(props: Props) {
       props.attachmentKey, files, props.attachmentStepId,
     );
   }, [addFilesToDraft, props.attachmentKey, props.attachmentStepId]);
-  if (!props.onChange) {
-    if (!props.value.trim()) {
-      return <p className={css.empty}>{props.emptyLabel}</p>;
-    }
-    return <MDEditor.Markdown
-      className={css.rendered}
-      source={props.value}
-      skipHtml
-      urlTransform={(url) => isSafeUrl(url) ? url : ""}
-      wrapperElement={{ "data-color-mode": colorMode }}
-    />;
-  }
-  const addFiles = attachmentEnabled ? addAttachmentFiles : undefined;
   const pending = attachmentEnabled
     ? attachments?.entries.filter((entry) => entry.fieldKey === props.attachmentKey) ?? []
     : [];
+  if (!props.onChange) return <>
+    {!props.value.trim() ? <p className={css.empty}>{props.emptyLabel}</p> : <MDEditor.Markdown
+      className={css.rendered} source={props.value} skipHtml
+      urlTransform={(url) => isSafeUrl(url) ? url : ""}
+      wrapperElement={{ "data-color-mode": colorMode }} />}
+    {attachments && <MarkdownPendingAttachments locale={locale} entries={pending} onRemove={attachments.remove} />}
+  </>;
+  const addFiles = attachmentEnabled ? addAttachmentFiles : undefined;
   const draftProblem = attachments?.problem;
   let attachmentProblem = "";
   if (draftProblem && draftProblem.fieldKey === props.attachmentKey) {

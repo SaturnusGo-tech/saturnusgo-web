@@ -52,6 +52,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
       onFolderPath: model.setCaseFolderPath,
       onSubmit: model.saveCase,
       submitting: model.caseSubmitting,
+      attachmentsPending: model.caseAttachmentRecovery,
       onCancel: () => {
         if (!model.caseSubmitting) model.resetCaseEditor(model.selectedFolder);
       },

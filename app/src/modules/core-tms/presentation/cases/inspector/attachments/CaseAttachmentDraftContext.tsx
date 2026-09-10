@@ -6,6 +6,7 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 
 type DraftContext = {
   enabled: boolean;
+  locked?: boolean;
   entries: PendingCaseAttachment[];
   problem: { fieldKey: string; message: string } | null;
   add: (fieldKey: string, files: File[], stepId?: string) => void;
@@ -18,6 +19,7 @@ const Context = createContext<DraftContext | null>(null);
 export function CaseAttachmentDraftProvider(props: {
   locale: TmsLocale;
   enabled: boolean;
+  locked?: boolean;
   entries: PendingCaseAttachment[];
   validStepIds: ReadonlySet<string>;
   onEntries: (entries: PendingCaseAttachment[]) => void;
@@ -38,23 +40,26 @@ export function CaseAttachmentDraftProvider(props: {
     props.onEntries(entries);
   }, [props.onEntries]);
   const add = useCallback((fieldKey: string, files: File[], stepId?: string) => {
+    if (props.locked) return;
     const result = appendPendingCaseAttachments(entriesRef.current, { fieldKey, files, stepId });
     update(result.entries);
     setProblem(result.rejected > 0 ? { fieldKey, message: props.locale === "ru"
       ? "Часть файлов не добавлена: дубликат или превышен лимит 20 вложений."
       : "Some files were not added: duplicate or the 20-file limit was reached." } : null);
-  }, [props.locale, update]);
+  }, [props.locale, props.locked, update]);
   const remove = useCallback((id: string) => {
+    if (props.locked) return;
     update(entriesRef.current.filter((entry) => entry.id !== id));
     setProblem(null);
-  }, [update]);
+  }, [props.locked, update]);
   const removeFields = useCallback((predicate: (fieldKey: string) => boolean) => {
+    if (props.locked) return;
     update(entriesRef.current.filter((entry) => !predicate(entry.fieldKey)));
     setProblem(null);
-  }, [update]);
+  }, [props.locked, update]);
   const value = useMemo<DraftContext>(() => ({
-    enabled: props.enabled, entries: props.entries, problem, add, remove, removeFields,
-  }), [props.enabled, props.entries, problem, add, remove, removeFields]);
+    enabled: props.enabled, locked: props.locked, entries: props.entries, problem, add, remove, removeFields,
+  }), [props.enabled, props.locked, props.entries, problem, add, remove, removeFields]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 

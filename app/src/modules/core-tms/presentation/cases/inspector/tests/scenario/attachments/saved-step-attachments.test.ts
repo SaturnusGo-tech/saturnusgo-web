@@ -21,6 +21,7 @@ function load(path: string) {
     if (name.endsWith("ScenarioAttachments")) return {
       useScenarioAttachments: () => ({ pending: [], paste: () => false }),
       ScenarioAttachmentControls: () => null,
+      PendingScenarioAttachments: () => null,
       SavedScenarioAttachments: ({ ids }: { ids?: string[] }) => React.createElement("div", {},
         ...((ids ?? []).map((id) => React.createElement("span", { key: id, "data-attachment": id }, id)))),
     };

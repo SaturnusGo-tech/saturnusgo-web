@@ -1,6 +1,6 @@
 import type { PrivateAttachmentClient } from "../../attachments/application/private-attachment-client";
 import type {
-  AttachmentScope, AttachmentKind, AttachmentMetadata, AttachmentMimeType, AttachmentOwner,
+  AttachmentScope, AttachmentKind, AttachmentMetadata, AttachmentMimeType, AttachmentOwner, AttachmentUploadPhase,
 } from "../../attachments/domain/attachment";
 
 const supported = new Set<AttachmentMimeType>([
@@ -36,6 +36,7 @@ export async function uploadEvidence(input: AttachmentScope & {
   files: File[];
   operationKeyPrefix: string;
   signal?: AbortSignal;
+  onProgress?: (file: File, phase: AttachmentUploadPhase) => void;
 }): Promise<AttachmentMetadata[]> {
   if (input.files.length > 20) throw new Error("A maximum of 20 evidence files can be uploaded together.");
   const uploaded: AttachmentMetadata[] = [];
@@ -51,6 +52,7 @@ export async function uploadEvidence(input: AttachmentScope & {
         ? new File([file], file.name, { type: mime, lastModified: file.lastModified }) : file,
       operationKey: `${input.operationKeyPrefix}:${index}`,
       signal: input.signal,
+      onProgress: input.onProgress ? (phase) => input.onProgress?.(file, phase) : undefined,
     }));
   }
   return uploaded;

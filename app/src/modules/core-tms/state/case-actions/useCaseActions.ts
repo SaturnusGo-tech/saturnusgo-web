@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { TestCase, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
 import {
@@ -11,8 +11,8 @@ import {
 } from "../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
-import { pendingCaseAttachmentSignature, type PendingCaseAttachment } from "../../application/evidence/case/pendingCaseAttachment";
-import { uploadCaseAttachments } from "../../application/evidence/case/uploadCaseAttachments";
+import { pendingCaseAttachmentSignature, type PendingCaseAttachment, type CaseAttachmentProgress } from "../../application/evidence/case/pendingCaseAttachment";
+import { saveCaseWithAttachments, type CaseSaveCheckpoint } from "../../application/evidence/case/save/saveCaseWithAttachments";
 import { createEmptyRevision, normalizeRevisionTags } from "../../helpers/cases/caseRevision";
 import { createUid } from "../../helpers/id/createUid";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -36,6 +36,8 @@ export function useCaseActions(
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const caseOperation = useRef<PendingOperation | null>(null);
+  const saveCheckpoint = useRef<CaseSaveCheckpoint | null>(null);
+  const [caseAttachmentRecovery, setCaseAttachmentRecovery] = useState(false);
 
   function commit(testCase: TestCase, etag: string | null, append = false) {
     const summary: TestCaseSummary = state.connection === "demo"
@@ -57,6 +59,8 @@ export function useCaseActions(
   function openNewCase(folderPath = state.selectedFolder || "/Unsorted") {
     if (state.isCaseSubmitting()) return;
     caseOperation.current = null;
+    saveCheckpoint.current = null;
+    setCaseAttachmentRecovery(false);
     state.setCaseDraft(createEmptyRevision(locale));
     state.setCaseFolderPath(folderPath);
     state.setEditing(false);
@@ -66,13 +70,15 @@ export function useCaseActions(
   function openEditCase() {
     if (state.isCaseSubmitting() || !derived.selectedRevision || derived.selectedCase?.archivedAt) return;
     caseOperation.current = null;
+    saveCheckpoint.current = null;
+    setCaseAttachmentRecovery(false);
     state.setCaseDraft(structuredClone(derived.selectedRevision));
     state.setCaseFolderPath(derived.selectedCase?.folderPath ?? "/Unsorted");
     state.setEditing(true);
     state.setDialog("case");
   }
 
-  async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = []) {
+  async function saveCase(event: FormEvent, files: PendingCaseAttachment[] = [], onProgress?: CaseAttachmentProgress) {
     event.preventDefault();
     if (state.editing && derived.selectedCase?.archivedAt) return;
     if (!derived.project || !state.caseDraft.title.trim() || !state.beginCaseSubmission()) return;
@@ -83,7 +89,7 @@ export function useCaseActions(
     };
     const validStepIds = new Set(input.revision.steps.map(({ id }) => id));
     const validFiles = files.filter(({ stepId }) => !stepId || validStepIds.has(stepId));
-    let caseCommitted = false;
+
     try {
       if (state.connection === "demo") {
         const now = new Date().toISOString();
@@ -93,7 +99,7 @@ export function useCaseActions(
           ? { ...previous, folderPath: input.folderPath, currentRevision: revision.revision, revisionCount: previous.revisionCount + 1, current: revision, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, updatedAt: now }
           : { id: createUid("case"), projectId: derived.project.id, key: `${derived.project.key}-TC-${String(derived.projectCases.length + 1).padStart(3, "0")}`, folderPath: input.folderPath, currentRevision: 1, revisionCount: 1, title: revision.title, type: revision.type, lifecycle: revision.lifecycle, priority: revision.priority, component: revision.component, ownerIdentityId: revision.ownerIdentityId, tags: revision.tags, estimatedMinutes: revision.estimatedMinutes, current: revision, linkIds: [], archivedAt: null, createdAt: now, updatedAt: now };
         commit(testCase, null, !previous);
-        caseCommitted = true;
+
       } else {
         const signature = JSON.stringify({
           caseId: state.editing ? derived.selectedCase?.id ?? null : null,
@@ -101,36 +107,30 @@ export function useCaseActions(
           input,
           attachments: pendingCaseAttachmentSignature(validFiles),
         });
-        caseOperation.current = resolvePendingOperation(caseOperation.current, signature);
-        const key = caseOperation.current.key;
-        const result = state.editing && derived.selectedCase
-          ? state.selectedCaseEtag
-            ? await reviseTestCase(http, derived.selectedCase.id, input, state.selectedCaseEtag, key)
-            : null
-          : await createTestCase(http, input, key);
-        if (!result) throw new Error("missing case precondition");
-        let refreshed = await getTestCase(http, result.data.id);
+        if (!saveCheckpoint.current?.saved) caseOperation.current = resolvePendingOperation(caseOperation.current, signature);
+        const key = saveCheckpoint.current?.saved ? saveCheckpoint.current.key : caseOperation.current!.key;
+        if (saveCheckpoint.current?.key !== key) saveCheckpoint.current = { key, saved: null, completed: new Set() };
+        const refreshed = await saveCaseWithAttachments({
+          checkpoint: saveCheckpoint.current, files: validFiles, client: attachments, onProgress,
+          onSaved: () => { if (validFiles.length) setCaseAttachmentRecovery(true); },
+          save: async () => {
+            const result = state.editing && derived.selectedCase
+              ? state.selectedCaseEtag
+                ? await reviseTestCase(http, derived.selectedCase.id, input, state.selectedCaseEtag, key) : null
+              : await createTestCase(http, input, key);
+            if (!result) throw new Error("missing case precondition");
+            return result;
+          },
+          reload: (id) => getTestCase(http, id),
+        });
         commit(refreshed.data, refreshed.etag, !state.editing);
-        caseCommitted = true;
-        if (validFiles.length > 0) {
-          await uploadCaseAttachments({
-            client: attachments,
-            projectId: refreshed.data.projectId,
-            caseId: refreshed.data.id,
-            revisionNo: refreshed.data.currentRevision,
-            attachments: validFiles,
-            operationKeyPrefix: `${key}:evidence`,
-          });
-          refreshed = await getTestCase(http, refreshed.data.id);
-          commit(refreshed.data, refreshed.etag);
-        }
       }
     } catch (caught) {
-      if (caseCommitted) {
-        state.setDialog(null);
-        notify(formatTmsMutationFailure(
-          toTmsMutationFailure(caught), t("runs.evidenceUploadError"),
-        ));
+      for (const file of validFiles) if (!saveCheckpoint.current?.completed.has(file.id)) onProgress?.(file.id, "error");
+      if (saveCheckpoint.current?.saved) {
+        notify(formatTmsMutationFailure(toTmsMutationFailure(caught), locale === "ru"
+          ? "Не удалось завершить сохранение вложений. Нажмите «Сохранить», чтобы повторить."
+          : "Could not finish saving attachments. Select Save to retry."));
         return;
       }
       const fallback = state.editing
@@ -142,6 +142,8 @@ export function useCaseActions(
       state.finishCaseSubmission();
     }
     caseOperation.current = null;
+    saveCheckpoint.current = null;
+    setCaseAttachmentRecovery(false);
     state.setDialog(null);
     notify(state.editing ? t("actions.caseRevisionSaved") : t("actions.caseCreated"));
   }
@@ -177,5 +179,5 @@ export function useCaseActions(
     notify(restoring ? t("actions.caseRestored") : t("actions.caseArchived"));
   }
 
-  return { openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
+  return { caseAttachmentRecovery, openNewCase, openEditCase, saveCase, cloneCase, toggleArchiveCase };
 }

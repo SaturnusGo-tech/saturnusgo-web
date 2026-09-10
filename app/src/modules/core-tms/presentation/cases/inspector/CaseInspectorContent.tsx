@@ -14,13 +14,14 @@ import { copyInspectorRevision, isInspectorSectionEditing, restoreInspectorSecti
 import css from "./caseInspector.module.css";
 import type { SharedStep, SharedStepSummary } from "../../../shared-steps/model/shared-step";
 type Props = {
+  testCaseId?: string;
   locale: TmsLocale; revision: TestCaseRevision; archived?: boolean; editor?: CaseInspectorEditor;
   sharedSteps: readonly SharedStepSummary[];
   onResolveSharedStep: (id: string) => Promise<SharedStep | null>;
   onRequestEdit: () => void;
 };
 export function CaseInspectorContent({
-  locale, revision, archived, editor, sharedSteps, onResolveSharedStep, onRequestEdit,
+  locale, revision, archived, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId,
 }: Props) {
   const ru = locale === "ru";
   const attachmentDraft = useCaseAttachmentDraft();
@@ -48,7 +49,7 @@ export function CaseInspectorContent({
     if (!editor) onRequestEdit();
   }
   function patch(next: Partial<TestCaseRevision>) {
-    if (editor && !readOnly) editor.onChange({ ...editor.value, ...next });
+    if (editor && !readOnly && !editor.submitting && !editor.attachmentsPending) editor.onChange({ ...editor.value, ...next });
   }
   function cancel(section: InspectorSection) {
     const snapshot = snapshots.current[section];
@@ -82,7 +83,7 @@ export function CaseInspectorContent({
     onEdit: begin,
     onCancel: cancel,
     onSave: saveSection,
-    disabled: readOnly || editor?.submitting,
+    disabled: readOnly || editor?.submitting || editor?.attachmentsPending,
   });
   const sectionEditing = (section: InspectorSection) => (
     !readOnly && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
@@ -126,7 +127,7 @@ export function CaseInspectorContent({
           autoFocus={!creating} showLabels onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} {...controls("details")}>
-        <InspectorDetails revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />
+        <InspectorDetails testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />
       </InspectorSectionView>
     </aside>
   </div>;

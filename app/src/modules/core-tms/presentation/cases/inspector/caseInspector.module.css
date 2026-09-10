@@ -127,3 +127,6 @@
   .caseByline { display: grid; justify-items: start; gap: 3px; }
   .attachmentPicker label { align-items: center; flex-direction: row; }
 }
+
+.uploadFieldset { display: contents; border: 0; min-width: 0; padding: 0; margin: 0; }
+.uploadFieldset:disabled [contenteditable="true"] { pointer-events: none; }

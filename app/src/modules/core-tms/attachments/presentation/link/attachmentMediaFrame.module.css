@@ -48,6 +48,8 @@
 .identity { min-width: 0; display: flex; align-items: baseline; gap: 7px; }
 .identity b { overflow: hidden; font-size: 12px; font-weight: 560; text-overflow: ellipsis; white-space: nowrap; }
 .identity small { flex: 0 0 auto; color: var(--cases-faint); font-size: 10px; }
+.identity[data-upload] { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 7px; }
+.identity > [role] { grid-column: 1 / -1; }
 .actions { display: inline-flex; align-items: center; gap: 1px; }
 
 .collapse {

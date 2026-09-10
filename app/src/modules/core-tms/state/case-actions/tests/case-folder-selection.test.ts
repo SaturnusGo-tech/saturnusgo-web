@@ -1,3 +1,4 @@
+import { saveCaseWithAttachments } from "../../../application/evidence/case/save/saveCaseWithAttachments";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
@@ -5,11 +6,12 @@ import test from "node:test";
 import ts from "typescript";
 import { resolvePendingOperation } from "../../../../../core/tms/idempotency/pending-operation";
 import type { TestCase } from "../../../../../core/tms/contracts/legacy-contract";
+import type { PrivateAttachmentClient } from "../../../attachments/application/private-attachment-client";
 import type { useCaseActions } from "../useCaseActions";
 
-function harness(folderPath: string, folderId: string | null | undefined, archived = false) {
+function harness(folderPath: string, folderId: string | null | undefined, archived = false, upload?: PrivateAttachmentClient["upload"]) {
   const saved = { id: "case-b", projectId: "project-a", folderPath, folderId,
-    title: "Saved", current: {}, linkIds: [] } as unknown as TestCase;
+    title: "Saved", currentRevision: 1, current: {}, linkIds: [] } as unknown as TestCase;
   let selectedFolder = "/A";
   let selectedFolderId = "folder-a";
   const notices: string[] = [];
@@ -29,11 +31,11 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
   runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } }).outputText, {
     module, exports: module.exports, crypto,
     require(name: string) {
-      if (name === "react") return { useRef: (current: unknown) => ({ current }) };
+      if (name === "react") return { useRef: (current: unknown) => ({ current }), useState: (value: unknown) => [value, () => {}] };
       if (name.endsWith("pending-operation")) return { resolvePendingOperation };
       if (name.endsWith("mutation-failure")) return { toTmsMutationFailure: (value: unknown) => value, formatTmsMutationFailure: () => "Unexpected failure" };
       if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
-      if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({}) };
+      if (name.endsWith("AttachmentClientProvider")) return { useAttachmentClient: () => ({ upload }) };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
       if (name.endsWith("test-case-api")) {
         const response = async () => ({ data: saved, etag: '"case-b:1"' });
@@ -41,6 +43,7 @@ function harness(folderPath: string, folderId: string | null | undefined, archiv
       }
       if (name.endsWith("caseRevision")) return { normalizeRevisionTags: (tags: string[]) => tags };
       if (name.endsWith("pendingCaseAttachment")) return { pendingCaseAttachmentSignature: () => "" };
+      if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments };
       if (name.endsWith("uploadCaseAttachments") || name.endsWith("createUid")) return {};
       throw new Error(`Unexpected import ${name}`);
     },
@@ -79,4 +82,19 @@ test("archived cases cannot open, save or clone through canonical actions", asyn
   assert.equal(prevented, true);
   assert.deepEqual(h.selection(), { folderPath: "/A", folderId: "folder-a" });
   assert.deepEqual(h.notices, []);
+});
+
+
+test("the canonical save does not publish the new case or close its draft before uploads finish", async () => {
+  let release!: () => void;
+  const uploading = new Promise<void>((resolve) => { release = resolve; });
+  const h = harness("/B", "folder-b", false, async () => { await uploading; return { id: "attachment", status: "ready" } as never; });
+  const files = [{ id: "upload-1", fieldKey: "description", file: new File(["image"], "Screenshot.png", { type: "image/png" }) }];
+  const job = h.actions.saveCase({ preventDefault() {} } as Parameters<typeof h.actions.saveCase>[0], files);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(h.selection(), { folderPath: "/A", folderId: "folder-a" });
+  assert.deepEqual(h.notices, []);
+  release(); await job;
+  assert.deepEqual(h.selection(), { folderPath: "/B", folderId: "folder-b" });
+  assert.deepEqual(h.notices, ["actions.caseCreated"]);
 });

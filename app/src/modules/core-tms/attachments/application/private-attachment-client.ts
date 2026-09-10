@@ -51,6 +51,7 @@ export function createPrivateAttachmentClient(
     },
     async upload(input: UploadPrivateAttachmentInput): Promise<AttachmentMetadata> {
       validFile(input);
+      input.onProgress?.("preparing");
       const operationKey = input.operationKey;
       if (!operationKeyPattern.test(operationKey)) {
         throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment operation key is invalid.");
@@ -63,8 +64,10 @@ export function createPrivateAttachmentClient(
       const previous = finalizations.get(operationKey);
       if (previous) {
         if (previous.identity !== identity) throw new AttachmentClientError("INVALID_CLIENT_INPUT", "Attachment operation key was reused.");
+        input.onProgress?.("finalizing");
         const metadata = await dependencies.transport.finalizeUpload({ ...previous.input, signal: input.signal });
         finalizations.delete(operationKey);
+        input.onProgress?.("ready");
         return metadata;
       }
       const created = await dependencies.transport.createUploadIntent({
@@ -88,6 +91,7 @@ export function createPrivateAttachmentClient(
       ) {
         throw new AttachmentClientError("UPLOAD_INTENT_EXPIRED", "Attachment upload intent is unusable.");
       }
+      input.onProgress?.("uploading");
       const storageETag = await dependencies.transport.uploadPrivateObject(
         created.intent,
         input.file,
@@ -105,8 +109,10 @@ export function createPrivateAttachmentClient(
       };
       if (finalizations.size >= 100) finalizations.delete(finalizations.keys().next().value!);
       finalizations.set(operationKey, { identity, input: finalization });
+      input.onProgress?.("finalizing");
       const metadata = await dependencies.transport.finalizeUpload(finalization);
       finalizations.delete(operationKey);
+      input.onProgress?.("ready");
       return metadata;
     },
     async createAccess(input: CreateAttachmentAccessInput): Promise<AttachmentReadAccess> {

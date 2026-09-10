@@ -10,7 +10,7 @@ import {
 import inspector from "../inspector/caseInspector.module.css";
 import { InspectorPendingAttachments } from "../inspector/attachments/InspectorPendingAttachments";
 import { CaseAttachmentDraftProvider } from "../inspector/attachments/CaseAttachmentDraftContext";
-import type { PendingCaseAttachment } from "../../../application/evidence/case/pendingCaseAttachment";
+import type { PendingCaseAttachment, CaseAttachmentProgress } from "../../../application/evidence/case/pendingCaseAttachment";
 import { CaseOverview } from "./CaseOverview";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
@@ -57,6 +57,9 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const creating = props.editor?.mode === "create";
   const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);
+  const uploadLocked = Boolean(props.editor?.submitting || props.editor?.attachmentsPending);
+  const uploadProgress: CaseAttachmentProgress = (id, phase) => setFiles((current) =>
+    current.map((entry) => entry.id === id ? { ...entry, phase } : entry));
   const editorWasOpen = useRef(editorOpen);
   const revision = archived ? props.revision : props.editor?.value ?? props.revision;
   const readyDefects = creating ? 0 : readyDefectCount(props.collaboration.defects.items);
@@ -85,7 +88,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   }, [editorOpen]);
 
   function beginHeaderEdit(section: "title") {
-    if (archived) return;
+    if (archived || uploadLocked) return;
     headerReturnFocus.current = section;
     setHeaderEditing(section);
     if (!props.editor) props.onEdit();
@@ -113,6 +116,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     : problem === "checklist" ? (ru ? "Добавьте пункт чек-листа" : "Add a checklist item") : "";
   const editorActions = props.editor && <div id="case-editor-actions" tabIndex={-1} className={`${inspector.createActions} ${creating ? inspector.creationFooter : ""}`}>
     {problemMessage && <span className={inspector.validationMessage} role="status">{problemMessage}</span>}
+    {props.editor.attachmentsPending && !props.editor.submitting && <span className={inspector.validationMessage} role="status">{ru ? "Повторите сохранение, чтобы завершить загрузку файлов." : "Save again to finish uploading the files."}</span>}
     <button type="button" disabled={props.editor.submitting} onClick={cancelEditor}>{ru ? "Отмена" : "Cancel"}</button>
     <button type="submit" form={formId} disabled={archived || props.editor.submitting || Boolean(problem)}>{props.editor.submitting ? (ru ? "Сохранение…" : "Saving…") : creating ? (ru ? "Создать" : "Create") : (ru ? "Сохранить" : "Save")}</button>
   </div>;
@@ -147,7 +151,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>}
       <div className={inspector.titleRow}>
         {creating && <span className={inspector.createTitleLabel}>{ru ? "Название тест-кейса" : "Test case title"}<b aria-hidden="true"> *</b></span>}
-        {!archived && props.editor && (creating || headerEditing === "title") ? <input data-inline-title autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
+        {!archived && props.editor && (creating || headerEditing === "title") ? <input disabled={uploadLocked} data-inline-title autoFocus={creating || headerEditing === "title"} aria-label={ru ? "Название тест-кейса" : "Test case title"} className={inspector.titleInput} value={revision.title} onChange={(event) => props.editor?.onChange({ ...revision, title: event.target.value })} placeholder={ru ? "Название тест-кейса" : "Test case title"} /> : <div className={inspector.titleCopy}>
           <h2>{revision.title}{props.testCase && <span className={inspector.titleKey}>#{props.testCase.key}</span>}</h2>
           {props.testCase && <p className={inspector.caseByline}>
             <LifecycleBadge locale={props.locale} lifecycle={revision.lifecycle} archived={Boolean(props.testCase.archivedAt)} />
@@ -161,11 +165,17 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
         fileCount={attachmentIds.length} activityCount={caseActivity.length} onActive={setTab} />}
     </header>
-    <CaseAttachmentDraftProvider locale={props.locale} enabled={!archived && Boolean(props.editor)} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
-    <form id={formId} className={inspector.panelForm} onSubmit={(event) => { if (archived || !props.editor || problem) event.preventDefault(); else props.editor.onSubmit(event, files); }}>
+    <CaseAttachmentDraftProvider locale={props.locale} enabled={!archived && Boolean(props.editor)} locked={uploadLocked} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
+    <form id={formId} className={inspector.panelForm} onBeforeInput={(event) => { if (uploadLocked) event.preventDefault(); }} onSubmit={(event) => {
+      if (archived || !props.editor || problem || props.editor.submitting) { event.preventDefault(); return; }
+      setFiles((current) => current.map((entry) => entry.phase === "ready" ? entry : { ...entry, phase: "preparing" }));
+      props.editor.onSubmit(event, files, uploadProgress);
+    }}>
+      <fieldset disabled={uploadLocked} className={inspector.uploadFieldset}>
       <div className={`${styles.detailScroll} ${inspector.scroll}`} id={`${tabsId}-panel`} role={creating ? undefined : "tabpanel"} aria-labelledby={creating ? undefined : `${tabsId}-${activeTab}`} tabIndex={0}>
         {activeTab === "overview" ? <><CaseOverview locale={props.locale} languageTag={props.languageTag} testCaseId={creating ? undefined : props.testCase?.id} revision={revision} archived={archived} editor={archived ? undefined : props.editor} collaboration={props.collaboration} sharedSteps={props.sharedSteps} onResolveSharedStep={props.onResolveSharedStep} onRequestEdit={requestEdit} />{creating && <InspectorPendingAttachments locale={props.locale} />}</> : <CaseContextTab tab={activeTab} locale={props.locale} languageTag={props.languageTag} testCase={props.testCase} revision={revision} attachmentIds={attachmentIds} linkIds={props.linkIds} activity={caseActivity} collaboration={props.collaboration} onOpenDefect={props.onOpenDefect} onRunCase={runCase} />}
       </div>
+      </fieldset>
     </form>
     {creating && editorActions}
     </CaseAttachmentDraftProvider>

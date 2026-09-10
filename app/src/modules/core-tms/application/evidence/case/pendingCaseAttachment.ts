@@ -1,3 +1,5 @@
+import type { AttachmentUploadPhase } from "../../../attachments/domain/attachment";
+export type CaseAttachmentProgress = (id: string, phase: AttachmentUploadPhase) => void;
 export const MAX_PENDING_CASE_ATTACHMENTS = 20;
 
 export type PendingCaseAttachment = {
@@ -5,6 +7,7 @@ export type PendingCaseAttachment = {
   readonly fieldKey: string;
   readonly stepId?: string;
   readonly file: File;
+  readonly phase?: AttachmentUploadPhase;
 };
 
 export type PendingCaseAttachmentResult = {

@@ -63,3 +63,11 @@ export function SavedScenarioAttachments({ ids }: { ids?: string[] }) {
     {ids.map((id) => <AttachmentLink key={id} attachmentId={id} presentation="media" />)}
   </div>;
 }
+
+export function PendingScenarioAttachments({ stepId }: { stepId: string }) {
+  const draft = useCaseAttachmentDraft();
+  const { locale } = useTmsLocale();
+  if (!draft) return null;
+  return <MarkdownPendingAttachments locale={locale} entries={draft.entries.filter((entry) => entry.stepId === stepId)}
+    onRemove={draft.remove} presentation="media" />;
+}

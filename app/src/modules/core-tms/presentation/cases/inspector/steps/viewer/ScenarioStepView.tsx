@@ -3,7 +3,7 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-contract";
-import { SavedScenarioAttachments } from "../support/ScenarioAttachments";
+import { SavedScenarioAttachments, PendingScenarioAttachments } from "../support/ScenarioAttachments";
 import { scenarioLineLabel, splitScenarioAction } from "../support/scenarioLines";
 import css from "../scenarioSteps.module.css";
 
@@ -42,6 +42,7 @@ export function ScenarioStepView({ step, order, ru }: {
       <span>{ru ? "Тестовые данные" : "Test data"}</span>
       <p>{step.testData}</p>
     </div>}
+    <PendingScenarioAttachments stepId={step.id} />
     {!collapsed && <SavedScenarioAttachments ids={step.attachmentIds} />}
   </article>;
 }

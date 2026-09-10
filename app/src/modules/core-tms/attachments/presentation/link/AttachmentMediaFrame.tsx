@@ -4,13 +4,14 @@ import {
   ChevronDown, ChevronRight, ExternalLink, FileText, GripVertical, Paperclip, Trash2,
 } from "lucide-react";
 import {
-  useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent,
+  useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode,
 } from "react";
 import css from "./attachmentMediaFrame.module.css";
 
 type Props = {
   name: string;
   detail?: string;
+  progress?: ReactNode;
   source: string;
   mediaType: "image" | "video" | "pdf" | "file";
   locale: "en" | "ru";
@@ -26,7 +27,7 @@ type Props = {
 const MIN_WIDTH = 220;
 
 export function AttachmentMediaFrame({
-  name, detail, source, mediaType, locale, variant = "scenario", defaultExpanded = false,
+  name, detail, progress, source, mediaType, locale, variant = "scenario", defaultExpanded = false,
   loading = false, removing = false, onOpen, onRemove, onExpandedChange,
 }: Props) {
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -93,8 +94,9 @@ export function AttachmentMediaFrame({
       <span className={css.kindIcon} aria-hidden="true">
         {mediaType === "file" ? <FileText size={15} /> : <Paperclip size={15} />}
       </span>
-      <span className={css.identity} title={name}>
+      <span className={css.identity} title={name} data-upload={Boolean(progress) || undefined}>
         <b>{name}</b>{detail && <small>{detail}</small>}
+        {progress}
       </span>
       <span className={css.actions}>
         {onOpen && <button type="button" onClick={onOpen} disabled={loading}

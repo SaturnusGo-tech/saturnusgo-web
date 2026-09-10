@@ -32,6 +32,6 @@ test("uploads case and step files with exact revision ownership", async () => {
     { kind: "test_case_revision", caseId: "case-1", revisionNo: 3, stepId: "s1" },
   ]);
   assert.deepEqual(uploads.map(({ operationKey }) => operationKey), [
-    "operation:evidence:0:0", "operation:evidence:1:0",
+    "operation:evidence:a:0", "operation:evidence:b:0",
   ]);
 });

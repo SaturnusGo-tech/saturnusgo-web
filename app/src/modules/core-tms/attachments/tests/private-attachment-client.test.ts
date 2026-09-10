@@ -52,13 +52,16 @@ test("upload orchestrates intent, private PUT, and finalize with stable operatio
     projectId: "project-1", owner: { kind: "run", runId: "run-1" }, kind: "log",
     mimeType: "text/plain", file: new File(["evidence"], "evidence.txt", { type: "text/plain" }),
     operationKey: "stable-operation-key",
+    onProgress: (phase) => calls.push(`phase:${phase}`),
   });
 
   assert.equal(result.status, "ready");
   assert.deepEqual(calls, [
+    "phase:preparing",
     `intent:intent:stable-operation-key:${digest}`,
-    "put:att-1",
+    "phase:uploading", "put:att-1", "phase:finalizing",
     'finalize:finalize:stable-operation-key:"attachment:att-1:1":"storage-etag"',
+    "phase:ready",
   ]);
 });
 

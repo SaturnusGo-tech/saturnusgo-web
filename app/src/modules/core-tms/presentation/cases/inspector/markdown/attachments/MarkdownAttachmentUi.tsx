@@ -4,6 +4,7 @@ import { FileText, Film, Paperclip, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PendingCaseAttachment } from "../../../../../application/evidence/case/pendingCaseAttachment";
 import { AttachmentMediaFrame } from "../../../../../attachments/presentation/link/AttachmentMediaFrame";
+import { AttachmentUploadProgress } from "../../../../../attachments/presentation/progress/AttachmentUploadProgress";
 import type { TmsLocale } from "../../../../../localization/model/locale";
 import css from "../markdownField.module.css";
 
@@ -46,7 +47,8 @@ export function MarkdownPendingAttachments(props: {
   return <div className={css.attachmentStrip} aria-label={props.locale === "ru" ? "Новые вложения" : "New attachments"}>
     {props.entries.map((entry) => <span className={css.attachmentChip} key={entry.id}>
       <AttachmentPreview file={entry.file} />
-      <span><b>{entry.file.name}</b><small>{formatBytes(entry.file.size)}</small></span>
+      <span><b>{entry.file.name}</b><small>{formatBytes(entry.file.size)}</small>
+        <AttachmentUploadProgress phase={entry.phase} name={entry.file.name} locale={props.locale} /></span>
       <button type="button" onClick={() => props.onRemove(entry.id)}
         aria-label={`${remove} ${entry.file.name}`} title={`${remove} ${entry.file.name}`}>
         <X size={13} />
@@ -74,6 +76,7 @@ function PendingMediaAttachment({ entry, locale, onRemove }: {
   return <AttachmentMediaFrame
     name={entry.file.name}
     detail={formatBytes(entry.file.size)}
+    progress={<AttachmentUploadProgress phase={entry.phase} name={entry.file.name} locale={locale} />}
     source={mediaType === "file" ? "" : source}
     mediaType={mediaType}
     locale={locale}
