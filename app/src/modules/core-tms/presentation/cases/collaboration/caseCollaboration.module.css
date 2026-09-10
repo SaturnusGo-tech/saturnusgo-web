@@ -198,6 +198,7 @@
 .deletedComment { color: var(--cases-muted); font-size: 12px; font-style: italic; }
 .mentionedPeople { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
 .mentionedPeople > span { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cases-secondary-text); }
+.mentionedPeople > span > svg { flex-shrink: 0; }
 .confirmDelete { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 8px 0; font-size: 12px; }
 .confirmDelete button { min-height: 28px; padding: 4px 9px; border: 0; border-radius: 9px; color: var(--cases-secondary-text); background: var(--cases-hover); cursor: pointer; }
 .confirmDelete button:last-of-type { color: #db6872; }

@@ -40,8 +40,8 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
         onSubmit={async (draft) => { const ok = await model.changeComment?.(editing, draft); if (ok) setEditing(null); return Boolean(ok); }} />
         : comment.deletedAt ? <p className={css.deletedComment}>{ru ? "Комментарий удалён" : "Comment deleted"}</p>
         : <div className={css.commentMarkdown}><MarkdownField value={comment.body} label={ru ? "Комментарий" : "Comment"} /></div>}
-      {!comment.deletedAt && !editing && Boolean(comment.mentions?.length) && <div className={css.mentionedPeople}>
-        {comment.mentions!.map((id) => <span key={id}>@<ResponsibleName workspaceId={people.workspaceId} identityId={id} offline={people.offline} /></span>)}
+      {!comment.deletedAt && !editing && Boolean(comment.mentions?.length) && <div className={css.mentionedPeople} role="group" aria-label={ru ? "Упомянутые сотрудники" : "Mentioned teammates"}>
+        {comment.mentions!.map((id) => <span key={id}><Reply size={14} strokeWidth={1.6} aria-hidden="true" /><ResponsibleName workspaceId={people.workspaceId} identityId={id} offline={people.offline} /></span>)}
       </div>}
       {confirming && <div className={css.confirmDelete} role="group" aria-label={ru ? "Удалить комментарий?" : "Delete comment?"}>
         <span>{ru ? "Удалить комментарий? Ответы сохранятся." : "Delete this comment? Replies will remain."}</span>
