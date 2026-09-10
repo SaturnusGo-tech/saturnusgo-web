@@ -10,22 +10,19 @@ const categories: readonly [NotificationCategory, string, string][] = [
   ["suites", "Тест-сьюты", "Test suites"],
   ["integrations", "Интеграции", "Integrations"],
 ];
-export function NotificationPage({ model: m, ru, onOpen }: { model: NotificationsState; ru: boolean; onOpen?: (url:string)=>void }) {
+export function NotificationPage({
+  model: m,
+  ru,
+  onOpen,
+}: {
+  model: NotificationsState;
+  ru: boolean;
+  onOpen?: (url: string) => void;
+}) {
   return (
     <section className={styles.page} data-testid="notification-page">
       <header className={styles.header}>
-        <div>
-          <span className={styles.eyebrow}>FALCON</span>
-          <h1>{ru ? "Уведомления" : "Notifications"}</h1>
-          <p>
-            {ru
-              ? "Выберите, где получать новости о работе команды."
-              : "Choose where you receive updates from your team."}
-          </p>
-        </div>
-        <div className={styles.headerIcon}>
-          <Bell size={28} strokeWidth={1.4} />
-        </div>
+        <h1>{ru ? "Уведомления" : "Notifications"}</h1>
       </header>
       {m.loading ? (
         <div
@@ -88,7 +85,7 @@ export function NotificationPage({ model: m, ru, onOpen }: { model: Notification
               </div>
               {m.items.length === 0 ? (
                 <div className={styles.empty}>
-                  <Bell size={36} strokeWidth={1.2} />
+                  <Bell size={20} strokeWidth={1.5} />
                   <h3>{ru ? "Новых событий пока нет" : "No new activity"}</h3>
                 </div>
               ) : (
@@ -98,12 +95,21 @@ export function NotificationPage({ model: m, ru, onOpen }: { model: Notification
                       <span className={styles.eventIcon}>
                         {item.read ? <Check size={18} /> : <Bell size={18} />}
                       </span>
-                      <div>
+                      <div className={styles.eventContent}>
                         <a
                           href={item.url}
-                          onClick={event => {
+                          onClick={(event) => {
                             void m.markRead(item.id);
-                            if(onOpen && !event.metaKey && !event.ctrlKey && !event.shiftKey && event.button===0){event.preventDefault();onOpen(item.url);}
+                            if (
+                              onOpen &&
+                              !event.metaKey &&
+                              !event.ctrlKey &&
+                              !event.shiftKey &&
+                              event.button === 0
+                            ) {
+                              event.preventDefault();
+                              onOpen(item.url);
+                            }
                           }}
                         >
                           <strong>{item.title}</strong>
@@ -111,12 +117,15 @@ export function NotificationPage({ model: m, ru, onOpen }: { model: Notification
                         </a>
                         {item.body && <p>{item.body}</p>}
                         <time dateTime={item.createdAt}>
-                          {new Date(item.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(item.createdAt).toLocaleString(
+                            ru ? "ru-RU" : "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </time>
                       </div>
                       {!item.read && (
@@ -135,7 +144,11 @@ export function NotificationPage({ model: m, ru, onOpen }: { model: Notification
                 </ol>
               )}
               {m.next && (
-                <button className={styles.more} disabled={m.busy} onClick={() => void m.more()}>
+                <button
+                  className={styles.more}
+                  disabled={m.busy}
+                  onClick={() => void m.more()}
+                >
                   {ru ? "Показать ещё" : "Show more"}
                 </button>
               )}
