@@ -4,6 +4,8 @@ import { Bold, Code, FileCode2, List, Pencil, Check } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ClipboardEventHandler } from "react";
 import { ScenarioMarkdown } from "./ScenarioMarkdown";
 import { formatStepSelection, type StepFormat } from "./format/formatSelection";
+import { pasteMarkdown } from "./paste/pasteMarkdown";
+import { useStepHistory } from "./history/useStepHistory";
 import css from "./scenarioMarkdown.module.css";
 
 type Props = {
@@ -15,6 +17,7 @@ type Props = {
 export function ScenarioMarkdownInput(props: Props) {
   const [editing, setEditing] = useState(Boolean(props.autoFocus));
   const input = useRef<HTMLTextAreaElement>(null);
+  const history = useStepHistory(props.value, props.onChange, input);
   const shell = useRef<HTMLDivElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
   const sourceVisible = editing || !props.value;
@@ -40,7 +43,8 @@ export function ScenarioMarkdownInput(props: Props) {
     const node = input.current;
     if (!node) return;
     const next = formatStepSelection(props.value, node.selectionStart, node.selectionEnd, kind);
-    props.onChange(next.value);
+    history.boundary();
+    history.record(next.value);
     requestAnimationFrame(() => { node.focus({ preventScroll: true }); node.setSelectionRange(next.start, next.end); });
   }
   const actions = [
@@ -61,8 +65,10 @@ export function ScenarioMarkdownInput(props: Props) {
     </div></div></div>
     <textarea ref={input} id={props.id} rows={1} hidden={!sourceVisible} data-code={/```|~~~/.test(props.value)} value={props.value}
       aria-label={props.label} placeholder={props.placeholder} autoFocus={props.autoFocus}
-      onFocus={() => setEditing(true)} onChange={(event) => props.onChange(event.target.value)} onPaste={props.onPaste}
+      onFocus={() => setEditing(true)} onChange={(event) => history.record(event.target.value, (event.nativeEvent as InputEvent).inputType === "insertText")}
+      onPaste={(event) => { props.onPaste?.(event); history.boundary(); pasteMarkdown(event, history.record); }}
       onKeyDown={(event) => {
+        if (history.onKeyDown(event)) return;
         if (event.nativeEvent.isComposing) return;
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") { event.preventDefault(); format("bold"); }
         if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); preview(); }
