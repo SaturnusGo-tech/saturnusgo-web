@@ -18,6 +18,8 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
+  realmPlugin,
+  addTopAreaChild$,
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
@@ -27,6 +29,11 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import { markdownEditorTranslation } from "./translations/markdownEditorTranslation";
 import css from "./markdownField.module.css";
+import { MarkdownContextArea } from "./context/MarkdownContextContent";
+
+const contextContentPlugin = realmPlugin({
+  init(realm) { realm.pub(addTopAreaChild$, MarkdownContextArea); },
+});
 
 export type InitializedMarkdownEditorProps = {
   markdown: string;
@@ -79,6 +86,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         <ListsToggle /><CreateLink />
       </>,
     }),
+    contextContentPlugin(),
   ], [props.locale, props.onAttachmentFiles, props.validateUrl]);
 
   useEffect(() => {

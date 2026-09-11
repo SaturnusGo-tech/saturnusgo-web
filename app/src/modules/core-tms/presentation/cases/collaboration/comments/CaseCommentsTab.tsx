@@ -23,11 +23,13 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
   const motion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" as const : "smooth" as const;
   useEffect(() => { setComposer(null); setCollapsed(new Set()); }, [caseId]);
   useEffect(() => {
-    if (composer && !composer.reply) composerRef.current?.scrollIntoView({ block: "nearest", behavior: motion() });
+    if (!composer) return;
+    composerRef.current?.scrollIntoView({ block: "nearest", behavior: motion() });
+    composerRef.current?.querySelector<HTMLElement>('[role="textbox"], textarea')?.focus({ preventScroll: true });
   }, [composer]);
-  const editor = composer && <CommentComposer key={`${caseId}:${composer.reply?.id ?? "new"}`} ru={ru} projectId={model.commentProjectId}
+  const editor = composer && <CommentComposer key={caseId} ru={ru} projectId={model.commentProjectId}
     reply={composer.reply} pending={model.commentSubmitting || Boolean(model.changingCommentId)} failure={model.commentFailure ? commentFailureLabel(locale, model.commentFailure) : ""}
-    onCancel={() => setComposer(null)} onSubmit={async draft => {
+    onClearReply={() => setComposer({})} onCancel={() => setComposer(null)} onSubmit={async draft => {
       const ok = await model.addComment(draft.body, draft);
       if (ok && currentCase.current === caseId) setComposer(null); return ok;
     }} />;
@@ -41,14 +43,14 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
       <span>{ru ? "Не удалось загрузить комментарии" : "Could not load comments"}</span>
       <button type="button" onClick={model.retryComments}>{ru ? "Повторить" : "Retry"}</button></div>}
     {model.comments.status === "ready" && <>
-      {model.canComment && <div ref={composerRef}><ExpandingComment>{composer && !composer.reply ? editor
+      {model.canComment && <div ref={composerRef}><ExpandingComment>{composer ? editor
         : <button type="button" className={css.commentPrompt} disabled={model.commentSubmitting || Boolean(model.changingCommentId)} onClick={() => setComposer({})}><MessageSquare size={14} />{ru ? "Написать комментарий…" : "Write a comment…"}</button>}</ExpandingComment></div>}
       {failedId && <div className={css.pagination} role="alert"><span>{ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded."}</span>
         <button type="button" onClick={() => void reveal(failedId)}>{ru ? "Повторить" : "Retry"}</button></div>}
       {commentTree(model.comments.items).map(node => <CommentThread key={node.comment.id} node={node} ru={ru} languageTag={languageTag}
         model={model} collapsed={collapsed} toggle={id => setCollapsed(old => { const next = new Set(old); if (next.has(id)) next.delete(id); else next.add(id); return next; })}
         onReply={reply => { setComposer({ reply }); setCollapsed(old => { const next = new Set(old); next.delete(reply.id); return next; }); }}
-        onParent={id => void reveal(id)} replyId={composer?.reply?.id} composer={editor} />)}
+        onParent={id => void reveal(id)} />)}
       {(model.comments.hasMore || model.comments.loadMoreFailed) && <div className={css.pagination}>
         {model.comments.loadMoreFailed && <span role="alert">{ru ? "Не удалось загрузить предыдущие комментарии" : "Could not load older comments"}</span>}
         <button type="button" disabled={model.comments.loadingMore || model.comments.refreshing}

@@ -2,7 +2,8 @@
 
 import MDEditor from "@uiw/react-md-editor/nohighlight";
 import dynamic from "next/dynamic";
-import { createContext, useCallback, useContext } from "react";
+import { createContext, useCallback, useContext, type ReactNode } from "react";
+import { MarkdownContextContent } from "./context/MarkdownContextContent";
 import { useColorMode } from "../../../../../../shared/_hooks/useColorMode";
 import { filesFromClipboard } from "../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -20,6 +21,7 @@ type Props = {
   attachmentKey?: string;
   attachmentStepId?: string;
   allowAttachments?: boolean;
+  contextContent?: ReactNode;
 };
 
 const WysiwygMarkdownEditor = dynamic(
@@ -115,6 +117,7 @@ export function MarkdownField(props: Props) {
       autoFocus: Boolean(props.autoFocus),
       onChange: props.onChange,
     }}>
+      <MarkdownContextContent.Provider value={props.contextContent}>
       <WysiwygMarkdownEditor
         markdown={props.value}
         label={props.label}
@@ -127,6 +130,7 @@ export function MarkdownField(props: Props) {
         onAttachmentFiles={addFiles}
         onRemoveAttachment={attachmentEnabled ? attachments?.remove : undefined}
       />
+      </MarkdownContextContent.Provider>
     </LoadingEditorContext.Provider>
     {attachmentEnabled && attachmentProblem && <span className={css.attachmentError} role="alert">
       {attachmentProblem}

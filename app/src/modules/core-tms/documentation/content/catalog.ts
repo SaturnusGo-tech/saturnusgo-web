@@ -4,6 +4,7 @@ import { portfoliosArticle } from "./organization/portfolios";
 import { gettingStarted } from "./start/getting-started";
 import { dashboardArticle } from "./start/dashboard";
 import { caseAuthoring } from "./cases/authoring";
+import { caseCommentsArticle } from "./cases/discussion/comments";
 import { caseOrganization } from "./cases/organization";
 import { executionArticles } from "./runs/execution";
 import { suitesArticle } from "./runs/suites";
@@ -31,7 +32,7 @@ export const docGroups = [
   { id: "reference", title: "Справочник" },
 ] as const;
 export const docArticles: readonly DocArticle[] = [
-  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, ...caseOrganization,
+  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, caseCommentsArticle, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
   ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,

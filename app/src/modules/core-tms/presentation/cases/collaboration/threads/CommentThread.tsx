@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { ExpandingComment } from "../expansion/ExpandingComment";
 import { CaseCommentRecord } from "../records/CaseCommentRecord";
 import type { CaseCollaborationViewModel } from "../model";
 import type { TestCaseComment } from "../../../../test-cases/collaboration/model/test-case-collaboration";
@@ -8,7 +6,7 @@ import type { CommentBranch } from "./comment-tree";
 import css from "../ancestry/thread.module.css";
 type Props = { node: CommentBranch; depth?: number; ru: boolean; languageTag: string; model: CaseCollaborationViewModel;
   collapsed: ReadonlySet<string>; toggle: (id: string) => void; onReply: (comment: TestCaseComment) => void;
-  onParent: (id: string) => void; replyId?: string; composer: ReactNode };
+  onParent: (id: string) => void };
 export function CommentThread(props: Props) {
   const { node, ru, collapsed, toggle, onReply, depth = 0 } = props;
   const hidden = collapsed.has(node.comment.id);
@@ -23,7 +21,6 @@ export function CommentThread(props: Props) {
         {hidden ? (ru ? "Показать ответы" : "Show replies") : (ru ? "Свернуть ветку" : "Collapse thread")}
       </button>}
     </div>}
-    <div className={css.inlineComposer}><ExpandingComment>{props.replyId === node.comment.id ? props.composer : null}</ExpandingComment></div>
     {hasReplies && <div hidden={hidden} className={css.replies} data-deep={depth >= 3}>
       {node.children.map(child => <CommentThread key={child.comment.id} {...props} node={child} depth={depth + 1} />)}
     </div>}

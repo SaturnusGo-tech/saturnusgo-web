@@ -4,16 +4,24 @@
 .composer .editorFrame [data-editor-shell] { border: 0; border-radius: 12px 12px 0 0; outline: none; box-shadow: none !important; background: transparent; }
 .composer .editorFrame [data-editor-shell]:focus-within { box-shadow: none !important; }
 .editorFrame [data-editor-shell] > :global(.mdxeditor), .editorFrame [data-editor-shell] > div:has(> textarea) { height: 112px; min-height: 112px; background: transparent; }
+.editorFrame[data-reply="true"] [data-editor-shell] > :global(.mdxeditor) { height: auto; }
+.editorFrame[data-reply="true"] :global(.mdxeditor-root-contenteditable) { height: 80px; }
 .editorFrame :global(.mdxeditor-toolbar) { border-bottom: 0; background: transparent; }
 .editorFrame :global(.mdxeditor-root-contenteditable) { background: transparent; }
 .composer footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 10px; padding: 4px 10px 8px; margin: 0; border: 0; background: transparent; }
-.mentions { min-width: 0; flex: 1 1 120px; }
+.mentions { min-width: 0; flex: 1 1 80px; }
 .submitActions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 .submitActions > button, .reply button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--cases-secondary-text); border-radius: 10px; min-height: 30px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
 .submitActions .send { color: white; background: #3475ed; }
 .composer button:disabled { opacity: .5; cursor: default; }
-.reply { display: flex; align-items: center; gap: 7px; color: var(--cases-secondary-text); font-size: 12px; padding: 0 0 4px; }
-.reply button { margin-left: auto; }
+.reply { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 7px; color: var(--cases-secondary-text); font-size: 12px; padding: 6px 8px 0; }
+.replyAuthor { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.replyAuthor > span:first-child { width: 22px; height: 22px; flex-shrink: 0; }
+.reply button { min-height: 24px; padding: 3px; flex-shrink: 0; }
+.replyQuote { margin: 4px 10px 6px; padding: 7px 10px; border-left: 2px solid var(--cases-primary); border-radius: 4px; background: var(--cases-hover); max-height: 76px; overflow: auto; }
+.replyQuote :global(.wmde-markdown) { font-family: inherit; font-size: 13px; line-height: 1.5 !important; color: var(--cases-text) !important; background: transparent !important; }
+.replyQuote :global(.wmde-markdown) :is(p, ul, ol, blockquote) { margin-top: 0 !important; margin-bottom: 4px !important; }
+.replyQuote :global(.wmde-markdown) :last-child { margin-bottom: 0 !important; }
 .channels { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 4px 10px; font-size: 11px; color: var(--cases-secondary-text); }
 .channels label { display: flex; align-items: center; gap: 5px; }
 .channels small { flex-basis: 100%; color: var(--cases-muted); }
