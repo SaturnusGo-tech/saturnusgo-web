@@ -6,8 +6,8 @@ import { useWorkspaceMembers } from "../state/useWorkspaceMembers";
 import { useMemberName } from "../state/useMemberName";
 import styles from "./responsible-picker.module.css";
 
-export function ResponsiblePicker({ workspaceId, value, onChange, disabled = false, offline = false, selectedName }: {
-  workspaceId: string; value: string | null; onChange: (value: string | null) => void; disabled?: boolean; offline?: boolean; selectedName?: string | null;
+export function ResponsiblePicker({ workspaceId, value, onChange, disabled = false, offline = false, selectedName, ariaLabel, unselectedLabel, noSelection = false }: {
+  workspaceId: string; value: string | null; onChange: (value: string | null) => void; disabled?: boolean; offline?: boolean; selectedName?: string | null; ariaLabel?: string; unselectedLabel?: string; noSelection?: boolean;
 }) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
@@ -38,9 +38,9 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
   return <div ref={root} className={styles.root} onKeyDown={(event) => {
     if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); trigger.current?.focus(); }
   }}>
-    <button ref={trigger} className={styles.trigger} type="button" disabled={disabled || offline} aria-label={label}
+    <button ref={trigger} className={styles.trigger} type="button" disabled={disabled || offline} aria-label={ariaLabel ?? label}
       aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={() => { const rect = trigger.current?.getBoundingClientRect(); setAbove(Boolean(rect && window.innerHeight - rect.bottom < 300 && rect.top > 300)); setOpen((current) => !current); }}>
-      <MemberAvatar identityId={value} name={selected ?? ""} offline={offline} /><span className={styles.label}>{value ? selected || (ru ? "Назначенный участник" : "Assigned member") : empty}</span><PiCaretDown aria-hidden="true" />
+      <MemberAvatar identityId={value} name={selected ?? ""} offline={offline} /><span className={styles.label}>{value ? selected || (ru ? "Назначенный участник" : "Assigned member") : unselectedLabel ?? empty}</span><PiCaretDown aria-hidden="true" />
     </button>
     {open && <div className={styles.popover} data-above={above}>
       <label className={styles.search} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input ref={search} value={members.search}
@@ -54,7 +54,7 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
         if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); options[(index + (event.key === "ArrowDown" ? 1 : options.length - 1)) % options.length]?.focus(); }
         if (event.key === "Home" || event.key === "End") { event.preventDefault(); options[event.key === "Home" ? 0 : options.length - 1]?.focus(); }
       }}>
-        <button type="button" role="option" aria-selected={!value} onClick={() => choose(null)}><span className={styles.label}>{empty}</span>{!value && <PiCheck />}</button>
+        <button type="button" role="option" aria-selected={!value && !noSelection} onClick={() => choose(null)}><span className={styles.label}>{empty}</span>{!value && !noSelection && <PiCheck />}</button>
         {members.items.map((member) => <button type="button" key={member.id} role="option" aria-selected={value === member.id} onClick={() => choose(member.id, member.name)}>
           <MemberAvatar identityId={member.id} name={member.name} offline={offline} /><span className={styles.label}>{member.name}<small>{member.email}</small></span>{value === member.id && <PiCheck />}
         </button>)}

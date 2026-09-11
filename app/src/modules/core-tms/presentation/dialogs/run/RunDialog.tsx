@@ -1,3 +1,4 @@
+import { RunCasesSkeleton } from "../../runs/loading/RunCasesSkeleton";
 import { Plus, X } from "lucide-react";
 import type { Bootstrap, Project, Suite, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -35,16 +36,16 @@ export function RunDialog(props: Props) {
     }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
       <div className={styles.body} aria-busy={state.loading || state.busy} inert={state.busy ? true : undefined}>
         <RunIterationFields state={state} workspaceId={props.data.workspace.id} offline={props.offline} ru={ru} />
-        <div className={styles.projects}><span>{ru ? "Проекты" : "Projects"}</span>
-          <AnimatedMultiSelect label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
+        <div className={styles.projects}>
+          <AnimatedMultiSelect textOnly label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
             options={props.data.projects.filter((p) => p.status !== "archived").map((p) => ({ value: p.id, label: p.name }))}
             allLabel={ru ? "Выберите проекты" : "Choose projects"} selectedLabel={ru ? "Проекты" : "Projects"}
             onChange={state.setProjectIds} /></div>
         {suite && <div className={styles.suite}><span>{suite.name}</span><small>{ru ? "Состав набора определит сервер" : "Suite membership is resolved by the server"}</small>
           <button type="button" aria-label={ru ? "Убрать набор" : "Remove suite"} onClick={() => state.setSuiteId("")}><X size={14} /></button></div>}
         <SelectionControls state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
-        {state.loading && <p role="status">{ru ? "Загружаем кейсы…" : "Loading cases…"}</p>}
-        {state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
+        {state.loading && <RunCasesSkeleton />}
+        {!state.loading && state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
           folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable
           disabled={state.loading || (Boolean(suite) && id === props.project.id)} onToggle={toggle} onScope={scope}
           heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>

@@ -47,7 +47,7 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
 
 export function mapRunItemSummary(dto: Api["RunItemSummary"]): RunItemSummary {
   return {
-    preview: dto.preview,
+    rowVersion: dto.rowVersion, preview: dto.preview,
     id: dto.id,
     caseId: dto.caseId,
     caseKey: dto.caseKey,

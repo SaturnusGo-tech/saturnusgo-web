@@ -3813,6 +3813,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/run-assignments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign selected run items atomically without changing repository owners
+         * @description Tester, QA manager or workspace administrator. Run items must belong to the same logical run. All item versions are checked atomically. Archived and terminal runs reject reassignment. An active tenant member or null clears assignment.
+         */
+        post: operations["assignRunItems"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5206,6 +5231,7 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             preview?: components["schemas"]["RunCasePreview"];
+            rowVersion?: number;
         };
         RunItem: components["schemas"]["RunItemSummary"] & {
             snapshot: components["schemas"]["TestCaseRevision"];
@@ -7404,7 +7430,7 @@ export interface components {
             };
             transition: {
                 /** @enum {string} */
-                kind: "start" | "pause" | "resume" | "complete";
+                kind: "start" | "pause" | "resume" | "complete" | "archive" | "restore";
             } | {
                 /** @constant */
                 kind: "abort";
@@ -7440,6 +7466,20 @@ export interface components {
             estimatedMinutes: number | null;
             /** @description Folder path captured on creation; null for historical runs without folder snapshots. */
             folderPath: string | null;
+        };
+        RunAssignmentRequest: {
+            runId: string;
+            assigneeIdentityId: string | null;
+            items: {
+                runId: string;
+                itemId: string;
+                rowVersion: number;
+            }[];
+        };
+        RunAssignmentEnvelope: {
+            data: {
+                updated: number;
+            };
         };
     };
     responses: {
@@ -15842,6 +15882,47 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    assignRunItems: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Number of assignments changed */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunAssignmentEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
         };
     };

@@ -18,3 +18,5 @@
 .multiMenu { width: max(100%, 220px); }
 :global(.dark) .menu { background: var(--nav-raised, var(--control)); box-shadow: 0 10px 30px rgb(0 0 0 / 30%); }
 @media (prefers-reduced-motion: reduce) { .trigger, .trigger > svg, .menu { transition: none; } }
+
+.textTrigger { background: transparent !important; border: 0 !important; border-bottom: 1px solid var(--tms-border, #d3d5da) !important; border-radius: 0 !important; box-shadow: none !important; padding: 6px 0 !important; }

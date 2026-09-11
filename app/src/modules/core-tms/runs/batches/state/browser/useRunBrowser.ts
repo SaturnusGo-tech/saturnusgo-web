@@ -3,18 +3,20 @@ import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../../../core/tms/idempotency/pending-operation";
 import { useTmsHttpClient } from "../../../../auth/http/TmsHttpClientContext";
-import { getRun, listRunItems, transitionRun } from "../../../data/run-api";
+import { TmsApiError } from "../../../../../../core/tms/transport/http";
+import { getRun, listRunItems, transitionRun, archiveRun, restoreRun } from "../../../data/run-api";
 import { getRunBatch, listRunBatches, transitionRunBatch } from "../../data/batch-api";
 import type { RunBatch, RunBatchTransition } from "../../model/batch";
 import { runRepositoryEntries, type RunRepositoryEntry } from "../../model/repository/run-repository";
 
-type Action = "start" | "pause" | "resume" | "complete";
+type Action = "start" | "pause" | "resume" | "complete" | "archive" | "restore";
 export function useRunBrowser(input: { workspaceId: string; selected: TestRunSummary | null;
   knownRuns: TestRunSummary[]; connected: boolean; ru: boolean;
   onUpdate: (runs: TestRunSummary[]) => void; onRefreshSelected: () => void }) {
   const http = useTmsHttpClient(); const [batches, setBatches] = useState<RunBatch[]>([]);
   const [entries, setEntries] = useState<RunRepositoryEntry[]>([]);
   const [loading, setLoading] = useState(false); const [busy, setBusy] = useState(false);
+  const [incomplete, setIncomplete] = useState(false);
   const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
   const latest = useRef(input); latest.current = input;
   const pending = useRef(false); const operation = useRef<PendingOperation | null>(null);
@@ -37,7 +39,7 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   const memberIds = batch?.runs.map((r) => r.id).join("|") ?? input.selected?.id ?? "";
   const selectedRuns = batch?.runs ?? (input.selected ? [input.selected] : []);
   useEffect(() => {
-    const controller = new AbortController(); generation.current += 1; setError("");
+    const controller = new AbortController(); generation.current += 1; setError(""); setIncomplete(false);
     const scope = `${input.workspaceId}:${memberIds}`;
     if (entriesScope.current !== scope) { setEntries([]); entriesScope.current = scope; }
     if (!memberIds || !input.connected) { setEntries([]); setLoading(false); return; }
@@ -93,18 +95,23 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
         updated = next.runs;
         if (token === generation.current) setBatches((values) => [...values.filter((b) => b.id !== next.id), next]);
       } else {
-        updated = [(await transitionRun(http, input.selected.id, action, prepared.etag!, prepared.key)).data];
+        updated = [(await (action === "archive" ? archiveRun(http, input.selected.id, prepared.etag!, prepared.key)
+          : action === "restore" ? restoreRun(http, input.selected.id, prepared.etag!, prepared.key)
+          : transitionRun(http, input.selected.id, action, prepared.etag!, prepared.key))).data];
       }
-      command.current = null; operation.current = null;
+      command.current = null; operation.current = null; setIncomplete(false);
       if (token === generation.current) { latest.current.onUpdate(updated); latest.current.onRefreshSelected(); setRevision((n) => n + 1); }
     } catch (err) {
       const failure = toTmsMutationFailure(err);
       if (failure.code && failure.code !== "INTERNAL_ERROR") { command.current = null; operation.current = null; }
       if (token === generation.current) {
+        if (action === "complete" && err instanceof TmsApiError && err.validationField === "completion") {
+          setIncomplete(true); latest.current.onRefreshSelected(); return;
+        }
         const conflict = ["CONFLICT", "INVALID_TRANSITION", "PRECONDITION_FAILED"].includes(failure.code ?? "");
         const message = input.ru
-          ? "Не удалось изменить прогон. Обновите его состояние. Для завершения у всех кейсов должен быть результат."
-          : "Could not change run. Refresh its state. Every case needs a result before completion.";
+          ? "Не удалось изменить прогон. Обновите его состояние и повторите действие."
+          : "Could not change run. Refresh its state and try again.";
         setError(formatTmsMutationFailure(conflict ? { ...failure, message: null } : failure, message));
         latest.current.onRefreshSelected();
       }
@@ -114,6 +121,6 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   const choices = [...batches.map((b) => ({ id: b.id, name: `${b.iteration.name} · ${b.sequence}`, runs: b.runs, tags: b.iteration.tags, createdAt: b.createdAt })),
     ...input.knownRuns.filter((r) => !batchMembers.has(r.id)).map((r) => ({ id: r.id, name: r.name, runs: [r], tags: [], createdAt: r.createdAt }))]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return { batch, choices, entries, loading, busy, error, act, selectedRuns,
+  return { incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries, loading, busy, error, act, selectedRuns,
     refresh: () => setRevision((n) => n + 1) };
 }

@@ -1,0 +1,13 @@
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; padding: 2px 0 10px; }
+.filter { flex: 1; min-width: 160px; display: flex; align-items: center; }
+.filter > div { flex: 1; }
+.filter > div > button { min-height: 32px; padding: 5px 8px; background: transparent; font-size: 12px; }
+.clear, .select { display: inline-flex; align-items: center; gap: 5px; padding: 7px; border: 0; border-radius: 12px; background: transparent; color: var(--cases-muted); font: inherit; cursor: pointer; }
+.select[aria-pressed=true] { color: #3574f0; }
+.bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; padding: 10px; border-radius: 12px; background: #3574f0; color: #fff; animation: appear 180ms ease-out; }
+.bar > div { flex: 1; min-width: 160px; }
+.bar > strong { font-size: 12px; }
+.assign { border: 1px solid #ffffff66; border-radius: 16px; padding: 7px 11px; background: #fff; color: #245cc3; font: inherit; cursor: pointer; }
+.assign:disabled { opacity: .6; }
+@keyframes appear { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .bar { animation: none; } }

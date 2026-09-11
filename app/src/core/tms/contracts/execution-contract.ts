@@ -67,6 +67,7 @@ export type RunAttemptSummary = {
 export type RunAttempt = RunAttemptSummary & { stepResults: StepResult[] };
 
 export type RunItemSummary = {
+  rowVersion?: number;
   preview?: Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
   id: string;
   caseId: string;

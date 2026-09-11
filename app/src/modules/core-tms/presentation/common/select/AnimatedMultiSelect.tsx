@@ -4,9 +4,9 @@ import type { AnimatedSelectOption } from "./AnimatedSelect";
 import styles from "./animated-select.module.css";
 
 export function AnimatedMultiSelect({
-  label, values, options, allLabel, selectedLabel, onChange,
+  label, values, options, allLabel, selectedLabel, onChange, textOnly = false,
 }: {
-  label: string;
+  label: string; textOnly?: boolean;
   values: readonly string[];
   options: readonly AnimatedSelectOption[];
   allLabel: string;
@@ -52,7 +52,7 @@ export function AnimatedMultiSelect({
   return <div className={styles.root} ref={rootRef}>
     <button
       ref={triggerRef}
-      className={`${styles.trigger} ${styles.compactTrigger}`}
+      className={`${styles.trigger} ${styles.compactTrigger} ${textOnly ? styles.textTrigger : ""}`}
       type="button"
       aria-label={label}
       aria-haspopup="listbox"

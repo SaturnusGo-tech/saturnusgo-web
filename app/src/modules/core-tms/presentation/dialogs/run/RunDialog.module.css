@@ -3,9 +3,9 @@
 .form { display: flex; flex: 1; flex-direction: column; min-height: 0; color: var(--cases-text); }
 .body { padding: 4px 24px 20px; overflow-y: auto; min-height: 0; flex: 1; }
 .iteration { display: grid; gap: 14px; margin-bottom: 20px; }
-.iteration label { display: grid; grid-template-columns: 150px minmax(0,1fr); align-items: center; gap: 16px; font-size: 13px; }
-.iteration input { width: 100%; min-width: 0; border: 1px solid var(--cases-control-border); border-radius: 9px; padding: 9px 11px; background: transparent; color: inherit; font: inherit; outline: none; }
-.iteration input:focus { border-color: #3574f0; }
+.fieldRow { display: grid; grid-template-columns: 150px minmax(0,1fr); align-items: center; gap: 16px; font-size: 13px; }
+.fieldRow > input { width: 100%; min-width: 0; border: 1px solid var(--cases-control-border); border-radius: 9px; padding: 9px 11px; background: transparent; color: inherit; font: inherit; outline: none; }
+.fieldRow > input:focus { border-color: #3574f0; }
 .details { font-size: 12px; color: var(--cases-muted); }
 .details summary { cursor: pointer; padding: 4px 0; }
 .details[open] summary { margin-bottom: 12px; }
@@ -25,4 +25,9 @@
 @keyframes enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes exit { from { transform: var(--run-exit-from, translateX(0)); } to { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .runPanel, .closing { animation: none; } }
-@media (max-width: 600px) { .body { padding: 0 14px 16px; } .iteration label { grid-template-columns: 1fr; gap: 7px; } .settings { grid-template-columns: 1fr; } .footer { padding: 14px; } }
+@media (max-width: 600px) { .body { padding: 0 14px 16px; } .fieldRow { grid-template-columns: 1fr; gap: 7px; } .settings { grid-template-columns: 1fr; } .footer { padding: 14px; } }
+
+.description { border: 1px solid var(--cases-control-border); border-radius: 12px; padding: 8px 10px; margin-bottom: 12px; background: transparent; }
+.description:focus-within { border-color: #3574f0; }
+.projects { justify-content: flex-end; }
+.projects > div { min-width: 0; max-width: 100%; }
