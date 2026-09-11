@@ -1,4 +1,5 @@
 "use client";
+import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 
 import {
@@ -70,13 +71,13 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
       {tab === "overview" ? <div className={surface.overviewLayout}>
         <main className={surface.primaryColumn}>
           <DetailSection title={t("reports.descriptionHeading")}>
-            <p>{defect.description || t("reports.noDescription")}</p>
+            <MarkdownField value={defect.description} label={t("reports.descriptionHeading")} emptyLabel={t("reports.noDescription")} allowAttachments={false} />
           </DetailSection>
           <DetailSection title={t("reports.actualResult")} accent="danger">
             <p>{defect.actualResult || t("reports.notProvided")}</p>
           </DetailSection>
           <DetailSection title={t("reports.expectedResult")} accent="success">
-            <p>{defect.expectedResult || t("reports.notProvided")}</p>
+            <MarkdownField value={defect.expectedResult} label={t("reports.expectedResult")} emptyLabel={t("reports.notProvided")} allowAttachments={false} />
           </DetailSection>
           <DetailSection title={t("reports.executionContext")}>
             {defect.runId ? <dl className={surface.contextList}>

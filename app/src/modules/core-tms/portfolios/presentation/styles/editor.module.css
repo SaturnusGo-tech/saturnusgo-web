@@ -25,3 +25,6 @@
 .note { margin: -7px 0 23px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .note code { font: inherit; white-space: nowrap; }
 @media(max-width:700px) { .titleField { min-width: 0; } .titleField input { font-size: 23px; } .mainFields { gap: 20px; } }
+
+.editor > header button { border-radius: 12px; }
+.markdownContent { --cases-text: var(--ink); --cases-secondary-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-hover: var(--control-hover); --cases-primary: var(--action); --cases-link: var(--action); --cases-control-border: var(--line-strong); --cases-raised: var(--control-hover); }

@@ -94,12 +94,12 @@ export function CaseInspectorContent({
     {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
     <main className={css.primaryColumn}>
       <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
-        <MarkdownField attachmentKey="description" value={value.description} label={ru ? "Описание" : "Description"}
+        <MarkdownField appearance="plain" onRequestEdit={!readOnly && !editor?.submitting && !editor?.attachmentsPending ? () => begin("description") : undefined} attachmentKey="description" value={value.description} label={ru ? "Описание" : "Description"}
           autoFocus={!creating} onChange={sectionEditing("description") && editor ? (description) => patch({ description }) : undefined}
           emptyLabel={ru ? "Описание не указано" : "No description"} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Предусловия" : "Preconditions"} editLabel={ru ? "Изменить условия" : "Edit conditions"} {...controls("preconditions")}>
-        <MarkdownField attachmentKey="preconditions" value={value.preconditions} label={ru ? "Предусловия" : "Preconditions"}
+        <MarkdownField appearance="plain" onRequestEdit={!readOnly && !editor?.submitting && !editor?.attachmentsPending ? () => begin("preconditions") : undefined} attachmentKey="preconditions" value={value.preconditions} label={ru ? "Предусловия" : "Preconditions"}
           autoFocus={!creating} onChange={sectionEditing("preconditions") && editor ? (preconditions) => patch({ preconditions }) : undefined}
           emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"} />
       </InspectorSectionView>

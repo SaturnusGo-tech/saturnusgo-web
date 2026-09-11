@@ -72,7 +72,7 @@ function CreationNarrativeSection({ section, title, value, ru, onChange }: {
     onEdit={() => { snapshot.current = value; setEditing(true); }}
     onCancel={() => { onChange(snapshot.current); setEditing(false); }}
     onSave={() => setEditing(false)}>
-    <MarkdownField attachmentKey={section} value={value} label={title}
+    <MarkdownField appearance="plain" onRequestEdit={() => { snapshot.current = value; setEditing(true); }} attachmentKey={section} value={value} label={title}
       autoFocus={editing} onChange={editing ? onChange : undefined} emptyLabel={emptyLabel} />
   </InspectorSectionView>;
 }

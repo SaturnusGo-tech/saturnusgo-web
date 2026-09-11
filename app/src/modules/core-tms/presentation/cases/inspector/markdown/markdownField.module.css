@@ -293,3 +293,6 @@
   border-color: var(--tms-focus-border, #75757d);
   box-shadow: 0 0 0 2px var(--tms-focus-ring, rgb(161 161 170 / 15%));
 }
+
+.field[data-appearance="plain"] .editorFooter { background: transparent; border: 0; padding-inline: 0; }
+.field[data-appearance="plain"] :is(.editorLoading, .editorBootOverlay) { background: transparent; }

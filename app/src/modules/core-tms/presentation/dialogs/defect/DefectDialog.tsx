@@ -1,3 +1,4 @@
+import { NarrativeField } from "../../cases/inspector/markdown/plain/NarrativeField";
 import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { Bug, Image as ImageIcon, Paperclip, X } from "lucide-react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -161,12 +162,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
             ]} />
           </div>
           <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} />
-          <Field label={copy.description} wide>
-            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={description} onChange={(event) => setDescription(event.target.value)} />
-          </Field>
-          <Field label={copy.expected} wide>
-            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} value={failedStep?.expectedResult ?? ""} readOnly />
-          </Field>
+          <NarrativeField label={copy.description} value={description} onChange={setDescription} disabled={submitting} />
+          <NarrativeField label={copy.expected} value={failedStep?.expectedResult ?? ""} />
           <Field label={copy.actual} wide>
             <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} required value={actual} onChange={(event) => setActual(event.target.value)} />
           </Field>

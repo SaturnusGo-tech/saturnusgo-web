@@ -1,3 +1,4 @@
+import { NarrativeField } from "../../cases/inspector/markdown/plain/NarrativeField";
 import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { Bug, Paperclip, RefreshCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -78,6 +79,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting) return;
+    if (!description.trim()) { setError(locale === "ru" ? "Добавьте описание дефекта." : "Add a defect description."); return; }
     if (!routing.resolved) { setError(copy.youTrackRequired); return; }
     setSubmitting(true);
     setError("");
@@ -111,7 +113,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
             <Field label={copy.routingLabel} wide><AnimatedSelect label={copy.routingLabel} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
               {!offline && <small>{copy.routingHint}</small>}{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
             <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} />
-            <Field label={t("inlineDefect.description")} wide><textarea required value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
+            <NarrativeField label={t("inlineDefect.description")} value={description} onChange={setDescription} disabled={submitting} />
           </div>
         </section>
         <section className={`${shared.drawerSection} ${surface.section} ${styles.section}`}>

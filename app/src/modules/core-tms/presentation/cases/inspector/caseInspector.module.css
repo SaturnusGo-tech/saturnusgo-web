@@ -55,6 +55,7 @@
 .count { min-width: 20px; height: 18px; display: grid; place-items: center; color: var(--cases-muted); background: var(--cases-control); border-radius: 9px; font-size: 10px; }
 .sectionActions { display: flex; justify-content: flex-end; gap: 6px; padding-top: 10px; }
 .sectionActions button, .addButton { min-height: 30px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; color: var(--cases-secondary-text); background: transparent; border: 1px solid var(--cases-control-border); border-radius: 4px; cursor: pointer; font: inherit; font-size: 11px; }
+.sectionActions button { border-radius: 12px; }
 .sectionActions .saveButton { color: var(--cases-on-primary); background: var(--cases-primary); border-color: var(--cases-primary); }
 .sectionActions button:disabled { cursor: wait; opacity: .6; }
 .compactFields, .railFields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -111,7 +112,7 @@
 .creationSection { animation: none; }
 .creationFooter { min-height: 58px; flex: 0 0 auto; justify-content: flex-end; padding: 12px 24px; background: var(--cases-bg); border-top: 1px solid var(--cases-border); box-shadow: 0 -8px 24px rgb(23 29 38 / 5%); }
 .createActions { display: flex; align-items: center; gap: 7px; padding: 0 24px 10px; }
-.createActions button { min-width: 82px; height: 32px; padding: 0 11px; border-radius: 4px; cursor: pointer; font: inherit; font-size: 12px; }
+.createActions button { min-width: 82px; height: 32px; padding: 0 11px; border-radius: 12px; cursor: pointer; font: inherit; font-size: 12px; }
 .createActions button:first-of-type { color: var(--cases-secondary-text); background: transparent; border: 1px solid var(--cases-control-border); }
 .createActions button:last-of-type { color: var(--cases-on-primary); background: var(--cases-primary); border: 1px solid var(--cases-primary); }
 .createActions button:disabled { cursor: not-allowed; opacity: .55; }

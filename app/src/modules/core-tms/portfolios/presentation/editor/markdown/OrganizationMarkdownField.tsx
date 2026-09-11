@@ -16,7 +16,7 @@ export function OrganizationMarkdownField({ label, value, placeholder, editing, 
       {editing ? <><PiCheck aria-hidden="true" />{ru ? "Готово" : "Done"}</> : <PiPencilSimple aria-hidden="true" />}
     </button></header>
     <div className={css.markdownContent}>
-      <MarkdownField label={label} value={value} emptyLabel={placeholder} compact allowAttachments={false}
+      <MarkdownField appearance="plain" onRequestEdit={!disabled ? onEdit : undefined} label={label} value={value} emptyLabel={placeholder} compact allowAttachments={false}
         autoFocus={editing} onChange={editing && !disabled ? onChange : undefined} />
     </div>
     {value.length > 20000 && <p className={css.limit} role="alert">{ru ? "Максимум 20 000 символов." : "Maximum 20,000 characters."}</p>}

@@ -10,6 +10,7 @@ import {
   StrikeThroughSupSubToggles,
   UndoRedo,
   headingsPlugin,
+  codeBlockPlugin,
   linkDialogPlugin,
   linkPlugin,
   listsPlugin,
@@ -29,6 +30,8 @@ import type { TmsLocale } from "../../../../localization/model/locale";
 import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import { markdownEditorTranslation } from "./translations/markdownEditorTranslation";
 import css from "./markdownField.module.css";
+import { MarkdownCodeEditor } from "./code/MarkdownCodeEditor";
+import { stripRawHtml } from "./code/stripRawHtml";
 import { MarkdownContextArea } from "./context/MarkdownContextContent";
 
 const contextContentPlugin = realmPlugin({
@@ -48,13 +51,6 @@ export type InitializedMarkdownEditorProps = {
   onRemoveAttachment?: (id: string) => void;
 };
 
-export function stripRawHtml(markdown: string) {
-  return markdown
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*?)?\s*\/?>/g, "")
-    .replace(/<(?:!DOCTYPE|\?xml)[^>]*>/gi, "");
-}
-
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
   const editorRef = useRef<MDXEditorMethods>(null);
   const overlayAnchor = useRef<HTMLDivElement>(null);
@@ -65,6 +61,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   const [problem, setProblem] = useState("");
   const plugins = useMemo(() => [
     headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+    codeBlockPlugin({ codeBlockEditorDescriptors: [{ priority: 0, match: () => true, Editor: MarkdownCodeEditor }] }),
     listsPlugin(),
     quotePlugin(),
     tablePlugin(),

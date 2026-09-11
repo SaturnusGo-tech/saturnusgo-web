@@ -123,3 +123,6 @@
 :global(.dark) .scopeToggle,
 :global(.dark) .pickerActions button { color: #99bbff; }
 :global(.dark) .scopeToggle:hover { background: var(--tms-bg-selected); }
+
+.form { --cases-text: var(--ink); --cases-secondary-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-hover: var(--control-hover); --cases-primary: #3475ed; --cases-link: #3475ed; --cases-control-border: var(--line); --cases-raised: var(--control-hover); }
+.form > div:last-child > button, .form > div:last-child > div > button { border-radius: 12px; }

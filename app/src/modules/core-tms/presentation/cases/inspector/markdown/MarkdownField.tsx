@@ -10,6 +10,7 @@ import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { useCaseAttachmentDraft } from "../attachments/CaseAttachmentDraftContext";
 import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
+import plain from "./plain/plainMarkdown.module.css";
 
 type Props = {
   value: string;
@@ -22,6 +23,8 @@ type Props = {
   attachmentStepId?: string;
   allowAttachments?: boolean;
   contextContent?: ReactNode;
+  appearance?: "plain";
+  onRequestEdit?: () => void;
 };
 
 const WysiwygMarkdownEditor = dynamic(
@@ -87,20 +90,24 @@ export function MarkdownField(props: Props) {
   const pending = attachmentEnabled
     ? attachments?.entries.filter((entry) => entry.fieldKey === props.attachmentKey) ?? []
     : [];
-  if (!props.onChange) return <>
+  if (!props.onChange) return <div className={props.onRequestEdit ? plain.readable : undefined}
+    onClick={props.onRequestEdit ? (event) => {
+      if ((event.target as Element).closest("a, button, input") || window.getSelection()?.toString()) return;
+      props.onRequestEdit?.();
+    } : undefined}>
     {!props.value.trim() ? <p className={css.empty}>{props.emptyLabel}</p> : <MDEditor.Markdown
       className={css.rendered} source={props.value} skipHtml
       urlTransform={(url) => isSafeUrl(url) ? url : ""}
       wrapperElement={{ "data-color-mode": colorMode }} />}
     {attachments && <MarkdownPendingAttachments locale={locale} entries={pending} onRemove={attachments.remove} />}
-  </>;
+  </div>;
   const addFiles = attachmentEnabled ? addAttachmentFiles : undefined;
   const draftProblem = attachments?.problem;
   let attachmentProblem = "";
   if (draftProblem && draftProblem.fieldKey === props.attachmentKey) {
     attachmentProblem = draftProblem.message;
   }
-  return <div className={css.field} data-editor-shell data-color-mode={colorMode} role="group" aria-label={props.label}
+  return <div className={`${css.field} ${props.appearance === "plain" ? plain.plain : ""}`} data-editor-shell data-appearance={props.appearance} data-color-mode={colorMode} role="group" aria-label={props.label}
     onPasteCapture={(event) => {
       if (!addFiles) return;
       const files = filesFromClipboard(event.clipboardData);

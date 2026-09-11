@@ -1,0 +1,15 @@
+.plain[data-editor-shell][data-appearance="plain"], .plain[data-editor-shell][data-appearance="plain"]:is(:hover, :focus-within) { background: transparent !important; border: 0 !important; border-radius: 0; box-shadow: none !important; outline: 0 !important; overflow: visible; }
+.plain[data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 112px; background: transparent; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { background: transparent; border: 0; padding: 2px 0 5px; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) button { border-radius: 8px; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 76px; max-height: 360px; background: transparent; scrollbar-width: thin; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) > div { padding: 5px 2px 8px; min-height: 76px; background: transparent; }
+.plain[data-editor-shell][data-appearance="plain"] > div:has(> textarea) { min-height: 112px; height: 112px; background: transparent; }
+.plain[data-editor-shell][data-appearance="plain"] textarea { padding: 6px 2px; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+.readable { cursor: text; min-height: 24px; }
+.section { grid-column: 1 / -1; min-width: 0; }
+.section header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.section h3 { flex: 1; font: inherit; font-size: 13px; font-weight: 600; margin: 0; color: var(--cases-strong); }
+.edit { width: 28px; height: 28px; border: 0; background: transparent; color: var(--cases-muted); border-radius: 9px; padding: 0; display: grid; place-items: center; cursor: pointer; }
+.edit:hover { color: var(--cases-primary); background: var(--cases-hover); }
+.edit:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 1px; }
