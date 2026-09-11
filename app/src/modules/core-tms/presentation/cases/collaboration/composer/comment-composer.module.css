@@ -1,16 +1,23 @@
-.composer { padding: 10px 14px; color: var(--cases-text); }
-.composer [data-editor-shell] { border-radius: 12px; }
-.composer > div > div:first-child { margin-bottom: 8px; }
-.composer footer { display: flex; justify-content: flex-end; gap: 7px; padding-top: 7px; }
-.composer footer button, .reply button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--cases-secondary-text); border-radius: 10px; min-height: 30px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
-.composer footer .send { color: white; background: #3475ed; }
+.composer { padding: 6px 14px 10px; color: var(--cases-text); min-width: 0; }
+.editorFrame { border: 1px solid var(--cases-control-border); border-radius: 12px; background: transparent; transition: border-color 160ms ease; }
+.editorFrame:focus-within { border-color: color-mix(in srgb, var(--cases-primary) 45%, var(--cases-control-border)); }
+.composer .editorFrame [data-editor-shell] { border: 0; border-radius: 12px 12px 0 0; outline: none; box-shadow: none !important; background: transparent; }
+.composer .editorFrame [data-editor-shell]:focus-within { box-shadow: none !important; }
+.editorFrame [data-editor-shell] > :global(.mdxeditor), .editorFrame [data-editor-shell] > div:has(> textarea) { height: 112px; min-height: 112px; background: transparent; }
+.editorFrame :global(.mdxeditor-toolbar) { border-bottom: 0; background: transparent; }
+.editorFrame :global(.mdxeditor-root-contenteditable) { background: transparent; }
+.composer footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 10px; padding: 4px 10px 8px; margin: 0; border: 0; background: transparent; }
+.mentions { min-width: 0; flex: 1 1 120px; }
+.submitActions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.submitActions > button, .reply button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--cases-secondary-text); border-radius: 10px; min-height: 30px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.submitActions .send { color: white; background: #3475ed; }
 .composer button:disabled { opacity: .5; cursor: default; }
-.reply { display: flex; align-items: center; gap: 7px; color: var(--cases-secondary-text); font-size: 12px; padding: 4px 0 8px; }
+.reply { display: flex; align-items: center; gap: 7px; color: var(--cases-secondary-text); font-size: 12px; padding: 0 0 4px; }
 .reply button { margin-left: auto; }
-.channels { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; padding: 8px 0 2px; font-size: 11px; color: var(--cases-secondary-text); }
+.channels { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 4px 10px; font-size: 11px; color: var(--cases-secondary-text); }
 .channels label { display: flex; align-items: center; gap: 5px; }
 .channels small { flex-basis: 100%; color: var(--cases-muted); }
-.error { color: #db6872; font-size: 12px; }
+.error { color: #db6872; font-size: 12px; padding: 0 10px; }
 
 .composer { animation: composer-reveal 180ms ease-out; }
 @keyframes composer-reveal { from { opacity:0; } to { opacity:1; } }

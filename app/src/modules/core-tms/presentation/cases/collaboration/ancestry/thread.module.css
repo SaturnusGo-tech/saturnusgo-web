@@ -10,4 +10,4 @@
 .actions button:hover { background: var(--cases-hover); color: var(--cases-text); }
 .inlineComposer { margin-left: 36px; }
 .replies[data-deep="true"] { margin-left: 0; padding-left: 0; }
-@media(max-width:600px) { .replies { margin-left: 15px; padding-left: 7px; } .inlineComposer { margin-left: 12px; } }
+@media(max-width:600px) { .replies { margin-left: 15px; padding-left: 7px; } .inlineComposer { margin-left: 24px; } .rail { left: 21px; } }

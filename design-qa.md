@@ -38,6 +38,8 @@ Initial review found a P2 mismatch: inherited Markdown rules muted quotation tex
 
 User correction: separate rounded comment surfaces made short discussions look like stacked cards. Removed comment fills and radii, tightened header/body spacing and the collapse-control gap. Verified transparent backgrounds and zero radius in the rendered DOM in the dark theme; reviewed light theme and collapse/reopen behavior. Updated evidence: `/tmp/falcon-comment-redesign/flat-dark.png` and `/tmp/falcon-comment-redesign/flat-light.png` (1280 × 720). Earlier rounded-surface screenshots are superseded.
 
+Reply composer correction: combined mention controls and submission inside a single thin editor outline; reduced editor height; removed duplicate cancel for replies; Post appears after entering nonblank text. Pending protection and submission validation remain. Verified an actual reply saved against the disposable backend, member selection/removal, cancellation, and no horizontal overflow at 390 px. Corrected the inherited editor focus ring and mobile rail spacing found during visual review. Evidence: `flat-reply-dark.png`, `flat-reply-light.png`, `flat-reply-mobile.png` in the same evidence directory. TypeScript and architecture checks passed after the composer change.
+
 No unresolved P0/P1/P2 visual findings within this scope. Production verification is recorded in the release handoff.
 
 final result: passed
