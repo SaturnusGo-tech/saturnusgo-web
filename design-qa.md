@@ -30,3 +30,5 @@ TypeScript, architecture, comment attachment, private attachment, comment link/s
 No unresolved P0/P1/P2 visual findings within the reviewed scope.
 
 final result: passed
+
+Follow-up, 2026-09-11: removed the decorative curved elbows at each nested reply, as requested in the 3.57.17 AM screenshot. Straight nesting rails and collapse/reopen behavior remain. Verified computed pseudo-element content is `none` for all nested replies and exercised collapse/reopen in the local browser. Evidence: `/tmp/falcon-comment-redesign/straight-threads-light.png`. CSS-only change; no data or reply logic changed.
