@@ -1,11 +1,9 @@
-import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, X, XCircle } from "lucide-react";
+import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
 import { ScenarioMarkdown } from "../cases/inspector/steps/markdown/ScenarioMarkdown";
 import { StepActualEditor } from "./actual/StepActualEditor";
-import { uploadEvidence } from "../../application/evidence/uploadEvidence";
-import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
 import { executableSteps } from "../../helpers/cases/caseRevision";
 import { localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -43,18 +41,11 @@ type RunsViewProps = {
 };
 export function RunsView({ navigation, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
-  const attachments = useAttachmentClient();
-  const [evidence, setEvidence] = useState<string[]>([]);
-  const [evidenceError, setEvidenceError] = useState("");
   const [reporting, setReporting] = useState(false);
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
   useEffect(() => { onDirtyChange?.(dirtySteps.length > 0); return () => onDirtyChange?.(false); }, [dirtySteps.length, onDirtyChange]);
-  const evidenceOperation = useRef<{ signature: string; key: string } | null>(null);
   useEffect(() => {
     setReporting(false); setDirtySteps([]);
-    setEvidence([]);
-    setEvidenceError("");
-    evidenceOperation.current = null;
   }, [selectedItem?.id, selectedRun?.id]);
   const runWritable = Boolean(selectedRun && !selectedRun.archivedAt && selectedRun.status === "active");
   const editScope = JSON.stringify([selectedRun?.id, selectedItem?.id, selectedItem?.activeAttemptNo]);
@@ -64,34 +55,6 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
     items, selectedItem, selectedRun, runWritable: attemptWritable && dirtySteps.length === 0, onItemStatus, onSelectItem,
     setReporting,
   });
-  async function addEvidence(files: File[]) {
-    if (!selectedRun || !selectedItem || files.length === 0) return;
-    setEvidenceError("");
-    try {
-      if (offline) throw new Error("Evidence upload requires the TMS API.");
-      const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo)
-        ?? selectedItem.attempts[0];
-      const signature = files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join("|");
-      if (evidenceOperation.current?.signature !== signature) {
-        evidenceOperation.current = { signature, key: crypto.randomUUID() };
-      }
-      const uploaded = await uploadEvidence({
-        client: attachments, projectId: selectedRun.projectId,
-        owner: {
-          kind: "run_attempt",
-          runId: selectedRun.id,
-          runItemId: selectedItem.id,
-          attemptNo: attempt.attemptNo,
-        },
-        files,
-        operationKeyPrefix: evidenceOperation.current.key,
-      });
-      setEvidence((current) => [...current, ...uploaded.map((item) => item.id)]);
-      evidenceOperation.current = null;
-    } catch {
-      setEvidenceError(t("runs.evidenceUploadError"));
-    }
-  }
   const runNavigator = navigation;
   if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
   if (selectedRun && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
@@ -104,7 +67,6 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
   const attachmentIds = Array.from(new Set([
     ...attempt.attachmentIds,
     ...attempt.stepResults.flatMap((result) => result.attachmentIds),
-    ...evidence,
   ]));
   const currentIndex = items.findIndex((item) => item.id === selectedItem.id);
   return <div className={runStyles.shell} data-testid="runs-view">
@@ -169,8 +131,7 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
     </section>
     {runWritable && <footer className={runStyles.footer}>
       <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{t("runs.previous")}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{t("runs.next")}</span><ChevronRight size={16} /></button></div>
-      <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={`${styles.secondaryButton} ${runStyles.compactAction}`} aria-label={t("runs.block")} title={t("runs.block")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.compactActionLabel}>{t("runs.block")}</span></button><button className={`${styles.dangerButton} ${runStyles.compactAction}`} aria-label={t("runs.fail")} title={t("runs.fail")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.compactActionLabel}>{t("runs.fail")}</span></button><button className={`${styles.successButton} ${runStyles.compactAction}`} aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={!canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.compactActionLabel}>{t("runs.pass")}</span></button></>}<label className={`${styles.secondaryButton} ${runStyles.wideAction}`} aria-label={t("runs.addEvidence")} title={t("runs.addEvidence")}><Paperclip size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.addEvidence")}</span> {evidence.length > 0 && <span>{evidence.length}</span>}<input id={`run-evidence-${selectedItem.id}`} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => void addEvidence(Array.from(event.target.files ?? []))} /></label>{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
-      {evidenceError && <FormError message={evidenceError} />}
+      <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={`${styles.secondaryButton} ${runStyles.compactAction}`} aria-label={t("runs.block")} title={t("runs.block")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.compactActionLabel}>{t("runs.block")}</span></button><button className={`${styles.dangerButton} ${runStyles.compactAction}`} aria-label={t("runs.fail")} title={t("runs.fail")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.compactActionLabel}>{t("runs.fail")}</span></button><button className={`${styles.successButton} ${runStyles.compactAction}`} aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={!canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.compactActionLabel}>{t("runs.pass")}</span></button></>}{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
 
     </footer>}
   </div>;

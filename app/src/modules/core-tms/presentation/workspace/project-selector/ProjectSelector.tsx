@@ -1,5 +1,6 @@
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import loadingStyles from "./project-loading.module.css";
 import styles from "../../../tms.module.css";
 
 type ProjectOption = { id: string; name: string };
@@ -9,6 +10,7 @@ export function ProjectSelector({
   projects,
   disabled,
   currentProjectLabel,
+  loadingProjectLabel,
   createProjectLabel,
   onSelect,
   onCreate,
@@ -17,10 +19,13 @@ export function ProjectSelector({
   projects: ProjectOption[];
   disabled: boolean;
   currentProjectLabel: string;
+  loadingProjectLabel: string;
   createProjectLabel: string;
-  onSelect: (projectId: string) => void;
+  onSelect: (projectId: string) => Promise<boolean | void> | void;
   onCreate: () => void;
 }) {
+  const [pending, setPending] = useState(false);
+  const pendingRef = useRef(false);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -40,14 +45,25 @@ export function ProjectSelector({
     requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
+  async function selectProject(projectId: string) {
+    if (disabled || pendingRef.current) return;
+    closeAndRestoreFocus();
+    if (projectId === activeProjectId) return;
+    pendingRef.current = true;
+    setPending(true);
+    try { await onSelect(projectId); }
+    finally { pendingRef.current = false; setPending(false); }
+  }
+
   return (
     <div className={styles.projectSelector} ref={rootRef}>
       <button
         ref={triggerRef}
         className={styles.projectSelectorTrigger}
         type="button"
-        disabled={disabled}
-        aria-label={currentProjectLabel}
+        disabled={disabled || pending}
+        aria-label={pending ? loadingProjectLabel : currentProjectLabel}
+        aria-busy={pending}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
@@ -59,7 +75,10 @@ export function ProjectSelector({
           }
         }}
       >
-        <strong title={activeProject?.name}>{activeProject?.name ?? createProjectLabel}</strong>
+        <span className={loadingStyles.name} data-loading={pending}>
+          <strong className={loadingStyles.label} title={pending ? undefined : activeProject?.name} aria-hidden={pending || undefined}>{activeProject?.name ?? createProjectLabel}</strong>
+          {pending && <span className={loadingStyles.skeleton} aria-hidden="true" />}
+        </span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
       {open && (
@@ -82,8 +101,7 @@ export function ProjectSelector({
                 role="menuitemradio"
                 aria-checked={project.id === activeProjectId}
                 onClick={() => {
-                  onSelect(project.id);
-                  closeAndRestoreFocus();
+                  void selectProject(project.id);
                 }}
               >
                 <span>{project.name}</span>

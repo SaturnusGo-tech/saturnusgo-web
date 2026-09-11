@@ -173,7 +173,7 @@
 
 .footer { min-width: 0; min-height: 54px; display: grid; grid-column: 2; grid-row: 2; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); box-shadow: 0 -8px 24px rgb(23 29 38 / 5%); }
 .pager, .actions, .completion { min-width: 0; display: flex; align-items: center; gap: 5px; }
-.actions { flex-wrap: nowrap; justify-content: flex-end; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: none; }
+.actions { flex-wrap: wrap; justify-content: flex-end; }
 .actions::-webkit-scrollbar { display: none; }
 .completion { justify-content: flex-end; color: var(--runs-muted); font-size: 12px; white-space: nowrap; }
 .footer :is(button, label) { min-height: 34px; border-radius: 5px; white-space: nowrap; }

@@ -77,6 +77,7 @@ export function WorkspaceHeader({
             projects={model.projects}
             disabled={!workspaceReady}
             currentProjectLabel={t("header.currentProject")}
+            loadingProjectLabel={t("common.loading")}
             createProjectLabel={model.project ? t("header.createProject") : t("header.createFirstProject")}
             onSelect={model.chooseProject}
             onCreate={model.openNewProject}
