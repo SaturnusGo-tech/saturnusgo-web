@@ -23,7 +23,7 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
   const pending = Boolean(model.changingCommentId || model.commentSubmitting);
   const error = model.changeFailure ? commentFailureLabel(ru ? "ru" : "en", model.changeFailure) : "";
   const time = new Intl.DateTimeFormat(languageTag, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-  const shareLink = () => buildCommentLink(window.location.href, { ...comment, workspaceId: people.workspaceId });
+  const shareLink = () => buildCommentLink(window.location.href, { ...comment, targetKind: model.commentTargetKind, workspaceId: people.workspaceId });
   const edit = () => { setEditing(comment); setConfirming(false); };
   return <article className={css.comment} id={`comment-${comment.id}`} tabIndex={-1}>
     <MemberAvatar identityId={comment.author.identityId} name={activityActorLabel(comment.author.displayName)} />

@@ -22,7 +22,10 @@ export function useDefectNavigation(projectId: string, setView: (view: View) => 
   function openDefect(defectId: string) { selectDefect(defectId); setView("reports"); }
   const canonicalizeSelectedDefect = useCallback(() => {
     if (!projectId || !selectedDefectId || !canWriteNavigation()) return;
-    navigateWorkspace(buildDefectDeepLink(window.location.href, { projectId, defectId: selectedDefectId }), true);
+    const current = new URL(window.location.href);
+    const commentId = current.searchParams.get("defectId") === selectedDefectId && current.searchParams.get("projectId") === projectId
+      ? current.searchParams.get("commentId") : null;
+    navigateWorkspace(buildDefectDeepLink(current.href, { projectId, defectId: selectedDefectId, commentId }), true);
   }, [projectId, selectedDefectId, canWriteNavigation]);
   const clearDefectSelection = useCallback(() => setSelectedDefectId(null), []);
   return { selectedDefectId, setSelectedDefectId: selectDefect, openDefect, canonicalizeSelectedDefect, clearDefectSelection };

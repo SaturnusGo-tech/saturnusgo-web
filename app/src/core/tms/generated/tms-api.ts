@@ -3526,6 +3526,60 @@ export interface paths {
         patch: operations["updateTestCaseComment"];
         trace?: never;
     };
+    "/defects/{defectId}/comments": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        /** List versioned tester comments newest first, including deleted reply anchors */
+        get: operations["listDefectComments"];
+        put?: never;
+        /** Append a tester comment without revising bug-report content */
+        post: operations["createDefectComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/defects/{defectId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Read a scoped comment or deleted reply anchor */
+        get: operations["getDefectComment"];
+        put?: never;
+        post?: never;
+        /**
+         * Remove comment text; preserve its reply anchor and audit history
+         * @description Version-conditional mutation. A stale retry cannot repeat side effects. Repeated deletion returns its existing tombstone.
+         */
+        delete: operations["deleteDefectComment"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit your own comment using its current version
+         * @description Version-conditional mutation. A stale retry cannot repeat side effects. Repeated deletion returns its existing tombstone.
+         */
+        patch: operations["updateDefectComment"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6907,6 +6961,54 @@ export interface components {
             projectId: components["schemas"]["Identifier"];
             version: number;
         };
+        DefectCommentAuthor: {
+            identityId: components["schemas"]["Identifier"];
+            displayName: string;
+        };
+        DefectComment: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            defectId: components["schemas"]["Identifier"];
+            body: string;
+            author: components["schemas"]["DefectCommentAuthor"];
+            createdAt: components["schemas"]["Timestamp"];
+            version: number;
+            /** Format: date-time */
+            editedAt: string | null;
+            /** Format: date-time */
+            deletedAt: string | null;
+            parentId: components["schemas"]["Identifier"] | null;
+            mentions: components["schemas"]["Identifier"][];
+            canEdit: boolean;
+            canDelete: boolean;
+        };
+        DefectCommentCreateRequest: {
+            projectId: components["schemas"]["Identifier"];
+            body: string;
+            parentId?: components["schemas"]["Identifier"] | null;
+            mentions?: components["schemas"]["Identifier"][];
+            /** @description Telegram targets mentioned members who opted in. Slack posts to the connected project channel. Browser mentions respect recipient preferences. */
+            notifyChannels?: ("telegram" | "slack")[];
+        };
+        DefectCommentEnvelope: {
+            data: components["schemas"]["DefectComment"];
+        };
+        DefectCommentListEnvelope: {
+            data: components["schemas"]["DefectComment"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        DefectCommentUpdateRequest: {
+            projectId: components["schemas"]["Identifier"];
+            body: string;
+            mentions?: components["schemas"]["Identifier"][];
+            /** @description Telegram targets mentioned members who opted in. Slack posts to the connected project channel. Browser mentions respect recipient preferences. */
+            notifyChannels?: ("telegram" | "slack")[];
+            version: number;
+        };
+        DefectCommentDeleteRequest: {
+            projectId: components["schemas"]["Identifier"];
+            version: number;
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -7873,6 +7975,28 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
+        /** @description A bounded page of append-only comments ordered newest first. */
+        DefectCommentListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectCommentListEnvelope"];
+            };
+        };
+        /** @description New or idempotently replayed append-only comment. */
+        DefectCommentResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectCommentEnvelope"];
+            };
+        };
     };
     parameters: {
         /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -8107,6 +8231,11 @@ export interface components {
         OrganizationCommentCreate: {
             content: {
                 "application/json": components["schemas"]["OrganizationCommentCreateRequest"];
+            };
+        };
+        DefectCommentCreate: {
+            content: {
+                "application/json": components["schemas"]["DefectCommentCreateRequest"];
             };
         };
     };
@@ -14639,6 +14768,182 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TestCaseCommentEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listDefectComments: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DefectCommentListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createDefectComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["DefectCommentCreate"];
+        responses: {
+            201: components["responses"]["DefectCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDefectComment: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current comment */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefectCommentEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteDefectComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefectCommentDeleteRequest"];
+            };
+        };
+        responses: {
+            /** @description Current comment */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefectCommentEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateDefectComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                defectId: components["parameters"]["DefectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefectCommentUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Current comment */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefectCommentEnvelope"];
                 };
             };
             400: components["responses"]["BadRequest"];

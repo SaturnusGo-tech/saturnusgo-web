@@ -35,6 +35,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const folderId = url.searchParams.get("folderId");
   const suiteId = url.searchParams.get("suiteId");
   const article = url.searchParams.get("article"); const section = url.hash;
+  const commentId = url.searchParams.get("commentId");
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
   const sameWorkspace = !url.searchParams.get("workspaceId") || url.searchParams.get("workspaceId") === input.workspaceId;
   const sameScope = ["workspaceId", "projectId"].every((key) => {
@@ -62,7 +63,10 @@ export function buildWorkspaceDeepLink(href: string, input: {
   }
   if (input.view === "runs" && input.runId) url.searchParams.set("runId", input.runId);
   if (input.view === "runs" && input.runId && input.runItemId) url.searchParams.set("runItemId", input.runItemId);
-  if (input.view === "reports" && sameScope && defectId) url.searchParams.set("defectId", defectId);
+  if (input.view === "reports" && sameScope && defectId) {
+    url.searchParams.set("defectId", defectId);
+    if (commentId && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(commentId)) url.searchParams.set("commentId", commentId);
+  }
   if (input.view === "hooks" && integration && (isProvider(integration) || integration === "youtrack")) {
     url.searchParams.set("integration", integration);
     if (sameScope && integration === "github" && (impact === "1" || analysisId)) {

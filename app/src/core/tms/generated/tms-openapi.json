@@ -13511,6 +13511,303 @@
           }
         ]
       }
+    },
+    "/defects/{defectId}/comments": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/DefectIdPath"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Defects"
+        ],
+        "summary": "List versioned tester comments newest first, including deleted reply anchors",
+        "operationId": "listDefectComments",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DefectCommentListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Defects"
+        ],
+        "summary": "Append a tester comment without revising bug-report content",
+        "operationId": "createDefectComment",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/DefectCommentCreate"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/DefectCommentResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/defects/{defectId}/comments/{commentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/DefectIdPath"
+        },
+        {
+          "name": "commentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Defects"
+        ],
+        "operationId": "getDefectComment",
+        "summary": "Read a scoped comment or deleted reply anchor",
+        "responses": {
+          "200": {
+            "description": "Current comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCommentEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Defects"
+        ],
+        "operationId": "updateDefectComment",
+        "summary": "Edit your own comment using its current version",
+        "responses": {
+          "200": {
+            "description": "Current comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCommentEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefectCommentUpdateRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "required",
+        "description": "Version-conditional mutation. A stale retry cannot repeat side effects. Repeated deletion returns its existing tombstone.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Defects"
+        ],
+        "operationId": "deleteDefectComment",
+        "summary": "Remove comment text; preserve its reply anchor and audit history",
+        "responses": {
+          "200": {
+            "description": "Current comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCommentEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefectCommentDeleteRequest"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "required",
+        "description": "Version-conditional mutation. A stale retry cannot repeat side effects. Repeated deletion returns its existing tombstone.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -14261,6 +14558,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/OrganizationCommentCreateRequest"
+            }
+          }
+        }
+      },
+      "DefectCommentCreate": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectCommentCreateRequest"
             }
           }
         }
@@ -15823,6 +16130,42 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "DefectCommentListResponse": {
+        "description": "A bounded page of append-only comments ordered newest first.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectCommentListEnvelope"
+            }
+          }
+        }
+      },
+      "DefectCommentResponse": {
+        "description": "New or idempotently replayed append-only comment.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectCommentEnvelope"
             }
           }
         }
@@ -31771,6 +32114,249 @@
         }
       },
       "TestCaseCommentDeleteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "version"
+        ],
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "DefectCommentAuthor": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "displayName"
+        ],
+        "properties": {
+          "identityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "DefectComment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectId",
+          "defectId",
+          "body",
+          "author",
+          "createdAt",
+          "version",
+          "editedAt",
+          "deletedAt",
+          "parentId",
+          "mentions",
+          "canEdit",
+          "canDelete"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "defectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "author": {
+            "$ref": "#/components/schemas/DefectCommentAuthor"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "editedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "parentId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "canEdit": {
+            "type": "boolean"
+          },
+          "canDelete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DefectCommentCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "body"
+        ],
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "parentId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "notifyChannels": {
+            "type": "array",
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "telegram",
+                "slack"
+              ]
+            },
+            "description": "Telegram targets mentioned members who opted in. Slack posts to the connected project channel. Browser mentions respect recipient preferences."
+          }
+        }
+      },
+      "DefectCommentEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DefectComment"
+          }
+        }
+      },
+      "DefectCommentListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/DefectComment"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
+      },
+      "DefectCommentUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "body",
+          "version"
+        ],
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "notifyChannels": {
+            "type": "array",
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "telegram",
+                "slack"
+              ]
+            },
+            "description": "Telegram targets mentioned members who opted in. Slack posts to the connected project channel. Browser mentions respect recipient preferences."
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "DefectCommentDeleteRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [

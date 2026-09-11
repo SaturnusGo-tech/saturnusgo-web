@@ -179,7 +179,7 @@ test("collaboration UI exposes real links, cursor retry, and durable sync truth"
   assert.match(record, /defect\.fixVerification/);
   assert.doesNotMatch(record, /model\.queuedTransition/);
   assert.match(comments, /event\.metaKey \|\| event\.ctrlKey/); assert.match(comments, /<MarkdownField/);
-  assert.match(comments, /value=\{comment\.body\}/); assert.match(comments, /body\.length > 10_000/);
+  assert.match(comments, /<CommentBody body=\{comment\.body\}/); assert.match(comments, /serialized\.length > 10_000/);
   assert.match(comments, /model\.retryComments/); assert.match(comments, /model\.loadMoreComments/); assert.match(comments, /loadMoreFailed/);
   assert.match(comments, /role="alert"/); assert.match(comments, /comment\.author\.displayName/);
   assert.match(comments, /<time dateTime=\{comment\.createdAt\}>/);

@@ -1,3 +1,4 @@
+import { commentPath, discussionComment, type CommentTargetKind, type DiscussionCommentDto } from "./target/comment-target";
 import type { components } from "../../../../../core/tms/generated/tms-api";
 import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 import type {
@@ -13,12 +14,13 @@ export async function listTestCaseComments(
   caseId: string,
   cursor: string | null = null,
   signal?: AbortSignal,
+  targetKind: CommentTargetKind = "test_case",
 ) {
   const query = pageQuery(projectId, cursor);
-  const page = await http.get<Api["TestCaseCommentListEnvelope"]>(
-    `/test-cases/${caseId}/comments?${query}`, signal,
+  const page = await http.get<Omit<Api["TestCaseCommentListEnvelope"], "data"> & { data: DiscussionCommentDto[] }>(
+    `${commentPath(caseId, targetKind)}?${query}`, signal,
   );
-  return { items: page.data.map(mapComment), meta: page.meta };
+  return { items: page.data.map(discussionComment), meta: page.meta };
 }
 
 export async function createTestCaseComment(
@@ -28,13 +30,14 @@ export async function createTestCaseComment(
   body: string,
   idempotencyKey: string,
   options: Omit<import("../model/drafts/comment-draft").CommentDraft, "body"> = {},
+  targetKind: CommentTargetKind = "test_case",
 ) {
-  const resource = await http.mutateResource<Api["TestCaseComment"]>(
-    `/test-cases/${caseId}/comments`, "POST",
+  const resource = await http.mutateResource<DiscussionCommentDto>(
+    commentPath(caseId, targetKind), "POST",
     { projectId, body, ...options } satisfies Api["TestCaseCommentCreateRequest"],
     { idempotencyKey },
   );
-  return mapComment(resource.data);
+  return discussionComment(resource.data);
 }
 
 export async function listTestCaseDefects(
@@ -66,10 +69,6 @@ export async function confirmDefectFix(
     body satisfies Api["DefectFixConfirmationRequest"],
     { ifMatch: defect.defectEtag, idempotencyKey },
   );
-}
-
-function mapComment(dto: Api["TestCaseComment"]): TestCaseComment {
-  return { ...dto, author: { ...dto.author } };
 }
 
 function mapLinkedDefect(dto: Api["TestCaseLinkedDefect"]): CaseLinkedDefect {

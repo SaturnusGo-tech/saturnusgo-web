@@ -23,7 +23,7 @@ import { usePageAppearance } from "./motion/usePageAppearance";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
-  const pageRef = usePageAppearance([model.view, model.project?.id, model.selectedCaseId, model.selectedRunId, model.selectedRunItemId, model.selectedSuiteId, model.selectedDefectId, model.connection].join(":"));
+  const pageRef = usePageAppearance([model.view, model.project?.id, model.selectedCaseId, model.selectedRunId, model.selectedRunItemId, model.selectedSuiteId, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

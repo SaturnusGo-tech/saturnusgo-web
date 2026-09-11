@@ -63,7 +63,7 @@ export function useCommentNavigation(caseId: string, model: CaseCollaborationVie
     if (!location || model.comments.status !== "ready") return;
     const url = new URL(location);
     const id = url.searchParams.get("commentId");
-    if (url.searchParams.get("caseId") !== caseId || !id || !validId(id)
+    if (url.searchParams.get(model.commentTargetKind === "defect" ? "defectId" : "caseId") !== caseId || !id || !validId(id)
       || (url.searchParams.get("projectId") && model.commentProjectId && url.searchParams.get("projectId") !== model.commentProjectId)) {
       requested.current = ""; owner.current.request++; setFailedId(null); return;
     }

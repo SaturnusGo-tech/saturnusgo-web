@@ -27,3 +27,14 @@ test("workspace canonicalization retains a shared comment only for the same work
   assert.equal(new URL(buildCaseDeepLink(canonical, scope)).searchParams.get("commentId"), null);
   assert.equal(new URL(clearCaseDeepLink(canonical)).searchParams.get("commentId"), null);
 });
+
+void test("defect comments link to the report and clear unrelated case navigation", () => {
+ const url = new URL(buildCommentLink("https://tenant.example/testcases/umbrella-home/work/?caseId=old&view=cases", {
+  targetKind: "defect", workspaceId: "company", projectId: "project", caseId: "bug", id: "comment-1",
+ }));
+ assert.equal(url.searchParams.get("view"), "reports");
+ assert.equal(url.searchParams.get("defectId"), "bug");
+ assert.equal(url.searchParams.get("commentId"), "comment-1");
+ assert.equal(url.searchParams.has("caseId"), false);
+ assert.equal(url.origin, "https://tenant.example");
+});

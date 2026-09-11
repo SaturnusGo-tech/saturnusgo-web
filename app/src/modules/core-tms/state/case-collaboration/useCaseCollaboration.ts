@@ -18,6 +18,7 @@ import {
 } from "./usePagedCaseResource";
 
 type Input = {
+  targetKind?: "test_case" | "defect";
   active: boolean; connected: boolean; projectId: string; caseId: string;
   canComment: boolean; canConfirmFix: boolean;
 };
@@ -30,10 +31,10 @@ export { scheduleVisibleDefectRefresh, DEFECT_VISIBLE_REFRESH_INTERVAL } from ".
 export function useCaseCollaboration(input: Input) {
   const http = useTmsHttpClient();
   const available = input.connected && Boolean(input.projectId && input.caseId);
-  const scopeKey = available ? collaborationScopeKey(input.projectId, input.caseId) : "";
+  const scopeKey = available ? `${input.targetKind ?? "test_case"}:${collaborationScopeKey(input.projectId, input.caseId)}` : "";
   const loadComments = useCallback((cursor: string | null, signal: AbortSignal) => (
-    listTestCaseComments(http, input.projectId, input.caseId, cursor, signal)
-  ), [http, input.caseId, input.projectId]);
+    listTestCaseComments(http, input.projectId, input.caseId, cursor, signal, input.targetKind)
+  ), [http, input.caseId, input.projectId, input.targetKind]);
   const loadDefects = useCallback((cursor: string | null, signal: AbortSignal) => (
     listTestCaseDefects(http, input.projectId, input.caseId, cursor, signal)
   ), [http, input.caseId, input.projectId]);
@@ -41,7 +42,7 @@ export function useCaseCollaboration(input: Input) {
     active: input.active, available, scopeKey, load: loadComments, keyOf: commentKey,
   });
   const defectPages = usePagedCaseResource({
-    active: input.active, available, scopeKey, load: loadDefects, keyOf: defectKey,
+    active: input.active && input.targetKind !== "defect", available: available && input.targetKind !== "defect", scopeKey, load: loadDefects, keyOf: defectKey,
   });
   const [commentPending, setCommentPending] = useState({ scope: "", active: false });
   const [commentFailure, setCommentFailure] = useState<{
@@ -121,7 +122,7 @@ export function useCaseCollaboration(input: Input) {
     setCommentFailure(null);
     try {
       const created = await createTestCaseComment(
-        http, input.projectId, input.caseId, body, operation.key, options,
+        http, input.projectId, input.caseId, body, operation.key, options, input.targetKind,
       );
       if (currentScope.current !== scopeKey || scopeEpoch.current !== epoch) return false;
       commentPages.updateItems((items) => upsertNewestComment(items, created));
@@ -138,7 +139,7 @@ export function useCaseCollaboration(input: Input) {
       }
     }
   }, [available, commentPages.updateItems, commentSubmitting, http,
-    input.canComment, input.caseId, input.projectId, scopeKey]);
+    input.canComment, input.caseId, input.projectId, input.targetKind, scopeKey]);
 
   const confirmFix = useCallback(async (defect: CaseLinkedDefect) => {
     if (!available || !input.canConfirmFix || confirmingOccurrenceId
@@ -177,10 +178,10 @@ export function useCaseCollaboration(input: Input) {
     }
   }, [available, confirmingOccurrenceId, defectPages.refresh, http, input.canConfirmFix, scopeKey]);
 
-  const changes = useCommentChanges({ projectId: input.projectId, caseId: input.caseId,
+  const changes = useCommentChanges({ targetKind: input.targetKind, projectId: input.projectId, caseId: input.caseId,
     updateItems: commentPages.updateItems, refresh: commentPages.refresh });
   return {
-    ...changes, commentProjectId: input.projectId,
+    ...changes, commentTargetKind: input.targetKind, commentProjectId: input.projectId,
     comments: commentPages.resource, defects: defectPages.resource,
     canComment: input.canComment && available, canConfirmFix: input.canConfirmFix && available,
     commentSubmitting,

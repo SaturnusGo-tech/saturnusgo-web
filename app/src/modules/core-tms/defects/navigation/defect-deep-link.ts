@@ -12,7 +12,7 @@ export function readDefectDeepLink(href: string) {
 
 export function buildDefectDeepLink(
   href: string,
-  input: { projectId: string; defectId: string | null },
+  input: { projectId: string; defectId: string | null; commentId?: string | null },
 ) {
   const url = new URL(href);
   url.searchParams.set("projectId", input.projectId);
@@ -25,8 +25,10 @@ export function buildDefectDeepLink(
     url.searchParams.set("projectId", input.projectId);
     url.searchParams.set("view", "reports");
     url.searchParams.set(DEFECT_ID_PARAM, input.defectId);
+    if (input.commentId && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(input.commentId)) url.searchParams.set("commentId", input.commentId);
   } else {
     url.searchParams.delete(DEFECT_ID_PARAM);
+    url.searchParams.delete("commentId");
   }
   return url.toString();
 }

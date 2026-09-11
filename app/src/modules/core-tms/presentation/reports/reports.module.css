@@ -24,6 +24,12 @@
   --cases-strong: var(--report-strong);
   --cases-secondary-text: var(--report-text);
   --cases-primary: var(--report-primary);
+  --cases-border: var(--report-border);
+  --cases-row-border: var(--report-row-border);
+  --cases-avatar: var(--report-muted);
+  --cases-on-primary: var(--report-on-primary);
+  --cases-link: var(--report-primary);
+  --cases-icon: var(--report-muted);
   height: 100%; min-width: 0; min-height: 0; display: flex; overflow: hidden;
   color: var(--report-text); background: var(--report-bg); font-size: 14px; line-height: 1.35;
   color-scheme: light; position: relative;
@@ -107,13 +113,13 @@
 .empty strong { color: var(--report-strong); font-size: 13px; }
 .empty small { max-width: 360px; font-size: 11px; line-height: 1.45; }
 
-.detailPanel { width: clamp(620px, 53vw, 850px); min-width: 540px; min-height: 0; flex: 0 0 clamp(620px, 53vw, 850px); overflow: hidden; background: var(--report-bg); border-left: 1px solid var(--report-border); animation: reportInspectorIn 220ms cubic-bezier(.2,.72,.3,1) both; }
+.detailPanel { width: clamp(620px, 53vw, 850px); min-width: 540px; min-height: 0; flex: 0 0 clamp(620px, 53vw, 850px); overflow: hidden; background: var(--report-bg); border-left: 1px solid var(--report-border); }
 .detail { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; color: var(--report-text); background: var(--report-bg); container: report-detail / inline-size; }
 .detailHeader { flex: 0 0 auto; border-bottom: 1px solid var(--report-border); }
 .detailUtility { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 12px 7px 24px; }
 .detailEyebrow { color: var(--report-muted); font-size: 13px; font-weight: 500; }
 .detailActions { min-width: 0; display: flex; align-items: center; gap: 5px; }
-.detailActions > a, .detailActions > button:not(.closeButton):not(.mobileBack) { min-height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; color: var(--report-text); background: transparent; border: 1px solid var(--report-control-border); border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 500; text-decoration: none; }
+.detailActions > a, .detailActions > button:not(.closeButton):not(.mobileBack):not(.runButton) { min-height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; color: var(--report-text); background: transparent; border: 1px solid var(--report-control-border); border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 500; text-decoration: none; }
 .detailActions > a:hover, .detailActions > button:hover { color: var(--report-strong); background: var(--report-hover); }
 .closeButton, .mobileBack { width: 30px; height: 30px; display: inline-grid; place-items: center; padding: 0; color: var(--report-muted); background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
 .closeButton:hover, .mobileBack:hover { color: var(--report-strong); background: var(--report-hover); border-color: var(--report-border); }
@@ -129,7 +135,7 @@
 .tabs button span { min-width: 18px; height: 18px; display: inline-grid; place-items: center; padding: 0 5px; color: var(--report-text); background: var(--report-raised); border-radius: 9px; font-size: 10px; }
 .detailScroll { min-height: 0; flex: 1; overflow: auto; scrollbar-color: var(--report-control-border) transparent; }
 .overviewLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, 32%); align-items: start; gap: 28px; padding: 24px; }
-.primaryColumn, .sideRail { min-width: 0; display: grid; align-content: start; gap: 24px; }
+.primaryColumn, .sideRail { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 24px; }
 .sideRail { gap: 20px; }
 .detailSection { min-width: 0; }
 .detailSection > header { min-height: 28px; display: flex; align-items: center; padding: 0 0 8px; }
@@ -165,7 +171,6 @@
 .detailError strong { color: var(--report-strong); }
 .detailError button { min-height: 32px; margin-top: 8px; padding: 0 10px; color: var(--report-text); background: transparent; border: 1px solid var(--report-control-border); border-radius: 5px; cursor: pointer; }
 
-@keyframes reportInspectorIn { from { opacity: .55; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
 :global(.dark) .statusChip[data-status="open"] { color: #f1f3f5; background: #4b5058; border-color: #6b717b; }
 @media (prefers-reduced-motion: reduce) { .detailPanel { animation: none; } .prioritySortButton svg { transition: none; } }
 @media (max-width: 1180px) {
@@ -184,7 +189,9 @@
   .mobileBack { display: inline-grid; order: -1; }
   .closeButton { display: none; }
   .detailUtility { justify-content: flex-end; padding-left: 12px; }
-  .overviewLayout { grid-template-columns: 1fr; gap: 22px; padding: 20px 18px; }
+  .overviewLayout { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 20px 18px; }
   .sideRail { padding-top: 20px; border-top: 1px solid var(--report-border); }
   .detailTitle { padding-inline: 18px; }
 }
+
+.detailActions > button.runButton, .detailActions > button.runButton:hover { width: 30px; height: 30px; min-height: 30px; padding: 0; justify-content: center; border: 0; border-radius: 50%; color: #fff; background: #3475ed; }

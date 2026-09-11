@@ -12,7 +12,7 @@ test("report list follows the production split-view and keeps evidence out of ro
   assert.match(list, /data-selected=\{defect\.id === selectedDefectId/);
   assert.doesNotMatch(list, /AttachmentLink/);
   assert.doesNotMatch(list, /defect\.attachmentIds\.map/);
-  assert.match(styles, /\.detailPanel\s*\{[^}]*animation: reportInspectorIn/s);
+  assert.match(list, /<AnimatePresence>[\s\S]*<motion\.aside[\s\S]*exit=/);
   assert.match(list, /<PrioritySignal priority=\{defect\.severity\}/);
   assert.match(list, /className=\{surface\.prioritySortButton\}/);
   assert.doesNotMatch(list, /<AlertTriangle/);

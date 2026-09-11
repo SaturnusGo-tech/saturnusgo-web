@@ -102,7 +102,8 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.doesNotMatch(detailActions, /aria-label=\{ru \? "Клонировать"|SlidersHorizontal/);
   assert.doesNotMatch(detailPanel, /testCase\??\.folderPath/);
   assert.doesNotMatch(detailPanel, /className=\{inspector\.titleMark\}/);
-  assert.match(comments, /composer[\s\S]*commentPrompt/);
+  assert.match(comments, /<CommentComposer[^;]*persistent/s);
+  assert.doesNotMatch(comments, /className=\{css\.commentPrompt\}/);
   assert.match(comments, /compact[\s\S]*autoFocus/);
   assert.doesNotMatch(comments, /comments\.items\.length\}/);
   assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--cases-muted\) !important/);

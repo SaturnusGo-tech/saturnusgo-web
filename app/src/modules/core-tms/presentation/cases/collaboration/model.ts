@@ -7,6 +7,7 @@ import type {
 
 export type CaseCollaborationViewModel = {
   commentProjectId?: string;
+  commentTargetKind?: "test_case" | "defect";
   comments: CaseCollaborationResource<TestCaseComment>;
   defects: CaseCollaborationResource<CaseLinkedDefect>;
   canComment: boolean;

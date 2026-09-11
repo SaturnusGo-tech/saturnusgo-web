@@ -120,3 +120,15 @@ test("portfolio detail survives project changes, while embedded project detail f
   assert.equal(new URL(buildWorkspaceDeepLink(activating, input)).searchParams.get("catalogProjectId"), "other-project");
   assert.equal(new URL(buildWorkspaceDeepLink(activating, { ...input, workspaceId: "other-workspace" })).searchParams.get("catalogProjectId"), null);
 });
+
+test("report comment canonicalization is stable and never carries across companies, projects or views", () => {
+ const href="https://company.test/work/?workspaceId=w&projectId=p&view=reports&defectId=d&commentId=c";
+ const scope={workspaceId:"w",projectId:"p",view:"reports" as const,runId:null};
+ const canonical=buildWorkspaceDeepLink(href,scope);
+ assert.equal(new URL(canonical).searchParams.get("commentId"),"c");
+ assert.equal(buildWorkspaceDeepLink(canonical,scope),canonical);
+ for(const next of [{...scope,workspaceId:"other"},{...scope,projectId:"other"},{...scope,view:"cases" as const}])
+  assert.equal(new URL(buildWorkspaceDeepLink(href,next)).searchParams.has("commentId"),false);
+ assert.equal(new URL(buildDefectDeepLink(href,{projectId:"p",defectId:"other"})).searchParams.has("commentId"),false);
+ assert.equal(new URL(buildDefectDeepLink(href,{projectId:"p",defectId:null})).searchParams.has("commentId"),false);
+});

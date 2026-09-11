@@ -2,7 +2,7 @@ import { Check, Link2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import css from "./sharing.module.css";
 
-export function CommentShareItem({ ru, link, compact = false }: { ru: boolean; link: () => string; compact?: boolean }) {
+export function CommentShareItem({ ru, link, compact = false, resource = "comment" }: { ru: boolean; link: () => string; compact?: boolean; resource?: "comment" | "defect" }) {
   const [copied, setCopied] = useState(false);
   const [fallback, setFallback] = useState("");
   const container = useRef<HTMLSpanElement>(null);
@@ -14,7 +14,7 @@ export function CommentShareItem({ ru, link, compact = false }: { ru: boolean; l
     document.addEventListener("keydown", closeOnEscape);
     return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeOnEscape); };
   }, [compact, fallback]);
-  const label = copied ? (ru ? "Ссылка скопирована" : "Link copied") : compact ? (ru ? "Скопировать ссылку" : "Copy comment link") : (ru ? "Поделиться" : "Share");
+  const label = copied ? (ru ? "Ссылка скопирована" : "Link copied") : compact ? (ru ? "Скопировать ссылку" : (resource === "defect" ? "Copy bug report link" : "Copy comment link")) : (ru ? "Поделиться" : "Share");
   async function share() {
     const value = link();
     try {
@@ -31,7 +31,7 @@ export function CommentShareItem({ ru, link, compact = false }: { ru: boolean; l
     </button>
     {fallback && <span className={`${css.fallback} ${compact ? css.popover : ""}`}>
       <label>{ru ? "Скопируйте ссылку вручную" : "Copy the link manually"}
-        <input readOnly value={fallback} aria-label={ru ? "Ссылка на комментарий" : "Comment link"}
+        <input readOnly value={fallback} aria-label={resource === "defect" ? (ru ? "Ссылка на баг-репорт" : "Bug report link") : (ru ? "Ссылка на комментарий" : "Comment link")}
           onFocus={event => event.target.select()} onKeyDown={event => { if (event.key !== "Escape" && event.key !== "Tab") event.stopPropagation(); }} />
       </label>
     </span>}

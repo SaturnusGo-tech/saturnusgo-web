@@ -2,7 +2,7 @@
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 
 import {
-  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, PlayCircle, X,
+  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, Play, X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -10,11 +10,15 @@ import { ConnectorTargetLinks } from "../../../connectors/presentation/links/Con
 import { AttachmentLink } from "../../../attachments/presentation/link/AttachmentLink";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
+import { DefectDiscussion } from "./discussion/DefectDiscussion";
+import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShareItem";
+import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import surface from "../reports.module.css";
 
 export type DetailTab = "overview" | "attachments";
 
-export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun }: {
+export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, connected = false, canComment = false }: {
+  connected?: boolean; canComment?: boolean;
   workspaceId?: string;
   defect: Defect;
   run?: TestRunSummary;
@@ -35,8 +39,12 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
       <div className={surface.detailUtility}>
         <span className={surface.detailEyebrow}>{locale === "ru" ? "Карточка баг-репорта" : "Bug report"}</span>
         <div className={surface.detailActions}>
-          {defect.runId && <button type="button" onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
-            <PlayCircle size={15} />{t("reports.openRun")}
+          <CommentShareItem key={defect.id} compact resource="defect" ru={locale === "ru"} link={() => {
+            const url = new URL(window.location.href); if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
+            return buildDefectDeepLink(url.href, { projectId: defect.projectId, defectId: defect.id });
+          }} />
+          {defect.runId && <button type="button" className={surface.runButton} title={t("reports.openRun")} aria-label={t("reports.openRun")} onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
+            <Play size={14} fill="currentColor" />
           </button>}
           <button className={surface.mobileBack} type="button" onClick={onBack} aria-label={t("reports.backToList")}><ArrowLeft size={17} /></button>
           <button className={surface.closeButton} type="button" onClick={onBack} aria-label={t("reports.backToList")}><X size={18} /></button>
@@ -77,6 +85,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
               <div><dt>{t("reports.step")}</dt><dd>{defect.stepId || "—"}</dd></div>
             </dl> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}
           </DetailSection>
+          <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
         </main>
         <aside className={surface.sideRail} aria-label={t("reports.properties")}>
           <DetailSection title={t("reports.properties")}>
