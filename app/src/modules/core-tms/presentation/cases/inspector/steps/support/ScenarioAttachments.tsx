@@ -41,10 +41,8 @@ export function ScenarioAttachmentControls(props: DraftAttachmentsProps) {
   const attachments = useScenarioAttachments(props);
   if (!attachments.enabled) return null;
   return <div className={css.attachmentControls}>
-    <MarkdownAttachmentButton locale={locale} onFiles={attachments.addFiles} />
-    <span className={css.attachmentHint}>
-      {locale === "ru" ? "Прикрепить файл" : "Attach file"}
-    </span>
+    <MarkdownAttachmentButton locale={locale} onFiles={attachments.addFiles}
+      text={locale === "ru" ? "Прикрепить файл" : "Attach file"} />
     {attachments.pending.length > 0 && attachments.remove && <MarkdownPendingAttachments
       locale={locale}
       entries={attachments.pending}

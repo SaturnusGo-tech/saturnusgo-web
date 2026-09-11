@@ -11,6 +11,7 @@ import { useCaseAttachmentDraft } from "../attachments/CaseAttachmentDraftContex
 import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
 import plain from "./plain/plainMarkdown.module.css";
+import { MarkdownTransition, MarkdownReadyContext } from "./transition/MarkdownTransition";
 
 type Props = {
   value: string;
@@ -50,6 +51,8 @@ function loadMarkdownEditor() {
 
 function MarkdownEditorLoadingFallback() {
   const state = useContext(LoadingEditorContext);
+  const onReady = useContext(MarkdownReadyContext);
+  if (onReady) return null;
   if (!state) return null;
   const height = state.compact
     ? (state.withAttachments ? css.editorLoadingCompactWithFooter : css.editorLoadingCompact)
@@ -74,6 +77,13 @@ function isSafeUrl(url: string) {
 }
 
 export function MarkdownField(props: Props) {
+  if (props.appearance === "plain") return <MarkdownTransition editing={Boolean(props.onChange)} autoFocus={props.autoFocus}
+    read={<MarkdownFieldContent {...props} onChange={undefined} />}
+    editor={props.onChange ? <MarkdownFieldContent {...props} /> : null} />;
+  return <MarkdownFieldContent {...props} />;
+}
+
+function MarkdownFieldContent(props: Props) {
   const { theme } = useColorMode();
   const { locale } = useTmsLocale();
   const attachments = useCaseAttachmentDraft();

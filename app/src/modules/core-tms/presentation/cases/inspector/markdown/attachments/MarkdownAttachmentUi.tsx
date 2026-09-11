@@ -11,6 +11,7 @@ import css from "../markdownField.module.css";
 export function MarkdownAttachmentButton(props: {
   locale: TmsLocale;
   disabled?: boolean;
+  text?: string;
   onFiles: (files: File[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -18,9 +19,10 @@ export function MarkdownAttachmentButton(props: {
     ? "Добавить изображение, видео или файл"
     : "Attach image, video, or file";
   return <>
-    <button className={css.attachmentButton} type="button" disabled={props.disabled}
-      aria-label={label} onClick={() => inputRef.current?.click()}>
+    <button className={`${css.attachmentButton} ${props.text ? css.attachmentWithText : ""}`} type="button" disabled={props.disabled}
+      aria-label={props.text ?? label} title={label} onClick={() => inputRef.current?.click()}>
       <Paperclip size={15} />
+      {props.text && <span>{props.text}</span>}
     </button>
     <input ref={inputRef} className={css.hiddenFileInput} tabIndex={-1}
       type="file" multiple

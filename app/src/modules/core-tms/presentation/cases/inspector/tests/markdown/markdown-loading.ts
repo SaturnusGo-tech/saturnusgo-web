@@ -15,13 +15,13 @@ export async function assertLazyMarkdownLoading() {
     if (name.endsWith("InitializedMarkdownEditor")) { imports++; throw new Error("Chunk unavailable"); }
   });
   const props = { label: "Description", value: "**Safe** <script>alert(1)</script>" };
-  const readOnly = nodes(h.render(() => component.MarkdownField(props)));
+  const readOnly = nodes(h.render(() => { const field = component.MarkdownField(props); return field.type(field.props); }));
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(imports, 0); assert.equal(readOnly.some((node) => (node.type as unknown) === mountEditor), false);
   const markdown = readOnly.find((node) => node.type === "RenderedMarkdown")!;
   assert.equal(markdown.props.skipHtml, true);
   assert.equal((markdown.props.urlTransform as (value: string) => string)("javascript:alert(1)"), "");
-  const editing = nodes(h.render(() => component.MarkdownField({ ...props, onChange() {} })));
+  const editing = nodes(h.render(() => { const field = component.MarkdownField({ ...props, onChange() {} }); return field.type(field.props); }));
   assert.equal(editing.some((node) => (node.type as unknown) === mountEditor), true);
   await assert.rejects(mountEditor(), /Chunk unavailable/); assert.equal(imports, 1);
   h.dispose();

@@ -1,0 +1,4 @@
+.frame { position: relative; min-width: 0; transition: height 220ms cubic-bezier(.22, 1, .36, 1); }
+.read { display: flow-root; min-width: 0; transition: opacity 160ms ease-out; }
+.editor { position: absolute; inset: 0 0 auto; min-width: 0; display: flow-root; transition: opacity 220ms ease-out, transform 220ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .frame, .read, .editor { transition: none; } .editor { transform: none !important; } }

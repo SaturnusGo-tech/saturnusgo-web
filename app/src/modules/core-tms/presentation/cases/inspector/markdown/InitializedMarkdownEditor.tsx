@@ -24,7 +24,7 @@ import {
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
@@ -33,6 +33,7 @@ import css from "./markdownField.module.css";
 import { MarkdownCodeEditor } from "./code/MarkdownCodeEditor";
 import { stripRawHtml } from "./code/stripRawHtml";
 import { MarkdownContextArea } from "./context/MarkdownContextContent";
+import { MarkdownReadyContext } from "./transition/MarkdownTransition";
 
 const contextContentPlugin = realmPlugin({
   init(realm) { realm.pub(addTopAreaChild$, MarkdownContextArea); },
@@ -52,6 +53,7 @@ export type InitializedMarkdownEditorProps = {
 };
 
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
+  const onReady = useContext(MarkdownReadyContext);
   const editorRef = useRef<MDXEditorMethods>(null);
   const overlayAnchor = useRef<HTMLDivElement>(null);
   const [overlayContainer, setOverlayContainer] = useState<HTMLElement | null>(null);
@@ -112,7 +114,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     const waitForPaint = () => {
       const editor = editorRef.current;
       const rendered = stripRawHtml(editor?.getMarkdown() ?? "").trim();
-      const hasRenderedContent = Boolean(editor) && rendered === expected;
+      const hasRenderedContent = Boolean(editor) && (rendered === expected || rendered === lastEmitted.current.trim());
       matchingFrames = hasRenderedContent ? matchingFrames + 1 : 0;
       if (matchingFrames >= 2) {
         setEditorPainted(true);
@@ -125,9 +127,13 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
   }, [editorPainted, props.markdown]);
 
   useEffect(() => {
-    if (!editorPainted || !props.autoFocus) return;
+    if (editorPainted || problem) onReady?.();
+  }, [editorPainted, problem, onReady]);
+
+  useEffect(() => {
+    if (!editorPainted || !props.autoFocus || onReady) return;
     editorRef.current?.focus(undefined, { defaultSelection: "rootStart", preventScroll: true });
-  }, [editorPainted, props.autoFocus]);
+  }, [editorPainted, props.autoFocus, onReady]);
 
   const loadingHeight = props.compact
     ? (props.onAttachmentFiles ? css.editorLoadingCompactWithFooter : css.editorLoadingCompact)
@@ -141,7 +147,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       markdown={initialMarkdown}
       className={`${css.wysiwyg} ${props.compact ? css.compact : ""}`}
       contentEditableClassName={css.editorContent}
-      autoFocus={props.autoFocus ? { defaultSelection: "rootStart", preventScroll: true } : false}
+      autoFocus={props.autoFocus && !onReady ? { defaultSelection: "rootStart", preventScroll: true } : false}
       placeholder={props.locale === "ru" ? "Введите текст…" : "Enter text…"}
       suppressHtmlProcessing
       spellCheck
@@ -167,7 +173,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     {props.onAttachmentFiles && <div className={css.editorFooter}>
       <MarkdownAttachmentButton locale={props.locale} onFiles={props.onAttachmentFiles} />
     </div>}
-    {!editorPainted && <div className={`${css.editorLoading} ${css.editorBootOverlay} ${loadingHeight}`}>
+    {!editorPainted && !onReady && <div className={`${css.editorLoading} ${css.editorBootOverlay} ${loadingHeight}`}>
       <textarea
         className={css.editorLoadingInput}
         aria-label={props.label}

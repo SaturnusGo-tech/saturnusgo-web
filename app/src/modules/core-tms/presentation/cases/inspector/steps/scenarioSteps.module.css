@@ -137,14 +137,16 @@
 .attachmentControls {
   min-width: 0;
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 3px;
   margin-top: 2px;
 }
 
 .attachmentControls > button {
-  width: 24px;
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
   height: 24px;
   opacity: .62;
 }
@@ -152,11 +154,6 @@
 .attachmentControls:hover > button,
 .attachmentControls > button:focus-visible {
   opacity: 1;
-}
-
-.attachmentHint {
-  color: var(--cases-faint);
-  font-size: 10px;
 }
 
 .attachmentControls > div,
