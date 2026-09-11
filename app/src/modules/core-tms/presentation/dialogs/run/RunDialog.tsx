@@ -1,129 +1,61 @@
-import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
-import { Layers, Play, ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import { Plus, X } from "lucide-react";
 import type { Bootstrap, Project, Suite, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
-import { formatTmsMutationFailure } from "../../../../../core/tms/errors/mutation-failure";
-import { resolvePendingOperation, type PendingOperation } from "../../../../../core/tms/idempotency/pending-operation";
-import { createRun } from "../../../application/runs/createRun";
-import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { formatCount } from "../../../localization/format/count";
-import { useResolvedSuiteCount } from "../../../state/run-builder/useResolvedSuiteCount";
-import { FormError } from "../../common/error/FormError";
+import { useBatchComposer } from "../../../runs/batches/state/composer/useBatchComposer";
+import { SelectionControls, useSelectionFilters } from "../../cases/selection/controls/SelectionControls";
+import { SelectionTree } from "../../cases/selection/tree/SelectionTree";
 import { Modal } from "../../common/modal/Modal";
-import { AnimatedSelect } from "../../common/select/AnimatedSelect";
-import { RunScopeBuilder } from "../run-scope/RunScopeBuilder";
-import { getRunDialogCopy, type RunDialogCopy } from "./copy";
+import { FormError } from "../../common/error/FormError";
+import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
 import { useRunDismiss } from "../run-motion/useRunDismiss";
+import { RunIterationFields } from "../run-iteration/RunIterationFields";
 import styles from "./RunDialog.module.css";
 
 type Props = {
   data: Bootstrap; project: Project; selectedSuiteId: string; presetCaseIds: string[];
-  selectedSuiteDetail?: Suite | null;
-  offline: boolean; onClose: () => void; onCreated: (run: TestRunSummary) => void;
+  selectedSuiteDetail?: Suite | null; offline: boolean; onClose: () => void;
+  onCreated: (run: TestRunSummary, runs?: TestRunSummary[]) => void;
 };
-
-const runTypeLabel = (copy: RunDialogCopy, type: TestRunSummary["type"]) => ({
-  smoke: copy.smoke, regression: copy.regression, acceptance: copy.acceptance, ad_hoc: copy.adHoc,
-})[type];
-
-export function RunDialog({ data, project, selectedSuiteId, presetCaseIds, selectedSuiteDetail, offline, onClose, onCreated }: Props) {
+export function RunDialog(props: Props) {
+  const { locale } = useTmsLocale(); const ru = locale === "ru";
   const { closing, dismiss, panelRef } = useRunDismiss();
-  const close = () => dismiss(onClose);
-  const http = useTmsHttpClient();
-  const { locale } = useTmsLocale();
-  const copy = getRunDialogCopy(locale);
-  const environments = data.environments.filter((item) => item.projectId === project.id && item.status !== "archived");
-  const suites = data.suites.filter((item) => item.projectId === project.id && item.status === "active");
-  const cases = data.testCases.filter((item) => item.projectId === project.id && !item.archivedAt);
-  const initialSuite = suites.find((item) => item.id === selectedSuiteId);
-  const initialIds = presetCaseIds.filter((id) => cases.some((item) => item.id === id));
-  const presetCase = initialIds.length === 1 ? cases.find((item) => item.id === initialIds[0]) : undefined;
-  const fastCase = Boolean(presetCase && !initialSuite);
-  const initialType: TestRunSummary["type"] = initialIds.length ? "ad_hoc" : "smoke";
-  const [assigneeIdentityId, setAssignee] = useState<string | null>(null);
-  const [suiteId, setSuiteId] = useState(initialSuite?.id ?? "");
-  const [caseIds, setCaseIds] = useState<string[]>(initialIds);
-  const [builderOpen, setBuilderOpen] = useState(!fastCase && !initialSuite);
-  const [environmentId, setEnvironmentId] = useState(environments.find((item) => item.isDefault)?.id ?? environments[0]?.id ?? "");
-  const [type, setType] = useState<TestRunSummary["type"]>(initialType);
-  const [build, setBuild] = useState("");
-  const makeName = (nextType: TestRunSummary["type"], scope?: string) => scope?.trim() || runTypeLabel(copy, nextType);
-  const [name, setName] = useState(() => makeName(initialType, initialSuite?.name ?? presetCase?.title));
-  const [nameEdited, setNameEdited] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const operation = useRef<PendingOperation | null>(null);
-  const environmentField = useRef<HTMLLabelElement>(null);
-  const focusEnvironmentOnMount = useRef(!builderOpen);
-  const selectedSuite = suites.find((item) => item.id === suiteId);
-  const knownSuiteDetail = selectedSuiteDetail?.id === selectedSuite?.id ? selectedSuiteDetail : null;
-  const { count: suiteCount, error: suiteError } = useResolvedSuiteCount(http, selectedSuite, offline, copy.suiteResolveError, knownSuiteDetail);
-  const selectedCases = cases.filter((item) => caseIds.includes(item.id));
-  const selectionCount = selectedSuite ? suiteCount ?? 0 : caseIds.length;
-  const hasSelection = selectionCount > 0;
-  const countLabel = (count: number) => formatCount(locale, count, ["case", "cases"], ["кейс", "кейса", "кейсов"]);
-  const title = copy.title;
-  const subtitle = project.name;
-
-  useEffect(() => {
-    if (focusEnvironmentOnMount.current) environmentField.current?.querySelector("button")?.focus();
-  }, []);
-
-  const changeType = (next: TestRunSummary["type"]) => { setType(next); if (!nameEdited) setName(makeName(next, selectedSuite?.name ?? presetCase?.title)); };
-  const changeBuild = (next: string) => setBuild(next);
-  const changeSuite = (nextId: string) => {
-    setSuiteId(nextId);
-    const nextSuite = suites.find((item) => item.id === nextId);
-    if (!nameEdited) setName(makeName(type, nextSuite?.name));
-  };
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    if (submitting || !hasSelection) return;
-    const environment = environments.find((item) => item.id === environmentId);
-    if (!environment) return;
-    setSubmitting(true); setError("");
-    const signature = JSON.stringify({ assigneeIdentityId, projectId: project.id, environmentId, suiteId: selectedSuite?.id ?? null, caseIds: selectedSuite ? [] : caseIds, name, type, build });
-    operation.current = resolvePendingOperation(operation.current, signature);
-    const result = await createRun({ http, project, environment, suite: selectedSuite, caseIds, name, type, build, offline, assigneeIdentityId, operationKey: operation.current.key });
-    if (!result.ok) { setError(formatTmsMutationFailure(result.failure, copy.createError)); setSubmitting(false); return; }
-    dismiss(() => onCreated(result.run));
-  }
-
-  const targetSection = <section className={styles.section}>
-    <header className={styles.sectionHeading}><div><h3>{copy.targetTitle}</h3></div></header>
-    {environments.length === 0 ? <div className={styles.blocker}><strong>{copy.environmentRequired}</strong><span>{copy.environmentRequiredHint}</span></div> : <div className={styles.targetGrid}>
-      <label ref={environmentField}><span>{copy.environment}</span><AnimatedSelect label={copy.environment} value={environmentId} onChange={setEnvironmentId} options={environments.map((environment) => ({ value: environment.id, label: environment.name }))} /></label>
-      <label><span>{copy.build}</span><span className={styles.inputShell} data-input-shell><input placeholder={locale === "ru" ? "Выберите сборку или напишите номер" : "Choose a build or enter its number"} value={build} onChange={(event) => changeBuild(event.target.value)} /></span></label>
-      <label><span>{copy.type}</span><AnimatedSelect label={copy.type} value={type} onChange={(value) => changeType(value as TestRunSummary["type"])} options={[{ value: "smoke", label: copy.smoke }, { value: "regression", label: copy.regression }, { value: "acceptance", label: copy.acceptance }, { value: "ad_hoc", label: copy.adHoc }]} /></label>
-    </div>}
-  </section>;
-  const scopeSection = <section className={`${styles.section} ${styles.scopeSection}`}>
-    <header className={styles.sectionHeading}><div><h3>{copy.scopeTitle}</h3></div>{(fastCase || initialSuite) && <button type="button" onClick={() => setBuilderOpen((value) => !value)}>{builderOpen ? copy.hideBuilder : fastCase ? copy.addMore : copy.changeScope}<ChevronDown size={13} style={{ transform: builderOpen ? "rotate(180deg)" : undefined }} /></button>}</header>
-    {!builderOpen && !selectedSuite && <div className={`${styles.scopeSummary} ${styles.caseSummary}`}><span><strong>{selectedCases.length === 1 ? selectedCases[0].title : copy.scopeTitle}</strong>{selectedCases.length > 1 && <em>{countLabel(caseIds.length)}</em>}</span></div>}
-    {!builderOpen && selectedSuite && <SuiteSummary suite={selectedSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} />}
-    {builderOpen && <>
-      <label className={styles.sourceField}><span>{copy.source}</span><AnimatedSelect label={copy.source} value={suiteId} onChange={changeSuite} options={[{ value: "", label: copy.customSelection }, ...suites.map((suite) => ({ value: suite.id, label: `${suite.name} · ${suite.type === "dynamic" ? copy.dynamicSuite : copy.staticSuite}` }))]} /></label>
-      {selectedSuite ? <SuiteSummary suite={selectedSuite} copy={copy} count={suiteCount === null ? copy.resolvingSuite : countLabel(suiteCount)} /> : <RunScopeBuilder cases={cases} caseIds={caseIds} setCaseIds={setCaseIds} copy={copy} />}
-    </>}
-    {selectedCases.length > 0 && !fastCase && !selectedSuite && <p className={styles.selectedPreview}>{selectedCases.slice(0, 4).map((item) => item.key).join(", ")}{selectedCases.length > 4 ? ` +${selectedCases.length - 4}` : ""}</p>}
-    {(error || suiteError) && <FormError message={error || suiteError} />}
-  </section>;
-
-  return <Modal title={title} subtitle={subtitle} onClose={close} wide drawer panelClassName={`${styles.runPanel} ${closing ? styles.closing : ""}`}>
-    <form className={styles.form} onSubmit={submit} ref={element => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
-      <div className={styles.body}>
-        <section className={styles.nameSection}><label className={styles.nameField}><span>{copy.name}</span><span data-input-shell className={styles.inputShell}><input required value={name} onChange={(event) => { setNameEdited(true); setName(event.target.value); }} /></span></label></section>
-        {scopeSection}{targetSection}
-        <section className={`${styles.section} ${styles.assigneeSection}`}><h3>{locale === "ru" ? "Ответственный" : "Responsible"}</h3><ResponsiblePicker workspaceId={data.workspace.id} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} /></section>
-        <p className={styles.resultHint}>{copy.targetHint}</p>
+  const state = useBatchComposer(props.data, props.project, props.presetCaseIds, props.offline, ru, props.selectedSuiteId);
+  const filters = useSelectionFilters(state.visibleCases);
+  const selected = new Set(state.caseIds);
+  const close = () => { if (!state.busy) dismiss(props.onClose); };
+  const toggle = (id: string) => state.setCaseIds((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id]);
+  const scope = (ids: readonly string[]) => state.setCaseIds((current) => ids.every((id) => current.includes(id))
+    ? current.filter((id) => !ids.includes(id)) : [...new Set([...current, ...ids])]);
+  const suite = props.data.suites.find((item) => item.id === state.suiteId);
+  return <Modal title={ru ? "Новый прогон" : "New test run"} onClose={close} wide drawer
+    panelClassName={`${styles.runPanel} ${closing ? styles.closing : ""}`}>
+    <form className={styles.form} onSubmit={async (event) => {
+      event.preventDefault(); const batch = await state.submit();
+      if (batch) dismiss(() => props.onCreated(batch.runs[0], batch.runs));
+    }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
+      <div className={styles.body} aria-busy={state.loading || state.busy} inert={state.busy ? true : undefined}>
+        <RunIterationFields state={state} workspaceId={props.data.workspace.id} offline={props.offline} ru={ru} />
+        <div className={styles.projects}><span>{ru ? "Проекты" : "Projects"}</span>
+          <AnimatedMultiSelect label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
+            options={props.data.projects.filter((p) => p.status !== "archived").map((p) => ({ value: p.id, label: p.name }))}
+            allLabel={ru ? "Выберите проекты" : "Choose projects"} selectedLabel={ru ? "Проекты" : "Projects"}
+            onChange={state.setProjectIds} /></div>
+        {suite && <div className={styles.suite}><span>{suite.name}</span><small>{ru ? "Состав набора определит сервер" : "Suite membership is resolved by the server"}</small>
+          <button type="button" aria-label={ru ? "Убрать набор" : "Remove suite"} onClick={() => state.setSuiteId("")}><X size={14} /></button></div>}
+        <SelectionControls state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
+        {state.loading && <p role="status">{ru ? "Загружаем кейсы…" : "Loading cases…"}</p>}
+        {state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
+          folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable
+          disabled={state.loading || (Boolean(suite) && id === props.project.id)} onToggle={toggle} onScope={scope}
+          heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>
+            <span>{filters.visible.filter((c) => c.projectId === id).length}</span></>} />)}
+        {!state.loading && !filters.visible.length && <p className={styles.hint}>{ru ? "Нет подходящих тест-кейсов" : "No matching test cases"}</p>}
+        {state.error && <FormError message={state.error} />}
+        {state.loadFailed && <button type="button" className={styles.secondary} onClick={state.reload}>{ru ? "Повторить загрузку" : "Retry loading"}</button>}
       </div>
-      <footer className={styles.footer}><span className={!hasSelection ? styles.footerWarning : ""}>{hasSelection ? `${copy.selected}: ${countLabel(selectionCount)}` : selectedSuite && suiteCount === null && !suiteError ? copy.resolvingSuite : copy.selectionRequired}</span><div><button type="button" className={styles.cancelButton} onClick={close}>{copy.cancel}</button><button className={styles.startButton} data-testid="start-run" disabled={submitting || !environmentId || !name.trim() || !hasSelection}><Play size={16} />{submitting ? copy.starting : copy.startRun}</button></div></footer>
+      <footer className={styles.footer}><span>{ru ? "Выбрано кейсов" : "Selected cases"}: {state.caseIds.length}{suite ? ` + ${suite.name}` : ""}</span>
+        <button className={styles.primary} type="submit" disabled={state.busy || state.loading || state.loadFailed || (!state.caseIds.length && !suite) || (!state.iterationId && !state.name.trim())}>
+          <Plus size={15} />{state.busy ? (ru ? "Создаём…" : "Creating…") : (ru ? "Создать прогон" : "Create run")}</button></footer>
     </form>
   </Modal>;
-}
-
-function SuiteSummary({ suite, copy, count }: { suite: Bootstrap["suites"][number]; copy: RunDialogCopy; count: string }) {
-  return <div className={styles.scopeSummary}><Layers size={20} strokeWidth={1.5} /><span><small>{suite.type === "dynamic" ? copy.dynamicSuite : copy.staticSuite}</small><strong>{suite.name}</strong><em>{count}</em></span></div>;
 }

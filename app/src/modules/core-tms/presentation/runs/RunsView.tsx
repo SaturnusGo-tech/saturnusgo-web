@@ -1,5 +1,5 @@
 import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, X, XCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
 import { ScenarioMarkdown } from "../cases/inspector/steps/markdown/ScenarioMarkdown";
@@ -14,49 +14,41 @@ import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
-import { RunNavigator, type RunListMode } from "./navigator/RunNavigator";
 import { RunScopeEmpty } from "./empty/RunScopeEmpty";
-import { RunListEmpty } from "./empty/RunListEmpty";
-import { resolveRunListMode, runListSelection, runScopeState } from "./state/run-view-state";
+import { runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
+  navigation: ReactNode; onDirtyChange?: (dirty: boolean) => void;
   workspaceId: string;
   offline: boolean;
-  runs: TestRunSummary[];
   cases: TestCaseSummary[];
   selectedRun: TestRunSummary | null;
   items: RunItemSummary[];
   scopeLoading: boolean;
   selectedItem: RunItem | null;
-  progress: number;
-  onSelectRun: (id: string) => void;
   onSelectItem: (id: string) => void;
-  onCreate: () => void;
   onStepStatus: (stepId: string, status: ExecutionStatus) => void;
   onStepActual: (stepId: string, value: string) => void;
   onSaveStepActual: (stepId: string, status: ExecutionStatus, value: string) => Promise<boolean>;
   onItemStatus: (status: ExecutionStatus) => void;
-  onComplete: () => void;
-  canExecute: boolean; canStart: boolean; startPending: boolean; startError: string; onStart: () => void;
+  canExecute: boolean; startPending: boolean; startError: string; onStart: () => void;
   canArchive: boolean;
   archivePending: boolean;
   onArchive: (run: TestRunSummary) => void;
-  onRestore: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items, scopeLoading, selectedItem, progress, onSelectRun, onSelectItem, onCreate, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, onComplete, canExecute, canStart, startPending, startError, onStart, canArchive, archivePending, onArchive, onRestore, onDefectCreated }: RunsViewProps) {
+export function RunsView({ navigation, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const attachments = useAttachmentClient();
-  const [listSelection, setListSelection] = useState(() => runListSelection(selectedRun));
-  const listMode = resolveRunListMode(listSelection, selectedRun);
   const [evidence, setEvidence] = useState<string[]>([]);
   const [evidenceError, setEvidenceError] = useState("");
   const [reporting, setReporting] = useState(false);
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
+  useEffect(() => { onDirtyChange?.(dirtySteps.length > 0); return () => onDirtyChange?.(false); }, [dirtySteps.length, onDirtyChange]);
   const evidenceOperation = useRef<{ signature: string; key: string } | null>(null);
   useEffect(() => {
     setReporting(false); setDirtySteps([]);
@@ -100,24 +92,10 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
       setEvidenceError(t("runs.evidenceUploadError"));
     }
   }
-  const selectedIsVisible = Boolean(selectedRun && (listMode === "archived" ? selectedRun.archivedAt : !selectedRun.archivedAt));
-  function changeListMode(mode: RunListMode) {
-    setListSelection(runListSelection(selectedRun, mode));
-    const next = runs.find((run) => mode === "archived" ? Boolean(run.archivedAt) : !run.archivedAt);
-    if (next && next.id !== selectedRun?.id) onSelectRun(next.id);
-  }
-  const runNavigator = <RunNavigator
-    runs={runs} cases={cases} selectedRun={selectedIsVisible ? selectedRun : null}
-    items={selectedIsVisible ? items : []} selectedItemId={selectedIsVisible ? selectedItem?.id ?? null : null}
-    scopeLoading={scopeLoading}
-    mode={listMode} onModeChange={changeListMode}
-    onSelectRun={onSelectRun} onSelectItem={onSelectItem} onCreate={onCreate}
-    archivePending={archivePending} onRestore={canArchive ? onRestore : undefined}
-  />;
-  if (selectedRun && selectedIsVisible && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
-  if (selectedRun && selectedIsVisible && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
-  if (!selectedRun || !selectedItem || !selectedIsVisible) return <div className={runStyles.shell} data-testid="runs-view"><RunListEmpty mode={listMode} activeCount={runs.filter((run) => !run.archivedAt).length}
-      archivedCount={runs.filter((run) => Boolean(run.archivedAt)).length} onModeChange={changeListMode} onCreate={onCreate} /></div>;
+  const runNavigator = navigation;
+  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
+  if (selectedRun && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
+  if (!selectedRun || !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{navigation}<div className={runStyles.emptyPane}><RunScopeEmpty /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");
@@ -128,12 +106,11 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
     ...attempt.stepResults.flatMap((result) => result.attachmentIds),
     ...evidence,
   ]));
-  const canComplete = runWritable && dirtySteps.length === 0 && items.every((item) => ["passed", "failed", "blocked", "skipped"].includes(item.status));
   const currentIndex = items.findIndex((item) => item.id === selectedItem.id);
   return <div className={runStyles.shell} data-testid="runs-view">
     {runNavigator}
     <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
-      <RunExecutionHeader run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive} archivePending={archivePending} onArchive={onArchive} canStart={canStart} startPending={startPending} onStart={onStart} />
+      <RunExecutionHeader run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive && !selectedRun.batchId} archivePending={archivePending} onArchive={onArchive} canStart={false} startPending={startPending} onStart={onStart} />
       {startError && <FormError message={startError} />}
       <div className={runStyles.detailContent}>
         <div className={runStyles.overviewLayout}>
@@ -179,8 +156,8 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
             <section className={runStyles.railSection}>
               <header><h2>{locale === "ru" ? "Контекст рана" : "Run context"}</h2></header>
               <dl className={runStyles.runFacts}>
-                <div><dt>{t("runs.environment")}</dt><dd>{selectedRun.environment.name}</dd></div>
-                <div><dt>{t("runs.build")}</dt><dd>{selectedRun.build}</dd></div>
+                <div><dt>{t("runs.environment")}</dt><dd>{selectedRun.environment.name || "-"}</dd></div>
+                <div><dt>{t("runs.build")}</dt><dd>{selectedRun.build || "-"}</dd></div>
                 <div><dt>{locale === "ru" ? "Прогресс" : "Progress"}</dt><dd>{selectedRun.progress.executed} / {selectedRun.itemCount} · {selectedRun.progress.percent}%</dd></div>
               </dl>
             </section>
@@ -194,7 +171,7 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
       <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{t("runs.previous")}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{t("runs.next")}</span><ChevronRight size={16} /></button></div>
       <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={`${styles.secondaryButton} ${runStyles.compactAction}`} aria-label={t("runs.block")} title={t("runs.block")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.compactActionLabel}>{t("runs.block")}</span></button><button className={`${styles.dangerButton} ${runStyles.compactAction}`} aria-label={t("runs.fail")} title={t("runs.fail")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.compactActionLabel}>{t("runs.fail")}</span></button><button className={`${styles.successButton} ${runStyles.compactAction}`} aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={!canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.compactActionLabel}>{t("runs.pass")}</span></button></>}<label className={`${styles.secondaryButton} ${runStyles.wideAction}`} aria-label={t("runs.addEvidence")} title={t("runs.addEvidence")}><Paperclip size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.addEvidence")}</span> {evidence.length > 0 && <span>{evidence.length}</span>}<input id={`run-evidence-${selectedItem.id}`} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => void addEvidence(Array.from(event.target.files ?? []))} /></label>{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
       {evidenceError && <FormError message={evidenceError} />}
-      <div className={runStyles.completion}>{canComplete ? <button className={styles.primaryButton} onClick={onComplete}><CheckCircle2 size={16} /> {t("runs.complete")}</button> : <span>{t("runs.percentComplete", { percent: progress })}</span>}</div>
+
     </footer>}
   </div>;
 }

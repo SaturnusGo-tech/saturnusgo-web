@@ -33,3 +33,4 @@
 .filter > div { left: 0; top: calc(100% + 5px); width: 100%; }
 @container repository-controls (max-width: 400px) { .tools .tool > span { display: none; } }
 @media(prefers-reduced-motion:reduce) { .selection { transition: none; } }
+.controls .tool { border: 0; background: transparent; cursor: pointer; }

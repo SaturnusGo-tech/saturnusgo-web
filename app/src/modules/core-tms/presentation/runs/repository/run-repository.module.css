@@ -1,0 +1,31 @@
+.browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 14px 12px; border-right: 1px solid var(--cases-row-border); background: var(--cases-bg); font-size: 12px; }
+.browser button { cursor: pointer; font: inherit; }
+.newRun, .lifecycle button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 16px; padding: 8px 12px; white-space: nowrap; }
+.newRun, .lifecycle .primary { background: #3574f0; color: white; }
+.runSelection { display: grid; gap: 6px; padding: 12px 0 8px; }
+.runSelection input { border: 0; background: transparent; padding: 5px 8px; color: inherit; font: inherit; outline: none; }
+.runSelection input:focus-visible { outline: 1px solid var(--cases-primary); border-radius: 6px; }
+.lifecycle { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0 12px; color: var(--cases-muted); }
+.lifecycle > div { display: flex; gap: 6px; }
+.lifecycle button { background: var(--cases-hover); color: var(--cases-text); }
+.lifecycle button:disabled { opacity: .45; }
+.grouping { display: flex; gap: 6px; align-items: center; padding-bottom: 8px; }
+.grouping > div { flex: 1; min-width: 0; }
+.grouping > button { border: 0; background: transparent; color: var(--cases-muted); padding: 7px; border-radius: 8px; }
+.scroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
+.empty { padding: 18px 8px; color: var(--cases-muted); }
+.status { display: inline-flex; color: var(--cases-muted); }
+.status svg { width: 16px; height: 16px; }
+.status[data-status=passed] { color: #368667; }
+.status[data-status=failed] { color: #d66c79; }
+.status[data-status=blocked] { color: #c2924d; }
+.status[data-status=in_progress] { color: #3574f0; }
+@media (max-width: 600px) { .browser { padding: 12px 8px; } }
+.status svg { color: inherit !important; }
+
+.assignee { margin-left: auto; max-width: 130px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.assignee > span { max-width: 100%; }
+.assignee > span > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 700px) { .assignee { max-width: 80px; } }
+
+.restore { border: 0; border-radius: 16px; padding: 8px 12px; background: var(--cases-hover); color: var(--cases-text); align-self: flex-start; }

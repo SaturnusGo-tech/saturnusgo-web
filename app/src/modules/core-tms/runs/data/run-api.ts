@@ -92,7 +92,7 @@ export async function createRun(http: TmsHttpClient, body: Api["RunCreateRequest
 export async function transitionRun(
   http: TmsHttpClient,
   runId: string,
-  transition: "start" | "complete" | "abort",
+  transition: "start" | "pause" | "resume" | "complete" | "abort",
   etag: string,
   key: string,
   body?: unknown,

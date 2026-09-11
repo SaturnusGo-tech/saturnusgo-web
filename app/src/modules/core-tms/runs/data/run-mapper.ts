@@ -12,6 +12,7 @@ type Api = components["schemas"];
 
 export function mapRun(dto: Api["Run"]): TestRunSummary {
   return {
+    batchId: dto.batchId, elapsedMilliseconds: dto.elapsedMilliseconds, activeSince: dto.activeSince, measuredAt: dto.measuredAt,
     id: dto.id,
     projectId: dto.projectId,
     key: dto.key,
@@ -46,6 +47,7 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
 
 export function mapRunItemSummary(dto: Api["RunItemSummary"]): RunItemSummary {
   return {
+    preview: dto.preview,
     id: dto.id,
     caseId: dto.caseId,
     caseKey: dto.caseKey,

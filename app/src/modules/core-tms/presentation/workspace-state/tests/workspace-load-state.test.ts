@@ -45,7 +45,7 @@ test("resource hydration uses the branded loader instead of a false empty state"
   assert.match(casesSource, /data-testid="case-detail-error"/);
   assert.match(casesSource, /onClick=\{props\.onRetryDetail\}/);
   assert.match(suitesSource, /!detail \? <TessiqLoader/);
-  assert.match(runsSource, /selectedRun && selectedIsVisible && !selectedItem/);
+  assert.match(runsSource, /selectedRun && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
 });
 
@@ -55,7 +55,7 @@ test("suite and run drawers share the production test-case list", () => {
     "utf8",
   );
   const runScopeSource = readFileSync(
-    new URL("../../dialogs/run-scope/RunScopeBuilder.tsx", import.meta.url),
+    new URL("../../dialogs/run/RunDialog.tsx", import.meta.url),
     "utf8",
   );
   const embeddedListSource = readFileSync(
@@ -68,7 +68,7 @@ test("suite and run drawers share the production test-case list", () => {
   );
 
   assert.match(suiteDialogSource, /<EmbeddedCaseList/);
-  assert.match(runScopeSource, /<EmbeddedCaseList/);
+  assert.match(runScopeSource, /<SelectionTree/);
   assert.match(embeddedListSource, /<LifecycleBadge/);
   assert.match(embeddedListSource, /<PrioritySignal/);
   assert.match(embeddedListSource, /prioritySortButton/);

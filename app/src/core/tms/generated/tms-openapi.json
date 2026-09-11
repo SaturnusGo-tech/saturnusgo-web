@@ -4837,7 +4837,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -14207,6 +14207,459 @@
           "$ref": "#/components/parameters/XRequestId"
         }
       ]
+    },
+    "/runs/{runId}/pause": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/RunIdPath"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "Pause a test run",
+        "operationId": "pauseRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RunResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires an active run."
+      }
+    },
+    "/runs/{runId}/resume": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/RunIdPath"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "Resume a test run",
+        "operationId": "resumeRun",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RunResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Requires a paused run. Preserves its first start timestamp and accumulated duration."
+      }
+    },
+    "/workspaces/{workspaceId}/run-batches": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "listRunBatches",
+        "operationId": "listRunBatches",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A bounded page",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "createRunBatch",
+        "operationId": "createRunBatch",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "201": {
+            "description": "Run summary; items are paginated separately.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunBatchCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/run-iterations": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "listRunIterations",
+        "operationId": "listRunIterations",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A bounded page",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunIterationListEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/run-batches/{batchId}/transition": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "batchId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "transitionRunBatch",
+        "operationId": "transitionRunBatch",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "description": "Run summary; items are paginated separately.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunBatchTransitionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/run-batches/{batchId}": {
+      "get": {
+        "tags": [
+          "Runs"
+        ],
+        "summary": "Get a consistent run batch and current member versions",
+        "operationId": "getRunBatch",
+        "parameters": [],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "description": "Run summary; items are paginated separately.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "batchId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ]
     }
   },
   "components": {
@@ -18062,6 +18515,7 @@
         "enum": [
           "draft",
           "active",
+          "paused",
           "completed",
           "aborted"
         ]
@@ -22733,7 +23187,11 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/Identifier"
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null when no environment was selected."
           },
           "key": {
             "type": "string",
@@ -22855,7 +23313,10 @@
           "archivedBy",
           "archiveReason",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "elapsedMilliseconds",
+          "activeSince",
+          "measuredAt"
         ],
         "properties": {
           "id": {
@@ -22993,6 +23454,32 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "elapsedMilliseconds": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Accumulated active time before activeSince. Paused intervals are excluded."
+          },
+          "activeSince": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Start of the current active interval, or null when not running."
+          },
+          "measuredAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Server observation time for clock-skew independent display."
+          },
+          "batchId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Parent multi-project run. Its lifecycle must be changed through the batch endpoint."
           }
         }
       },
@@ -23345,6 +23832,9 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "preview": {
+            "$ref": "#/components/schemas/RunCasePreview"
           }
         }
       },
@@ -30640,7 +31130,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -31262,7 +31752,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -31364,7 +31854,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -32972,6 +33462,615 @@
                 }
               }
             }
+          }
+        }
+      },
+      "RunIteration": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "tags",
+          "createdAt"
+        ]
+      },
+      "RunBatchMember": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectId",
+          "key",
+          "name",
+          "description",
+          "type",
+          "status",
+          "environment",
+          "suiteId",
+          "suiteResolutionId",
+          "build",
+          "configuration",
+          "itemCount",
+          "progress",
+          "attachmentIds",
+          "createdBy",
+          "startedAt",
+          "completedAt",
+          "abortedAt",
+          "abortReason",
+          "archivedAt",
+          "archivedBy",
+          "archiveReason",
+          "createdAt",
+          "updatedAt",
+          "elapsedMilliseconds",
+          "activeSince",
+          "measuredAt",
+          "rowVersion"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "description": {
+            "$ref": "#/components/schemas/LongText"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RunType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/EnvironmentSnapshot"
+          },
+          "suiteId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suiteResolutionId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Immutable suite resolution used for reproducibility; null for explicit caseIds."
+          },
+          "build": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/StringMap"
+          },
+          "itemCount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Included immutable case snapshots. An impact draft may be empty while QA reviews its scope; approval and start require at least one case."
+          },
+          "progress": {
+            "$ref": "#/components/schemas/RunProgress"
+          },
+          "attachmentIds": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Ready private attachments owned by this run."
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/ActorRef"
+          },
+          "startedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "abortedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "abortReason": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LongText"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "archivedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "archivedBy": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActorRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "archiveReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "elapsedMilliseconds": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Accumulated active time before activeSince. Paused intervals are excluded."
+          },
+          "activeSince": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Start of the current active interval, or null when not running."
+          },
+          "measuredAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Server observation time for clock-skew independent display."
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "batchId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Parent multi-project run. Its lifecycle must be changed through the batch endpoint."
+          }
+        }
+      },
+      "RunBatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "iteration": {
+            "$ref": "#/components/schemas/RunIteration"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunBatchMember"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "iteration",
+          "sequence",
+          "runs",
+          "createdAt"
+        ]
+      },
+      "RunBatchCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "iterationId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "iteration": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 20000
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "selections": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "projectId": {
+                  "$ref": "#/components/schemas/Identifier"
+                },
+                "caseIds": {
+                  "type": "array",
+                  "minItems": 0,
+                  "maxItems": 10000,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Identifier"
+                  }
+                },
+                "suiteId": {
+                  "$ref": "#/components/schemas/Identifier"
+                }
+              },
+              "required": [
+                "projectId"
+              ],
+              "description": "Choose either nonempty caseIds or suiteId. Suite membership is resolved by the server."
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/RunType"
+          },
+          "build": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "assigneeIdentityId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "selections"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "iterationId": {
+                "type": "string"
+              },
+              "iteration": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "iterationId"
+            ]
+          },
+          {
+            "properties": {
+              "iterationId": {
+                "type": "null"
+              },
+              "iteration": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 20000
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            "required": [
+              "iteration"
+            ]
+          }
+        ]
+      },
+      "RunBatchTransitionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "versions": {
+            "type": "object",
+            "maxProperties": 100,
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "transition": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "start",
+                      "pause",
+                      "resume",
+                      "complete"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "abort"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "kind",
+                  "reason"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "versions",
+          "transition"
+        ]
+      },
+      "RunBatchEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RunBatch"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "RunBatchListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunBatch"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "nextCursor"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RunIterationListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunIteration"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "nextCursor"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RunCasePreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "type",
+          "lifecycle",
+          "priority",
+          "component",
+          "tags",
+          "estimatedMinutes",
+          "folderPath"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "checklist",
+              "automated"
+            ],
+            "description": "The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance."
+          },
+          "lifecycle": {
+            "$ref": "#/components/schemas/TestCaseLifecycle"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "component": {
+            "$ref": "#/components/schemas/ShortText"
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+            }
+          },
+          "estimatedMinutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "folderPath": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Folder path captured on creation; null for historical runs without folder snapshots."
           }
         }
       }

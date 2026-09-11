@@ -3672,6 +3672,147 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/runs/{runId}/pause": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause a test run
+         * @description Requires an active run.
+         */
+        post: operations["pauseRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/runs/{runId}/resume": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume a test run
+         * @description Requires a paused run. Preserves its first start timestamp and accumulated duration.
+         */
+        post: operations["resumeRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/run-batches": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** listRunBatches */
+        get: operations["listRunBatches"];
+        put?: never;
+        /** createRunBatch */
+        post: operations["createRunBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/run-iterations": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** listRunIterations */
+        get: operations["listRunIterations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/run-batches/{batchId}/transition": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+                batchId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** transitionRunBatch */
+        post: operations["transitionRunBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/run-batches/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+                batchId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Get a consistent run batch and current member versions */
+        get: operations["getRunBatch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3993,7 +4134,7 @@ export interface components {
         /** @enum {string} */
         RunType: "smoke" | "regression" | "acceptance" | "ad_hoc";
         /** @enum {string} */
-        RunStatus: "draft" | "active" | "completed" | "aborted";
+        RunStatus: "draft" | "active" | "paused" | "completed" | "aborted";
         /** @enum {string} */
         ExecutionStatus: "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
         /** @enum {string} */
@@ -4920,7 +5061,8 @@ export interface components {
             meta: components["schemas"]["PageMeta"];
         };
         EnvironmentSnapshot: {
-            id: components["schemas"]["Identifier"];
+            /** @description Null when no environment was selected. */
+            id: string | null;
             key: string;
             name: string;
             baseUrl: string;
@@ -4973,6 +5115,23 @@ export interface components {
             archiveReason: string | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            /**
+             * Format: int64
+             * @description Accumulated active time before activeSince. Paused intervals are excluded.
+             */
+            elapsedMilliseconds: number;
+            /**
+             * Format: date-time
+             * @description Start of the current active interval, or null when not running.
+             */
+            activeSince: string | null;
+            /**
+             * Format: date-time
+             * @description Server observation time for clock-skew independent display.
+             */
+            measuredAt: string;
+            /** @description Parent multi-project run. Its lifecycle must be changed through the batch endpoint. */
+            batchId?: string | null;
         };
         RunCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -5046,6 +5205,7 @@ export interface components {
             activeAttemptNo: number;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            preview?: components["schemas"]["RunCasePreview"];
         };
         RunItem: components["schemas"]["RunItemSummary"] & {
             snapshot: components["schemas"]["TestCaseRevision"];
@@ -7143,6 +7303,143 @@ export interface components {
                     };
                 }[];
             };
+        };
+        RunIteration: {
+            id: components["schemas"]["Identifier"];
+            name: string;
+            description: string;
+            tags: string[];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        RunBatchMember: {
+            id: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            key: string;
+            name: string;
+            description: components["schemas"]["LongText"];
+            type: components["schemas"]["RunType"];
+            status: components["schemas"]["RunStatus"];
+            environment: components["schemas"]["EnvironmentSnapshot"];
+            suiteId: components["schemas"]["Identifier"] | null;
+            /** @description Immutable suite resolution used for reproducibility; null for explicit caseIds. */
+            suiteResolutionId: components["schemas"]["Identifier"] | null;
+            build: components["schemas"]["ShortText"];
+            configuration: components["schemas"]["StringMap"];
+            /** @description Included immutable case snapshots. An impact draft may be empty while QA reviews its scope; approval and start require at least one case. */
+            itemCount: number;
+            progress: components["schemas"]["RunProgress"];
+            /** @description Ready private attachments owned by this run. */
+            attachmentIds: components["schemas"]["Identifier"][];
+            createdBy: components["schemas"]["ActorRef"];
+            /** Format: date-time */
+            startedAt: string | null;
+            /** Format: date-time */
+            completedAt: string | null;
+            /** Format: date-time */
+            abortedAt: string | null;
+            abortReason: components["schemas"]["LongText"] | null;
+            /** Format: date-time */
+            archivedAt: string | null;
+            archivedBy: components["schemas"]["ActorRef"] | null;
+            archiveReason: string | null;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            /**
+             * Format: int64
+             * @description Accumulated active time before activeSince. Paused intervals are excluded.
+             */
+            elapsedMilliseconds: number;
+            /**
+             * Format: date-time
+             * @description Start of the current active interval, or null when not running.
+             */
+            activeSince: string | null;
+            /**
+             * Format: date-time
+             * @description Server observation time for clock-skew independent display.
+             */
+            measuredAt: string;
+            rowVersion: number;
+            /** @description Parent multi-project run. Its lifecycle must be changed through the batch endpoint. */
+            batchId?: string | null;
+        };
+        RunBatch: {
+            id: components["schemas"]["Identifier"];
+            iteration: components["schemas"]["RunIteration"];
+            sequence: number;
+            runs: components["schemas"]["RunBatchMember"][];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        RunBatchCreateRequest: {
+            iterationId?: string | null;
+            iteration?: {
+                name: string;
+                description?: string;
+                tags?: string[];
+            } | null;
+            selections: {
+                projectId: components["schemas"]["Identifier"];
+                caseIds?: components["schemas"]["Identifier"][];
+                suiteId?: components["schemas"]["Identifier"];
+            }[];
+            type?: components["schemas"]["RunType"];
+            build?: string;
+            assigneeIdentityId?: string | null;
+        } & ({
+            iterationId: string;
+            iteration?: null;
+        } | {
+            iterationId?: null;
+            iteration: {
+                name: string;
+                description?: string;
+                tags?: string[];
+            };
+        });
+        RunBatchTransitionRequest: {
+            versions: {
+                [key: string]: number;
+            };
+            transition: {
+                /** @enum {string} */
+                kind: "start" | "pause" | "resume" | "complete";
+            } | {
+                /** @constant */
+                kind: "abort";
+                reason: string;
+            };
+        };
+        RunBatchEnvelope: {
+            data: components["schemas"]["RunBatch"];
+        };
+        RunBatchListEnvelope: {
+            data: components["schemas"]["RunBatch"][];
+            meta: {
+                nextCursor: string | null;
+            };
+        };
+        RunIterationListEnvelope: {
+            data: components["schemas"]["RunIteration"][];
+            meta: {
+                nextCursor: string | null;
+            };
+        };
+        RunCasePreview: {
+            title: string;
+            /**
+             * @description The server validates the fully resolved revision. Automated revisions require at least one complete step and an empty checklist; manual revisions keep their existing zero-step allowance.
+             * @enum {string}
+             */
+            type: "manual" | "checklist" | "automated";
+            lifecycle: components["schemas"]["TestCaseLifecycle"];
+            priority: components["schemas"]["Priority"];
+            component: components["schemas"]["ShortText"];
+            tags: string[];
+            estimatedMinutes: number | null;
+            /** @description Folder path captured on creation; null for historical runs without folder snapshots. */
+            folderPath: string | null;
         };
     };
     responses: {
@@ -15313,6 +15610,238 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    pauseRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["RunResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resumeRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                runId: components["parameters"]["RunIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["RunResponse"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listRunBatches: {
+        parameters: {
+            query?: {
+                cursor?: components["schemas"]["Identifier"];
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunBatchListEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createRunBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunBatchCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Run summary; items are paginated separately. */
+            201: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunBatchEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listRunIterations: {
+        parameters: {
+            query?: {
+                cursor?: components["schemas"]["Identifier"];
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunIterationListEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    transitionRunBatch: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+                batchId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunBatchTransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Run summary; items are paginated separately. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunBatchEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRunBatch: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+                batchId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Run summary; items are paginated separately. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunBatchEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };

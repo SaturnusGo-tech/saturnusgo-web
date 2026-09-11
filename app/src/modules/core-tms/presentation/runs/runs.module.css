@@ -1,4 +1,6 @@
 .shell {
+  --cases-bg: var(--runs-bg);
+  --cases-row-border: var(--runs-row-border);
   --cases-text: var(--runs-text);
   --cases-strong: var(--runs-strong);
   --cases-secondary-text: var(--runs-secondary);

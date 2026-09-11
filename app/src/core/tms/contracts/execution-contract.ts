@@ -67,6 +67,7 @@ export type RunAttemptSummary = {
 export type RunAttempt = RunAttemptSummary & { stepResults: StepResult[] };
 
 export type RunItemSummary = {
+  preview?: Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
   id: string;
   caseId: string;
   caseKey: string;
@@ -92,14 +93,18 @@ export type RunProgress = {
 };
 
 export type TestRunSummary = {
+  batchId?: string | null;
+  elapsedMilliseconds?: number;
+  activeSince?: string | null;
+  measuredAt?: string;
   id: string;
   projectId: string;
   key: string;
   name: string;
   description: string;
   type: "smoke" | "regression" | "acceptance" | "ad_hoc";
-  status: "draft" | "active" | "completed" | "aborted";
-  environment: { id: string; key: string; name: string; baseUrl: string };
+  status: "draft" | "active" | "paused" | "completed" | "aborted";
+  environment: { id: string | null; key: string; name: string; baseUrl: string };
   suiteId: string | null;
   build: string;
   configuration: Record<string, string>;

@@ -4,7 +4,7 @@ import { mapRun } from "../../../../runs/data/run-mapper";
 
 export const dto: components["schemas"]["Run"] = {
   id: "run-1", projectId: "project-1", key: "QA-TR-1", name: "Source checks", description: "",
-  type: "smoke", status: "draft", environment: { id: "env-1", key: "QA", name: "QA",
+  type: "smoke", status: "draft", elapsedMilliseconds: 0, activeSince: null, measuredAt: "2026-09-11T00:00:00.000Z", environment: { id: "env-1", key: "QA", name: "QA",
     baseUrl: "https://qa.example.test", variableKeys: [] },
   suiteId: null, suiteResolutionId: null, build: "sha-a", configuration: {}, itemCount: 1,
   progress: { total: 1, executed: 0, percent: 0,
@@ -22,7 +22,7 @@ export function response(run = dto, etag: string | null = '"run-1:2"') {
     status: 200, headers: etag ? { etag } : undefined,
   });
 }
-export const active = () => response({ ...dto, status: "active", startedAt: dto.createdAt });
+export const active = () => response({ ...dto, status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z", startedAt: dto.createdAt });
 export function stale() {
   return new Response(JSON.stringify({ error: {
     code: "PRECONDITION_FAILED", message: "The run changed", requestId: "request-stale",

@@ -1,0 +1,7 @@
+.root { width: 100%; flex: initial; padding: 0; border: 0; background: transparent; }
+.root > div:last-child { overflow: visible; }
+.heading { display: flex; gap: 7px; align-items: center; padding: 14px 6px 9px; font-size: 12px; font-weight: 600; }
+.root[data-readonly] input[type=checkbox] { display: none; }
+.root[data-readonly] li > div:first-child, .root[data-readonly] li:has(> button) { grid-template-columns: 20px minmax(0,1fr) 21px; }
+.root[data-readonly] li > button { grid-column: 2 / -1; }
+.root { max-height: none; }

@@ -132,12 +132,12 @@
     "height": 814
   },
   "execute-03-complete-action": {
-    "width": 1087,
-    "height": 814
+    "width": 563,
+    "height": 875
   },
   "execute-04-completed": {
-    "width": 1087,
-    "height": 814
+    "width": 563,
+    "height": 875
   },
   "github-01-connection": {
     "width": 1087,
@@ -212,20 +212,20 @@
     "height": 1024
   },
   "run-01-library": {
-    "width": 1280,
-    "height": 720
+    "width": 940,
+    "height": 900
   },
   "run-02-scope": {
-    "width": 1280,
-    "height": 720
+    "width": 940,
+    "height": 900
   },
   "run-03-target": {
-    "width": 1280,
-    "height": 720
+    "width": 940,
+    "height": 900
   },
   "run-04-started": {
-    "width": 1087,
-    "height": 814
+    "width": 563,
+    "height": 874
   },
   "settings-01-general": {
     "width": 1280,

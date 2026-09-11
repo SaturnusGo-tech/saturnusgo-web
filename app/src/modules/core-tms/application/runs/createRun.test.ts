@@ -8,7 +8,7 @@ type Api = components["schemas"];
 const time = "2026-08-29T00:00:00.000Z";
 const runDto: Api["Run"] = {
   id: "run-1", projectId: "project-1", key: "TMS-TR-1", name: "Smoke", description: "",
-  type: "smoke", status: "active",
+  type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
   environment: { id: "environment-1", key: "QA", name: "QA",
     baseUrl: "https://example.test", variableKeys: [] },
   suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 1,

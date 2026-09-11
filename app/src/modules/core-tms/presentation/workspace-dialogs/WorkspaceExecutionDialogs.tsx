@@ -1,5 +1,4 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import { localizedLabel } from "../../localization/format/labels";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { DefectDialog } from "../dialogs/defect/DefectDialog";
 import { EnvironmentDialog } from "../dialogs/environment/EnvironmentDialog";
@@ -52,20 +51,19 @@ export function WorkspaceExecutionDialogs({
           model.setRunPresetSuiteId("");
           close();
         }}
-        onCreated={(run) => {
+        onCreated={(run, runs = [run]) => {
           model.setData((current) => ({
             ...current,
-            runs: [...current.runs, run],
+            runs: [...current.runs, ...runs],
           }));
+          model.setProjectId(run.projectId);
           model.setSelectedRunId(run.id);
           model.setSelectedRunItemId(null);
           model.setRunPresetCaseIds([]);
           model.setRunPresetSuiteId("");
           model.setView("runs");
           close();
-          model.notify(t("actions.runStarted", {
-            type: localizedLabel(locale, run.type), count: run.itemCount,
-          }));
+          model.notify(locale === "ru" ? "Прогон создан" : "Run created");
         }}
       />
     );

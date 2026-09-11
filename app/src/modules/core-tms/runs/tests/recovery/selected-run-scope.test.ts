@@ -7,7 +7,7 @@ import { loadSelectedRun } from "../../../state/run-resource/load-selected-run";
 const time = "2026-09-07T00:00:00.000Z";
 const run: components["schemas"]["Run"] = {
   id: "run-1", projectId: "project-1", key: "TMS-TR-1", name: "Smoke", description: "",
-  type: "smoke", status: "active",
+  type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
   environment: { id: "env-1", key: "QA", name: "QA", baseUrl: "https://qa.test", variableKeys: [] },
   suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 0,
   progress: { total: 0, executed: 0, percent: 0,
