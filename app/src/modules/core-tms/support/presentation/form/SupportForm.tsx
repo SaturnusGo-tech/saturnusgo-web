@@ -13,7 +13,7 @@ export function SupportForm({model:m,ru,pageUrl,capture,capturing,screenshot,onC
     onDragOver={e=>{if(e.dataTransfer.types.includes('Files')){e.preventDefault();e.dataTransfer.dropEffect='copy';}}}
     onDrop={e=>{if(e.dataTransfer.files.length){e.preventDefault();m.add(Array.from(e.dataTransfer.files));}}}
     onPasteCapture={e=>{if(e.clipboardData.files.length){e.preventDefault();e.stopPropagation();m.add(Array.from(e.clipboardData.files));}}}>
-    <fieldset disabled={m.busy} className={css.fields}>
+    <fieldset ref={element=>{if(element)element.inert=m.busy;}} disabled={m.busy} className={css.fields}>
       <div className={css.kinds} role="group" aria-label={ru?'Тип обращения':'Request type'}>
         {([['question',CircleHelp,ru?'Вопрос':'Question'],['bug',Bug,ru?'Баг':'Bug'],['improvement',Lightbulb,ru?'Улучшение':'Improvement']] as const).map(([kind,Icon,label])=>
           <button type="button" key={kind} aria-pressed={m.kind===kind} onClick={()=>m.setKind(kind)}><Icon size={19}/>{label}</button>)}
