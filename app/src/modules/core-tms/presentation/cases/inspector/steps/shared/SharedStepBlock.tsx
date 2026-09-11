@@ -6,7 +6,7 @@ import type { SharedStepSnapshot } from "../../../../../../../core/tms/contracts
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import { StepActionMenu } from "../menu/StepActionMenu";
 import { SavedScenarioAttachments } from "../support/ScenarioAttachments";
-import { splitScenarioAction } from "../support/scenarioLines";
+import { ScenarioMarkdown } from "../markdown/ScenarioMarkdown";
 import css from "./sharedStepBlock.module.css";
 
 export function SharedStepBlock({
@@ -44,18 +44,16 @@ export function SharedStepBlock({
     </header>
     {!collapsed && <div className={css.items}>
       {snapshot.items.map((item, itemIndex) => <div className={css.item} key={item.id}>
-        {splitScenarioAction(item.action).filter((line, index) => index === 0 || line.trim())
-          .map((line, lineIndex) => <div className={css.line} key={`${item.id}-${lineIndex}`}>
-            <span>{lineIndex === 0 ? `${order}.${itemIndex + 1}`
-              : `${order}.${itemIndex + 1}.${lineIndex}`}</span>
-            <p>{line || (ru ? "Действие не указано" : "No action")}</p>
-          </div>)}
+        <div className={css.line}>
+          <span>{order}.{itemIndex + 1}</span>
+          <ScenarioMarkdown value={item.action || (ru ? "Действие не указано" : "No action")} label={ru ? "Действие" : "Action"} />
+        </div>
         {item.expectedResult && <div className={css.expected}>
           <b>{ru ? "Ожидаемый результат" : "Expected result"}</b>
-          <p>{item.expectedResult}</p>
+          <ScenarioMarkdown value={item.expectedResult} label={ru ? "Ожидаемый результат" : "Expected result"} />
         </div>}
         {item.testData && <div className={css.data}><b>{ru ? "Тестовые данные" : "Test data"}</b>
-          <p>{item.testData}</p></div>}
+          <ScenarioMarkdown value={item.testData} label={ru ? "Тестовые данные" : "Test data"} /></div>}
         <SavedScenarioAttachments ids={item.attachmentIds} />
       </div>)}
     </div>}

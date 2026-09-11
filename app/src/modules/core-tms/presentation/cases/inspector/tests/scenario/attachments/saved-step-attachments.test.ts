@@ -25,6 +25,8 @@ function load(path: string) {
       SavedScenarioAttachments: ({ ids }: { ids?: string[] }) => React.createElement("div", {},
         ...((ids ?? []).map((id) => React.createElement("span", { key: id, "data-attachment": id }, id)))),
     };
+    if (name.endsWith("ScenarioMarkdownInput")) return { ScenarioMarkdownInput: () => null };
+    if (name.endsWith("ScenarioMarkdown")) return { ScenarioMarkdown: () => null };
     if (name.endsWith("ScenarioTextInput")) return { ScenarioTextInput: () => null };
     if (name.endsWith("StepActionMenu")) return { StepActionMenu: () => null };
     throw new Error(`Unexpected import ${name}`);

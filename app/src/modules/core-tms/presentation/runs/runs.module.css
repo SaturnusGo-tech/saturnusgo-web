@@ -1,4 +1,13 @@
 .shell {
+  --cases-text: var(--runs-text);
+  --cases-strong: var(--runs-strong);
+  --cases-secondary-text: var(--runs-secondary);
+  --cases-muted: var(--runs-muted);
+  --cases-hover: var(--runs-hover);
+  --cases-raised: var(--runs-raised);
+  --cases-control-border: var(--runs-border-strong);
+  --cases-primary: var(--runs-primary);
+  --cases-link: var(--runs-link);
   --runs-bg: #fff;
   --runs-deep: #f4f5f7;
   --runs-raised: #f7f8fa;

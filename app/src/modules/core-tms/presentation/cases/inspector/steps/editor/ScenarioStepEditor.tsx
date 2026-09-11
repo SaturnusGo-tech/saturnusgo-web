@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState, type KeyboardEvent, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { TestStep } from "../../../../../../../core/tms/contracts/legacy-contract";
 import type { SharedStepSummary } from "../../../../../shared-steps/model/shared-step";
 import {
@@ -9,16 +9,8 @@ import {
   SavedScenarioAttachments,
   useScenarioAttachments,
 } from "../support/ScenarioAttachments";
-import { ScenarioTextInput } from "./ScenarioTextInput";
+import { ScenarioMarkdownInput } from "../markdown/ScenarioMarkdownInput";
 import { StepActionMenu } from "../menu/StepActionMenu";
-import {
-  insertScenarioLine,
-  joinScenarioAction,
-  removeScenarioLine,
-  replaceScenarioLine,
-  scenarioLineLabel,
-  splitScenarioAction,
-} from "../support/scenarioLines";
 import css from "../scenarioSteps.module.css";
 
 type Props = {
@@ -40,7 +32,6 @@ type Props = {
 
 export function ScenarioStepEditor(props: Props) {
   const [collapsed, setCollapsed] = useState(false);
-  const lines = splitScenarioAction(props.step.action);
   const actionAttachments = useScenarioAttachments({
     fieldKey: `step:${props.step.id}:action`,
     stepId: props.step.id,
@@ -54,32 +45,6 @@ export function ScenarioStepEditor(props: Props) {
     stepId: props.step.id,
   });
 
-  function focusLine(index: number) {
-    requestAnimationFrame(() => {
-      document.getElementById(`scenario-${props.step.id}-${index}`)?.focus();
-    });
-  }
-
-  function updateLine(index: number, value: string) {
-    const replacementCount = value.replace(/\r\n?/g, "\n").split("\n").length;
-    props.onChange({ action: joinScenarioAction(replaceScenarioLine(lines, index, value)) });
-    if (replacementCount > 1) focusLine(index + replacementCount - 1);
-  }
-
-  function handleLineKey(event: KeyboardEvent<HTMLTextAreaElement>, index: number) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      props.onChange({ action: joinScenarioAction(insertScenarioLine(lines, index)) });
-      focusLine(index + 1);
-      return;
-    }
-    if (event.key === "Backspace" && index > 0 && lines[index] === "") {
-      event.preventDefault();
-      props.onChange({ action: joinScenarioAction(removeScenarioLine(lines, index)) });
-      focusLine(index - 1);
-    }
-  }
-
   return <article className={css.stepGroup}>
     <div className={css.stepMenu}><StepActionMenu ru={props.ru}
       sharedSteps={props.sharedSteps} canRemove={props.canRemove}
@@ -87,32 +52,25 @@ export function ScenarioStepEditor(props: Props) {
       onAdd={props.onAddAfter} onInsertShared={props.onInsertShared}
       onDuplicate={props.onDuplicate} onRemove={props.onRemove} /></div>
     <div className={css.actionLines}>
-      {(collapsed ? lines.slice(0, 1) : lines).map((line, lineIndex) => <div
-        data-input-shell className={`${css.actionLine} ${lineIndex === 0 ? css.primaryLine : css.nestedLine}`}
-        key={`${props.step.id}-${lineIndex}`}>
-        {lineIndex === 0 && <button type="button" className={css.collapseButton}
+      <div data-input-shell className={`${css.actionLine} ${css.primaryLine}`}>
+        <button type="button" className={css.collapseButton}
           aria-expanded={!collapsed}
           aria-label={collapsed
             ? (props.ru ? `Развернуть шаг ${props.order}` : `Expand step ${props.order}`)
             : (props.ru ? `Свернуть шаг ${props.order}` : `Collapse step ${props.order}`)}
           onClick={() => setCollapsed((value) => !value)}>
           {collapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
-        </button>}
-        <span className={css.lineNumber}>{scenarioLineLabel(props.order, lineIndex)}</span>
-        <ScenarioTextInput
-          id={`scenario-${props.step.id}-${lineIndex}`}
-          value={line}
-          label={`${props.ru ? "Шаг" : "Step"} ${scenarioLineLabel(props.order, lineIndex)}`}
-          placeholder={lineIndex === 0
-            ? (props.ru ? "Название шага" : "Step title")
-            : (props.ru ? "Технический подшаг" : "Technical substep")}
-          autoFocus={props.autoFocus && lineIndex === 0}
-          className={css.lineInput}
-          onChange={(value) => updateLine(lineIndex, value)}
-          onKeyDown={(event) => handleLineKey(event, lineIndex)}
-          onPaste={actionAttachments.paste}
-        />
-      </div>)}
+        </button>
+        <span className={css.lineNumber}>{props.order}</span>
+        {collapsed ? <p className={css.collapsedCopy}>{props.step.action.split("\n")[0] || (props.ru ? "Шаг" : "Step")}</p>
+          : <ScenarioMarkdownInput
+            id={`scenario-${props.step.id}-0`} ru={props.ru}
+            value={props.step.action} label={`${props.ru ? "Шаг" : "Step"} ${props.order}`}
+            placeholder={props.ru ? "Действие или запрос" : "Action or request"}
+            autoFocus={props.autoFocus}
+            onChange={(action) => props.onChange({ action })}
+            onPaste={actionAttachments.paste} />}
+      </div>
       {!collapsed && !props.attachmentScope && <div className={css.actionAttachmentRow}>
         <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />
       </div>}
@@ -120,12 +78,11 @@ export function ScenarioStepEditor(props: Props) {
 
     {!collapsed && <div className={css.expectedBlock} data-input-shell>
       <span className={css.expectedLabel}>{props.ru ? "Ожидаемый результат" : "Expected result"}</span>
-      <ScenarioTextInput
+      <ScenarioMarkdownInput ru={props.ru}
         id={`scenario-${props.step.id}-expected`}
         value={props.step.expectedResult}
         label={`${props.ru ? "Ожидаемый результат шага" : "Expected result for step"} ${props.order}`}
         placeholder={props.ru ? "Что должно произойти" : "What should happen"}
-        className={css.expectedInput}
         onChange={(expectedResult) => props.onChange({ expectedResult })}
         onPaste={expectedAttachments.paste}
       />
@@ -133,11 +90,10 @@ export function ScenarioStepEditor(props: Props) {
     </div>}
 
     {!collapsed && (props.step.testData || (!props.attachmentScope && dataAttachments.pending.length > 0)) && <div className={css.optionalData} data-input-shell>
-      <ScenarioTextInput
+      <ScenarioMarkdownInput ru={props.ru}
         value={props.step.testData ?? ""}
         label={`${props.ru ? "Тестовые данные шага" : "Test data for step"} ${props.order}`}
-        placeholder={props.ru ? "Тестовые данные — необязательно" : "Test data — optional"}
-        className={css.dataInput}
+        placeholder={props.ru ? "Тестовые данные (необязательно)" : "Test data (optional)"}
         onChange={(testData) => props.onChange({ testData })}
         onPaste={dataAttachments.paste}
       />

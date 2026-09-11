@@ -1,0 +1,32 @@
+.input { min-width: 0; border-radius: 8px; transition: background-color 160ms ease; }
+.input[data-editing="true"] { background: color-mix(in srgb, var(--cases-hover) 45%, transparent); }
+.input textarea { display: block; width: 100%; min-height: 26px; max-height: 240px; padding: 3px 6px; resize: none; overflow: auto; scrollbar-width: thin; border: 0; border-radius: 8px; outline: 0 !important; box-shadow: none !important; background: transparent !important; color: var(--cases-text); font: inherit; font-size: 13px; line-height: 1.5; tab-size: 2; }
+.input textarea[data-code="true"] { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.input textarea[hidden] { display: none; }
+.input textarea::placeholder { color: var(--cases-faint); }
+.toolbarReveal { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 160ms ease, opacity 160ms ease, visibility 160ms; }
+.toolbarReveal > div { overflow: hidden; min-height: 0; }
+.input[data-editing="true"] .toolbarReveal { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
+.toolbar { display: flex; align-items: center; gap: 2px; padding: 3px 4px 1px; }
+.toolbar button, .edit { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 0; border-radius: 7px; padding: 0; color: var(--cases-muted); background: transparent; cursor: pointer; }
+.toolbar button:hover, .edit:hover { background: var(--cases-hover); color: var(--cases-primary); }
+.toolbar button:focus-visible, .edit:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 1px; }
+.toolbar .done { margin-left: auto; color: var(--cases-primary); }
+.preview { position: relative; min-height: 26px; padding: 3px 28px 3px 6px; cursor: text; }
+.edit { position: absolute; right: 2px; top: 2px; opacity: 0; transition: opacity 160ms ease; }
+.input:hover .edit, .input:focus-within .edit { opacity: 1; }
+.rendered { min-width: 0; color: var(--cases-secondary-text); overflow-wrap: anywhere; }
+.rendered :global(.wmde-markdown) { min-width: 0; background: transparent !important; color: inherit !important; font: inherit; font-size: 13px; line-height: 1.5 !important; }
+.rendered :global(.wmde-markdown) :is(p,ul,ol,blockquote,pre,table) { margin: 0 0 6px !important; }
+.rendered :global(.wmde-markdown) > :last-child { margin-bottom: 0 !important; }
+.rendered :global(.wmde-markdown) p { white-space: pre-wrap; }
+.rendered :global(.wmde-markdown) :is(h1,h2,h3,h4,h5,h6) { font-size: 13px; font-weight: 600; border: 0; margin: 6px 0 3px; padding: 0; }
+.rendered :global(.wmde-markdown) pre { max-height: 224px; overflow: auto; padding: 8px 10px !important; border: 0; border-radius: 8px; background: var(--cases-hover) !important; scrollbar-width: thin; }
+.rendered :global(.wmde-markdown) code { font-size: 12px; color: var(--cases-text); background: var(--cases-hover); border-radius: 4px; }
+.rendered :global(.wmde-markdown) pre code { white-space: pre; background: transparent !important; }
+.rendered :global(.wmde-markdown) table { display: block; width: max-content; max-width: 100%; overflow: auto; }
+.rendered :global(.wmde-markdown) :is(th,td) { padding: 4px 7px; border-color: var(--cases-control-border); background: transparent; }
+.rendered :global(.wmde-markdown) tr { background: transparent; }
+.rendered :global(.wmde-markdown) blockquote { padding-left: 9px; border-left: 2px solid var(--cases-primary); color: var(--cases-muted); }
+@media (hover: none) { .edit { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .input, .toolbarReveal, .edit { transition: none; } }

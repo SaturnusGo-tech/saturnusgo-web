@@ -120,11 +120,6 @@
   opacity: .76;
 }
 
-.actionLine:hover,
-.expectedBlock:hover,
-.optionalData:hover {
-  background: color-mix(in srgb, var(--cases-hover) 54%, transparent);
-}
 
 .lineInput:focus,
 .expectedInput:focus,
@@ -393,3 +388,10 @@
     margin-left: 38px;
   }
 }
+
+.collapsedCopy { margin: 0; padding: 3px 6px; color: var(--cases-secondary-text); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actionLines > .primaryLine { padding-right: 28px; }
+
+.stepGroup :is(.actionLine, .expectedBlock, .optionalData)[data-input-shell]:is(:hover, :focus-within) { box-shadow: none !important; outline: none !important; }
+
+.stepGroup .expectedBlock[data-input-shell] { border-color: #278c7b !important; border-radius: 0; }

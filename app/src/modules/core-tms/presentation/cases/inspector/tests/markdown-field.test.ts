@@ -144,12 +144,10 @@ test("section snapshots and rich field labels remain interaction-safe", () => {
   assert.doesNotMatch(scenarioStep, /MarkdownField/);
 });
 
-test("scenario editing is a clean hierarchical sheet instead of boxed Markdown fields", () => {
-  assert.match(scenarioStep, /scenarioLineLabel\(props\.order, lineIndex\)/);
-  assert.match(scenarioStep, /event\.key === "Enter"/);
-  assert.match(scenarioStep, /insertScenarioLine/);
-  assert.match(scenarioStep, /event\.key === "Backspace"/);
-  assert.match(scenarioStep, /removeScenarioLine/);
+test("scenario editing keeps one compact field per action and preserves Markdown across newlines", () => {
+  assert.match(scenarioStep, /value=\{props\.step\.action\}/);
+  assert.match(scenarioStep, /ScenarioMarkdownInput/);
+  assert.doesNotMatch(scenarioStep, /insertScenarioLine|removeScenarioLine/);
   assert.match(scenarioStep, /Ожидаемый результат/);
   assert.match(scenarioStep, /ScenarioAttachmentControls/);
   assert.match(scenarioStep, /onPaste=\{actionAttachments\.paste\}/);

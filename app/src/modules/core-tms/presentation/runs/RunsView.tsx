@@ -2,6 +2,7 @@ import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, Paperclip, X,
 import { useEffect, useRef, useState } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
+import { ScenarioMarkdown } from "../cases/inspector/steps/markdown/ScenarioMarkdown";
 import { StepActualEditor } from "./actual/StepActualEditor";
 import { uploadEvidence } from "../../application/evidence/uploadEvidence";
 import { useAttachmentClient } from "../../attachments/presentation/context/AttachmentClientProvider";
@@ -83,8 +84,7 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
         evidenceOperation.current = { signature, key: crypto.randomUUID() };
       }
       const uploaded = await uploadEvidence({
-        client: attachments,
-        projectId: selectedRun.projectId,
+        client: attachments, projectId: selectedRun.projectId,
         owner: {
           kind: "run_attempt",
           runId: selectedRun.id,
@@ -155,10 +155,10 @@ export function RunsView({ workspaceId, offline, runs, cases, selectedRun, items
                   return <article className={`${runStyles.step} ${runStyles[`step_${status}`]}`} key={step.id} role="row" aria-rowindex={index + 1}>
                     <div className={runStyles.stepTop}>
                       <span className={runStyles.stepNumber} role="cell">{step.order}</span>
-                      <div className={runStyles.stepAction} role="cell"><span>{step.action}</span></div>
+                      <div className={runStyles.stepAction} role="cell"><ScenarioMarkdown value={step.action} label={locale === "ru" ? "Действие" : "Action"} /></div>
                       <span className={`${runStyles.executionBadge} ${runStyles[`execution_${status}`]}`}>{statusIcon[status]}{localizedLabel(locale, status)}</span>
                     </div>
-                    <div className={runStyles.stepExpected} role="cell"><small>{t("runs.expected")}</small><span>{step.expectedResult || "—"}</span></div>
+                    <div className={runStyles.stepExpected} role="cell"><small>{t("runs.expected")}</small><ScenarioMarkdown value={step.expectedResult || "—"} label={t("runs.expected")} /></div>
                     <div className={runStyles.stepActual} role="cell"><small>{t("runs.actual")}</small>{["passed", "failed", "blocked"].includes(status) && attemptWritable ? <StepActualEditor key={`${selectedItem.id}:${attempt.attemptNo}:${step.id}`} order={step.order} value={result?.actualResult ?? ""} onChange={(value) => onStepActual(step.id, value)} onSave={(value) => onSaveStepActual(step.id, status, value)} onDirtyChange={(dirty) => { if (currentEditScope.current === editScope) setDirtySteps((current) => dirty ? Array.from(new Set([...current, step.id])) : current.filter((id) => id !== step.id)); }} /> : <span>{result?.actualResult || "—"}</span>}</div>
                     {attemptWritable && <div className={runStyles.stepActions} role="cell"><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} disabled={dirtySteps.length > 0} className={status === "passed" ? runStyles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} disabled={dirtySteps.length > 0} className={status === "failed" ? runStyles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} disabled={dirtySteps.length > 0} className={status === "blocked" ? runStyles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
                   </article>;

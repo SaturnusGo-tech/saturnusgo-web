@@ -46,3 +46,9 @@ Evidence: `/tmp/falcon-comment-preview/defect-webkit-1789119619035-mobile.png` a
 Moved the reply recipient tray inside the shared editor frame. The editor and tray now share one outer border; the tray uses an 11px inner bottom radius inside the 12px frame. Removed the negative-margin join. No overflow clipping was introduced, so editor and mention menus remain unrestricted.
 
 Validated actual shared bug-report composer in Chrome and WebKit, light and dark themes. Removing the recipient hides the tray and preserves the draft. Typecheck, architecture (928 files), and diff whitespace checks passed. Screenshots: `/tmp/falcon-comment-preview/reply-tray-chrome-light.png`, `/tmp/falcon-comment-preview/reply-tray-webkit-dark.png`.
+
+## Compact Markdown scenario fields, 2026-09-11
+
+Scenario actions now edit as one multiline string instead of splitting each newline into an independent input. The shared compact field exposes bold, inline code, fenced code, and list tools while editing; otherwise it renders Markdown with a pencil. Expected results and existing step data use the same field. Original IDs, attachment ownership, revision strings, and save transport remain unchanged. Shared-step snapshots and run execution render the same Markdown. Updated authoring documentation.
+
+Chrome and WebKit checks on actual ScenarioStepEditor/ScenarioStepView: multiline JSON and tables, formatting a selected request, new empty case, Enter within a step, Escape, editing and saving/reloading a local fixture, light/dark themes, mobile width, no browser exceptions. Screenshots in `/tmp/falcon-step-preview/`. The fixture stores revisions locally; it does not claim a production write. Typecheck and architecture passed (932 files); 20 focused Markdown/attachment tests plus related run/documentation/scenario tests passed. Attachment upload and backend contracts were not changed.
