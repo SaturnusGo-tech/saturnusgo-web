@@ -31,7 +31,7 @@ export function RunRepositoryBrowser({ model, repository, draftDirty = false, li
       onChoose={id=>{const next=browser.choices.find(c=>c.id===id)?.runs[0];if(next)choose(next.id,next.projectId);}}/>
     <SelectionControls disabled={lifecycleBlocked} inline state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
       onSelectAll={assignments.selecting && canAssign && !assignments.busy ? () => assignments.toggleScope(visible.map((c) => c.id)) : undefined}
-      tools={<button type="button" className={css.refresh} aria-label={ru ? "Обновить" : "Refresh"} onClick={browser.refresh} disabled={browser.loading || browser.busy}><RefreshCw size={14} /></button>}/>
+      tools={<button type="button" className={css.refresh} aria-label={ru ? "Обновить" : "Refresh"} onClick={browser.refresh} disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked}><RefreshCw size={14} /></button>}/>
     {assignments.error && <FormError message={assignments.error} />}
     {browser.incomplete && <RunIncompleteDialog ru={ru} busy={browser.busy} canArchive={model.canArchiveRun}
       onClose={browser.dismissIncomplete} onArchive={() => void browser.act("archive")} />}
