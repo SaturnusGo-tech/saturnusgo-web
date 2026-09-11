@@ -7117,8 +7117,8 @@ export interface components {
             topic: "access" | "cases" | "runs" | "defects" | "projects" | "integrations" | "attachments" | "notifications" | "billing" | "other";
             subject: string;
             description: string;
-            /** Format: uri */
-            pageUrl: string;
+            /** @description Optional page URL. May be omitted or empty. HTTP(S) only, without credentials. Unknown query parameters and fragments are removed. */
+            pageUrl?: "" | string;
             files: components["schemas"]["SupportFile"][];
         };
         SupportReceipt: {

@@ -1,11 +1,12 @@
 import { Bug, CircleHelp, Lightbulb, Camera, Send, Check } from "lucide-react";
+import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { MarkdownAttachmentButton } from "../../../presentation/cases/inspector/markdown/attachments/MarkdownAttachmentUi";
 import type { SupportFormModel } from "../../application/useSupportForm";
 import { topics } from "../../domain/support";
 import { SupportFiles } from "../SupportFiles";
 import css from "../support.module.css";
-export function SupportForm({model:m,ru,pageUrl,capture,capturing,screenshot,onClose}:{model:SupportFormModel;ru:boolean;pageUrl:string;capture:()=>void;capturing:boolean;screenshot:boolean;onClose:()=>void}) {
+export function SupportForm({model:m,ru,pageUrl,onPageUrlChange,capture,capturing,screenshot,onClose}:{model:SupportFormModel;ru:boolean;pageUrl:string;onPageUrlChange:(value:string)=>void;capture:()=>void;capturing:boolean;screenshot:boolean;onClose:()=>void}) {
   return <form onSubmit={e=>{e.preventDefault();if(!capturing)void m.submit(pageUrl);}} className={css.form}
     onDragOver={e=>{if(e.dataTransfer.types.includes('Files')){e.preventDefault();e.dataTransfer.dropEffect='copy';}}}
     onDrop={e=>{if(e.dataTransfer.files.length){e.preventDefault();m.add(Array.from(e.dataTransfer.files));}}}
@@ -15,9 +16,10 @@ export function SupportForm({model:m,ru,pageUrl,capture,capturing,screenshot,onC
         {([['question',CircleHelp,ru?'Вопрос':'Question'],['bug',Bug,ru?'Баг':'Bug'],['improvement',Lightbulb,ru?'Улучшение':'Improvement']] as const).map(([kind,Icon,label])=>
           <button type="button" key={kind} aria-pressed={m.kind===kind} onClick={()=>m.setKind(kind)}><Icon size={19}/>{label}</button>)}
       </div>
-      <label className={css.row}><span>{ru?'О чём обращение':'Topic'}</span><select value={m.topic} onChange={e=>m.setTopic(e.target.value as typeof m.topic)}>
-        {topics.map(([id,rus,en])=><option key={id} value={id}>{ru?rus:en}</option>)}</select></label>
-      <label className={css.row}><span>{ru?'Ссылка на страницу':'Page URL'}</span><input readOnly value={pageUrl}/></label>
+      <div className={css.row}><span>{ru?'О чём обращение':'Topic'}</span><AnimatedSelect className={css.topic}
+        label={ru?'О чём обращение':'Topic'} value={m.topic} disabled={m.busy}
+        options={topics.map(([value,rus,en])=>({value,label:ru?rus:en}))} onChange={value=>m.setTopic(value as typeof m.topic)}/></div>
+      <label className={css.row}><span>{ru?'Ссылка на страницу':'Page URL'}</span><input type="url" pattern="https?://.+" maxLength={3000} value={pageUrl} onChange={e=>onPageUrlChange(e.target.value)} placeholder={ru?'Необязательно':'Optional'}/></label>
       <input className={css.subject} aria-label={ru?'Тема обращения':'Subject'} placeholder={ru?'Тема обращения':'Subject'} value={m.subject} minLength={3} maxLength={250} required onChange={e=>m.setSubject(e.target.value)}/>
       <div className={css.editor}>
         <MarkdownField value={m.description} onChange={m.setDescription} label={ru?'Описание обращения':'Request description'} appearance="plain" allowAttachments={false}/>

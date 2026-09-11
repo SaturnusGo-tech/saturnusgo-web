@@ -22,10 +22,20 @@ export function SupportContact({workspaceId}:{workspaceId:string}) {
   const [accepted,setAccepted]=useState<string|null>(null);
   const dismissToast=useCallback(()=>setAccepted(null),[]);
   useEffect(()=>{if(model.receipt){setOpen(false);setAccepted(model.receipt.id);}},[model.receipt]);
+  const pageSource=useRef('');
   const [pageUrl,setPageUrl]=useState('');const [capturing,setCapturing]=useState(false);
   const shot=useRef<File|null>(null);const snapshot=useRef<Promise<File>|null>(null);
   const screenshot=Boolean(shot.current&&model.files.some(entry=>entry.file===shot.current));
-  function show(){if(model.receipt){model.reset();shot.current=null;snapshot.current=null;}if(pageUrl!==cleanPageUrl()){if(shot.current){const entry=model.files.find(e=>e.file===shot.current);if(entry)model.remove(entry.id);}shot.current=null;snapshot.current=null;}setPageUrl(cleanPageUrl());setOpen(true);}
+  function show(){
+    const current=cleanPageUrl();
+    if(model.receipt){model.reset();shot.current=null;snapshot.current=null;}
+    if(!pageSource.current||model.receipt||pageUrl===pageSource.current)setPageUrl(current);
+    if(pageSource.current!==current){
+      if(shot.current){const entry=model.files.find(e=>e.file===shot.current);if(entry)model.remove(entry.id);}
+      shot.current=null;snapshot.current=null;
+    }
+    pageSource.current=current;setOpen(true);
+  }
   async function capture(){
     if(capturing)return;setCapturing(true);model.setError('');
     try {snapshot.current??=supportScreenshot();shot.current=await snapshot.current;model.add([shot.current]);}
@@ -38,6 +48,6 @@ export function SupportContact({workspaceId}:{workspaceId:string}) {
   </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/><AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
     initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.18}}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>
-      <SupportForm model={model} ru={ru} pageUrl={pageUrl} capture={()=>void capture()} capturing={capturing} screenshot={screenshot} onClose={close}/>
+      <SupportForm model={model} ru={ru} pageUrl={pageUrl} onPageUrlChange={setPageUrl} capture={()=>void capture()} capturing={capturing} screenshot={screenshot} onClose={close}/>
     </Modal></motion.div>}</AnimatePresence></>,document.body)}</>;
 }

@@ -32825,7 +32825,6 @@
           "topic",
           "subject",
           "description",
-          "pageUrl",
           "files"
         ],
         "properties": {
@@ -32863,9 +32862,20 @@
             "minLength": 3
           },
           "pageUrl": {
-            "type": "string",
-            "maxLength": 3000,
-            "format": "uri"
+            "description": "Optional page URL. May be omitted or empty. HTTP(S) only, without credentials. Unknown query parameters and fragments are removed.",
+            "oneOf": [
+              {
+                "type": "string",
+                "const": ""
+              },
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 3000,
+                "format": "uri",
+                "pattern": "^https?://"
+              }
+            ]
           },
           "files": {
             "type": "array",

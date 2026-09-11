@@ -9,12 +9,15 @@
 .kinds button[aria-pressed="true"] { color: #3979ed; border-color: #3979ed; background: #3979ed0b; }
 .row { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: center; gap: 12px; font-size: 13px; }
 .row > span { color: #85858e; }
-.row input, .row select, .subject { width: 100%; min-width: 0; height: 38px; padding: 8px 12px; border: 1px solid #8883; border-radius: 10px; background: transparent; color: inherit; font: inherit; outline: none; box-shadow: none; }
-.row input { color: #85858e; font-size: 12px; text-overflow: ellipsis; }
-.row select option { background: var(--support-surface); color: inherit; }
+.row input, .subject { width: 100%; min-width: 0; height: 38px; padding: 8px 12px; border: 1px solid #8883; border-radius: 10px; background: transparent; color: inherit; font: inherit; outline: none; box-shadow: none; }
+.row input { color: inherit; font-size: 12px; text-overflow: ellipsis; }
+.topic { --paper: var(--support-surface); --nav-raised: var(--support-surface); --ink: var(--foreground, #202126); --line-strong: #8883; }
+.topic > button { height: 38px; border-radius: 10px; background: transparent; color: inherit; }
+.topic > button:is(:focus-visible, [aria-expanded="true"]) { box-shadow: none; border-color: #3979ed88; }
+.topic [role="listbox"] { background: var(--support-surface); color: inherit; box-shadow: 0 4px 16px #0001; }
 .subject { font-size: 15px; height: 42px; }
-.row input:focus-visible, .row select:focus-visible, .subject:focus-visible { border-color: #3979ed88; }
-.editor { min-height: 200px; min-width: 0; background: transparent; padding: 0; border: 0; }
+.row input:focus-visible, .subject:focus-visible { border-color: #3979ed88; }
+.editor { min-height: 200px; min-width: 0; background: transparent; padding: 10px 12px 6px; border: 1px solid #8883; border-radius: 12px; box-shadow: none; }
 .editor :global(.mdxeditor-root-contenteditable) { min-height: 140px !important; max-height: 260px !important; }
 .editor :global(.mdxeditor-toolbar) { flex-wrap: wrap; }
 .editorFooter { display: flex; gap: 12px; align-items: center; min-height: 34px; margin-top: 8px; }
