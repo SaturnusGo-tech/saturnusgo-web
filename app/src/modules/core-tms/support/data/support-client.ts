@@ -15,19 +15,19 @@ export function supportClient(http:TmsHttpClient,workspaceId:string) {
   const path=(suffix="")=>`/support/requests${suffix}?${new URLSearchParams({workspaceId})}`;
   return {
     async send(id:string,input:SupportInput,files:SupportFile[],progress:(value:number)=>void) {
-      const receipt=(await http.mutateResource<Schemas["SupportReceiptResponse"]>(path(),"POST",input,{idempotencyKey:id})).data.data;
+      const receipt=(await http.mutateResource<Schemas["SupportReceipt"]>(path(),"POST",input,{idempotencyKey:id})).data;
       if(receipt.state==="expired") throw new Error("DRAFT_EXPIRED");
       if(receipt.state!=="draft") return receipt;
       let issued=Date.now();
-      let grants=(await http.mutate<Schemas["SupportUploadResponse"]>(path(`/${id}/uploads`),"POST")).data.files;
+      let grants=(await http.mutate<Schemas["SupportUploadResponse"]["data"]>(path(`/${id}/uploads`),"POST" )).files;
       for(let index=0;index<files.length;index++) {
-        if(Date.now()-issued>120000){grants=(await http.mutate<Schemas["SupportUploadResponse"]>(path(`/${id}/uploads`),"POST")).data.files;issued=Date.now();}
+        if(Date.now()-issued>120000){grants=(await http.mutate<Schemas["SupportUploadResponse"]["data"]>(path(`/${id}/uploads`),"POST" )).files;issued=Date.now();}
         const entry=files[index]; const grant=grants.find(g=>g.id===entry.id);
         if(!grant) throw new Error("UPLOAD_FAILED");
         await upload(grant.url,grant.headers,entry.file,n=>progress((index+n)/Math.max(files.length,1)));
       }
       progress(1);
-      return (await http.mutate<Schemas["SupportReceiptResponse"]>(path(`/${id}/submit`),"POST")).data;
+      return await http.mutate<Schemas["SupportReceipt"]>(path(`/${id}/submit`),"POST");
     },
   };
 }
