@@ -22,7 +22,7 @@ Evidence directory: `/tmp/falcon-comment-redesign/`.
 - Colors: existing Falcon light/dark surface and text tokens; blue quotation rule; restrained rounded hover states.
 - Images: existing member avatar component retained, including production employee photographs. Isolated preview identities use initials. No airplane/status badge introduced.
 - Content: original comment bodies and mentions retained. No artificial reactions, task creation or other unsupported actions introduced.
-- Surfaces: subtle rounded comment background and existing menu styling; no heavy comment outline. Nested branches retain their connecting rails and collapse controls.
+- Surfaces: transparent comment background with no card radius, fill or border; existing menu styling retained. Nested branches retain their connecting rails and collapse controls.
 
 ## Comparison history
 
@@ -35,6 +35,8 @@ Initial review found a P2 mismatch: inherited Markdown rules muted quotation tex
 - Browser console: no warnings or errors observed in the isolated preview.
 - TypeScript and TMS architecture checks passed (917 files).
 - Existing comment-link suite: 8 passed. Existing adapter suite: 189 passed.
+
+User correction: separate rounded comment surfaces made short discussions look like stacked cards. Removed comment fills and radii, tightened header/body spacing and the collapse-control gap. Verified transparent backgrounds and zero radius in the rendered DOM in the dark theme; reviewed light theme and collapse/reopen behavior. Updated evidence: `/tmp/falcon-comment-redesign/flat-dark.png` and `/tmp/falcon-comment-redesign/flat-light.png` (1280 × 720). Earlier rounded-surface screenshots are superseded.
 
 No unresolved P0/P1/P2 visual findings within this scope. Production verification is recorded in the release handoff.
 

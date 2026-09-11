@@ -80,8 +80,8 @@
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
   gap: 12px;
-  padding: 14px 16px;
-  background: var(--cases-raised);
+  padding: 10px 16px;
+  background: transparent;
 }
 .comment > span {
   width: 32px;
@@ -97,7 +97,7 @@
 .comment header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .commentIdentity > strong { color: var(--cases-strong); font-size: 13px; font-weight: 600; }
 .comment time { color: var(--cases-muted); font-size: 12px; white-space: nowrap; }
-.commentMarkdown { min-width: 0; margin-top: 9px; overflow-wrap: anywhere; }
+.commentMarkdown { min-width: 0; margin-top: 4px; overflow-wrap: anywhere; }
 .commentMarkdown :global(.wmde-markdown) { font-family: inherit; font-size: 14px; line-height: 1.65 !important; color: var(--cases-text) !important; background: transparent; }
 .commentMarkdown :global(.wmde-markdown) blockquote { margin: 0 0 14px !important; padding: 1px 0 1px 14px !important; color: var(--cases-text) !important; border-left: 2px solid var(--cases-primary) !important; }
 .commentMarkdown :global(.wmde-markdown) :is(p, ol, ul) { margin-top: 0 !important; margin-bottom: 12px !important; }
@@ -191,8 +191,8 @@
 .commentsSection { border-top: 0; padding-bottom: 64px; }
 .commentsHeading { border-bottom: 0; }
 .commentPrompt { border-radius: 12px; border-color: transparent; }
-.comment { border-bottom: 0; margin: 6px 0; scroll-margin: 18px; border-radius: 14px; }
-.comment:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: -2px; border-radius: 12px; }
+.comment { border-bottom: 0; margin: 4px 0; scroll-margin: 18px; }
+.comment:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: -2px; }
 .commentContent { min-width: 0; }
 .comment .commentHeader { align-items: flex-start; flex-wrap: nowrap; gap: 12px; min-height: 28px; }
 .commentIdentity { display: flex; flex: 1; min-width: 0; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-height: 28px; }
