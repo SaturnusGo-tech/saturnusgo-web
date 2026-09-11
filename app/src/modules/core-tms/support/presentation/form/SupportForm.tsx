@@ -6,9 +6,6 @@ import { topics } from "../../domain/support";
 import { SupportFiles } from "../SupportFiles";
 import css from "../support.module.css";
 export function SupportForm({model:m,ru,pageUrl,capture,capturing,screenshot,onClose}:{model:SupportFormModel;ru:boolean;pageUrl:string;capture:()=>void;capturing:boolean;screenshot:boolean;onClose:()=>void}) {
-  if(m.receipt) return <div className={css.receipt} role="status"><Check size={28}/><h3>{ru?'Обращение принято':'Request received'}</h3>
-    <p>{ru?'Ответим на вашу почту, указанную в профиле.':'We will reply to the email address in your profile.'}</p>
-    <small>{m.receipt.reference??m.receipt.id}</small><button className={css.primary} onClick={onClose}>{ru?'Готово':'Done'}</button></div>;
   return <form onSubmit={e=>{e.preventDefault();if(!capturing)void m.submit(pageUrl);}} className={css.form}
     onDragOver={e=>{if(e.dataTransfer.types.includes('Files')){e.preventDefault();e.dataTransfer.dropEffect='copy';}}}
     onDrop={e=>{if(e.dataTransfer.files.length){e.preventDefault();m.add(Array.from(e.dataTransfer.files));}}}

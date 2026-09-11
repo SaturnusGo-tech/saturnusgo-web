@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MessageCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { Modal } from "../../presentation/common/modal/Modal";
 import { useSupportForm } from "../application/useSupportForm";
 import { supportScreenshot } from "../data/capture/support-screenshot";
 import { SupportForm } from "../presentation/form/SupportForm";
+import { SupportToast } from "../presentation/toast/SupportToast";
 import css from "../presentation/support.module.css";
 import nav from "../../presentation/workspace/tms-shell.module.css";
 function cleanPageUrl() {
@@ -18,6 +19,9 @@ function cleanPageUrl() {
 export function SupportContact({workspaceId}:{workspaceId:string}) {
   const {locale}=useTmsLocale();const ru=locale==='ru';const http=useTmsHttpClient();
   const model=useSupportForm(http,workspaceId,ru);const [open,setOpen]=useState(false);
+  const [accepted,setAccepted]=useState<string|null>(null);
+  const dismissToast=useCallback(()=>setAccepted(null),[]);
+  useEffect(()=>{if(model.receipt){setOpen(false);setAccepted(model.receipt.id);}},[model.receipt]);
   const [pageUrl,setPageUrl]=useState('');const [capturing,setCapturing]=useState(false);
   const shot=useRef<File|null>(null);const snapshot=useRef<Promise<File>|null>(null);
   const screenshot=Boolean(shot.current&&model.files.some(entry=>entry.file===shot.current));
@@ -31,9 +35,9 @@ export function SupportContact({workspaceId}:{workspaceId:string}) {
   const close=()=>{if(!model.busy&&!capturing)setOpen(false);};
   return <><button type="button" className={nav.navigationUtilityButton} onClick={show} title={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
     <span className={nav.navigationIcon} aria-hidden="true"><MessageCircle size={20}/></span><span className={nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
-  </button>{typeof document!=='undefined'&&createPortal(<AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
+  </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/><AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
     initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.18}}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>
       <SupportForm model={model} ru={ru} pageUrl={pageUrl} capture={()=>void capture()} capturing={capturing} screenshot={screenshot} onClose={close}/>
-    </Modal></motion.div>}</AnimatePresence>,document.body)}</>;
+    </Modal></motion.div>}</AnimatePresence></>,document.body)}</>;
 }

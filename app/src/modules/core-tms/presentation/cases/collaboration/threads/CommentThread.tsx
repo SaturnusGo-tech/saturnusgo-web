@@ -12,7 +12,7 @@ export function CommentThread(props: Props) {
   const hidden = collapsed.has(node.comment.id);
   const hasReplies = node.children.length > 0;
   return <div className={css.thread} data-nested={depth > 0}>
-    {hasReplies && !hidden && <button type="button" className={css.rail} onClick={() => toggle(node.comment.id)} aria-label={ru ? "Свернуть ветку" : "Collapse thread"} />}
+    {hasReplies && !hidden && depth < 3 && <button type="button" className={css.rail} onClick={() => toggle(node.comment.id)} aria-label={ru ? "Свернуть ветку" : "Collapse thread"} />}
     <CaseCommentRecord comment={node.comment} ru={ru} languageTag={props.languageTag} model={props.model}
       nested={depth > 0 && depth < 4} onReply={onReply} onParent={props.onParent} />
     {hasReplies && <div className={css.actions}>

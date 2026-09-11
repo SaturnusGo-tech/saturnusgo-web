@@ -3,7 +3,9 @@
 .plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { background: transparent; border: 0; padding: 2px 0 5px; }
 .plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) button { border-radius: 8px; }
 .plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 76px; max-height: 360px; background: transparent; scrollbar-width: thin; }
-.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) > div { padding: 5px 2px 8px; min-height: 76px; background: transparent; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper) { padding: 0; background: transparent; }
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)),
+.plain[data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable [contenteditable]) { padding: 5px 2px 8px; min-height: 76px; background: transparent; }
 .plain[data-editor-shell][data-appearance="plain"] > div:has(> textarea) { min-height: 112px; height: 112px; background: transparent; }
 .plain[data-editor-shell][data-appearance="plain"] textarea { padding: 6px 2px; background: transparent !important; border: 0 !important; box-shadow: none !important; }
 .readable { cursor: text; min-height: 24px; }
