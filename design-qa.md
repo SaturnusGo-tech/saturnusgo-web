@@ -40,3 +40,9 @@ Reused the test-case discussion controller, editor, thread renderer and private 
 Verified against the actual defect comment API with disposable PostgreSQL in Chrome and WebKit: create, reply through one shared editor, edit, reload, deep-link focus, close/reopen, light/dark blue-button contrast, and 390 px layout. Fixed the grid's implicit minimum width so description/editor stay within the mobile panel. No production comments or messages were sent for QA. Integration-link errors in the isolated fixture are from its intentionally absent connector routes.
 
 Evidence: `/tmp/falcon-comment-preview/defect-webkit-1789119619035-mobile.png` and corresponding `-dark.png`; browser checks `/tmp/falcon-defect-browser.log`. Backend integration tests cover guarded deletion, concurrent versions, idempotency/pagination, reporter permissions, tenant isolation and Telegram/browser/Slack recipient routing. Frontend adapter, navigation and architecture checks passed. Public documentation now covers both discussion targets.
+
+## Reply composer tray contour, 2026-09-11
+
+Moved the reply recipient tray inside the shared editor frame. The editor and tray now share one outer border; the tray uses an 11px inner bottom radius inside the 12px frame. Removed the negative-margin join. No overflow clipping was introduced, so editor and mention menus remain unrestricted.
+
+Validated actual shared bug-report composer in Chrome and WebKit, light and dark themes. Removing the recipient hides the tray and preserves the draft. Typecheck, architecture (928 files), and diff whitespace checks passed. Screenshots: `/tmp/falcon-comment-preview/reply-tray-chrome-light.png`, `/tmp/falcon-comment-preview/reply-tray-webkit-dark.png`.

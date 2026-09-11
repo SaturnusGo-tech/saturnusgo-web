@@ -59,10 +59,10 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
       <div className={css.submitActions}>{!persistent && <button type="button" disabled={pending} onClick={onCancel}>{ru ? "Отмена" : "Cancel"}</button>}
       <button type="button" className={css.send} disabled={cannotSubmit} onClick={() => void submit()}><Send size={14} />
         {pending ? (ru ? "Сохранение…" : "Saving…") : initial ? (ru ? "Сохранить" : "Save") : (ru ? "Отправить" : "Post")}</button></div></footer>
-    </div>
     {reply && <div className={css.reply}><Reply size={14} /><span>{ru ? "Ответить:" : "Reply to:"}</span>
       <span className={css.replyAuthor}><MemberAvatar identityId={reply.author.identityId} name={reply.author.displayName} />{reply.author.displayName}
         <button type="button" disabled={pending} onClick={onClearReply ?? onCancel} aria-label={ru ? "Убрать получателя ответа" : "Remove reply recipient"}><X size={14} /></button>
       </span></div>}
+    </div>
   </div>;
 }
