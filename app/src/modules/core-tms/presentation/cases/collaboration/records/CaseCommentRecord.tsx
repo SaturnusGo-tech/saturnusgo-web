@@ -3,7 +3,7 @@ import { Pencil, Reply } from "lucide-react";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
 import { ResponsibleName } from "../../../../workspace/members/presentation/ResponsibleName";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
-import { MarkdownField } from "../../inspector/markdown/MarkdownField";
+import { CommentBody } from "../attachments/CommentBody";
 import { CommentMenu } from "../menu/CommentMenu";
 import { CommentComposer } from "../composer/CommentComposer";
 import { buildCommentLink } from "../../../../test-cases/navigation/comments/comment-link";
@@ -52,7 +52,12 @@ export function CaseCommentRecord({ comment, ru, languageTag, model, onReply, on
         pending={pending} failure={error} onCancel={() => setEditing(null)}
         onSubmit={async (draft) => { const ok = await model.changeComment?.(editing, draft); if (ok) setEditing(null); return Boolean(ok); }} />
         : comment.deletedAt ? <p className={css.deletedComment}>{ru ? "Комментарий удалён" : "Comment deleted"}</p>
-        : <div className={css.commentMarkdown}><MarkdownField value={comment.body} label={ru ? "Комментарий" : "Comment"} /></div>}
+        : <div className={css.commentMarkdown}>
+          {parent && <blockquote className={css.parentQuote} aria-label={ru ? "Исходное сообщение" : "Original message"}>
+            {parent.deletedAt ? <span>{ru ? "Комментарий удалён" : "Comment deleted"}</span> : <CommentBody body={parent.body} ru={ru} />}
+          </blockquote>}
+          <CommentBody body={comment.body} ru={ru} />
+        </div>}
       {confirming && <div className={css.confirmDelete} role="group" aria-label={ru ? "Удалить комментарий?" : "Delete comment?"}>
         <span>{ru ? "Удалить комментарий? Ответы сохранятся." : "Delete this comment? Replies will remain."}</span>
         <button type="button" disabled={pending} onClick={() => setConfirming(false)}>{ru ? "Отмена" : "Cancel"}</button>

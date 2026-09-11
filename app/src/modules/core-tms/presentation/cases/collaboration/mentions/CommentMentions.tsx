@@ -23,8 +23,8 @@ export function CommentMentions({ value, onChange, ru }: { value: string[]; onCh
   }}>
     {value.map((id) => <MentionName key={id} id={id} ru={ru} onRemove={() => onChange(value.filter((item) => item !== id))} />)}
     <button type="button" ref={trigger} className={css.add} disabled={offline || value.length >= 20}
-      aria-expanded={open} onClick={() => setOpen(!open)}><AtSign size={14} />{ru ? "Позвать" : "Mention"}</button>
-    {open && <div className={css.picker} role="dialog" aria-label={ru ? "Позвать сотрудника" : "Mention a teammate"}>
+      aria-expanded={open} onClick={() => setOpen(!open)}><AtSign size={14} />{ru ? "Призвать" : "Mention"}</button>
+    {open && <div className={css.picker} role="dialog" aria-label={ru ? "Призвать сотрудника" : "Mention a teammate"}>
       <label className={css.search} data-input-shell><Search size={14} /><input value={members.search}
         aria-label={ru ? "Найти сотрудника" : "Find a teammate"} placeholder={ru ? "Имя или почта" : "Name or email"}
         maxLength={120} onChange={(e) => members.setSearch(e.target.value)} /></label>

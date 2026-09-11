@@ -1,0 +1,9 @@
+.attach { display: grid; place-items: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: 8px; color: var(--cases-secondary-text); cursor: pointer; flex-shrink: 0; }
+.attach:hover { background: var(--cases-hover); }
+.separator { height: 16px; width: 1px; background: var(--cases-control-border); margin: 0 5px; flex-shrink: 0; }
+.files:empty { display: none; }
+.files { display: grid; gap: 6px; padding: 4px 10px; }
+.file { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--cases-secondary-text); min-width: 0; }
+.file > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.file button { border: 0; border-radius: 7px; background: transparent; color: var(--cases-secondary-text); padding: 4px; cursor: pointer; }
+.error { display: block; color: #db6872; font-size: 11px; }

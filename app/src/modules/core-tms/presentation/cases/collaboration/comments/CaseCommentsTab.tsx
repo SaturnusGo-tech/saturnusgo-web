@@ -16,22 +16,23 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
   const ru = locale === "ru";
   useCommentAncestors(caseId, model);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-  const [composer, setComposer] = useState<{ reply?: TestCaseComment } | null>(null);
+  const [composer, setComposer] = useState<{ reply?: TestCaseComment }>({});
+  const [composerVersion, setComposerVersion] = useState(0);
   const { failedId, reveal } = useCommentNavigation(caseId, model, () => setCollapsed(new Set()));
   const composerRef = useRef<HTMLDivElement>(null);
   const currentCase = useRef(caseId); currentCase.current = caseId;
   const motion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" as const : "smooth" as const;
-  useEffect(() => { setComposer(null); setCollapsed(new Set()); }, [caseId]);
+  useEffect(() => { setComposer({}); setCollapsed(new Set()); }, [caseId]);
   useEffect(() => {
-    if (!composer) return;
+    if (!composer.reply) return;
     composerRef.current?.scrollIntoView({ block: "nearest", behavior: motion() });
     composerRef.current?.querySelector<HTMLElement>('[role="textbox"], textarea')?.focus({ preventScroll: true });
   }, [composer]);
-  const editor = composer && <CommentComposer key={caseId} ru={ru} projectId={model.commentProjectId}
+  const editor = <CommentComposer key={`${caseId}:${composerVersion}`} ru={ru} projectId={model.commentProjectId} persistent
     reply={composer.reply} pending={model.commentSubmitting || Boolean(model.changingCommentId)} failure={model.commentFailure ? commentFailureLabel(locale, model.commentFailure) : ""}
-    onClearReply={() => setComposer({})} onCancel={() => setComposer(null)} onSubmit={async draft => {
+    onClearReply={() => setComposer({})} onCancel={() => setComposer({})} onSubmit={async draft => {
       const ok = await model.addComment(draft.body, draft);
-      if (ok && currentCase.current === caseId) setComposer(null); return ok;
+      if (ok && currentCase.current === caseId) { setComposer({}); setComposerVersion(value => value + 1); } return ok;
     }} />;
   return <section className={css.commentsSection} aria-labelledby={`case-comments-${caseId}`}>
     <header className={css.commentsHeading}><MessageSquare size={15} /><h3 id={`case-comments-${caseId}`}>{ru ? "Комментарии" : "Comments"}</h3>
@@ -43,8 +44,7 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
       <span>{ru ? "Не удалось загрузить комментарии" : "Could not load comments"}</span>
       <button type="button" onClick={model.retryComments}>{ru ? "Повторить" : "Retry"}</button></div>}
     {model.comments.status === "ready" && <>
-      {model.canComment && <div ref={composerRef}><ExpandingComment>{composer ? editor
-        : <button type="button" className={css.commentPrompt} disabled={model.commentSubmitting || Boolean(model.changingCommentId)} onClick={() => setComposer({})}><MessageSquare size={14} />{ru ? "Написать комментарий…" : "Write a comment…"}</button>}</ExpandingComment></div>}
+      {model.canComment && <div ref={composerRef}><ExpandingComment>{editor}</ExpandingComment></div>}
       {failedId && <div className={css.pagination} role="alert"><span>{ru ? "Комментарий недоступен или не удалось его загрузить." : "The comment is unavailable or could not be loaded."}</span>
         <button type="button" onClick={() => void reveal(failedId)}>{ru ? "Повторить" : "Retry"}</button></div>}
       {commentTree(model.comments.items).map(node => <CommentThread key={node.comment.id} node={node} ru={ru} languageTag={languageTag}

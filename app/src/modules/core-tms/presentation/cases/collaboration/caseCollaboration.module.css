@@ -98,6 +98,7 @@
 .commentIdentity > strong { color: var(--cases-strong); font-size: 13px; font-weight: 600; }
 .comment time { color: var(--cases-muted); font-size: 12px; white-space: nowrap; }
 .commentMarkdown { min-width: 0; margin-top: 4px; overflow-wrap: anywhere; }
+.parentQuote { margin: 2px 0 12px; padding: 1px 0 1px 12px; border-left: 2px solid var(--cases-primary); color: var(--cases-text); }
 .commentMarkdown :global(.wmde-markdown) { font-family: inherit; font-size: 14px; line-height: 1.65 !important; color: var(--cases-text) !important; background: transparent; }
 .commentMarkdown :global(.wmde-markdown) blockquote { margin: 0 0 14px !important; padding: 1px 0 1px 14px !important; color: var(--cases-text) !important; border-left: 2px solid var(--cases-primary) !important; }
 .commentMarkdown :global(.wmde-markdown) :is(p, ol, ul) { margin-top: 0 !important; margin-bottom: 12px !important; }

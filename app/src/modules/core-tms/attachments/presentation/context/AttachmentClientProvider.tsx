@@ -43,6 +43,10 @@ export function useAttachmentClient(): PrivateAttachmentClient {
   return context.client;
 }
 
+export function useOptionalAttachmentClient(): PrivateAttachmentClient | null {
+  return useContext(AttachmentClientContext)?.client ?? null;
+}
+
 export function useAttachmentVisibility() {
   return useAttachmentContext();
 }
