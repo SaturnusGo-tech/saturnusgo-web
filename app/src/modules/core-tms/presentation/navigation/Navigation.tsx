@@ -49,8 +49,7 @@ export function Navigation({
   disabled,
   collapsed,
   onToggleCollapsed,
-  onCreateCase,
-  onCreateDefect,
+  workspaceId,
   activeRunCount,
 }: {
   view: View;
@@ -58,8 +57,7 @@ export function Navigation({
   disabled: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
-  onCreateCase: () => void;
-  onCreateDefect: () => void;
+  workspaceId: string;
   activeRunCount: number;
 }) {
   const { locale, t } = useTmsLocale();
@@ -141,8 +139,7 @@ export function Navigation({
         helpActive={view === "help"}
         notificationsActive={view === "notifications"}
         onOpenNotifications={() => onChange("notifications")}
-        onCreateCase={onCreateCase}
-        onCreateDefect={onCreateDefect}
+        workspaceId={workspaceId}
         onOpenSettings={() => onChange("config")}
         onOpenHelp={() => onChange("help")}
       />

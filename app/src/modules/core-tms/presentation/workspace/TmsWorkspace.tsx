@@ -70,10 +70,7 @@ function LocalizedWorkspace() {
         disabled={!model.project}
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebar}
-        onCreateCase={() => {
-          transitionContent(() => { selectView("cases"); model.openNewCase(); });
-        }}
-        onCreateDefect={() => model.setDialog("defect")}
+        workspaceId={model.data.workspace.id}
         activeRunCount={model.activeProjectRuns.length}
       />
       <div className={shellStyles.workspaceColumn}>

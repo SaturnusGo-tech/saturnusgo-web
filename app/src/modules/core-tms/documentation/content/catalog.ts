@@ -1,3 +1,4 @@
+import { supportArticle } from "./support/contact";
 import { companyAccessArticles } from "./access/company-access";
 import { swaggerArticle } from "./integrations/swagger/swagger";
 import { portfoliosArticle } from "./organization/portfolios";
@@ -32,6 +33,7 @@ export const docGroups = [
   { id: "reference", title: "Справочник" },
 ] as const;
 export const docArticles: readonly DocArticle[] = [
+  supportArticle,
   ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, caseCommentsArticle, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,

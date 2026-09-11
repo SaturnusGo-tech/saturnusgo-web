@@ -3580,6 +3580,98 @@ export interface paths {
         patch: operations["updateDefectComment"];
         trace?: never;
     };
+    "/support/requests": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * createSupportRequest
+         * @description Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.
+         */
+        post: operations["createSupportRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * getSupportRequest
+         * @description Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.
+         */
+        get: operations["getSupportRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support/requests/{id}/uploads": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * renewSupportUploads
+         * @description Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.
+         */
+        post: operations["renewSupportUploads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support/requests/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * submitSupportRequest
+         * @description Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.
+         */
+        post: operations["submitSupportRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -7008,6 +7100,49 @@ export interface components {
         DefectCommentDeleteRequest: {
             projectId: components["schemas"]["Identifier"];
             version: number;
+        };
+        SupportFile: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            size: number;
+            /** @enum {string} */
+            mime: "image/png" | "image/jpeg" | "image/webp" | "image/gif" | "application/pdf" | "text/plain" | "application/json" | "text/csv" | "application/zip";
+            sha256: string;
+        };
+        SupportInput: {
+            /** @enum {string} */
+            kind: "question" | "bug" | "improvement";
+            /** @enum {string} */
+            topic: "access" | "cases" | "runs" | "defects" | "projects" | "integrations" | "attachments" | "notifications" | "billing" | "other";
+            subject: string;
+            description: string;
+            /** Format: uri */
+            pageUrl: string;
+            files: components["schemas"]["SupportFile"][];
+        };
+        SupportReceipt: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            state: "draft" | "queued" | "delivering" | "delivered" | "expired";
+            reference: string | null;
+        };
+        SupportReceiptResponse: {
+            data: components["schemas"]["SupportReceipt"];
+        };
+        SupportUploadResponse: {
+            data: {
+                files: {
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uri */
+                    url: string;
+                    headers: {
+                        [key: string]: string;
+                    };
+                }[];
+            };
         };
     };
     responses: {
@@ -14953,6 +15088,159 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createSupportRequest: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportInput"];
+            };
+        };
+        responses: {
+            /** @description Persisted support request */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    /** @description Whether this request was already persisted */
+                    "Idempotency-Replayed"?: boolean;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportReceiptResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Conflict"];
+            429: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSupportRequest: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persisted support request */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportReceiptResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Conflict"];
+            429: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    renewSupportUploads: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persisted support request */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportUploadResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Conflict"];
+            429: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitSupportRequest: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persisted support request */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportReceiptResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Conflict"];
+            429: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };
