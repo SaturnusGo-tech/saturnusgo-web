@@ -76,7 +76,7 @@ Verified actual components in Chrome and WebKit: sampled every frame for nonblan
 
 # Test run organization and filters — 2026-09-12
 
-Local implementation: passed. Production verification: blocked pending deployment authorization after automatic approval review rejected the production upload. No production migration or application publication was performed in this change.
+Local implementation and production verification: passed after explicit user approval of backend, migration 0057 and frontend. Published frontend code `65bfdce6d3464dfe69238bacca007cdd8c401445`; backend code `63464a95b01224e131b3594294702cd38629e439`.
 
 ## Reference and final UI
 
@@ -99,8 +99,17 @@ Intentional differences from the repository reference: run-specific actions repl
 - Real PostgreSQL HTTP/integration tests cover all organization mutations, atomic rollback on stale versions, tenant isolation under the restricted runtime role, idempotent replay, immutable case/revision/snapshot preservation and retained execution history.
 - New run, start/pause and the red finish control retain their established lifecycle semantics. The footer has text at laptop widths and switches only when its available panel width is too small. At 1024 px, the initially discovered overlap was fixed and DOM bounds no longer intersect.
 - Browser console: no errors in the final preview. No horizontal document overflow at checked 820/1024/1280 widths. Viewport overrides reset after testing.
-- Existing floating verification action is hidden while the bulk bar is active; on desktop its expanded state is lifted above the execution footer. This coexistence is implemented in shared layout CSS but still requires a production smoke check with a real verification queue.
+- Existing floating verification action is hidden while the bulk bar is active; on desktop its expanded state is lifted above the execution footer. Production smoke with the actual verification queue confirmed this at 1280×720: the expanded verification action is above the labeled footer and does not intersect result buttons.
 
 ## Gates and limits
 
-Frontend: 760 tests passed; typecheck and architecture (970 files) passed; export build passed. Backend: 695 tests passed against PostgreSQL; typecheck, lint, architecture, migration verification, OpenAPI and build passed. The frontend lint command remains the repository's existing no-op, not a substantive lint gate. No physical Windows/Linux/mobile browser testing performed; browser checks used Codex's in-app browser. Final live verification remains pending publication; local UI fixture results alone are not claimed as production persistence verification.
+Frontend: 760 tests passed; typecheck and architecture (970 files) passed; export build passed. Backend: 695 tests passed against PostgreSQL; typecheck, lint, architecture, migration verification, OpenAPI and build passed. The frontend lint command remains the repository's existing no-op, not a substantive lint gate. No physical Windows/Linux/mobile browser testing performed; browser checks used Codex's in-app browser. Production smoke additionally verified persistence through the API and a read-only database audit. No physical Windows/Linux/mobile browser testing was added.
+
+
+## Production follow-through
+
+Published Pages `5ec95cb26e8b81b6603cedc07de25ee46e73d274` / Worker `a8e35760-fb3f-4e9b-9385-6def7ad0962e`. Created only one isolated QA iteration/run (`run_fc696942-b53c-4690-8302-329f68a59824`). Verified priority, move, archive/show/restore, reload persistence, removal, no-op unassignment, two assignees + two result filters and outside dismissal. Start/pause/resume, incomplete completion → stop/archive → restore passed. The empty QA run was completed at the end; no product result was marked passed/failed. Database audit confirmed original repository folder/snapshot priority and all 1,414 pre-existing snapshot digests unchanged.
+
+Production screenshots: `/tmp/falcon-0057-production-assignees.png`, `/tmp/falcon-0057-production-multifilter.png`, `/tmp/falcon-0057-production-footer.png` (1280×720, light). Detailed deployment/recovery evidence is in backend `docs/releases/2026-09-12-run-organization.md`.
+
+New user report after publication: execution detail and Next/Previous must follow the filtered tree; defect-create drawer needs redesign and opaque assignee popup. These subsequent fixes are not covered by the release evidence above.
