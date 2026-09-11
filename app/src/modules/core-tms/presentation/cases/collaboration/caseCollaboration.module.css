@@ -78,14 +78,14 @@
 .comment {
   min-height: 64px;
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 9px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--cases-row-border);
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--cases-raised);
 }
 .comment > span {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   color: var(--cases-on-primary);
@@ -95,9 +95,13 @@
   font-weight: 600;
 }
 .comment header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.comment strong { color: var(--cases-strong); font-size: 12px; font-weight: 600; }
-.comment time { color: var(--cases-muted); font-size: 10px; white-space: nowrap; }
-.commentMarkdown { min-width: 0; margin-top: 4px; overflow-wrap: anywhere; }
+.commentIdentity > strong { color: var(--cases-strong); font-size: 13px; font-weight: 600; }
+.comment time { color: var(--cases-muted); font-size: 12px; white-space: nowrap; }
+.commentMarkdown { min-width: 0; margin-top: 9px; overflow-wrap: anywhere; }
+.commentMarkdown :global(.wmde-markdown) { font-family: inherit; font-size: 14px; line-height: 1.65 !important; color: var(--cases-text) !important; background: transparent; }
+.commentMarkdown :global(.wmde-markdown) blockquote { margin: 0 0 14px !important; padding: 1px 0 1px 14px !important; color: var(--cases-text) !important; border-left: 2px solid var(--cases-primary) !important; }
+.commentMarkdown :global(.wmde-markdown) :is(p, ol, ul) { margin-top: 0 !important; margin-bottom: 12px !important; }
+.commentMarkdown :global(.wmde-markdown) :last-child { margin-bottom: 0 !important; }
 .pagination { display: grid; justify-items: center; gap: 6px; padding: 10px 12px; color: var(--cases-muted); font-size: 10px; text-align: center; }
 .pagination button { min-height: 28px; padding: 0 10px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
 .pagination button:disabled { cursor: wait; opacity: .55; }
@@ -187,18 +191,33 @@
 .commentsSection { border-top: 0; padding-bottom: 64px; }
 .commentsHeading { border-bottom: 0; }
 .commentPrompt { border-radius: 12px; border-color: transparent; }
-.comment { border-bottom: 0; margin: 3px 0; scroll-margin: 18px; border-radius: 12px; }
+.comment { border-bottom: 0; margin: 6px 0; scroll-margin: 18px; border-radius: 14px; }
 .comment:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: -2px; border-radius: 12px; }
 .commentContent { min-width: 0; }
-.comment header { justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 7px; }
+.comment .commentHeader { align-items: flex-start; flex-wrap: nowrap; gap: 12px; min-height: 28px; }
+.commentIdentity { display: flex; flex: 1; min-width: 0; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-height: 28px; }
+.commentIdentity > strong { overflow-wrap: anywhere; }
+.commentDate { display: inline-flex; align-items: center; gap: 8px; color: var(--cases-muted); }
+.commentActions { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.commentAction { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--cases-secondary-text); cursor: pointer; transition: background-color 150ms, color 150ms; }
+.commentAction:hover { color: var(--cases-strong); background: var(--cases-hover); }
+.commentAction:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 2px; }
+.commentAction:disabled { opacity: .45; cursor: default; }
 .comment header small { color: var(--cases-muted); font-size: 10px; }
 .refreshComments { margin-left: auto; display: grid; place-items: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: 9px; color: var(--cases-muted); cursor: pointer; }
 .refreshComments:hover { background: var(--cases-hover); }
 .replyReference { display: flex; align-items: center; gap: 6px; padding: 5px 0; border: 0; color: var(--cases-secondary-text); background: transparent; font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
 .deletedComment { color: var(--cases-muted); font-size: 12px; font-style: italic; }
-.mentionedPeople { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
-.mentionedPeople > span { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--cases-secondary-text); }
-.mentionedPeople > span > svg { flex-shrink: 0; }
+.mentionedPeople { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; font-size: 13px; color: var(--cases-strong); }
+.mentionedPeople > span { max-width: 100%; overflow-wrap: anywhere; }
+.mentionVerb { color: var(--cases-secondary-text); font-weight: 400; }
+@media(max-width:600px) {
+  .comment { padding: 12px; grid-template-columns: 28px minmax(0,1fr); gap: 9px; }
+  .comment > span { width: 28px; height: 28px; }
+  .comment .commentHeader { flex-wrap: wrap; gap: 4px; }
+  .commentActions { margin-left: auto; }
+  .commentIdentity { flex-basis: 100%; }
+}
 .confirmDelete { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 8px 0; font-size: 12px; }
 .confirmDelete button { min-height: 28px; padding: 4px 9px; border: 0; border-radius: 9px; color: var(--cases-secondary-text); background: var(--cases-hover); cursor: pointer; }
 .confirmDelete button:last-of-type { color: #db6872; }

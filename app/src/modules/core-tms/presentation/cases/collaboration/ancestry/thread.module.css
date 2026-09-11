@@ -1,11 +1,11 @@
 .thread { position:relative; min-width: 0; }
 .replies { position: relative; margin-left: 25px; padding-left: 14px; }
-.rail { position: absolute; left: 20px; top: 43px; bottom: 12px; width: 12px; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: 8px; }
+.rail { position: absolute; left: 26px; top: 52px; bottom: 12px; width: 12px; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: 8px; z-index: 1; }
 .rail::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px; border-radius: 3px; background: var(--cases-control-border); transition: background-color 160ms; }
 .rail:hover::before { background: var(--cases-muted); width: 2px; }
 .thread[data-nested="true"] { position: relative; }
 .thread[data-nested="true"]::before { content: ""; position: absolute; left: -14px; top: 24px; width: 13px; height: 10px; border-left: 1px solid var(--cases-control-border); border-bottom: 1px solid var(--cases-control-border); border-bottom-left-radius: 8px; pointer-events: none; }
-.actions { display: flex; align-items: center; gap: 8px; margin: -4px 12px 10px 49px; flex-wrap: wrap; }
+.actions { display: flex; align-items: center; gap: 8px; margin: 0 12px 10px 53px; flex-wrap: wrap; }
 .actions button { display: inline-flex; align-items: center; gap: 5px; min-height: 26px; padding: 3px 7px; border: 0; border-radius: 9px; background: transparent; color: var(--cases-muted); font: inherit; font-size: 11px; cursor: pointer; }
 .actions button:hover { background: var(--cases-hover); color: var(--cases-text); }
 .inlineComposer { margin-left: 36px; }

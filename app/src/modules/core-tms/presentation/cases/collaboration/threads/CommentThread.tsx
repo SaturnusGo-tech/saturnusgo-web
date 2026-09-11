@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ChevronDown, ChevronRight, Reply } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { ExpandingComment } from "../expansion/ExpandingComment";
 import { CaseCommentRecord } from "../records/CaseCommentRecord";
 import type { CaseCollaborationViewModel } from "../model";
@@ -17,13 +17,12 @@ export function CommentThread(props: Props) {
     {hasReplies && !hidden && <button type="button" className={css.rail} onClick={() => toggle(node.comment.id)} aria-label={ru ? "Свернуть ветку" : "Collapse thread"} />}
     <CaseCommentRecord comment={node.comment} ru={ru} languageTag={props.languageTag} model={props.model}
       nested={depth > 0 && depth < 4} onReply={onReply} onParent={props.onParent} />
-    <div className={css.actions}>
-      {props.model.canComment && !node.comment.deletedAt && <button type="button" disabled={props.model.commentSubmitting || Boolean(props.model.changingCommentId)} onClick={() => onReply(node.comment)}><Reply size={13} />{ru ? "Ответить" : "Reply"}</button>}
+    {hasReplies && <div className={css.actions}>
       {hasReplies && <button type="button" aria-expanded={!hidden} onClick={() => toggle(node.comment.id)}>
         {hidden ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
         {hidden ? (ru ? "Показать ответы" : "Show replies") : (ru ? "Свернуть ветку" : "Collapse thread")}
       </button>}
-    </div>
+    </div>}
     <div className={css.inlineComposer}><ExpandingComment>{props.replyId === node.comment.id ? props.composer : null}</ExpandingComment></div>
     {hasReplies && <div hidden={hidden} className={css.replies} data-deep={depth >= 3}>
       {node.children.map(child => <CommentThread key={child.comment.id} {...props} node={child} depth={depth + 1} />)}
