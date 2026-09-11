@@ -113,3 +113,14 @@ Published Pages `5ec95cb26e8b81b6603cedc07de25ee46e73d274` / Worker `a8e35760-fb
 Production screenshots: `/tmp/falcon-0057-production-assignees.png`, `/tmp/falcon-0057-production-multifilter.png`, `/tmp/falcon-0057-production-footer.png` (1280×720, light). Detailed deployment/recovery evidence is in backend `docs/releases/2026-09-12-run-organization.md`.
 
 New user report after publication: execution detail and Next/Previous must follow the filtered tree; defect-create drawer needs redesign and opaque assignee popup. These subsequent fixes are not covered by the release evidence above.
+
+
+# 2026-09-12 — Filtered execution and defect creation follow-up
+
+The execution detail, counter, keyboard and previous/next actions now use the exact same filtered, deduplicated folder order as the run repository. Cross-project transitions retain confirmed item versions before navigating, so a completed case cannot reappear from an older list cache. Empty filters hide the detail and execution controls. Failed requests do not advance; pending writes and unsaved actual-result drafts block navigation. New server versions supersede cached versions. Optional preview metadata is retained when updating from a detail response.
+
+Both defect creation entry points now use the same 680px maximum drawer, compact two-column properties, rounded thin fields, collapsible routing help, fixed footer and reduced-motion-aware entry/exit. The shared assignee picker has a solid theme background, elevated stacking, bounded list height, search and smooth appearance. File additions preserve previously selected files, deduplicate and permit reselecting a removed file.
+
+CUA at 1280×720: Anna filter returned API-1 and HOST-1; previous crossed projects within this set; passed API-1 advanced to HOST-1. With result `not_run`, saved API-1 disappeared and stayed absent after project change; blocked HOST-1 produced an empty selection without showing any other case. Tested both defect forms, both themes, QA search/selection and Escape. No production defect or external notification was submitted for this follow-up.
+
+Evidence: `/tmp/falcon-filter-next-project.png`, `/tmp/falcon-filter-empty.png`, `/tmp/falcon-defect-standalone-light.png`, `/tmp/falcon-defect-inline-dark.png`. Regression adapters + organization: 625 tests passed, including 10 new navigation/cache tests. Typecheck, architecture and static export are release gates. The browser fixture uses actual production components with isolated synthetic API responses; real backend writes are covered by the preceding release smoke, not this fixture. No new database migration or backend change.

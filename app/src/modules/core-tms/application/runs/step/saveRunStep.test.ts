@@ -105,6 +105,6 @@ test("actual editor deliberately saves on blur/click, guards dirty completion an
   assert.match(editor, /await onSave\(draft\)/);
   assert.match(editor, /if \(!dirty \|\| inFlight\.current\) return/);
   assert.match(view, /\["passed", "failed", "blocked"\]\.includes\(status\) && attemptWritable/);
-  assert.match(view, /runWritable: attemptWritable && dirtySteps\.length === 0/);
+  assert.match(view, /runWritable: attemptWritable && !executionPending && dirtySteps\.length === 0/);
   assert.match(view, /currentEditScope\.current === editScope/);
 });

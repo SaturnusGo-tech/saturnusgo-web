@@ -1,44 +1,23 @@
+import type { RunRepositoryModel } from "./state/useRunRepository";
 import { RunIncompleteDialog } from "../completion/RunIncompleteDialog";
 import { RunCasesSkeleton } from "../loading/RunCasesSkeleton";
 import { RunAssignmentTools } from "../assignment/RunAssignmentTools";
-import { useRunAssignments } from "../../../runs/assignment/state/useRunAssignments";
 import { CheckSquare, RefreshCw } from "lucide-react";
-import { useMemo } from "react";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
-import { useRunBrowser } from "../../../runs/batches/state/browser/useRunBrowser";
-import { runRepositoryGroups } from "../../../runs/batches/model/repository/run-repository-groups";
 import { runRepositoryFolders } from "../../../runs/batches/model/repository/run-repository";
-import { SelectionControls, useSelectionFilters } from "../../cases/selection/controls/SelectionControls";
+import { SelectionControls } from "../../cases/selection/controls/SelectionControls";
 import { SelectionTree } from "../../cases/selection/tree/SelectionTree";
 import { RunRepositoryHeader } from "./header/RunRepositoryHeader";
 import { FormError } from "../../common/error/FormError";
 import { statusIcon } from "../../status/executionStatus";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
-import { useRunFilterSections } from "../filters/useRunFilterSections";
 import css from "./run-repository.module.css";
 
-export function RunRepositoryBrowser({ model, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
+export function RunRepositoryBrowser({ model, repository, draftDirty = false, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; repository: RunRepositoryModel; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
-  const browser = useRunBrowser({ workspaceId: model.data.workspace.id, selected: model.selectedRun,
-    knownRuns: model.data.runs, connected: model.connection === "connected", ru,
-    onUpdate: (runs) => model.setData((current) => ({ ...current,
-      runs: [...current.runs.filter((r) => !runs.some((next) => r.id === next.id)), ...runs] })),
-    onRefreshSelected: model.retryRunResource });
-  const rows = useMemo(() => browser.entries.map((entry) => ({ ...entry,
-    item: entry.runId === model.selectedRun?.id ? model.runItems.find((item) => item.id === entry.item.id) ?? entry.item : entry.item })),
-  [browser.entries, model.runItems, model.selectedRun?.id]);
-  const run = browser.selectedRuns[0];
-  const assignments = useRunAssignments({ workspaceId:model.data.workspace.id,scope:run?.batchId ?? run?.id ?? "",
-    runId:run?.id ?? "",rows,ru,onChanged:() => { browser.refresh();model.retryRunResource(); } });
-  const runFilters = useRunFilterSections({ workspaceId: model.data.workspace.id, ru, scope:run?.batchId??run?.id??"", rows,
-    projects: model.data.projects.filter((project) => rows.some((entry) => entry.projectId === project.id)) });
-  const cases = useMemo(() => rows.map((entry) => entry.testCase), [rows]);
-  const filters = useSelectionFilters(cases);
-  const lookup = new Map(rows.map((entry) => [entry.item.id, entry]));
-  const visible = filters.visible.filter((item) => { const row = lookup.get(item.id); return row && runFilters.matches(row); });
-  const groups = runRepositoryGroups(visible, runFilters.group, model.data.projects, ru);
+  const { browser, rows, run, assignments, runFilters, cases, filters, visible, groups, lookup } = repository;
   const choose = (runId: string, projectId: string, itemId: string | null = null) => {
     model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(itemId);
   };
@@ -50,13 +29,13 @@ export function RunRepositoryBrowser({ model, lifecycleBlocked = false, startBlo
       disabled={browser.busy || assignments.busy || lifecycleBlocked} startBlocked={startBlocked || browser.loading}
       onCreate={()=>model.openRunDialog()} onAction={action=>void browser.act(action)}
       onChoose={id=>{const next=browser.choices.find(c=>c.id===id)?.runs[0];if(next)choose(next.id,next.projectId);}}/>
-    <SelectionControls inline state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
+    <SelectionControls disabled={lifecycleBlocked} inline state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
       onSelectAll={assignments.selecting && canAssign && !assignments.busy ? () => assignments.toggleScope(visible.map((c) => c.id)) : undefined}
       tools={<button type="button" className={css.refresh} aria-label={ru ? "Обновить" : "Refresh"} onClick={browser.refresh} disabled={browser.loading || browser.busy}><RefreshCw size={14} /></button>}/>
     {assignments.error && <FormError message={assignments.error} />}
     {browser.incomplete && <RunIncompleteDialog ru={ru} busy={browser.busy} canArchive={model.canArchiveRun}
       onClose={browser.dismissIncomplete} onArchive={() => void browser.act("archive")} />}
-    {lifecycleBlocked && <p role="status">{ru ? "Сохраните результат шага перед изменением прогона." : "Save the step result before changing the run."}</p>}
+    {draftDirty && <p role="status">{ru ? "Сохраните результат шага перед изменением прогона." : "Save the step result before changing the run."}</p>}
     {run?.archivedAt && model.canArchiveRun && <button type="button" className={css.restore} disabled={browser.busy} onClick={() => void browser.act("restore")}>{ru ? "Вернуть из архива" : "Restore from archive"}</button>}
     {browser.error && <FormError message={browser.error} />}
     <div className={css.scroll} aria-busy={browser.loading}>

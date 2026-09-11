@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { ExecutionStatus, RunItem, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
+import type { ExecutionStatus, RunItem, RunItemSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../core/tms/idempotency/pending-operation";
 import { TmsApiError } from "../../../../core/tms/transport/http";
@@ -110,10 +110,10 @@ export function useRunActions(
     itemMutations.patch(item.id, () => next);
     state.setSelectedRunItemDetail(next);
   }
-  async function setItemStatus(status: ExecutionStatus) {
+  async function setItemStatus(status: ExecutionStatus, onCommitted?: (item: RunItemSummary) => void) {
     const run = derived.selectedRun;
     const item = derived.selectedRunItem;
-    if (!run || !item || !state.selectedRunItemEtag || state.connection !== "connected") return;
+    if (!run || !item || !state.selectedRunItemEtag || state.connection !== "connected") return false;
     const key = crypto.randomUUID();
     let policyBlocked = false;
     try {
@@ -137,6 +137,10 @@ export function useRunActions(
             status, actualResult, comment: attempt.comment, blockedReason,
           }, current.etag, key);
           commitItem(refreshed.data, refreshed.etag);
+          if (currentOwner.current === owner) {
+            const { snapshot: _snapshot, attempts: _attempts, ...summary } = refreshed.data;
+            onCommitted?.(summary);
+          }
           await refreshRunAfterSuccessfulMutation(() => refreshRun(run.id),
             () => { if (currentOwner.current === owner) state.setSelectedRunEtag(null); });
           return refreshed;
@@ -148,15 +152,12 @@ export function useRunActions(
     } catch (error) {
       const fallback = t("actions.itemMarkError", statusVariables(item.caseKey, status));
       notify(formatTmsMutationFailure(toTmsMutationFailure(error), fallback));
-      return;
+      return false;
     }
-    if (currentOwner.current !== owner) return;
-    if (policyBlocked) { notify(t("actions.passRequiredFirst")); return; }
+    if (currentOwner.current !== owner) return false;
+    if (policyBlocked) { notify(t("actions.passRequiredFirst")); return false; }
     notify(t("actions.itemMarked", statusVariables(item.caseKey, status)));
-    if (status !== "failed") {
-      const index = state.runItems.findIndex((entry) => entry.id === item.id);
-      state.setSelectedRunItemId(state.runItems[index + 1]?.id ?? item.id);
-    }
+    return true;
   }
   async function completeRun() {
     const run = derived.selectedRun;

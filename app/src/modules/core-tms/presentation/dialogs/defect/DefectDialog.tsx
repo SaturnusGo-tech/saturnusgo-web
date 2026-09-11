@@ -20,7 +20,9 @@ import { Modal } from "../../common/modal/Modal";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { getDefectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
-import surface from "../drawer-surfaces.module.css";
+import { appendDefectFiles } from "../defect-layout/files";
+import surface from "../defect-layout/defect-form.module.css";
+import { useRunDismiss } from "../run-motion/useRunDismiss";
 type DefectDialogProps = {
   workspaceId: string; projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
   offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
@@ -31,6 +33,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
+  const { closing, dismiss, panelRef } = useRunDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const occurrence = run && item ? { run, item } : null;
   const attempt = item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item?.attempts[0];
@@ -113,9 +116,8 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
       actualResult: actual,
     };
     try {
-      onCreated(
-        await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale }),
-      );
+      const created = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
+      dismiss(() => onCreated(created));
     } catch (caught) {
       setError(describeDefectCreateError(caught, copy.error, locale));
       setSubmitting(false);
@@ -129,64 +131,64 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
           ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}`
           : copy.subtitle
       }
-      onClose={onClose}
+      onClose={() => { if (!submitting) dismiss(onClose); }}
       wide
-      drawer
+      drawer panelClassName={`${surface.panel} ${closing ? surface.closing : ""}`}
     >
-      <form onSubmit={submit} className={`${styles.drawerForm} ${styles.productionDrawerForm} ${surface.form}`}>
-        <div className={`${styles.drawerBody} ${surface.body}`}>
-          <section className={`${styles.drawerSection} ${surface.section}`}><div className={`${styles.formGrid} ${surface.grid}`}>
+      <form onSubmit={submit} className={surface.form} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing || submitting; }}>
+        <div className={surface.body}>
+          <section className={surface.section}><div className={surface.grid}>
           <Field label={copy.summary} wide>
             <input required autoFocus value={title} onChange={(event) => setTitle(event.target.value)} data-testid="defect-title" />
           </Field>
-          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.component}</span>
+          <div className={`${surface.field} ${surface.wide}`}><span>{copy.component}</span>
             <AnimatedSelect label={copy.component} value={component} onChange={setComponent} options={localizedComponentOptions} />
           </div>
-          <div className={`${styles.formField} ${styles.formFieldWide}`}><span>{copy.routingLabel}</span>
+          <div className={`${surface.field} ${surface.wide}`}><span>{copy.routingLabel}</span>
             <AnimatedSelect label={copy.routingLabel} value={integrationChoice}
               onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)}
               options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
-            {!offline && <small>{copy.routingHint}</small>}
+            {!offline && <details className={surface.hint}><summary>{locale === "ru" ? "Куда отправится дефект" : "Where the defect is sent"}</summary><p>{copy.routingHint}</p></details>}
             {!routing.resolved && <small className={styles.fieldValidation} role="status">{routingMessage}</small>}
           </div>
-          <div className={styles.formField}><span>{copy.severity}</span>
+          <div className={surface.field}><span>{copy.severity}</span>
             <AnimatedSelect label={copy.severity} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[
               { value: "low", label: copy.low }, { value: "medium", label: copy.medium },
               { value: "high", label: copy.high }, { value: "critical", label: copy.critical },
             ]} />
           </div>
-          <div className={styles.formField}><span>{copy.reproducibility}</span>
+          <div className={surface.field}><span>{copy.reproducibility}</span>
             <AnimatedSelect label={copy.reproducibility} value={reproducibility} onChange={setReproducibility} options={[
               { value: "Always", label: copy.always }, { value: "Sometimes", label: copy.sometimes },
               { value: "Once", label: copy.once },
             ]} />
           </div>
-          <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} />
+          <div className={`${surface.field} ${surface.wide}`}><span>{locale === "ru" ? "Ответственный" : "Assignee"}</span><ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} /></div>
           <NarrativeField label={copy.description} value={description} onChange={setDescription} disabled={submitting} />
           <NarrativeField label={copy.expected} value={failedStep?.expectedResult ?? ""} />
           <Field label={copy.actual} wide>
-            <textarea className={`${styles.drawerTextarea} ${surface.textarea}`} required value={actual} onChange={(event) => setActual(event.target.value)} />
+            <textarea className={surface.textarea} required value={actual} onChange={(event) => setActual(event.target.value)} />
           </Field>
           <Field label={copy.deepLink} wide>
             <input value={link} onChange={(event) => setLink(event.target.value)} placeholder={copy.linkPlaceholder} />
           </Field>
         </div></section>
-        <section className={`${styles.drawerSection} ${surface.section}`}><div className={styles.drawerSectionHeading}><strong>{copy.addEvidence}</strong><span>{copy.evidenceFormats}</span></div><div className={styles.compactUpload}>
-          <label role="button" tabIndex={0} onKeyDown={(event) => {
+        <section className={surface.section}><div className={surface.evidenceHeading}><strong>{copy.addEvidence}</strong><span>{copy.evidenceFormats}</span></div><div>
+          <label className={surface.upload} role="button" tabIndex={0} onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); }
           }}>
             <ImageIcon size={18} />
             <span>{copy.addEvidence}</span>
-            <input tabIndex={-1} type="file" multiple accept="image/*,video/*,.log,.txt,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} />
+            <input tabIndex={-1} type="file" multiple accept="image/*,video/*,.log,.txt,.pdf" onChange={(event) => { const added = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; setFiles(current => appendDefectFiles(current, added)); }} />
           </label>
-        </div><div ref={filesRef} className={styles.compactFileList}>{files.map((file) => (
+        </div><div ref={filesRef} className={surface.files}>{files.map((file) => (
             <span key={`${file.name}-${file.lastModified}`}><Paperclip size={13} />{file.name}<button type="button" aria-label={`${copy.removeFile} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>
           ))}</div></section>
           {error && <FormError message={error} />}
         </div>
-        <div className={styles.modalFooter}>
-          <button type="button" className={styles.textButton} onClick={onClose}>{copy.cancel}</button>
-          <button className={styles.primaryButton} data-testid="create-defect" disabled={submitting || !routing.resolved}>
+        <div className={surface.footer}>
+          <button type="button" className={styles.textButton} onClick={() => dismiss(onClose)} disabled={submitting}>{copy.cancel}</button>
+          <button type="submit" data-testid="create-defect" disabled={submitting || !routing.resolved}>
             <Bug size={16} /> {submitting ? copy.creating : copy.create}
           </button>
         </div>

@@ -6,20 +6,21 @@ type RunKeyboardShortcutOptions = {
   items: RunItemSummary[];
   selectedItem: RunItem | null;
   selectedRun: TestRunSummary | null;
-  runWritable: boolean;
+  runWritable: boolean; navigationBlocked?: boolean;
   onItemStatus: (status: ExecutionStatus) => void;
   onSelectItem: (id: string) => void;
   setReporting: Dispatch<SetStateAction<boolean>>;
 };
 
 export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
-  const { items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting } = options;
+  const { navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting } = options;
   useEffect(() => {
-    if (!selectedRun || !selectedItem) return;
+    if (!selectedRun || !selectedItem || !items.some(entry => entry.id === selectedItem.id)) return;
     const item = selectedItem;
     function handleShortcut(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (event.defaultPrevented || target?.closest("[role=dialog], [role=menu], [role=listbox]")) return;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       const index = items.findIndex((entry) => entry.id === item.id);
       const activeAttempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo)
         ?? item.attempts[0];
@@ -31,12 +32,14 @@ export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
       const key = event.key.toLowerCase();
       if ((event.metaKey || event.ctrlKey) && event.key === "[") {
         event.preventDefault();
-        const previous = items[index - 1];
+        const previous = !navigationBlocked && items[index - 1];
         if (previous) onSelectItem(previous.id);
       } else if ((event.metaKey || event.ctrlKey) && event.key === "]") {
         event.preventDefault();
-        const next = items[index + 1];
+        const next = !navigationBlocked && items[index + 1];
         if (next) onSelectItem(next.id);
+      } else if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
       } else if (key === "b" && runWritable) {
         event.preventDefault(); onItemStatus("blocked");
       } else if (key === "f" && runWritable) {
@@ -51,5 +54,5 @@ export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
     }
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting]);
+  }, [navigationBlocked, items, onItemStatus, onSelectItem, runWritable, selectedItem, selectedRun, setReporting]);
 }

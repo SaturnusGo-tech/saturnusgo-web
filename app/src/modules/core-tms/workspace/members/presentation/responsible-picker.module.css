@@ -1,18 +1,29 @@
 .root { position: relative; min-width: 0; }
+.root[data-open] { z-index: 1200; }
 .trigger { width: 100%; display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 10px 12px; background: var(--paper); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 9px; font: inherit; font-size: 13px; cursor: pointer; }
 .trigger > .label { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trigger > svg { color: var(--muted); flex-shrink: 0; }
 .trigger:disabled { opacity: .6; cursor: default; }
-.popover { position: absolute; inset: calc(100% + 6px) 0 auto; padding: 6px; z-index: 20; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: 0 12px 36px #0003; }
+.popover { position: absolute; inset: calc(100% + 6px) 0 auto; padding: 6px; z-index: 1; isolation: isolate; overflow: hidden; color: var(--ink); background: var(--tms-bg-panel, #fff); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: 0 8px 24px #0002; }
 .popover .search { display: flex; grid-template-columns: none; width: 100%; box-sizing: border-box; min-height: 34px; align-items: center; gap: 8px; padding: 7px 9px; border-bottom: 1px solid var(--line); color: var(--muted); }
 .popover .search input { flex: 1; min-width: 0; width: 100%; height: 24px; text-align: left; border-radius: 0; box-shadow: none; border: 0; padding: 3px; background: transparent; color: var(--ink); font: inherit; font-size: 12px; outline: none; }
 .options { max-height: 200px; overflow: auto; padding: 5px 0; }
 .options button { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px; border: 0; border-radius: 7px; background: transparent; color: var(--ink); text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
 .options button > .label { flex: 1; display: grid; gap: 3px; }
-.options small { color: var(--muted); font-size: 11px; }
+.options .label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.options small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 11px; }
 .options button:hover, .options button[aria-selected=true] { background: var(--control-hover); }
 .more { width: 100%; padding: 9px; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--muted); cursor: pointer; font: inherit; font-size: 11px; }
 .popover p { margin: 7px; color: var(--muted); font-size: 11px; }
 .root button:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: 2px; }
 
 .popover[data-above="true"] { inset: auto 0 calc(100% + 6px); }
+
+.popover .search { border: 1px solid var(--line-strong); border-radius: 8px; margin-bottom: 4px; padding: 7px 9px; }
+.popover .search:focus-within { border-color: var(--tms-focus-border,#3574f0); }
+.popover .search input { min-height: 18px; height: 18px; padding: 0; border: 0 !important; background: transparent !important; }
+:global(.dark) .popover { background: var(--tms-bg-elevated,#23252b); border-color: var(--line-strong,#44464d); box-shadow: 0 8px 24px #0005; }
+.skeleton { display: grid; gap: 10px; padding: 10px; }
+.skeleton i { display: block; height: 20px; border-radius: 6px; background: var(--control-hover); animation: pulse 1.4s ease-in-out infinite alternate; }
+@keyframes pulse { to { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .skeleton i { animation: none; } }

@@ -10,10 +10,12 @@ import type { RunBatch, RunBatchTransition } from "../../model/batch";
 import { runRepositoryEntries, type RunRepositoryEntry } from "../../model/repository/run-repository";
 
 type Action = "start" | "pause" | "resume" | "complete" | "archive" | "restore";
-export function useRunBrowser(input: { workspaceId: string; selected: TestRunSummary | null;
+export function useRunBrowser(input: { workspaceId: string; selected: TestRunSummary | null; selectedId?: string | null;
   knownRuns: TestRunSummary[]; connected: boolean; ru: boolean;
   onUpdate: (runs: TestRunSummary[]) => void; onRefreshSelected: () => void }) {
   const http = useTmsHttpClient(); const [batches, setBatches] = useState<RunBatch[]>([]);
+  const [batchesWorkspace, setBatchesWorkspace] = useState("");
+  const [loadedScope, setLoadedScope] = useState("");
   const [entries, setEntries] = useState<RunRepositoryEntry[]>([]);
   const [loading, setLoading] = useState(false); const [busy, setBusy] = useState(false);
   const [incomplete, setIncomplete] = useState(false);
@@ -31,18 +33,21 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
     const controller = new AbortController();
     if (!input.connected) return;
     listRunBatches(http, input.workspaceId, controller.signal).then((next) => {
-      if (!controller.signal.aborted) setBatches(next);
+      if (!controller.signal.aborted) { setBatches(next); setBatchesWorkspace(input.workspaceId); }
     }).catch((err: unknown) => { if (!controller.signal.aborted) setError(formatTmsMutationFailure(toTmsMutationFailure(err), input.ru ? "Не удалось загрузить прогоны." : "Could not load runs.")); });
     return () => controller.abort();
   }, [http, input.workspaceId, input.connected, revision, input.knownRuns.length]);
-  const batch = batches.find((b) => b.runs.some((r) => r.id === input.selected?.id));
-  const memberIds = batch?.runs.map((r) => r.id).join("|") ?? input.selected?.id ?? "";
+  const selectedId = input.selectedId ?? input.selected?.id;
+  const batch = batches.find((b) => b.runs.some((r) => r.id === selectedId));
+  const memberIds = batch?.runs.map((r) => r.id).join("|") ?? selectedId ?? "";
   const selectedRuns = batch?.runs ?? (input.selected ? [input.selected] : []);
+  const resolvedIds = selectedRuns.map(run => run.id).join("|");
   useEffect(() => {
     const controller = new AbortController(); generation.current += 1; setError(""); setIncomplete(false);
     const scope = `${input.workspaceId}:${memberIds}`;
     if (entriesScope.current !== scope) { setEntries([]); entriesScope.current = scope; }
     if (!memberIds || !input.connected) { setEntries([]); setLoading(false); return; }
+    if (batchesWorkspace !== input.workspaceId || resolvedIds !== memberIds) { setLoading(true); return; }
     setLoading(true);
     async function load() {
       try {
@@ -51,11 +56,11 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
           const page = await listRunItems(http, run.id, controller.signal);
           result.push(...runRepositoryEntries(run.id, run.projectId, page.items));
         }
-        controller.signal.throwIfAborted(); setEntries(result); setLoading(false);
+        controller.signal.throwIfAborted(); setEntries(result); setLoadedScope(`${scope}:${revision}`); setLoading(false);
       } catch (err) { if (!controller.signal.aborted) { setLoading(false); setError(formatTmsMutationFailure(toTmsMutationFailure(err), input.ru ? "Не удалось загрузить кейсы прогона." : "Could not load run cases.")); } }
     }
     void load(); return () => { controller.abort(); generation.current += 1; };
-  }, [http, memberIds, input.workspaceId, input.connected, revision]);
+  }, [http, memberIds, resolvedIds, batchesWorkspace, input.workspaceId, input.connected, revision]);
   const batchId = batch?.id ?? input.selected?.batchId;
   useEffect(() => {
     if (!batchId || !input.connected) return;
@@ -121,6 +126,6 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   const choices = [...batches.map((b) => ({ id: b.id, name: `${b.iteration.name} · ${b.sequence}`, runs: b.runs, tags: b.iteration.tags, createdAt: b.createdAt })),
     ...input.knownRuns.filter((r) => !batchMembers.has(r.id)).map((r) => ({ id: r.id, name: r.name, runs: [r], tags: [], createdAt: r.createdAt }))]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return { incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries, loading, busy, error, act, selectedRuns,
+  return { ready: !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries, loading, busy, error, act, selectedRuns,
     refresh: () => setRevision((n) => n + 1) };
 }

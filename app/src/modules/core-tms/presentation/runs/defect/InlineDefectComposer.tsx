@@ -20,7 +20,9 @@ import { Modal } from "../../common/modal/Modal";
 import { AnimatedSelect } from "../../common/select/AnimatedSelect";
 import { getDefectDialogCopy } from "../../dialogs/defect/copy";
 import shared from "../../../tms.module.css";
-import surface from "../../dialogs/drawer-surfaces.module.css";
+import { appendDefectFiles } from "../../dialogs/defect-layout/files";
+import surface from "../../dialogs/defect-layout/defect-form.module.css";
+import { useRunDismiss } from "../../dialogs/run-motion/useRunDismiss";
 import styles from "./inline-defect.module.css";
 
 type Props = {
@@ -40,6 +42,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
+  const { closing, dismiss, panelRef } = useRunDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;
@@ -92,8 +95,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
     };
     try {
       const next = await createDefect({ http, attachments, projectId, payload, files, operationKey, link, offline, locale });
-      onCreated(next);
-      onClose();
+      dismiss(() => { onCreated(next); onClose(); });
     } catch (caught) {
       setError(describeDefectCreateError(caught, t("inlineDefect.saveError"), locale));
       setSubmitting(false);
@@ -101,35 +103,35 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   }
 
   const componentChoices = componentOptions.map((value) => ({ value, label: localizedComponentLabel(locale, value) }));
-  return <Modal title={t("inlineDefect.step", { step: step.order })} subtitle={`${item.caseKey} · ${run.environment.name} · ${run.build}`} onClose={onClose} drawer panelClassName={styles.panel}>
-    <form id={`defect-form-${item.id}`} className={`${shared.drawerForm} ${shared.productionDrawerForm} ${surface.form} ${styles.form}`} onSubmit={submit} data-testid="inline-defect-composer">
-      <div className={`${shared.drawerBody} ${surface.body} ${styles.body}`}>
-        <section className={`${shared.drawerSection} ${surface.section} ${styles.section}`}>
-          <div className={`${shared.formGrid} ${surface.grid} ${styles.grid}`}>
+  return <Modal title={t("inlineDefect.step", { step: step.order })} subtitle={`${item.caseKey} · ${run.environment.name} · ${run.build}`} onClose={() => { if (!submitting) dismiss(onClose); }} drawer panelClassName={`${surface.panel} ${closing ? surface.closing : ""}`}>
+    <form id={`defect-form-${item.id}`} className={surface.form} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing || submitting; }} onSubmit={submit} data-testid="inline-defect-composer">
+      <div className={surface.body}>
+        <section className={surface.section}>
+          <div className={surface.grid}>
             <Field label={t("inlineDefect.title")} wide><input autoFocus required value={title} onChange={(event) => setTitle(event.target.value)} /></Field>
             <Field label={t("inlineDefect.severity")}><AnimatedSelect label={t("inlineDefect.severity")} value={severity} onChange={(value) => setSeverity(value as Defect["severity"])} options={[{ value: "critical", label: t("severity.critical") }, { value: "high", label: t("severity.major") }, { value: "medium", label: t("severity.minor") }, { value: "low", label: t("severity.low") }]} /></Field>
             <Field label={t("inlineDefect.priority")}><AnimatedSelect label={t("inlineDefect.priority")} value={priority} onChange={(value) => setPriority(value as Defect["priority"])} options={[{ value: "critical", label: t("inlineDefect.priorityUrgent") }, { value: "high", label: t("priority.high") }, { value: "medium", label: t("priority.medium") }, { value: "low", label: t("priority.low") }]} /></Field>
             <Field label={t("inlineDefect.category")} wide><AnimatedSelect label={t("inlineDefect.category")} value={component} onChange={setComponent} options={componentChoices} /></Field>
             <Field label={copy.routingLabel} wide><AnimatedSelect label={copy.routingLabel} value={integrationChoice} onChange={(value) => setIntegrationChoice(value as DefectIntegrationChoice)} options={routeOptions} disabled={offline || youTrackStatus !== "ready"} />
-              {!offline && <small>{copy.routingHint}</small>}{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
-            <ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} />
+              {!offline && <details className={surface.hint}><summary>{locale === "ru" ? "Куда отправится дефект" : "Where the defect is sent"}</summary><p>{copy.routingHint}</p></details>}{!routing.resolved && <small className={shared.fieldValidation} role="status">{routingMessage}</small>}</Field>
+            <div className={`${surface.field} ${surface.wide}`}><span>{locale === "ru" ? "Ответственный" : "Assignee"}</span><ResponsiblePicker workspaceId={workspaceId} value={assigneeIdentityId} onChange={setAssignee} offline={offline} disabled={submitting} /></div>
             <NarrativeField label={t("inlineDefect.description")} value={description} onChange={setDescription} disabled={submitting} />
           </div>
         </section>
-        <section className={`${shared.drawerSection} ${surface.section} ${styles.section}`}>
-          <div className={shared.drawerSectionHeading}><strong>{t("inlineDefect.reproSteps")}</strong><span>{t("inlineDefect.runSnapshotHint")}</span></div>
-          <textarea className={styles.repro} aria-label={t("inlineDefect.reproSteps")} required value={repro} onChange={(event) => setRepro(event.target.value)} />
+        <section className={surface.section}>
+          <div className={surface.evidenceHeading}><strong>{t("inlineDefect.reproSteps")}</strong><span>{t("inlineDefect.runSnapshotHint")}</span></div>
+          <textarea className={surface.textarea} aria-label={t("inlineDefect.reproSteps")} required value={repro} onChange={(event) => setRepro(event.target.value)} />
           <div className={styles.snapshot}><RefreshCw size={14} /><span><strong>{t("inlineDefect.runSnapshot")}</strong><small>{t("inlineDefect.linkStep")} {step.order}</small></span></div>
         </section>
-        <section className={`${shared.drawerSection} ${surface.section} ${styles.section}`}>
-          <div className={shared.drawerSectionHeading}><strong>{t("inlineDefect.evidence")}</strong><span>{t("inlineDefect.fileTypes")}</span></div>
-          <label className={styles.upload} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); } }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setFiles(Array.from(event.dataTransfer.files)); }}><Paperclip size={15} /><span>{t("inlineDefect.chooseFiles")}</span><input tabIndex={-1} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} /></label>
-          {files.length > 0 && <div className={styles.files}>{files.map((file) => <span key={`${file.name}-${file.lastModified}`}><Paperclip size={12} />{file.name}<button type="button" aria-label={`${t("inlineDefect.removeFile")} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>)}</div>}
+        <section className={surface.section}>
+          <div className={surface.evidenceHeading}><strong>{t("inlineDefect.evidence")}</strong><span>{t("inlineDefect.fileTypes")}</span></div>
+          <label className={surface.upload} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); } }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setFiles(current => appendDefectFiles(current, Array.from(event.dataTransfer.files))); }}><Paperclip size={15} /><span>{t("inlineDefect.chooseFiles")}</span><input tabIndex={-1} type="file" multiple accept="image/*,video/*,.txt,.log,.pdf" onChange={(event) => { const added = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; setFiles(current => appendDefectFiles(current, added)); }} /></label>
+          {files.length > 0 && <div className={surface.files}>{files.map((file) => <span key={`${file.name}-${file.lastModified}`}><Paperclip size={12} />{file.name}<button type="button" aria-label={`${t("inlineDefect.removeFile")} ${file.name}`} onClick={() => setFiles((current) => current.filter((item) => item !== file))}><X size={12} /></button></span>)}</div>}
           <Field label={t("inlineDefect.deepLink")} wide><input value={link} onChange={(event) => setLink(event.target.value)} /></Field>
         </section>
         {error && <FormError message={error} />}
       </div>
-      <div className={`${shared.modalFooter} ${styles.footer}`}><span>{item.caseKey} · {t("inlineDefect.linkStep")} {step.order}</span><div><button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button><button className={shared.primaryButton} disabled={submitting || !routing.resolved}><Bug size={15} />{submitting ? t("inlineDefect.creating") : copy.create}</button></div></div>
+      <div className={surface.footer}><span>{item.caseKey} · {t("inlineDefect.linkStep")} {step.order}</span><div><button type="button" className={shared.textButton} onClick={() => dismiss(onClose)} disabled={submitting}>{copy.cancel}</button><button type="submit" disabled={submitting || !routing.resolved}><Bug size={15} />{submitting ? t("inlineDefect.creating") : copy.create}</button></div></div>
     </form>
   </Modal>;
 }
