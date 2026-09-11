@@ -72,3 +72,35 @@ Chrome and WebKit browser checks passed using actual ScenarioStepEditor/Scenario
 Plain narrative fields retain rendered content while the lazy Markdown editor initializes. A shared transparent transition frame then crossfades the content and animates its measured height in both directions. CSS transitions retain their final opacity rather than resetting on a Web Animations completion frame. Read/exit layers are inert, rapid close/reopen is supported, focus is applied after the editor becomes interactive, and reduced-motion preferences disable movement. Existing comment editor loading stays unchanged. The narrative attachment footer has a 1px vertical divider to the right of the paperclip. Scenario attachment text and icon now form one native button; pending uploads and saved evidence remain separate controls.
 
 Verified actual components in Chrome and WebKit: sampled every frame for nonblank crossfade and intermediate heights; cold editor initialization, autofocus, apply/cancel/reopen, rapid toggles, light/dark themes, reduced motion, 390px overflow, file chooser opened by clicking the visible label and by Enter, and correct draft field ownership for two files. Local fixture only, no production writes/uploads. Existing Markdown, safe-code and saved-attachment checks: 19 passed; typecheck and architecture (941 files) passed. Evidence: `/tmp/falcon-narrative-preview/motion-webkit-dark.png`, `/tmp/falcon-narrative-preview/motion-chrome-light.png`, `/tmp/falcon-motion-final.log`, `/tmp/falcon-narrative-regression.log`.
+
+
+# Test run organization and filters — 2026-09-12
+
+Local implementation: passed. Production verification: blocked pending deployment authorization after automatic approval review rejected the production upload. No production migration or application publication was performed in this change.
+
+## Reference and final UI
+
+Compared the supplied repository bulk-action reference (Screenshot 2026-09-11 at 11.56.51 PM) alongside the final light-theme capture in one visual review. The global blue bar is centered across both panels, with one row of labeled actions and the same shared repository styles. It is not constrained to the left case tree. The QA menu has full-width rows with avatars, names and emails, a thin outlined search input, rounded corners and subtle hover. It opens above its trigger using the existing measured-height transition plus opacity/translation.
+
+Evidence:
+- `/tmp/falcon-run-bulk-light-final.png`, `/tmp/falcon-run-bulk-dark-final.png`: 1280 × 800, two selected cases, assignment menu open.
+- `/tmp/falcon-run-footer-desktop.png`: 1280 × 800, active run, navigation left and labeled result actions right, 52 px reserved at the right edge.
+- `/tmp/falcon-run-footer-narrow.png`: 820 × 740, narrow execution pane; icon-only result/navigation controls with accessible names. The final threshold also handles the intermediate 1024 px layout.
+
+Intentional differences from the repository reference: run-specific actions replace Create run/Status; current-run selector, state and circular lifecycle buttons remain; New run is blue with a white plus and label. The local fixture shows an open case detail and two projects, whereas the source reference shows an empty detail. Preview-only theme toggle, fixture members and missing organization avatar lookup are not shipped. No unsupported generated filters were adopted.
+
+## Functional verification
+
+- Global selection can span projects; selecting, filtering and grouping retain unique run item identities.
+- Multiple assignees, projects and results were selected in the browser; component/type/priority/status/tag/folder OR-within and AND-across semantics are covered by unit tests. Grouping supports project, component and tags together without collisions between duplicate project names or duplicate tags.
+- Click outside the filter closes it without clearing choices; Escape also closes and returns focus. No separate owner/project/result filter blocks remain.
+- Assignment, priority, move to a new folder, archive, restore and removal were exercised with real presentation components and a local API fixture. The original all-actions failure was a missing organization route in this isolated fixture; that route now handles the same contract, idempotency and stale-version checks.
+- Archive UI regression fixed: Include archived now passes archived cases through the selection tree and allows explicit run-only selection for Restore. Repository archive selection and dragging remain disabled. Browser archive → show archived → select → restore → remove completed without alerts.
+- Real PostgreSQL HTTP/integration tests cover all organization mutations, atomic rollback on stale versions, tenant isolation under the restricted runtime role, idempotent replay, immutable case/revision/snapshot preservation and retained execution history.
+- New run, start/pause and the red finish control retain their established lifecycle semantics. The footer has text at laptop widths and switches only when its available panel width is too small. At 1024 px, the initially discovered overlap was fixed and DOM bounds no longer intersect.
+- Browser console: no errors in the final preview. No horizontal document overflow at checked 820/1024/1280 widths. Viewport overrides reset after testing.
+- Existing floating verification action is hidden while the bulk bar is active; on desktop its expanded state is lifted above the execution footer. This coexistence is implemented in shared layout CSS but still requires a production smoke check with a real verification queue.
+
+## Gates and limits
+
+Frontend: 760 tests passed; typecheck and architecture (970 files) passed; export build passed. Backend: 695 tests passed against PostgreSQL; typecheck, lint, architecture, migration verification, OpenAPI and build passed. The frontend lint command remains the repository's existing no-op, not a substantive lint gate. No physical Windows/Linux/mobile browser testing performed; browser checks used Codex's in-app browser. Final live verification remains pending publication; local UI fixture results alone are not claimed as production persistence verification.

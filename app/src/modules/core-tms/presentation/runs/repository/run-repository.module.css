@@ -1,13 +1,5 @@
 .browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 14px 12px; border-right: 1px solid var(--cases-row-border); background: var(--cases-bg); font-size: 12px; }
 .browser button { cursor: pointer; font: inherit; }
-.newRun, .lifecycle button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 16px; padding: 8px 12px; white-space: nowrap; }
-.newRun, .lifecycle .primary { background: #3574f0; color: white; }
-.runSelection { display: grid; gap: 6px; padding: 12px 0 8px; }
-.runSelection input { border: 0; background: transparent; padding: 5px 8px; color: inherit; font: inherit; outline: none; }
-.runSelection input:focus-visible { outline: 1px solid var(--cases-primary); border-radius: 6px; }
-.lifecycle { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0 12px; color: var(--cases-muted); }
-.lifecycle button { background: var(--cases-hover); color: var(--cases-text); }
-.lifecycle button:disabled { opacity: .45; }
 .scroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
 .empty { padding: 18px 8px; color: var(--cases-muted); }
 .status { display: inline-flex; color: var(--cases-muted); }
@@ -26,10 +18,6 @@
 
 .restore { border: 0; border-radius: 16px; padding: 8px 12px; background: var(--cases-hover); color: var(--cases-text); align-self: flex-start; }
 
-.play { width: 33px; height: 33px; flex: 0 0 33px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #3574f0; color: #fff; padding: 0; }
-.play:disabled { opacity: .45; cursor: default; }
-.play:hover:not(:disabled), .newRun:hover { background: #2866df; }
-.newRun { flex-shrink: 0; }
 .refresh { margin-left: auto; border: 0; background: transparent; color: var(--cases-muted); display: flex; padding: 6px; border-radius: 7px; }
 .selectCases { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 5px 2px; border: 0; background: transparent; color: var(--cases-muted); font-size: 11px !important; }
 .selectCases[aria-pressed=true] { color: #3574f0; }

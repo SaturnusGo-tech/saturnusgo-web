@@ -13,8 +13,10 @@ test("metadata listbox wraps arrow navigation and supports boundaries", () => {
   assert.equal(nextMetadataOption(0, 0, "ArrowDown"), -1);
 });
 
-test("metadata trigger is one colored control with its chevron inside", () => {
-  assert.match(source, /className=\{`\$\{styles\.trigger\} \$\{selected\?\.tone/);
+test("metadata trigger is one control with its chevron inside", () => {
+  assert.match(source, /className=\{styles\.trigger\}/);
+  assert.match(source, /aria-haspopup="listbox"/);
+  assert.match(source, /aria-expanded=\{open\}/);
   assert.match(source, /className=\{styles\.triggerLabel\}/);
   assert.doesNotMatch(source, /className=\{`\$\{styles\.chip\} \$\{selected/);
   assert.match(source, /<ChevronDown[^>]+aria-hidden="true"/);

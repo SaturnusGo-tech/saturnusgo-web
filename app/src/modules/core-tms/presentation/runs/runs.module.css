@@ -171,10 +171,10 @@
 .evidenceGrid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
 .evidenceGrid > span { min-height: 40px !important; color: var(--runs-text) !important; background: var(--runs-control) !important; border-color: var(--runs-border) !important; }
 
-.footer { min-width: 0; min-height: 54px; display: grid; grid-column: 2; grid-row: 2; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 20px; padding: 9px 64px 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); box-shadow: 0 -8px 24px rgb(23 29 38 / 5%); }
+.footer { min-width: 0; min-height: 54px; display: flex; grid-column: 2; grid-row: 2; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 52px 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); container: run-footer / inline-size; }
 .pager, .actions, .completion { min-width: 0; display: flex; align-items: center; gap: 5px; }
-.actions { grid-column: 1; grid-row: 1; order: -1; flex-wrap: wrap; justify-content: flex-start; }
-.pager { grid-column: 2; grid-row: 1; }
+.actions { margin-left: auto; justify-content: flex-end; flex-shrink: 0; }
+.pager { justify-content: flex-start; flex-shrink: 0; }
 .actions::-webkit-scrollbar { display: none; }
 .completion { justify-content: flex-end; color: var(--runs-muted); font-size: 12px; white-space: nowrap; }
 .footer :is(button, label) { min-height: 34px; border-radius: 5px; white-space: nowrap; }
@@ -185,21 +185,17 @@
   .shell { grid-template-columns: minmax(390px, 43%) minmax(0, 1fr); }
   .overviewLayout { grid-template-columns: 1fr; gap: 22px; padding: 20px; }
   .sideRail { grid-template-columns: 1fr 1fr; padding-top: 18px; border-top: 1px solid var(--runs-border); }
-  .compactActionLabel, .pagerLabel { display: none; }
-  .compactAction { width: 34px; min-width: 34px; padding-inline: 0; }
 }
 @container runs-shell (max-width: 960px) {
   .shell { grid-template-columns: minmax(320px, 41%) minmax(0, 1fr); }
-  .mobileActionLabel { display: none; }
-  .wideAction { width: 34px; min-width: 34px; padding-inline: 0; }
   .titleBlock, .utilityRow { padding-inline: 16px; }
 }
 @media (max-width: 720px) {
   .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 38vh) minmax(0, 1fr) auto; }
   .emptyPane { grid-column: 1; grid-row: 2 / 4; }
   .detail { grid-column: 1; grid-row: 2; }
-  .footer { z-index: 8; grid-column: 1; grid-row: 3; display: flex; flex-direction: column; align-items: stretch; padding: 8px 64px 8px 8px; }
-  .actions, .completion { justify-content: stretch; }
+  .footer { z-index: 8; grid-column: 1; grid-row: 3; display: flex; align-items: center; padding: 8px 48px 8px 8px; }
+  .actions, .completion { justify-content: flex-end; }
   .actions > :is(button, label), .completion > button { min-width: 40px; min-height: 40px; flex: 1 1 40px; }
   .actions > :is(.compactAction, .wideAction) { width: auto; min-width: 40px; padding-inline: 8px; }
   .overviewLayout { padding: 18px 16px; }
@@ -219,4 +215,14 @@
 @keyframes runs-reveal { from { opacity: .72; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .detailTransition, .detailArchiving, .archivePopover, .contentSection, .railSection { animation: none; transition: none; } }
 
-@container runs-shell (max-width: 1450px) { .footer .pagerLabel { display: none; } }
+.shell .footer :is(button, label) { flex: 0 0 auto; min-height: 34px; border-radius: 9px; font-size: 12px; gap: 6px; padding-inline: 9px; }
+@container run-footer (max-width: 600px) {
+  .compactActionLabel, .pagerLabel, .mobileActionLabel { display: none; }
+  .shell .footer button { width: 34px; min-width: 34px; padding-inline: 0; }
+}
+@container run-footer (max-width: 720px) {
+  .mobileActionLabel { display: none; }
+  .footer:has([data-testid="report-defect"]) .pagerLabel { display: none; }
+}
+.shell { position: relative; }
+.shell:has([data-run-bulk]) .footer { visibility: hidden; }

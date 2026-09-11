@@ -50,7 +50,7 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
   const runWritable = Boolean(selectedRun && !selectedRun.archivedAt && selectedRun.status === "active");
   const editScope = JSON.stringify([selectedRun?.id, selectedItem?.id, selectedItem?.activeAttemptNo]);
   const currentEditScope = useRef(editScope); currentEditScope.current = editScope;
-  const attemptWritable = canExecute && canEditRunAttempt(selectedRun, selectedItem);
+  const attemptWritable = canExecute && !selectedItem?.archivedAt && canEditRunAttempt(selectedRun, selectedItem);
   useRunKeyboardShortcuts({
     items, selectedItem, selectedRun, runWritable: attemptWritable && dirtySteps.length === 0, onItemStatus, onSelectItem,
     setReporting,
@@ -110,7 +110,7 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
               <header><h2>{locale === "ru" ? "Свойства" : "Properties"}</h2></header>
               <div className={runStyles.propertyList}>
                 <div><span>{t("runs.status")}</span><span className={`${runStyles.executionBadge} ${runStyles[`execution_${selectedItem.status}`]}`}>{statusIcon[selectedItem.status]}{localizedLabel(locale, selectedItem.status)}</span></div>
-                <div><span>{locale === "ru" ? "Приоритет" : "Priority"}</span><PriorityBadge locale={locale} priority={selectedItem.snapshot.priority} /></div>
+                <div><span>{locale === "ru" ? "Приоритет" : "Priority"}</span><PriorityBadge locale={locale} priority={selectedItem.preview?.priority ?? selectedItem.snapshot.priority} /></div>
                 <div><span>{locale === "ru" ? "Тип" : "Type"}</span><TypeBadge locale={locale} type={selectedItem.snapshot.type} /></div>
                 <div><span>{t("runs.estimate")}</span><EstimateBadge locale={locale} minutes={selectedItem.snapshot.estimatedMinutes} /></div>
               </div>
@@ -129,8 +129,8 @@ export function RunsView({ navigation, onDirtyChange, workspaceId, offline, case
         {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} workspaceId={workspaceId} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}
       </div>
     </section>
-    {runWritable && <footer className={runStyles.footer}>
-      <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{t("runs.previous")}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{t("runs.next")}</span><ChevronRight size={16} /></button></div>
+    {runWritable && <footer className={runStyles.footer} data-run-execution-footer>
+      <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{locale === "ru" ? "Предыдущий" : "Previous"}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{locale === "ru" ? "Следующий" : "Next"}</span><ChevronRight size={16} /></button></div>
       <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={`${styles.secondaryButton} ${runStyles.compactAction}`} aria-label={t("runs.block")} title={t("runs.block")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.compactActionLabel}>{t("runs.block")}</span></button><button className={`${styles.dangerButton} ${runStyles.compactAction}`} aria-label={t("runs.fail")} title={t("runs.fail")} disabled={dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.compactActionLabel}>{t("runs.fail")}</span></button><button className={`${styles.successButton} ${runStyles.compactAction}`} aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={!canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.compactActionLabel}>{t("runs.pass")}</span></button></>}{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
 
     </footer>}

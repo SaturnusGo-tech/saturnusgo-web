@@ -2,9 +2,11 @@
 .panel .search { display: flex; height: 32px; align-items: center; gap: 7px; margin: 2px 3px 6px; padding: 0 8px; border: 1px solid var(--cases-row-border); border-radius: 8px; color: var(--cases-muted); }
 .panel .search input { width: 100%; min-width: 0; height: 28px; padding: 0; border: 0; outline: none; background: transparent; color: var(--cases-text); font: inherit; font-size: 12px; text-align: left; }
 .panel .search input:focus-visible { box-shadow: none; outline: none !important; }
-.panel .search:focus-within { border-color: var(--cases-primary); }
+.panel .search:focus-within { border-color:var(--cases-primary)!important; box-shadow:none!important; outline:none!important; }
 .options { max-height: 230px; overflow-y: auto; scrollbar-width: thin; }
-.options button { min-height: 32px; padding-block: 5px; }
+.options button { width:100%; display:flex; align-items:center; gap:8px; min-height:32px; padding:6px 8px; border:0; border-radius:7px; background:transparent; color:var(--cases-text); font:inherit; text-align:left; cursor:pointer; }
+.options button:hover,.options button:focus-visible { background:var(--cases-hover); }
+.options button > svg { flex-shrink:0; }
 .options button > .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .options button small { display: block; font-size: 10px; color: var(--cases-muted); overflow: hidden; text-overflow: ellipsis; }
 .options button[aria-selected=true] { color: var(--cases-primary); background: var(--cases-hover); }

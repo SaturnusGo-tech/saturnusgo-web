@@ -11,7 +11,7 @@ import css from "../styles/repository.module.css";
 
 export type FolderBranchProps = {
   trailing?: (item: TestCaseSummary) => ReactNode;
-  canSelect?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
+  canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
   node: FolderNode; depth: number; expanded: ReadonlySet<string>; selected: ReadonlySet<string>;
   selectedFolder: string; selectedFolderId?: string; activeCaseId: string; ru: boolean; locked: boolean; canManage: boolean;
   onExpand: (id: string) => void; onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void;
@@ -53,7 +53,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       <ul id={childrenId} className={css.children}>
       {node.children.map((child) => <RepositoryFolderBranch key={child.folder.id} {...props} node={child} depth={depth + 1} />)}
       {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
-        trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
+        trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
       {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder}>{ru ? "Папка пуста" : "Empty folder"}</li>}
       </ul>
     </div>}

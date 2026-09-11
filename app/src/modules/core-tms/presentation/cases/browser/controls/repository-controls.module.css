@@ -34,3 +34,7 @@
 @container repository-controls (max-width: 400px) { .tools .tool > span { display: none; } }
 @media(prefers-reduced-motion:reduce) { .selection { transition: none; } }
 .controls .tool { border: 0; background: transparent; cursor: pointer; }
+
+.controls[data-inline=true]{display:grid;grid-template-columns:minmax(120px,1fr) auto;align-items:center;gap:8px;margin-bottom:8px}
+.controls[data-inline=true] .searchRow{min-width:0}.controls[data-inline=true] .tools{margin:0;gap:5px}
+.controls[data-inline=true] .filter>div{left:auto;right:0}.controls[data-inline=true]>div:last-child:not(.tools):not(.searchRow){grid-column:1/-1}

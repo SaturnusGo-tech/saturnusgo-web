@@ -8,7 +8,7 @@ export function runRepositoryEntries(runId: string, projectId: string, items: Ru
       title: p?.title ?? item.caseKey, folderPath: p?.folderPath ?? "/", currentRevision: item.revision,
       type: p?.type ?? "manual", lifecycle: p?.lifecycle ?? "ready", priority: p?.priority ?? "medium",
       component: p?.component ?? "", tags: p?.tags ?? [], estimatedMinutes: p?.estimatedMinutes ?? null,
-      ownerIdentityId: item.assigneeIdentityId, revisionCount: item.revision, archivedAt: null,
+      ownerIdentityId: item.assigneeIdentityId, revisionCount: item.revision, archivedAt: item.archivedAt ?? null,
       createdAt: item.createdAt, updatedAt: item.updatedAt, etag: "" } };
   });
 }

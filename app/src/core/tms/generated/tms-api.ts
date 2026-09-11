@@ -3838,6 +3838,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/run-item-organization": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Organize selected run items without changing repository cases or snapshots
+         * @description Tester, QA manager or workspace administrator. Run items must belong to the same logical run. All item versions are checked atomically. Archived and terminal runs reject reassignment. An active tenant member or null clears assignment.
+         */
+        post: operations["organizeRunItems"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5232,6 +5257,8 @@ export interface components {
             updatedAt: components["schemas"]["Timestamp"];
             preview?: components["schemas"]["RunCasePreview"];
             rowVersion?: number;
+            /** Format: date-time */
+            archivedAt?: string | null;
         };
         RunItem: components["schemas"]["RunItemSummary"] & {
             snapshot: components["schemas"]["TestCaseRevision"];
@@ -7479,6 +7506,27 @@ export interface components {
         RunAssignmentEnvelope: {
             data: {
                 updated: number;
+            };
+        };
+        RunItemOrganizationRequest: {
+            runId: string;
+            items: {
+                runId: string;
+                itemId: string;
+                rowVersion: number;
+            }[];
+            action: {
+                /** @enum {string} */
+                kind: "move";
+                folderPath: string;
+            } | {
+                /** @enum {string} */
+                kind: "priority";
+                /** @enum {string} */
+                priority: "low" | "medium" | "high" | "critical";
+            } | {
+                /** @enum {string} */
+                kind: "remove" | "archive" | "restore";
             };
         };
     };
@@ -15902,6 +15950,47 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RunAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Number of assignments changed */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunAssignmentEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    organizeRunItems: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunItemOrganizationRequest"];
             };
         };
         responses: {

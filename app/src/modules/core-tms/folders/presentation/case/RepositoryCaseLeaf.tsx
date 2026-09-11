@@ -5,8 +5,8 @@ import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-c
 import { DragClickContext } from "../dnd/drag-click";
 import css from "../styles/repository.module.css";
 
-export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canManage, canSelect, accessory, trailing, ru, onToggle, onOpen }: {
-  canSelect?: boolean; accessory?: ReactNode; trailing?: ReactNode;
+export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canManage, canSelect, allowArchivedSelection, accessory, trailing, ru, onToggle, onOpen }: {
+  canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: ReactNode; trailing?: ReactNode;
   item: TestCaseSummary; depth: number; selected: boolean; active: boolean; locked: boolean; canManage: boolean;
   ru: boolean; onToggle: (id: string) => void; onOpen: (item: TestCaseSummary) => void;
 }) {
@@ -14,7 +14,7 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canM
   const suppress = useContext(DragClickContext);
   return <li className={css.leaf} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} style={{ opacity: drag.isDragging ? .35 : 1 }}>
     <span className={css.caseRail} aria-hidden="true" />
-    <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || Boolean(item.archivedAt)}
+    <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || (Boolean(item.archivedAt) && !allowArchivedSelection)}
       aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />
     <button ref={drag.setNodeRef} {...drag.listeners} {...drag.attributes} type="button" className={css.caseButton}
       disabled={locked} aria-disabled={locked || undefined}

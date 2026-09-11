@@ -76,3 +76,7 @@
 }
 
 @media (max-width: 760px) { .dock { bottom: 58px; } }
+
+@media (min-width: 761px) {
+  :global([data-testid="tms-workspace"]):has(:global([data-run-execution-footer])) .dock:not([data-collapsed="true"]) { bottom: 58px; }
+}

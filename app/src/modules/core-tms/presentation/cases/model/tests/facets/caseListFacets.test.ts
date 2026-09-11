@@ -83,7 +83,8 @@ test("keeps one visible row tabbable when selection is filtered or collapsed", (
 
 test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", () => {
   const toolbar = readFileSync(new URL("../../../toolbar/CasesToolbar.tsx", import.meta.url), "utf8");
-  const popovers = readFileSync(new URL("../../../toolbar/CasesToolbarPopovers.tsx", import.meta.url), "utf8");
+  const popovers = readFileSync(new URL("../../../toolbar/CasesToolbarPopovers.tsx", import.meta.url), "utf8")
+    + readFileSync(new URL("../../../toolbar/ql/CaseQlAutocomplete.tsx", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../../listing/caseListing.module.css", import.meta.url), "utf8");
   assert.match(popovers, /role="combobox"/);
   assert.match(popovers, /aria-autocomplete="list"/);
@@ -96,7 +97,7 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
   assert.match(popovers, /data-filter-section="folders"/);
   assert.match(popovers, /returnSectionRef/);
   assert.match(popovers, /status: "lifecycle"/);
-  assert.match(popovers, /role="listbox" aria-multiselectable=/);
+  assert.match(popovers, /role="listbox"[^>]*aria-multiselectable=/);
   assert.match(popovers, /Поиск папок/);
   assert.match(popovers, /Поиск компонентов/);
   assert.match(css, /\.filterPanel \{[^}]*max-height: min\(362px/s);

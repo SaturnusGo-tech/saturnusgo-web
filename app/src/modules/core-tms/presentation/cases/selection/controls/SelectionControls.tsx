@@ -22,14 +22,14 @@ export function useSelectionFilters(cases: TestCaseSummary[]) {
     .map((row) => row.testCase), [cases, query, qlQuery, filters, facets]);
   return { query, setQuery, qlQuery, setQlQuery, filters, setFilters, facets, setFacets, options, visible };
 }
-export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools }: {
-  extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
+export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools, inline = false }: {
+  inline?: boolean; extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
   state: ReturnType<typeof useSelectionFilters>; ru: boolean; onSelectAll?: () => void; action?: ReactNode;
 }) {
   const qlButton = useRef<HTMLButtonElement>(null); const qlPanel = useRef<HTMLDivElement>(null);
   const [ql, setQl] = useState(false); const [filter, setFilter] = useState(false);
   useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus(); }, [ql]);
-  return <div className={css.controls} data-case-popover-root>
+  return <div className={css.controls} data-inline={inline || undefined} data-case-popover-root>
     <div className={css.searchRow}><label className={css.search} data-input-shell><PiMagnifyingGlass size={16} />
       <input aria-label={ru ? "Найти тест-кейс" : "Find a test case"} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
         value={state.query} onChange={(e) => state.setQuery(e.target.value)} /></label>{action}</div>
@@ -38,7 +38,7 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
       <div className={css.filter}><button className={css.tool} type="button" aria-expanded={filter}
         data-active={extraSections?.some((item) => item.active) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
-          extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
+          customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
       {onSelectAll && <button className={css.tool} type="button" onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>}
       {tools}
     </div>

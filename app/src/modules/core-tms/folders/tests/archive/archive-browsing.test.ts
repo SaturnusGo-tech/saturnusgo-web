@@ -57,3 +57,21 @@ test("read-only users may browse active cases while an open editor still locks n
     assert.equal(elements(result, "input")[0].props.disabled, true);
   }
 });
+
+
+test("run archive selection is explicit and does not enable dragging or bypass a locked view", () => {
+  for (const allowArchivedSelection of [false, true]) for (const locked of [false, true]) {
+    const control = treeControl("case/RepositoryCaseLeaf.tsx", "RepositoryCaseLeaf");
+    const toggled: string[] = [];
+    const result = control.render({ item: cases[0], depth: 1, selected: false, active: false,
+      locked, canManage: false, canSelect: true, allowArchivedSelection, ru: true,
+      onToggle: (id: string) => toggled.push(id) });
+    const checkbox = elements(result, "input")[0];
+    assert.equal(checkbox.props.disabled, locked || !allowArchivedSelection);
+    if (!checkbox.props.disabled) {
+      (checkbox.props.onChange as () => void)();
+      assert.deepEqual(toggled, [cases[0].id]);
+    }
+    assert.deepEqual(control.dragStates, [true]);
+  }
+});
