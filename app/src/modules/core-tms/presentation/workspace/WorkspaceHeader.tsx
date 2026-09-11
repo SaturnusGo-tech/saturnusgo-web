@@ -9,6 +9,7 @@ import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
 import { transitionContent } from "./motion/transition/content-transition";
+import { RunClock } from "../runs/clock/RunClock";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -86,6 +87,7 @@ export function WorkspaceHeader({
       </div>}
 
       {model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && model.project && <div className={shellStyles.headerMeta}>
+        {model.view === "runs" && model.selectedRun && <div className={shellStyles.runTime}><RunClock run={model.selectedRun} /></div>}
         <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
           title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />

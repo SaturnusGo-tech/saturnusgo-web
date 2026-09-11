@@ -171,9 +171,10 @@
 .evidenceGrid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
 .evidenceGrid > span { min-height: 40px !important; color: var(--runs-text) !important; background: var(--runs-control) !important; border-color: var(--runs-border) !important; }
 
-.footer { min-width: 0; min-height: 54px; display: grid; grid-column: 2; grid-row: 2; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); box-shadow: 0 -8px 24px rgb(23 29 38 / 5%); }
+.footer { min-width: 0; min-height: 54px; display: grid; grid-column: 2; grid-row: 2; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 20px; padding: 9px 64px 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); box-shadow: 0 -8px 24px rgb(23 29 38 / 5%); }
 .pager, .actions, .completion { min-width: 0; display: flex; align-items: center; gap: 5px; }
-.actions { flex-wrap: wrap; justify-content: flex-end; }
+.actions { grid-column: 1; grid-row: 1; order: -1; flex-wrap: wrap; justify-content: flex-start; }
+.pager { grid-column: 2; grid-row: 1; }
 .actions::-webkit-scrollbar { display: none; }
 .completion { justify-content: flex-end; color: var(--runs-muted); font-size: 12px; white-space: nowrap; }
 .footer :is(button, label) { min-height: 34px; border-radius: 5px; white-space: nowrap; }
@@ -197,7 +198,7 @@
   .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 38vh) minmax(0, 1fr) auto; }
   .emptyPane { grid-column: 1; grid-row: 2 / 4; }
   .detail { grid-column: 1; grid-row: 2; }
-  .footer { z-index: 8; grid-column: 1; grid-row: 3; display: flex; flex-direction: column; align-items: stretch; padding: 8px; }
+  .footer { z-index: 8; grid-column: 1; grid-row: 3; display: flex; flex-direction: column; align-items: stretch; padding: 8px 64px 8px 8px; }
   .actions, .completion { justify-content: stretch; }
   .actions > :is(button, label), .completion > button { min-width: 40px; min-height: 40px; flex: 1 1 40px; }
   .actions > :is(.compactAction, .wideAction) { width: auto; min-width: 40px; padding-inline: 8px; }
@@ -217,3 +218,5 @@
 @keyframes runs-detail-in { from { opacity: .45; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes runs-reveal { from { opacity: .72; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .detailTransition, .detailArchiving, .archivePopover, .contentSection, .railSection { animation: none; transition: none; } }
+
+@container runs-shell (max-width: 1450px) { .footer .pagerLabel { display: none; } }

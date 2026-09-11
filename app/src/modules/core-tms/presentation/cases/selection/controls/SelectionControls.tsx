@@ -3,7 +3,7 @@ import { PiFunnelSimple, PiMagnifyingGlass } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { CaseFilters } from "../../../../state/types/workspace";
 import { filterCaseRows, type CaseFacetFilters } from "../../model/caseListModel";
-import { CaseFilterMenu, CaseQlAutocomplete } from "../../toolbar/CasesToolbarPopovers";
+import { CaseFilterMenu, CaseQlAutocomplete, type ExtraFilterSection } from "../../toolbar/CasesToolbarPopovers";
 import css from "../../browser/controls/repository-controls.module.css";
 
 export function useSelectionFilters(cases: TestCaseSummary[]) {
@@ -22,7 +22,8 @@ export function useSelectionFilters(cases: TestCaseSummary[]) {
     .map((row) => row.testCase), [cases, query, qlQuery, filters, facets]);
   return { query, setQuery, qlQuery, setQlQuery, filters, setFilters, facets, setFacets, options, visible };
 }
-export function SelectionControls({ state, ru, onSelectAll, action }: {
+export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools }: {
+  extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
   state: ReturnType<typeof useSelectionFilters>; ru: boolean; onSelectAll?: () => void; action?: ReactNode;
 }) {
   const qlButton = useRef<HTMLButtonElement>(null); const qlPanel = useRef<HTMLDivElement>(null);
@@ -35,10 +36,11 @@ export function SelectionControls({ state, ru, onSelectAll, action }: {
     <div className={css.tools}>
       <button ref={qlButton} className={css.tool} type="button" aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" aria-expanded={filter}
-        aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
+        data-active={extraSections?.some((item) => item.active) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
-          facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
+          extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
       {onSelectAll && <button className={css.tool} type="button" onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>}
+      {tools}
     </div>
     {ql && <div ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
       folders={state.options.folders} components={state.options.components} /></div>}
