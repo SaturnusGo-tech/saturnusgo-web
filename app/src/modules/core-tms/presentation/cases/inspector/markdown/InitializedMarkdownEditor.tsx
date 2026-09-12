@@ -29,6 +29,7 @@ import { MarkdownContextArea } from "./context/MarkdownContextContent";
 import { MarkdownReadyContext } from "./transition/MarkdownTransition";
 import { MarkdownToolbar } from "./writing/MarkdownToolbar";
 import { highlightPlugin } from "./highlight/editor/highlightPlugin";
+import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
 
 const contextContentPlugin = realmPlugin({
@@ -137,7 +138,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       overlayContainer={overlayContainer ?? undefined}
       markdown={initialMarkdown}
       className={`${css.wysiwyg} ${markerCss.surface} ${props.compact ? css.compact : ""}`}
-      contentEditableClassName={css.editorContent}
+      contentEditableClassName={`${css.editorContent} ${typography.prose}`}
       autoFocus={props.autoFocus && !onReady ? { defaultSelection: "rootStart", preventScroll: true } : false}
       placeholder={props.locale === "ru" ? "Введите текст…" : "Enter text…"}
       suppressHtmlProcessing
