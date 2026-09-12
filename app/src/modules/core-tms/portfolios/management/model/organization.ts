@@ -3,7 +3,7 @@ export type WorkflowPhase = typeof workflowPhases[number];
 export type ChecklistItem = Readonly<{ id: string; text: string; completed: boolean }>;
 export type OrganizationFields = { workflowPhase: WorkflowPhase; checklist: readonly ChecklistItem[] };
 export type OrganizationTarget = { workspaceId: string; targetType: "project" | "portfolio"; targetId: string };
-export type OrganizationPatch = Partial<OrganizationFields>;
+export type OrganizationPatch = Partial<OrganizationFields & { name: string; description: string; testingPlan: string; responsibleIdentityId: string | null; portfolioId: string | null }>;
 export function validChecklist(value: readonly ChecklistItem[] | null | undefined): boolean {
   const items = value ?? [];
   return Array.isArray(items) && items.length <= 100

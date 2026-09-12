@@ -48,3 +48,10 @@
 .headerActions.headerActions button[data-save-organization] { background: #3475ed; color: #fff; border-color: #3475ed; }
 .headerActions.headerActions button[data-save-organization] svg { color: #fff !important; }
 .property > div { width: 100%; max-width: none; }
+
+.portfolioEditor .titleField input { padding: 0; border: 0; border-radius: 0; }
+.portfolioEditor .titleField input:focus-visible { border-bottom: 1px solid var(--action); }
+.portfolioEditor .properties { display: flex; flex-direction: column; gap: 20px; max-width: 600px; }
+.portfolioEditor .property { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: center; width: 100%; }
+.portfolioEditor .property > div > button[aria-haspopup="listbox"] { border: 0; background: transparent; padding: 5px 7px; min-height: 30px; }
+.portfolioEditor .property > div { width: max-content; max-width: 100%; }

@@ -29,7 +29,7 @@ export function PortfoliosView(props: PortfoliosViewProps) {
   const creatingProject = state.route.kind === "project-create";
   const creatingPortfolio = state.route.kind === "portfolio-create";
   const creationPortfolioId = state.route.kind === "project-create" ? state.route.portfolioId : undefined;
-  const editing = creatingPortfolio || creatingProject || state.dialog === "portfolio-edit" || state.dialog === "project-edit";
+  const editing = creatingPortfolio || creatingProject;
   const casesScreen = !editing && state.route.kind === "project" && projectNavigation.tab === "cases";
   return <section className={`${styles.page} ${casesScreen ? styles.casesPage : ""}`} data-testid="portfolios-view">
     <div className={styles.breadcrumbs} hidden={casesScreen}>
@@ -42,18 +42,17 @@ export function PortfoliosView(props: PortfoliosViewProps) {
     {props.offline ? <FormError message={copy.offline} /> : <>
       {!casesScreen && state.notice && <p className={styles.notice} role="status">{state.notice === "project" ? copy.projectSaved : copy.portfolioSaved}</p>}
       {!editing && state.route.kind === "catalog" && <PortfolioCatalog state={state} copy={copy} workspaceId={props.workspaceId} canManage={canManage} />}
-      {!editing && state.route.kind === "portfolio" && <PortfolioDetail {...attachmentPermissions} key={state.route.id} state={state} copy={copy} workspaceId={props.workspaceId} canManage={canManage} />}
+      {!editing && state.route.kind === "portfolio" && <PortfolioDetail actionsTargetId={actionsTargetId} {...attachmentPermissions} key={state.route.id} state={state} copy={copy} workspaceId={props.workspaceId} canManage={canManage} />}
       {!editing && state.route.kind === "project" && <ProjectOverview navigation={projectNavigation} {...attachmentPermissions} key={state.route.id} projectId={state.route.id} state={state} copy={copy} workspaceId={props.workspaceId}
         canManage={canManage} onActivateProject={props.onActivateProject} projectCases={props.projectCases} />}
       {editing && !canManage && <FormError message={copy.permission} />}
       {state.command.error && !state.dialog && <FormError message={formatTmsMutationFailure(state.command.error, copy.saveError)} />}
     </>}
-    {canManage && (creatingPortfolio || state.dialog === "portfolio-edit" && currentPortfolio) && <PortfolioEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
-      key={state.dialog === "portfolio-edit" ? currentPortfolio?.id : "new"} workspaceId={props.workspaceId} current={state.dialog === "portfolio-edit" ? currentPortfolio : undefined}
-      copy={copy} pending={state.command.pending} error={state.command.error} onCancel={state.cancelEditor} onSave={state.save} />}
-    {canManage && (creatingProject || state.dialog === "project-edit" && project) && <ProjectEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
-      key={creatingProject ? `new:${creationPortfolioId ?? ""}` : project?.data.id} workspaceId={props.workspaceId} copy={copy}
-      current={creatingProject ? undefined : project?.data} etag={creatingProject ? undefined : project?.etag}
+    {canManage && creatingPortfolio && <PortfolioEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
+      key="new" workspaceId={props.workspaceId} copy={copy} pending={state.command.pending} error={state.command.error}
+      onCancel={state.cancelEditor} onSave={state.save} />}
+    {canManage && creatingProject && <ProjectEditorPage actionsTargetId={actionsTargetId} {...attachmentPermissions}
+      key={`new:${creationPortfolioId ?? ""}`} workspaceId={props.workspaceId} copy={copy}
       portfolioId={creationPortfolioId ?? currentPortfolio?.id} portfolioName={currentPortfolio?.name} onCancel={state.cancelEditor} onCreated={state.created} onUpdated={state.updated} />}
     {canManage && state.dialog === "attach" && <AttachProjectDialog workspaceId={props.workspaceId} copy={copy} pending={state.command.pending}
       error={state.command.error} onClose={close} onAttach={state.attach} />}

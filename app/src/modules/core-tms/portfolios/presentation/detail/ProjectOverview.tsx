@@ -3,11 +3,13 @@ import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
 import { organizationCopy } from "../../management/model/copy";
 import { ManagementFeedback } from "../../management/presentation/feedback/ManagementFeedback";
 import { useOrganizationManagement } from "../../management/state/useOrganizationManagement";
-import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
+import { InlineOrganizationTitle } from "../inline/InlineOrganizationTitle";
+import { InlineOrganizationMarkdown } from "../inline/InlineOrganizationMarkdown";
+import { InlineProjectPortfolio } from "../inline/project/InlineProjectPortfolio";
 import type { ReactNode } from "react";
-import { PiFolderSimpleDuotone, PiPencilSimple } from "react-icons/pi";
+import { PiFolderSimpleDuotone } from "react-icons/pi";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
+import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { FormError } from "../../../presentation/common/error/FormError";
 import type { PortfolioCopy } from "../../model/copy";
 import type { usePortfoliosView } from "../../state/view/usePortfoliosView";
@@ -30,10 +32,10 @@ export function ProjectOverview({ navigation, state, projectId, workspaceId, can
   if (!project) return <ResourceFeedback loading={state.project.loading} error={state.project.error} copy={copy} retry={state.project.reload} />;
   const portfolio = state.portfolio.data?.data;
   return <>
-    <header hidden={navigation.tab === "cases"} className={styles.heading}><PiFolderSimpleDuotone className={styles.projectIcon} size={24} aria-hidden="true" /><div>
-      <h1>{project.name}<code className={styles.key}>{project.key}</code></h1>
-    </div>{canManage && project.status !== "archived" && <button type="button" className={styles.secondary}
-      onClick={() => state.setDialog("project-edit")}><PiPencilSimple />{copy.change}</button>}</header>
+    <header hidden={navigation.tab === "cases"} className={styles.heading}><PiFolderSimpleDuotone className={styles.projectIcon} size={24} aria-hidden="true" />
+      <InlineOrganizationTitle value={project.name} label={copy.projectName} disabled={management.disabled || navigation.tab !== "overview"} onSave={name => management.save({ name })} />
+      <code className={styles.key}>{project.key}</code>
+    </header>
     <ResourceFeedback hasContent loading={state.project.loading} error={state.project.error} copy={copy} retry={state.project.reload} />
     {project.status === "archived" && <p className={styles.status}>{copy.archived}</p>}
     <nav hidden={navigation.tab === "cases"} className={styles.tabs} aria-label={project.name}>
@@ -42,16 +44,15 @@ export function ProjectOverview({ navigation, state, projectId, workspaceId, can
     </nav>
     <div hidden={navigation.tab !== "overview"}>
       <div className={styles.stackedDetail}><main>
-        <section className={styles.about}><h2>{copy.description}</h2><MarkdownField label={copy.description} value={project.description ?? ""} emptyLabel={copy.noDescription} allowAttachments={false} /></section>
+        <InlineOrganizationMarkdown label={copy.description} value={project.description ?? ""} placeholder={copy.noDescription} disabled={management.disabled} onSave={description => management.save({ description })} />
         <OrganizationExtras target={target} canReadAttachments={canReadAttachments} canManageAttachments={canManageAttachments && project.status !== "archived"}
           items={project.checklist ?? []} pending={management.pending} readOnly={management.disabled && !management.pending} onChange={(checklist) => management.save({ checklist })} />
         <ManagementFeedback state={management} />
-        <section className={styles.about}><h2>{copy.testingPlan}</h2><MarkdownField label={copy.testingPlan} value={project.testingPlan ?? ""} emptyLabel={copy.planEmpty} allowAttachments={false} /></section>
+        <InlineOrganizationMarkdown label={copy.testingPlan} value={project.testingPlan ?? ""} placeholder={copy.planEmpty} disabled={management.disabled} onSave={testingPlan => management.save({ testingPlan })} />
         <aside className={styles.sidebar} aria-label={copy.properties}><dl>
         <dt>{organizationCopy(locale).phase}</dt><dd><WorkflowSelect value={project.workflowPhase ?? "new"} disabled={management.disabled} onChange={(workflowPhase) => void management.save({ workflowPhase })} /></dd>
-        <dt>{copy.portfolio}</dt><dd>{project.portfolioId ? <button type="button" className={styles.textButton}
-          onClick={() => state.navigate({ kind: "portfolio", id: project.portfolioId! })}>{portfolio?.name ?? copy.portfolio}</button> : copy.noPortfolio}</dd>
-        <dt>{copy.responsible}</dt><dd><ResponsibleName workspaceId={workspaceId} identityId={project.responsibleIdentityId ?? null} /></dd>
+        <dt>{copy.portfolio}</dt><dd><InlineProjectPortfolio workspaceId={workspaceId} value={project.portfolioId ?? null} name={portfolio?.name} disabled={management.disabled} copy={copy} onChange={portfolioId => void management.save({ portfolioId })} /></dd>
+        <dt>{copy.responsible}</dt><dd><div className={styles.inlineResponsible}><ResponsiblePicker workspaceId={workspaceId} value={project.responsibleIdentityId ?? null} disabled={management.disabled} onChange={responsibleIdentityId => void management.save({ responsibleIdentityId })} /></div></dd>
         <dt>{copy.key}</dt><dd><code>{project.key}</code></dd>
         {project.createdAt && <><dt>{copy.created}</dt><dd>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(project.createdAt))}</dd></>}
       </dl><ResourceFeedback loading={state.portfolio.loading} error={state.portfolio.error} retry={state.portfolio.reload} copy={copy} /></aside>

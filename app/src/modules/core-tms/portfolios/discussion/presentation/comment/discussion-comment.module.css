@@ -1,0 +1,11 @@
+.comment { padding: 16px 0; }
+.author { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.author strong { font-size: 13px; font-weight: 550; }
+.author time, .author > span { font-size: 11px; color: var(--muted); }
+.author button { display: grid; place-items: center; width: 28px; height: 28px; margin-left: auto; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
+.author button:hover { background: var(--control-hover); color: var(--text); }
+.comment footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.comment footer button { border: 1px solid var(--line); border-radius: 10px; padding: 7px 13px; background: transparent; color: var(--text); cursor: pointer; }
+.comment footer button[type=submit] { background: var(--primary, #3976f6); border-color: transparent; color: white; }
+.comment button:disabled { opacity: .5; cursor: default; }
+.comment form > p[role=alert] { color: var(--danger, #c74755); font-size: 12px; }

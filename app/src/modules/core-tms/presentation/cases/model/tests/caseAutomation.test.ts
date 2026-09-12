@@ -39,7 +39,7 @@ test("case type surfaces expose automated with a robot icon", () => {
   assert.match(metadata, /<Modal[\s\S]*Change and remove/);
   assert.doesNotMatch(metadata, /window\.confirm|globalThis\.confirm/);
   assert.match(metadataCss, /\.typeAutomated/);
-  const ql = readFileSync(new URL("../../toolbar/ql/CaseQlAutocomplete.tsx", import.meta.url), "utf8");
+  const ql = readFileSync(new URL("../../toolbar/ql/suggestions/query-suggestions.ts", import.meta.url), "utf8");
   assert.match(ql, /\["manual", "checklist", "automated"\]/);
   assert.match(popovers, /caseTypes = \["all", "manual", "checklist", "automated"\]/);
   assert.match(popovers, /props\.filters\.type === value/);

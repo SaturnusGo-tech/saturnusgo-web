@@ -4,11 +4,6 @@
 .composer { position: relative; overflow: visible; border: 1px solid var(--line); border-radius: 16px; transition: border-color 160ms ease; }
 .composer:focus-within { border-color: var(--tms-focus-border, #999); box-shadow: none; }
 .comments { margin: 22px 0 0; padding: 0; list-style: none; }
-.comments li { padding: 16px 0; }
-.comments li > div:first-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 11px; }
-.comments strong { font-size: 12px; font-weight: 550; }
-.comments time { color: var(--muted); font-size: 11px; }
-.comments p { margin: 9px 0 0; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .statusStrip { border-radius: 15px 15px 0 0; display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--muted); background: var(--control-hover); font-size: 12px; }
 .editor { position: relative; padding: 0; }
 .discussion .composer .editor [data-editor-shell] { border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none !important; }
@@ -23,3 +18,5 @@
 .limit { padding: 0 12px; color: var(--danger, #c74755); font-size: 12px; }
 
 .editor textarea { min-height: 112px; border: 0 !important; outline: none !important; box-shadow: none !important; background: transparent !important; }
+
+.editor { --markdown-content-top: 12px; --markdown-content-inline: 14px; }

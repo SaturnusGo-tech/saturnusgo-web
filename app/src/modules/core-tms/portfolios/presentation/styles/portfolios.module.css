@@ -95,3 +95,12 @@
 .stackedDetail { max-width: 1060px; }
 .stackedDetail .sidebar { padding: 0; margin: 24px 0; }
 .stackedDetail .sidebar dl { grid-template-columns: minmax(90px, 140px) minmax(0, 1fr); max-width: 600px; }
+
+.inlineResponsible { width: max-content; max-width: 100%; }
+.inlineResponsible > div > button { min-height: 30px; padding: 3px 7px; background: transparent; border: 0; box-shadow: none; gap: 7px; }
+
+.inlineChoice { width: max-content; max-width: 100%; }
+.inlineChoice > div { width: max-content; max-width: 100%; }
+.inlineChoice button[aria-haspopup="listbox"] { display: inline-flex; width: auto; gap: 7px; min-height: 30px; padding: 4px 0; background: transparent; border: 0; box-shadow: none; }
+.inlineChoice [role="listbox"] { min-width: 220px; max-width: min(320px, 75vw); }
+.editorActionSlot .iconButton { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 50%; }

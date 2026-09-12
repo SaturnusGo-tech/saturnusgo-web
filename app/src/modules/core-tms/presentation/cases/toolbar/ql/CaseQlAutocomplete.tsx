@@ -1,83 +1,46 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
-import { localizedComponentLabel } from "../../../../localization/format/labels";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
 import type { TmsLocale } from "../../../../localization/model/locale";
+import { parseCaseQuery } from "../../model/query/parse";
+import type { QueryMember } from "../../model/query/match";
+import { insertQuerySuggestion, querySuggestions, type QuerySuggestion } from "./suggestions/query-suggestions";
 import styles from "../../listing/caseListing.module.css";
 
-type QlField = { key: string; ru: string; en: string; values?: readonly string[] };
-const qlFields: QlField[] = [
-  { key: "key", ru: "ID", en: "ID" }, { key: "title", ru: "Название", en: "Title" },
-  { key: "lifecycle", ru: "Статус", en: "Status", values: ["ready", "draft", "deprecated", "archived"] },
-  { key: "priority", ru: "Приоритет", en: "Priority", values: ["critical", "high", "medium", "low"] },
-  { key: "component", ru: "Компонент", en: "Component" }, { key: "folder", ru: "Папка", en: "Folder" },
-  { key: "tag", ru: "Тег", en: "Tag" }, { key: "type", ru: "Тип", en: "Type", values: ["manual", "checklist", "automated"] },
-  { key: "owner", ru: "Ответственный", en: "Owner" },
-];
-const qlFieldAliases: Record<string, string> = {
-  id: "key", key: "key", ид: "key", title: "title", name: "title", название: "title",
-  status: "lifecycle", state: "lifecycle", lifecycle: "lifecycle", статус: "lifecycle", состояние: "lifecycle",
-  priority: "priority", приоритет: "priority", component: "component", functionality: "component", компонент: "component",
-  folder: "folder", path: "folder", папка: "folder", tag: "tag", тег: "tag", type: "type", тип: "type",
-  owner: "owner", assignee: "owner", владелец: "owner", ответственный: "owner",
-};
-
-function tokenStart(query: string) {
-  let quoted = false;
-  for (let index = query.length - 1; index >= 0; index -= 1) {
-    if (query[index] === '"') quoted = !quoted;
-    if (!quoted && /\s/.test(query[index])) return index + 1;
-  }
-  return 0;
-}
-
-type QlProps = { locale: TmsLocale; query: string; folders: string[]; components: string[]; onQuery: (value: string) => void };
-export function CaseQlAutocomplete(props: QlProps) {
-  const ru = props.locale === "ru";
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const start = tokenStart(props.query);
-  const token = props.query.slice(start);
-  const excluded = token.startsWith("-");
-  const body = excluded ? token.slice(1) : token;
-  const separator = body.indexOf(":");
-  const fieldKey = separator >= 0 ? body.slice(0, separator).toLocaleLowerCase() : "";
-  const valueQuery = separator >= 0 ? body.slice(separator + 1).replace(/^"|"$/g, "") : "";
-  const suggestions = useMemo(() => {
-    if (separator < 0) return qlFields.filter((field) => `${field.key} ${ru ? field.ru : field.en}`.toLocaleLowerCase().includes(body.toLocaleLowerCase())).map((field) => ({ value: field.key, label: ru ? field.ru : field.en, field: true }));
-    const canonicalField = qlFieldAliases[fieldKey] ?? fieldKey;
-    const field = qlFields.find((item) => item.key === canonicalField);
-    const dynamic = canonicalField === "folder" ? props.folders : canonicalField === "component" ? props.components : field?.values ?? [];
-    return dynamic.filter((value) => value.toLocaleLowerCase().includes(valueQuery.toLocaleLowerCase())).map((value) => ({ value, label: canonicalField === "component" ? localizedComponentLabel(props.locale, value) : value, field: false }));
-  }, [body, fieldKey, props.components, props.folders, props.locale, ru, separator, valueQuery]);
-  const renderedSuggestions = suggestions.slice(0, 10);
-  useEffect(() => { setActiveIndex(0); }, [token]);
-  useEffect(() => {
-    setActiveIndex((current) => Math.max(0, Math.min(renderedSuggestions.length - 1, current)));
-  }, [renderedSuggestions.length]);
-  useEffect(() => {
-    const close = (event: PointerEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false); };
-    window.addEventListener("pointerdown", close); return () => window.removeEventListener("pointerdown", close);
-  }, []);
-  function apply(value: string, isField: boolean) {
-    const prefix = excluded ? "-" : "";
-    const replacement = isField ? `${prefix}${value}:` : `${prefix}${fieldKey}:${/\s/.test(value) ? `"${value}"` : value} `;
-    props.onQuery(`${props.query.slice(0, start)}${replacement}`); setOpen(true);
-  }
-  function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); return; }
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault(); setOpen(true);
-      setActiveIndex((current) => Math.max(0, Math.min(renderedSuggestions.length - 1, current + (event.key === "ArrowDown" ? 1 : -1))));
-    }
-    if (event.key === "Enter" && open && renderedSuggestions[activeIndex]) { event.preventDefault(); apply(renderedSuggestions[activeIndex].value, renderedSuggestions[activeIndex].field); }
-  }
-  return <div ref={rootRef} className={styles.qlRoot} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>
-    <label className={styles.inputShell} data-input-shell><input role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls="case-ql-suggestions" aria-activedescendant={open && renderedSuggestions[activeIndex] ? `case-ql-option-${activeIndex}` : undefined} value={props.query} onFocus={() => setOpen(true)} onKeyDown={onKeyDown} onChange={(event) => { props.onQuery(event.target.value); setOpen(true); }} placeholder={ru ? "Введите QL-запрос" : "Enter a QL query"} aria-label={ru ? "QL-запрос" : "QL query"} />{props.query && <button type="button" className={styles.clearButton} onClick={() => props.onQuery("")} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
-    {open && <div className={`${styles.popover} ${styles.qlSuggestions}`} id="case-ql-suggestions" role="listbox">
-      <div className={styles.qlSyntax}><span><kbd>:</kbd>{ru ? "значение поля" : "field value"}</span><span><kbd>-</kbd>{ru ? "исключить" : "exclude"}</span></div>
-      {renderedSuggestions.map((suggestion, index) => <button type="button" role="option" aria-selected={index === activeIndex} id={`case-ql-option-${index}`} className={index === activeIndex ? styles.optionActive : ""} key={`${suggestion.field ? "field" : "value"}-${suggestion.value}`} onMouseDown={(event) => event.preventDefault()} onClick={() => apply(suggestion.value, suggestion.field)}><span>{suggestion.label}</span><code>{suggestion.field ? `${suggestion.value}:` : suggestion.value}</code></button>)}
-      {renderedSuggestions.length === 0 && <span className={styles.noOptions}>{separator >= 0 ? (ru ? "Продолжите ввод значения" : "Continue typing a value") : (ru ? "Поле не найдено" : "No matching field")}</span>}
-    </div>}
-  </div>;
+type Props = { locale: TmsLocale; query: string; folders: string[]; components: string[]; tags?: string[]; members?: readonly QueryMember[]; onQuery: (value: string) => void };
+export function CaseQlAutocomplete(props: Props) {
+ const ru = props.locale === "ru"; const id = useId();
+ const [open, setOpen] = useState(false); const [active, setActive] = useState(0); const [caret, setCaret] = useState(props.query.length);
+ const root = useRef<HTMLDivElement>(null); const input = useRef<HTMLInputElement>(null);
+ const result = useMemo(() => querySuggestions(props.query, caret, { ...props, ru }), [props.query, caret, props.folders, props.components, props.tags, props.members, ru]);
+ const error = useMemo(() => parseCaseQuery(props.query).error, [props.query]);
+ const errors: Record<string, string> = ru ? { quote: "Закройте кавычки.", field: "Неизвестное поле. Выберите поле из подсказки.", value: "Укажите значение или завершите условие.", parenthesis: "Проверьте скобки и разделители значений.", depth: "Слишком много вложенных условий.", length: "Запрос — до 4 000 символов." }
+ : { quote: "Close the quotation mark.", field: "Unknown field. Choose a suggested field.", value: "Enter a value or complete the condition.", parenthesis: "Check parentheses and value separators.", depth: "Too many nested conditions.", length: "Queries support up to 4,000 characters." };
+ useEffect(() => setActive(0), [props.query, caret]);
+ useEffect(() => {
+  const close = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
+  document.addEventListener("pointerdown", close); return () => document.removeEventListener("pointerdown", close);
+ }, []);
+ function apply(item: QuerySuggestion) {
+  const next = insertQuerySuggestion(props.query, result, item); props.onQuery(next.query); setCaret(next.caret); setOpen(item.field);
+  requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(next.caret, next.caret); });
+ }
+ return <div ref={root} className={styles.qlRoot} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>
+  <label className={styles.inputShell} data-input-shell><input ref={input} role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls={`${id}-list`}
+   aria-activedescendant={open && result.suggestions[active] ? `${id}-${active}` : undefined} aria-describedby={`${id}-help`} aria-invalid={Boolean(error)}
+   value={props.query} onFocus={() => setOpen(true)} onSelect={event => setCaret(event.currentTarget.selectionStart ?? props.query.length)}
+   onChange={event => { props.onQuery(event.target.value); setCaret(event.target.selectionStart ?? event.target.value.length); setOpen(true); }}
+   onKeyDown={event => {
+    if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); }
+    if (["ArrowDown", "ArrowUp"].includes(event.key) && result.suggestions.length) { event.preventDefault(); setOpen(true); setActive(value => (value + (event.key === "ArrowDown" ? 1 : -1) + result.suggestions.length) % result.suggestions.length); }
+    if (event.key === "Enter" && open && result.suggestions[active]) { event.preventDefault(); apply(result.suggestions[active]); }
+   }} placeholder={ru ? "Например: статус: готов И приоритет: высокий" : "Example: status: ready AND priority: high"} aria-label={ru ? "QL-запрос" : "QL query"} />
+   {props.query && <button type="button" className={styles.clearButton} onClick={() => { props.onQuery(""); setCaret(0); input.current?.focus(); }} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
+  <div id={`${id}-help`} className={styles.qlHelp} role="status" data-error={Boolean(error) || undefined}>{error ? errors[error] ?? (ru ? "Проверьте запрос." : "Check the query.") : ru ? 'И / ИЛИ · НЕ · несколько значений: приоритет: (высокий, критический)' : 'AND / OR · NOT · multiple values: priority: (high, critical)'}</div>
+  {open && <div className={`${styles.popover} ${styles.qlSuggestions}`} id={`${id}-list`} role="listbox" aria-label={ru ? "Подсказки запроса" : "Query suggestions"}>
+   {result.suggestions.map((item, index) => <button type="button" role="option" aria-selected={active === index} id={`${id}-${index}`} key={`${item.value}-${index}`}
+    className={active === index ? styles.optionActive : ""} onMouseDown={event => event.preventDefault()} onClick={() => apply(item)}>
+    <span>{item.label}</span><code>{item.field ? `${item.value}:` : item.detail ?? ""}</code></button>)}
+   {!result.suggestions.length && <span className={styles.noOptions}>{ru ? "Введите значение; фразы заключайте в кавычки." : "Enter a value; enclose phrases in quotes."}</span>}
+  </div>}
+ </div>;
 }

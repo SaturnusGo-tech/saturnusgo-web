@@ -1,6 +1,8 @@
+import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
+import { useMemberDirectory } from "../../../workspace/members/state/directory/useMemberDirectory";
 import { transitionContent } from "../../workspace/motion/transition/content-transition";
 import { repositoryScope } from "../../../folders/model/selection/folder-scope";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { formatCount } from "../../../localization/format/count";
 import type { TmsLocale } from "../../../localization/model/locale";
 import {
@@ -32,6 +34,10 @@ export function useCasesViewController(
   const [selectionMode, setSelectionMode] = useState(false);
   const [repositoryArchived, setRepositoryArchived] = useState(false);
   const [facetFilters, setFacetFilters] = useState<CaseFacetFilters>({ folders: [], components: [] });
+  const people = useWorkspacePeople();
+  const directory = useMemberDirectory(people.workspaceId, !people.offline && props.testCases.some(item => Boolean(item.ownerIdentityId)));
+  const queryContext = useMemo(() => ({ members: directory.members }), [directory.members]);
+  const deferredQuery = useDeferredValue(props.query); const deferredQl = useDeferredValue(qlQuery);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const inspectorResize = useCaseInspectorResize(workspaceRef);
 
@@ -49,17 +55,17 @@ export function useCasesViewController(
     && (!props.filters.tag.trim() || testCase.tags.some((tag) => (
       tag.toLocaleLowerCase().includes(props.filters.tag.trim().toLocaleLowerCase())
     )))
-  )), { titleQuery: props.query }), [allRows, props.folders, props.filters, props.query, folderScope.archived]);
+  )), { titleQuery: deferredQuery, context: queryContext }), [allRows, props.folders, props.filters, deferredQuery, queryContext, folderScope.archived]);
   const facetOptions = useMemo(
     () => resolveDependentCaseFacets(baseRows, facetFilters),
     [baseRows, facetFilters],
   );
   const matchingRows = useMemo(() => sortCaseRows(filterCaseRows(baseRows, {
-    qlQuery, facets: facetFilters,
-  }), sort, languageTag), [baseRows, facetFilters, languageTag, qlQuery, sort]);
+    qlQuery: deferredQl, facets: facetFilters, context: queryContext,
+  }), sort, languageTag), [baseRows, facetFilters, languageTag, deferredQl, queryContext, sort]);
   const rows = useMemo(() => matchingRows.filter(({ testCase }) => (!props.folders || folderScope.includes(testCase))
     && (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)), [matchingRows, props.folders, folderScope, props.filters.includeArchived]);
-  const treeFiltered = Boolean(props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length
+  const treeFiltered = Boolean(props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length || facetFilters.owners?.length
     || props.filters.type !== "all" || props.filters.priority !== "all" || props.filters.lifecycle !== "all" || props.filters.tag.trim());
   const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
     !testCase.archivedAt && Boolean(testCase.etag)
@@ -153,6 +159,7 @@ export function useCasesViewController(
   }
 
   return {
+    directory, workspaceId: people.workspaceId,
     folderArchived: folderScope.archived,
     folderEmpty,
     workspaceRef, inspectorResize, filterOpen, setFilterOpen, detailFullscreen,

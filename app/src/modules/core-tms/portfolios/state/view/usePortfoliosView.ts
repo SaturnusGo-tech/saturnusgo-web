@@ -23,7 +23,7 @@ export type PortfoliosViewProps = {
   onProjectCreated: (project: Project) => void;
   onProjectUpdated: (project: Project, etag: string | null) => void;
 };
-type Dialog = null | "portfolio-edit" | "project-edit" | "attach" | "archive";
+type Dialog = null | "attach" | "archive";
 
 export function usePortfoliosView(props: PortfoliosViewProps) {
   const http = useTmsHttpClient();
@@ -56,7 +56,7 @@ export function usePortfoliosView(props: PortfoliosViewProps) {
   function refresh() { portfolioList.reload(); projects.reload(); project.reload(); portfolio.reload(); }
   async function save(draft: PortfolioDraft) {
     if (props.offline || props.canManage === false) return;
-    const current = dialog === "portfolio-edit" && portfolio.data ? { id: portfolio.data.data.id, etag: portfolio.data.etag } : null;
+    const current = null;
     const result = await command.run(JSON.stringify({ current, draft }), (key, signal) => savePortfolio(http, props.workspaceId, draft, current, key, signal));
     if (result) { setDialog(null); refresh(); navigate({ kind: "portfolio", id: result.data.id }); setNotice("portfolio"); }
   }

@@ -14944,6 +14944,156 @@
           }
         }
       }
+    },
+    "/projects/{projectId}/comments/{commentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "in": "path",
+          "name": "commentId",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "Edit an authored project discussion comment",
+        "operationId": "editProjectComment",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationCommentEditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "description": "Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal \"organization-comment-{revision}\". Stale revisions return 412; identical retries replay for 24 hours.",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/portfolios/{portfolioId}/comments/{commentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/PortfolioIdPath"
+        },
+        {
+          "in": "path",
+          "name": "commentId",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Organization discussion"
+        ],
+        "summary": "Edit an authored portfolio discussion comment",
+        "operationId": "editPortfolioComment",
+        "x-tms-idempotency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationCommentEditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "description": "Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal \"organization-comment-{revision}\". Stale revisions return 412; identical retries replay for 24 hours.",
+        "x-tms-concurrency": "required"
+      }
     }
   },
   "components": {
@@ -17245,6 +17395,9 @@
           },
           "Idempotency-Replayed": {
             "$ref": "#/components/headers/IdempotencyReplayed"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
           }
         },
         "content": {
@@ -31174,7 +31327,10 @@
           "createdAt",
           "workspaceId",
           "targetType",
-          "targetId"
+          "targetId",
+          "revision",
+          "updatedAt",
+          "canEdit"
         ],
         "properties": {
           "id": {
@@ -31204,6 +31360,21 @@
           },
           "targetId": {
             "$ref": "#/components/schemas/Identifier"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "canEdit": {
+            "type": "boolean",
+            "description": "True when the authenticated caller is the author. Active target and project:manage are checked on update."
           }
         }
       },
@@ -34645,6 +34816,30 @@
                 "maxLength": 60000
               }
             }
+          }
+        }
+      },
+      "OrganizationCommentEditRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "body",
+          "revision"
+        ],
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
           }
         }
       }

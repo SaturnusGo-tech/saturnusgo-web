@@ -274,3 +274,6 @@
 }
 
 .filterMenuBody small[data-active] { color: var(--cases-primary); }
+
+.qlHelp { padding: 5px 2px 0; color: var(--cases-muted); font-size: 11px; line-height: 1.45; }
+.qlHelp[data-error] { color: var(--cases-danger, #be555f); }

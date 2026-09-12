@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createTmsHttpClient } from "../../../../../core/tms/transport/http";
-import { listDiscussion, postDiscussion } from "../data/discussion-api";
+import { editDiscussion, listDiscussion, postDiscussion } from "../data/discussion-api";
 import { mergeDiscussionComments } from "../application/merge-comments";
 
 const comment = { id: "comment-one", workspaceId: "workspace-one", targetId: "project-one", targetType: "project" as const,
@@ -42,4 +42,16 @@ test("refresh merges confirmed comments without duplicate or disappearing posts"
   const result = mergeDiscussionComments([older, { ...comment, body: "Server value" }], [newest, comment]);
   assert.deepEqual(result.map((item) => item.id), ["new", "comment-one", "older"]);
   assert.equal(result[1].body, "Server value");
+});
+
+test("editing keeps scoped URL, author-controlled revision and stable retry key", async () => {
+ const requests: { url: URL; init?: RequestInit }[] = [];
+ const updated = { ...comment, body: "Changed", revision: 2, updatedAt: "2026-09-12T12:00:00Z", canEdit: true };
+ const result = await editDiscussion(client({ data: updated }, requests), scope, { ...comment, revision: 1, canEdit: true }, " Changed ", "stable-comment-edit-key");
+ assert.equal(requests[0].url.pathname, "/api/v1/projects/project-one/comments/comment-one");
+ assert.equal(requests[0].init?.method, "PATCH");
+ assert.deepEqual(JSON.parse(String(requests[0].init?.body)), { workspaceId: "workspace-one", body: "Changed", revision: 1 });
+ assert.equal(result.revision, 2); assert.equal(result.canEdit, true);
+ assert.equal(mergeDiscussionComments([{ ...comment, revision: 1 }], [result])[0].body, "Changed");
+ assert.equal(mergeDiscussionComments([{ ...result, revision: 3, body: "Newer server edit" }], [result])[0].body, "Newer server edit");
 });

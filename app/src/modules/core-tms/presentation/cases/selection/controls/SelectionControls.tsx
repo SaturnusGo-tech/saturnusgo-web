@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
+import { useMemberDirectory } from "../../../../workspace/members/state/directory/useMemberDirectory";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PiFunnelSimple, PiMagnifyingGlass } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { CaseFilters } from "../../../../state/types/workspace";
@@ -7,20 +9,23 @@ import { CaseFilterMenu, CaseQlAutocomplete, type ExtraFilterSection } from "../
 import css from "../../browser/controls/repository-controls.module.css";
 
 export function useSelectionFilters(cases: TestCaseSummary[]) {
+  const people = useWorkspacePeople();
+  const directory = useMemberDirectory(people.workspaceId, !people.offline && cases.some(item => Boolean(item.ownerIdentityId)));
   const [query, setQuery] = useState("");
   const [qlQuery, setQlQuery] = useState("");
   const [filters, setFilters] = useState<CaseFilters>({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
   const [facets, setFacets] = useState<CaseFacetFilters>({ folders: [], components: [] });
+  const deferredQuery = useDeferredValue(query); const deferredQl = useDeferredValue(qlQuery);
   const options = useMemo(() => ({ folders: [...new Set(cases.map((c) => c.folderPath))].sort(),
-    components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort() }), [cases]);
+    components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort(), tags: [...new Set(cases.flatMap(item => item.tags))].sort() }), [cases]);
   const visible = useMemo(() => filterCaseRows(cases.filter((c) =>
     (filters.includeArchived || !c.archivedAt) && (filters.type === "all" || c.type === filters.type)
     && (filters.priority === "all" || c.priority === filters.priority)
     && (filters.lifecycle === "all" || c.lifecycle === filters.lifecycle)
     && (!filters.tag || c.tags.some((tag) => tag.toLowerCase().includes(filters.tag.toLowerCase()))))
-    .map((testCase) => ({ testCase, folderPath: testCase.folderPath })), { titleQuery: query, qlQuery, facets })
-    .map((row) => row.testCase), [cases, query, qlQuery, filters, facets]);
-  return { query, setQuery, qlQuery, setQlQuery, filters, setFilters, facets, setFacets, options, visible };
+    .map((testCase) => ({ testCase, folderPath: testCase.folderPath })), { titleQuery: deferredQuery, qlQuery: deferredQl, facets, context: { members: directory.members } })
+    .map((row) => row.testCase), [cases, deferredQuery, deferredQl, filters, facets, directory.members]);
+  return { query, setQuery, qlQuery, setQlQuery, filters, setFilters, facets, setFacets, options, visible, directory };
 }
 export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools, inline = false, disabled = false }: {
   disabled?: boolean; inline?: boolean; extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
@@ -44,6 +49,6 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
       {tools}
     </div>
     {ql && <div ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
-      folders={state.options.folders} components={state.options.components} /></div>}
+      folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} /></div>}
   </div>;
 }

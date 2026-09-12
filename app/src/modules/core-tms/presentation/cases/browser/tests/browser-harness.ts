@@ -16,7 +16,7 @@ import { elements } from "../../bulk/action/tests/bulk-harness";
 export { elements };
 function runtime() {
   const h = hookHarness("https://tms.example/work/?workspaceId=w&projectId=p&view=cases");
-  Object.assign(h.react, { useMemo<T>(compute: () => T, dependencies: readonly unknown[]) {
+  Object.assign(h.react, { useDeferredValue: <T>(value: T) => value, useMemo<T>(compute: () => T, dependencies: readonly unknown[]) {
     const ref = h.react.useRef<{ deps?: readonly unknown[]; value?: T }>({}) as { current: { deps?: readonly unknown[]; value?: T } };
     if (!ref.current.deps || dependencies.some((value, i) => !Object.is(value, ref.current.deps?.[i]))) ref.current = { deps: dependencies, value: compute() };
     return ref.current.value;
@@ -53,6 +53,8 @@ export function browserHarness() {
   const bulk = h.load<{ useCaseBulkSelection: typeof useCaseBulkSelection }>(new URL("../../bulk/selection-hook/useCaseBulkSelection.ts", import.meta.url), () => selection);
   const controller = h.load<{ useCasesViewController: typeof useCasesViewController }>(new URL("../../view/useCasesViewController.ts", import.meta.url), (name) => {
     if (name.endsWith("content-transition")) return { transitionContent: (update: () => void) => update() };
+    if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "w", offline: true }) };
+    if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
     if (name.endsWith("folder-scope")) return scope;
     if (name.endsWith("caseListModel")) return model;
     if (name.endsWith("format/count")) return { formatCount };

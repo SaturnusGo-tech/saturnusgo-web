@@ -1,9 +1,12 @@
+import { TmsHttpClientProvider } from "../../../../../auth/http/TmsHttpClientContext";
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createElement } from "react";
+import React, { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useCasesViewController } from "../../../view/useCasesViewController";
 import type { CasesViewProps } from "../../../types";
+
+Object.assign(globalThis, { React });
 
 function inspect(overrides: Partial<CasesViewProps> = {}) {
   const props = {
@@ -16,7 +19,8 @@ function inspect(overrides: Partial<CasesViewProps> = {}) {
     open = useCasesViewController(props, "ru", "ru-RU").inspectorOpen;
     return null;
   }
-  renderToStaticMarkup(createElement(Probe));
+  const unavailable = async (): Promise<never> => { throw new Error("SSR must not request data"); };
+  renderToStaticMarkup(createElement(TmsHttpClientProvider, { client: { get: unavailable, getResource: unavailable, mutate: unavailable, mutateResource: unavailable }, children: createElement(Probe) }));
   return open;
 }
 

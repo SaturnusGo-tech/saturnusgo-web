@@ -1,5 +1,5 @@
-.phase { min-width: 130px; max-width: 210px; }
-.phase > button { border: 0; background: transparent; padding: 5px 7px; min-height: 30px; box-shadow: none; }
+.phase.phase { width: max-content; min-width: 0; max-width: 100%; }
+.phase.phase > button { width: auto; display: inline-flex; justify-content: flex-start; gap: 7px; border: 0; background: transparent; padding: 5px 7px; min-height: 30px; box-shadow: none; }
 .phase > button:hover { background: var(--control-hover); }
 .checklist { margin: 4px 0 20px; }
 .action { display: inline-flex; gap: 7px; align-items: center; padding: 6px 8px; margin-left: -8px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
@@ -20,3 +20,6 @@
 .newItem { display: flex; gap: 5px; margin: 8px 0; align-items: center; }
 .newItem input { width: 100%; min-width: 0; padding: 7px 9px; font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: transparent; }
 .note { font-size: 11px; line-height: 1.7; color: var(--muted); }
+
+.phase [role="listbox"] { width: max-content; min-width: 185px; max-width: min(280px, 85vw); }
+.phase [role="option"] > span { overflow: visible; text-overflow: clip; }

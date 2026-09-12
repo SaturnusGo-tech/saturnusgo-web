@@ -1,64 +1,22 @@
+import { parseCaseQuery } from "./query/parse";
+import { caseSearchValues, matchesCaseQuery, type CaseQueryContext } from "./query/match";
+import { normalizeQueryText as normalized } from "./query/vocabulary/fields";
+export { parseCaseQlQuery } from "./query/parse";
+export type { CaseQlTerm } from "./query/parse";
+export type { CaseQlField } from "./query/vocabulary/fields";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { CaseListRow, CaseSort } from "../types";
 
 export type CaseListViewMode = "list" | "dynamic";
 export type CaseGroupBy = "none" | "folder" | "component" | "priority" | "lifecycle";
-export type CaseQlField = "text" | "key" | "title" | "lifecycle" | "priority" | "component" | "folder" | "tag" | "type" | "owner";
-export type CaseQlTerm = { field: CaseQlField; value: string; exclude: boolean };
 export type CaseRowGroup = { key: string; value: string; rows: CaseListRow[] };
-export type CaseFacetFilters = { folders: string[]; components: string[] };
+export type CaseFacetFilters = { folders: string[]; components: string[]; owners?: string[] };
 export type CaseFacetOptions = { folders: string[]; components: string[] };
 
 const priorityRank = { low: 0, medium: 1, high: 2, critical: 3 } as const;
 const lifecycleRank = { draft: 0, ready: 1, deprecated: 2, archived: 3 } as const;
-const fieldAliases: Record<string, CaseQlField> = {
-  id: "key", key: "key", ид: "key", title: "title", name: "title", название: "title",
-  status: "lifecycle", state: "lifecycle", lifecycle: "lifecycle", статус: "lifecycle", состояние: "lifecycle",
-  priority: "priority", приоритет: "priority", component: "component", functionality: "component", компонент: "component",
-  folder: "folder", path: "folder", папка: "folder", tag: "tag", тег: "tag", type: "type", тип: "type",
-  owner: "owner", assignee: "owner", владелец: "owner", ответственный: "owner",
-};
-
 export function flattenCaseGroups(groups: Array<[string, TestCaseSummary[]]>): CaseListRow[] {
   return groups.flatMap(([folderPath, testCases]) => testCases.map((testCase) => ({ testCase, folderPath })));
-}
-
-export function parseCaseQlQuery(query: string): CaseQlTerm[] {
-  const tokens = query.match(/(?:[^\s"]+|"[^"]*")+/g) ?? [];
-  return tokens.map((rawToken) => {
-    const exclude = rawToken.startsWith("-");
-    const token = exclude ? rawToken.slice(1) : rawToken;
-    const separator = token.indexOf(":");
-    const rawField = separator > 0 ? token.slice(0, separator).toLocaleLowerCase() : "";
-    const field = fieldAliases[rawField] ?? "text";
-    const rawValue = separator > 0 && field !== "text" ? token.slice(separator + 1) : token;
-    return { field, value: rawValue.replace(/^"|"$/g, "").trim(), exclude };
-  }).filter((term) => term.value.length > 0);
-}
-
-function normalized(value: string | null | undefined) { return (value ?? "").trim().toLocaleLowerCase(); }
-
-function aliases(value: string) {
-  const map: Record<string, string[]> = {
-    ready: ["ready", "готов", "actual", "актуальный"], draft: ["draft", "черновик"],
-    deprecated: ["deprecated", "устарел"], archived: ["archived", "архив"],
-    critical: ["critical", "критический"], high: ["high", "высокий"],
-    medium: ["medium", "средний"], low: ["low", "низкий"], manual: ["manual", "ручной"],
-    checklist: ["checklist", "чеклист"], automated: ["automated", "автоматизированный", "автотест"],
-  };
-  return map[value] ?? [value];
-}
-
-function termMatches(row: CaseListRow, term: CaseQlTerm) {
-  const item = row.testCase;
-  const values: Record<CaseQlField, string[]> = {
-    text: [item.key, item.title, row.folderPath, item.component, ...item.tags], key: [item.key], title: [item.title],
-    lifecycle: aliases(item.archivedAt ? "archived" : item.lifecycle), priority: aliases(item.priority), component: [item.component],
-    folder: [row.folderPath], tag: item.tags, type: aliases(item.type), owner: [item.ownerIdentityId ?? ""],
-  };
-  const needle = normalized(term.value);
-  const matches = values[term.field].some((value) => normalized(value).includes(needle));
-  return term.exclude ? !matches : matches;
 }
 
 function matchesFolder(row: CaseListRow, folders: string[]) {
@@ -85,6 +43,7 @@ export function resolveDependentCaseFacets(rows: CaseListRow[], facets: CaseFace
 export function sanitizeDependentCaseFacets(rows: CaseListRow[], facets: CaseFacetFilters): CaseFacetFilters {
   const options = resolveDependentCaseFacets(rows, facets);
   return {
+    ...facets,
     folders: facets.folders,
     components: facets.components.filter((component) => options.components.includes(component)),
   };
@@ -107,20 +66,17 @@ export function visibleCaseTabStop(
     : (visible[0]?.testCase.id ?? null);
 }
 
-export function filterCaseRows(rows: CaseListRow[], query: { titleQuery?: string; qlQuery?: string; facets?: CaseFacetFilters }): CaseListRow[] {
+export function filterCaseRows(rows: CaseListRow[], query: { titleQuery?: string; qlQuery?: string; facets?: CaseFacetFilters; context?: CaseQueryContext }): CaseListRow[] {
   const titleNeedle = normalized(query.titleQuery);
-  const terms = parseCaseQlQuery(query.qlQuery ?? "");
+  const parsed = parseCaseQuery(query.qlQuery ?? "");
+  if (parsed.error) return [];
   return rows.filter((row) => {
-    const titleMatches = !titleNeedle || [
-      row.testCase.title,
-      row.testCase.key,
-      row.folderPath,
-      row.testCase.component,
-      ...row.testCase.tags,
-    ].some((value) => normalized(value).includes(titleNeedle));
+    const values = caseSearchValues(row, query.context);
+    const titleMatches = !titleNeedle || values.text.some(value => normalized(value).includes(titleNeedle));
     const folderMatches = matchesFolder(row, query.facets?.folders ?? []);
     const componentMatches = !query.facets?.components.length || query.facets.components.includes(row.testCase.component);
-    return titleMatches && folderMatches && componentMatches && terms.every((term) => termMatches(row, term));
+    const ownerMatches = !query.facets?.owners?.length || query.facets.owners.includes(row.testCase.ownerIdentityId ?? "unassigned");
+    return titleMatches && folderMatches && componentMatches && ownerMatches && matchesCaseQuery(parsed.root, values);
   });
 }
 

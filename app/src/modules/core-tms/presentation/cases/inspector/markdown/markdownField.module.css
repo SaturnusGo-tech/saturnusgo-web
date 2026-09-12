@@ -62,7 +62,7 @@
 .wysiwyg :global(.mdxeditor-toolbar button:hover),
 .wysiwyg :global(.mdxeditor-toolbar button:focus-visible) { color: var(--cases-strong); background: var(--cases-hover); outline: 1px solid var(--cases-control-border); outline-offset: -1px; }
 .wysiwyg :global(.mdxeditor-root-contenteditable) { height: calc(100% - 31px); min-height: 0; overflow: auto; background: var(--cases-control); }
-.wysiwyg .editorContent { min-height: 100%; padding: 10px 11px; color: var(--cases-secondary-text); font: inherit; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.wysiwyg .editorContent { min-height: 100%; padding: var(--markdown-content-top, 10px) var(--markdown-content-inline, 11px); color: var(--cases-secondary-text); font: inherit; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
 .editorContent :is(h1, h2, h3) { color: var(--cases-strong); font-family: inherit; font-weight: 600; line-height: 1.3; }
 .editorContent h1 { font-size: 1.6em; }
 .editorContent h2 { font-size: 1.35em; }
@@ -296,3 +296,5 @@
 .attachmentButton.attachmentWithText { display: inline-flex; align-items: center; gap: 6px; padding: 0 5px; border: 0; border-radius: 8px; font: inherit; font-size: 10px; text-align: left; }
 .attachmentWithText svg { flex-shrink: 0; }
 .field[data-appearance="plain"] .editorFooter::after { content: ""; width: 1px; height: 17px; margin-left: 8px; background: var(--cases-control-border); flex-shrink: 0; }
+
+.wysiwyg :global([class*="_placeholder_"]) { padding: var(--markdown-content-top, 10px) calc(var(--markdown-content-inline, 11px) + 2px); font: inherit; font-size: 14px; line-height: 1.55; color: var(--cases-faint); }

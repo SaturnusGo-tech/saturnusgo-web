@@ -19,8 +19,10 @@ function renderModule(path: string, actionMenu = false) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name === "react") return {
         useState: (initial: unknown) => [actionMenu && stateIndex++ === 1 ? true : typeof initial === "function" ? initial() : initial, () => {}],
-        useMemo: (fn: () => unknown) => fn(), useEffect: () => {}, useRef: (current: unknown) => ({ current }), useId: () => "ql",
+        useDeferredValue: (value: unknown) => value, useMemo: (fn: () => unknown) => fn(), useEffect: () => {}, useRef: (current: unknown) => ({ current }), useId: () => "ql",
       };
+      if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "w", offline: true }) };
+      if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
       if (name.endsWith("folder-scope")) return { repositoryScope };
       if (name.endsWith("caseListModel")) return {
         filterCaseRows: (rows: unknown, filters: { titleQuery?: string }) => filters.titleQuery === "missing" ? [] : rows, sortCaseRows: (rows: unknown) => rows,

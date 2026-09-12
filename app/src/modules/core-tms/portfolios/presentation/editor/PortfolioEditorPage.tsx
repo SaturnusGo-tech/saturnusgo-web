@@ -31,7 +31,7 @@ export function PortfolioEditorPage({ actionsTargetId, workspaceId, canReadAttac
   const [description, setDescription] = useState(current?.description ?? "");
   const [responsibleIdentityId, setResponsibleIdentityId] = useState(current?.responsibleIdentityId ?? null);
   const errors = organizationErrors({ name, description, checklist }, locale === "ru");
-  return <form id={formId} noValidate className={css.editor} onSubmit={(event) => { event.preventDefault(); setAttempted(true); if (pending) return; if (Object.keys(errors).length) { focusOrganizationError(event.currentTarget, errors); return; } void onSave({ name, description, responsibleIdentityId, workflowPhase, checklist }); }} aria-busy={pending || undefined}>
+  return <form id={formId} noValidate className={`${css.editor} ${css.portfolioEditor}`} onSubmit={(event) => { event.preventDefault(); setAttempted(true); if (pending) return; if (Object.keys(errors).length) { focusOrganizationError(event.currentTarget, errors); return; } void onSave({ name, description, responsibleIdentityId, workflowPhase, checklist }); }} aria-busy={pending || undefined}>
     <header className={styles.heading}>
       <PiBriefcaseDuotone size={24} className={styles.portfolioIcon} aria-hidden="true" />
       <div className={css.titleField}><label className={styles.srOnly} htmlFor="portfolio-title">{copy.portfolioTitle}</label>

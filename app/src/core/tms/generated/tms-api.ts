@@ -3888,6 +3888,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit an authored project discussion comment
+         * @description Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal "organization-comment-{revision}". Stale revisions return 412; identical retries replay for 24 hours.
+         */
+        patch: operations["editProjectComment"];
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit an authored portfolio discussion comment
+         * @description Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal "organization-comment-{revision}". Stale revisions return 412; identical retries replay for 24 hours.
+         */
+        patch: operations["editPortfolioComment"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6802,6 +6854,11 @@ export interface components {
             /** @enum {string} */
             targetType: "project" | "portfolio";
             targetId: components["schemas"]["Identifier"];
+            revision: number;
+            /** Format: date-time */
+            updatedAt: string | null;
+            /** @description True when the authenticated caller is the author. Active target and project:manage are checked on update. */
+            canEdit: boolean;
         };
         OrganizationCommentAuthor: {
             identityId: components["schemas"]["Identifier"];
@@ -7566,6 +7623,11 @@ export interface components {
             data: {
                 markdown: string;
             };
+        };
+        OrganizationCommentEditRequest: {
+            workspaceId: components["schemas"]["Identifier"];
+            body: string;
+            revision: number;
         };
     };
     responses: {
@@ -8517,6 +8579,7 @@ export interface components {
             headers: {
                 "X-Request-Id": components["headers"]["XRequestId"];
                 "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                ETag: components["headers"]["ETag"];
                 [name: string]: unknown;
             };
             content: {
@@ -16118,6 +16181,74 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+        };
+    };
+    editProjectComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationCommentEditRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["OrganizationCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    editPortfolioComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+                commentId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationCommentEditRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["OrganizationCommentResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
         };
     };
 }

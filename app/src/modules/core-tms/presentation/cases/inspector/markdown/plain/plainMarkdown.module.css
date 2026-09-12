@@ -15,3 +15,5 @@
 .edit { width: 28px; height: 28px; border: 0; background: transparent; color: var(--cases-muted); border-radius: 9px; padding: 0; display: grid; place-items: center; cursor: pointer; }
 .edit:hover { color: var(--cases-primary); background: var(--cases-hover); }
 .edit:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 1px; }
+
+.plain { --markdown-content-top: 5px; --markdown-content-inline: 2px; }
