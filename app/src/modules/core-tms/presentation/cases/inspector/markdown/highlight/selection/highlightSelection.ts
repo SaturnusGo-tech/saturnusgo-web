@@ -2,7 +2,7 @@ import type { Nodes, PhrasingContent, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
 import { directive } from "micromark-extension-directive";
-import { directiveFromMarkdown, directiveToMarkdown } from "mdast-util-directive";
+import { highlightFromMarkdown, highlightToMarkdown } from "../serialization/highlightSerialization";
 import { gfm } from "micromark-extension-gfm";
 import { gfmFromMarkdown, gfmToMarkdown } from "mdast-util-gfm";
 import { highlightedNode, highlightColorOf } from "../model/highlightSyntax";
@@ -10,7 +10,7 @@ import type { HighlightColor } from "../model/highlightColors";
 
 type Edit = { start: number; end: number; value: string };
 const parse = (value: string) => fromMarkdown(value, {
-  extensions: [gfm(), directive()], mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown()],
+  extensions: [gfm(), directive()], mdastExtensions: [gfmFromMarkdown(), highlightFromMarkdown()],
 });
 
 /** Returns source edits and selection offsets; never rewrites text outside the selected range. */
@@ -32,7 +32,7 @@ export function formatHighlightSelection(value: string, start: number, end: numb
     const parsed = parse(content.trim()).children;
     const inline = parsed.length === 1 && "children" in parsed[0] ? parsed[0].children as PhrasingContent[] : null;
     if (!inline) return line;
-    const marker = toMarkdown(highlightedNode(color, inline), { extensions: [gfmToMarkdown(), directiveToMarkdown()] }).trimEnd();
+    const marker = toMarkdown(highlightedNode(color, inline), { extensions: [gfmToMarkdown(), highlightToMarkdown()] }).trimEnd();
     return prefix + leading + marker + trailing;
   }).join("\n");
   return { value: value.slice(0, start) + replacement + value.slice(end), start, end: start + replacement.length };

@@ -64,7 +64,11 @@
 .wysiwyg :global(.mdxeditor-root-contenteditable) { height: calc(100% - 31px); min-height: 0; overflow: auto; background: var(--cases-control); }
 .wysiwyg .editorContent { min-height: 100%; padding: 10px 11px; color: var(--cases-secondary-text); font: inherit; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
 .editorContent :is(p, ul, ol, blockquote, pre) { margin: 0 0 7px; }
-.editorContent :is(h1, h2, h3) { margin: 8px 0 5px; color: var(--cases-strong); font: inherit; font-size: 1em; font-weight: 600; line-height: 1.4; }
+.editorContent :is(h1, h2, h3) { margin: 16px 0 7px; color: var(--cases-strong); font-family: inherit; font-weight: 600; line-height: 1.3; }
+.editorContent h1 { font-size: 1.6em; }
+.editorContent h2 { font-size: 1.35em; }
+.editorContent h3 { font-size: 1.15em; }
+.editorContent > :first-child { margin-top: 0; }
 .editorContent strong { color: var(--cases-strong); font-weight: 600; }
 .editorContent em { color: var(--cases-strong); font-style: italic; font-weight: 500; }
 .editorContent a { color: var(--cases-link); }
@@ -251,14 +255,17 @@
 .rendered :global(h2),
 .rendered :global(h3),
 .rendered :global(h4) {
-  margin: 9px 0 5px !important;
+  margin: 16px 0 7px !important;
   color: var(--cases-strong) !important;
   font-family: inherit !important;
   font-size: 1em !important;
   font-weight: 600 !important;
-  line-height: 1.4 !important;
+  line-height: 1.3 !important;
   border: 0 !important;
 }
+.rendered :global(h1) { font-size: 1.6em !important; }
+.rendered :global(h2) { font-size: 1.35em !important; }
+.rendered :global(h3) { font-size: 1.15em !important; }
 .rendered :global(a) { color: var(--cases-link) !important; }
 .rendered :global(strong) {
   color: var(--cases-strong) !important;

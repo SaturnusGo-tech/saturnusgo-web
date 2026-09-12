@@ -8,7 +8,7 @@ import { animateReplacement } from "./motion/animateReplacement";
 /** Capture node positions, not a string search: duplicate text must never redirect an edit. */
 export function captureMarkdownTarget(editor: LexicalEditor, parameters: MarkdownExportParameters,
   insertMarkdown: (markdown: string) => void, canImport: (markdown: string) => boolean = () => true,
-  insertInline: (markdown: string) => boolean = () => false): WritingTarget | null {
+  insertPartial: (markdown: string) => boolean = () => false): WritingTarget | null {
   const element = editor.getRootElement();
   if (!element?.isConnected || !editor.isEditable()) return null;
   const root: HTMLElement = element;
@@ -46,7 +46,7 @@ export function captureMarkdownTarget(editor: LexicalEditor, parameters: Markdow
             // Resolve captured keys before inserting; external replacements may retain equal text.
             if (!$getSelection()?.getNodes().length) return;
           } else $getRoot().select(0, $getRoot().getChildrenSize());
-          if (!isPartialBlock() || !insertInline(markdown)) insertMarkdown(markdown);
+          if (!isPartialBlock() || !insertPartial(markdown)) insertMarkdown(markdown);
           committed = true;
         }, { discrete: true, tag: HISTORY_PUSH_TAG });
       } catch { return false; }

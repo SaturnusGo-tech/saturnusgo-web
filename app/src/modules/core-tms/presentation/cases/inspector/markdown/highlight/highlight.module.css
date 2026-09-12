@@ -3,7 +3,7 @@
 .surface :global([data-marker="green"]), .surface :global([style*="--falcon-marker: green"]) { --marker-ink: 105, 183, 127; }
 .surface :global([data-marker="pink"]), .surface :global([style*="--falcon-marker: pink"]) { --marker-ink: 221, 128, 160; }
 .surface :global([data-marker="purple"]), .surface :global([style*="--falcon-marker: purple"]) { --marker-ink: 162, 137, 222; }
-.surface :global(mark[data-marker]), .surface :global(span[style*="--falcon-marker:"]) {
+.surface :global(mark[data-marker]), .surface :global([style*="--falcon-marker:"]) {
   background-color: transparent;
   background-image: linear-gradient(177deg, transparent 13%, rgba(var(--marker-ink), .36) 17%, rgba(var(--marker-ink), .31) 77%, rgba(var(--marker-ink), .39) 84%, transparent 89%);
   border-radius: .22em .13em .28em .12em / .24em .2em .16em .21em;
@@ -13,7 +13,11 @@
   margin-inline: -.065em;
   color: inherit;
 }
-:global(.dark) .surface :global(mark[data-marker]), :global(.dark) .surface :global(span[style*="--falcon-marker:"]),
-:global([data-color-mode="dark"]) .surface :global(mark[data-marker]), :global([data-color-mode="dark"]) .surface :global(span[style*="--falcon-marker:"]) {
+:global(.dark) .surface :global(mark[data-marker]), :global(.dark) .surface :global([style*="--falcon-marker:"]),
+:global([data-color-mode="dark"]) .surface :global(mark[data-marker]), :global([data-color-mode="dark"]) .surface :global([style*="--falcon-marker:"]) {
   background-image: linear-gradient(177deg, transparent 13%, rgba(var(--marker-ink), .31) 17%, rgba(var(--marker-ink), .24) 77%, rgba(var(--marker-ink), .34) 84%, transparent 89%);
 }
+
+/* Native selection stays distinct without covering the marker with an opaque blue slab. */
+.surface::selection, .surface :global(::selection) { background: rgb(112 184 235 / 25%); color: inherit; }
+:global(.dark) .surface::selection, :global(.dark) .surface :global(::selection) { background: rgb(112 184 235 / 30%); color: inherit; }

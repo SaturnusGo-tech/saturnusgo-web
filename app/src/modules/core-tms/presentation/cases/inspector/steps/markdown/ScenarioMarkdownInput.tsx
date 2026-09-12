@@ -9,6 +9,7 @@ import { useStepHistory } from "./history/useStepHistory";
 import css from "./scenarioMarkdown.module.css";
 import { WritingAction } from "../../../../../writing-assistant/presentation/WritingAction";
 import { useScenarioWriting } from "./writing/useScenarioWriting";
+import { HeadingButtons } from "../../markdown/headings/HeadingButtons";
 import { RawHighlightToolbar } from "../../markdown/highlight/raw/RawHighlightToolbar";
 import { formatHighlightSelection } from "../../markdown/highlight/selection/highlightSelection";
 import type { HighlightColor } from "../../markdown/highlight/model/highlightColors";
@@ -60,7 +61,7 @@ export function ScenarioMarkdownInput(props: Props) {
     if (selected.value !== props.value || !input.current) return;
     const next = formatHighlightSelection(props.value, selected.start, selected.end, color);
     history.boundary(); history.record(next.value);
-    requestAnimationFrame(() => { input.current?.focus({ preventScroll: true }); input.current?.setSelectionRange(next.start, next.end); });
+    preview();
   }
   const actions = [
     { kind: "bold", Icon: Bold, label: props.ru ? "Жирный текст" : "Bold" },
@@ -75,6 +76,7 @@ export function ScenarioMarkdownInput(props: Props) {
       <WritingAction ru={props.ru} capture={captureWriting} tabIndex={editing ? 0 : -1} onOpenChange={setWriting} />
       <RawHighlightToolbar locale={props.ru ? "ru" : "en"} tabIndex={editing ? 0 : -1} onChoose={mark}
         onOpen={() => { markerSelection.current = { value: props.value, start: input.current?.selectionStart ?? 0, end: input.current?.selectionEnd ?? 0 }; }} />
+      <HeadingButtons ru={props.ru} tabIndex={editing ? 0 : -1} onChoose={format} />
       {actions.map(({ kind, Icon, label }) => <button key={kind} type="button" title={label} aria-label={label}
         tabIndex={editing ? 0 : -1} onMouseDown={(event) => event.preventDefault()} onClick={() => format(kind)}><Icon size={14} /></button>)}
       <button type="button" className={css.done} tabIndex={editing ? 0 : -1} title={props.ru ? "Готово" : "Done"}

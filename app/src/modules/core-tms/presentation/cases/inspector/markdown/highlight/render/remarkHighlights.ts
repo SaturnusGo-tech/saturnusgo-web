@@ -1,3 +1,4 @@
+import { normalizeMarkerLinks } from "../serialization/highlightLinks";
 import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
 import { directive } from "micromark-extension-directive";
@@ -9,6 +10,7 @@ import { directiveLiteral, highlightColorOf } from "../model/highlightSyntax";
 /** Only our exact color vocabulary reaches HTML; arbitrary directive attributes never do. */
 export function remarkHighlights() {
   return (tree: Root) => {
+    normalizeMarkerLinks(tree);
     function childrenOf(parent: { children: RootContent[] }) {
       parent.children = parent.children.map((node) => {
         if (["textDirective", "leafDirective", "containerDirective"].includes(node.type)) {

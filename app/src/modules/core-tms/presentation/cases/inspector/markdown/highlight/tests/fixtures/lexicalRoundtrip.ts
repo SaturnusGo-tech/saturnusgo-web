@@ -6,7 +6,8 @@ import type { Nodes } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
 import { directive } from "micromark-extension-directive";
-import { directiveFromMarkdown, directiveToMarkdown } from "mdast-util-directive";
+import { highlightMarkToMarkdown } from "mdast-util-highlight-mark";
+import { highlightFromMarkdown, highlightToMarkdown } from "../../serialization/highlightSerialization";
 import { gfm } from "micromark-extension-gfm";
 import { gfmFromMarkdown, gfmToMarkdown } from "mdast-util-gfm";
 import { highlightCodeImportVisitor, highlightExportVisitor, highlightImportVisitor } from "../../editor/highlightVisitors";
@@ -26,7 +27,7 @@ const imports: MdastImportVisitor<Nodes>[] = [highlightImportVisitor, highlightC
       .setStyle(actions.getParentStyle()).setFormat(actions.getParentFormatting()));
   } },
   { testNode: "link", visitNode: ({ mdastNode, actions }) => {
-    if (mdastNode.type === "link") actions.addAndStepInto($createLinkNode(mdastNode.url));
+    if (mdastNode.type === "link") actions.addAndStepInto($createLinkNode(mdastNode.url, { title: mdastNode.title }));
   } },
   ...(["strong", "emphasis", "delete"] as const).map((type): MdastImportVisitor<Nodes> => ({
     testNode: type, visitNode: ({ mdastNode, lexicalParent, actions }) => {
@@ -42,7 +43,7 @@ const exports: LexicalVisitor[] = [highlightExportVisitor,
     if ($isHeadingNode(lexicalNode)) actions.addAndStepInto("heading", { depth: Number(lexicalNode.getTag()[1]) });
   } },
   { testLexicalNode: $isLinkNode, visitLexicalNode: ({ lexicalNode, actions }) => {
-    if ($isLinkNode(lexicalNode)) actions.addAndStepInto("link", { url: lexicalNode.getURL() });
+    if ($isLinkNode(lexicalNode)) actions.addAndStepInto("link", { url: lexicalNode.getURL(), title: lexicalNode.getTitle() });
   } },
   { testLexicalNode: $isTextNode, visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     actions.appendToParent(mdastParent, { type: "text", value: lexicalNode.getTextContent() });
@@ -54,10 +55,10 @@ export async function roundtrip(markdown: string) {
   let output = "", spans: { text: string; style: string; bold: boolean; code: boolean }[] = [];
   editor.update(() => {
     importMdastTreeToLexical({ root: $getRoot(), mdastRoot: fromMarkdown(markdown, {
-      extensions: [gfm(), directive()], mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown()],
+      extensions: [gfm(), directive()], mdastExtensions: [gfmFromMarkdown(), highlightFromMarkdown()],
     }), visitors: imports, jsxComponentDescriptors: [], directiveDescriptors: [], codeBlockEditorDescriptors: [] });
     output = toMarkdown(exportLexicalTreeToMdast({ root: $getRoot(), visitors: exports, jsxComponentDescriptors: [], jsxIsAvailable: false }),
-      { extensions: [gfmToMarkdown(), directiveToMarkdown()] }).trimEnd();
+      { extensions: [gfmToMarkdown(), highlightMarkToMarkdown, highlightToMarkdown()] }).trimEnd();
     spans = $getRoot().getAllTextNodes().filter($isTextNode).map((node) => ({
       text: node.getTextContent(), style: node.getStyle(), bold: node.hasFormat("bold"), code: node.hasFormat("code"),
     }));

@@ -1,6 +1,9 @@
-export type StepFormat = "bold" | "inline" | "code" | "list";
+import { formatStepHeading } from "./formatHeading";
+
+export type StepFormat = "bold" | "inline" | "code" | "list" | "h1" | "h2" | "h3";
 
 export function formatStepSelection(value: string, start: number, end: number, format: StepFormat) {
+  if (format === "h1" || format === "h2" || format === "h3") return formatStepHeading(value, start, end, Number(format[1]));
   const selected = value.slice(start, end);
   let before = "", after = "", content = selected;
   if (format === "bold") { before = "**"; after = "**"; }

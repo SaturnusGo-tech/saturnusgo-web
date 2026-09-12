@@ -8,7 +8,7 @@ import { $createParagraphNode, $createTextNode, $getRoot, $isElementNode, $isTex
   createEditor, UNDO_COMMAND } from "lexical";
 import { captureMarkdownTarget } from "../captureMarkdownTarget";
 import { fullMarkdown, markdownExportParameters } from "../serialization/markdownSerialization";
-import { canImportMarkdown, insertInlineMarkdown } from "../serialization/validateMarkdown";
+import { canImportMarkdown, insertPartialMarkdown } from "../serialization/validateMarkdown";
 import { $createHeadingNode } from "@lexical/rich-text";
 import { $createListNode, $createListItemNode } from "@lexical/list";
 
@@ -31,7 +31,7 @@ function harness() {
   const parameters = markdownExportParameters(realm)!;
   const insert = (markdown: string) => realm.pub(insertMarkdown$, markdown);
   const capture = () => captureMarkdownTarget(editor, parameters, insert, (markdown) => canImportMarkdown(realm, editor, markdown),
-    (markdown) => insertInlineMarkdown(realm, markdown));
+    (markdown) => insertPartialMarkdown(realm, markdown));
   const state = createEmptyHistoryState();
   registerHistory(editor, state, 300);
   editor.update(() => {
@@ -140,4 +140,41 @@ test("a partial list item replacement preserves the list and neighboring inline 
   }, { discrete: true });
   assert.equal(h.capture()!.apply("**Другой**"), true);
   assert.equal(h.read(), "* **Другой**оверка авторизации **API**");
+});
+
+test("explicit H1 H2 H3 AI output keeps every heading level on whole-field replacement", () => {
+  const h = harness(); h.editor.update(() => { $setSelection(null); }, { discrete: true });
+  const markdown = "# Авторизация\n\nОписание проверки.\n\n## Предусловия\n\nТестовый аккаунт.\n\n### Запрос\n\nGET /session";
+  assert.equal(h.capture()!.apply(markdown), true);
+  assert.equal(h.read(), markdown);
+  const headings = h.editor.getEditorState().read(() => $getRoot().getChildren()
+    .filter((node) => node.getType() === "heading").map((node) => node.exportJSON()));
+  assert.deepEqual(headings.map((node) => (node as { tag?: string }).tag), ["h1", "h2", "h3"]);
+});
+
+test("a selected full paragraph accepts explicit AI heading levels", () => {
+  const h = harness();
+  assert.equal(h.capture()!.apply("## Заголовок\n\n### Подзаголовок"), true);
+  assert.equal(h.read(), "before **same** after\n\n## Заголовок\n\n### Подзаголовок");
+});
+
+test("an explicit heading response is not flattened by the partial-block inline adapter", () => {
+  const h = harness();
+  h.editor.update(() => { const text = $createTextNode("Проверка авторизации");
+    $getRoot().clear().append($createHeadingNode("h1").append(text)); text.select(0, 2);
+  }, { discrete: true });
+  assert.equal(h.capture()!.apply("## Уточнённый фрагмент"), true);
+  assert.equal(h.read(), "## Уточнённый фрагмент\n\n# оверка авторизации");
+});
+
+test("a block reply preserves both outside headings and remains one undoable edit", async () => {
+  const h = harness();
+  h.editor.update(() => { const text = $createTextNode("before same after");
+    $getRoot().clear().append($createHeadingNode("h1").append(text)); text.select(7, 11);
+  }, { discrete: true });
+  assert.equal(h.capture()!.apply("## Changed\n\n### Detail"), true);
+  assert.equal(h.read(), "# before&#x20;\n\n## Changed\n\n### Detail\n\n# &#x20;after");
+  h.editor.dispatchCommand(UNDO_COMMAND, undefined);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(h.read(), "# before same after");
 });

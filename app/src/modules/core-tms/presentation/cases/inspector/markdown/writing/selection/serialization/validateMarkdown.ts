@@ -2,6 +2,7 @@ import * as MarkdownEditor from "@mdxeditor/editor";
 import type { MdastTreeImportOptions, NodeRef, Realm } from "@mdxeditor/editor";
 import { $getRoot, $insertNodes, $isParagraphNode, createEditor, type LexicalEditor, type LexicalNode } from "lexical";
 import type { Options } from "mdast-util-from-markdown";
+import { insertPartialBlocks } from "../blocks/insertPartialBlocks";
 
 type ImportParameters = Omit<MdastTreeImportOptions, "mdastRoot"> & {
   markdown: string;
@@ -24,13 +25,19 @@ export function canImportMarkdown(realm: Realm, editor: LexicalEditor, markdown:
   return valid;
 }
 
-/** Insert one paragraph's inline children without changing a partially selected heading/list item. */
-export function insertInlineMarkdown(realm: Realm, markdown: string): boolean {
+/** Keep inline replies inside their source block; preserve explicit block replies as blocks. */
+export function insertPartialMarkdown(realm: Realm, markdown: string): boolean {
   const importInto = markdownImporter(realm);
   if (!importInto) return false;
   const nodes: LexicalNode[] = [];
   importInto({ append: (node) => { nodes.push(node); }, getType: () => "root" }, markdown);
-  if (nodes.length !== 1 || !$isParagraphNode(nodes[0])) return false;
+  // MDXEditor appends a caret paragraph after terminal blocks; it is not part of the response.
+  while (nodes.length > 1) {
+    const last = nodes[nodes.length - 1];
+    if (!$isParagraphNode(last) || !last.isEmpty()) break;
+    nodes.pop();
+  }
+  if (nodes.length !== 1 || !$isParagraphNode(nodes[0])) return insertPartialBlocks(nodes);
   $insertNodes(nodes[0].getChildren());
   return true;
 }

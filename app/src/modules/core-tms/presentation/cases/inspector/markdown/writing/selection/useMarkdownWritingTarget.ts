@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import type { WritingTarget } from "../../../../../../writing-assistant/model/target";
 import { captureMarkdownTarget } from "./captureMarkdownTarget";
 import { markdownExportParameters } from "./serialization/markdownSerialization";
-import { canImportMarkdown, insertInlineMarkdown } from "./serialization/validateMarkdown";
+import { canImportMarkdown, insertPartialMarkdown } from "./serialization/validateMarkdown";
 
 export function useMarkdownWritingTarget(): () => WritingTarget | null {
   const realm = useRealm();
@@ -16,6 +16,6 @@ export function useMarkdownWritingTarget(): () => WritingTarget | null {
       realm.pub(activeEditor$, editor);
       realm.pub(inFocus$, true);
       realm.pub(insertMarkdown$, markdown);
-    }, (markdown) => canImportMarkdown(realm, editor, markdown), (markdown) => insertInlineMarkdown(realm, markdown));
+    }, (markdown) => canImportMarkdown(realm, editor, markdown), (markdown) => insertPartialMarkdown(realm, markdown));
   }, [realm]);
 }

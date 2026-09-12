@@ -1,0 +1,5 @@
+.headings { display: inline-flex; align-items: center; gap: 1px; flex-shrink: 0; }
+.headings button { display: inline-flex; align-items: baseline; justify-content: center; min-width: 25px; height: 25px; padding: 3px !important; border: 0; border-radius: 7px !important; background: transparent; color: var(--cases-muted); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.headings sub { font-size: 9px; line-height: 1; }
+.headings button[aria-pressed="true"] { color: var(--cases-link) !important; background: rgb(112 184 235 / 18%) !important; }
+.headings button:focus-visible { outline: 1px solid var(--cases-control-border); outline-offset: 1px; }

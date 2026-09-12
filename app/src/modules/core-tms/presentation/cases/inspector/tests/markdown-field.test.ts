@@ -89,9 +89,9 @@ test("Markdown link editing uses a themed modal layer with clear fields", () => 
   assert.match(styles, /\[role="dialog"\] input[\s\S]*min-height: 38px/);
 });
 
-test("Markdown inputs omit the disruptive block-type selector", () => {
-  assert.doesNotMatch(initialized, /BlockTypeSelect/);
-  assert.doesNotMatch(initialized, /toolbar\.blockTypes|blockTypeSelect/);
+test("Markdown inputs expose compact heading controls", () => {
+  assert.match(toolbar, /<MarkdownHeadings/);
+  assert.match(initialized, /allowedHeadingLevels: \[1, 2, 3\]/);
 });
 
 test("case chrome is quiet until the user asks to edit", () => {

@@ -49,6 +49,10 @@ export function useHighlightToolbar() {
       const selection = saved.current!.clone();
       $setSelection(selection);
       $patchStyleText(selection, { [highlightStyleProperty]: color });
+      // Reveal the stroke immediately instead of covering it with the native text selection.
+      const end = selection.isBackward() ? selection.anchor : selection.focus;
+      selection.anchor.set(end.key, end.offset, end.type);
+      selection.focus.set(end.key, end.offset, end.type);
     });
     close();
     editor.focus();
