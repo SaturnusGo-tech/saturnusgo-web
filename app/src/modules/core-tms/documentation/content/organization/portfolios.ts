@@ -5,7 +5,7 @@ export const portfoliosArticle: DocArticle = {
   id: "portfolios", title: "Портфели и проекты", group: "start",
   description: "Создавайте портфели и проекты на отдельных страницах, ведите статусы, чек-листы, файлы и обсуждение вместе с тестовой базой проекта.",
   keywords: ["портфель", "portfolio", "создать проект", "ответственный", "назначить", "без портфеля", "архив", "каталог", "Markdown", "карандаш", "план тестирования", "статус", "чек-лист", "вложения", "файлы"],
-  related: ["workspace", "organize-cases", "create-test-case", "import-export"],
+  related: ["workspace", "organize-cases", "create-test-case", "falcon-ai-writing", "import-export"],
   sections: [
     section("walkthrough", "На практике: портфель, проект и тест-кейсы", portfoliosWalkthrough),
     section("structure", "Что объединяет портфель", table(["Уровень", "Назначение"],

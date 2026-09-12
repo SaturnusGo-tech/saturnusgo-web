@@ -1,0 +1,30 @@
+.panel { --writing-bg: #fff; --writing-ink: #242830; --writing-muted: #767d88; --writing-line: #e3e6ec; --writing-hover: #f3f5f8; --cases-text: var(--writing-ink); --cases-secondary-text: var(--writing-ink); --cases-muted: var(--writing-muted); --cases-hover: var(--writing-hover); --cases-primary: #3478ee; --cases-control-border: var(--writing-line); position: fixed; z-index: 2200; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; box-sizing: border-box; padding: 18px; border: 1px solid var(--writing-line); border-radius: 16px; background: var(--writing-bg); color: var(--writing-ink); box-shadow: 0 8px 32px #1728421a, 0 2px 7px #1728420d; font-family: inherit; font-size: 14px; line-height: 1.5; scrollbar-width: thin; }
+.panel[data-color-mode="dark"] { --writing-bg: #212328; --writing-ink: #edf0f5; --writing-muted: #a0a7b3; --writing-line: #383c45; --writing-hover: #2b2e35; box-shadow: 0 8px 32px #0005; color-scheme: dark; }
+.panel, .panel * { box-sizing: border-box; }
+.panel button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 32px; padding: 6px 11px; border: 0; border-radius: 9px; font: inherit; font-size: 12px; line-height: 1.4; color: var(--writing-ink); background: var(--writing-hover); cursor: pointer; transition: background .16s ease; }
+.panel button:disabled { opacity: .45; cursor: default; }
+.panel button:hover:not(:disabled) { background: color-mix(in srgb, var(--writing-hover), var(--writing-ink) 7%); }
+.panel button:focus-visible, .result:focus-visible { outline: 2px solid #5188ef; outline-offset: 2px; }
+.header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.header strong { display: block; font-size: 14px; font-weight: 600; }
+.scope { display: block; font-size: 11px; color: var(--writing-muted); margin-top: 1px; }
+.header .close { margin-left: auto; align-self: flex-start; background: transparent; padding: 5px; width: 28px; min-height: 28px; color: var(--writing-muted); }
+.prompt { display: flex; align-items: flex-end; gap: 8px; padding: 10px 10px 10px 12px; border: 1px solid var(--writing-line); border-radius: 11px; transition: border-color .16s ease; }
+.prompt:focus-within { border-color: #74a1ef; }
+.prompt textarea { flex: 1; width: 100%; min-width: 0; min-height: 42px; max-height: 120px; padding: 0; resize: vertical; border: 0; outline: 0; box-shadow: none; color: var(--writing-ink); background: transparent; font: inherit; font-size: 13px; line-height: 1.55; }
+.prompt textarea::placeholder { color: var(--writing-muted); }
+.prompt .send { width: 30px; min-height: 30px; padding: 5px; color: #fff; background: #3478ee; border-radius: 50%; }
+.prompt .send:hover:not(:disabled), .footer .apply:hover { background: #2869d9; }
+.shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.result { padding-top: 18px; margin-top: 16px; max-height: min(320px, 42dvh); overflow: auto; scrollbar-width: thin; border-top: 1px solid var(--writing-line); }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 16px; }
+.footer .apply { color: #fff; background: #3478ee; }
+.error { margin: 12px 0 0; color: #b94545; font-size: 12px; line-height: 1.5; }
+.panel[data-color-mode="dark"] .error { color: #ef9b9b; }
+.loading { margin-top: 18px; border-top: 1px solid var(--writing-line); padding-top: 18px; }
+.loading > span { display: block; height: 10px; border-radius: 5px; margin-bottom: 10px; background: linear-gradient(100deg, var(--writing-hover) 25%, color-mix(in srgb, var(--writing-hover), #84b7f0 18%) 45%, var(--writing-hover) 65%); background-size: 250% 100%; animation: shimmer 1.5s linear infinite; }
+.loading > span:nth-child(2) { width: 90%; }.loading > span:nth-child(3) { width: 68%; }
+.loadingFooter { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; color: var(--writing-muted); }
+.loadingFooter button { background: transparent; }
+@keyframes shimmer { to { background-position: -250% 0; } }
+@media (prefers-reduced-motion: reduce) { .loading > span { animation: none; }.panel button, .prompt { transition: none; } }

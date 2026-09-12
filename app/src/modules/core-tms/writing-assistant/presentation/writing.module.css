@@ -1,0 +1,6 @@
+.sphereButton { display: inline-flex !important; flex: 0 0 28px; width: 28px !important; height: 28px !important; align-items: center; justify-content: center; padding: 4px !important; border: 0 !important; border-radius: 8px !important; background: transparent !important; cursor: pointer; }
+.sphere { display: block; width: 19px; height: 19px; flex: 0 0 19px; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #e4fbff 0%, #8ddfff 22%, #51b0fa 45%, #4b7af0 70%, #3159bd 100%); box-shadow: inset -1px -2px 3px #3456ba55, 0 1px 5px #3b95e82a; transition: transform 180ms ease, box-shadow 180ms ease; }
+.sphereButton:hover .sphere, .sphereButton[aria-expanded="true"] .sphere { transform: scale(1.1); box-shadow: inset -1px -2px 3px #3456ba55, 0 0 9px #6fb8ff66; }
+.sphereButton:focus-visible { outline: 2px solid #528df5 !important; outline-offset: 2px; }
+.sphereButton:disabled { opacity: .45; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .sphere { transition: none; } }

@@ -4,7 +4,7 @@ import { archiveCaseWalkthrough } from "../walkthroughs/cases/archive";
 import { archiveFoldersWalkthrough } from "../walkthroughs/folders/lifecycle";
 export const caseAuthoring: DocArticle[] = [
   { id: "create-test-case", title: "Создать тест-кейс", group: "cases", description: "Опишите воспроизводимую проверку: условия, действия и конкретный ожидаемый результат.",
-    keywords: ["создание", "тесткейс", "test case", "сценарий", "новый кейс", "чек-лист"], related: ["edit-test-case", "shared-steps", "create-run"],
+    keywords: ["создание", "тесткейс", "test case", "сценарий", "новый кейс", "чек-лист"], related: ["edit-test-case", "falcon-ai-writing", "shared-steps", "create-run"],
     sections: [
       section("open", "Откройте новый кейс", paragraph("Выберите проект. В разделе **Тест-кейсы** нажмите создание кейса или выберите **Создать → Тест-кейс** в глобальной навигации. В дереве папок можно открыть меню нужной папки и выбрать **Новый тест-кейс**: расположение подставится автоматически. Во всех случаях открывается один и тот же редактор с привычными полями и сохранением.")),
       section("from-portfolio", "Из портфеля в общий редактор", steps(
@@ -34,7 +34,7 @@ export const caseAuthoring: DocArticle[] = [
       section("check", "Проверьте перед запуском", bullets("Сценарий имеет понятное начало и конечный результат.", "Предусловия не дублируют действия теста.", "Ожидаемые результаты позволяют отличить успех от ошибки.", "Компонент, приоритет и теги помогут включить кейс в правильный набор.")),
     ] },
   { id: "edit-test-case", title: "Редактирование и версии", group: "cases", description: "Обновляйте базу проверок, сохраняя различие между актуальным кейсом и снимком в прогоне.",
-    keywords: ["изменить", "редакция", "revision", "история", "markdown", "вложения"], related: ["create-test-case", "shared-steps", "retest"],
+    keywords: ["изменить", "редакция", "revision", "история", "markdown", "вложения"], related: ["create-test-case", "falcon-ai-writing", "shared-steps", "retest"],
     sections: [
       section("edit", "Изменить существующий кейс", steps(
         ["Откройте карточку", "Найдите кейс по ID или названию и выберите строку. При необходимости разверните карточку на весь экран."],

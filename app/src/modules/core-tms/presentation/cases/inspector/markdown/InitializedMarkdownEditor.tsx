@@ -1,14 +1,7 @@
 "use client";
 
 import {
-  BoldItalicUnderlineToggles,
-  CodeToggle,
-  CreateLink,
-  ListsToggle,
   MDXEditor,
-  Separator,
-  StrikeThroughSupSubToggles,
-  UndoRedo,
   headingsPlugin,
   codeBlockPlugin,
   linkDialogPlugin,
@@ -34,6 +27,9 @@ import { MarkdownCodeEditor } from "./code/MarkdownCodeEditor";
 import { stripRawHtml } from "./code/stripRawHtml";
 import { MarkdownContextArea } from "./context/MarkdownContextContent";
 import { MarkdownReadyContext } from "./transition/MarkdownTransition";
+import { MarkdownToolbar } from "./writing/MarkdownToolbar";
+import { highlightPlugin } from "./highlight/editor/highlightPlugin";
+import markerCss from "./highlight/highlight.module.css";
 
 const contextContentPlugin = realmPlugin({
   init(realm) { realm.pub(addTopAreaChild$, MarkdownContextArea); },
@@ -68,6 +64,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     quotePlugin(),
     tablePlugin(),
     thematicBreakPlugin(),
+    highlightPlugin(),
     linkPlugin({ validateUrl: props.validateUrl }),
     linkDialogPlugin({
       onClickLinkCallback: (url) => {
@@ -77,13 +74,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
     }),
     markdownShortcutPlugin(),
     toolbarPlugin({
-      toolbarContents: () => <>
-        <UndoRedo /><Separator />
-        <BoldItalicUnderlineToggles options={["Bold", "Italic"]} />
-        <StrikeThroughSupSubToggles options={["Strikethrough"]} />
-        <CodeToggle /><Separator />
-        <ListsToggle /><CreateLink />
-      </>,
+      toolbarContents: () => <MarkdownToolbar locale={props.locale} />,
     }),
     contextContentPlugin(),
   ], [props.locale, props.onAttachmentFiles, props.validateUrl]);
@@ -145,7 +136,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
       ref={editorRef}
       overlayContainer={overlayContainer ?? undefined}
       markdown={initialMarkdown}
-      className={`${css.wysiwyg} ${props.compact ? css.compact : ""}`}
+      className={`${css.wysiwyg} ${markerCss.surface} ${props.compact ? css.compact : ""}`}
       contentEditableClassName={css.editorContent}
       autoFocus={props.autoFocus && !onReady ? { defaultSelection: "rootStart", preventScroll: true } : false}
       placeholder={props.locale === "ru" ? "Введите текст…" : "Enter text…"}

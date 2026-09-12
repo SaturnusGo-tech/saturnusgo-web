@@ -1,0 +1,17 @@
+.trigger.trigger.trigger { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: inherit; cursor: pointer; }
+.trigger.trigger.trigger:hover, .trigger.trigger.trigger[aria-expanded="true"] { background: var(--tms-bg-hover, rgba(110, 120, 140, .12)); }
+.trigger.trigger.trigger:focus-visible, .menu .swatch.swatch:focus-visible, .menu .remove.remove:focus-visible { outline: 2px solid var(--tms-accent, #3974ec); outline-offset: 2px; }
+.menu { position: fixed; margin: 0; width: 226px; padding: 12px; border: 1px solid var(--tms-border, #dfe2e8); border-radius: 13px; background: var(--tms-bg-elevated, #fff); color: var(--tms-text, #20232a); box-shadow: 0 8px 25px #111a3022; box-sizing: border-box; animation: appear 150ms ease-out; }
+.colors { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.menu .swatch.swatch { width: 30px; height: 28px; border: 1px solid #171e2920; border-radius: 7px 5px 9px 6px; cursor: pointer; background: var(--swatch); transition: transform 120ms ease, filter 120ms ease; }
+.menu .swatch.swatch:hover { transform: translateY(-2px); filter: saturate(1.15); background: var(--swatch); }
+.menu .swatch.swatch[data-color="yellow"] { --swatch: #edce77; }
+.menu .swatch.swatch[data-color="blue"] { --swatch: #9cc9ee; }
+.menu .swatch.swatch[data-color="green"] { --swatch: #a9d4b3; }
+.menu .swatch.swatch[data-color="pink"] { --swatch: #e5b0c3; }
+.menu .swatch.swatch[data-color="purple"] { --swatch: #c2b2e6; }
+.menu .remove.remove { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-width: 0; height: 28px; min-height: 28px; margin-top: 10px; padding: 5px 7px; border: 0; border-radius: 7px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
+.menu .remove.remove:hover { background: var(--tms-bg-hover, #77777713); }
+:global(.dark) .menu { background: var(--tms-bg-elevated, #25262b); color: var(--tms-text, #ededf0); border-color: var(--tms-border, #41424a); }
+@keyframes appear { from { opacity: 0; transform: translateY(-3px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .menu { animation: none; } .menu .swatch.swatch { transition: none; } }

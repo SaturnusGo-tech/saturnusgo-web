@@ -4837,7 +4837,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -14826,6 +14826,124 @@
         },
         "description": "Tester, QA manager or workspace administrator. Run items must belong to the same logical run. All item versions are checked atomically. Archived and terminal runs reject reassignment. An active tenant member or null clears assignment."
       }
+    },
+    "/workspaces/{workspaceId}/ai/text-rewrite": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "rewriteWorkspaceMarkdown",
+        "tags": [
+          "Writing assistant"
+        ],
+        "summary": "Rewrite selected Markdown without saving content",
+        "description": "Active workspace editors (workspace_admin, qa_manager, tester, reporter) may request a Markdown proposal. Viewers and non-members are forbidden. Uses existing authenticated principal and explicit workspace scope. Body limit 200000 bytes. Selected source is untrusted text; no documents are read or saved. Improve/correct preserve technical content; custom permits instructed generation. No automatic retries. Durable per-workspace and global budgets apply. AI_WRITING_RATE_LIMITED returns 429; AI_WRITING_UNAVAILABLE 503; refusal or invalid/incomplete output 422. Client must explicitly apply the proposal and use normal domain commands to save.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkdownWritingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Markdown proposal; original content is unchanged",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkdownWritingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "description": "AI_WRITING_REFUSED or AI_WRITING_OUTPUT_INVALID; no partial proposal",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI_WRITING_RATE_LIMITED; wait before retrying. Daily quotas may require waiting until the next UTC day.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "60 seconds (minimum suggested retry delay)"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI_WRITING_UNAVAILABLE; no content changes",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -20483,7 +20601,11 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
+          "AI_WRITING_UNAVAILABLE",
+          "AI_WRITING_RATE_LIMITED",
+          "AI_WRITING_REFUSED",
+          "AI_WRITING_OUTPUT_INVALID"
         ]
       },
       "ValidationIssue": {
@@ -31305,7 +31427,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -31927,7 +32049,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -32029,7 +32151,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -34441,6 +34563,88 @@
                 }
               }
             ]
+          }
+        }
+      },
+      "MarkdownWritingRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text",
+          "action"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 30000,
+            "description": "Selected Markdown, or the current field content when there is no selection. May be empty only for custom generation."
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "improve",
+              "correct",
+              "custom"
+            ]
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": "\\S",
+            "description": "Required only for custom; ignored instructions in source text never redefine the action."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "custom"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "instruction"
+              ]
+            },
+            "else": {
+              "properties": {
+                "text": {
+                  "minLength": 1,
+                  "pattern": "\\S"
+                }
+              },
+              "not": {
+                "required": [
+                  "instruction"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "MarkdownWritingResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "markdown"
+            ],
+            "properties": {
+              "markdown": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60000
+              }
+            }
           }
         }
       }

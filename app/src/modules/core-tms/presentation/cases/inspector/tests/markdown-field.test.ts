@@ -5,6 +5,7 @@ import { assertLazyMarkdownLoading } from "./markdown/markdown-loading";
 
 const source = readFileSync(new URL("../markdown/MarkdownField.tsx", import.meta.url), "utf8");
 const initialized = readFileSync(new URL("../markdown/InitializedMarkdownEditor.tsx", import.meta.url), "utf8");
+const toolbar = readFileSync(new URL("../markdown/writing/MarkdownToolbar.tsx", import.meta.url), "utf8");
 const translations = readFileSync(new URL("../markdown/translations/markdownEditorTranslation.ts", import.meta.url), "utf8");
 const attachmentUi = readFileSync(new URL("../markdown/attachments/MarkdownAttachmentUi.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../markdown/markdownField.module.css", import.meta.url), "utf8");
@@ -40,8 +41,8 @@ test("markdown fields use a client-only WYSIWYG editor with an interactive loadi
   assert.match(styles, /\.editorBootOverlay \{ position: absolute; z-index: 3; inset: 0; \}/);
   assert.doesNotMatch(source, /editorLoading[^\n]*aria-hidden/);
   assert.match(initialized, /<MDXEditor/);
-  assert.match(initialized, /BoldItalicUnderlineToggles options=\{\["Bold", "Italic"\]\}/);
-  assert.match(initialized, /<ListsToggle \/>/);
+  assert.match(toolbar, /BoldItalicUnderlineToggles options=\{\["Bold", "Italic"\]\}/);
+  assert.match(toolbar, /<ListsToggle \/>/);
   assert.doesNotMatch(initialized, /diffSourcePlugin|DiffSourceToggleWrapper/);
   assert.doesNotMatch(source, /preview="(?:edit|live)"/);
 });
@@ -62,7 +63,7 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
 });
 
 test("case Markdown inputs attach or paste private files from the conventional lower-left position", () => {
-  assert.match(initialized, /<ListsToggle \/><CreateLink \/>/);
+  assert.match(toolbar, /<ListsToggle \/><CreateLink \/>/);
   assert.match(initialized, /className=\{css\.editorFooter\}[\s\S]*<MarkdownAttachmentButton/);
   assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
   assert.match(attachmentUi, /type="file" multiple/);

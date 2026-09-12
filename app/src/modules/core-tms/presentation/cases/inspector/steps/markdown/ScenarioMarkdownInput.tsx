@@ -7,6 +7,11 @@ import { formatStepSelection, type StepFormat } from "./format/formatSelection";
 import { pasteMarkdown } from "./paste/pasteMarkdown";
 import { useStepHistory } from "./history/useStepHistory";
 import css from "./scenarioMarkdown.module.css";
+import { WritingAction } from "../../../../../writing-assistant/presentation/WritingAction";
+import { useScenarioWriting } from "./writing/useScenarioWriting";
+import { RawHighlightToolbar } from "../../markdown/highlight/raw/RawHighlightToolbar";
+import { formatHighlightSelection } from "../../markdown/highlight/selection/highlightSelection";
+import type { HighlightColor } from "../../markdown/highlight/model/highlightColors";
 
 type Props = {
   id?: string; value: string; label: string; placeholder: string; ru: boolean;
@@ -16,11 +21,14 @@ type Props = {
 
 export function ScenarioMarkdownInput(props: Props) {
   const [editing, setEditing] = useState(Boolean(props.autoFocus));
+  const [writing, setWriting] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const history = useStepHistory(props.value, props.onChange, input);
   const shell = useRef<HTMLDivElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
+  const markerSelection = useRef({ value: "", start: 0, end: 0 });
   const sourceVisible = editing || !props.value;
+  const captureWriting = useScenarioWriting(props.value, input, history, preview);
   useLayoutEffect(() => {
     const node = input.current;
     if (!node || !sourceVisible) return;
@@ -47,6 +55,13 @@ export function ScenarioMarkdownInput(props: Props) {
     history.record(next.value);
     requestAnimationFrame(() => { node.focus({ preventScroll: true }); node.setSelectionRange(next.start, next.end); });
   }
+  function mark(color: HighlightColor | null) {
+    const selected = markerSelection.current;
+    if (selected.value !== props.value || !input.current) return;
+    const next = formatHighlightSelection(props.value, selected.start, selected.end, color);
+    history.boundary(); history.record(next.value);
+    requestAnimationFrame(() => { input.current?.focus({ preventScroll: true }); input.current?.setSelectionRange(next.start, next.end); });
+  }
   const actions = [
     { kind: "bold", Icon: Bold, label: props.ru ? "Жирный текст" : "Bold" },
     { kind: "inline", Icon: Code, label: props.ru ? "Код в строке" : "Inline code" },
@@ -54,9 +69,12 @@ export function ScenarioMarkdownInput(props: Props) {
     { kind: "list", Icon: List, label: props.ru ? "Список" : "List" },
   ] as const;
   return <div ref={shell} className={css.input} data-editing={editing} onBlur={(event) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setEditing(false);
+    if (!writing && !event.currentTarget.contains(event.relatedTarget as Node | null)) setEditing(false);
   }}>
     <div className={css.toolbarReveal}><div><div className={css.toolbar} role="group" aria-label={props.ru ? "Форматирование шага" : "Step formatting"}>
+      <WritingAction ru={props.ru} capture={captureWriting} tabIndex={editing ? 0 : -1} onOpenChange={setWriting} />
+      <RawHighlightToolbar locale={props.ru ? "ru" : "en"} tabIndex={editing ? 0 : -1} onChoose={mark}
+        onOpen={() => { markerSelection.current = { value: props.value, start: input.current?.selectionStart ?? 0, end: input.current?.selectionEnd ?? 0 }; }} />
       {actions.map(({ kind, Icon, label }) => <button key={kind} type="button" title={label} aria-label={label}
         tabIndex={editing ? 0 : -1} onMouseDown={(event) => event.preventDefault()} onClick={() => format(kind)}><Icon size={14} /></button>)}
       <button type="button" className={css.done} tabIndex={editing ? 0 : -1} title={props.ru ? "Готово" : "Done"}

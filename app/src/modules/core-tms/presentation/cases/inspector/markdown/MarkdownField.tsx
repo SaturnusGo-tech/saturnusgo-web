@@ -12,6 +12,8 @@ import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import css from "./markdownField.module.css";
 import plain from "./plain/plainMarkdown.module.css";
 import { MarkdownTransition, MarkdownReadyContext } from "./transition/MarkdownTransition";
+import { highlightRemarkPlugins } from "./highlight/render/remarkHighlights";
+import markerCss from "./highlight/highlight.module.css";
 
 type Props = {
   value: string;
@@ -106,7 +108,7 @@ function MarkdownFieldContent(props: Props) {
       props.onRequestEdit?.();
     } : undefined}>
     {!props.value.trim() ? <p className={css.empty}>{props.emptyLabel}</p> : <MDEditor.Markdown
-      className={css.rendered} source={props.value} skipHtml
+      className={`${css.rendered} ${markerCss.surface}`} source={props.value} skipHtml remarkPlugins={highlightRemarkPlugins}
       urlTransform={(url) => isSafeUrl(url) ? url : ""}
       wrapperElement={{ "data-color-mode": colorMode }} />}
     {attachments && <MarkdownPendingAttachments locale={locale} entries={pending} onRemove={attachments.remove} />}
