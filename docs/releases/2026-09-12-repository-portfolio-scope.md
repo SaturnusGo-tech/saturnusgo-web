@@ -28,3 +28,14 @@ A navigation restoration guard now completes immediately for scope-only URL chan
 - Built-in help updated: case organization, portfolio scope, and assignee filters.
 
 Publication evidence is appended after release verification.
+
+## Publication — 2026-09-12
+
+- Frontend source: `33ed8ee38449fb99833d8573fe0448af9ea79890` (pushed).
+- Production static build passed; 65 routes generated. Existing unrelated autoprefixer warnings remain.
+- Pages: `06c8822b783c9a740674c4a52e4a78f39189d3e9` (main, pushed).
+- Public origin manifest reports the exact source SHA.
+- Worker: `c5d343d4-45b7-4500-b3c4-9c960f6bd819`, 100% traffic, seven domains verified, 53 Worker tests passed.
+- Production work route returned HTTP 200. Its current `page-8d1c6c6ab0ffe5a7.js` chunk returned HTTP 200 with JavaScript MIME type (1,179,627 bytes).
+- Backend and schema unchanged.
+- Authenticated production UI smoke was unavailable: the existing browser session showed the sign-in page. No credentials were changed or customer records mutated. Functional browser verification used the local fixture described above.
