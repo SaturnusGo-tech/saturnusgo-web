@@ -1,7 +1,11 @@
-.dialog { width: min(780px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 24px !important; overflow: hidden !important; }
+.dialog { height: auto !important; min-height: 0 !important; width: min(620px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 18px !important; overflow: hidden !important; }
 .dialog > header { flex-shrink: 0; }
-.body { min-height: 0; overflow: auto; flex: 1 1 auto; padding: 6px 26px 20px; }
-.fileArea { display: flex; align-items: center; gap: 14px; padding: 12px 2px; border: 0; border-radius: 0; background: transparent; }
+.body { min-height: 0; overflow: auto; flex: 1 1 auto; padding: 4px 24px 20px; }
+.location { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+.fileArea { display: flex; align-items: center; gap: 14px; padding: 22px 18px; border: 1px dashed var(--line); border-radius: 14px; background: var(--control-bg, transparent); }
+.fileArea[data-selected="true"] { border-style: solid; }
+.resultTree { margin-top: 16px; font-size: 12px; }
+.resultTree > summary { cursor: pointer; color: var(--muted); }
 .fileArea > svg { color: #7c97d1; flex-shrink: 0; }
 .fileArea > div { flex: 1; min-width: 0; display: grid; gap: 6px; }
 .fileArea strong { font-size: 13px; font-weight: 550; overflow-wrap: anywhere; }
@@ -11,10 +15,6 @@
 .destination { margin: 14px 0 0; border: 0; padding: 0; min-width: 0; }
 .destination legend { margin-bottom: 10px; padding: 0; font-size: 12px; font-weight: 550; }
 .destination:disabled { opacity: .7; }
-.counts { display: flex; gap: 26px; flex-wrap: wrap; margin: 18px 0; }
-.counts > div { display: grid; gap: 8px; }
-.counts dt { color: var(--muted); font-size: 11px; }
-.counts dd { font-size: 17px; letter-spacing: -.3px; font-weight: 500; margin: 0; }
 .preview { border: 0; border-radius: 0; overflow: hidden; }
 .previewHeading { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 2px; border-bottom: 0; }
 .previewHeading strong { font-size: 12px; font-weight: 550; }
@@ -46,6 +46,17 @@
 .failures { font-size: 12px; color: var(--red); margin-top: 14px; }
 .failures summary { cursor: pointer; }
 .failures li { margin-top: 7px; overflow-wrap: anywhere; }
-.footer { flex-shrink: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 10px 26px 22px; border-top: 0; }
-@media (max-width: 600px) { .body { padding-inline: 18px; } .fileArea { flex-wrap: wrap; } .fileArea > div { min-width: 160px; } .fileArea > button { width: 100%; } .counts { gap: 18px; } .footer { padding-inline: 18px; } .previewHeading span { display: none; } }
+.footer { flex-shrink: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 10px 26px 22px; border-top: 1px solid var(--line); }
+@media (max-width: 600px) { .body { padding-inline: 18px; } .fileArea { flex-wrap: wrap; } .fileArea > div { min-width: 160px; } .fileArea > button { width: 100%; } .footer { padding-inline: 18px; } .previewHeading span { display: none; } }
 @media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }
+
+@media (max-width: 600px) { .location { grid-template-columns: 1fr; gap: 4px; } }
+.destination > div > button { min-height: 42px; border-radius: 12px; }
+
+.fileArea button { background: transparent; color: var(--yt-link, var(--action)); border: 1px solid color-mix(in srgb, var(--action) 25%, transparent); box-shadow: none; transition: background-color 150ms ease; }
+.fileArea button:hover:not(:disabled) { background: color-mix(in srgb, var(--action) 7%, transparent); }
+
+.fileButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 12px; font: inherit; cursor: pointer; }
+.fileButton:disabled { opacity: .45; cursor: default; }
+
+.dialog > header p { color: var(--muted) !important; }

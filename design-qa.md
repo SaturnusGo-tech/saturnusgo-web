@@ -147,3 +147,13 @@ Published source `80ecd707043810c12c151d7469fdfb26ac01906e`, Pages `96587ea5094c
 Additional local CUA exercised the actual full CaseDetailPanel: initial creation shows no validation error; submitting an empty case focuses the title and displays the error; filling title, action and expected result invokes the successful fixture save callback. The duplicate general attachment button is absent, while per-step attachment buttons remain. Screenshot: `/tmp/falcon-org-hotfix/case-create-light.png`. This was an isolated local API fixture, not a database write.
 
 Authenticated production UI smoke remains pending: the owned production browser tab displays the Falcon login screen, and the user has been asked to sign in. Do not treat local component checks or deployment readiness as proof of authenticated production layout.
+
+
+## 2026-09-12 — automatic JSON import and folder popup
+
+- One Import action replaces the manual provider conversion/review checkbox. Compact 620 px dialog, soft outlined upload action, project/destination controls, progress, cancellation and result tree.
+- Destination picker uses a native top-layer custom popover; it does not move the drop zone or clip inside the modal scroller. Search is 32 px with a thin underline. Outside click and Escape close the menu; arrow navigation remains available. Inline tree consumers keep their static layout.
+- Browser checked the actual dialog in light/dark themes and at 390 px. Local verification calls the real import application/OpenAI provider and stores only its test writes in browser memory; no production case mutations occurred.
+- The user-provided seven-case sample produced seven separate product/module hierarchies, including Digital Banking/Transfers and E-commerce/Checkout. A separate live corpus covered root arrays, nested custom records, Russian checklists and work-item layouts.
+- Backend gate: lint, typecheck, architecture, 705 tests (real PostgreSQL included), build, 213-operation OpenAPI validation. Frontend: typecheck, architecture, 435 adapters + 195 organization/import tests, 23 managed tests, 53 worker tests. Production build/deployment evidence is recorded after publication.
+- Screenshots: docs/evidence/import-openai-ready.png, import-openai-light.png, import-openai-mobile.png, import-openai-result.png. These are local component verification images, not production screenshots.

@@ -1,13 +1,13 @@
-.picker { min-width: 0; }
+.picker { min-width: 0; position: relative; }
 .picker .trigger { display: grid; grid-template-columns: 18px minmax(0, 1fr) 14px; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--paper); text-align: left; cursor: pointer; font: inherit; font-size: 13px; }
 .trigger > svg:first-child { color: #7c97d1; }
 .trigger > svg:last-child { color: var(--muted); transition: transform 160ms ease; }
 .trigger[aria-expanded="true"] > svg:last-child { transform: rotate(180deg); }
 .trigger:focus-visible { outline: 2px solid var(--tms-focus-ring); outline-offset: 2px; }
-.browser { margin-top: 10px; padding: 8px; border: 1px solid var(--line); border-radius: 15px; background: var(--paper); }
-.browser[data-inline] { margin: 0; }
-.search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid transparent; border-radius: 9px; color: var(--muted); background: var(--control-hover); }
-.picker .search input { width: 100%; min-width: 0; min-height: 36px; height: 36px; padding: 0; font-size: 12px; border: 0; background: transparent !important; box-shadow: none !important; outline: none !important; }
+.browser { position: fixed; inset: auto; margin: 0; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 24px rgb(0 0 0 / 10%); overflow: auto; z-index: 100; animation: folderPopupEnter 160ms ease-out; }
+.browser[data-inline] { position: static; margin: 0; box-shadow: none; animation: none; }
+.search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; color: var(--muted); background: transparent; }
+.picker .search input { width: 100%; min-width: 0; min-height: 32px; height: 32px; padding: 0; font-size: 12px; border: 0; background: transparent !important; box-shadow: none !important; outline: none !important; }
 .search:focus-within { border-color: var(--tms-focus-border); }
 .list { max-height: min(290px, 34dvh); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; padding-top: 8px; scroll-padding-block: 5px; }
 .row { display: flex; align-items: center; gap: 1px; min-width: 0; margin-block: 3px; }
@@ -23,4 +23,9 @@
 .row > [role="option"][aria-selected="true"] { background: color-mix(in srgb, #7995d4 11%, var(--paper)); }
 .row > button:focus-visible { outline: 1px solid var(--tms-focus-border); outline-offset: -1px; }
 .empty { padding: 16px 8px; text-align: center; color: var(--muted); font-size: 12px; }
-@media (prefers-reduced-motion: reduce) { .trigger > svg { transition: none; } }
+@keyframes folderPopupEnter { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+:global(.dark) .browser { background: var(--nav-raised, var(--paper)); }
+@media (prefers-reduced-motion: reduce) { .trigger > svg { transition: none; } .browser { animation: none; } }
+
+.picker .browser .search[data-input-shell] { border-radius: 0; box-shadow: none !important; }
+.picker .browser .search[data-input-shell]:focus-within { box-shadow: none !important; border-bottom-color: var(--tms-focus-border); }

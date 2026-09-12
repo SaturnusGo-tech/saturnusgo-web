@@ -3463,7 +3463,7 @@ export interface paths {
         put?: never;
         /**
          * Inspect external test case JSON without saving cases
-         * @description Requires test_case:manage in the target project workspace. Explicit OpenRouter conversion; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.
+         * @description Requires test_case:manage in the target project workspace. Automatic source mapping with server-side OpenAI when inference is needed; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.
          */
         post: operations["inspectExternalTestCaseImport"];
         delete?: never;
@@ -3486,7 +3486,7 @@ export interface paths {
         put?: never;
         /**
          * Normalize external test case JSON without saving cases
-         * @description Requires test_case:manage in the target project workspace. Explicit OpenRouter conversion; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.
+         * @description Requires test_case:manage in the target project workspace. Automatic source mapping with server-side OpenAI when inference is needed; source content is untrusted data. Bounded conversion, no repository mutations. Inspect body limit 5.1 MB, normalize body limit 500 KB.
          */
         post: operations["normalizeExternalTestCaseImport"];
         delete?: never;

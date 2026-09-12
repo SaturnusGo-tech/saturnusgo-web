@@ -1,8 +1,9 @@
 import { PiCheck, PiCaretDown, PiCaretRight, PiMagnifyingGlass, PiFolderSimpleDuotone, PiFolderOpenDuotone } from "react-icons/pi";
-import { useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { sortFolderOptions } from "./folder-options";
 import { folderChoiceAncestors, folderChoiceRows } from "./tree/folder-choice-tree";
 import { FolderBreadcrumb } from "../breadcrumb/FolderBreadcrumb";
+import { useFolderPopup } from "./popup/useFolderPopup";
 import css from "./parent-folder-picker.module.css";
 
 export function ParentFolderPicker({ value, options, label, searchLabel, emptyLabel, onChange, inline = false }: {
@@ -16,6 +17,9 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const search = useRef<HTMLInputElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const dismiss = useCallback(() => setOpen(false), []);
+  useFolderPopup(open, inline, root, trigger, menu, dismiss);
   const visible = folderChoiceRows(sortFolderOptions(options), expanded, query);
   function close() { if (!inline) { setOpen(false); trigger.current?.focus(); } }
   function buttons() { return Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []); }
@@ -25,14 +29,14 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
     if (event.key === "Escape" && open && !inline) { event.preventDefault(); event.stopPropagation(); close(); }
   }}>
     {!inline && <button ref={trigger} type="button" className={css.trigger} aria-label={`${label}: ${current?.label ?? value}`}
-      aria-expanded={open} aria-controls={id} onClick={() => {
+      aria-haspopup="listbox" aria-expanded={open} aria-controls={id} onClick={() => {
         setOpen(!open); setQuery(""); setExpanded(folderChoiceAncestors(value));
         if (!open) requestAnimationFrame(() => search.current?.focus());
       }}>
       <PiFolderSimpleDuotone size={18} aria-hidden="true" /><FolderBreadcrumb path={value} root={current?.label} />
       <PiCaretDown size={14} aria-hidden="true" />
     </button>}
-    {(open || inline) && <div className={css.browser} data-inline={inline || undefined}>
+    {(open || inline) && <div ref={menu} popover={inline ? undefined : "manual"} className={css.browser} data-inline={inline || undefined}>
       <div className={css.search} data-input-shell><PiMagnifyingGlass size={15} aria-hidden="true" />
         <input ref={search} value={query} aria-label={searchLabel} placeholder={searchLabel} onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => { if (event.key === "ArrowDown") { event.preventDefault(); buttons()[0]?.focus(); } }} />

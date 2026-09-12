@@ -10,7 +10,7 @@ import { prepareImportFolders } from "../../data/folders/prepare-import-folders"
 import { TEST_CASE_IMPORT_BYTES, type TestCaseExchangeDocument } from "../../model/test-case-exchange";
 import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange";
 
-type Phase = "loading" | "idle" | "reading" | "ready" | "folders" | "importing" | "partial" | "success" | "stopped";
+type Phase = "loading" | "idle" | "reading" | "ready" | "converting" | "folders" | "importing" | "partial" | "success" | "stopped";
 type Context = Awaited<ReturnType<typeof loadImportContext>>;
 export function useImportCases(props: Readonly<{ project: Project; folders?: readonly RepositoryFolder[];
   locale?: "ru" | "en"; workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown> }>) {
@@ -32,7 +32,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
   const scopeGeneration = useRef(0);
   const successful = useRef<readonly number[]>([]);
   const running = useRef(false);
-  const external = useExternalImport(http, props.project, props.locale ?? "ru", context?.folders.map(f => f.path) ?? [], value => { setDocument(value); setPhase("ready"); });
+  const external = useExternalImport(http, props.project, props.locale ?? "ru", context?.folders.map(f => f.path) ?? []);
   const imported = useRef(props.onImported);
   imported.current = props.onImported;
   useEffect(() => {
@@ -89,15 +89,25 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
     }
   }
   async function start() {
-    if (!preview.plan || !context || running.current || external.busy || (external.active && !external.reviewed)) return;
-    const plan = preview.plan;
+    if (!context || running.current || phase === "reading" || (!document && !external.active)) return;
     const generation = scopeGeneration.current;
     const current = () => alive.current && generation === scopeGeneration.current;
     const abort = new AbortController();
     controller.current = abort; running.current = true;
-    setLocked(true); setError(""); setFailed([]); setPhase("folders");
+    setError(""); setFailed([]);
     let changed = false;
     try {
+      let ready = document;
+      if (!ready) {
+        setPhase("converting");
+        ready = await external.convert(abort.signal);
+        abort.signal.throwIfAborted();
+        if (!current()) return;
+        setDocument(ready);
+      }
+      const plan = buildImportPlan(ready, destination, context.folders);
+      if (!ready.testCases.length && !plan.folders.length) throw new Error(props.locale === "ru" ? "В файле нет кейсов или папок." : "No cases or folders found.");
+      setLocked(true); setPhase("folders");
       const known = await prepareImportFolders(http, context.scope, plan, context.folders, abort.signal, (folders) => {
         changed = true;
         if (current()) setContext({ ...context, folders });
@@ -114,8 +124,15 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
       }
     } catch (failure) {
       if (current()) {
-        setPhase(abort.signal.aborted ? "stopped" : "partial");
-        setError(abort.signal.aborted ? "" : failure instanceof Error ? failure.message : "Import failed.");
+        setPhase(changed || successful.current.length ? (abort.signal.aborted ? "stopped" : "partial") : "ready");
+        const code = typeof failure === "object" && failure && "code" in failure ? String(failure.code) : "";
+        const message = code.startsWith("IMPORT_") ? (props.locale === "ru"
+          ? code === "IMPORT_SOURCE_INVALID" ? "В файле не найдены тест-кейсы. Проверьте содержимое JSON."
+            : code === "IMPORT_LIMIT_EXCEEDED" ? "Файл превышает лимит обработки. Разделите его на несколько файлов."
+            : "Не удалось обработать файл. Повторите импорт; выбранный файл сохранён."
+          : "Could not process this file. Retry the import; your file is retained.")
+          : failure instanceof Error ? failure.message : "Import failed.";
+        setError(abort.signal.aborted ? "" : message);
       }
     } finally {
       if (generation === scopeGeneration.current) running.current = false;
@@ -127,6 +144,6 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
   }
   return { context, phase, external, error: error || preview.message, document, fileName, destination,
     setDestination, completed, attempted, failed, locked, plan: preview.plan,
-    busy: external.busy || phase === "folders" || phase === "importing", selectFile, start,
+    busy: phase === "converting" || external.busy || phase === "folders" || phase === "importing", selectFile, start,
     stop: () => { controller.current?.abort(); external.stop(); }, retryContext: () => setReload((value) => value + 1) };
 }

@@ -1,6 +1,6 @@
 export const importCopy = {
   ru: {
-    title: "Импорт тест-кейсов", subtitle: "Добавьте кейсы в проект и сохраните структуру папок.",
+    title: "Импорт тест-кейсов", subtitle: "Загрузите JSON — Falcon подготовит кейсы и папки.",
     choose: "Выбрать JSON", replace: "Другой файл", format: "JSON с тест-кейсами · до 5 МБ",
     destination: "Куда импортировать", root: "Корень проекта", search: "Найти папку", noFolder: "Папки не найдены",
     preview: "Структура после импорта", cases: "Кейсов в файле", newFolders: "Новых папок", existingFolders: "Существующих папок",
@@ -11,10 +11,10 @@ export const importCopy = {
     rules: "Структура из файла добавится внутри выбранной папки. Существующие кейсы не изменятся.",
     partialRule: "Импорт идёт последовательно. Готовые кейсы и папки сохраняются; продолжение повторит только незавершённые шаги.",
     noData: "В файле нет кейсов или папок.", retryLoad: "Повторить загрузку", errors: "Не удалось импортировать",
-    files: "Выберите файл для предпросмотра", folderHint: "Включая пустые папки из файла.",
+    files: "Перетащите JSON сюда", folderHint: "Включая пустые папки из файла.",
   },
   en: {
-    title: "Import test cases", subtitle: "Add cases to the project and preserve the folder structure.",
+    title: "Import test cases", subtitle: "Upload JSON — Falcon will prepare cases and folders.",
     choose: "Choose JSON", replace: "Choose another file", format: "Test-case JSON · up to 5 MB",
     destination: "Import destination", root: "Project root", search: "Find a folder", noFolder: "No folders found",
     preview: "Structure after import", cases: "Cases in file", newFolders: "New folders", existingFolders: "Existing folders",
@@ -25,7 +25,7 @@ export const importCopy = {
     rules: "The file structure will be added inside the selected folder. Existing cases remain unchanged.",
     partialRule: "Import runs sequentially. Completed cases and folders are saved; continuing retries only unfinished steps.",
     noData: "This file contains no cases or folders.", retryLoad: "Retry loading", errors: "Could not import",
-    files: "Choose a file to preview", folderHint: "Including empty folders from the file.",
+    files: "Drop your JSON here", folderHint: "Including empty folders from the file.",
   },
 } as const;
 export type ImportCopy = typeof importCopy["ru"] | typeof importCopy["en"];
