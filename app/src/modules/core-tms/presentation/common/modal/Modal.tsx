@@ -109,7 +109,7 @@ export function Modal({
         panelRef.current?.querySelector<HTMLElement>("[autofocus], [data-autofocus]") ??
         panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
         panelRef.current;
-      target?.focus();
+      target?.focus({ preventScroll: true });
     });
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return;
@@ -146,7 +146,7 @@ export function Modal({
       window.cancelAnimationFrame(focusPanel);
       document.body.style.overflow = bodyOverflow;
       document.removeEventListener("keydown", handleKeyDown);
-      returnFocusRef.current?.focus();
+      returnFocusRef.current?.focus({ preventScroll: true });
     };
   }, []);
 

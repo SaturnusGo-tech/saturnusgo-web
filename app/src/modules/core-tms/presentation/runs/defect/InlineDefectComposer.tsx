@@ -22,7 +22,7 @@ import { getDefectDialogCopy } from "../../dialogs/defect/copy";
 import shared from "../../../tms.module.css";
 import { appendDefectFiles } from "../../dialogs/defect-layout/files";
 import surface from "../../dialogs/defect-layout/defect-form.module.css";
-import { useRunDismiss } from "../../dialogs/run-motion/useRunDismiss";
+import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 import styles from "./inline-defect.module.css";
 
 type Props = {
@@ -42,7 +42,7 @@ export function InlineDefectComposer({ workspaceId, projectId, run, item, step, 
   const attachments = useAttachmentClient();
   const { locale, t } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
-  const { closing, dismiss, panelRef } = useRunDismiss();
+  const { closing, dismiss, panelRef } = useDrawerDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const attempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item.attempts[0];
   const localizedStep = executableSteps(item.snapshot, locale).find((entry) => entry.id === step.id) ?? step;

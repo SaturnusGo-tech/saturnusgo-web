@@ -1,5 +1,5 @@
-.runPanel { --cases-bg: var(--tms-bg-panel, #fff); --cases-text: var(--tms-text, #1f2329); --cases-strong: var(--tms-text-strong, #111318); --cases-muted: var(--tms-text-muted, #73767d); --cases-secondary-text: var(--tms-text-secondary, #3f434a); --cases-hover: var(--tms-bg-hover, #f1f3f6); --cases-control-border: var(--tms-border, #d3d5da); --cases-row-border: var(--tms-border, #e4e6ea); --cases-primary: #3574f0; --cases-raised: var(--tms-bg-elevated, #f7f8fa); --cases-link: #3574f0; width: min(940px, 96vw) !important; animation: enter 260ms cubic-bezier(.2,.75,.25,1) both; }
-.closing { animation: exit 240ms ease-in both; pointer-events: none; }
+.runPanel { --cases-bg: var(--tms-bg-panel, #fff); --cases-text: var(--tms-text, #1f2329); --cases-strong: var(--tms-text-strong, #111318); --cases-muted: var(--tms-text-muted, #73767d); --cases-secondary-text: var(--tms-text-secondary, #3f434a); --cases-hover: var(--tms-bg-hover, #f1f3f6); --cases-control-border: var(--tms-border, #d3d5da); --cases-row-border: var(--tms-border, #e4e6ea); --cases-primary: #3574f0; --cases-raised: var(--tms-bg-elevated, #f7f8fa); --cases-link: #3574f0; width: min(940px, 96vw) !important; }
+.closing { pointer-events: none; }
 .form { display: flex; flex: 1; flex-direction: column; min-height: 0; color: var(--cases-text); }
 .body { padding: 4px 24px 20px; overflow-y: auto; min-height: 0; flex: 1; }
 .iteration { display: grid; gap: 14px; margin-bottom: 20px; }
@@ -22,8 +22,6 @@
 .primary { background: #3574f0; color: #fff; }
 .secondary { background: var(--cases-hover); color: var(--cases-text); }
 .primary:disabled { opacity: .45; cursor: default; }
-@keyframes enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes exit { from { transform: var(--run-exit-from, translateX(0)); } to { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .runPanel, .closing { animation: none; } }
 @media (max-width: 600px) { .body { padding: 0 14px 16px; } .fieldRow { grid-template-columns: 1fr; gap: 7px; } .settings { grid-template-columns: 1fr; } .footer { padding: 14px; } }
 

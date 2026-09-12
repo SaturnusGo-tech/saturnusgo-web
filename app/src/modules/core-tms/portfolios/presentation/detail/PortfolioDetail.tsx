@@ -61,7 +61,7 @@ export function PortfolioDetail({ actionsTargetId, state, workspaceId, canManage
             <button type="button" className={styles.secondary} onClick={() => state.setDialog("attach")}><PiPlus />{copy.attach}</button>
           </div>}
         </div>
-        <ResourceFeedback hasContent={state.projects.items.length > 0} loading={state.projects.loading} error={state.projects.error} copy={copy} retry={state.projects.reload} />
+        <ResourceFeedback catalog hasContent={state.projects.items.length > 0} loading={state.projects.loading} error={state.projects.error} copy={copy} retry={state.projects.reload} />
         {projects.length > 0 && <CatalogTable portfolios={[]} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} />}
         {!projects.length && !state.projects.loading && !state.projects.error && <section className={styles.empty}>
           <h2>{state.search ? copy.noResults : copy.emptyPortfolio}</h2><p>{state.search ? copy.noResultsHint : copy.emptyPortfolioHint}</p>

@@ -1,0 +1,11 @@
+.skeleton i { display: block; flex-shrink: 0; height: 11px; border-radius: 5px; background: linear-gradient(100deg, var(--tms-bg-hover, #eef0f3) 30%, var(--tms-bg-elevated, #f8f9fb) 50%, var(--tms-bg-hover, #eef0f3) 70%); background-size: 240% 100%; animation: shimmer 1.6s ease-in-out infinite; }
+.identity { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.name { display: grid; gap: 7px; }
+.name i:last-child { height: 8px; width: 75%; }
+.skeleton .folder { width: 18px; height: 16px; border-radius: 4px; }
+.skeleton .avatar { width: 25px; height: 25px; border-radius: 50%; }
+.project { width: 62px; max-width: 90%; }
+.person { width: 95px; max-width: 65%; }
+.skeleton .chevron { width: 6px; height: 10px; border-radius: 3px; }
+@keyframes shimmer { from { background-position: 180% 0; } to { background-position: -60% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton i { animation: none; } }

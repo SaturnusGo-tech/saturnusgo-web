@@ -8,7 +8,7 @@ import { SelectionTree } from "../../cases/selection/tree/SelectionTree";
 import { Modal } from "../../common/modal/Modal";
 import { FormError } from "../../common/error/FormError";
 import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
-import { useRunDismiss } from "../run-motion/useRunDismiss";
+import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 import { RunIterationFields } from "../run-iteration/RunIterationFields";
 import styles from "./RunDialog.module.css";
 
@@ -19,7 +19,7 @@ type Props = {
 };
 export function RunDialog(props: Props) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
-  const { closing, dismiss, panelRef } = useRunDismiss();
+  const { closing, dismiss, panelRef } = useDrawerDismiss();
   const state = useBatchComposer(props.data, props.project, props.presetCaseIds, props.offline, ru, props.selectedSuiteId);
   const filters = useSelectionFilters(state.visibleCases);
   const selected = new Set(state.caseIds);

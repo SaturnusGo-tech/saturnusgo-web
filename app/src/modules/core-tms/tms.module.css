@@ -2490,7 +2490,7 @@
   border-right: 0;
   border-radius: 0;
   box-shadow: -18px 0 52px rgb(10 23 32 / 24%);
-  animation: tms-drawer-in 180ms cubic-bezier(.2, .72, .3, 1);
+  animation: tms-drawer-in 260ms cubic-bezier(.2, .75, .25, 1) both;
 }
 
 .modalBackdropSheet {
@@ -2831,8 +2831,8 @@
 .productionDrawerForm > .modalFooter button { min-height: 38px; padding-inline: 14px; border-radius: 4px; font-size: 11px; }
 
 @keyframes tms-drawer-in {
-  from { transform: translateX(28px); opacity: .72; }
-  to { transform: translateX(0); opacity: 1; }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 @keyframes tms-backdrop-in {

@@ -1,4 +1,5 @@
 .workspace {
+  --report-panel-width: clamp(620px, 53vw, 850px);
   --report-bg: #fff;
   --report-raised: #f7f8fa;
   --report-hover: #f0f1f3;
@@ -66,7 +67,8 @@
 .severityChip[data-level="medium"] { color: #fff; background: #3574f0; border-color: #235ec8; }
 .severityChip[data-level="high"] { color: #2e1c00; background: #f3ac32; border-color: #ce8410; }
 .severityChip[data-level="critical"] { color: #fff; background: #cf3441; border-color: #ae2130; }
-.detailPanel { width: clamp(620px, 53vw, 850px); min-width: 540px; min-height: 0; flex: 0 0 clamp(620px, 53vw, 850px); overflow: hidden; background: var(--report-bg); border-left: 1px solid var(--report-border); }
+.detailSpace { flex: 0 0 auto; min-width: 0; pointer-events: none; }
+.detailPanel { position: absolute; z-index: 30; inset: 0 0 0 auto; width: var(--report-panel-width); min-width: 0; min-height: 0; overflow: hidden; background: var(--report-bg); border-left: 1px solid var(--report-border); }
 .detail { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; color: var(--report-text); background: var(--report-bg); container: report-detail / inline-size; }
 .detailHeader { flex: 0 0 auto; border-bottom: 1px solid var(--report-border); }
 .detailUtility { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 12px 7px 24px; }
@@ -124,10 +126,12 @@
 :global(.dark) .statusChip[data-status="open"] { color: #f1f3f5; background: #4b5058; border-color: #6b717b; }
 @media (prefers-reduced-motion: reduce) { .detailPanel { animation: none; } }
 @media (max-width: 1180px) {
-  .detailPanel { position: absolute; z-index: 30; inset: 0 0 0 auto; width: min(820px, 78vw); min-width: 0; box-shadow: -18px 0 40px rgb(0 0 0 / 18%); }
+  .workspace { --report-panel-width: min(820px, 78vw); }
+  .detailSpace { display: none; }
+  .detailPanel { box-shadow: -18px 0 40px rgb(0 0 0 / 18%); }
 }
 @media (max-width: 760px) {
-  .detailPanel { width: 100%; }
+  .workspace { --report-panel-width: 100%; }
   .detailEyebrow { display: none; }
   .mobileBack { display: inline-grid; order: -1; }
   .closeButton { display: none; }

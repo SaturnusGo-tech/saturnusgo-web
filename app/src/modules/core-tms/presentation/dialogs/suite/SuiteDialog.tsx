@@ -10,6 +10,7 @@ import { useSuitePreview } from "../../../suites/state/preview/useSuitePreview";
 import { RunCasesSkeleton } from "../../runs/loading/RunCasesSkeleton";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { FormError } from "../../common/error/FormError";
+import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 import { Modal } from "../../common/modal/Modal";
 import { SelectionControls, useSelectionFilters } from "../../cases/selection/controls/SelectionControls";
 import { SelectionTree } from "../../cases/selection/tree/SelectionTree";
@@ -26,6 +27,7 @@ type Props = {
 export function SuiteDialog(props: Props) {
   const http = useTmsHttpClient(); const { locale } = useTmsLocale(); const ru = locale === "ru";
   const copy = getSuiteDialogCopy(locale);
+  const { closing, dismiss, panelRef } = useDrawerDismiss();
   const activeCases = useMemo(() => props.cases.filter(item => !item.archivedAt && item.projectId === props.projectId), [props.cases, props.projectId]);
   const [name, setName] = useState<string>(props.suite?.name ?? "");
   const [description, setDescription] = useState<string>(props.suite?.description ?? "");
@@ -41,10 +43,10 @@ export function SuiteDialog(props: Props) {
   const filters = useSelectionFilters(type === "dynamic" ? preview.cases : activeCases);
   const selected = new Set(effectiveIds);
   const scope = (ids: readonly string[]) => setCaseIds(current => toggleSuiteScope(current, ids));
-  const close = () => { if (!submitting) props.onClose(); };
+  const close = () => { if (!submitting) dismiss(props.onClose); };
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (submitting || preview.loading || preview.error || !name.trim() || effectiveIds.length === 0) return;
+    if (closing || submitting || preview.loading || preview.error || !name.trim() || effectiveIds.length === 0) return;
     setSubmitting(true); setError("");
     const signature = JSON.stringify({ suiteId: props.suite?.id, suiteEtag: props.suiteEtag, projectId: props.projectId,
       name: name.trim(), description: description.trim(), type, caseIds: type === "static" ? [...new Set(caseIds)] : [], tags: type === "dynamic" ? [...new Set(normalizedTags)] : [] });
@@ -52,13 +54,13 @@ export function SuiteDialog(props: Props) {
     try {
       const saved = await saveSuite({ http, suite: props.suite, suiteEtag: props.suiteEtag, projectId: props.projectId, name, description, type, caseIds,
         tags: normalizedTags, offline: props.offline, operationKey: operation.current.key });
-      props.onSaved(saved.data, saved.etag);
+      dismiss(() => props.onSaved(saved.data, saved.etag));
     } catch (caught) {
       setError(formatTmsMutationFailure(toTmsMutationFailure(caught), copy.error)); setSubmitting(false);
     }
   }
   return <Modal title={props.suite ? copy.configureTitle : copy.createTitle} onClose={close} panelClassName={dialog.panel} wide drawer>
-    <form onSubmit={submit} className={dialog.form}>
+    <form ref={element => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }} onSubmit={submit} className={dialog.form}>
       <div className={dialog.body} aria-busy={submitting} inert={submitting ? true : undefined}>
         <SuiteEditableFields name={name} description={description} type={type} tags={tags} creating={!props.suite} ru={ru} retainedFilter={props.suite?.type === "dynamic" && type === "dynamic" ? props.suite.filter : undefined} folders={props.folders}
           onName={setName} onDescription={setDescription} onType={(value, restoring) => { if (!restoring && value === "static" && type === "dynamic") setCaseIds(preview.cases.map(item => item.id)); setType(value); }} onTags={setTags} />

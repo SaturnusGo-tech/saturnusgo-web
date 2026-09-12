@@ -22,7 +22,7 @@ import { getDefectDialogCopy } from "./copy";
 import styles from "../../../tms.module.css";
 import { appendDefectFiles } from "../defect-layout/files";
 import surface from "../defect-layout/defect-form.module.css";
-import { useRunDismiss } from "../run-motion/useRunDismiss";
+import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 type DefectDialogProps = {
   workspaceId: string; projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
   offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
@@ -33,7 +33,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
-  const { closing, dismiss, panelRef } = useRunDismiss();
+  const { closing, dismiss, panelRef } = useDrawerDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const occurrence = run && item ? { run, item } : null;
   const attempt = item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item?.attempts[0];

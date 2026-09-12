@@ -46,9 +46,12 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
       selectedDefectId={selectedDefectId} onSelectDefect={selectDefect} onNew={onNew} />
 
     <AnimatePresence>
+    {selectedDefectId && <motion.div key="detail-space" className={surface.detailSpace} aria-hidden="true"
+      initial={{ width: 0 }} animate={{ width: "var(--report-panel-width)" }} exit={{ width: 0 }}
+      transition={{ duration: reducedMotion ? 0 : .26, ease: [.2,.75,.25,1] }} />}
     {selectedDefectId && <motion.aside key={`${workspaceId}:${projectId}`} className={surface.detailPanel}
-      initial={{ x: reducedMotion ? 0 : -28, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
-      exit={{ x: reducedMotion ? 0 : -28, opacity: 0 }} transition={{ duration: reducedMotion ? 0 : .24, ease: [.22,.68,.25,1] }} aria-label={locale === "ru" ? "Баг-репорт" : "Bug report"}>
+      initial={{ x: reducedMotion ? 0 : "100%" }} animate={{ x: 0 }}
+      exit={{ x: reducedMotion ? 0 : "100%" }} transition={{ duration: reducedMotion ? 0 : .26, ease: [.2,.75,.25,1] }} aria-label={locale === "ru" ? "Баг-репорт" : "Bug report"}>
       {selectedDefect
         ? <DefectReportDetail
             connected={connected} canComment={canComment} workspaceId={workspaceId} defect={selectedDefect}

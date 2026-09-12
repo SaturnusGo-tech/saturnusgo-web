@@ -1,8 +1,8 @@
-.panel { width: min(680px, 100vw) !important; --cases-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-secondary-text: var(--ink); --cases-hover: var(--control-hover); --cases-primary: #3574f0; --cases-link: #3574f0; --cases-control-border: var(--line); --cases-raised: var(--control-hover); animation: enter 260ms cubic-bezier(.2,.75,.25,1) both; }
+.panel { width: min(680px, 100vw) !important; --cases-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-secondary-text: var(--ink); --cases-hover: var(--control-hover); --cases-primary: #3574f0; --cases-link: #3574f0; --cases-control-border: var(--line); --cases-raised: var(--control-hover); }
 .panel > header { padding: 20px 24px 16px !important; }
 .panel > header h2 { font-size: 19px !important; }
 .panel > header p { font-size: 12px !important; line-height: 1.5; margin-top: 6px; }
-.closing { animation: exit 240ms ease-in both; pointer-events: none; }
+.closing { pointer-events: none; }
 .form { display: flex; flex: 1; flex-direction: column; min-height: 0; color: var(--ink); font-size: 13px; }
 .body { overflow-y: auto; min-height: 0; flex: 1; padding: 4px 24px 20px !important; scrollbar-gutter: stable; }
 .section { padding: 16px 0 !important; border: 0 !important; }
@@ -37,8 +37,6 @@
 .footer button { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 36px; padding: 8px 14px; border: 0; border-radius: 14px; color: var(--ink); background: var(--control-hover); font: inherit; font-size: 12px; cursor: pointer; }
 .footer button[type=submit] { background: #3574f0; color: #fff; }
 .footer button:disabled { opacity: .45; cursor: default; }
-@keyframes enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes exit { from { transform: var(--run-exit-from,translateX(0)); } to { transform: translateX(100%); } }
 @media (max-width: 600px) { .panel > header { padding-inline: 16px !important; } .body { padding-inline: 16px !important; } .grid { gap: 12px !important; } .footer { padding: 12px 16px; } .footer > span { display: none; } }
 @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .panel, .closing { animation: none; } }
