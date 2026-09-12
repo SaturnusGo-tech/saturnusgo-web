@@ -67,6 +67,8 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
     return (
       <SuiteDialog
         projectId={model.project?.id ?? ""}
+        projectName={model.project?.name ?? ""}
+        folders={model.folders.items}
         cases={model.projectCases}
         suite={model.selectedSuiteDetail?.id === model.editingSuiteId
           ? model.selectedSuiteDetail

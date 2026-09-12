@@ -1,3 +1,4 @@
+import type { RepositoryFolder } from "../../folders/model/folder";
 import { useEffect, useRef } from "react";
 import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
 import type { Suite, SuiteSummary, TestCaseSummary } from "../../../../core/tms/contracts/legacy-contract";
@@ -9,7 +10,7 @@ import styles from "./suites.module.css";
 
 type Props = {
   workspaceId: string; projectId: string; projectName: string;
-  suites: SuiteSummary[]; cases: TestCaseSummary[]; selectedDetail: Suite | null;
+  suites: SuiteSummary[]; cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; selectedDetail: Suite | null;
   detailError: boolean; onRetryDetail: () => void;
   canManage: boolean; canRun: boolean;
   onSelect: (id: string) => void; onCreate: () => void;
@@ -41,7 +42,7 @@ export function SuitesView(props: Props) {
   const suite = props.suites.find(item => item.id === nav.id);
   const detail = props.selectedDetail?.id === nav.id && props.selectedDetail.projectId === props.projectId ? props.selectedDetail : null;
   return <div ref={container} className={styles.workspace}>
-    {nav.id ? <SuiteDetail suite={suite} detail={detail} cases={props.cases} projectName={props.projectName}
+    {nav.id ? <SuiteDetail suite={suite} detail={detail} cases={props.cases} folders={props.folders} projectName={props.projectName}
       error={props.detailError} onRetry={props.onRetryDetail} onBack={nav.back}
       canManage={props.canManage} canRun={props.canRun} onConfigure={props.onConfigure} onRun={props.onRun} onOpenCase={props.onOpenCase} />
       : <SuiteCatalog suites={props.suites} detail={props.selectedDetail} projectName={props.projectName}

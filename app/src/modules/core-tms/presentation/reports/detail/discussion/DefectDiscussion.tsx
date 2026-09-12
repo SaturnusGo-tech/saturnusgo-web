@@ -7,5 +7,5 @@ export function DefectDiscussion({ defectId, projectId, connected, canComment }:
  const { locale, languageTag } = useTmsLocale();
  const model = useCaseCollaboration({ active: true, connected, canComment, canConfirmFix: false,
    targetKind: "defect", projectId, caseId: defectId });
- return <CaseCommentsSection key={defectId} caseId={defectId} locale={locale} languageTag={languageTag} model={model} />;
+ return <CaseCommentsSection key={defectId} caseId={defectId} locale={locale} languageTag={languageTag} model={model} showRefresh={false} />;
 }

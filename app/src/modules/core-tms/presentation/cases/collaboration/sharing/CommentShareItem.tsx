@@ -2,7 +2,9 @@ import { Check, Link2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import css from "./sharing.module.css";
 
-export function CommentShareItem({ ru, link, compact = false, resource = "comment" }: { ru: boolean; link: () => string; compact?: boolean; resource?: "comment" | "defect" }) {
+export function CommentShareItem({ ru, link, compact = false, resource = "comment", visibleLabel }: {
+  ru: boolean; link: () => string; compact?: boolean; resource?: "comment" | "defect"; visibleLabel?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const [fallback, setFallback] = useState("");
   const container = useRef<HTMLSpanElement>(null);
@@ -14,7 +16,7 @@ export function CommentShareItem({ ru, link, compact = false, resource = "commen
     document.addEventListener("keydown", closeOnEscape);
     return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeOnEscape); };
   }, [compact, fallback]);
-  const label = copied ? (ru ? "Ссылка скопирована" : "Link copied") : compact ? (ru ? "Скопировать ссылку" : (resource === "defect" ? "Copy bug report link" : "Copy comment link")) : (ru ? "Поделиться" : "Share");
+  const label = copied ? (ru ? "Ссылка скопирована" : "Link copied") : visibleLabel ?? (compact ? (ru ? "Скопировать ссылку" : (resource === "defect" ? "Copy bug report link" : "Copy comment link")) : (ru ? "Поделиться" : "Share"));
   async function share() {
     const value = link();
     try {
@@ -25,9 +27,9 @@ export function CommentShareItem({ ru, link, compact = false, resource = "commen
     }
   }
   return <span ref={container} className={compact ? css.compact : undefined}>
-    <button type="button" role={compact ? undefined : "menuitem"} className={compact ? css.linkButton : undefined} aria-label={label} title={label} onClick={() => void share()}>
+    <button type="button" role={compact ? undefined : "menuitem"} className={compact ? `${css.linkButton} ${visibleLabel ? css.textButton : ""}` : undefined} aria-label={label} title={label} onClick={() => void share()}>
       {copied ? <Check size={compact ? 16 : 14} strokeWidth={1.6} /> : <Link2 size={compact ? 16 : 14} strokeWidth={1.6} />}
-      <span role="status" className={compact ? css.srOnly : undefined}>{label}</span>
+      <span role="status" className={compact && !visibleLabel ? css.srOnly : undefined}>{label}</span>
     </button>
     {fallback && <span className={`${css.fallback} ${compact ? css.popover : ""}`}>
       <label>{ru ? "Скопируйте ссылку вручную" : "Copy the link manually"}

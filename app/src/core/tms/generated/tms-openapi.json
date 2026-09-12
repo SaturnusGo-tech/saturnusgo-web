@@ -3191,7 +3191,13 @@
             "$ref": "#/components/parameters/ProjectIdQueryRequired"
           },
           {
-            "$ref": "#/components/parameters/Cursor"
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16384
+            }
           },
           {
             "$ref": "#/components/parameters/Limit"
@@ -3211,6 +3217,39 @@
             "schema": {
               "$ref": "#/components/schemas/Identifier"
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "description": "Literal search text."
+          },
+          {
+            "name": "component",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "description": "Exact component label. Empty string selects unclassified defects."
+          },
+          {
+            "name": "severitySort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "description": "Severity ordering; continuation preserves this ordering."
           }
         ],
         "responses": {
@@ -3228,8 +3267,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters."
       },
       "post": {
         "tags": [
@@ -15094,6 +15137,65 @@
         "description": "Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal \"organization-comment-{revision}\". Stale revisions return 412; identical retries replay for 24 hours.",
         "x-tms-concurrency": "required"
       }
+    },
+    "/defects/groups": {
+      "get": {
+        "tags": [
+          "Defects"
+        ],
+        "summary": "Browse project defect component groups",
+        "operationId": "listDefectGroups",
+        "x-tms-pagination": "cursor",
+        "description": "Requires defect:read. Groups nonarchived defects by their exact stored component label. Empty component is an unclassified group. Counts and groupCount cover the entire q-filtered project and are computed from one SQL snapshot regardless of group pagination. q has the same literal normalized matching as GET /defects. Groups are ordered by component in deterministic C collation; group cursors are bound to project and q. No folder attribution is inferred from occurrences.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16384
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DefectGroupListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -17456,6 +17558,24 @@
             "schema": {
               "$ref": "#/components/schemas/DefectCommentEnvelope"
             }
+          }
+        }
+      },
+      "DefectGroupListResponse": {
+        "description": "Component groups and authoritative totals across the full matching scope, not just this page.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefectGroupListEnvelope"
+            }
+          }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
           }
         }
       }
@@ -34840,6 +34960,100 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 2147483646
+          }
+        }
+      },
+      "DefectCounts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "total",
+          "open",
+          "critical"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "open": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Nonarchived defects not verified or closed, including ready_for_retest."
+          },
+          "critical": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Open defects with critical severity."
+          }
+        }
+      },
+      "DefectComponentGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "component",
+          "total",
+          "open",
+          "critical"
+        ],
+        "properties": {
+          "component": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Stored component label; empty means unclassified. This is not a repository folder or component ID."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "open": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Nonarchived defects not verified or closed, including ready_for_retest."
+          },
+          "critical": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Open defects with critical severity."
+          }
+        }
+      },
+      "DefectGroupListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "groups",
+              "totals",
+              "groupCount"
+            ],
+            "properties": {
+              "groups": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/DefectComponentGroup"
+                }
+              },
+              "totals": {
+                "$ref": "#/components/schemas/DefectCounts"
+              },
+              "groupCount": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
           }
         }
       }

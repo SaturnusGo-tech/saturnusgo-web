@@ -1,5 +1,6 @@
 import type { components } from "../../../../core/tms/generated/tms-api";
 import type { TmsHttpClient } from "../../../../core/tms/transport/http";
+import { notifyDefectsChanged } from "../application/defect-resource-events";
 import { mapDefect } from "./defect-mapper";
 
 type Api = components["schemas"];
@@ -18,6 +19,7 @@ export async function createDefectResource(
   const resource = await http.mutateResource<Api["Defect"]>(
     "/defects", "POST", body, { idempotencyKey },
   );
+  notifyDefectsChanged(body.projectId);
   return { data: mapDefect(resource.data), etag: resource.etag };
 }
 

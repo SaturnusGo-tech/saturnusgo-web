@@ -8,13 +8,14 @@ import { filterCaseRows, type CaseFacetFilters } from "../../model/caseListModel
 import { CaseFilterMenu, CaseQlAutocomplete, type ExtraFilterSection } from "../../toolbar/CasesToolbarPopovers";
 import css from "../../browser/controls/repository-controls.module.css";
 
-export function useSelectionFilters(cases: TestCaseSummary[]) {
+type InitialSelectionFilters = { query?: string; qlQuery?: string; filters?: CaseFilters; facets?: CaseFacetFilters };
+export function useSelectionFilters(cases: TestCaseSummary[], initial: InitialSelectionFilters = {}) {
   const people = useWorkspacePeople();
   const directory = useMemberDirectory(people.workspaceId, !people.offline && cases.some(item => Boolean(item.ownerIdentityId)));
-  const [query, setQuery] = useState("");
-  const [qlQuery, setQlQuery] = useState("");
-  const [filters, setFilters] = useState<CaseFilters>({ type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
-  const [facets, setFacets] = useState<CaseFacetFilters>({ folders: [], components: [] });
+  const [query, setQuery] = useState(initial.query ?? "");
+  const [qlQuery, setQlQuery] = useState(initial.qlQuery ?? "");
+  const [filters, setFilters] = useState<CaseFilters>(initial.filters ?? { type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
+  const [facets, setFacets] = useState<CaseFacetFilters>(initial.facets ?? { folders: [], components: [] });
   const deferredQuery = useDeferredValue(query); const deferredQl = useDeferredValue(qlQuery);
   const options = useMemo(() => ({ folders: [...new Set(cases.map((c) => c.folderPath))].sort(),
     components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort(), tags: [...new Set(cases.flatMap(item => item.tags))].sort() }), [cases]);

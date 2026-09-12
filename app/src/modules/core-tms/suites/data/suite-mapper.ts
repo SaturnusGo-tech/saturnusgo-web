@@ -22,7 +22,11 @@ export function mapSuite(dto: Api["Suite"]): Suite {
   return {
     ...mapSuiteSummary(dto),
     caseIds: [...dto.caseIds],
-    filter: { tags: dto.filter.tags ? [...dto.filter.tags] : undefined },
+    filter: { ...dto.filter,
+      ...(dto.filter.tags ? { tags: [...dto.filter.tags] } : {}),
+      ...(dto.filter.priority ? { priority: [...dto.filter.priority] } : {}),
+      ...(dto.filter.lifecycle ? { lifecycle: [...dto.filter.lifecycle] } : {}),
+    },
     resolvedCaseCount: dto.resolvedCaseCount,
   };
 }

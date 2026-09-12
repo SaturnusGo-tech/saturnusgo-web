@@ -15,6 +15,7 @@ import { DefectDiscussion } from "./discussion/DefectDiscussion";
 import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShareItem";
 import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import surface from "../reports.module.css";
+import detail from "./defect-detail.module.css";
 
 export type DetailTab = "overview" | "attachments";
 
@@ -39,13 +40,14 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
     <header className={surface.detailHeader}>
       <div className={surface.detailUtility}>
         <span className={surface.detailEyebrow}>{locale === "ru" ? "Карточка баг-репорта" : "Bug report"}</span>
-        <div className={surface.detailActions}>
-          <CommentShareItem key={defect.id} compact resource="defect" ru={locale === "ru"} link={() => {
+        <div className={detail.actions}>
+          <CommentShareItem key={defect.id} compact resource="defect" ru={locale === "ru"}
+            visibleLabel={locale === "ru" ? "Ссылка на дефект" : "Bug report link"} link={() => {
             const url = new URL(window.location.href); if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
             return buildDefectDeepLink(url.href, { projectId: defect.projectId, defectId: defect.id });
           }} />
-          {defect.runId && <button type="button" className={surface.runButton} title={t("reports.openRun")} aria-label={t("reports.openRun")} onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
-            <Play size={14} fill="currentColor" />
+          {defect.runId && <button type="button" className={detail.runButton} title={t("reports.openRun")} aria-label={t("reports.openRun")} onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
+            <Play size={15} fill="currentColor" aria-hidden="true" />
           </button>}
           <button className={surface.mobileBack} type="button" onClick={onBack} aria-label={t("reports.backToList")}><ArrowLeft size={17} /></button>
           <button className={surface.closeButton} type="button" onClick={onBack} aria-label={t("reports.backToList")}><X size={18} /></button>
@@ -68,7 +70,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
     </header>
 
     <div className={surface.detailScroll}>
-      {tab === "overview" ? <div className={surface.overviewLayout}>
+      {tab === "overview" ? <div className={`${surface.overviewLayout} ${detail.overview}`}>
         <main className={surface.primaryColumn}>
           <DetailSection title={t("reports.descriptionHeading")}>
             <MarkdownField value={defect.description} label={t("reports.descriptionHeading")} emptyLabel={t("reports.noDescription")} allowAttachments={false} />
@@ -86,7 +88,6 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
               <div><dt>{t("reports.step")}</dt><dd>{defect.stepId || "—"}</dd></div>
             </dl> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}
           </DetailSection>
-          <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
         </main>
         <aside className={surface.sideRail} aria-label={t("reports.properties")}>
           <DetailSection title={t("reports.properties")}>
@@ -120,6 +121,9 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
             {defect.labels.length > 0 ? <div className={surface.tagList}>{defect.labels.map((label) => <span key={label}>#{label}</span>)}</div> : <p className={surface.mutedText}>{t("reports.noLabels")}</p>}
           </DetailSection>
         </aside>
+        <div className={detail.discussion}>
+          <DefectDiscussion key={defect.id} defectId={defect.id} projectId={defect.projectId} connected={connected} canComment={canComment} />
+        </div>
       </div> : <section className={surface.attachmentsPanel}>
         <header><div><h2>{t("reports.evidence")}</h2><p>{t("reports.evidenceHint")}</p></div><span><Paperclip size={15} />{evidenceCount}</span></header>
         {evidenceCount > 0 ? <div className={surface.attachmentGallery}>

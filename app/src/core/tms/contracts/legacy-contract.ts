@@ -73,7 +73,10 @@ export type SuiteSummary = {
 
 export type Suite = SuiteSummary & {
   caseIds: string[];
-  filter: { tags?: string[] };
+  filter: {
+    tags?: string[]; priority?: TestCaseRevision["priority"][]; lifecycle?: TestCaseRevision["lifecycle"][];
+    folderPathPrefix?: string; folderId?: string; text?: string;
+  };
   resolvedCaseCount: number;
 };
 

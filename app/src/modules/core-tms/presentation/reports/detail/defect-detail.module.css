@@ -1,0 +1,24 @@
+.actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.actions .runButton {
+  display: inline-grid; place-items: center; flex: 0 0 32px;
+  width: 32px; height: 32px; min-width: 32px; min-height: 32px; padding: 0;
+  border: 0; border-radius: 50%; color: #fff; background: var(--report-primary);
+  cursor: pointer; transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+.actions .runButton svg { display: block; margin: 0; transform: translateX(1px); }
+.actions .runButton:hover { background: color-mix(in srgb, var(--report-primary) 90%, #000); }
+.actions .runButton:focus-visible { outline: 2px solid var(--report-primary); outline-offset: 3px; }
+.overview .discussion {
+  grid-column: 1 / -1; min-width: 0; padding-top: 8px;
+  border-top: 1px solid var(--report-row-border);
+  --comment-editor-height: 160px;
+}
+@container report-detail (max-width: 660px) {
+  .overview { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .overview > aside { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; border-top: 1px solid var(--report-row-border); }
+}
+@container report-detail (max-width: 380px) {
+  .actions { gap: 6px; }
+  .overview > aside { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .actions .runButton { transition: none; } }

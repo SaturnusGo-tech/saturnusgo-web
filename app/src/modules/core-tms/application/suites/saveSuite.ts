@@ -24,7 +24,7 @@ export async function saveSuite(input: {
     description: input.description.trim(),
     type: input.type,
     caseIds: input.type === "static" ? Array.from(new Set(input.caseIds)) : [],
-    filter: input.type === "dynamic" ? { tags: Array.from(new Set(input.tags)) } : {},
+    filter: input.type === "dynamic" ? { ...(input.suite?.type === "dynamic" ? input.suite.filter : {}), tags: Array.from(new Set(input.tags)) } : {},
   } satisfies Api["SuitePatchRequest"];
   if (input.offline) {
     const now = new Date().toISOString();

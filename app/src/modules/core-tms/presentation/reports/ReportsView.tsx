@@ -1,23 +1,21 @@
 "use client";
-import { ResponsibleName } from "../../workspace/members/presentation/ResponsibleName";
 
 import { useNavigationValue } from "../../state/navigation/context/useNavigationValue";
-import { Bug, CheckCircle2, ChevronDown, CircleDashed, Search } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { Bug } from "lucide-react";
+import { useCallback } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
-import { localizedComponentLabel, localizedLabel } from "../../localization/format/labels";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
-import { PrioritySignal, prioritySignalRank } from "../cases/list/priority/PrioritySignal";
+import { DefectBrowser } from "./browser/DefectBrowser";
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useDefectCommentTab } from "../../state/defect-navigation/useDefectCommentTab";
 import surface from "./reports.module.css";
 
-export function ReportsView({ workspaceId, projectId, defects, runs, links, selectedDefectId, onSelectDefect,
+export function ReportsView({ workspaceId, projectId, projectName = "", defects, runs, links, selectedDefectId, onSelectDefect,
   selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, connected = false, canComment = false }: {
   connected?: boolean; canComment?: boolean;
-  workspaceId?: string; projectId?: string;
+  workspaceId?: string; projectId?: string; projectName?: string;
   defects: Defect[];
   runs: TestRunSummary[];
   links: ExternalLink[];
@@ -35,22 +33,6 @@ export function ReportsView({ workspaceId, projectId, defects, runs, links, sele
   useDefectCommentTab(projectId, selectedDefectId, useCallback(() => setDetailTab("overview"), [setDetailTab]));
   const [severitySort, setSeveritySort] = useNavigationValue<"asc" | "desc" | null>(`reports:${workspaceId}:${projectId}:sort`, null);
   const selectedDefect = defects.find((item) => item.id === selectedDefectId);
-  const normalizedQuery = query.trim().toLocaleLowerCase(locale);
-  const visibleDefects = useMemo(() => {
-    const filtered = !normalizedQuery ? defects : defects.filter((defect) => [
-      defect.key, defect.title, defect.description, defect.component,
-      defect.assigneeIdentityId ?? "", ...defect.labels,
-    ].some((value) => value.toLocaleLowerCase(locale).includes(normalizedQuery)));
-    if (!severitySort) return filtered;
-    const direction = severitySort === "asc" ? 1 : -1;
-    return [...filtered].sort((left, right) => (
-      (prioritySignalRank[left.severity] - prioritySignalRank[right.severity]) * direction
-      || left.key.localeCompare(right.key, locale, { numeric: true, sensitivity: "base" })
-    ));
-  }, [defects, locale, normalizedQuery, severitySort]);
-  const open = defects.filter((item) => !["closed", "verified"].includes(item.status)).length;
-  const critical = defects.filter((item) => item.severity === "critical").length;
-  const completed = runs.filter((item) => item.status === "completed").length;
 
   function selectDefect(defectId: string | null) {
     if (defectId !== selectedDefectId) setDetailTab("overview");
@@ -58,65 +40,10 @@ export function ReportsView({ workspaceId, projectId, defects, runs, links, sele
   }
 
   return <div className={surface.workspace} data-testid="reports-view" data-detail-open={Boolean(selectedDefectId) || undefined}>
-    <section className={surface.listPane} aria-label={t("reports.title")}>
-      <header className={surface.toolbar}>
-        <label className={surface.searchField} data-input-shell>
-          <Search size={17} aria-hidden="true" />
-          <input value={query} onChange={(event) => setQuery(event.target.value)}
-            placeholder={t("reports.searchPlaceholder")} aria-label={t("reports.searchPlaceholder")} />
-        </label>
-        <div className={surface.metrics} aria-label={t("reports.title")}>
-          <span><b>{open}</b>{t("reports.openShort")}</span>
-          <span><b>{critical}</b>{t("reports.criticalShort")}</span>
-          <span><b>{completed}</b>{t("reports.runsShort")}</span>
-        </div>
-        <button className={surface.newButton} onClick={onNew}><Bug size={16} />{t("reports.newBug")}</button>
-      </header>
-      <div className={surface.listSummary}>
-        <strong>{t("reports.title")}</strong>
-        <span>{formatDefectCount(visibleDefects.length, locale)}</span>
-      </div>
-      <div className={surface.tableViewport}>
-        <table className={surface.table}>
-          <thead><tr>
-            <th aria-sort={severitySort === "asc" ? "ascending" : severitySort === "desc" ? "descending" : "none"}>
-              <button type="button" className={surface.prioritySortButton}
-                onClick={() => setSeveritySort((current) => current === "desc" ? "asc" : "desc")}
-                aria-label={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
-                title={locale === "ru" ? "Сортировать по приоритету" : "Sort by priority"}
-                data-active={Boolean(severitySort) || undefined} data-direction={severitySort ?? undefined}><ChevronDown size={14} /></button>
-            </th>
-            <th scope="col">{t("reports.key")}</th>
-            <th scope="col">{t("reports.summary")}</th>
-            <th scope="col">{t("reports.component")}</th>
-            <th scope="col">{t("reports.status")}</th>
-            <th scope="col">{t("reports.assignee")}</th>
-          </tr></thead>
-          <tbody>{visibleDefects.length === 0 ? <tr><td colSpan={6}>
-            <div className={surface.empty}><Bug size={20} /><span><strong>{t("reports.empty")}</strong><small>{normalizedQuery ? t("reports.emptySearch") : t("reports.emptyHint")}</small></span></div>
-          </td></tr> : visibleDefects.map((defect) => <tr key={defect.id} data-selected={defect.id === selectedDefectId || undefined}>
-            <td><span className={surface.severityMark} title={localizedLabel(locale, defect.severity)}>
-              <PrioritySignal priority={defect.severity} label={localizedLabel(locale, defect.severity)} size={14} />
-            </span></td>
-            <td><button className={surface.rowButton} type="button" onClick={() => selectDefect(defect.id)}>
-              <span className={surface.key}>{defect.key}</span>
-            </button></td>
-            <td><button className={surface.rowButton} type="button" onClick={() => selectDefect(defect.id)}>
-              <strong className={surface.title}>{defect.title}</strong>
-              {defect.labels.length > 0 && <small className={surface.labels}>{defect.labels.slice(0, 3).join(", ")}</small>}
-            </button></td>
-            <td>{localizedComponentLabel(locale, defect.component) || "—"}</td>
-            <td><span className={surface.statusChip} data-status={defect.status}>
-              {defect.status === "open" ? <CircleDashed size={13} aria-hidden="true" />
-                : defect.status === "verified" || defect.status === "closed" ? <CheckCircle2 size={13} aria-hidden="true" />
-                  : defect.status === "ready_for_retest" ? null : <span aria-hidden="true" />}
-              {localizedLabel(locale, defect.status)}
-            </span></td>
-            <td>{workspaceId ? <ResponsibleName workspaceId={workspaceId} identityId={defect.assigneeIdentityId} /> : t("common.unassigned")}</td>
-          </tr>)}</tbody>
-        </table>
-      </div>
-    </section>
+    <DefectBrowser workspaceId={workspaceId} projectId={projectId} projectName={projectName}
+      connected={connected} defects={defects} query={query} onQueryChange={setQuery}
+      severitySort={severitySort} onSeveritySortChange={setSeveritySort}
+      selectedDefectId={selectedDefectId} onSelectDefect={selectDefect} onNew={onNew} />
 
     <AnimatePresence>
     {selectedDefectId && <motion.aside key={`${workspaceId}:${projectId}`} className={surface.detailPanel}
@@ -137,11 +64,4 @@ export function ReportsView({ workspaceId, projectId, defects, runs, links, sele
           : <TessiqLoader pane label={locale === "ru" ? "Загрузка баг-репорта" : "Loading bug report"} testId="defect-detail-loading" />}
     </motion.aside>}</AnimatePresence>
   </div>;
-}
-
-function formatDefectCount(count: number, locale: "ru" | "en") {
-  if (locale === "en") return `${count} ${count === 1 ? "bug report" : "bug reports"}`;
-  const category = new Intl.PluralRules("ru").select(count);
-  const noun = category === "one" ? "баг-репорт" : category === "few" ? "баг-репорта" : "баг-репортов";
-  return `${count} ${noun}`;
 }

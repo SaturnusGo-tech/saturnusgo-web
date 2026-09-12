@@ -4,6 +4,8 @@
 .linkButton { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; color: var(--cases-muted); background: transparent; border: 0; border-radius: 8px; cursor: pointer; transition: background-color 150ms, color 150ms; }
 .linkButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
 .linkButton:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 2px; }
+.textButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: auto; height: 32px; padding: 0 10px; border: 1px solid var(--cases-border); border-radius: 9px; color: var(--cases-text); font: inherit; font-size: 12px; white-space: nowrap; }
+.textButton svg { flex-shrink: 0; }
 .popover { position: absolute; top: 30px; left: 0; z-index: 75; padding: 12px; border: 1px solid var(--cases-control-border); border-radius: 12px; background: var(--cases-bg); box-shadow: 0 8px 24px #0002; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 @media(max-width:600px) { .popover { left: auto; right: 0; } }

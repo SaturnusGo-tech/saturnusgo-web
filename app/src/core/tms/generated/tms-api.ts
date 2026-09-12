@@ -1038,7 +1038,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List project defects */
+        /**
+         * List project defects
+         * @description Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters.
+         */
         get: operations["listDefects"];
         put?: never;
         /** Create a traceable defect */
@@ -3938,6 +3941,26 @@ export interface paths {
          * @description Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal "organization-comment-{revision}". Stale revisions return 412; identical retries replay for 24 hours.
          */
         patch: operations["editPortfolioComment"];
+        trace?: never;
+    };
+    "/defects/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Browse project defect component groups
+         * @description Requires defect:read. Groups nonarchived defects by their exact stored component label. Empty component is an unclassified group. Counts and groupCount cover the entire q-filtered project and are computed from one SQL snapshot regardless of group pagination. q has the same literal normalized matching as GET /defects. Groups are ordered by component in deterministic C collation; group cursors are bound to project and q. No folder attribution is inferred from occurrences.
+         */
+        get: operations["listDefectGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -7629,6 +7652,30 @@ export interface components {
             body: string;
             revision: number;
         };
+        DefectCounts: {
+            total: number;
+            /** @description Nonarchived defects not verified or closed, including ready_for_retest. */
+            open: number;
+            /** @description Open defects with critical severity. */
+            critical: number;
+        };
+        DefectComponentGroup: {
+            /** @description Stored component label; empty means unclassified. This is not a repository folder or component ID. */
+            component: string;
+            total: number;
+            /** @description Nonarchived defects not verified or closed, including ready_for_retest. */
+            open: number;
+            /** @description Open defects with critical severity. */
+            critical: number;
+        };
+        DefectGroupListEnvelope: {
+            data: {
+                groups: components["schemas"]["DefectComponentGroup"][];
+                totals: components["schemas"]["DefectCounts"];
+                groupCount: number;
+            };
+            meta: components["schemas"]["PageMeta"];
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -8616,6 +8663,17 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["DefectCommentEnvelope"];
+            };
+        };
+        /** @description Component groups and authoritative totals across the full matching scope, not just this page. */
+        DefectGroupListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["DefectGroupListEnvelope"];
             };
         };
     };
@@ -10473,12 +10531,17 @@ export interface operations {
             query: {
                 /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
                 projectId: components["parameters"]["ProjectIdQueryRequired"];
-                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
-                cursor?: components["parameters"]["Cursor"];
+                cursor?: string;
                 /** @description Requested page size. */
                 limit?: components["parameters"]["Limit"];
                 status?: components["schemas"]["DefectStatus"];
                 runId?: components["schemas"]["Identifier"];
+                /** @description Literal search text. */
+                q?: string;
+                /** @description Exact component label. Empty string selects unclassified defects. */
+                component?: string;
+                /** @description Severity ordering; continuation preserves this ordering. */
+                severitySort?: "asc" | "desc";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -10493,6 +10556,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -16248,6 +16312,33 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listDefectGroups: {
+        parameters: {
+            query: {
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                cursor?: string;
+                q?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DefectGroupListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };

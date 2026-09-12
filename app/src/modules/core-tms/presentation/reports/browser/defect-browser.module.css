@@ -1,0 +1,42 @@
+.pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; container: reports-list / inline-size; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; }
+.header h1 { margin: 0; color: var(--report-strong); font-size: 16px; line-height: 1.4; font-weight: 600; }
+.newButton.newButton { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 14px; color: #fff; background: var(--report-primary); border: 0; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 550; }
+.newButton:hover { background: #2d67da; }
+.toolbar { display: flex; align-items: center; gap: 10px; padding: 0 24px 18px; }
+.search { display: flex; flex: 1; align-items: center; gap: 9px; max-width: 660px; min-width: 0; height: 38px; padding: 0 12px; color: var(--report-muted); background: var(--report-raised); border: 1px solid var(--report-border); border-radius: 10px; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.search:focus-within { border-color: var(--report-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--report-primary) 12%, transparent); }
+.search svg { flex: 0 0 auto; }
+.search input { width: 100%; min-width: 0; height: 100%; padding: 0; color: var(--report-text); background: transparent; border: 0; border-radius: 0; outline: 0; font-size: 13px; }
+.search input::placeholder { color: var(--report-muted); }
+.sort { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; color: var(--report-muted); background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
+.sort:hover { background: var(--report-hover); }
+.sort[data-direction] { color: var(--report-primary); background: var(--report-selection); }
+.summary { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-height: 45px; padding: 5px 26px 10px; font-size: 12px; }
+.summary strong { overflow: hidden; max-width: 65%; color: var(--report-strong); font-weight: 600; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.total { color: var(--report-muted); font-variant-numeric: tabular-nums; }
+.metrics { display: flex; flex-wrap: wrap; gap: 12px; margin-left: auto; color: var(--report-muted); font-size: 11px; }
+.viewport { min-height: 0; flex: 1; overflow: auto; padding: 0 18px 24px; scrollbar-gutter: stable; scrollbar-color: var(--report-control-border) transparent; }
+.groups { list-style: none; margin: 0; padding: 0; }
+.message { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px; color: var(--report-muted); font-size: 12px; }
+.message button { border: 0; border-radius: 8px; padding: 8px 10px; background: transparent; color: var(--report-primary); cursor: pointer; }
+.message button:hover { background: var(--report-hover); }
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; min-height: 250px; padding: 32px; color: var(--report-muted); text-align: center; }
+.empty strong { color: var(--report-strong); font-size: 14px; }
+.empty span { max-width: 360px; font-size: 12px; line-height: 1.5; }
+.skeleton { display: grid; gap: 20px; padding: 15px 10px; }
+.skeleton span { height: 24px; width: 70%; max-width: 600px; border-radius: 6px; background: linear-gradient(100deg,var(--report-raised) 25%,var(--report-hover) 48%,var(--report-raised) 72%); background-size: 220% 100%; animation: shimmer 1.5s ease infinite; }
+.skeleton span:nth-child(even) { width: 50%; }
+.pane button:focus-visible { outline: 2px solid var(--report-primary); outline-offset: 2px; }
+@keyframes shimmer { to { background-position: -220% 0; } }
+@container (max-width: 430px) {
+  .header { padding: 14px 14px 12px; gap: 8px; }
+  .header h1 { font-size: 16px; }
+  .newButton.newButton { padding: 0 10px; font-size: 11px; }
+  .toolbar { padding-inline: 14px; flex-wrap: wrap; }
+  .search { flex-basis: calc(100% - 46px); }
+  .summary { padding-inline: 18px; }
+  .metrics { width: 100%; margin-left: 0; }
+  .viewport { padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .skeleton span { animation: none; } }

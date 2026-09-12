@@ -44,7 +44,7 @@ test("resource hydration uses the branded loader instead of a false empty state"
   assert.match(casesSource, /props\.detailLoadError/);
   assert.match(casesSource, /data-testid="case-detail-error"/);
   assert.match(casesSource, /onClick=\{props\.onRetryDetail\}/);
-  assert.match(suitesSource, /!detail \? <TessiqLoader/);
+  assert.match(suitesSource, /!detail \|\| preview\.loading \? <div data-testid="suite-detail-loading"><RunCasesSkeleton/);
   assert.match(runsSource, /selectedRun && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
 });
@@ -67,7 +67,7 @@ test("suite and run drawers share the production test-case list", () => {
     "utf8",
   );
 
-  assert.match(suiteDialogSource, /<EmbeddedCaseList/);
+  assert.match(suiteDialogSource, /<SelectionTree/);
   assert.match(runScopeSource, /<SelectionTree/);
   assert.match(embeddedListSource, /<LifecycleBadge/);
   assert.match(embeddedListSource, /<PrioritySignal/);
@@ -137,5 +137,5 @@ test("suite detail failures remain retryable and do not become empty suites", ()
   assert.doesNotMatch(resource, /catch\(\(\) => \{\}\)/);
   assert.match(detail, /props.error && !detail/);
   assert.match(detail, /data-testid="suite-detail-error"/);
-  assert.match(detail, /onClick=\{props.onRetry\}/);
+  assert.match(detail, /onClick=\{preview.error \? preview.retry : props.onRetry\}/);
 });

@@ -3,7 +3,7 @@
 .editorFrame:focus-within { border-color: color-mix(in srgb, var(--cases-primary) 25%, var(--cases-control-border)); box-shadow: none; }
 .composer .editorFrame [data-editor-shell] { border: 0; border-radius: 12px 12px 0 0; outline: none; box-shadow: none !important; background: transparent; }
 .composer .editorFrame [data-editor-shell]:focus-within { box-shadow: none !important; }
-.editorFrame [data-editor-shell] > :global(.mdxeditor), .editorFrame [data-editor-shell] > div:has(> textarea) { height: 112px; min-height: 112px; background: transparent; }
+.editorFrame [data-editor-shell] > :global(.mdxeditor), .editorFrame [data-editor-shell] > div:has(> textarea) { height: var(--comment-editor-height, 112px); min-height: var(--comment-editor-height, 112px); background: transparent; }
 .editorFrame[data-reply="true"] [data-editor-shell] > :global(.mdxeditor) { height: auto; }
 .editorFrame[data-reply="true"] :global(.mdxeditor-root-contenteditable) { height: 80px; }
 .editorFrame :global(.mdxeditor-toolbar) { border-bottom: 0; background: transparent; }

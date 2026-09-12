@@ -11,8 +11,8 @@ import { useCommentNavigation } from "../navigation/useCommentNavigation";
 import type { CaseCollaborationViewModel } from "../model";
 import { commentFailureLabel } from "../model";
 import css from "../caseCollaboration.module.css";
-type Props = { caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel };
-export function CaseCommentsSection({ caseId, locale, languageTag, model }: Props) {
+type Props = { caseId: string; locale: TmsLocale; languageTag: string; model: CaseCollaborationViewModel; showRefresh?: boolean };
+export function CaseCommentsSection({ caseId, locale, languageTag, model, showRefresh = true }: Props) {
   const ru = locale === "ru";
   useCommentAncestors(caseId, model);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
@@ -36,8 +36,8 @@ export function CaseCommentsSection({ caseId, locale, languageTag, model }: Prop
     }} />;
   return <section className={css.commentsSection} aria-labelledby={`case-comments-${caseId}`}>
     <header className={css.commentsHeading}><MessageSquare size={15} /><h3 id={`case-comments-${caseId}`}>{ru ? "Комментарии" : "Comments"}</h3>
-      <button type="button" className={css.refreshComments} disabled={model.comments.refreshing || model.commentSubmitting || Boolean(model.changingCommentId)}
-        onClick={model.refreshComments} aria-label={ru ? "Обновить комментарии" : "Refresh comments"}><RotateCw size={14} /></button></header>
+      {showRefresh && <button type="button" className={css.refreshComments} disabled={model.comments.refreshing || model.commentSubmitting || Boolean(model.changingCommentId)}
+        onClick={model.refreshComments} aria-label={ru ? "Обновить комментарии" : "Refresh comments"}><RotateCw size={14} /></button>}</header>
     {model.comments.status === "loading" && <div className={css.commentSkeleton} role="status" aria-busy="true" aria-label={ru ? "Загрузка комментариев" : "Loading comments"}><span /><span /><span /></div>}
     {model.comments.status === "unavailable" && <p className={css.commentsEmpty}>{ru ? "Комментарии доступны при подключении к серверу" : "Connect to the server to view comments"}</p>}
     {model.comments.status === "error" && <div className={css.loadState} role="alert"><AlertCircle size={18} />
