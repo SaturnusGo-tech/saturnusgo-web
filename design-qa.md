@@ -157,3 +157,11 @@ Authenticated production UI smoke remains pending: the owned production browser 
 - The user-provided seven-case sample produced seven separate product/module hierarchies, including Digital Banking/Transfers and E-commerce/Checkout. A separate live corpus covered root arrays, nested custom records, Russian checklists and work-item layouts.
 - Backend gate: lint, typecheck, architecture, 705 tests (real PostgreSQL included), build, 213-operation OpenAPI validation. Frontend: typecheck, architecture, 435 adapters + 195 organization/import tests, 23 managed tests, 53 worker tests. Production build/deployment evidence is recorded after publication.
 - Screenshots: docs/evidence/import-openai-ready.png, import-openai-light.png, import-openai-mobile.png, import-openai-result.png. These are local component verification images, not production screenshots.
+
+### Import publication and authenticated production smoke
+
+Published frontend source `258de5a1ccf3e178d050559b413dd15e31afdb29`, Pages `a9ad121d58d4f47516ef9a4aa88930ee4a4f997c`, Worker `2ad792ba-6766-48f0-b593-534aef743383` at 100%. Backend source `acb4d6b6dd40c47ccd07ea326bed1e6085c8c272` is running successfully in the primary and managed API services. Both health checks passed. Existing schema 0057 is unchanged; no migration was required. The 65-page production build and exact-source Pages/Worker readiness checks passed.
+
+Authenticated production CUA in Umbrella-Host verified the compact form and soft outlined upload button. The folder menu opens downward as an opaque overlay, with the drop zone staying in place. Search for Android returned the existing matching folder paths. Clicking the dialog heading dismissed only the folder menu; the form remained open. The unsent form was then closed. No production import or case/folder mutation was performed in this smoke. Screenshots: `/tmp/falcon-import-production-ready.png`, `/tmp/falcon-import-production-folder-menu.png`. Light/dark and 390 px layout checks, automatic import writes in isolated browser memory and live OpenAI normalization are covered by the local evidence above. No physical Windows/Linux/mobile-device testing was performed.
+
+Full deployment IDs and recovery references are in backend `docs/releases/2026-09-12-openai-import.md`. Subsequent documentation commits do not change the deployed frontend revision above.
