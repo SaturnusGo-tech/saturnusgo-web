@@ -1,9 +1,11 @@
-import { ArrowUpRight, ChevronDown, Folder } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Folder, FolderKanban } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { SelectionControls, useSelectionFilters } from "../../../presentation/cases/selection/controls/SelectionControls";
+import { RunFilterOptions } from "../../../presentation/runs/filters/options/RunFilterOptions";
+import { selectPortfolioProjects, togglePortfolioProject } from "../../model/project-selection";
 import { PortfolioCaseTree } from "./PortfolioCaseTree";
 import { useRepositoryWidth, REPOSITORY_MIN, REPOSITORY_MAX } from "../../../folders/presentation/resize/useRepositoryWidth";
 import { useNavigationValue } from "../../../state/navigation/context/useNavigationValue";
@@ -16,6 +18,8 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
   const resource = model.portfolioRepository;
   const resize = useRepositoryWidth();
   const [collapsed, setCollapsed] = useNavigationValue<string[]>(`repository:${id}:collapsed`, []);
+  const [selectedProjects, setSelectedProjects] = useNavigationValue<string[]>(`repository:${id}:projects`, []);
+  const projects = selectPortfolioProjects(resource.catalog?.projects ?? [], selectedProjects);
   const [opening, setOpening] = useState<string | null>(null); const [error, setError] = useState(false);
   const branches = useMemo(() => {
     const result = new Map(resource.branches);
@@ -24,7 +28,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
     }
     return result;
   }, [resource.branches, model.projectId, model.projectCases, model.folders.items, model.folders.loading, model.folders.error]);
-  const allCases = useMemo(() => [...branches.values()].flatMap(branch => branch?.cases ?? []), [branches]);
+  const allCases = useMemo(() => [...branches].filter(([projectId]) => !selectedProjects.length || selectedProjects.includes(projectId)).flatMap(([, branch]) => branch?.cases ?? []), [branches, selectedProjects]);
   const filters = useSelectionFilters(allCases);
   const visibleIds = useMemo(() => new Set(filters.visible.map(item => item.id)), [filters.visible]);
   const filtered = Boolean(filters.query || filters.qlQuery || filters.facets.owners?.length || filters.facets.folders.length
@@ -38,11 +42,17 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
       model.setSelectedCaseId(item.id); model.setSelectedFolder(item.folderPath); model.setSelectedFolderId(item.folderId ?? ""); model.setEditing(false);
     } catch { setError(true); } finally { setOpening(null); }
   }
-  const projects = resource.catalog?.projects ?? [];
   return <aside ref={resize.ref} style={resize.style} data-repository-tree className={`${shared.repository} ${css.pane}`}
     aria-label={ru ? "Репозиторий портфеля" : "Portfolio repository"}>
     <header className={shared.heading}><strong>{ru ? "Репозиторий" : "Repository"}</strong></header>
-    <SelectionControls state={filters} ru={ru} disabled={locked} />
+    <SelectionControls state={filters} ru={ru} disabled={locked} onResetExtra={() => setSelectedProjects([])} extraSections={[{
+      id: "projects", label: ru ? "Проекты" : "Projects", icon: <FolderKanban size={13} />,
+      active: selectedProjects.length > 0, summary: selectedProjects.length ? String(selectedProjects.length) : (ru ? "Все" : "All"),
+      render: () => <RunFilterOptions label={ru ? "Проекты портфеля" : "Portfolio projects"} multiple
+        selected={selectedProjects.length ? selectedProjects : ["all"]} placeholder={ru ? "Найти проект" : "Find a project"}
+        options={[{ value: "all", label: ru ? "Все проекты" : "All projects" }, ...(resource.catalog?.projects ?? []).map(project => ({ value: project.id, label: project.name }))]}
+        onChange={value => setSelectedProjects(current => togglePortfolioProject(current, value))} />,
+    }]} />
     <div className={css.caption}><strong>{resource.catalog?.portfolio.name ?? (ru ? "Портфель" : "Portfolio")}</strong>
       {!resource.loading && !resource.error && ![...branches.values()].some(branch => branch === null) && <span>{filters.visible.length}</span>}</div>
     {error && <p className={css.message} role="alert">{ru ? "Не удалось открыть кейс. Попробуйте ещё раз." : "Could not open the case. Please try again."}</p>}
@@ -70,7 +80,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
           </div>}
         </section>;
       })}
-      {!resource.loading && !resource.error && !projects.length && <p className={css.message}>{ru ? "В портфеле пока нет активных проектов" : "This portfolio has no active projects yet"}</p>}
+      {!resource.loading && !resource.error && !resource.catalog?.projects.length && <p className={css.message}>{ru ? "В портфеле пока нет активных проектов" : "This portfolio has no active projects yet"}</p>}
       {!resource.loading && !resource.error && filtered && !filters.visible.length && <p className={css.message}>{ru ? "Кейсы не найдены. Измените поиск или фильтры." : "No matching cases. Adjust the search or filters."}</p>}
     </div>
     <div {...resize.handleProps} className={shared.resizeHandle} role="separator" tabIndex={0} aria-orientation="vertical"
