@@ -20,4 +20,13 @@ Portfolio catalog and portfolio project listings use the actual catalog table st
 
 ## Deployment
 
-Pending release build and public runtime verification. No backend or database changes.
+- Frontend source: `ddbbe29b7a0ce8e5bdd70ea02cbc6c2f317607a8` (pushed).
+- Static production build passed; 65 routes generated. Existing unrelated autoprefixer warnings remain.
+- Pages: `55b8514c87fdccc854b39f2f87c84ef7edfa33d8` (main, pushed).
+- Public origin manifest reports the exact source SHA.
+- Worker: `2296d38e-35fc-4c2e-a528-f0434094ee47`, 100% traffic, seven domains verified, 53 Worker tests passed.
+- First Worker attempt stopped at the readiness gate while Pages still exposed the preceding release. Retried only after the origin manifest matched; the release then completed.
+- Production work route: HTTP 200. Current `page-13a4d69838a24ab3.js` returned HTTP 200, JavaScript MIME, 1,181,400 bytes.
+- Additional browser verification: the actual new-run dialog opened from a suite at x=1536 and settled at x=596 (940 px width), keeping opacity 1 and horizontal scroll 0; close button dismissed it through the shared lifecycle.
+- Authenticated production UI smoke unavailable: the existing browser session shows the company sign-in form. No credentials or customer records were changed.
+- No backend or database changes.
