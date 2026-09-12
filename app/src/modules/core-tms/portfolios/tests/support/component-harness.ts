@@ -15,6 +15,7 @@ export function componentHarness(initialHref = "https://tms.example/work/") {
   };
   const same = (a?: readonly unknown[], b?: readonly unknown[]) => Boolean(a && b && a.length === b.length && a.every((value, index) => Object.is(value, b[index])));
   const react = {
+    useId() { const index = cursor++; slots[index] ??= { value: `test-id-${index}` }; return slots[index].value; },
     createContext<T>(value: T) { return { value, Provider: "ContextProvider" }; },
     useContext<T>(context: { value: T }) { return context.value; },
     useState<T>(initial: T | (() => T)) {

@@ -138,7 +138,7 @@ test("rich text is scoped to narrative test-case fields", () => {
 test("section snapshots and rich field labels remain interaction-safe", () => {
   assert.match(content, /if \(snapshots\.current\[section\]\) return/);
   assert.match(section, /!props\.persistentEditing && !active/);
-  assert.match(details, /className=\{`\$\{css\.wideField\} \$\{css\.markdownControl\}`\}/);
+  assert.match(details, /className=\{`\$\{css\.wideField\} \$\{css\.markdownControl\} \$\{css\.borderedMarkdown\}`\}/);
   const markdownInsideLabel = /<label[^>]*>(?:(?!<\/label>)[\s\S])*<MarkdownField/;
   assert.doesNotMatch(details, markdownInsideLabel);
   assert.doesNotMatch(scenarioStep, /MarkdownField/);

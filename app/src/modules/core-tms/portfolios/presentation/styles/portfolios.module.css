@@ -85,3 +85,13 @@
 @media (max-width: 800px) { .detailGrid { grid-template-columns: minmax(0, 1fr); } .sidebar { padding: 20px 0 0; } .sidebar dl { grid-template-columns: 140px 1fr; } }
 @media (max-width: 700px) { .page { padding: 0 17px 22px; } .heading { flex-wrap: wrap; } .heading .actions { flex-basis: 100%; justify-content: flex-start; } .heading h1 { font-size: 23px; } .table th:first-child { width: auto; } .table th:nth-child(2) { width: 28%; } .table th:nth-child(3), .table td:nth-child(3) { display: none; } .tabs { gap: 22px; } .toolbar .actions { justify-content: flex-start; } .breadcrumbs > span { max-width: 150px; } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+.page [hidden] { display: none !important; }
+.editorActionSlot { margin-left: auto; flex-shrink: 0; }
+.casesPage { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.casesBody { display: flex; flex: 1; min-height: 0; }
+.casesBody .projectRepository { height: 100%; min-height: 0; flex: 1; }
+
+.stackedDetail { max-width: 1060px; }
+.stackedDetail .sidebar { padding: 0; margin: 24px 0; }
+.stackedDetail .sidebar dl { grid-template-columns: minmax(90px, 140px) minmax(0, 1fr); max-width: 600px; }

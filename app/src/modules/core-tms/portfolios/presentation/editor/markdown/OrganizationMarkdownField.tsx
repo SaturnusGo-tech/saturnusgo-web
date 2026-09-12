@@ -15,7 +15,7 @@ export function OrganizationMarkdownField({ label, value, placeholder, editing, 
       onClick={editing ? onClose : onEdit}>
       {editing ? <><PiCheck aria-hidden="true" />{ru ? "Готово" : "Done"}</> : <PiPencilSimple aria-hidden="true" />}
     </button></header>
-    <div className={css.markdownContent}>
+    <div className={`${css.markdownContent} ${css.markdownFrame}`}>
       <MarkdownField appearance="plain" onRequestEdit={!disabled ? onEdit : undefined} label={label} value={value} emptyLabel={placeholder} compact allowAttachments={false}
         autoFocus={editing} onChange={editing && !disabled ? onChange : undefined} />
     </div>

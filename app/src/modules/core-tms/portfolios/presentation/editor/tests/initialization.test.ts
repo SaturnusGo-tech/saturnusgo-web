@@ -8,6 +8,7 @@ import { resolvePendingOperation } from "../../../../../../core/tms/idempotency/
 import type { Project } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { useProjectForm } from "../../../../projects/state/dialog/useProjectForm";
 import type { ProjectEditorPage } from "../ProjectEditorPage";
+import { organizationErrors, focusOrganizationError } from "../validation/validate";
 const copy = portfolioCopy("ru");
 for (const [editing, omitsChecklist] of [[false, false], [true, false], [false, true]]) test(`${omitsChecklist ? "legacy form with omitted checklist" : editing ? "legacy project edit" : "creation from existing portfolio"} renders and saves through real form initialization without a checklist field`, async () => {
   const h = componentHarness(); const commands: Record<string, unknown>[] = []; const events: string[] = [];
@@ -21,6 +22,7 @@ for (const [editing, omitsChecklist] of [[false, false], [true, false], [false, 
     };
   });
   const view = h.load<{ ProjectEditorPage: typeof ProjectEditorPage }>(new URL("../ProjectEditorPage.tsx", import.meta.url), (name) => {
+    if (name.endsWith("validation/validate")) return { organizationErrors, focusOrganizationError };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
     if (name.endsWith("useProjectForm")) return { useProjectForm: (input: Parameters<typeof useProjectForm>[0]) => {
       const value = form.useProjectForm(input); return omitsChecklist ? { ...value, checklist: undefined } : value;

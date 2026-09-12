@@ -6,18 +6,19 @@ import { useCaseAttachmentDraft } from "./CaseAttachmentDraftContext";
 
 type Props = {
   locale: TmsLocale;
-  includeStepFiles?: boolean;
+  includeStepFiles?: boolean; showPicker?: boolean;
 };
 
-export function InspectorPendingAttachments({ locale, includeStepFiles = false }: Props) {
+export function InspectorPendingAttachments({ locale, includeStepFiles = false, showPicker = true }: Props) {
   const draft = useCaseAttachmentDraft();
   if (!draft?.enabled) return null;
   const ru = locale === "ru";
   const entries = includeStepFiles
     ? draft.entries
     : draft.entries.filter((entry) => entry.fieldKey === "case-files");
+  if (!showPicker && entries.length === 0 && !draft.problem) return null;
   return <div className={css.attachmentPicker}>
-    <label>
+    {showPicker && <label>
       <Upload size={16} />
       <span>{ru ? "Добавить вложения" : "Add attachments"}</span>
       <input
@@ -28,7 +29,7 @@ export function InspectorPendingAttachments({ locale, includeStepFiles = false }
           event.currentTarget.value = "";
         }}
       />
-    </label>
+    </label>}
     {entries.length > 0 && <MarkdownPendingAttachments locale={locale} entries={entries}
       onRemove={draft.remove} presentation="media" />}
     {draft.problem?.fieldKey === "case-files" && <span role="alert">{draft.problem.message}</span>}

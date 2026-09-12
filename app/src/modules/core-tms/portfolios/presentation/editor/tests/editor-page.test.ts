@@ -7,8 +7,10 @@ import type { PortfolioEditorPage } from "../PortfolioEditorPage";
 
 import { organizationCopy } from "../../../management/model/copy";
 import { validChecklist } from "../../../management/model/organization";
+import { organizationErrors, focusOrganizationError } from "../validation/validate";
 const copy = portfolioCopy("ru");
 function shared(name: string) {
+  if (name.endsWith("validation/validate")) return { organizationErrors, focusOrganizationError };
   if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
   if (name.endsWith("management/model/copy")) return { organizationCopy };
   if (name.endsWith("management/model/organization")) return { validChecklist };
@@ -52,7 +54,7 @@ test("project page persists through the existing form owner and invokes only the
   invoke(all.find((node) => node.type === "OrganizationMarkdownField")!, "onEdit");
   all = nodes(h.render(() => Editor(props)));
   assert.equal(all.filter((node) => node.type === "OrganizationMarkdownField" && node.props.editing).length, 1);
-  assert.equal(all.find((node) => node.props.id === "project-title")?.props["data-inline-title"], true);
+  assert.equal(all.find((node) => node.props.id === "project-title")?.props["data-field"], "name");
   assert.equal(all.some((node) => node.type === "Modal"), false);
   await invoke(all[0], "onSubmit", { preventDefault() {} });
   assert.deepEqual(events, ["save", "detail"]);
@@ -60,4 +62,14 @@ test("project page persists through the existing form owner and invokes only the
   assert.equal(all.find((node) => node.type === "input" && node.props.pattern)?.props.disabled, true);
   await invoke(all[0], "onSubmit", { preventDefault() {} });
   assert.deepEqual(events, ["save", "detail", "save", "updated"]);
+});
+
+
+test("organization validation rejects missing and numeric keys and accepts localized names", () => {
+  const valid = { name: "Платежи", key: "PAY2", description: "", checklist: [] };
+  assert.deepEqual(organizationErrors(valid, true), {});
+  assert.ok(organizationErrors({ ...valid, key: "" }, true).key);
+  assert.ok(organizationErrors({ ...valid, key: "2345" }, true).key);
+  assert.ok(organizationErrors({ ...valid, name: "   " }, true).name);
+  assert.ok(organizationErrors({ ...valid, testingPlan: "x".repeat(20001) }, true).plan);
 });

@@ -1,8 +1,8 @@
 .editor { min-height: 500px; }
 .titleField { flex: 1; min-width: 200px; }
-.titleField input { width: 100%; padding: 0 0 5px; border: 0; border-radius: 0; background: transparent !important; color: var(--ink); font: inherit; font-size: clamp(23px, 2vw, 29px); font-weight: 620; line-height: 1.35; letter-spacing: -.5px; }
+ .titleField input { width: 100%; padding: 10px 14px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; color: var(--ink); font: inherit; font-size: clamp(21px, 2vw, 27px); font-weight: 620; line-height: 1.35; letter-spacing: -.5px; transition: border-color 160ms ease; }
 .titleField input::placeholder { color: var(--muted); opacity: .75; }
-.titleField input:hover, .titleField input:active, .titleField input:focus, .titleField input:focus-visible { outline: none !important; border: 0; box-shadow: none !important; }
+.titleField input:focus-visible { outline: none; border-color: var(--action); box-shadow: none; }
 .activeTab { display: inline-flex; padding: 12px 0; border-bottom: 2px solid var(--action); color: var(--ink); font-size: 13px; font-weight: 550; }
 .mainFields { display: grid; align-content: start; gap: 25px; }
 .markdownSection { min-width: 0; }
@@ -14,17 +14,37 @@
 .markdownContent { min-height: 48px; line-height: 1.8; }
 .markdownContent > p { margin: 0; color: var(--muted); font-size: 13px; }
 .limit { color: var(--danger, #c74755); font-size: 12px; }
-.properties { padding-top: 4px; }
-.property { display: grid; grid-template-columns: minmax(80px, .8fr) minmax(0, 1.2fr); align-items: center; gap: 8px 12px; margin-bottom: 18px; font-size: 12px; }
+.editorBody { display: grid; gap: 28px; max-width: 1060px; }
+.properties { padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.property { display: grid; align-content: start; gap: 9px; min-width: 0; margin: 0; font-size: 12px; }
 .property > span { color: var(--muted); }
-.property > input { min-width: 0; width: 100%; border: 0; border-radius: 8px; padding: 8px 6px; color: var(--ink); background: transparent !important; font: inherit; }
+.property > input { min-width: 0; width: 100%; min-height: 38px; border: 1px solid var(--line-strong); border-radius: 12px; padding: 8px 11px; color: var(--ink); background: transparent; font: inherit; }
 .property > div { min-width: 0; }
-.property > div > button[aria-haspopup="listbox"] { min-height: 32px; border: 0; border-radius: 8px; background: transparent; padding: 6px; font-size: 12px; box-shadow: none; }
+.property > div > button[aria-haspopup="listbox"] { min-height: 38px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; padding: 8px 11px; font-size: 12px; box-shadow: none; }
 .property > div > button[aria-haspopup="listbox"]:hover { background: var(--control-hover); }
-.property > button { grid-column: 2; }
+.property > input:focus-visible { outline: none; border-color: var(--action); box-shadow: none; }
+.editor [aria-invalid="true"] { border-color: var(--danger, #c74755); }
+.property > .limit { color: var(--danger, #c74755); }
+.markdownFrame { padding: 12px; border: 1px solid var(--line-strong); border-radius: 14px; transition: border-color 160ms ease; }
+.markdownFrame:focus-within { border-color: var(--action); }
+.headerActions { display: flex; gap: 8px; align-items: center; }
+.headerActions button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+.headerActions button[data-save-organization] { background: #3475ed; color: white; border-color: #3475ed; }
+.headerActions svg { width: 19px; height: 19px; }
+.spin { animation: editor-spin 900ms linear infinite; }
+@keyframes editor-spin { to { transform: rotate(360deg); } }
+@media (max-width:600px) { .properties { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion:reduce) { .spin { animation: none; } .markdownFrame, .titleField input { transition: none; } }
 .note { margin: -7px 0 23px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .note code { font: inherit; white-space: nowrap; }
 @media(max-width:700px) { .titleField { min-width: 0; } .titleField input { font-size: 23px; } .mainFields { gap: 20px; } }
 
-.editor > header button { border-radius: 12px; }
+
 .markdownContent { --cases-text: var(--ink); --cases-secondary-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-hover: var(--control-hover); --cases-primary: var(--action); --cases-link: var(--action); --cases-control-border: var(--line-strong); --cases-raised: var(--control-hover); }
+
+.editor .titleField input:focus-visible, .editor .property input:focus-visible { outline: none !important; box-shadow: none !important; }
+.editor .titleField input[aria-invalid="true"]:focus-visible { border-color: var(--danger, #c74755); }
+.headerActions.headerActions button { width: 36px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--ink); }
+.headerActions.headerActions button[data-save-organization] { background: #3475ed; color: #fff; border-color: #3475ed; }
+.headerActions.headerActions button[data-save-organization] svg { color: #fff !important; }
+.property > div { width: 100%; max-width: none; }

@@ -40,11 +40,17 @@ export function PortfolioDetail({ state, workspaceId, canManage, canManageAttach
         <button type="button" aria-current={tab === "about" ? "page" : undefined} onClick={() => setTab("about")}>{copy.aboutPortfolio}</button>
         <button type="button" aria-current={tab === "projects" ? "page" : undefined} onClick={() => setTab("projects")}>{copy.projects}</button>
     </nav>
-    <div className={tab === "about" ? styles.detailGrid : undefined}><main>
+    <div className={tab === "about" ? styles.stackedDetail : undefined}><main>
       {tab === "about" ? <><section className={styles.about}><h2>{copy.description}</h2><MarkdownField label={copy.description} value={portfolio.description ?? ""} emptyLabel={copy.noDescription} allowAttachments={false} /></section>
         <OrganizationExtras target={target} canReadAttachments={canReadAttachments} canManageAttachments={canManageAttachments && portfolio.status !== "archived"}
           items={portfolio.checklist ?? []} pending={management.pending} readOnly={management.disabled && !management.pending} onChange={(checklist) => management.save({ checklist })} />
         <ManagementFeedback state={management} />
+        <aside className={styles.sidebar} aria-label={copy.properties}><dl>
+        <dt>{organizationCopy(locale).phase}</dt><dd><WorkflowSelect value={portfolio.workflowPhase ?? "new"} disabled={management.disabled} onChange={(workflowPhase) => void management.save({ workflowPhase })} /></dd>
+      <dt>{copy.responsible}</dt><dd><ResponsibleName workspaceId={workspaceId} identityId={portfolio.responsibleIdentityId} /></dd>
+      <dt>{copy.projects}</dt><dd>{portfolio.projectCount}</dd>
+      <dt>{copy.created}</dt><dd>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(portfolio.createdAt))}</dd>
+    </dl></aside>
         <OrganizationDiscussion workspaceId={workspaceId} targetType="portfolio" targetId={portfolio.id} canPost={canManage && active}
           workflowPhase={portfolio.workflowPhase} phaseDisabled={management.disabled} onPhaseChange={(workflowPhase) => void management.save({ workflowPhase })} />
       </> : <>
@@ -62,11 +68,6 @@ export function PortfolioDetail({ state, workspaceId, canManage, canManageAttach
         </section>}
         {state.projects.cursor && <button type="button" className={styles.secondary} disabled={state.projects.loading} onClick={state.projects.loadMore}>{copy.loadMore}</button>}
       </>}
-    </main>{tab === "about" && <aside className={styles.sidebar} aria-label={copy.properties}><dl>
-        <dt>{organizationCopy(locale).phase}</dt><dd><WorkflowSelect value={portfolio.workflowPhase ?? "new"} disabled={management.disabled} onChange={(workflowPhase) => void management.save({ workflowPhase })} /></dd>
-      <dt>{copy.responsible}</dt><dd><ResponsibleName workspaceId={workspaceId} identityId={portfolio.responsibleIdentityId} /></dd>
-      <dt>{copy.projects}</dt><dd>{portfolio.projectCount}</dd>
-      <dt>{copy.created}</dt><dd>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(portfolio.createdAt))}</dd>
-    </dl></aside>}</div>
+    </main></div>
   </>;
 }
