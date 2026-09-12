@@ -111,11 +111,11 @@ if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }
 if (process.env.OMIT_ATMOSPHERE !== "1") write("out/falcon/landing/2026-09/atmosphere.webp", "falcon atmosphere\\n");
-for (const id of ["projects", "cases", "runs", "defects", "youtrack", "dashboard"]) {
+for (const id of ["cases", "runs", "suites", "defects", "dashboard", "youtrack"]) {
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
     if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack" && extension === "mp4") continue;
-    write("out/falcon/landing/2026-09-commercial/" + id + "." + extension, "demo asset\\n");
+    write("out/falcon/landing/2026-09-production/" + id + "." + extension, "demo asset\\n");
   }
 }
 write("out/falcon/landing/hero.webp", "falcon hero\\n");
@@ -188,7 +188,7 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     "falcon atmosphere\n",
   );
   assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09-commercial/youtrack.mp4"), "utf8"),
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09-production/youtrack.mp4"), "utf8"),
     "demo asset\n",
   );
   assert.equal(

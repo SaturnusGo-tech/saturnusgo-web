@@ -14,7 +14,7 @@
 .video {
   display: block;
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 1728/1118;
   object-fit: contain;
   background: #111114;
 }

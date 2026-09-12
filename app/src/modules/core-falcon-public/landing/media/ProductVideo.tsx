@@ -17,6 +17,7 @@ export function ProductVideo({
   const timeline = useProductTimeline(player.video);
   const id = useId();
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [captionsEnabled, setCaptionsEnabled] = useState(true);
   const playbackControl = useRef<HTMLButtonElement>(null);
   return (
     <figure className={styles.figure} aria-labelledby={id}>
@@ -44,6 +45,7 @@ export function ProductVideo({
               src={demo.captions}
               srcLang="ru"
               label="Русский"
+              default
             />
           )}
         </video>
@@ -131,6 +133,20 @@ export function ProductVideo({
             onChange={(event) => timeline.seek(event.target.valueAsNumber)}
           />
           <span className={styles.silent}>Без звука</span>
+          <button
+            type="button"
+            aria-label={`Русские подписи: ${demo.title}`}
+            aria-pressed={captionsEnabled}
+            onClick={() => {
+              const enabled = !captionsEnabled;
+              const tracks = player.video.current?.textTracks;
+              if (tracks) for (const track of Array.from(tracks))
+                track.mode = enabled ? "showing" : "disabled";
+              setCaptionsEnabled(enabled);
+            }}
+          >
+            CC
+          </button>
           <button
             disabled={!player.interactive}
             aria-label={`На весь экран: ${demo.title}`}

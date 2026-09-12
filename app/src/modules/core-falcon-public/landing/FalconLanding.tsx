@@ -6,7 +6,7 @@ import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, workflow, overviewStory, resultsStory } from "./content/demos";
+import { demos, workflow, caseStory, resultsStory } from "./content/demos";
 import { PilotSection } from "./pilot/PilotSection";
 import { Reveal } from "./motion/Reveal";
 import { ProductStory } from "./ProductStory";
@@ -24,14 +24,15 @@ export function FalconLanding() {
         <section
           className={styles.overview}
           id="product"
-          aria-labelledby="overview-title"
+          aria-labelledby="case-title"
         >
-          <ProductStory story={overviewStory} headingId="overview-title" />
+          <ProductStory story={caseStory} headingId="case-title" />
           <Reveal className={styles.videoReveal} variant="media">
-            <ProductVideo demo={demos.projects} priority />
+            <ProductVideo demo={demos.cases} priority />
           </Reveal>
         </section>
         <nav className={styles.chapterNav} aria-label="Возможности Falcon">
+          <a href="#product">Тест-кейсы</a>
           {workflow.map((item) => (
             <a key={item.id} href={`#${item.id}`}>
               {item.label}
@@ -51,13 +52,13 @@ export function FalconLanding() {
             </Reveal>
           </section>
         ))}
-        <FalconIntegrations />
         <section className={styles.workflowSection} id="results" aria-labelledby="results-title">
           <ProductStory story={resultsStory} headingId="results-title" />
           <Reveal className={styles.videoReveal} variant="media">
             <ProductVideo demo={demos.dashboard} />
           </Reveal>
         </section>
+        <FalconIntegrations />
         <PilotSection />
         <section className={styles.faq} aria-labelledby="faq-title">
           <h2 id="faq-title">Перед началом работы</h2>
