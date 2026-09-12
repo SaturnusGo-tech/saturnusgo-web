@@ -1,3 +1,5 @@
+import { usePortfolioRepository } from "../../repository-scope/state/usePortfolioRepository";
+import { useRepositoryScope } from "../../repository-scope/state/useRepositoryScope";
 import { useFolderNavigation } from "../../folders/navigation/useFolderNavigation";
 import { useWorkspaceFolders } from "../../folders/state/workspace/useWorkspaceFolders";
 import { useEffect } from "react";
@@ -20,6 +22,8 @@ import { useWorkspaceVerification } from "../../runs/verification/state/workspac
 export function useWorkspaceModel() {
   const state = useWorkspaceState();
   const derived = useWorkspaceDerived(state);
+  const repositoryScope = useRepositoryScope(state.data.workspace.id, state.projectId, state.view === "cases");
+  const portfolioRepository = usePortfolioRepository(state.data.workspace.id, repositoryScope.portfolioId, state.connection === "connected");
   const folders = useWorkspaceFolders(state, derived);
   const selectRepositoryFolder = useFolderNavigation(state, folders);
   const workspace = useWorkspaceActions(state);
@@ -68,6 +72,7 @@ export function useWorkspaceModel() {
     ? [...derived.projectDefects, selectedDefect] : derived.projectDefects;
   return {
     ...state,
+    repositoryScope, portfolioRepository,
     folders,
     ...derived,
     ...workspace,

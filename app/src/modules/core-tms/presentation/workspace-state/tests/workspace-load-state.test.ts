@@ -126,7 +126,7 @@ test("project switching resets editors only after a successful load", () => {
   assert.match(actionsSource.slice(failureGuard), /state\.setQuery\(""\)/);
   assert.match(actionsSource.slice(failureGuard), /state\.setCaseFilters\(\{/);
   assert.match(stageSource, /<WorkspaceCasesStage model=\{model\}/);
-  assert.match(casesStageSource, /<CasesView key=\{model\.project!\.id\}/);
+  assert.match(casesStageSource, /<CasesView key=\{model\.repositoryScope\.portfolioId \?\? model\.project!\.id\}/);
 });
 
 test("suite detail failures remain retryable and do not become empty suites", () => {

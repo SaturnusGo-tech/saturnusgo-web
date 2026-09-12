@@ -71,7 +71,7 @@ export function CasesView(props: CasesViewProps) {
     data-testid="cases-view"
   >
     <div className={props.folders ? browser.panes : undefined} style={props.folders ? undefined : { display: "contents" }} data-open={view.inspectorOpen || undefined} data-fullscreen={view.detailFullscreen || undefined}>
-    <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} />
+    {props.repository ?? <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} />}
     {!props.folders && view.inspectorOpen && !view.detailFullscreen && <div
       {...view.inspectorResize.handleProps}
       className={styles.detailResizeHandle}

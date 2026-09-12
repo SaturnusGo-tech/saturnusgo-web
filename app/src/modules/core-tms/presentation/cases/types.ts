@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { FolderResource } from "../../folders/model/folder";
 import type {
   Activity,
@@ -11,6 +12,7 @@ import type { CaseCollaborationViewModel } from "./collaboration/model";
 import type { SharedStep, SharedStepSummary } from "../../shared-steps/model/shared-step";
 
 export type CasesViewProps = {
+  repository?: ReactNode;
   folders?: FolderResource;
   onImport?: () => void;
   query: string;

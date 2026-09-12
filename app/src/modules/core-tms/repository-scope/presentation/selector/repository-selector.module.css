@@ -1,0 +1,20 @@
+.root { position: relative; min-width: 0; }
+.trigger { display: flex; align-items: center; gap: 8px; max-width: min(440px, 42vw); padding: 6px 0; border: 0; color: var(--ink); background: none; cursor: pointer; }
+.trigger strong { font: inherit; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trigger svg { flex-shrink: 0; }
+.menu { position: absolute; top: calc(100% + 10px); left: 0; width: min(360px, calc(100vw - 110px)); padding: 10px; z-index: 130; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); color: var(--ink); box-shadow: 0 14px 44px #0003; animation: reveal 160ms ease-out; }
+.tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.tabs button { flex: 1; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 9px; cursor: pointer; }
+.tabs button[aria-selected="true"] { border-color: var(--tms-accent, #3674ed); color: var(--ink); }
+.search { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; }
+.search input { min-width: 0; width: 100%; border: 0; outline: 0; background: none; color: inherit; font: inherit; }
+.list { max-height: min(360px, 55vh); overflow: auto; margin: 8px 0; }
+.list button, .create { display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px; border: 0; border-radius: 10px; color: inherit; background: transparent; text-align: left; font: inherit; cursor: pointer; }
+.list button span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list button:hover, .list button:focus-visible, .list button[aria-checked="true"] { background: var(--control-hover); }
+.list p { padding: 10px; color: var(--muted); }
+.create { border-top: 1px solid var(--line); border-radius: 0; color: var(--tms-accent, #3674ed); }
+.skeleton { display: block; width: 150px; height: 22px; border-radius: 8px; background: linear-gradient(100deg,#8094b31a 25%,#8094b34a 50%,#8094b31a 75%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .menu, .skeleton { animation: none; } }

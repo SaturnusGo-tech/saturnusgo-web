@@ -1,8 +1,11 @@
+import { PortfolioRepository } from "../../../repository-scope/presentation/browser/PortfolioRepository";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { CasesView } from "../../cases/CasesView";
 
 export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
-  return <CasesView key={model.project!.id}
+  const selectionAllowed = !model.repositoryScope.portfolioId || model.portfolioRepository.catalog?.projects.some(project => project.id === model.selectedCase?.projectId);
+  return <CasesView key={model.repositoryScope.portfolioId ?? model.project!.id}
+    repository={model.repositoryScope.portfolioId ? <PortfolioRepository key={model.repositoryScope.portfolioId} model={model} /> : undefined}
     folders={model.folders}
     onImport={() => model.setDialog("import-cases")}
     query={model.query}
@@ -12,12 +15,12 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     selectedFolder={model.selectedFolder}
     selectedFolderId={model.selectedFolderId}
     onSelectFolder={model.selectFolder}
-    selectedCaseId={model.selectedCase?.id ?? ""}
+    selectedCaseId={selectionAllowed ? model.selectedCase?.id ?? "" : ""}
     onSelectCase={(id) => {
       model.setSelectedCaseId(id);
       model.setEditing(false);
     }}
-    testCase={model.selectedCase}
+    testCase={selectionAllowed ? model.selectedCase : undefined}
     revision={model.selectedRevision}
     linkIds={model.selectedCaseDetail?.linkIds ?? []}
     onNew={model.openNewCase}

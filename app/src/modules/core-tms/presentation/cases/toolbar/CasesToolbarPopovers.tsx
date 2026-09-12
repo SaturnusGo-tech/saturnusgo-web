@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, Bot, Box, Check, ChevronRight, CircleDot, Flag, Folder, Search, X } from "lucide-react";
+import { ArrowLeft, Bot, Box, Check, ChevronRight, CircleDot, Flag, Folder, Search, Users, X } from "lucide-react";
+import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
+import { RunAssigneeFilter } from "../../runs/filters/assignee/RunAssigneeFilter";
 import { localizedComponentLabel } from "../../../localization/format/labels";
 import type { TmsLocale } from "../../../localization/model/locale";
 import type { CaseFilters } from "../../../state/types/workspace";
@@ -23,12 +25,21 @@ type FilterProps = {
 
 export function CaseFilterMenu(props: FilterProps) {
   const ru = props.locale === "ru";
+  const people = useWorkspacePeople();
+  const sections = [...(props.extraSections ?? [])];
+  if (!props.customSectionsOnly && !sections.some(item => item.id === "owner" || item.id === "assignee")) {
+    sections.unshift({ id: "owner", label: ru ? "Ответственные" : "Assignees", icon: <Users size={13} />,
+      active: Boolean(props.facets.owners?.length), summary: String(props.facets.owners?.length || (ru ? "Все" : "All")),
+      render: () => <RunAssigneeFilter workspaceId={people.workspaceId} ru={ru} selected={props.facets.owners ?? []}
+        onChange={value => props.onFacets({ ...props.facets, owners: value === "all" ? [] : props.facets.owners?.includes(value)
+          ? props.facets.owners.filter(id => id !== value) : [...(props.facets.owners ?? []), value] })} /> });
+  }
   const [section, setSection] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
   const returnSectionRef = useRef<string | null>(null);
-  const extra = props.extraSections?.find((item) => item.id === section);
+  const extra = sections.find((item) => item.id === section);
   const labels: Record<string, string> = { folders: ru ? "Папки" : "Folders", components: ru ? "Компоненты" : "Components", type: ru ? "Тип" : "Type", priority: ru ? "Приоритет" : "Priority", lifecycle: ru ? "Статус" : "Status" };
   const valueLabel = (value: string) => {
     const values: Record<string, string> = ru
@@ -105,7 +116,7 @@ export function CaseFilterMenu(props: FilterProps) {
         {visibleValues.length === 0 && <span className={styles.noOptions}>{ru ? "Ничего не найдено" : "Nothing found"}</span>}
       </div>
     </> : <div className={styles.filterMenuBody} role="menu" aria-label={ru ? "Параметры фильтра" : "Filter options"}>
-      {props.extraSections?.map((item) => <button type="button" role="menuitem" key={item.id} data-filter-section={item.id} aria-haspopup="listbox" onClick={() => openSection(item.id)}>{item.icon}<span>{item.label}</span><small data-active={item.active || undefined}>{item.summary}</small><ChevronRight size={13} /></button>)}
+      {sections.map((item) => <button type="button" role="menuitem" key={item.id} data-filter-section={item.id} aria-haspopup="listbox" onClick={() => openSection(item.id)}>{item.icon}<span>{item.label}</span><small data-active={item.active || undefined}>{item.summary}</small><ChevronRight size={13} /></button>)}
       {!props.customSectionsOnly && <><button type="button" role="menuitem" data-filter-section="folders" aria-haspopup="listbox" onClick={() => openSection("folders")}><Folder size={13} /><span>{labels.folders}</span><small>{selectedCount("folders") || (ru ? "Все" : "All")}</small><ChevronRight size={13} /></button>
       <button type="button" role="menuitem" data-filter-section="components" aria-haspopup="listbox" onClick={() => openSection("components")}><Box size={13} /><span>{labels.components}</span><small>{selectedCount("components") || (ru ? "Все" : "All")}</small><ChevronRight size={13} /></button>
       <button type="button" role="menuitem" data-filter-section="type" aria-haspopup="listbox" onClick={() => openSection("type")}><Bot size={13} /><span>{labels.type}</span><small>{valueLabel(props.filters.type)}</small><ChevronRight size={13} /></button>

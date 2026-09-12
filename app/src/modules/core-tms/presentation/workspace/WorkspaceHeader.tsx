@@ -1,3 +1,4 @@
+import { RepositoryScopeSelector } from "../../repository-scope/presentation/selector/RepositoryScopeSelector";
 import {
   CalendarDays,
   GitBranch,
@@ -68,12 +69,12 @@ export function WorkspaceHeader({
       </button>
 
       <HistoryControls />
-      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || !model.project ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
+      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || (!model.project && model.view !== "cases") ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
-          {t("header.project")}
+          {model.view === "cases" && model.repositoryScope.portfolioId ? (languageTag.startsWith("ru") ? "Портфель" : "Portfolio") : t("header.project")}
         </span>
         <div className={shellStyles.projectSelectorSlot}>
-          <ProjectSelector
+          {model.view === "cases" ? <RepositoryScopeSelector model={model} /> : <ProjectSelector
             activeProjectId={model.project?.id ?? null}
             projects={model.projects}
             disabled={!workspaceReady}
@@ -82,11 +83,11 @@ export function WorkspaceHeader({
             createProjectLabel={model.project ? t("header.createProject") : t("header.createFirstProject")}
             onSelect={model.chooseProject}
             onCreate={model.openNewProject}
-          />
+          />}
         </div>
       </div>}
 
-      {model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && model.project && <div className={shellStyles.headerMeta}>
+      {model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && !model.repositoryScope.portfolioId && model.project && <div className={shellStyles.headerMeta}>
         {model.view === "runs" && model.selectedRun && <div className={shellStyles.runTime}><RunClock run={model.selectedRun} /></div>}
         <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
           title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>

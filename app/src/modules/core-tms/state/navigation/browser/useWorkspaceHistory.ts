@@ -36,6 +36,8 @@ export function useWorkspaceHistory(input: Input) {
       const caseId = view === "cases" || isProjectCaseContext(window.location.href, projectId) ? linked.caseId ?? "" : "";
       // Guard URL effects before updating React, including asynchronous project reloads.
       begin({ workspaceId, projectId, view, runId: target.runId, caseId });
+      // Scope-only URL changes may not update any selection state or trigger URL effects.
+      restoration.current.canWrite(current);
       current.closeDialog();
       if (workspaceId !== current.workspaceId || projectId !== current.projectId) { current.reload(); return; }
       current.setView(view); current.setCase(caseId); current.setRun(target.runId); current.setItem(target.runItemId ?? null);

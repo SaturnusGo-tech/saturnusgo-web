@@ -1,3 +1,4 @@
+import { preserveRepositoryScope } from "../../repository-scope/navigation/repository-scope";
 import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { isProvider } from "../../connectors/model/connector-types";
 import { workspaceViews, type View } from "../types/workspace";
@@ -74,5 +75,6 @@ export function buildWorkspaceDeepLink(href: string, input: {
       if (analysisId && /^[A-Za-z0-9._:-]{1,128}$/.test(analysisId)) url.searchParams.set("analysisId", analysisId);
     }
   }
+  if (input.view === "cases" && sameWorkspace) preserveRepositoryScope(href, url, input.workspaceId);
   return url.toString();
 }

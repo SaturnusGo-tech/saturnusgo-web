@@ -1,3 +1,4 @@
+import { preserveRepositoryScope } from "../../repository-scope/navigation/repository-scope";
 import { isProjectCaseContext } from "./project/project-case-context";
 
 const CASE_ID_PARAM = "caseId";
@@ -51,6 +52,7 @@ export function buildCaseDeepLink(
   if (defectId) url.searchParams.set("defectId", defectId);
   if (legacyDefectId) url.searchParams.set("defect", legacyDefectId);
   if (legacyReports) url.searchParams.set("view", "reports");
+  if (!embedded && !legacyReports) preserveRepositoryScope(href, url, workspaceId ?? undefined);
   return url.toString();
 }
 

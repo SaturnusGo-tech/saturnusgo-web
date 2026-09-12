@@ -1,0 +1,27 @@
+.pane { padding-top: 18px; }
+.caption { display: flex; align-items: baseline; gap: 8px; padding: 16px 10px; font-size: 12px; }
+.caption strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.caption span { color: var(--cases-muted); font-variant-numeric: tabular-nums; }
+.project { margin-bottom: 8px; min-width: 0; }
+.projectHeading { display: flex; align-items: center; gap: 4px; padding: 3px 5px; border-radius: 10px; }
+.projectHeading:hover { background: var(--cases-hover); }
+.projectHeading > button { display: flex; align-items: center; gap: 7px; padding: 7px 2px; min-width: 0; }
+.projectHeading > button:first-child { flex: 1; }
+.projectHeading strong { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-size: 12px; }
+.projectHeading small { font-size: 11px; color: var(--cases-muted); }
+.projectHeading svg { flex-shrink: 0; color: #7b96d0; }
+.chevron { transform: rotate(-90deg); transition: transform 180ms ease; }
+.chevron[data-open="true"] { transform: rotate(0); }
+.contents { margin-left: 12px; animation: appear 160ms ease-out; }
+.contents > div { width: 100%; padding: 0; border-right: 0; }
+.message { color: var(--cases-muted); font-size: 12px; padding: 10px; line-height: 1.6; }
+@keyframes appear { from { opacity: .2; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+@media(prefers-reduced-motion:reduce) { .contents { animation: none; } .chevron { transition: none; } }
+
+.more { display: block; margin: 8px 10px 16px; padding: 7px 12px; border: 1px solid var(--cases-control-border) !important; border-radius: 10px; font-size: 12px !important; }
+
+.pane { container-type: inline-size; container-name: portfolio-tree; }
+.owner { margin-left: auto; max-width: 120px; flex: 0 0 auto; }
+.owner > span { max-width: 100%; }
+.owner > span > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@container portfolio-tree (max-width: 480px) { .owner { width: 24px; overflow: hidden; } .owner > span > span:last-child { display: none; } }

@@ -63,3 +63,15 @@ test("a mismatched catalog project or global creation destination cannot restore
   app.h.window.location.href = `${href.replace("catalogProjectId=p", "catalogProjectId=other")}&caseId=c`;
   app.h.emit("popstate"); assert.equal(app.state.caseId, ""); app.h.dispose();
 });
+
+test("a portfolio-only scope change releases restoration before opening a case in another project", () => {
+  const app = setup();
+  app.state.view = "cases"; app.render();
+  app.h.window.location.href = "https://tms.example/work/?workspaceId=w&projectId=p&view=cases&repositoryPortfolioId=portfolio";
+  app.h.emit("popstate");
+  // React may skip selection effects because their primitive dependencies did not change.
+  app.state.projectId = "other"; app.state.caseId = "other-case";
+  assert.equal(app.render().canWrite(), true);
+  assert.ok(!app.events.includes("reload"));
+  app.h.dispose();
+});

@@ -1,6 +1,5 @@
-import { RunAssigneeFilter } from "../../../runs/filters/assignee/RunAssigneeFilter";
 import { useId, useRef, useState } from "react";
-import { PiCheckSquare, PiFunnelSimple, PiMagnifyingGlass, PiPlus, PiUser, PiX } from "react-icons/pi";
+import { PiCheckSquare, PiFunnelSimple, PiMagnifyingGlass, PiPlus, PiX } from "react-icons/pi";
 import type { CasesViewProps } from "../../types";
 import type { useCasesViewController } from "../../view/useCasesViewController";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -42,9 +41,7 @@ export function RepositoryControls({ props, view, locale }: {
           title={ru ? "Фильтры" : "Filters"} data-testid="case-filter-toggle"><PiFunnelSimple size={16} />{active > 0 && <b>{active}</b>}</button>
         {view.filterOpen && <CaseFilterMenu locale={locale} filters={props.filters} facets={view.facetFilters} options={view.facetOptions}
           onFilters={props.onFilters} onFacets={view.setFacetFilters} onClose={closeFilters}
-          extraSections={[{ id: "owner", icon: <PiUser size={13} />, active: Boolean(view.facetFilters.owners?.length), label: ru ? "Ответственные" : "Assignees", summary: String(view.facetFilters.owners?.length || (ru ? "Все" : "All")),
-            render: () => <RunAssigneeFilter workspaceId={view.workspaceId} ru={ru} selected={view.facetFilters.owners ?? []}
-              onChange={value => view.setFacetFilters(current => ({ ...current, owners: value === "all" ? [] : current.owners?.includes(value) ? current.owners.filter(id => id !== value) : [...(current.owners ?? []), value] }))} /> }]} />}
+          />}
       </div>
       <div className={css.selection} data-open={view.selectionMode || undefined} aria-hidden={!view.selectionMode}
         ref={(element) => { if (element) element.inert = !view.selectionMode; }}>

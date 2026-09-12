@@ -77,6 +77,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   }
   if (model.view === "notifications") return <WorkspaceNotifications key={model.data.workspace.id} workspaceId={model.data.workspace.id}/>;
   if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
+  if (model.view === "cases" && model.repositoryScope.portfolioId) return <WorkspaceCasesStage model={model} />;
   if (!model.project) {
     return (
       <ProjectOnboarding

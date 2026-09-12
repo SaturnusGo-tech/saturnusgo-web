@@ -46,7 +46,7 @@ export function CasesToolbar(props: Props) {
   const lockedTitle = ru ? "Сначала сохраните или отмените изменения в редакторе" : "Save or cancel the editor changes first";
   const createTitle = props.folderArchived ? (ru ? "Восстановите папку или выберите активную, чтобы создать кейс" : "Restore this folder or select an active folder to create a case") : props.interactionLocked ? lockedTitle : undefined;
   const activeFilterCount = Number(props.filters.type !== "all") + Number(props.filters.priority !== "all") + Number(props.filters.lifecycle !== "all")
-    + Number(Boolean(props.filters.tag.trim())) + Number(props.filters.includeArchived) + facets.folders.length + facets.components.length;
+    + Number(Boolean(props.filters.tag.trim())) + Number(props.filters.includeArchived) + facets.folders.length + facets.components.length + (facets.owners?.length ?? 0);
   const text = {
     list: ru ? "Список" : "List", dynamic: ru ? "Группы" : "Dynamic groups", group: ru ? "Группировать:" : "Group by:",
     all: ru ? "Без группировки" : "No grouping", folder: ru ? "Папка" : "Folder", component: ru ? "Компонент" : "Component",

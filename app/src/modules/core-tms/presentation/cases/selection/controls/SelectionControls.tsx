@@ -43,7 +43,7 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
     <div className={css.tools}>
       <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" disabled={disabled} aria-expanded={filter}
-        data-active={extraSections?.some((item) => item.active) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
+        data-active={extraSections?.some((item) => item.active) || Boolean(state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
           customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
       {onSelectAll && <button className={css.tool} type="button" disabled={disabled} onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>}
