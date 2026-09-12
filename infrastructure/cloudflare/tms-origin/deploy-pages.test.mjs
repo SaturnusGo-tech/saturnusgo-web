@@ -111,7 +111,7 @@ if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }
 if (process.env.OMIT_ATMOSPHERE !== "1") write("out/falcon/landing/2026-09/atmosphere.webp", "falcon atmosphere\\n");
-for (const id of ["cases", "runs", "suites", "defects", "dashboard", "youtrack"]) {
+for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard", "youtrack"]) {
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
     if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack" && extension === "mp4") continue;

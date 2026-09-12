@@ -26,14 +26,14 @@ test("Falcon landing has one company login action and accessible chapter navigat
   assert.doesNotMatch(header + landing, /href="\/signup\/"|Создать аккаунт/);
   assert.match(header, /aria-label="Навигация по лендингу"/);
   assert.match(landing, /href="#product">\s*К содержанию/);
-  assert.match(landing, /aria-labelledby="case-title"/);
+  assert.match(landing, /aria-labelledby="projects-title"/);
   assert.match(landing, /aria-label="Возможности Falcon"/);
   assert.doesNotMatch(landing, /analytics-dashboard\.jpg|case-repository\.jpg|run-builder\.jpg/);
 });
 
 test("every landing demonstration has a real MP4, poster and timed text", () => {
   assert.equal(demos.integrations.src, "/falcon/landing/2026-09-production/youtrack.mp4");
-  assert.equal(Object.keys(demos).length, 6);
+  assert.equal(Object.keys(demos).length, 7);
   for (const { id, src, poster: posterPath, captions: captionsPath } of Object.values(demos)) {
     const video = readFileSync(resolve(root, `public${src}`));
     assert.equal(video.subarray(4, 8).toString(), "ftyp", `${id}: invalid MP4`);

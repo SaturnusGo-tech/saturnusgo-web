@@ -31,7 +31,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
   const allCases = useMemo(() => [...branches].filter(([projectId]) => !selectedProjects.length || selectedProjects.includes(projectId)).flatMap(([, branch]) => branch?.cases ?? []), [branches, selectedProjects]);
   const filters = useSelectionFilters(allCases);
   const visibleIds = useMemo(() => new Set(filters.visible.map(item => item.id)), [filters.visible]);
-  const filtered = Boolean(filters.query || filters.qlQuery || filters.facets.owners?.length || filters.facets.folders.length
+  const filtered = Boolean(selectedProjects.length || filters.query || filters.qlQuery || filters.facets.owners?.length || filters.facets.folders.length
     || filters.facets.components.length || filters.filters.tag || filters.filters.type !== "all" || filters.filters.priority !== "all" || filters.filters.lifecycle !== "all");
   const locked = Boolean(opening || model.dialog === "case");
   async function openCase(item: TestCaseSummary) {

@@ -6,7 +6,7 @@ import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, workflow, caseStory, resultsStory } from "./content/demos";
+import { demos, workflow, projectStory, resultsStory } from "./content/demos";
 import { PilotSection } from "./pilot/PilotSection";
 import { Reveal } from "./motion/Reveal";
 import { ProductStory } from "./ProductStory";
@@ -24,15 +24,15 @@ export function FalconLanding() {
         <section
           className={styles.overview}
           id="product"
-          aria-labelledby="case-title"
+          aria-labelledby="projects-title"
         >
-          <ProductStory story={caseStory} headingId="case-title" />
+          <ProductStory story={projectStory} headingId="projects-title" />
           <Reveal className={styles.videoReveal} variant="media">
-            <ProductVideo demo={demos.cases} priority />
+            <ProductVideo demo={demos.projects} priority />
           </Reveal>
         </section>
         <nav className={styles.chapterNav} aria-label="Возможности Falcon">
-          <a href="#product">Тест-кейсы</a>
+          <a href="#product">Портфели и проекты</a>
           {workflow.map((item) => (
             <a key={item.id} href={`#${item.id}`}>
               {item.label}
