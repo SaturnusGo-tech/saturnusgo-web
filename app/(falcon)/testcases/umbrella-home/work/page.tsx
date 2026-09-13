@@ -3,7 +3,7 @@ import { TmsWorkspace } from "../../../../src/modules/core-tms";
 import { TmsFavicon } from "./TmsFavicon";
 
 export const metadata: Metadata = {
-  title: "Falcon",
+  title: { absolute: "Falcon" },
   description: "Falcon test management workspace",
   openGraph: {
     title: "Falcon",
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <>
+    <div data-falcon-workspace>
       <TmsFavicon />
       <TmsWorkspace />
-    </>
+    </div>
   );
 }

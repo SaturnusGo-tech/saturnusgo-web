@@ -23,5 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function FalconLayout({ children }: { readonly children: React.ReactNode }) {
-  return <div id="app-main" style={{ padding: 0 }}>{children}</div>;
+  return <div data-falcon-shell id="app-main" style={{ padding: 0 }}>{children}</div>;
 }

@@ -11,8 +11,8 @@ test("Falcon is the active user-facing TMS brand", () => {
     "app/src/modules/core-tms/presentation/workspace/tms-shell.module.css",
   );
   const activeSources = [
-    source("app/(routes)/testcases/umbrella-home/work/page.tsx"),
-    source("app/(routes)/testcases/umbrella-home/work/TmsFavicon.tsx"),
+    source("app/(falcon)/testcases/umbrella-home/work/page.tsx"),
+    source("app/(falcon)/testcases/umbrella-home/work/TmsFavicon.tsx"),
     source("app/src/modules/core-tms/presentation/navigation/Navigation.tsx"),
     shellSource,
     source("app/src/modules/core-tms/tms.module.css"),
