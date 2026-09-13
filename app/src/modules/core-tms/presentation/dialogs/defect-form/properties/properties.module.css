@@ -22,3 +22,8 @@
 .levelDot[data-level="medium"] { background: #3981e8; }
 .levelDot[data-level="high"] { background: #a276cd; }
 .levelDot[data-level="critical"] { background: var(--red, #d74b59); }
+
+.routing [role="listbox"] { min-width: min(440px, calc(100vw - 24px)); }
+.component.component, .routing.routing { width: 100%; }
+.component.component > button, .routing.routing > button { width: 100%; }
+.value.value [role="option"] + [role="option"] { margin-top: 3px; }

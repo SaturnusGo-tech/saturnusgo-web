@@ -35,7 +35,7 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
       <ResponsiblePicker workspaceId={workspaceId} value={value.assigneeIdentityId} offline={offline} disabled={disabled}
         onChange={assigneeIdentityId => onChange({ assigneeIdentityId })} /></div></div>
     <div className={css.row}><span className={css.label}>{copy.routingLabel}<DefectRoutingHelp /></span>
-      <AnimatedSelect menuMinWidth={220} className={css.value} label={copy.routingLabel} value={routing.value} options={routing.options}
+      <AnimatedSelect menuMinWidth={440} scrollLabels className={`${css.value} ${css.routing}`} label={copy.routingLabel} value={routing.value} options={routing.options}
         onChange={value => routing.onChange(value as DefectRouting["value"])} disabled={disabled || routing.disabled} />
       {showRoutingError && !routing.resolved && <small className={css.error} role="alert">{routing.message}</small>}
     </div>

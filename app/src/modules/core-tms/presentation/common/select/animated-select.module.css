@@ -11,8 +11,8 @@
 .menu[popover] { position: fixed; inset: auto; margin: 0; }
 .menu[data-open="true"] { opacity: 1; pointer-events: auto; transform: none; visibility: visible; transition-delay: 0s; }
 .menu > button { width: 100%; min-height: 34px; display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-items: center; gap: 8px; padding: 7px 9px; color: inherit; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; text-align: left; }
-.menu > button:hover, .menu > button:focus-visible, .menu > button[data-selected="true"] { outline: 0; background: var(--control-hover); }
-.menu > button:focus-visible { box-shadow: inset 0 0 0 1px var(--tms-focus-border, var(--muted)); }
+.menu > button:hover, .menu:not(:has(> button:hover)) > button:focus-visible { outline: 0; background: var(--control-hover); }
+.menu:not(:has(> button:hover)) > button:focus-visible { box-shadow: inset 0 0 0 1px var(--tms-focus-border, var(--muted)); }
 .menu > button[data-selected="true"] { font-weight: 550; }
 .menu > button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .menu > button > svg { color: var(--muted); }
