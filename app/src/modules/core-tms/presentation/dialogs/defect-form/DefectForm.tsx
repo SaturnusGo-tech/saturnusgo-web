@@ -1,6 +1,7 @@
 import { Check, LoaderCircle } from "lucide-react";
 import { useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
 import { Modal } from "../../common/modal/Modal";
+import { AppOverlay } from "../../common/overlay/AppOverlay";
 import { FormError } from "../../common/error/FormError";
 import { NarrativeField } from "../../cases/inspector/markdown/plain/NarrativeField";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -36,7 +37,7 @@ export function DefectForm(props: Props) {
     if (Object.keys(next).length) { if (next.title) titleRef.current?.focus(); return; }
     props.onSubmit(event);
   };
-  return <Modal title={copy.title} subtitle={props.context} drawer onClose={props.onClose}
+  return <AppOverlay><Modal title={copy.title} subtitle={props.context} drawer onClose={props.onClose}
     panelClassName={`${css.panel} ${closing ? css.closing : ""}`}
     headerActions={<button className={css.save} type="submit" form={id} disabled={submitting || closing}
       data-testid="create-defect" aria-label={submitting ? copy.creating : copy.create} title={copy.create}>
@@ -77,5 +78,5 @@ export function DefectForm(props: Props) {
         {props.error && <FormError message={props.error} />}
       </div>
     </form>
-  </Modal>;
+  </Modal></AppOverlay>;
 }
