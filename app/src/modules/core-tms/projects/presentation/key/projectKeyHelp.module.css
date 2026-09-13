@@ -1,0 +1,11 @@
+.root { display: inline-flex; flex: 0 0 auto; vertical-align: middle; }
+.root > .trigger { display: grid; place-items: center; width: 20px; height: 20px; min-height: 0; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: transparent; box-shadow: none; cursor: pointer; }
+.root > .trigger:hover { color: var(--ink); background: var(--control-hover); }
+.root > .trigger:focus-visible { outline: 1px solid #79a5ed; outline-offset: 2px; }
+.popup { position: fixed; inset: auto; margin: 0; width: min(280px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--paper); box-shadow: none; font-family: inherit; font-size: 12px; font-weight: 400; line-height: 1.6; }
+.popup:popover-open { animation: appear 140ms ease-out; }
+.popup p { margin: 0; }
+.popup p + p { margin-top: 8px; color: var(--muted); }
+.popup code { white-space: nowrap; font: inherit; }
+@keyframes appear { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .popup:popover-open { animation: none; } }

@@ -1,8 +1,10 @@
 import { PiInfo, PiLockKey, PiPlus, PiSpinnerGap } from "react-icons/pi";
+import { useId } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { portfolioCopy } from "../../../portfolios/model/copy";
 import { useProjectForm } from "../../../projects/state/dialog/useProjectForm";
+import { ProjectKeyHelp } from "../../../projects/presentation/key/ProjectKeyHelp";
 import { useProjectPortfolioOptions } from "../../../projects/state/dialog/useProjectPortfolioOptions";
 import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { FormError } from "../../common/error/FormError";
@@ -16,6 +18,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
   offline: boolean; onClose: () => void; onCreated: (project: Project) => void; onUpdated: (project: Project, etag: string | null) => void;
 }) {
   const { locale } = useTmsLocale();
+  const id = useId();
   const copy = getProjectDialogCopy(locale);
   const catalogCopy = portfolioCopy(locale);
   const form = useProjectForm({ workspaceId, project, projectEtag, offline, portfolioId, errorText: copy.projectError });
@@ -36,12 +39,11 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
           <label className={styles.field}><span>{copy.name}</span>
             <input required autoFocus data-autofocus maxLength={120} disabled={form.pending || offline} value={form.name}
               onChange={(event) => form.updateName(event.target.value)} placeholder={copy.namePlaceholder} data-testid="project-name" /></label>
-          {!project && <label className={styles.field}><span>{copy.key}</span>
-            <input required disabled={form.pending || offline} minLength={2} maxLength={12} pattern="[A-Z][A-Z0-9]{1,11}" value={form.key}
+          {!project && <div className={styles.field}><div className={styles.fieldLabel}><label htmlFor={`${id}-key`}>{copy.key}</label><ProjectKeyHelp id={`${id}-key-hint`} value={form.key} /></div>
+            <input id={`${id}-key`} required disabled={form.pending || offline} minLength={2} maxLength={12} pattern="[A-Z][A-Z0-9]{1,11}" value={form.key}
               onChange={(event) => form.setKey(event.target.value.replace(/[^a-z0-9]/gi, "").toUpperCase())}
-              placeholder={copy.keyPlaceholder} aria-describedby="project-key-hint" /></label>}
+              placeholder={copy.keyPlaceholder} aria-describedby={`${id}-key-hint`} /></div>}
         </div>
-        {!project && <p id="project-key-hint" className={styles.hint}>{copy.newKeyHint}<code>{form.key || copy.keyPlaceholder}-TC-1</code></p>}
         <label className={styles.field}><span>{copy.description}<small>{copy.optional}</small></span>
           <textarea disabled={form.pending || offline} maxLength={20000} value={form.description} onChange={(event) => form.setDescription(event.target.value)} placeholder={copy.descriptionPlaceholder} rows={3} /></label>
         <div className={styles.field}><span>{catalogCopy.portfolio}<small>{copy.optional}</small></span>
@@ -55,7 +57,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
           <ResponsiblePicker workspaceId={workspaceId} value={form.responsibleIdentityId} onChange={form.setResponsibleIdentityId} disabled={form.pending} offline={offline} />
         </div>
         {project ? <div className={styles.projectKey}>
-          <PiLockKey size={18} aria-hidden="true" /><span>{copy.key}<small>{copy.keyHint}</small></span><code>{project.key}</code>
+          <PiLockKey size={18} aria-hidden="true" /><div className={styles.fieldLabel}><span>{copy.key}</span><ProjectKeyHelp id={`${id}-key-hint`} value={project.key} locked /></div><code>{project.key}</code>
         </div> : <p className={styles.note}><PiInfo size={18} aria-hidden="true" />{copy.environmentHint}</p>}
         {offline && <FormError message={catalogCopy.offline} />}
         {form.error && <FormError message={form.error} />}

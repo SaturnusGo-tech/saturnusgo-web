@@ -8,6 +8,7 @@ import { PiFolderSimpleDuotone } from "react-icons/pi";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useProjectForm } from "../../../projects/state/dialog/useProjectForm";
+import { ProjectKeyHelp } from "../../../projects/presentation/key/ProjectKeyHelp";
 import { useProjectPortfolioOptions } from "../../../projects/state/dialog/useProjectPortfolioOptions";
 import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
@@ -62,10 +63,10 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
       {attempted && errors.checklist && <p data-field="checklist" tabIndex={-1} className={css.limit} role="alert">{errors.checklist}</p>}
     </main><aside className={css.properties} aria-label={copy.properties}>
       <div className={css.property}><span>{organizationCopy(locale).phase}</span><WorkflowSelect value={workflowPhase} disabled={form.pending} onChange={form.setWorkflowPhase} /></div>
-      <label className={css.property}><span>{copy.key}</span><input data-field="key" aria-invalid={attempted && Boolean(errors.key)} required disabled={form.pending || Boolean(current)} minLength={2} maxLength={12}
+      <div className={css.property}><div className={css.propertyLabel}><label htmlFor={`${formId}-key`}>{copy.key}</label><ProjectKeyHelp id={`${formId}-key-hint`} value={form.key} locked={Boolean(current)} /></div><input id={`${formId}-key`} data-field="key" aria-invalid={attempted && Boolean(errors.key)} required disabled={form.pending || Boolean(current)} minLength={2} maxLength={12}
         pattern="[A-Z][A-Z0-9]{1,11}" value={form.key} onChange={(event) => form.setKey(event.target.value.replace(/[^a-z0-9]/gi, "").toUpperCase())}
-        placeholder={formCopy.keyPlaceholder} aria-describedby={!current ? `${formId}-key-hint` : undefined} />{attempted && errors.key && <span className={css.limit} role="alert">{errors.key}</span>}
-      {!current && <p className={css.note} id={`${formId}-key-hint`}>{formCopy.newKeyHint} <code>{form.key || formCopy.keyPlaceholder}-TC-1</code></p>}</label>
+        placeholder={formCopy.keyPlaceholder} aria-describedby={`${formId}-key-hint`} />{attempted && errors.key && <span className={css.limit} role="alert">{errors.key}</span>}
+      </div>
       <div className={css.property}><span>{copy.portfolio}</span><AnimatedSelect label={copy.portfolio} value={form.portfolioId ?? ""} options={options}
         disabled={form.pending} onChange={(value) => form.setPortfolioId(value || null)} />
         {portfolios.error && <button type="button" className={styles.textButton} onClick={portfolios.retry}>{copy.optionsError} {copy.retry}</button>}
