@@ -2661,7 +2661,7 @@ export interface paths {
         };
         /**
          * getManagedSession
-         * @description Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.
+         * @description Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge. Authenticated sessions renew their idle expiry and return the same HttpOnly cookie with the renewed expiry. Renewal does not change authenticatedAt, extend MFA challenges, or revive expired or revoked sessions.
          */
         get: operations["getManagedSession"];
         put?: never;
@@ -13445,6 +13445,8 @@ export interface operations {
                 headers: {
                     "X-Request-Id": components["headers"]["XRequestId"];
                     "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description Authenticated browser session cookie; HttpOnly, Secure, SameSite=Lax, Path=/, renewed Expires. */
+                    "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {

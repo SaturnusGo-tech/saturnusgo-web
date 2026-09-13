@@ -60,12 +60,16 @@ export function useManagedAccess(client: ManagedAccessPort) {
       } finally { checking = false; }
     };
     const onFocus = () => { void check(); };
-    const timeout = window.setTimeout(onFocus, Math.max(0, Date.parse(expiresAt) - Date.now()));
+    // Browser timers overflow above ~24 days; long-lived cookies must not cause a request loop.
+    const timeout = window.setTimeout(onFocus, Math.min(2_147_483_647,
+      Math.max(1_000, Date.parse(expiresAt) - Date.now() - 60_000)));
     const interval = window.setInterval(onFocus, 60_000);
     window.addEventListener("focus", onFocus);
+    window.addEventListener("online", onFocus);
     document.addEventListener("visibilitychange", onFocus);
     return () => { controller.abort(); window.clearTimeout(timeout); window.clearInterval(interval);
-      window.removeEventListener("focus", onFocus); document.removeEventListener("visibilitychange", onFocus); };
+      window.removeEventListener("focus", onFocus); window.removeEventListener("online", onFocus);
+      document.removeEventListener("visibilitychange", onFocus); };
   }, [client, expiresAt, state.pending]);
 
   const perform = async (operation: (signal: AbortSignal) => Promise<Partial<ManagedAccessState> | void>, propagateError = false) => {

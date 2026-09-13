@@ -9268,7 +9268,7 @@
         "summary": "getManagedSession",
         "operationId": "getManagedSession",
         "security": [],
-        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge.",
+        "description": "Access is resolved from the verified gateway hostname, never a client workspaceId. Mutations require an exact matching HTTPS Origin. Pre-authentication sessions authorize only the matching password or MFA challenge. Authenticated sessions renew their idle expiry and return the same HttpOnly cookie with the renewed expiry. Renewal does not change authenticatedAt, extend MFA challenges, or revive expired or revoked sessions.",
         "responses": {
           "200": {
             "description": "Success",
@@ -9278,6 +9278,12 @@
               },
               "Cache-Control": {
                 "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "description": "Authenticated browser session cookie; HttpOnly, Secure, SameSite=Lax, Path=/, renewed Expires.",
+                "schema": {
+                  "type": "string"
+                }
               }
             },
             "content": {
