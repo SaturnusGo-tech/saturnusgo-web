@@ -1,7 +1,9 @@
 import { TmsApiError } from "../../../../core/tms/transport/http";
 import { motion, useReducedMotion } from "framer-motion";
+import { createPortal } from "react-dom";
+import workspaceStyles from "../../tms.module.css";
 import { Check, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ApiSource, NamedOption } from "../model/api-source";
 import { useApiSourceEditor } from "./useApiSourceEditor";
 import { apiSourceError } from "../model/api-source-error";
@@ -14,13 +16,16 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
 }) {
   const state = useApiSourceEditor(workspaceId, projectId, source, onSaved); const panel = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion(); const { draft, setDraft } = state;
+  const anchor = useRef<HTMLSpanElement>(null); const [host, setHost] = useState<Element | null>(null);
+  useLayoutEffect(() => { setHost(anchor.current?.closest(`.${workspaceStyles.app}`) ?? null); }, []);
   useEffect(() => {
+    if (!host) return;
     const origin = document.activeElement as HTMLElement | null;
     panel.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
     return () => { if (origin?.isConnected) origin.focus({ preventScroll: true }); };
-  }, []);
+  }, [host]);
   const duplicate = !source && catalog.find(api => api.sourceUrl.trim() === draft.sourceUrl.trim());
-  return <motion.div className={css.scrim} initial={{ backgroundColor: "#0000" }} animate={{ backgroundColor: "#0005" }} exit={{ backgroundColor: "#0000" }}
+  const overlay = <motion.div className={css.scrim} initial={{ backgroundColor: "#0000" }} animate={{ backgroundColor: "#0005" }} exit={{ backgroundColor: "#0000" }}
     transition={{ duration: reduced ? 0 : .24 }} onPointerDown={event => { if (event.target === event.currentTarget && !state.pending) onClose(); }}>
     <motion.div ref={panel} className={css.panel} role="dialog" aria-modal="true" aria-labelledby="api-source-title"
       initial={{ x: reduced ? 0 : "100%" }} animate={{ x: 0 }} exit={{ x: reduced ? 0 : "100%" }} transition={{ duration: reduced ? 0 : .26, ease: [.22,.75,.25,1] }}
@@ -54,4 +59,5 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
       </form>
     </motion.div>
   </motion.div>;
+  return <><span ref={anchor} hidden/>{host && createPortal(overlay, host)}</>;
 }
