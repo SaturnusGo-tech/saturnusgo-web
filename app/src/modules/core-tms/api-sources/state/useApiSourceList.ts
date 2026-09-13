@@ -9,6 +9,9 @@ export function useApiSourceList(workspaceId: string, context: ApiContext, catal
   const [state, setState] = useState<{ key: string; items: ApiSource[]; loading: boolean; error: unknown }>({ key: "", items: [], loading: true, error: null });
   useEffect(() => {
     if (!active) return;
+    if (!catalog && !context.portfolioId && !context.projectIds?.length) {
+      setState({ key, items: [], loading: false, error: null }); return;
+    }
     const controller = new AbortController();
     setState(current => ({ key, items: current.key === key ? current.items : [], loading: true, error: null }));
     void listApiSources(http, workspaceId, context, catalog, controller.signal).then(items => {

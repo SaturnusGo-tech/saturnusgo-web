@@ -16,7 +16,7 @@ void test("project switching cancels stale documents, keeps a shared API and cle
   let state!: ReturnType<typeof useApiSourceList>; let selection!: ReturnType<typeof useApiSelection>; let document!: ReturnType<typeof useApiDocument>;
   const source = { id: "shared", rowVersion: 1, enabled: true } as ApiSource;
   function Probe({ project }: { project: string }) {
-    state = useApiSourceList("w", { projectIds: [project] });
+    state = useApiSourceList("w", { projectIds: project ? [project] : [] });
     selection = useApiSelection("w", project, state.items, state.loading);
     document = useApiDocument("w", { projectIds: [project] }, selection.source); return null;
   }
@@ -36,6 +36,9 @@ void test("project switching cancels stale documents, keeps a shared API and cle
     assert.equal(selection.source, null); assert.equal(document.document, null);
     await act(async () => renderer.update(element("broken")));
     await act(async () => pending[5].reject(new Error("Unavailable"))); assert.ok(state.error); assert.equal(selection.source, null);
+    const requestCount = pending.length; await act(async () => renderer.update(element("")));
+    assert.equal(state.loading, false); assert.equal(state.error, null); assert.deepEqual(state.items, []);
+    assert.equal(pending.length, requestCount);
   } finally { await act(async () => renderer?.unmount()); if (original) Object.defineProperty(globalThis, "React", original); else Reflect.deleteProperty(globalThis, "React"); }
 });
 test("only administrators and QA managers see hooks; API reading remains available to testers and observers", () => {
