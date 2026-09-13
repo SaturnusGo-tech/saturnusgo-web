@@ -1,6 +1,8 @@
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { AnimatedSelectOption } from "./AnimatedSelect";
+import { useAnchoredPopup } from "../popup/useAnchoredPopup";
+import { OverflowLabel } from "./overflow/OverflowLabel";
 import styles from "./animated-select.module.css";
 
 export function AnimatedMultiSelect({
@@ -24,14 +26,9 @@ export function AnimatedMultiSelect({
       ? options.find((option) => option.value === values[0])?.label ?? selectedLabel
       : `${selectedLabel}: ${values.length}`;
 
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, [open]);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const dismiss = useCallback(() => setOpen(false), []);
+  useAnchoredPopup(open, false, rootRef, triggerRef, menuRef, dismiss, 340);
 
   function optionButtons() {
     return Array.from(rootRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ?? []);
@@ -64,13 +61,15 @@ export function AnimatedMultiSelect({
           event.preventDefault();
           openAndFocus();
         }
-        if (event.key === "Escape") setOpen(false);
+        if (event.key === "Escape" && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); }
       }}
     >
       <span>{summary}</span><ChevronDown size={15} aria-hidden="true" />
     </button>
     <div
-      className={`${styles.menu} ${styles.multiMenu}`}
+      ref={menuRef}
+      popover="manual"
+      className={styles.menu}
       id={menuId}
       role="listbox"
       aria-label={label}
@@ -91,6 +90,7 @@ export function AnimatedMultiSelect({
         }
         if (event.key === "Escape") {
           event.preventDefault();
+          event.stopPropagation();
           setOpen(false);
           requestAnimationFrame(() => triggerRef.current?.focus());
         }
@@ -103,7 +103,7 @@ export function AnimatedMultiSelect({
       {options.map((option) => {
         const active = selected.has(option.value);
         return <button key={option.value} type="button" role="option" aria-selected={active} data-selected={active} tabIndex={-1} onClick={() => toggle(option.value)}>
-          <span>{option.label}</span>{active && <Check size={15} aria-hidden="true" />}
+          <OverflowLabel text={option.label} />{active && <Check size={15} aria-hidden="true" />}
         </button>;
       })}
     </div>

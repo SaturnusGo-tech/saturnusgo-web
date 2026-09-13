@@ -16,7 +16,6 @@
 .menu > button[data-selected="true"] { font-weight: 550; }
 .menu > button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .menu > button > svg { color: var(--muted); }
-.multiMenu { width: max(100%, 220px); }
 :global(.dark) .menu { background: var(--nav-raised, var(--control)); box-shadow: 0 10px 30px rgb(0 0 0 / 30%); }
 @media (prefers-reduced-motion: reduce) { .trigger, .trigger > svg, .menu { transition: none; } }
 
