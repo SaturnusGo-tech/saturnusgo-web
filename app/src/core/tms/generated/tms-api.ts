@@ -929,7 +929,7 @@ export interface paths {
         head?: never;
         /**
          * Submit the active attempt result
-         * @description passed requires every required step to be passed; failed requires actualResult or comment; blocked requires a reason. Invalid transitions return stable domain codes.
+         * @description passed requires every required step to be passed; failed requires actualResult or comment; blocked requires a reason. Invalid transitions return stable domain codes. When the final included case passes, the server completes the active run in the same transaction and stops its clock. For a multi-project batch, every included case across all members must pass before all members complete together. Empty, partial, failed, blocked or skipped scopes do not auto-complete. Clients refresh the run or batch after a successful item mutation; replay does not repeat completion events.
          */
         patch: operations["updateRunItemStatus"];
         trace?: never;

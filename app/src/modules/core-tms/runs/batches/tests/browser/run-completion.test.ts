@@ -57,3 +57,24 @@ test("a late completion response cannot redirect a user who selected another run
   release({ data: run("current", "completed") }); await pending;
   assert.equal(f.finished.length, 0); assert.equal(f.updates.length, 0); f.h.dispose();
 });
+
+test("server completion advances to the next run or empty state without another complete command", async () => {
+  for (const remaining of [[], [run("next", "draft")]]) {
+    const f = fixture(remaining); await f.prepare();
+    f.input.selected = run("current", "completed");
+    f.input.knownRuns = [f.input.selected, ...remaining];
+    f.render(); await tick();
+    assert.equal(f.finished.length, 1);
+    assert.equal(f.finished[0]?.id ?? null, remaining[0]?.id ?? null);
+    f.render(); assert.equal(f.finished.length, 1); f.h.dispose();
+  }
+});
+
+test("opening historical results does not redirect and completed retests keep the fix confirmation available", async () => {
+  const history = fixture(); history.input.selected = run("current", "completed");
+  await history.prepare(); assert.equal(history.finished.length, 0); history.h.dispose();
+  const retest = fixture(); await retest.prepare();
+  retest.input.selected = { ...run("current", "completed"), configuration: { fixVerificationScope: "defect-a" } };
+  retest.render(); await tick(); assert.equal(retest.finished.length, 0);
+  assert.equal(retest.updates[0][0].status, "completed"); retest.h.dispose();
+});

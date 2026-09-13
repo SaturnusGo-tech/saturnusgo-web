@@ -134,6 +134,35 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
   const choices = [...batches.map((b) => ({ id: b.id, name: `${b.iteration.name} · ${b.sequence}`, runs: b.runs, tags: b.iteration.tags, createdAt: b.createdAt })),
     ...input.knownRuns.filter((r) => !batchMembers.has(r.id)).map((r) => ({ id: r.id, name: r.name, runs: [r], tags: [], createdAt: r.createdAt }))]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const observed = useRef({ scope: "", status: input.selected?.status });
+  useEffect(() => {
+    const scope = `${input.workspaceId}:${selectedId ?? ""}`;
+    const before = observed.current;
+    observed.current = { scope, status: input.selected?.status };
+    if (before.scope !== scope || before.status !== "active" || input.selected?.status !== "completed" || pending.current) return;
+    const controller = new AbortController();
+    const completed = input.selected;
+    async function reconcileCompletion() {
+      try {
+        let updated = [completed];
+        if (batchId) {
+          const next = await getRunBatch(http, input.workspaceId, batchId, controller.signal);
+          if (controller.signal.aborted) return;
+          updated = next.runs;
+          setBatches(values => [...values.filter(value => value.id !== next.id), next]);
+        }
+        if (controller.signal.aborted) return;
+        latest.current.onUpdate(updated);
+        // Keep the completed verification result visible until QA confirms the defect fix.
+        if (!completed.configuration?.fixVerificationScope) latest.current.onFinished?.(nextRunAfterFinish(choices, updated));
+      } catch (err) {
+        if (!controller.signal.aborted) setError(formatTmsMutationFailure(toTmsMutationFailure(err),
+          input.ru ? "Прогон завершён. Не удалось обновить список прогонов." : "Run completed. Could not refresh runs."));
+      }
+    }
+    void reconcileCompletion();
+    return () => controller.abort();
+  }, [http, input.workspaceId, selectedId, input.selected?.status, batchId]);
   return { ready: !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries, loading, busy, error, act, selectedRuns,
     refresh: () => setRevision((n) => n + 1) };
 }
