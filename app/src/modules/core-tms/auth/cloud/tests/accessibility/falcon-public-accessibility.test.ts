@@ -32,7 +32,7 @@ test("Falcon landing has one company login action and accessible chapter navigat
 });
 
 test("every landing demonstration has a real MP4, poster and timed text", () => {
-  assert.equal(demos.integrations.src, "/falcon/landing/2026-09-production/youtrack.mp4");
+  assert.equal(demos.integrations.src, "/falcon/landing/2026-09-production/youtrack-20260913.mp4");
   assert.equal(Object.keys(demos).length, 7);
   for (const { id, src, poster: posterPath, captions: captionsPath } of Object.values(demos)) {
     const video = readFileSync(resolve(root, `public${src}`));
