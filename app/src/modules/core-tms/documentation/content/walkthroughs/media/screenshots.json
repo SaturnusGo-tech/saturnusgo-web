@@ -99,10 +99,6 @@
     "width": 1728,
     "height": 1020
   },
-  "defect-03-evidence-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
   "organization-folder-01-tree-20260913": {
     "width": 1728,
     "height": 1020
@@ -380,6 +376,10 @@
     "height": 1020
   },
   "marker-02-preview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "defect-routing-light-20260914": {
     "width": 1728,
     "height": 1020
   }
