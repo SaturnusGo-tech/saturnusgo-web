@@ -1,5 +1,7 @@
+"use client";
+import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
 import { ArrowUpRight, FileSearch } from "lucide-react";
-import { docArticles, docGroups } from "../../content/catalog";
+import { docGroups } from "../../content/catalog";
 import { searchArticles } from "../../model/search";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import styles from "../documentation.module.css";
@@ -7,6 +9,7 @@ import styles from "../documentation.module.css";
 export function SearchResults({ query, navigation, onSelect }: {
   query: string; navigation: ReturnType<typeof useDocumentationNavigation>; onSelect: () => void;
 }) {
+  const { docArticles } = useDocumentationCatalog();
   const results = searchArticles(docArticles, query);
   return <section className={styles.searchResults} aria-label="Результаты поиска">
     <span className={styles.eyebrow}>Поиск по руководству</span><h1>Результаты поиска</h1>

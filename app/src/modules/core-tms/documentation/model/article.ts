@@ -20,6 +20,7 @@ export type DocArticle = {
   sections: DocSection[];
   related: string[];
   status?: "planned";
+  adminOnly?: boolean;
   sources?: { title: string; url: string }[];
 };
 

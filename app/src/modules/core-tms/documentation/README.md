@@ -43,7 +43,12 @@ Do not generate or retouch interface controls, expose credentials, or capture
 customer records. Clearly label hypothetical defects and unsaved setup forms.
 
 Store JPEG captures under `public/falcon/docs/<edition>/`. The current edition
-was captured on 8–9 September 2026. `media/screenshots.json` records each image's
+includes the 13–14 September 2026 refresh of projects, portfolios, environments,
+cases, folders, AI, markers, import/export, suites, runs, defects and dashboard.
+These captures use a 1728-pixel-wide browser viewport (1728×1020 captured content),
+with collapsed navigation and neutral guide data. Versioned `-20260913` filenames
+avoid stale image caches. Unchanged integration and administration illustrations
+retain their original capture dates. `media/screenshots.json` records each image's
 intrinsic dimensions; `screenshotStep` restricts references to this inventory.
 When replacing captures, update dimensions and provenance together. The visual
 catalog tests check JPEG headers, size limits, coverage and discoverability.
@@ -53,3 +58,7 @@ enlargement, previous/next, arrow keys and Escape; it uses the current theme.
 Test keyboard focus restoration, article navigation, image loading, and narrow
 screens. Capture dimensions can vary with the real browser viewport.
 The `/falcon/` public prefix is included in the existing Pages export pipeline.
+
+The `company-access` article is admin-only. `useDocumentationCatalog` filters
+the catalog before direct lookup, navigation, search and related links.
+Falcon AI and colored markers are separate articles.

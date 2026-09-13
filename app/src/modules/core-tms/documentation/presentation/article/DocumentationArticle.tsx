@@ -1,6 +1,8 @@
+"use client";
+import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Clock3, Link as LinkIcon } from "lucide-react";
 import type { DocArticle } from "../../model/article";
-import { articleById, docArticles, docGroups } from "../../content/catalog";
+import { docGroups } from "../../content/catalog";
 import { readingMinutes } from "../../model/search";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import { ArticleBlocks } from "../content/ArticleBlocks";
@@ -10,6 +12,7 @@ import styles from "../documentation.module.css";
 export function DocumentationArticle({ article, navigation }: {
   article: DocArticle; navigation: ReturnType<typeof useDocumentationNavigation>;
 }) {
+  const { docArticles, articleById } = useDocumentationCatalog();
   const index = docArticles.indexOf(article);
   const adjacent = [{ label: "Предыдущая статья", article: docArticles[index - 1], Icon: ArrowLeft },
     { label: "Следующая статья", article: docArticles[index + 1], Icon: ArrowRight }];
@@ -38,6 +41,6 @@ export function DocumentationArticle({ article, navigation }: {
     <nav className={styles.pagination} aria-label="Соседние статьи">{adjacent.map(({ label, article: neighbor, Icon }) => neighbor
       ? <a key={label} href={navigation.link(neighbor.id)} onClick={(event) => navigation.navigate(event, neighbor.id)}>
         <span>{label}</span><strong><Icon size={15} />{neighbor.title}</strong></a> : <span key={label} />)}</nav>
-    <footer className={styles.articleFooter}>Falcon · Руководство пользователя<span>Редакция от 12 сентября 2026</span></footer>
+    <footer className={styles.articleFooter}>Falcon · Руководство пользователя<span>Редакция от 14 сентября 2026</span></footer>
   </article>;
 }

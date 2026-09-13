@@ -1,36 +1,4 @@
 {
-  "archive-01-removed": {
-    "width": 1280,
-    "height": 720
-  },
-  "archive-02-filter": {
-    "width": 1280,
-    "height": 720
-  },
-  "archive-03-restore": {
-    "width": 1280,
-    "height": 720
-  },
-  "case-01-library": {
-    "width": 1280,
-    "height": 720
-  },
-  "case-02-context": {
-    "width": 1280,
-    "height": 720
-  },
-  "case-03-add-step": {
-    "width": 1280,
-    "height": 720
-  },
-  "case-04-ready": {
-    "width": 1280,
-    "height": 720
-  },
-  "case-05-saved": {
-    "width": 1280,
-    "height": 720
-  },
   "confluence-01-connection": {
     "width": 1087,
     "height": 814
@@ -38,106 +6,6 @@
   "confluence-02-events": {
     "width": 1087,
     "height": 814
-  },
-  "dashboard-v2-01-empty": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-05-size": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-10-runs": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v2-11-library": {
-    "width": 1087,
-    "height": 814
-  },
-  "dashboard-v3-02-catalog": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-03-preview": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-04-edit": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-06-remove": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-07-overview": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-08-freshness": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v3-09-context": {
-    "width": 1280,
-    "height": 720
-  },
-  "dashboard-v4-01-component": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-02-selection": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-03-builder": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-04-defects": {
-    "width": 1359,
-    "height": 1018
-  },
-  "dashboard-v4-05-runs": {
-    "width": 1359,
-    "height": 1018
-  },
-  "defect-01-failed-step": {
-    "width": 1087,
-    "height": 814
-  },
-  "defect-02-context": {
-    "width": 1087,
-    "height": 814
-  },
-  "defect-03-evidence": {
-    "width": 1087,
-    "height": 814
-  },
-  "edit-01-description": {
-    "width": 1280,
-    "height": 720
-  },
-  "edit-02-saved": {
-    "width": 1280,
-    "height": 720
-  },
-  "execute-01-result": {
-    "width": 1087,
-    "height": 814
-  },
-  "execute-02-steps-passed": {
-    "width": 1087,
-    "height": 814
-  },
-  "execute-03-complete-action": {
-    "width": 563,
-    "height": 875
-  },
-  "execute-04-completed": {
-    "width": 563,
-    "height": 875
   },
   "github-01-connection": {
     "width": 1087,
@@ -174,58 +42,6 @@
   "linear-02-events": {
     "width": 1087,
     "height": 814
-  },
-  "organization-01-catalog": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-02-portfolio": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-03-project-dialog": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-04-project-overview": {
-    "width": 1087,
-    "height": 814
-  },
-  "organization-folder-01-tree": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-folder-02-create": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-folder-03-selection": {
-    "width": 1087,
-    "height": 814
-  },
-  "organization-folder-04-move": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-folder-06-archive": {
-    "width": 1536,
-    "height": 1024
-  },
-  "run-01-library": {
-    "width": 940,
-    "height": 900
-  },
-  "run-02-scope": {
-    "width": 940,
-    "height": 900
-  },
-  "run-03-target": {
-    "width": 940,
-    "height": 900
-  },
-  "run-04-started": {
-    "width": 563,
-    "height": 874
   },
   "settings-01-general": {
     "width": 1280,
@@ -275,22 +91,6 @@
     "width": 1087,
     "height": 814
   },
-  "swagger-01-connection": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-02-auth": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-03-operations": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-04-request": {
-    "width": 1087,
-    "height": 814
-  },
   "trello-01-connection": {
     "width": 1087,
     "height": 814
@@ -298,34 +98,6 @@
   "trello-02-events": {
     "width": 1087,
     "height": 814
-  },
-  "workspace-03-project": {
-    "width": 1087,
-    "height": 814
-  },
-  "workspace-v2-01-settings": {
-    "width": 1280,
-    "height": 720
-  },
-  "workspace-v2-02-environment": {
-    "width": 1280,
-    "height": 720
-  },
-  "organization-05-portfolio-create": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-06-markdown-edit": {
-    "width": 1536,
-    "height": 1024
-  },
-  "organization-07-workflow": {
-    "width": 1087,
-    "height": 814
-  },
-  "organization-folder-05-import": {
-    "width": 1536,
-    "height": 1024
   },
   "company-login": {
     "width": 1280,
@@ -350,5 +122,249 @@
   "company-member-detail": {
     "width": 1280,
     "height": 720
+  },
+  "case-05-saved-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "archive-01-removed-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "archive-02-filter-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "archive-03-restore-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "case-01-library-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "case-02-context-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "case-03-add-step-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "case-04-ready-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "revision-01-edit-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "edit-02-saved-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "edit-03-history-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "defect-01-context-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "defect-02-fields-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "defect-03-evidence-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-01-tree-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-02-create-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-03-selection-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-04-move-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-05-import-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "import-02-destination-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "import-03-export-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-06-archive-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-01-catalog-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-05-portfolio-create-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-02-portfolio-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-07-workflow-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-03-project-dialog-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-06-markdown-edit-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-04-project-overview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "run-01-library-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "run-02-scope-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "run-03-target-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "run-04-started-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "execute-01-result-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "execute-02-steps-passed-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "execute-03-complete-action-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "execute-04-completed-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-01-create-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-02-list-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-03-detail-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-03-project-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-04-portfolio-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-v2-01-settings-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-v2-02-environment-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-01-empty-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-02-catalog-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-03-preview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-04-edit-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-05-size-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-06-overview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-07-context-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "dashboard-08-records-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "ai-01-request-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "ai-02-preview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "ai-03-replaced-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "marker-01-palette-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "marker-02-preview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-01-connection": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-02-auth": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-03-operations": {
+    "width": 1087,
+    "height": 814
+  },
+  "swagger-04-request": {
+    "width": 1087,
+    "height": 814
   }
 }

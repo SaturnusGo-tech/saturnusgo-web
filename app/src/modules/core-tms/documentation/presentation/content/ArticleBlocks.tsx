@@ -1,6 +1,7 @@
+"use client";
+import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
 import { ArrowUpRight, CheckCircle2, Info, TriangleAlert } from "lucide-react";
 import type { DocBlock } from "../../model/article";
-import { articleById } from "../../content/catalog";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import { CopyButton } from "../controls/CopyButton";
 import { InlineText } from "./InlineText";
@@ -12,6 +13,7 @@ export function ArticleBlocks({ blocks, navigation }: { blocks: DocBlock[]; navi
   return <>{blocks.map((block, index) => <Block key={index} block={block} navigation={navigation} />)}</>;
 }
 function Block({ block, navigation }: { block: DocBlock; navigation: Navigation }) {
+  const { articleById } = useDocumentationCatalog();
   switch (block.kind) {
     case "walkthrough": return <ArticleWalkthrough block={block} />;
     case "paragraph": return <p><InlineText text={block.text} /></p>;

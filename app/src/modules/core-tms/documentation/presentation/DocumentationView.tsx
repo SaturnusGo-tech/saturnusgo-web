@@ -1,9 +1,9 @@
 "use client";
+import { useDocumentationCatalog } from "../access/useDocumentationCatalog";
 
 import { BookOpen, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useColorMode } from "../../../../shared/_hooks/useColorMode";
-import { articleById } from "../content/catalog";
 import { useDocumentationNavigation } from "../navigation/useDocumentationNavigation";
 import { DocumentationTree } from "./navigation/DocumentationTree";
 import { DocumentationArticle } from "./article/DocumentationArticle";
@@ -11,6 +11,7 @@ import { SearchResults } from "./search/SearchResults";
 import styles from "./documentation.module.css";
 
 export function DocumentationView() {
+  const { articleById } = useDocumentationCatalog();
   const navigation = useDocumentationNavigation();
   const { isLight, toggleAnimated } = useColorMode();
   const [query, setQuery] = useState("");

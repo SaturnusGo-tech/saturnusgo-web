@@ -2,7 +2,7 @@ import { bullets, note, paragraph, section, steps, table, type DocArticle } from
 import { companyAccessWalkthrough, companyMembersWalkthrough } from "../walkthroughs/access/company";
 
 export const companyAccessArticles: DocArticle[] = [
-  { id: "company-access", title: "Вход и личный профиль", group: "start",
+  { id: "company-access", adminOnly: true, title: "Вход и личный профиль", group: "start",
     description: "Первый вход в компанию, пароль, двухэтапный вход, фотография и управление своими сессиями.",
     keywords: ["логин", "пароль", "вход", "аватар", "фотография", "профиль", "MFA", "восстановить доступ"],
     related: ["company-administration", "permissions", "quick-start"], sections: [

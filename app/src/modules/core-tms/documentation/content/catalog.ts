@@ -1,3 +1,4 @@
+import { coloredMarkerArticle } from "./writing/marker";
 import { writingAssistantArticle } from "./writing/assistant";
 import { supportArticle } from "./support/contact";
 import { companyAccessArticles } from "./access/company-access";
@@ -35,7 +36,7 @@ export const docGroups = [
 ] as const;
 export const docArticles: readonly DocArticle[] = [
   supportArticle,
-  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, writingAssistantArticle, caseCommentsArticle, ...caseOrganization,
+  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, writingAssistantArticle, coloredMarkerArticle, caseCommentsArticle, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
   ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,

@@ -1,8 +1,10 @@
+import { suiteWalkthrough } from "../walkthroughs/runs/suites";
 import { note, paragraph, section, steps, table, type DocArticle } from "../../model/article";
 export const suitesArticle: DocArticle = {
   id: "test-suites", title: "Наборы тестов", group: "runs", description: "Подготовьте повторяемый состав проверок для смоука, регресса и событий CI.",
   keywords: ["сьют", "suite", "набор", "регресс", "smoke", "папки", "Falcon AI"], related: ["create-run", "github", "organize-cases"],
   sections: [
+    section("walkthrough", "На практике", suiteWalkthrough),
     section("purpose", "Для чего нужен сьют", paragraph("Сьют собирает проверки для повторных запусков: смоука после сборки, регресса перед релизом или проверки отдельной области продукта. Изменение сьюта не переписывает уже созданные прогоны.")),
     section("catalog", "Найти нужный сьют", paragraph("Каталог показывает наборы выбранного проекта компактными строками: название, ключ, способ формирования, количество кейсов и дата обновления."),
       table(["Элемент", "Как использовать"],

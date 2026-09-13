@@ -1,6 +1,8 @@
+"use client";
+import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
 import { BookOpen, ChevronDown, FileText, Search, X } from "lucide-react";
 import { useEffect, useState, type RefObject } from "react";
-import { docArticles, docGroups } from "../../content/catalog";
+import { docGroups } from "../../content/catalog";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import styles from "../documentation.module.css";
 
@@ -8,6 +10,7 @@ export function DocumentationTree({ navigation, query, onQuery, searchRef, onNav
   navigation: ReturnType<typeof useDocumentationNavigation>; query: string; onQuery: (value: string) => void;
   searchRef: RefObject<HTMLInputElement | null>; onNavigate: () => void; onSearch: () => void;
 }) {
+  const { docArticles } = useDocumentationCatalog();
   const [closed, setClosed] = useState<string[]>([]);
   const group = docArticles.find((a) => a.id === navigation.articleId)?.group;
   useEffect(() => { if (group) setClosed((items) => items.filter((id) => id !== group)); }, [group]);

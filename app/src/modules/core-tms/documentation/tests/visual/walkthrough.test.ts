@@ -26,7 +26,7 @@ function jpegDimensions(bytes: Buffer) {
 }
 
 test("practical guide articles contain complete, captioned screenshot sequences", () => {
-  for (const id of ["create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run",
+  for (const id of ["falcon-ai-writing", "colored-marker", "test-suites", "create-test-case", "edit-test-case", "archive-test-case", "shared-steps", "create-run", "execute-run",
     "workspace", "portfolios", "organize-cases", "import-export", "dashboard", "create-defect", "jira", "linear", "trello", "github", "slack", "confluence", "swagger", "company-access", "company-administration"]) {
     assert.ok(flows.some(({ article }) => article.id === id), id);
   }
@@ -59,6 +59,6 @@ test("every published screenshot has accurate dimensions and fits the asset budg
 test("instructions, outcomes and image descriptions participate in documentation search", () => {
   const article = articleById.get("create-test-case")!;
   assert.ok(searchArticles([article], "начальное состояние").length);
-  assert.ok(searchArticles([article], "GUIDE-TC-1").length);
+  assert.ok(searchArticles([article], "GUIDEWEB-TC-1").length);
   assert.ok(searchArticles(docArticles, "учебный прогон").some((result) => result.article.id === "create-run"));
 });
