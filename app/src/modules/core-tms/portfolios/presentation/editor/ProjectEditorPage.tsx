@@ -4,7 +4,7 @@ import { organizationCopy } from "../../management/model/copy";
 import { organizationErrors, focusOrganizationError } from "./validation/validate";
 import { EditorActions } from "./actions/EditorActions";
 import { useId, useState } from "react";
-import { PiCheck, PiFolderSimpleDuotone, PiPlus, PiSpinnerGap } from "react-icons/pi";
+import { PiFolderSimpleDuotone } from "react-icons/pi";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useProjectForm } from "../../../projects/state/dialog/useProjectForm";
@@ -43,7 +43,7 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
   }}>
     <header className={styles.heading}><PiFolderSimpleDuotone size={24} className={styles.projectIcon} aria-hidden="true" />
       <div className={css.titleField}><label className={styles.srOnly} htmlFor="project-title">{copy.projectName}</label>
-        <input id="project-title" autoFocus required data-field="name" aria-invalid={attempted && Boolean(errors.name)} aria-describedby={attempted && errors.name ? `${formId}-name-error` : undefined} maxLength={120} disabled={form.pending} value={form.name}
+        <input data-inline-title id="project-title" autoFocus required data-field="name" aria-invalid={attempted && Boolean(errors.name)} aria-describedby={attempted && errors.name ? `${formId}-name-error` : undefined} maxLength={120} disabled={form.pending} value={form.name}
           onChange={(event) => form.updateName(event.target.value)} placeholder={copy.projectName} data-testid="project-name" />{attempted && errors.name && <span id={`${formId}-name-error`} className={css.limit} role="alert">{errors.name}</span>}</div>
       <EditorActions targetId={actionsTargetId} formId={formId} pending={form.pending} saveLabel={current ? copy.save : copy.newProject} cancelLabel={copy.cancel} onCancel={onCancel} />
     </header>
@@ -64,7 +64,7 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
       <div className={css.property}><span>{organizationCopy(locale).phase}</span><WorkflowSelect value={workflowPhase} disabled={form.pending} onChange={form.setWorkflowPhase} /></div>
       <label className={css.property}><span>{copy.key}</span><input data-field="key" aria-invalid={attempted && Boolean(errors.key)} required disabled={form.pending || Boolean(current)} minLength={2} maxLength={12}
         pattern="[A-Z][A-Z0-9]{1,11}" value={form.key} onChange={(event) => form.setKey(event.target.value.replace(/[^a-z0-9]/gi, "").toUpperCase())}
-        placeholder={formCopy.keyPlaceholder} aria-describedby={`${formId}-key-hint`} />{attempted && errors.key && <span className={css.limit} role="alert">{errors.key}</span>}
+        placeholder={formCopy.keyPlaceholder} aria-describedby={!current ? `${formId}-key-hint` : undefined} />{attempted && errors.key && <span className={css.limit} role="alert">{errors.key}</span>}
       {!current && <p className={css.note} id={`${formId}-key-hint`}>{formCopy.newKeyHint} <code>{form.key || formCopy.keyPlaceholder}-TC-1</code></p>}</label>
       <div className={css.property}><span>{copy.portfolio}</span><AnimatedSelect label={copy.portfolio} value={form.portfolioId ?? ""} options={options}
         disabled={form.pending} onChange={(value) => form.setPortfolioId(value || null)} />
