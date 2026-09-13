@@ -166,7 +166,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       selectedDefectStatus={model.selectedDefectResource.status}
       onRetrySelectedDefect={model.selectedDefectResource.retry}
       onNew={() => model.setDialog("defect")}
-      onOpenRun={model.openRun}
+      onOpenRun={model.openRun} defectRetest={model.defectRetest}
     />
   );
 }

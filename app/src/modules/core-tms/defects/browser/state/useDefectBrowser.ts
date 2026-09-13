@@ -7,22 +7,23 @@ import { createLocalDefectBrowser } from "../data/local-defect-browser";
 import { DefectBrowserController } from "../application/DefectBrowserController";
 import { subscribeDefectsChanged } from "../../application/defect-resource-events";
 import { scheduleVisibleDefectRefresh } from "../../../state/defect-refresh/visible-defect-refresh";
-import { emptyDefectBrowser } from "../model/defect-browser";
+import { emptyDefectBrowser, type DefectBrowserScope } from "../model/defect-browser";
 
-export function useDefectBrowser({ workspaceId, projectId, query, connected, defects, severitySort, selectedDefectId }: {
+export function useDefectBrowser({ workspaceId, projectId, query, connected, defects, severitySort, selectedDefectId, scope = "active" }: {
   workspaceId?: string; projectId?: string; query: string; connected: boolean;
   defects: Defect[]; selectedDefectId?: string | null; severitySort?: "asc" | "desc" | null;
+  scope?: DefectBrowserScope;
 }) {
   const http = useTmsHttpClient();
   const source = useMemo(() => connected ? createHttpDefectBrowser(http) : createLocalDefectBrowser(defects),
     [http, connected, connected ? null : defects]);
   const controller = useMemo(() => new DefectBrowserController(source), [source]);
-  const key = JSON.stringify([workspaceId ?? "", projectId ?? "", query.trim(), severitySort ?? null]);
+  const key = JSON.stringify([workspaceId ?? "", projectId ?? "", query.trim(), severitySort ?? null, scope]);
   const state = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
   useEffect(() => {
     controller.reset();
     const timer = setTimeout(() => {
-      if (projectId) controller.configure(key, { projectId, q: query.trim(), severitySort });
+      if (projectId) controller.configure(key, { projectId, q: query.trim(), severitySort, scope });
     }, query.trim() ? 225 : 0);
     return () => { clearTimeout(timer); controller.reset(); };
   }, [controller, key, projectId]);

@@ -1,6 +1,10 @@
 .pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; container: reports-list / inline-size; }
-.header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; }
+.header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 24px; }
 .header h1 { margin: 0; color: var(--report-strong); font-size: 16px; line-height: 1.4; font-weight: 600; }
+.scopes { display: flex; align-items: center; gap: 4px; }
+.scopes button { min-height: 32px; padding: 6px 10px; color: var(--report-muted); background: transparent; border: 0; border-radius: 9px; font-size: 12px; cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.scopes button:hover { background: var(--report-hover); color: var(--report-text); }
+.scopes button[aria-pressed="true"] { background: var(--report-selection); color: var(--report-primary); font-weight: 600; }
 .newButton.newButton { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 14px; color: #fff; background: var(--report-primary); border: 0; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 550; }
 .newButton:hover { background: #2d67da; }
 .toolbar { display: flex; align-items: center; gap: 10px; padding: 0 24px 18px; }
@@ -16,6 +20,9 @@
 .summary strong { overflow: hidden; max-width: 65%; color: var(--report-strong); font-weight: 600; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .total { color: var(--report-muted); font-variant-numeric: tabular-nums; }
 .metrics { display: flex; flex-wrap: wrap; gap: 12px; margin-left: auto; color: var(--report-muted); font-size: 11px; }
+.scopeHint { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 24px 12px; color: var(--report-muted); font-size: 12px; line-height: 1.5; }
+.scopeHint button, .empty button { border: 0; border-radius: 8px; padding: 5px 7px; background: transparent; color: var(--report-primary); font-size: 12px; cursor: pointer; }
+.scopeHint button:hover, .empty button:hover { background: var(--report-hover); }
 .viewport { min-height: 0; flex: 1; overflow: auto; padding: 0 18px 24px; scrollbar-gutter: stable; scrollbar-color: var(--report-control-border) transparent; }
 .groups { list-style: none; margin: 0; padding: 0; }
 .message { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px; color: var(--report-muted); font-size: 12px; }
@@ -36,6 +43,7 @@
   .toolbar { padding-inline: 14px; flex-wrap: wrap; }
   .search { flex-basis: calc(100% - 46px); }
   .summary { padding-inline: 18px; }
+  .scopeHint { margin-inline: 14px; }
   .metrics { width: 100%; margin-left: 0; }
   .viewport { padding-inline: 10px; }
 }

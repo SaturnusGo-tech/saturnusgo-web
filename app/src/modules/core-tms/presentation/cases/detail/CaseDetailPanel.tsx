@@ -1,3 +1,4 @@
+import { useCaseActivityNavigation } from "../../../test-cases/navigation/activity/useCaseActivityNavigation";
 import { ListChecks, Pencil } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Activity, TestCaseRevision, TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -73,6 +74,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
     setHeaderEditing(null);
     headerReturnFocus.current = null;
   }, [props.testCase?.id, creating]);
+  useCaseActivityNavigation(props.testCase?.projectId, props.testCase?.id, setTab);
   useEffect(() => {
     const closed = editorSessionClosed(editorWasOpen.current, editorOpen);
     editorWasOpen.current = editorOpen;

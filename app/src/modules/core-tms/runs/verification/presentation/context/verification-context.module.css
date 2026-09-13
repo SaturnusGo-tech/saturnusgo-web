@@ -1,0 +1,23 @@
+.context { container: verification-context / inline-size; display: grid; gap: 12px; margin: 0 0 26px; padding: 0 0 22px; border-bottom: 1px solid var(--runs-border, #d3d5da); color: var(--runs-text, #1f2329); }
+.context > header { display: flex; align-items: center; gap: 8px; color: var(--runs-primary, #3574f0); }
+.context h2 { margin: 0; color: var(--runs-strong, #111318); font-size: 15px; font-weight: 600; }
+.row { display: flex; align-items: flex-start; gap: 10px; padding-top: 4px; }
+.row > svg { flex: none; margin-top: 5px; color: var(--runs-muted, #73767d); }
+.row > div { flex: 1; min-width: 0; }
+.link { display: flex; flex-wrap: wrap; gap: 3px 8px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--runs-text, #1f2329); text-align: left; line-height: 1.5; font: inherit; font-size: 13px; cursor: pointer; }
+.link strong { color: var(--runs-link, #315fba); font-weight: 600; }
+.link span { overflow-wrap: anywhere; }
+.row small, .row p, .message { color: var(--runs-muted, #73767d); font-size: 12px; line-height: 1.5; }
+.row p { margin: 5px 0 0; }
+.row small { display: block; margin-top: 3px; }
+.confirm, .open, .message button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; min-height: 34px; padding: 7px 11px; border: 0; border-radius: 18px; background: var(--runs-selection, #e6efff); color: var(--runs-primary, #3574f0); font: inherit; font-size: 12px; cursor: pointer; }
+.confirm { background: var(--runs-primary, #3574f0); color: #fff; }
+.open { background: transparent; }
+.open:hover, .message button:hover { background: var(--runs-hover, #f0f1f3); }
+.confirm:hover { filter: brightness(.96); }
+.context button:focus-visible { outline: 2px solid var(--runs-primary, #3574f0); outline-offset: 3px; }
+.context button:disabled { opacity: .6; cursor: default; }
+.loading { display: grid; gap: 8px; }
+.loading i { height: 14px; width: 80%; max-width: 400px; border-radius: 6px; background: var(--runs-hover, #f0f1f3); }
+.loading i:last-child { width: 50%; }
+@container verification-context (max-width: 580px) { .row { flex-wrap: wrap; } .row > div { flex-basis: calc(100% - 28px); } .row > button { margin-left: 26px; } }

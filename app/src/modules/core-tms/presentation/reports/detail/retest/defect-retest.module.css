@@ -1,0 +1,19 @@
+.start { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 8px 14px; border: 0; border-radius: 999px; background: #3478f6; color: #fff; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.start svg { flex: none; display: block; }
+.start:hover { background: #286ae8; }
+.start:disabled { opacity: .55; cursor: default; }
+.start:focus-visible, .cancel:focus-visible { outline: 2px solid #80baff; outline-offset: 3px; }
+.dialog { width: min(460px, calc(100vw - 32px)) !important; height: auto !important; min-height: 0 !important; max-height: calc(100dvh - 32px) !important; }
+.form { display: grid; align-content: start; overflow-y: auto; gap: 20px; padding: 22px 24px 24px; }
+.form p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--tms-text-secondary, var(--muted, #687580)); }
+.form label { display: grid; gap: 8px; font-size: 13px; }
+.form input, .form select { box-sizing: border-box; width: 100%; min-width: 0; height: 42px; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: 12px; background: transparent; color: inherit; padding: 0 12px; font: inherit; }
+.form select option { color: #17212e; background: #fff; }
+.form input:focus, .form select:focus { outline: 2px solid #70acff; outline-offset: 2px; }
+.form footer { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.cancel { min-height: 36px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); padding: 7px 14px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.form .error { color: #dc646d; }
+.spinner { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@container report-detail (max-width: 520px) { .start > span { display: none; } .start { padding: 8px 10px; } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

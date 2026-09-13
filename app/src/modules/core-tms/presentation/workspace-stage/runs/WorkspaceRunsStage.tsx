@@ -1,3 +1,6 @@
+import { VerificationRunContext } from "../../../runs/verification/presentation/context/VerificationRunContext";
+import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
+import { visitWorkspace } from "../../../state/navigation/browser/workspace-history";
 import { useRunRepository } from "../../runs/repository/state/useRunRepository";
 import { useRunExecutionNavigation } from "../../runs/navigation/state/useRunExecutionNavigation";
 import { useState } from "react";
@@ -29,6 +32,11 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
       <div style={{ flex: 1, minHeight: 0 }}>
       <RunsView
+        verificationContext={<VerificationRunContext run={model.selectedRun} item={execution.selectedItem}
+          connected={model.connection === "connected"} onOpenDefect={model.openDefect}
+          onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {
+            workspaceId: model.data.workspace.id, projectId: model.project!.id, caseId,
+          }, { activity: true }))} />}
         navigation={<RunRepositoryBrowser model={model} repository={repository} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={impactEnabled && (!impact.ready || Boolean(impact.error) || impact.items.some((item) => !item.approved))} />}
         onDirtyChange={setExecutionDirty}
         workspaceId={model.data.workspace.id}

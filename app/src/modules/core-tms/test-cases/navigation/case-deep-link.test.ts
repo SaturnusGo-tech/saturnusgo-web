@@ -42,3 +42,15 @@ test("reads and clears the selected case without changing the route", () => {
   assert.deepEqual(readCaseDeepLink(href), { projectId: "p1", caseId: "c1" });
   assert.equal(clearCaseDeepLink(href), "https://tms.saturnusgo.com/testcases/umbrella-home/work/");
 });
+
+
+test("retest handoff opens case activity and keeps it only while the same case is selected", () => {
+  const href = buildCaseDeepLink("https://tms.example/work/?workspaceId=w&projectId=p&view=runs&runId=old", {
+    workspaceId: "w", projectId: "p", caseId: "c",
+  }, { activity: true });
+  assert.equal(new URL(href).searchParams.get("caseTab"), "activity");
+  assert.equal(new URL(href).searchParams.get("runId"), null);
+  assert.equal(new URL(buildCaseDeepLink(href, { workspaceId: "w", projectId: "p", caseId: "c" })).searchParams.get("caseTab"), "activity");
+  assert.equal(new URL(buildCaseDeepLink(href, { workspaceId: "w", projectId: "p", caseId: "other" })).searchParams.get("caseTab"), null);
+  assert.equal(new URL(clearCaseDeepLink(href)).searchParams.get("caseTab"), null);
+});

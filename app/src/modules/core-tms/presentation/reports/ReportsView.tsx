@@ -10,10 +10,12 @@ import { DefectBrowser } from "./browser/DefectBrowser";
 import { DefectReportDetail, type DetailTab } from "./detail/DefectReportDetail";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useDefectCommentTab } from "../../state/defect-navigation/useDefectCommentTab";
+import type { DefectRetest } from "../../runs/verification/state/defect/useDefectRetest";
 import surface from "./reports.module.css";
 
 export function ReportsView({ workspaceId, projectId, projectName = "", defects, runs, links, selectedDefectId, onSelectDefect,
-  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, connected = false, canComment = false }: {
+  selectedDefectStatus, onRetrySelectedDefect, onNew, onOpenRun, defectRetest, connected = false, canComment = false }: {
+  defectRetest?: DefectRetest;
   connected?: boolean; canComment?: boolean;
   workspaceId?: string; projectId?: string; projectName?: string;
   defects: Defect[];
@@ -60,7 +62,7 @@ export function ReportsView({ workspaceId, projectId, projectName = "", defects,
             tab={detailTab}
             onTabChange={setDetailTab}
             onBack={() => selectDefect(null)}
-            onOpenRun={onOpenRun}
+            onOpenRun={onOpenRun} retest={defectRetest}
           />
         : selectedDefectStatus === "error"
           ? <div className={surface.detailError} role="alert"><Bug size={22} /><strong>{locale === "ru" ? "Не удалось открыть баг-репорт" : "Could not open the bug report"}</strong><span>{locale === "ru" ? "Проверьте подключение и повторите." : "Check the connection and try again."}</span><button type="button" onClick={onRetrySelectedDefect}>{locale === "ru" ? "Повторить" : "Retry"}</button></div>

@@ -65,7 +65,7 @@ export interface paths {
         put?: never;
         /**
          * Create or open a standard run for the current verification queue
-         * @description Rechecks scope under transactional locks, deduplicates cases, and reuses an active run for the same scope, environment and build. Does not confirm fixes. Requires run management and execution capabilities.
+         * @description Rechecks selected scope under transactional locks and deduplicates linked cases. Optional defectId must match the queue request. Reuses only an active verification run for the same scope, environment and build with unfinished available items; finished runs and runs with only terminal item results create a fresh active run with untouched historical results. Does not confirm fixes or reopen defects. Requires run management and execution capabilities. Retry an uncertain request with the same idempotency key; a new intentional verification uses a new key.
          */
         post: operations["createVerificationRun"];
         delete?: never;
@@ -88,7 +88,7 @@ export interface paths {
         };
         /**
          * Find test cases linked to fixes awaiting QA
-         * @description Project-scoped queue, up to 100 entries per page. Scope token covers the complete snapshot. Above 10,000 occurrence mappings the request explicitly fails rather than truncating scope. Archived or deprecated cases and missing exact steps are listed as blocked.
+         * @description Project-scoped queue, optionally restricted to one defectId. Scope token covers the complete selected snapshot, independent of pagination. A selected defect must belong to this project and be unarchived and ready_for_retest (404 if missing, 409 otherwise). Above 10,000 occurrence mappings the request explicitly fails rather than truncating scope. Archived or deprecated cases and missing exact steps are listed as blocked.
          */
         get: operations["getVerificationQueue"];
         put?: never;
@@ -1040,7 +1040,7 @@ export interface paths {
         };
         /**
          * List project defects
-         * @description Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters.
+         * @description Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all.
          */
         get: operations["listDefects"];
         put?: never;
@@ -3952,7 +3952,7 @@ export interface paths {
         };
         /**
          * Browse project defect component groups
-         * @description Requires defect:read. Groups nonarchived defects by their exact stored component label. Empty component is an unclassified group. Counts and groupCount cover the entire q-filtered project and are computed from one SQL snapshot regardless of group pagination. q has the same literal normalized matching as GET /defects. Groups are ordered by component in deterministic C collation; group cursors are bound to project and q. No folder attribution is inferred from occurrences.
+         * @description Requires defect:read. Groups nonarchived defects by their exact stored component label. Empty component is an unclassified group. Counts and groupCount cover the entire q-filtered project and are computed from one SQL snapshot regardless of group pagination. q has the same literal normalized matching as GET /defects. Groups are ordered by component in deterministic C collation; group cursors are bound to project and q. No folder attribution is inferred from occurrences. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all.
          */
         get: operations["listDefectGroups"];
         put?: never;
@@ -3980,6 +3980,8 @@ export interface components {
             environmentId: components["schemas"]["Identifier"];
             build: string;
             name: string;
+            /** @description Optional single defect scope, matching the verification-queue request. Must be unarchived and ready_for_retest. */
+            defectId?: components["schemas"]["Identifier"];
         };
         VerificationQueue: {
             scopeToken: string;
@@ -9036,6 +9038,8 @@ export interface operations {
             query?: {
                 offset?: number;
                 limit?: number;
+                /** @description Select only the linked cases and affected steps of this defect. Omit to select the whole project verification queue. */
+                defectId?: components["schemas"]["Identifier"];
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -10542,6 +10546,8 @@ export interface operations {
                 component?: string;
                 /** @description Severity ordering; continuation preserves this ordering. */
                 severitySort?: "asc" | "desc";
+                /** @description Lifecycle browse scope. active excludes verified and closed; closed includes only verified and closed; all retains every nonarchived status. Applied before pagination and group counts. Cursors cannot cross scopes. */
+                scope?: "active" | "closed" | "all";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -16324,6 +16330,8 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 cursor?: string;
                 q?: string;
+                /** @description Lifecycle browse scope. active excludes verified and closed; closed includes only verified and closed; all retains every nonarchived status. Applied before pagination and group counts. Cursors cannot cross scopes. */
+                scope?: "active" | "closed" | "all";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

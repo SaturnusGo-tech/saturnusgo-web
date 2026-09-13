@@ -21,6 +21,7 @@ import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
 type RunsViewProps = {
   executionPending?: boolean; emptyFiltered?: boolean;
+  verificationContext?: ReactNode;
   navigation: ReactNode; onDirtyChange?: (dirty: boolean) => void;
   workspaceId: string;
   offline: boolean;
@@ -40,7 +41,7 @@ type RunsViewProps = {
   onArchive: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ executionPending = false, emptyFiltered = false, navigation, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
+export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
@@ -78,6 +79,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
       <div className={runStyles.detailContent}>
         <div className={runStyles.overviewLayout}>
           <div className={runStyles.primaryColumn}>
+            {verificationContext}
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
               <p>{selectedItem.snapshot.description || (locale === "ru" ? "Описание не указано." : "No description.")}</p>

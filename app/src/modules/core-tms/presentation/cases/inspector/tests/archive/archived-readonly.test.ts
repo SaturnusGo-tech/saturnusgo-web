@@ -23,6 +23,7 @@ function render(path: string, exported: string, props: unknown, menu = false) {
         useEffect: () => {}, useRef: (current: unknown) => ({ current }), useId: () => "inspector",
       };
       if (name.endsWith("inspector/model") || name === "./model") return model;
+      if (name.endsWith("useCaseActivityNavigation")) return { useCaseActivityNavigation: () => {} };
       if (name.endsWith("CaseAttachmentDraftContext")) return { useCaseAttachmentDraft: () => undefined, CaseAttachmentDraftProvider: "CaseAttachmentDraftProvider" };
       if (name.endsWith("collaboration/model")) return { caseActivityForKey: () => [] };
       if (name.endsWith("test-case-collaboration")) return { readyDefectCount: () => 0 };

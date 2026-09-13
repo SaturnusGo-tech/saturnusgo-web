@@ -84,3 +84,15 @@ test("generated run names fit the contract while preserving the complete build r
   assert.ok(body.name.length <= 240);
   assert.doesNotMatch(body.name, /[\uD800-\uDBFF]$/);
 });
+
+
+test("defect queue encodes its scope and does not request the project-wide queue", async () => {
+  let url = "";
+  const http = createTmsHttpClient({ apiBase: "https://api.example.test/api/v1", accessToken: async () => "qa-token",
+    fetch: (async (input) => { url = String(input); return new Response(JSON.stringify(queue)); }) as typeof fetch });
+  await getVerificationQueue(http, "project-1", 50, undefined, "bug/a & b");
+  const parsed = new URL(url);
+  assert.equal(parsed.searchParams.get("defectId"), "bug/a & b");
+  assert.equal(parsed.searchParams.get("offset"), "50");
+  assert.equal(parsed.pathname, "/api/v1/projects/project-1/verification-queue");
+});

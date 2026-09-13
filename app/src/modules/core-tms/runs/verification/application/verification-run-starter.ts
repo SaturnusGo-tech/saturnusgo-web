@@ -7,24 +7,25 @@ export function createVerificationRunStarter(http: TmsHttpClient, newKey = () =>
   const pending = new Map<string, PendingStart>();
   const active = new Map<string, ReturnType<typeof createVerificationRun>>();
   return {
-    pending(projectId: string) { return pending.get(projectId)?.body ?? null; },
+    pending(projectId: string, defectId?: string) { return pending.get(JSON.stringify([projectId, defectId ?? null]))?.body ?? null; },
     async start(projectId: string, body: VerificationRunRequest, signal?: AbortSignal) {
-      const running = active.get(projectId);
+      const scope = JSON.stringify([projectId, body.defectId ?? null]);
+      const running = active.get(scope);
       if (running) return running;
-      const operation = pending.get(projectId) ?? { key: newKey(), body: { ...body } };
-      pending.set(projectId, operation);
+      const operation = pending.get(scope) ?? { key: newKey(), body: { ...body } };
+      pending.set(scope, operation);
       const request = createVerificationRun(http, projectId, operation.body, operation.key, signal);
-      active.set(projectId, request);
+      active.set(scope, request);
       try {
         const result = await request;
-        pending.delete(projectId);
+        pending.delete(scope);
         return result;
       } catch (error) {
         if (error instanceof TmsApiError && [400, 403, 404, 409, 422].includes(error.status)) {
-          pending.delete(projectId);
+          pending.delete(scope);
         }
         throw error;
-      } finally { if (active.get(projectId) === request) active.delete(projectId); }
+      } finally { if (active.get(scope) === request) active.delete(scope); }
     },
   };
 }

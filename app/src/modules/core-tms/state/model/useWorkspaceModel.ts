@@ -17,6 +17,7 @@ import { useDefectNavigation } from "../defect-navigation/useDefectNavigation";
 import { useSelectedDefectResource } from "../defect-resource/useSelectedDefectResource";
 import { useRunNavigation } from "../run-navigation/useRunNavigation";
 import { useSharedSteps } from "../../shared-steps/state/useSharedSteps";
+import { useDefectRetest } from "../../runs/verification/state/defect/useDefectRetest";
 import { useWorkspaceVerification } from "../../runs/verification/state/workspace/useWorkspaceVerification";
 
 export function useWorkspaceModel() {
@@ -67,6 +68,8 @@ export function useWorkspaceModel() {
   }, [state.view, state.canWriteNavigation, defectNavigation.canonicalizeSelectedDefect, derived.project?.id,
     selectedDefectResource.data?.projectId, selectedDefectResource.status]);
   const selectedDefect = selectedDefectResource.data;
+  const defectRetest = useDefectRetest(state, derived, selectedDefect
+    ?? derived.projectDefects.find((item) => item.id === defectNavigation.selectedDefectId), openRun);
   const reportDefects = selectedDefect
     && !derived.projectDefects.some((defect) => defect.id === selectedDefect.id)
     ? [...derived.projectDefects, selectedDefect] : derived.projectDefects;
@@ -89,7 +92,7 @@ export function useWorkspaceModel() {
     reportDefects,
     selectedDefectResource,
     sharedSteps,
-    verification,
+    verification, defectRetest,
     canManageIntegrations: capabilities.includes("integration:manage"),
   };
 }

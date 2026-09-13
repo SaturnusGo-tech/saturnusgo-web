@@ -69,3 +69,37 @@ test("unresolved operations remain isolated when switching projects", async () =
     { project: "project-1", key: "key-1", build: "build-42" },
   ]);
 });
+
+
+test("uncertain defect starts stay isolated from other defects and the whole project", async () => {
+  const requests: { body: unknown; key: string }[] = []; let serial = 0;
+  const starter = createVerificationRunStarter(client((async (_url, init) => {
+    requests.push({ body: JSON.parse(String(init?.body)), key: new Headers(init?.headers).get("Idempotency-Key") ?? "" });
+    if (requests.length === 1) throw new TypeError("Network lost after commit");
+    return new Response(JSON.stringify({ data: run }));
+  }) as typeof fetch), () => `key-${++serial}`);
+  const defectA = { ...request, defectId: "bug-a" };
+  await assert.rejects(starter.start("project-1", defectA));
+  await starter.start("project-1", { ...request, defectId: "bug-b" });
+  await starter.start("project-1", request);
+  assert.deepEqual(starter.pending("project-1", "bug-a"), defectA);
+  assert.equal(starter.pending("project-1", "bug-b"), null);
+  assert.equal(starter.pending("project-1"), null);
+  await starter.start("project-1", { ...defectA, build: "changed" });
+  assert.deepEqual(requests.map((item) => item.key), ["key-1", "key-2", "key-3", "key-1"]);
+  assert.deepEqual(requests[3].body, requests[0].body);
+});
+
+test("concurrent defects are independent while duplicate taps share their operation", async () => {
+  const bodies: string[] = []; let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  const starter = createVerificationRunStarter(client((async (_url, init) => {
+    bodies.push(String(init?.body)); await gate; return new Response(JSON.stringify({ data: run }));
+  }) as typeof fetch));
+  const a = starter.start("project-1", { ...request, defectId: "a" });
+  const duplicate = starter.start("project-1", { ...request, defectId: "a" });
+  const b = starter.start("project-1", { ...request, defectId: "b" });
+  release(); await Promise.all([a, duplicate, b]);
+  assert.equal(bodies.length, 2);
+  assert.deepEqual(bodies.map((body) => JSON.parse(body).defectId).sort(), ["a", "b"]);
+});

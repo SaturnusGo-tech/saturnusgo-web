@@ -3,7 +3,7 @@ import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 
 import {
-  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, Play, X,
+  ArrowLeft, CircleDashed, ExternalLink as ExternalLinkIcon, Link2, Paperclip, X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Defect, ExternalLink, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
@@ -14,12 +14,15 @@ import { localizedComponentLabel, localizedLabel } from "../../../localization/f
 import { DefectDiscussion } from "./discussion/DefectDiscussion";
 import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShareItem";
 import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
+import type { DefectRetest } from "../../../runs/verification/state/defect/useDefectRetest";
+import { DefectRetestAction } from "./retest/DefectRetestAction";
 import surface from "../reports.module.css";
 import detail from "./defect-detail.module.css";
 
 export type DetailTab = "overview" | "attachments";
 
-export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, connected = false, canComment = false }: {
+export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTabChange, onBack, onOpenRun, retest, connected = false, canComment = false }: {
+  retest?: DefectRetest;
   connected?: boolean; canComment?: boolean;
   workspaceId?: string;
   defect: Defect;
@@ -46,9 +49,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
             const url = new URL(window.location.href); if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
             return buildDefectDeepLink(url.href, { projectId: defect.projectId, defectId: defect.id });
           }} />
-          {defect.runId && <button type="button" className={detail.runButton} title={t("reports.openRun")} aria-label={t("reports.openRun")} onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>
-            <Play size={15} fill="currentColor" aria-hidden="true" />
-          </button>}
+          {retest && <DefectRetestAction retest={retest} defectKey={defect.key} />}
           <button className={surface.mobileBack} type="button" onClick={onBack} aria-label={t("reports.backToList")}><ArrowLeft size={17} /></button>
           <button className={surface.closeButton} type="button" onClick={onBack} aria-label={t("reports.backToList")}><X size={18} /></button>
         </div>
@@ -83,7 +84,8 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
           </DetailSection>
           <DetailSection title={t("reports.executionContext")}>
             {defect.runId ? <dl className={surface.contextList}>
-              <div><dt>{t("reports.run")}</dt><dd>{run ? `${run.key} · ${run.name}` : defect.runId}</dd></div>
+              <div><dt>{locale === "ru" ? "Исходный прогон" : "Original run"}</dt><dd><button type="button" className={detail.originLink}
+                onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>{run ? `${run.key} · ${run.name}` : defect.runId}</button></dd></div>
               <div><dt>{t("reports.runItem")}</dt><dd>{defect.runItemId || "—"}</dd></div>
               <div><dt>{t("reports.step")}</dt><dd>{defect.stepId || "—"}</dd></div>
             </dl> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}

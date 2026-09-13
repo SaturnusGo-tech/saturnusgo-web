@@ -16,6 +16,7 @@ export function createHttpDefectBrowser(http: TmsHttpClient): DefectBrowserSourc
   }
   const parameters = (query: DefectBrowserQuery, cursor: string | null) => {
     const params = new URLSearchParams({ projectId: query.projectId, limit: "50" });
+    if (query.scope) params.set("scope", query.scope);
     if (query.q) params.set("q", query.q);
     if (cursor) params.set("cursor", cursor);
     return params;
