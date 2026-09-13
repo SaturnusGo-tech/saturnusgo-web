@@ -40,7 +40,9 @@ void test("tenant journal never accepts a client company override and auth failu
   await assert.rejects(client.journal(false, "foreign-workspace", "last-event", new AbortController().signal), (error: unknown) => {
     assert.ok(error instanceof AdministrationError); assert.equal(error.code, "SESSION_REQUIRED"); assert.equal(error.requestId, "test-request-001"); return true;
   });
-  assert.ok(urls[0].includes("/company/audit?limit=30&cursor=last-event"));
+  const url = new URL(urls[0]);
+  assert.equal(url.pathname, "/api/v1/company/audit");
+  assert.equal(url.searchParams.get("limit"), "30"); assert.equal(url.searchParams.get("cursor"), "last-event");
   assert.ok(!urls[0].includes("foreign-workspace"));
 });
 

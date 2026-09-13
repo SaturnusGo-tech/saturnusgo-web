@@ -23,12 +23,15 @@ export function useAdministrationNavigation() {
     if (next.id) query.set("id", next.id);
     if (next.page) query.set("page", next.page);
     if (next.creating) query.set("create", "true");
-    transitionContent(() => {
+    const commit = () => {
       const path = next.section ? `/${next.section}/` : window.location.pathname;
       window.history.pushState({}, "", `${path}${query.size ? `?${query}` : ""}`);
       setRoute(currentRoute());
       window.scrollTo({ top: 0 });
-    });
+    };
+    const previous = currentRoute();
+    if (previous.section === "admin" && (!next.section || next.section === "admin") && !previous.page && !next.page) commit();
+    else transitionContent(commit);
   }, []);
   return { route, navigate };
 }

@@ -12024,6 +12024,29 @@
               "maximum": 100,
               "default": 30
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Case-insensitive search by actor or target name."
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "changes",
+                "access"
+              ],
+              "default": "all"
+            },
+            "description": "Company/member changes, authentication activity, or all events."
           }
         ],
         "responses": {
@@ -12136,6 +12159,29 @@
               "maximum": 100,
               "default": 30
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Case-insensitive search by actor or target name."
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "changes",
+                "access"
+              ],
+              "default": "all"
+            },
+            "description": "Company/member changes, authentication activity, or all events."
           }
         ],
         "responses": {
@@ -12258,6 +12304,29 @@
               "maximum": 100,
               "default": 30
             }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Case-insensitive search by actor or target name."
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "changes",
+                "access"
+              ],
+              "default": "all"
+            },
+            "description": "Company/member changes, authentication activity, or all events."
           }
         ],
         "responses": {
@@ -32363,7 +32432,8 @@
           },
           "login": {
             "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$",
+            "description": "Optional. When omitted, Falcon allocates a unique username within the company from the email address and returns it with the created member."
           },
           "email": {
             "type": "string",
@@ -32394,7 +32464,6 @@
         },
         "required": [
           "name",
-          "login",
           "email",
           "role"
         ]

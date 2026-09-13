@@ -1,31 +1,47 @@
 "use client";
 
-import { ChevronRight, Plus, UsersRound } from "lucide-react";
+import { Plus, Search, UserRoundPlus } from "lucide-react";
+import { useEffect, useRef } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { useAdministrationList } from "../../application/list/useAdministrationList";
-import { AccessField } from "../../../auth/managed/presentation/fields/AccessField";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
 import { ResourceState } from "../common/ResourceState";
-import { StatusBadge } from "../common/StatusBadge";
-import styles from "../layout/administration.module.css";
+import { MemberDirectoryRow } from "../directory/MemberDirectoryRow";
+import styles from "../directory/directory.module.css";
 
-export function MemberList({ client, onOpen, onCreate }: {
+export function MemberList({ client, onOpen, onCreate, selectedId, creating, version, disabled }: {
   readonly client: AdministrationPort; readonly onOpen: (id: string) => void; readonly onCreate: () => void;
+  readonly selectedId: string | null; readonly creating: boolean; readonly version: number; readonly disabled: boolean;
 }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
   const list = useAdministrationList(client.members);
-  return <>
-    <header className={styles.heading}><h1>{copy.employees}</h1><button className={styles.primary} onClick={onCreate}><Plus size={17} />{copy.newMember}</button></header>
-    <div className={styles.toolbar}><AccessField label={copy.memberSearch} type="search" value={list.search} maxLength={200} onChange={(event) => list.setSearch(event.target.value)} /></div>
-    {list.loading || (list.error && !list.items.length) ? <ResourceState loading={list.loading} error={list.error} retry={list.refresh} />
-      : !list.items.length ? <div className={styles.empty}><UsersRound size={35} strokeWidth={1.1} /><h2>{copy.noMembers}</h2></div>
-      : <div className={styles.list}>{list.items.map((member) => <button key={member.identityId} className={styles.row} onClick={() => onOpen(member.identityId)}>
-        <span className={styles.rowTitle}><span className={styles.avatar}>{member.name.slice(0, 2).toUpperCase()}</span><span><strong>{member.name}</strong><small>{member.email}</small></span></span>
-        <StatusBadge status={member.status} member /><small>{member.owner ? copy.owner : member.login}</small><ChevronRight size={16} />
-      </button>)}</div>}
-    {list.error && list.items.length > 0 && <ResourceState loading={false} error={list.error} retry={() => void list.more()} />}
-    {list.cursor && <div className={styles.actions}><button className={styles.button} disabled={list.pending} onClick={() => void list.more()}>{copy.more}</button></div>}
-  </>;
+  const directory = useRef<HTMLElement | null>(null);
+  const covered = creating || !!selectedId;
+  useEffect(() => {
+    const narrow = window.matchMedia("(max-width: 1050px)");
+    const update = () => { if (directory.current) directory.current.inert = covered && narrow.matches; };
+    const frame = requestAnimationFrame(update);
+    narrow.addEventListener("change", update);
+    return () => { cancelAnimationFrame(frame); narrow.removeEventListener("change", update); if (directory.current) directory.current.inert = false; };
+  }, [covered]);
+  useEffect(() => { if (version) list.refresh(); }, [version, list.refresh]);
+  return <section ref={directory} className={styles.directory} aria-label={copy.employees}>
+    <header className={styles.heading}><h1>{copy.employees}</h1><button onClick={onCreate} disabled={disabled}
+      aria-label={copy.newMember} title={copy.newMember}><Plus size={23} strokeWidth={1.5} /></button></header>
+    <label className={styles.search}><Search size={19} strokeWidth={1.6} /><input type="search" aria-label={copy.memberSearch}
+      placeholder={copy.memberSearch} value={list.search} maxLength={200} onChange={(event) => list.setSearch(event.target.value)} /></label>
+    <div className={styles.people} aria-busy={list.loading}>
+      {list.loading ? <div className={styles.skeletons} aria-label={locale === "ru" ? "Загрузка сотрудников" : "Loading people"}>
+        {[0, 1, 2].map((item) => <div className={styles.skeletonRow} key={item}><i /><span /><span /></div>)}
+      </div> : list.items.map((member) => <MemberDirectoryRow key={member.identityId} member={member} client={client}
+        selected={selectedId === member.identityId && !creating} disabled={disabled} onOpen={onOpen} />)}
+      {!list.loading && !list.error && !list.items.length && <p className={styles.empty}>{copy.noMembers}</p>}
+      {list.error && <ResourceState loading={false} error={list.error} retry={list.refresh} />}
+      {creating && <div className={styles.newPerson} aria-current="true"><UserRoundPlus size={26} strokeWidth={1.4} />
+        {locale === "ru" ? "Новый сотрудник" : "New person"}</div>}
+      {list.cursor && <button className={styles.more} disabled={list.pending} onClick={() => void list.more()}>{copy.more}</button>}
+    </div>
+  </section>;
 }

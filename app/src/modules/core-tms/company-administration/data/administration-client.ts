@@ -14,8 +14,8 @@ export function createAdministrationClient(http: TmsHttpClient): AdministrationP
     }
   };
   const get = <T>(path: string, signal: AbortSignal) => call(async () => (await http.getResource<T>(path, signal)).data);
-  const list = <T>(path: string, search: string, cursor: string | null, signal: AbortSignal): Promise<ResultPage<T>> => call(async () => {
-    const query = new URLSearchParams({ limit: "30", ...(search ? { search } : {}), ...(cursor ? { cursor } : {}) });
+  const list = <T>(path: string, search: string, cursor: string | null, signal: AbortSignal, extra: Record<string, string> = {}): Promise<ResultPage<T>> => call(async () => {
+    const query = new URLSearchParams({ ...extra, limit: "30", ...(search ? { search } : {}), ...(cursor ? { cursor } : {}) });
     const result = await http.get<{ data: T[]; meta: { nextCursor: string | null } }>(`${path}?${query}`, signal);
     return { items: result.data, nextCursor: result.meta.nextCursor };
   });
@@ -26,8 +26,8 @@ export function createAdministrationClient(http: TmsHttpClient): AdministrationP
   return {
     companyOptions: (signal) => get<CompanyOptions>("/platform/company-options", signal),
     ownCompany: (signal) => get<Company>("/company", signal),
-    journal: (platform, id, cursor, signal) => list<AdministrationEvent>(platform
-      ? (id ? `/platform/companies/${encodeURIComponent(id)}/audit` : "/platform/audit") : "/company/audit", "", cursor, signal),
+    journal: (platform, id, cursor, signal, filter) => list<AdministrationEvent>(platform
+      ? (id ? `/platform/companies/${encodeURIComponent(id)}/audit` : "/platform/audit") : "/company/audit", filter?.search ?? "", cursor, signal, { category: filter?.category ?? "all" }),
     avatar: (id, signal) => get(avatarPath(id), signal),
     uploadAvatar: async (id, version, file, key, signal) => {
       const imageBase64 = await avatarFileBase64(file, signal);

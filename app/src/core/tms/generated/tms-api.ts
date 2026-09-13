@@ -7081,7 +7081,8 @@ export interface components {
         };
         CompanyMemberDraft: {
             name: string;
-            login: string;
+            /** @description Optional. When omitted, Falcon allocates a unique username within the company from the email address and returns it with the created member. */
+            login?: string;
             /** Format: email */
             email: string;
             phone?: string;
@@ -14652,6 +14653,10 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                /** @description Case-insensitive search by actor or target name. */
+                search?: string;
+                /** @description Company/member changes, authentication activity, or all events. */
+                category?: "all" | "changes" | "access";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -14692,6 +14697,10 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                /** @description Case-insensitive search by actor or target name. */
+                search?: string;
+                /** @description Company/member changes, authentication activity, or all events. */
+                category?: "all" | "changes" | "access";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -14732,6 +14741,10 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                /** @description Case-insensitive search by actor or target name. */
+                search?: string;
+                /** @description Company/member changes, authentication activity, or all events. */
+                category?: "all" | "changes" | "access";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

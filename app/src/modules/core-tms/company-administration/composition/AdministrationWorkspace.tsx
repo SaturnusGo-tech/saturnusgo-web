@@ -2,7 +2,8 @@
 
 import { CompanyOverview } from "../presentation/company-overview/CompanyOverview";
 import { AdministrationJournal } from "../presentation/audit/AdministrationJournal";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useAdministrationResource } from "../application/state/useAdministrationResource";
 import type { SignedInCompanySession } from "../../auth/managed/domain/managed-access";
 import { createAuthenticatedTmsHttpClient } from "../../auth/http/createAuthenticatedTmsHttpClient";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -13,9 +14,7 @@ import { administrationCopy } from "../presentation/copy/administration-copy";
 import { CompanyList } from "../presentation/companies/CompanyList";
 import { CreateCompany } from "../presentation/companies/CreateCompany";
 import { CompanyDetail } from "../presentation/company-detail/CompanyDetail";
-import { MemberList } from "../presentation/members/MemberList";
-import { CreateMember } from "../presentation/members/CreateMember";
-import { MemberDetail } from "../presentation/member-detail/MemberDetail";
+import { MemberWorkspace } from "../presentation/directory/MemberWorkspace";
 import { ProfilePage } from "../presentation/profile-page/ProfilePage";
 
 export function AdministrationWorkspace({ session, logout, section: initialSection }: {
@@ -31,15 +30,17 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
   const onCreate = () => navigate({ id: null, creating: true });
   const forbidden = (section === "sandbox" && session.audience !== "platform")
     || (section === "admin" && (session.audience !== "tenant" || session.identity.role !== "workspace_admin"));
-  return <AdministrationShell onNavigate={navigate} section={section} page={route.page} session={session} logout={logout}>
+  const canReadCompany = session.audience === "tenant" && session.identity.role === "workspace_admin";
+  const company = useAdministrationResource(useCallback((signal: AbortSignal) => canReadCompany
+    ? client.ownCompany(signal) : Promise.resolve(null), [client, canReadCompany]));
+  return <AdministrationShell companyName={company.value?.name} client={client} onNavigate={navigate} section={section} page={route.page} session={session} logout={logout}>
     {forbidden ? <p>{copy.noPermission}</p> : section === "profile" ? <ProfilePage client={client} />
       : route.page === "audit" ? <AdministrationJournal client={client} platform={session.audience === "platform"} />
-      : section === "admin" && route.page === "company" ? <CompanyOverview client={client} />
+      : section === "admin" && route.page === "company" ? <CompanyOverview resource={company} />
       : section === "sandbox" ? (route.creating ? <CreateCompany client={client} onBack={onBack} onCreated={onOpen} />
         : route.id ? <CompanyDetail key={route.id} id={route.id} client={client} onBack={onBack} />
           : <CompanyList client={client} onOpen={onOpen} onCreate={onCreate} />)
-        : route.creating ? <CreateMember client={client} owner={session.identity.owner} onBack={onBack} onCreated={onOpen} />
-          : route.id ? <MemberDetail key={route.id} id={route.id} client={client} session={session} onBack={onBack} />
-            : <MemberList client={client} onOpen={onOpen} onCreate={onCreate} />}
+        : <MemberWorkspace client={client} session={session} id={route.id} creating={route.creating}
+            onBack={onBack} onOpen={onOpen} onCreate={onCreate} />}
   </AdministrationShell>;
 }

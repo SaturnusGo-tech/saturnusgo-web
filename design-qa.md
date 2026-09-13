@@ -1,184 +1,58 @@
-# Test-case discussion and shared editor QA
+# Falcon administration · selected option 3
 
-Date: 2026-09-11
+13 September 2026. Implemented in the existing application. User approved revision 3, option 3 and required panels to enter from the right and leave to the right.
 
-Scope: the latest supplied editor and quotation references, Screenshot 2026-09-11 at 3.49.44 AM and 3.50.01 AM, plus the recipient strip shown at 3.37.19 AM. Earlier collapsed and inline reply editor designs are superseded.
+## Comparison target and evidence
 
-## Visual result
+- Source: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-admin-design-20260913/revision-3/option-3-graphite-directory.png`.
+- Source raster: 1561 × 1008 px, no browser chrome. The design was requested for a 1728 × 1117 viewport; its generated raster has approximately the same aspect ratio.
+- Implementation: `/admin/?create=true`, actual AdministrationWorkspace and transport client. For local visual and interaction checks only, network responses are simulated; backend persistence is tested independently against PostgreSQL.
+- CSS viewport: 1728 × 1117; deviceScaleFactor: 1. Actual screenshot: 1728 × 1117.
+- Normalization: render the reference raster into the same 1728 × 1117 frame in Chromium. This introduces less than two pixels of vertical aspect adjustment and no crop or browser frame.
+- State: Russian, dark theme, create employee, Dmitry Sokolov / dmitry@example.test / tester, focused email. The source shows an additional caret in the name while email has its focus border; actual browser focus belongs to email only.
+- Full-view comparison input contained both `implementation/ui/reference-normalized.png` and `implementation/ui/implementation-normalized.png` under the absolute output directory above.
+- Focused comparison input contained both `implementation/ui/reference-editor.png` and `implementation/ui/implementation-editor.png`; identical clip x=828, y=100, width=900, height=410. Checked name weight, label alignment, focus border, row separators and role control.
 
-- The shared Markdown editor is always open above the flat discussion. No extra reply forms below messages and no Cancel button for the shared editor.
-- A single thin outline with no shadow, including focused state. Paperclip, divider, Mention and Post are inside the editor.
-- A reply shows the original content below the formatting toolbar with a blue rule. A subtle strip below the editor contains the recipient/avatar and removal control. Clearing it removes the quote and strip while retaining the draft.
-- Posted replies quote the parent content above their own body. Thread relationships, collapse controls, member avatars and action menus remain.
-- Comments have transparent backgrounds, no card borders or radii. Existing Falcon typography and light/dark colors remain.
-- Desktop and narrow-screen screenshots were compared with the user's references. No airplane badge or unsupported toolbar actions were added.
+## Findings and resolution history
 
-Evidence: `/tmp/falcon-comment-redesign/final-editor-dark.png`, `final-editor-light.png` (1280 × 720), and `final-editor-mobile.png` (390 × 844).
+1. P2 — early implementation used smaller navigation and directory type than the normalized reference. Increased desktop body text to 16 px, directory heading to 28 px, row names to 17 px, secondary text to 14 px, and matched header/search spacing. Reduced the large editable name's optical weight. Recaptured and compared the normalized full view and focused editor after these changes.
+2. P2 — the initial narrow-screen directory could remain keyboard-accessible underneath the panel. The covered list now becomes inert, is restored on close, and panel focus returns to the originating action. Tested at 390 and 800 px.
+3. P2 — initial full-height rules allowed the employee workspace to overflow its available mobile height. The containing main/canvas now use the actual remaining height with independent panel scrolling. Recaptured all four widths and verified no horizontal page overflow.
+4. P2 — an early company screenshot captured an unfinished view transition and appeared faded. Verified the actual completed transition and recaptured the visible page; this was an evidence-timing issue, not a palette change.
+5. P2 — initial popover positioning put the account menu above a mobile header. It now opens below that header; keyboard tests verify its actions stay in view.
 
-## Functional checks
+Post-fix evidence is in `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-admin-design-20260913/implementation/ui/`: normalized comparisons, create/company/journal captures at 1728, 1366, 800 and 390 px; light/dark create captures; `results.json`, `motion-results.json`, and `keyboard-results.json`.
 
-- Exactly one shared textbox. No Cancel control in its idle/reply states. It remains open and clears after a successful post.
-- Replying to the first or last/nested message targets the same editor. Removing the recipient retains the text. Existing parent IDs and threaded navigation are preserved.
-- Computed editor-shell focus shadow: none. Document width equals viewport width at 390 px; footer controls fit without overlap.
-- Isolated actual comment API and disposable PostgreSQL: posted text and two attachment references persist and render after save. Upload transport in this UI check was a local delayed fixture, not production R2. One failed upload blocked Post; retry retained the first successful file and draft. No production messages or notification events were created for QA.
-- Attachment unit tests cover multiple files, failure/retry, operation-key reuse, cancellation/late responses, filename escaping, private reference round-trip and legacy text. Existing private attachment client tests cover intent/PUT/finalize, recovery and expiring access.
-- Browser console showed no errors/warnings in the isolated preview.
-- In-app documentation updated after the UX checks to match the always-open editor, contextual replies, attachments, mentions, notification channels, editing/deletion and sharing.
+## Required fidelity surfaces
 
-TypeScript, architecture, comment attachment, private attachment, comment link/state and documentation checks passed. Release verification is reported separately after deployment.
+- Typography: preserves the existing Falcon Geist font with system fallback. The raster reference does not supply a font file. Its lightweight editable name, restrained heading hierarchy, regular list names, muted metadata and wrapping are represented. Remaining family/rasterization differences are acceptable brand integration, not copied blurry raster text. The focused comparison confirms the name and email remain legible.
+- Layout and spacing: three adjoining regions, 276 px desktop navigation, approximately 552 px employee directory, remaining width for the editor. Flat 82 px field rows and the persistent list match the source composition. Mobile replaces the visible directory with the panel and preserves access to primary navigation.
+- Colors: graphite navigation #272729, directory #2d2d2f, editor #303032, separators #404042, main text #ededed, metadata #aaa9ad. Blue is reserved for actions and focus. Reference raster lighting/noise is intentionally expressed as flat surfaces to follow the user's minimal/flat requirement. Light theme uses the same hierarchy.
+- Images and icons: uses Falcon's existing mark asset and the real authenticated profile avatar. The generated portrait in the source was deliberately replaced with the user's actual photo, as previously required. Neutral initials remain only when a member has no avatar. Standard Lucide navigation/action icons remain crisp SVGs.
+- Content: three creation fields, no seat-capacity counters, percentage bars or explanatory marketing prose. Server allocates a unique login and returns normal credential handoff. Editing preserves login, phone, role and security controls. Company details use aligned rows; the audit journal uses a paginated table with server search and categories.
 
-No unresolved P0/P1/P2 visual findings within the reviewed scope.
+## Intentional adjustments
 
-final result: passed
+- The role chevron sits beside the role value rather than at the far edge, following the user's earlier control-alignment requirement.
+- Security operations and one-time credential handoff remain available; they are necessary administration behavior and are not replaced with fictional data.
+- Company and journal have no separate approved raster. They extend the selected navigation, typography, flat surfaces and row rhythm; their actual rendered states were inspected.
+- Existing platform-operator and personal-profile capabilities remain in their own sections. This selection applies to the customer's company administration.
 
-Follow-up, 2026-09-11: removed the decorative curved elbows at each nested reply, as requested in the 3.57.17 AM screenshot. Straight nesting rails and collapse/reopen behavior remain. Verified computed pseudo-element content is `none` for all nested replies and exercised collapse/reopen in the local browser. Evidence: `/tmp/falcon-comment-redesign/straight-threads-light.png`. CSS-only change; no data or reply logic changed.
+## Interaction and implementation checks
 
-## Bug-report discussions, 2026-09-11
+- Actual components: create, failed-save recovery retaining inputs, successful handoff, edit/save, preserved directory search, company details, journal search/category requests at 1728 × 1117, 1366 × 900, 800 × 900, 390 × 844. No page errors or horizontal page overflow.
+- Motion sampled on animation frames in light/dark with normal/reduced motion: normal x moves from offscreen right to its final position; exit moves back right; reduced motion has no displacement. Unmounted panel is removed after exit, and Escape restores trigger focus. A fixed 300 ms test wait was replaced by waiting for completed DOM/focus state, avoiding frame-scheduling flakiness.
+- Covered-list inertness and account-menu visibility verified at 800/390 px. Search and form controls are labeled, focus is visible, fields remain after request errors.
+- 26 managed frontend tests passed, including retention during refresh, stale company-response rejection and clearing data after permission loss.
+- Backend: 734 full-suite tests passed, including PostgreSQL creation/concurrency/idempotency/tenant isolation. The final audit category refinement also passed its PostgreSQL HTTP integration test. Type checks, lint, architecture checks, OpenAPI and existing migration checks passed.
+- No physical phone or Safari test was performed. Responsive checks used Chromium, not a claim of device testing.
 
-Reused the test-case discussion controller, editor, thread renderer and private attachment controls for defects. The overview has the same always-open composer, reply quote/recipient tray, author actions, mentions and comment links. Header copy icon precedes a 30 px circular blue Play button for the existing linked run. Enter moves left to right; exit reverses it, respecting reduced motion. Removed the competing whole-page animation on defect selection.
+## Implementation checklist
 
-Verified against the actual defect comment API with disposable PostgreSQL in Chrome and WebKit: create, reply through one shared editor, edit, reload, deep-link focus, close/reopen, light/dark blue-button contrast, and 390 px layout. Fixed the grid's implicit minimum width so description/editor stay within the mobile panel. No production comments or messages were sent for QA. Integration-link errors in the isolated fixture are from its intentionally absent connector routes.
+- [x] Reference and implementation opened together at matched dimensions and state.
+- [x] Full-view and focused comparisons completed after visual fixes.
+- [x] Employee directory, creation/editing, company, journal and real avatar implemented.
+- [x] Right-to-left entry and reverse exit, reduced motion and keyboard behavior verified.
+- [x] No remaining actionable P0/P1/P2 visual findings.
 
-Evidence: `/tmp/falcon-comment-preview/defect-webkit-1789119619035-mobile.png` and corresponding `-dark.png`; browser checks `/tmp/falcon-defect-browser.log`. Backend integration tests cover guarded deletion, concurrent versions, idempotency/pagination, reporter permissions, tenant isolation and Telegram/browser/Slack recipient routing. Frontend adapter, navigation and architecture checks passed. Public documentation now covers both discussion targets.
-
-## Reply composer tray contour, 2026-09-11
-
-Moved the reply recipient tray inside the shared editor frame. The editor and tray now share one outer border; the tray uses an 11px inner bottom radius inside the 12px frame. Removed the negative-margin join. No overflow clipping was introduced, so editor and mention menus remain unrestricted.
-
-Validated actual shared bug-report composer in Chrome and WebKit, light and dark themes. Removing the recipient hides the tray and preserves the draft. Typecheck, architecture (928 files), and diff whitespace checks passed. Screenshots: `/tmp/falcon-comment-preview/reply-tray-chrome-light.png`, `/tmp/falcon-comment-preview/reply-tray-webkit-dark.png`.
-
-## Compact Markdown scenario fields, 2026-09-11
-
-Scenario actions now edit as one multiline string instead of splitting each newline into an independent input. The shared compact field exposes bold, inline code, fenced code, and list tools while editing; otherwise it renders Markdown with a pencil. Expected results and existing step data use the same field. Original IDs, attachment ownership, revision strings, and save transport remain unchanged. Shared-step snapshots and run execution render the same Markdown. Updated authoring documentation.
-
-Chrome and WebKit checks on actual ScenarioStepEditor/ScenarioStepView: multiline JSON and tables, formatting a selected request, new empty case, Enter within a step, Escape, editing and saving/reloading a local fixture, light/dark themes, mobile width, no browser exceptions. Screenshots in `/tmp/falcon-step-preview/`. The fixture stores revisions locally; it does not claim a production write. Typecheck and architecture passed (932 files); 20 focused Markdown/attachment tests plus related run/documentation/scenario tests passed. Attachment upload and backend contracts were not changed.
-
-## Transparent narrative editors, 2026-09-11
-
-Added an opt-in plain appearance to the existing MarkdownField: transparent toolbar/content/footer, no outer box or focus shadow, rounded toolbar controls. Descriptions/preconditions can also activate through text or placeholder; pencil controls and existing section apply/cancel behavior remain available. Applied to case creation/editing and additional data, organization editor narratives, and defect creation descriptions. Defect detail renders saved description/expected Markdown. Case, organization and defect form action buttons use 12px radii. Comment composer appearance is not opted into the new variant.
-
-Defect descriptions may contain code copied from scenario steps, so the shared rich editor now supports lightweight fenced-code editing. The sanitizer retains literal HTML/XML within fences while suppressing raw markup outside them.
-
-Validated actual shared sections in Chrome and WebKit: text/placeholder activation, pencil, cancel restores original, apply retains draft, generic defect and organization narrative fields, code import, light/dark and mobile layout. Computed editor/toolbar backgrounds transparent, outer border 0 and shadow none in both engines. Screenshots: `/tmp/falcon-narrative-preview/chrome-dark.png`, `/tmp/falcon-narrative-preview/chrome-light.png`, `/tmp/falcon-narrative-preview/webkit-mobile.png`. Typecheck and architecture (936 files) passed; 31 focused tests passed. Backend transport is unchanged; fixture QA does not write production data.
-
-## Structured clipboard paste in compact scenario fields, 2026-09-11
-
-Added deterministic HTML-to-Markdown conversion with pinned Turndown 7.2.4. Browser clipboard headings, nested/ordered lists, strong text, links, preformatted payloads and tables preserve their structure in the existing action/expected/data fields. Conversion happens synchronously before saving. Plain-text-only paste and paste inside existing code stay literal. Existing attachment handling runs first. HTML remains inert, source controls/scripts are discarded and remote images are not fetched or treated as uploaded attachments. Oversized/unsupported HTML falls back to native plain text. No AI requests, backend/schema changes or rewriting of existing stored content.
-
-Chrome and WebKit browser checks passed using actual ScenarioStepEditor/ScenarioStepView: source-like GET article, three list levels with disc/circle/square markers, exact query parameters, indented JSON, table, selection replacement, undo/redo, light/dark themes and 390px width. Save/reload used the local revision fixture, not production writes. WebKit grouped execCommand insertion with prior typing, so replaced that path with a bounded editor draft history and explicit paste transactions. Screenshots: `/tmp/falcon-step-preview/paste-chrome-dark.png`, `/tmp/falcon-step-preview/paste-webkit-light.png`, `/tmp/falcon-step-preview/paste-webkit-mobile.png`. Authoring documentation describes paste and plain-text limitations.
-
-## Narrative edit motion and attachment hit areas, 2026-09-11
-
-Plain narrative fields retain rendered content while the lazy Markdown editor initializes. A shared transparent transition frame then crossfades the content and animates its measured height in both directions. CSS transitions retain their final opacity rather than resetting on a Web Animations completion frame. Read/exit layers are inert, rapid close/reopen is supported, focus is applied after the editor becomes interactive, and reduced-motion preferences disable movement. Existing comment editor loading stays unchanged. The narrative attachment footer has a 1px vertical divider to the right of the paperclip. Scenario attachment text and icon now form one native button; pending uploads and saved evidence remain separate controls.
-
-Verified actual components in Chrome and WebKit: sampled every frame for nonblank crossfade and intermediate heights; cold editor initialization, autofocus, apply/cancel/reopen, rapid toggles, light/dark themes, reduced motion, 390px overflow, file chooser opened by clicking the visible label and by Enter, and correct draft field ownership for two files. Local fixture only, no production writes/uploads. Existing Markdown, safe-code and saved-attachment checks: 19 passed; typecheck and architecture (941 files) passed. Evidence: `/tmp/falcon-narrative-preview/motion-webkit-dark.png`, `/tmp/falcon-narrative-preview/motion-chrome-light.png`, `/tmp/falcon-motion-final.log`, `/tmp/falcon-narrative-regression.log`.
-
-
-# Test run organization and filters — 2026-09-12
-
-Local implementation and production verification: passed after explicit user approval of backend, migration 0057 and frontend. Published frontend code `65bfdce6d3464dfe69238bacca007cdd8c401445`; backend code `63464a95b01224e131b3594294702cd38629e439`.
-
-## Reference and final UI
-
-Compared the supplied repository bulk-action reference (Screenshot 2026-09-11 at 11.56.51 PM) alongside the final light-theme capture in one visual review. The global blue bar is centered across both panels, with one row of labeled actions and the same shared repository styles. It is not constrained to the left case tree. The QA menu has full-width rows with avatars, names and emails, a thin outlined search input, rounded corners and subtle hover. It opens above its trigger using the existing measured-height transition plus opacity/translation.
-
-Evidence:
-- `/tmp/falcon-run-bulk-light-final.png`, `/tmp/falcon-run-bulk-dark-final.png`: 1280 × 800, two selected cases, assignment menu open.
-- `/tmp/falcon-run-footer-desktop.png`: 1280 × 800, active run, navigation left and labeled result actions right, 52 px reserved at the right edge.
-- `/tmp/falcon-run-footer-narrow.png`: 820 × 740, narrow execution pane; icon-only result/navigation controls with accessible names. The final threshold also handles the intermediate 1024 px layout.
-
-Intentional differences from the repository reference: run-specific actions replace Create run/Status; current-run selector, state and circular lifecycle buttons remain; New run is blue with a white plus and label. The local fixture shows an open case detail and two projects, whereas the source reference shows an empty detail. Preview-only theme toggle, fixture members and missing organization avatar lookup are not shipped. No unsupported generated filters were adopted.
-
-## Functional verification
-
-- Global selection can span projects; selecting, filtering and grouping retain unique run item identities.
-- Multiple assignees, projects and results were selected in the browser; component/type/priority/status/tag/folder OR-within and AND-across semantics are covered by unit tests. Grouping supports project, component and tags together without collisions between duplicate project names or duplicate tags.
-- Click outside the filter closes it without clearing choices; Escape also closes and returns focus. No separate owner/project/result filter blocks remain.
-- Assignment, priority, move to a new folder, archive, restore and removal were exercised with real presentation components and a local API fixture. The original all-actions failure was a missing organization route in this isolated fixture; that route now handles the same contract, idempotency and stale-version checks.
-- Archive UI regression fixed: Include archived now passes archived cases through the selection tree and allows explicit run-only selection for Restore. Repository archive selection and dragging remain disabled. Browser archive → show archived → select → restore → remove completed without alerts.
-- Real PostgreSQL HTTP/integration tests cover all organization mutations, atomic rollback on stale versions, tenant isolation under the restricted runtime role, idempotent replay, immutable case/revision/snapshot preservation and retained execution history.
-- New run, start/pause and the red finish control retain their established lifecycle semantics. The footer has text at laptop widths and switches only when its available panel width is too small. At 1024 px, the initially discovered overlap was fixed and DOM bounds no longer intersect.
-- Browser console: no errors in the final preview. No horizontal document overflow at checked 820/1024/1280 widths. Viewport overrides reset after testing.
-- Existing floating verification action is hidden while the bulk bar is active; on desktop its expanded state is lifted above the execution footer. Production smoke with the actual verification queue confirmed this at 1280×720: the expanded verification action is above the labeled footer and does not intersect result buttons.
-
-## Gates and limits
-
-Frontend: 760 tests passed; typecheck and architecture (970 files) passed; export build passed. Backend: 695 tests passed against PostgreSQL; typecheck, lint, architecture, migration verification, OpenAPI and build passed. The frontend lint command remains the repository's existing no-op, not a substantive lint gate. No physical Windows/Linux/mobile browser testing performed; browser checks used Codex's in-app browser. Production smoke additionally verified persistence through the API and a read-only database audit. No physical Windows/Linux/mobile browser testing was added.
-
-
-## Production follow-through
-
-Published Pages `5ec95cb26e8b81b6603cedc07de25ee46e73d274` / Worker `a8e35760-fb3f-4e9b-9385-6def7ad0962e`. Created only one isolated QA iteration/run (`run_fc696942-b53c-4690-8302-329f68a59824`). Verified priority, move, archive/show/restore, reload persistence, removal, no-op unassignment, two assignees + two result filters and outside dismissal. Start/pause/resume, incomplete completion → stop/archive → restore passed. The empty QA run was completed at the end; no product result was marked passed/failed. Database audit confirmed original repository folder/snapshot priority and all 1,414 pre-existing snapshot digests unchanged.
-
-Production screenshots: `/tmp/falcon-0057-production-assignees.png`, `/tmp/falcon-0057-production-multifilter.png`, `/tmp/falcon-0057-production-footer.png` (1280×720, light). Detailed deployment/recovery evidence is in backend `docs/releases/2026-09-12-run-organization.md`.
-
-New user report after publication: execution detail and Next/Previous must follow the filtered tree; defect-create drawer needs redesign and opaque assignee popup. These subsequent fixes are not covered by the release evidence above.
-
-
-# 2026-09-12 — Filtered execution and defect creation follow-up
-
-The execution detail, counter, keyboard and previous/next actions now use the exact same filtered, deduplicated folder order as the run repository. Cross-project transitions retain confirmed item versions before navigating, so a completed case cannot reappear from an older list cache. Empty filters hide the detail and execution controls. Failed requests do not advance; pending writes and unsaved actual-result drafts block navigation. New server versions supersede cached versions. Optional preview metadata is retained when updating from a detail response.
-
-Both defect creation entry points now use the same 680px maximum drawer, compact two-column properties, rounded thin fields, collapsible routing help, fixed footer and reduced-motion-aware entry/exit. The shared assignee picker has a solid theme background, elevated stacking, bounded list height, search and smooth appearance. File additions preserve previously selected files, deduplicate and permit reselecting a removed file.
-
-CUA at 1280×720: Anna filter returned API-1 and HOST-1; previous crossed projects within this set; passed API-1 advanced to HOST-1. With result `not_run`, saved API-1 disappeared and stayed absent after project change; blocked HOST-1 produced an empty selection without showing any other case. Tested both defect forms, both themes, QA search/selection and Escape. No production defect or external notification was submitted for this follow-up.
-
-Evidence: `/tmp/falcon-filter-next-project.png`, `/tmp/falcon-filter-empty.png`, `/tmp/falcon-defect-standalone-light.png`, `/tmp/falcon-defect-inline-dark.png`. Regression adapters + organization: 625 tests passed, including 10 new navigation/cache tests. Typecheck, architecture and static export are release gates. The browser fixture uses actual production components with isolated synthetic API responses; real backend writes are covered by the preceding release smoke, not this fixture. No new database migration or backend change.
-
-## Follow-up publication and production smoke
-
-Published source `c166d3945c5b491c03c7f326af45ae5d0391cfb8`, Pages `bfd4f1746f83e6fbf951f3f386293d5b0c70c717` and Worker `d74f781e-c839-4604-ae24-263d68e8e000` at 100%. The release script verified the exact Pages source revision and all seven Worker domain bindings. Typecheck, architecture (977 files), static export, 625 adapter/organization tests, 23 managed tests and 53 Worker tests passed. The last source change also blocks repository Refresh during a pending mutation or unsaved actual-result draft.
-
-Read-only production verification in the authenticated Umbrella tenant: opened the redesigned defect form, loaded the actual QA member list, searched for Mercury, and closed the unsent form. The menu is opaque and elevated above the surrounding fields. In the existing paused run, selecting Mercury with no assigned cases produced an empty tree and empty detail. Selecting unassigned cases and searching `HOST-TC-40` produced exactly three cases; keyboard navigation visited HOST-TC-403 → HOST-TC-402 → HOST-TC-401 with counters 1/3, 2/3, 3/3 and stayed on 3/3 at the boundary. No lifecycle action, result mutation, defect submission or external notification was performed in this follow-up production smoke. Automatic advance after confirmed results and cross-project cache behavior were exercised in the local actual-component fixture and automated tests described above.
-
-Production evidence: `/tmp/falcon-defect-production-menu.png`, `/tmp/falcon-filter-production-empty.png`, `/tmp/falcon-filter-production-navigation.png` (Codex in-app browser, 1280×720). Release logs: `/tmp/falcon-filter-pages-release-final.log`, `/tmp/falcon-filter-worker-release.log`. No physical Windows, Linux or mobile browser testing was performed.
-
-
-# 2026-09-12 — Organization authoring hotfix
-
-Reused the existing organization and case inspector fields. Project/portfolio editors now use rounded thin borders, header save/cancel icon actions, visible project-key help and submit-triggered validation with focus on the first invalid field. Properties follow the narrative/testing plan in both edit and read views. Project case repository fills the content below the global header; redundant project heading, edit action, tabs and catalog refresh are absent from this case workspace. Case creation defers validation messages until submission, retains a compact footer, omits the duplicate general attachment picker, and rounds test-data, tags, revision-note and responsible controls. Existing per-field and step attachment controls remain.
-
-Local CUA used actual ProjectEditorPage, PortfolioEditorPage and InspectorDetails with isolated API responses. Checked blank name, missing key for a Russian name, numeric key rejection, valid MOBILE key, successful fixture save callbacks, light/dark Markdown and compact inspector fields. Screenshots: `/tmp/falcon-org-hotfix/project-dark.png`, `portfolio-light.png`, `case-fields-light.png`. No production records were created by this fixture. Typecheck and architecture (979 files) passed; adapters 435 and organization 191 tests passed, including validation coverage. Backend transport and migrations unchanged. Production publication and smoke evidence follows below.
-
-## Organization hotfix publication
-
-Published source `80ecd707043810c12c151d7469fdfb26ac01906e`, Pages `96587ea5094cb626b708c1ec102b834e10b117c1`, Worker `5712bba2-4c73-4c5c-9a7e-591051caa652` at 100%. Release gates passed: 649 frontend tests (435 adapters, 191 organization, 23 managed), 53 Worker tests, typecheck, architecture (979 files), static export, exact-source Pages readiness and domain binding verification. Logs: `/tmp/falcon-org-hotfix-pages.log`, `/tmp/falcon-org-hotfix-worker.log`. No backend deployment or migration was required.
-
-Additional local CUA exercised the actual full CaseDetailPanel: initial creation shows no validation error; submitting an empty case focuses the title and displays the error; filling title, action and expected result invokes the successful fixture save callback. The duplicate general attachment button is absent, while per-step attachment buttons remain. Screenshot: `/tmp/falcon-org-hotfix/case-create-light.png`. This was an isolated local API fixture, not a database write.
-
-Authenticated production UI smoke remains pending: the owned production browser tab displays the Falcon login screen, and the user has been asked to sign in. Do not treat local component checks or deployment readiness as proof of authenticated production layout.
-
-
-## 2026-09-12 — automatic JSON import and folder popup
-
-- One Import action replaces the manual provider conversion/review checkbox. Compact 620 px dialog, soft outlined upload action, project/destination controls, progress, cancellation and result tree.
-- Destination picker uses a native top-layer custom popover; it does not move the drop zone or clip inside the modal scroller. Search is 32 px with a thin underline. Outside click and Escape close the menu; arrow navigation remains available. Inline tree consumers keep their static layout.
-- Browser checked the actual dialog in light/dark themes and at 390 px. Local verification calls the real import application/OpenAI provider and stores only its test writes in browser memory; no production case mutations occurred.
-- The user-provided seven-case sample produced seven separate product/module hierarchies, including Digital Banking/Transfers and E-commerce/Checkout. A separate live corpus covered root arrays, nested custom records, Russian checklists and work-item layouts.
-- Backend gate: lint, typecheck, architecture, 705 tests (real PostgreSQL included), build, 213-operation OpenAPI validation. Frontend: typecheck, architecture, 435 adapters + 195 organization/import tests, 23 managed tests, 53 worker tests. Production build/deployment evidence is recorded after publication.
-- Screenshots: docs/evidence/import-openai-ready.png, import-openai-light.png, import-openai-mobile.png, import-openai-result.png. These are local component verification images, not production screenshots.
-
-### Import publication and authenticated production smoke
-
-Published frontend source `258de5a1ccf3e178d050559b413dd15e31afdb29`, Pages `a9ad121d58d4f47516ef9a4aa88930ee4a4f997c`, Worker `2ad792ba-6766-48f0-b593-534aef743383` at 100%. Backend source `acb4d6b6dd40c47ccd07ea326bed1e6085c8c272` is running successfully in the primary and managed API services. Both health checks passed. Existing schema 0057 is unchanged; no migration was required. The 65-page production build and exact-source Pages/Worker readiness checks passed.
-
-Authenticated production CUA in Umbrella-Host verified the compact form and soft outlined upload button. The folder menu opens downward as an opaque overlay, with the drop zone staying in place. Search for Android returned the existing matching folder paths. Clicking the dialog heading dismissed only the folder menu; the form remained open. The unsent form was then closed. No production import or case/folder mutation was performed in this smoke. Screenshots: `/tmp/falcon-import-production-ready.png`, `/tmp/falcon-import-production-folder-menu.png`. Light/dark and 390 px layout checks, automatic import writes in isolated browser memory and live OpenAI normalization are covered by the local evidence above. No physical Windows/Linux/mobile-device testing was performed.
-
-Full deployment IDs and recovery references are in backend `docs/releases/2026-09-12-openai-import.md`. Subsequent documentation commits do not change the deployed frontend revision above.
-
-
-## 2026-09-12 — Falcon AI writing and colored Markdown markers (implementation)
-
-This change extends the existing Markdown toolbars and preserves the established forms. The first toolbar action is the blue gradient “Спросить Falcon AI” / “Ask Falcon AI” sphere. The captured target is either the current selection or the entire current field; suggestions are previewed before explicit replacement. Quick improve/correct actions and custom instructions share this flow. Applying a suggestion updates the draft through the editor's existing history; saving the containing object remains a separate action. Captured-source guards prevent a delayed result from replacing text edited while the request was pending.
-
-The marker palette exposes five named colors and removal. Rich-text and compact scenario inputs share the palette. Stored Markdown uses a strictly recognized `:highlight[content]{color="blue"}` directive; approved values are yellow, blue, green, pink and purple. Read rendering and the editable surface use the same translucent, irregular marker treatment. Unknown attributes or colors stay literal; raw HTML suppression is unchanged. Fenced code remains literal. Focused marker verification covers five-color load/export/render round trips, heading/bold/italic/link/inline-code coexistence, malicious attributes, raw selection offsets, and undo-friendly source replacement: nine tests passed.
-
-User help now includes the searchable `falcon-ai-writing` article, linked from case creation, case editing and portfolios/projects. The existing guide has a Russian-only catalog/shell; this article therefore provides explicit English guide sections without introducing an unrelated localization redesign. It explains selection scope, prompts, quick actions, loading/cancellation, preview/replace, Undo, normal save, and persistent five-color markers. Scenario text assistance is described as a field edit, not automatic creation of separate step entities.
-
-This section records implementation and focused checks only. It does not claim production deployment or completed visual acceptance. The release owner records final browser evidence, full gates and publication separately.
-
-### Writing verification before publication
-
-Actual shared Markdown components were exercised in a local isolated harness in light and dark themes. Browser checks covered whole-field and partial-heading replacement, unchanged surrounding URL/code/paragraphs, one-click rich-editor Undo, scenario replacement and keyboard Undo, custom generation into an empty field, persistent color after switching to read mode, and service errors preserving source. Palette choices in scenarios also serialize correctly. The prompt uses the Falcon AI name and opaque surfaces; all form layouts remain unchanged. A partial-heading replacement issue discovered in browser verification was fixed and reproduced in an automated Lexical test.
-
-The `test:tms-writing` gate contains 26 tests covering the actual Lexical/MDX import/export, selection offsets, unchanged-source guards, unsupported-response protection, history, highlight round trips/security, authenticated transport, cancellation and workspace/target changes. Full adapter (435) and organization (195) suites pass. Typecheck, architecture (1010 files) and diff checks pass. Backend feature has 715 passing tests and three live GPT-4.1 checks preserving GET/URLs/statuses/fenced JSON, including custom generation from an empty field. Browser network responses in the local frontend harness were controlled for UI/error validation; real model calls were independently verified on the backend.
+Final result: passed

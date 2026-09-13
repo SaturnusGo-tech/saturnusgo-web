@@ -1,11 +1,11 @@
 import type { ManagedAvatarGrant } from "../../../auth/managed/domain/managed-avatar";
-import type { AdministrationEvent, CompanyOptions, Company, CompanyDraft, CompanyChange, CompanyCreated, CompanyMember, MemberDraft, MemberChange,
+import type { JournalFilter, AdministrationEvent, CompanyOptions, Company, CompanyDraft, CompanyChange, CompanyCreated, CompanyMember, MemberDraft, MemberChange,
   MemberMutation, Profile, ProfileDetails, PasswordChange, SessionReauthentication, DeviceSession, ResultPage } from "../../domain/administration";
 
 export interface AdministrationPort {
   companyOptions(signal: AbortSignal): Promise<CompanyOptions>;
   ownCompany(signal: AbortSignal): Promise<Company>;
-  journal(platform: boolean, companyId: string | null, cursor: string | null, signal: AbortSignal): Promise<ResultPage<AdministrationEvent>>;
+  journal(platform: boolean, companyId: string | null, cursor: string | null, signal: AbortSignal, filter?: JournalFilter): Promise<ResultPage<AdministrationEvent>>;
   avatar(identityId: string | null, signal: AbortSignal): Promise<ManagedAvatarGrant>;
   uploadAvatar(identityId: string | null, version: number, file: Blob, key: string, signal: AbortSignal): Promise<void>;
   removeAvatar(identityId: string | null, version: number, signal: AbortSignal): Promise<void>;

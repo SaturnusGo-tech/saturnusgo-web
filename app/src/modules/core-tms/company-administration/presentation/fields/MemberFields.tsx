@@ -1,11 +1,11 @@
-import type { MemberDraft } from "../../domain/administration";
+import type { CompanyDraft } from "../../domain/administration";
 import type { AdministrationCopy } from "../copy/administration-copy";
 import { AccessField } from "../../../auth/managed/presentation/fields/AccessField";
 import styles from "../layout/administration.module.css";
 
 export function MemberFields({ draft, onChange, copy, disabled, showLogin = true }: {
-  readonly draft: Pick<MemberDraft, "name" | "login" | "email" | "phone">;
-  readonly onChange: (draft: Pick<MemberDraft, "name" | "login" | "email" | "phone">) => void;
+  readonly draft: CompanyDraft["administrator"];
+  readonly onChange: (draft: CompanyDraft["administrator"]) => void;
   readonly copy: AdministrationCopy; readonly disabled: boolean; readonly showLogin?: boolean;
 }) {
   return <div className={styles.fields}>

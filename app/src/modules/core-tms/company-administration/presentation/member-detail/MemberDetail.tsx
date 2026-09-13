@@ -1,8 +1,8 @@
 "use client";
 
 import { ProfileAvatarEditor } from "../avatar/ProfileAvatarEditor";
-import { ArrowLeft } from "lucide-react";
-import { useCallback, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import type { MemberChange, MemberMutation } from "../../domain/administration";
 import type { SignedInCompanySession } from "../../../auth/managed/domain/managed-access";
@@ -12,15 +12,15 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
 import { administrationError } from "../copy/administration-errors";
 import { ResourceState } from "../common/ResourceState";
-import { StatusBadge } from "../common/StatusBadge";
 import { CredentialHandoff } from "../handoff/CredentialHandoff";
 import { MemberDetailsForm } from "../member-edit/MemberDetailsForm";
 import { MemberSecurity } from "../member-edit/MemberSecurity";
 import { SessionConfirmation } from "../reauthentication/SessionConfirmation";
 import styles from "../layout/administration.module.css";
+import editor from "../editor/editor.module.css";
 
-export function MemberDetail({ id, client, session, onBack }: {
-  readonly id: string; readonly client: AdministrationPort; readonly session: SignedInCompanySession; readonly onBack: () => void;
+export function MemberDetail({ id, client, session, onBack, onSaved, onBusy }: {
+  readonly id: string; readonly client: AdministrationPort; readonly session: SignedInCompanySession; readonly onBack: () => void; readonly onSaved: () => void; readonly onBusy: (value: boolean) => void;
 }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
@@ -29,16 +29,20 @@ export function MemberDetail({ id, client, session, onBack }: {
   const [ownershipTransferred, setOwnershipTransferred] = useState(false);
   const command = useAdministrationCommand();
   const member = resource.value;
+  useEffect(() => { onBusy(command.pending || !!handoff); }, [command.pending, handoff, onBusy]);
+  useEffect(() => () => onBusy(false), [onBusy]);
   async function change(value: MemberChange) {
-    if (!member || resource.refreshing || resource.error) return;
+    if (!member || resource.refreshing || resource.error) return false;
     const result = await command.execute(JSON.stringify([id, member.version, value]), (key, signal) => client.changeMember(member, value, key, signal));
-    if (!result) return;
-    if (value.kind === "ownership") { setOwnershipTransferred(true); return; }
+    if (!result) return false;
+    onSaved();
+    if (value.kind === "ownership") { setOwnershipTransferred(true); return true; }
     if (result.temporaryPassword) setHandoff(result); else resource.refresh();
+    return true;
   }
-  if (handoff?.temporaryPassword) return <CredentialHandoff login={handoff.member.login} password={handoff.temporaryPassword} hostname={window.location.hostname}
-    onDone={() => { setHandoff(null); resource.refresh(); }} />;
-  const cannotEdit = command.pending || member?.status === "revoked" || (!session.identity.owner && member?.role === "workspace_admin");
+  if (handoff?.temporaryPassword) return <div className={editor.handoff}><CredentialHandoff login={handoff.member.login} password={handoff.temporaryPassword} hostname={window.location.hostname}
+    onDone={() => { setHandoff(null); resource.refresh(); }} /></div>;
+  const cannotEdit = command.pending || resource.refreshing || !!resource.error || member?.status === "revoked" || (!session.identity.owner && member?.role === "workspace_admin");
   const cannotManage = cannotEdit || member?.owner || session.identity.id === id;
   if (ownershipTransferred) return <section className={styles.section}>
     <h1>{locale === "ru" ? "Управление передано" : "Ownership transferred"}</h1>
@@ -47,18 +51,18 @@ export function MemberDetail({ id, client, session, onBack }: {
     <a className={styles.primary} href="/admin/">{locale === "ru" ? "Войти в Falcon" : "Sign in to Falcon"}</a>
   </section>;
   return <>
-    <button className={styles.back} disabled={command.pending} onClick={onBack}><ArrowLeft size={16} />{copy.employees}</button>
-    {resource.loading || !member ? <ResourceState loading={resource.loading} error={resource.error} retry={resource.refresh} /> : <>
-      {resource.error && <ResourceState loading={false} error={resource.error} retry={resource.refresh} />}
-    <header className={styles.heading}><div><h1>{member.name}</h1><div className={styles.meta}><StatusBadge status={member.status} member />
-        {member.owner && <span>{copy.owner}</span>}<span>{member.login}</span></div></div></header>
-      {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
-        : command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
-      <div className={styles.sections} key={member.version}>
-        <ProfileAvatarEditor identityId={id} name={member.name} hasAvatar={member.hasAvatar} version={member.version} client={client} disabled={cannotEdit} onSaved={resource.refresh} />
-        <MemberDetailsForm member={member} disabled={cannotEdit} onChange={change} />
-        <MemberSecurity member={member} disabled={cannotManage} allowAdmin={session.identity.owner} onChange={change} />
-      </div>
-    </>}
+    {resource.loading || !member ? <div className={editor.handoff}>
+      <button className={styles.back} onClick={onBack}>{copy.back}</button>
+      <ResourceState loading={resource.loading} error={resource.error} retry={resource.refresh} /></div> :
+      <MemberDetailsForm key={member.version} member={member} disabled={cannotEdit} onChange={change} onBack={onBack}>
+        {resource.error && <ResourceState loading={false} error={resource.error} retry={resource.refresh} />}
+        {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
+          : command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
+        <MemberSecurity member={member} disabled={!!cannotManage} allowAdmin={session.identity.owner} onChange={change} />
+        <details className={editor.additional}><summary><ChevronRight size={16} />{locale === "ru" ? "Фотография" : "Photo"}</summary>
+          <ProfileAvatarEditor identityId={id} name={member.name} hasAvatar={member.hasAvatar} version={member.version} client={client}
+            disabled={cannotEdit} onSaved={() => { resource.refresh(); onSaved(); }} />
+        </details>
+      </MemberDetailsForm>}
   </>;
 }
