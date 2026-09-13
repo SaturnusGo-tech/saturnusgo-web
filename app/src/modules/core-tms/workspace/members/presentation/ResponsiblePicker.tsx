@@ -17,6 +17,7 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
   const empty = ru ? "Не назначен" : "Not assigned";
   const reduced = useReducedMotion();
   const [availableHeight, setAvailableHeight] = useState(280);
+  const [placement, setPlacement] = useState({ width: 320, left: 0 });
   const [above, setAbove] = useState(false);
   const [open, setOpen] = useState(false);
   const [chosen, setChosen] = useState<{ id: string; name: string } | null>(null);
@@ -41,6 +42,10 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
     let parent = root.current?.parentElement;
     while (parent && !/(auto|scroll)/.test(getComputedStyle(parent).overflowY)) parent = parent.parentElement;
     const bounds = parent?.getBoundingClientRect();
+    const left = Math.max(12, bounds?.left ?? 12);
+    const right = Math.min(window.innerWidth - 12, bounds?.right ?? window.innerWidth - 12);
+    const width = Math.min(Math.max(320, rect.width), right - left);
+    setPlacement({ width, left: Math.max(left, Math.min(rect.left, right - width)) - rect.left });
     const bottom = Math.min(window.innerHeight - 12, bounds?.bottom ?? window.innerHeight - 12);
     const top = Math.max(12, bounds?.top ?? 12);
     const below = bottom - rect.bottom - 6; const above = rect.top - top - 6;
@@ -59,7 +64,7 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
       <MemberAvatar identityId={value} name={selected ?? ""} offline={offline} /><span className={styles.label}>{value ? selected || (ru ? "Назначенный участник" : "Assigned member") : unselectedLabel ?? empty}</span><PiCaretDown aria-hidden="true" />
     </button>
     <AnimatePresence>{open && <motion.div className={styles.popover} data-above={above}
-      style={{ maxHeight: availableHeight }} initial={{ opacity: 0, y: reduced ? 0 : above ? 4 : -4 }}
+      style={{ maxHeight: availableHeight, width: placement.width, left: placement.left }} initial={{ opacity: 0, y: reduced ? 0 : above ? 4 : -4 }}
       animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduced ? 0 : above ? 4 : -4 }}
       transition={{ duration: reduced ? 0 : .18 }}><FilterTransition view="members">
       <label className={styles.search} data-input-shell><PiMagnifyingGlass aria-hidden="true" /><input ref={search} value={members.search}
@@ -75,7 +80,7 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
       }}>
         <button type="button" role="option" aria-selected={!value && !noSelection} onClick={() => choose(null)}><span className={styles.label}>{empty}</span>{!value && !noSelection && <PiCheck />}</button>
         {members.items.map((member) => <button type="button" key={member.id} role="option" aria-selected={value === member.id} onClick={() => choose(member.id, member.name)}>
-          <MemberAvatar identityId={member.id} name={member.name} offline={offline} /><span className={styles.label}>{member.name}<small>{member.email}</small></span>{value === member.id && <PiCheck />}
+          <MemberAvatar identityId={member.id} name={member.name} offline={offline} /><span className={styles.label}><span title={member.name}>{member.name}</span><small title={member.email ?? undefined}>{member.email}</small></span>{value === member.id && <PiCheck />}
         </button>)}
       </div>
       {members.loading && <div role="status" aria-label={ru ? "Загрузка участников" : "Loading members"} className={styles.skeleton}><i /><i /></div>}
