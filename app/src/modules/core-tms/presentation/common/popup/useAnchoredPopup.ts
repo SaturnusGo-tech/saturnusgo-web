@@ -1,7 +1,7 @@
 import { useLayoutEffect, type RefObject } from "react";
 
 export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject<HTMLDivElement | null>,
-  trigger: RefObject<HTMLButtonElement | null>, menu: RefObject<HTMLDivElement | null>, onClose: () => void) {
+  trigger: RefObject<HTMLButtonElement | null>, menu: RefObject<HTMLDivElement | null>, onClose: () => void, preferredWidth = 0) {
   useLayoutEffect(() => {
     const element = menu.current;
     if (!open || inline || !element) return;
@@ -10,7 +10,7 @@ export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject
       const bounds = trigger.current?.getBoundingClientRect();
       if (!bounds) return;
       const gap = 6; const edge = 12;
-      const width = Math.min(bounds.width, innerWidth - edge * 2);
+      const width = Math.min(Math.max(bounds.width, preferredWidth), innerWidth - edge * 2);
       const below = innerHeight - bounds.bottom - gap - edge;
       const above = bounds.top - gap - edge;
       const upwards = below < Math.min(element.scrollHeight, 220) && above > below;
@@ -28,5 +28,5 @@ export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject
       document.removeEventListener("pointerdown", outside);
       if (element.matches(":popover-open")) element.hidePopover();
     };
-  }, [open, inline, root, trigger, menu, onClose]);
+  }, [open, inline, root, trigger, menu, onClose, preferredWidth]);
 }

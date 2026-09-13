@@ -1,0 +1,9 @@
+.viewport { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.text { display: inline-block; white-space: nowrap; }
+button:is(:hover, :focus-visible) .viewport[data-overflow="true"] { text-overflow: clip; }
+button:is(:hover, :focus-visible) .viewport[data-overflow="true"] .text { animation: reveal var(--overflow-duration) ease-in-out infinite alternate; }
+@keyframes reveal { 0%, 15% { transform: translateX(0); } 85%, 100% { transform: translateX(var(--overflow-distance)); } }
+@media (prefers-reduced-motion: reduce) {
+  button:is(:hover, :focus-visible) .viewport[data-overflow="true"] .text { animation: none; white-space: normal; overflow-wrap: anywhere; }
+  button:is(:hover, :focus-visible) .viewport[data-overflow="true"] { white-space: normal; }
+}

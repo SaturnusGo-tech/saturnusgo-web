@@ -7,12 +7,18 @@
 .value.value > button > span { flex: 0 1 auto; text-align: left; }
 .value.value > button:hover { background: var(--control-hover); }
 .value.value > button:focus-visible { outline: 1px solid #79a5ed; outline-offset: 1px; }
-.value.value > [role="listbox"] { min-width: 180px; width: max-content; max-width: min(270px, calc(100vw - 48px)); right: 0; left: auto; border: 1px solid var(--line); border-radius: 12px; box-shadow: none; background: var(--surface); }
-.value.value [role="option"] { white-space: normal; border-radius: 8px; font-size: 12px; }
-.value.value [role="option"] > span { white-space: normal; }
+.value.value > [role="listbox"] { min-width: 180px; width: max-content; max-width: calc(100vw - 24px); right: 0; left: auto; border: 1px solid var(--line); border-radius: 12px; box-shadow: none; background: var(--paper); color: var(--ink); color-scheme: inherit; }
+.value.value [role="option"] { white-space: nowrap; border-radius: 8px; font-size: 12px; }
+.value.value [role="option"] > span { white-space: nowrap; }
 .responsible { min-width: 0; }
 .responsible > div > button { width: max-content; max-width: 100%; min-height: 34px; padding: 4px 6px; gap: 6px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; font-size: 12px; }
 .responsible > div > button > span:first-child { width: 24px; height: 24px; font-size: 10px; }
 .responsible > div > button:hover { background: var(--control-hover); }
 .responsible.responsible > div > div { left: auto; right: 0; width: min(300px, calc(100vw - 80px)); border: 1px solid var(--line); border-radius: 13px; background: var(--paper); box-shadow: none; }
 .error { grid-column: 1 / -1; font-size: 12px; line-height: 1.5; color: var(--danger, #c96c70); }
+
+.component [role="listbox"] { min-width: min(340px, calc(100vw - 24px)); }
+.levelDot { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--green, #29955d); }
+.levelDot[data-level="medium"] { background: #3981e8; }
+.levelDot[data-level="high"] { background: #a276cd; }
+.levelDot[data-level="critical"] { background: var(--red, #d74b59); }
