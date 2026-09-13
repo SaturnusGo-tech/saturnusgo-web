@@ -1,4 +1,5 @@
-import { PiBriefcaseDuotone, PiCaretRight, PiFolderSimpleDuotone } from "react-icons/pi";
+import { PortfolioIcon } from "../icon/PortfolioIcon";
+import { PiCaretRight, PiFolderSimpleDuotone } from "react-icons/pi";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { formatCount } from "../../../localization/format/count";
@@ -16,7 +17,7 @@ export function CatalogTable({ portfolios, projects, workspaceId, copy, onNaviga
     <tbody>
       {portfolios.map((item) => <tr key={`portfolio:${item.id}`}>
         <td><button type="button" className={styles.rowLink} onClick={() => onNavigate({ kind: "portfolio", id: item.id })}>
-          <PiBriefcaseDuotone className={styles.portfolioIcon} size={18} aria-hidden="true" /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
+          <PortfolioIcon size={18} /><span><strong>{item.name}</strong>{item.description && <small>{item.description}</small>}</span>
         </button></td>
         <td className={styles.quiet}>{formatCount(locale, item.projectCount, ["project", "projects"], ["проект", "проекта", "проектов"])}</td>
         <td><ResponsibleName workspaceId={workspaceId} identityId={item.responsibleIdentityId} /></td>

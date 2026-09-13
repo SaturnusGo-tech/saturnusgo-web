@@ -1,7 +1,8 @@
 import { ArrowDownWideNarrow, ArrowUpWideNarrow, Bug, Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { Defect } from "../../../../../core/tms/contracts/legacy-contract";
 import { useDefectBrowser } from "../../../defects/browser/state/useDefectBrowser";
+import { useDefectExpansion } from "../../../defects/browser/state/expansion/useDefectExpansion";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useNavigationValue } from "../../../state/navigation/context/useNavigationValue";
 import { isClosedDefect, matchesDefectScope, normalizeDefectScope, type DefectBrowserScope } from "../../../defects/browser/model/defect-browser";
@@ -19,14 +20,10 @@ export function DefectBrowser({ workspaceId, projectId, projectName, connected, 
   const [savedScope, setScope] = useNavigationValue<DefectBrowserScope>(`reports:${workspaceId}:${projectId}:scope`, "active");
   const scope = normalizeDefectScope(savedScope);
   const browser = useDefectBrowser({ workspaceId, projectId, connected, query, defects, severitySort, selectedDefectId, scope });
-  const [expanded, setExpanded] = useState<string[]>([]);
-  useEffect(() => { setExpanded([]); }, [query, projectId, scope]);
+  const { collapsed, toggle } = useDefectExpansion(JSON.stringify([workspaceId, projectId, query, scope]));
   useEffect(() => {
-    if (!browser.groups.length) return;
-    setExpanded((current) => current.some((component) => browser.groups.some((group) => group.component === component))
-      ? current : [browser.groups[0].component]);
-  }, [browser.groups]);
-  useEffect(() => { expanded.forEach(browser.openComponent); }, [expanded, browser.openComponent, browser.groups]);
+    browser.groups.forEach(group => { if (!collapsed.includes(group.component)) browser.openComponent(group.component); });
+  }, [collapsed, browser.openComponent, browser.groups]);
   const loading = browser.groupsStatus === "loading" || browser.groupsStatus === "idle";
   const sortLabel = locale === "ru" ? "Сортировать по серьёзности" : "Sort by severity";
   const retryLabel = locale === "ru" ? "Повторить" : "Retry";
@@ -47,9 +44,6 @@ export function DefectBrowser({ workspaceId, projectId, projectName, connected, 
       : "Verified and closed bugs are kept in Closed.")
     : scope === "closed" ? (locale === "ru" ? "Здесь будут проверенные и закрытые баги с историей и результатами проверки."
       : "Verified and closed bugs will appear here with their history and verification results.") : t("reports.emptyHint");
-  function toggle(component: string) {
-    setExpanded((current) => current.includes(component) ? current.filter((value) => value !== component) : [...current, component]);
-  }
   return <section className={styles.pane} aria-label={t("reports.title")}>
     <header className={styles.header}>
       <h1>{locale === "ru" ? "Баг-репорты" : "Bug reports"}</h1>
@@ -93,7 +87,7 @@ export function DefectBrowser({ workspaceId, projectId, projectName, connected, 
       <ul className={styles.groups} aria-label={locale === "ru" ? "Компоненты и баги" : "Components and bugs"}>
         {browser.groups.map((group) => <DefectBranch key={group.component} group={group}
           branch={Object.prototype.hasOwnProperty.call(browser.branches, group.component) ? browser.branches[group.component] : undefined}
-          expanded={expanded.includes(group.component)}
+          expanded={!collapsed.includes(group.component)}
           workspaceId={workspaceId} selectedDefectId={selectedDefectId} onSelectDefect={onSelectDefect}
           onToggle={() => toggle(group.component)} onLoadMore={() => browser.loadMoreComponent(group.component)}
           onRetry={() => browser.retryComponent(group.component)} />)}

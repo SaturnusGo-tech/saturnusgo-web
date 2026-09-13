@@ -1,4 +1,5 @@
-import { BriefcaseBusiness, ChevronDown, Search } from "lucide-react";
+import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
+import { ChevronDown, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -32,7 +33,7 @@ export function ApiScopeSelector({ model }: { model: WorkspaceModel }) {
   return <div className={css.root} ref={root} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); setOpen(false); trigger.current?.focus(); } }}>
     <button className={css.trigger} ref={trigger} type="button" aria-label={ru ? "Проекты или портфель для API" : "API projects or portfolio"}
       aria-expanded={open} aria-haspopup="dialog" onClick={() => { setDraft(scope.context); setTab(scope.context.portfolioId ? "portfolios" : "projects"); setSearch(""); setOpen(!open); }}>
-      {scope.context.portfolioId && <BriefcaseBusiness size={16}/>}<strong>{label}</strong><ChevronDown size={15}/>
+      {scope.context.portfolioId && <PortfolioIcon size={16}/>}<strong>{label}</strong><ChevronDown size={15}/>
     </button>
     {open && <div className={css.menu} role="dialog" aria-label={ru ? "Область API" : "API scope"}>
       <div className={css.tabs}>{(["projects", "portfolios"] as const).map(value => <button key={value} type="button" aria-pressed={tab === value} onClick={() => { setTab(value); setSearch(""); }}>
@@ -41,7 +42,7 @@ export function ApiScopeSelector({ model }: { model: WorkspaceModel }) {
       <div className={css.list}>
         {tab === "portfolios" && portfolios.loading ? <p>{ru ? "Загрузка…" : "Loading…"}</p> : tab === "portfolios" && portfolios.error ? <button type="button" onClick={portfolios.retry}>{ru ? "Повторить загрузку" : "Retry"}</button> : items.map(item => <label className={css.option} key={item.id}>
           <input type={tab === "projects" ? "checkbox" : "radio"} name="api-scope" disabled={tab === "projects" && (draft.projectIds?.length ?? 0) >= 100 && !draft.projectIds?.includes(item.id)} checked={tab === "projects" ? Boolean(draft.projectIds?.includes(item.id)) : draft.portfolioId === item.id}
-            onChange={() => setDraft(tab === "portfolios" ? { portfolioId: item.id } : { projectIds: draft.projectIds?.includes(item.id) ? draft.projectIds.filter(id => id !== item.id) : [...draft.projectIds ?? [], item.id] })}/><span>{item.name}</span>
+            onChange={() => setDraft(tab === "portfolios" ? { portfolioId: item.id } : { projectIds: draft.projectIds?.includes(item.id) ? draft.projectIds.filter(id => id !== item.id) : [...draft.projectIds ?? [], item.id] })}/>{tab === "portfolios" && <PortfolioIcon size={16} />}<span>{item.name}</span>
         </label>)}
       </div>
       <footer><button type="button" disabled={!draft.portfolioId && !draft.projectIds?.length} onClick={() => void apply()}>{ru ? "Применить" : "Apply"}</button></footer>

@@ -1,4 +1,5 @@
-import { BriefcaseBusiness, Check, ChevronDown, Folder, Plus, Search } from "lucide-react";
+import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
+import { Check, ChevronDown, Folder, Plus, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -45,7 +46,7 @@ export function RepositoryScopeSelector({ model }: { model: WorkspaceModel }) {
   }}>
     <button ref={trigger} className={css.trigger} type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} aria-busy={loading}
       disabled={loading} onClick={() => { setKind(scope.portfolioId ? "portfolios" : "projects"); setSearch(""); setOpen(!open); }}>
-      {scope.portfolioId ? <BriefcaseBusiness size={16} /> : null}
+      {scope.portfolioId ? <PortfolioIcon size={16} /> : null}
       <strong className={loading ? css.skeleton : ""}>{loading ? "\u00a0" : scope.portfolioId ? portfolio?.name ?? (ru ? "Портфель" : "Portfolio") : model.project?.name ?? label}</strong>
       <ChevronDown size={15} />
     </button>
@@ -62,7 +63,7 @@ export function RepositoryScopeSelector({ model }: { model: WorkspaceModel }) {
           : kind === "portfolios" && catalog.error ? <button type="button" onClick={catalog.retry}>{ru ? "Не удалось загрузить. Повторить" : "Could not load. Retry"}</button>
           : items.map(item => <button type="button" key={item.id} role="menuitemradio"
             aria-checked={kind === "portfolios" ? scope.portfolioId === item.id : !scope.portfolioId && model.projectId === item.id} onClick={() => void select(item.id)}>
-            {kind === "projects" ? <Folder size={16} /> : <BriefcaseBusiness size={16} />}<span>{item.name}</span>
+            {kind === "projects" ? <Folder size={16} /> : <PortfolioIcon size={16} />}<span>{item.name}</span>
             {(kind === "portfolios" ? scope.portfolioId === item.id : !scope.portfolioId && model.projectId === item.id) && <Check size={15} />}</button>)}
         {!catalog.loading && !items.length && <p>{ru ? "Ничего не найдено" : "Nothing found"}</p>}
       </div>

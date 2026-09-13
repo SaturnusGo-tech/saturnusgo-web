@@ -1,0 +1,8 @@
+.evidence { min-width: 0; }
+.attach { display: inline-flex; align-items: center; gap: 7px; border: 0; padding: 7px 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; box-shadow: none; }
+.attach:hover { color: var(--ink); }
+.attach:focus-visible { outline: 1px solid #79a5ed; outline-offset: 3px; border-radius: 6px; }
+.files { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 8px 0 0; }
+.files li { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 5px 8px; font-size: 12px; }
+.files li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files button { display: grid; place-items: center; padding: 2px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }

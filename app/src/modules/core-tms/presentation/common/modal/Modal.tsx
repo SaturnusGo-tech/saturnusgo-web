@@ -23,6 +23,7 @@ export function Modal({
   sheet = false,
   adaptiveSheet = false,
   panelClassName = "",
+  headerActions,
 }: {
   title: string;
   subtitle?: string;
@@ -33,6 +34,7 @@ export function Modal({
   sheet?: boolean;
   adaptiveSheet?: boolean;
   panelClassName?: string;
+  headerActions?: ReactNode;
 }) {
   const { t } = useTmsLocale();
   const panelRef = useRef<HTMLElement>(null);
@@ -176,6 +178,7 @@ export function Modal({
             <h2 id={titleId}>{title}</h2>
             {subtitle && <p id={subtitleId}>{subtitle}</p>}
           </div>
+          {headerActions}
           <button
             type="button"
             className={styles.iconButton}

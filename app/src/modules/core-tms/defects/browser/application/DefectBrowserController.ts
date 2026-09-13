@@ -11,13 +11,14 @@ export class DefectBrowserController {
   private branchCursors = new Map<string, string | null>();
   private requests = new Map<string, AbortController>();
   private generation = 0;
+  private queue = new Map<string, boolean>();
   public constructor(private readonly source: DefectBrowserSource) {}
   public getState = () => this.state;
   public subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(next: DefectBrowserState) { this.state = next; this.listeners.forEach((listener) => listener()); }
   public reset = () => {
     this.generation += 1;
-    this.requests.forEach((request) => request.abort()); this.requests.clear();
+    this.requests.forEach((request) => request.abort()); this.requests.clear(); this.queue.clear();
     this.query = null; this.groupCursor = null; this.branchCursors.clear();
     this.publish(emptyDefectBrowser());
   };
@@ -25,21 +26,33 @@ export class DefectBrowserController {
     this.reset(); this.query = query; this.publish(emptyDefectBrowser(key)); void this.readGroups(false);
   };
   public refresh = () => {
-    this.requests.forEach((request) => request.abort()); this.requests.clear();
+    this.requests.forEach((request) => request.abort()); this.requests.clear(); this.queue.clear();
     void this.readGroups(false);
-    Object.keys(this.state.branches).forEach((component) => { void this.readBranch(component, false); });
+    Object.keys(this.state.branches).forEach((component) => { this.enqueue(component, false); });
   };
   public retryGroups = () => { void this.readGroups(false); };
   public loadMoreGroups = () => { if (this.state.hasMoreGroups) void this.readGroups(true); };
   public openComponent = (component: string) => {
-    if (!Object.prototype.hasOwnProperty.call(this.state.branches, component)) void this.readBranch(component, false);
+    if (!Object.prototype.hasOwnProperty.call(this.state.branches, component)) this.enqueue(component, false);
   };
-  public retryComponent = (component: string) => { void this.readBranch(component, false); };
+  public retryComponent = (component: string) => { this.enqueue(component, false); };
   public loadMoreComponent = (component: string) => {
     if (Object.prototype.hasOwnProperty.call(this.state.branches, component) && this.state.branches[component].hasMore) {
-      void this.readBranch(component, true);
+      this.enqueue(component, true);
     }
   };
+  private enqueue(component: string, append: boolean) {
+    if (!this.query || this.requests.has(`component:${component}`) || this.queue.has(component)) return;
+    this.queue.set(component, append);
+    this.pump();
+  }
+  private pump() {
+    while (this.query && this.queue.size && [...this.requests.keys()].filter(key => key.startsWith("component:")).length < 4) {
+      const [component, append] = this.queue.entries().next().value!;
+      this.queue.delete(component);
+      void this.readBranch(component, append).finally(() => this.pump());
+    }
+  }
   private async readGroups(append: boolean) {
     if (!this.query || this.requests.has("groups")) return;
     const query = this.query;
@@ -104,7 +117,7 @@ export class DefectBrowserController {
     } finally { if (this.requests.get(key) === request) this.requests.delete(key); }
   }
   private denyAccess() {
-    this.requests.forEach((request) => request.abort()); this.requests.clear();
+    this.requests.forEach((request) => request.abort()); this.requests.clear(); this.queue.clear();
     this.branchCursors.clear(); this.groupCursor = null;
     this.publish({ ...emptyDefectBrowser(this.state.key), groupsStatus: "error", groupsError: "access_unavailable" });
   }

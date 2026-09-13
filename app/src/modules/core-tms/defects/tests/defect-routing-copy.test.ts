@@ -4,11 +4,11 @@ import { getDefectDialogCopy } from "../../presentation/dialogs/defect/copy";
 import { defectRouteChoices } from "../presentation/defect-route-choices";
 import { resolveDefectIntegrationChoice } from "../model/integration-target";
 
-test("null routing is labelled project integrations across saved YouTrack configurations", () => {
+test("automatic routing uses project settings across saved YouTrack configurations", () => {
   for (const locale of ["ru", "en"] as const) {
     const copy = getDefectDialogCopy(locale);
-    assert.equal(copy.routingLabel, locale === "ru" ? "Маршрут дефекта" : "Defect routing");
-    assert.equal(copy.projectIntegrations, locale === "ru" ? "Интеграции проекта" : "Project integrations");
+    assert.equal(copy.routingLabel, locale === "ru" ? "Передача" : "Delivery");
+    assert.equal(copy.projectIntegrations, locale === "ru" ? "Автоматически" : "Automatic");
     for (const configurationVersion of [null, 1, 2]) {
       for (const enabled of [false, true]) {
         const options = defectRouteChoices({ configurationVersion, enabled, options: [] }, copy);
@@ -18,7 +18,6 @@ test("null routing is labelled project integrations across saved YouTrack config
         assert.equal(options.some((option) => /Falcon only|Только Falcon/.test(option.label)), false);
       }
     }
-    for (const provider of ["Jira", "Trello", "Linear", "YouTrack"]) assert.ok(copy.routingHint.includes(provider));
   }
 });
 

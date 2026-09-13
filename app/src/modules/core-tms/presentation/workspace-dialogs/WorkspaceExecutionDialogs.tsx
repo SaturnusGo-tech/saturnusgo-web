@@ -73,8 +73,8 @@ export function WorkspaceExecutionDialogs({
       <DefectDialog
         workspaceId={model.data.workspace.id}
         projectId={model.project.id}
-        run={model.selectedRun}
-        item={model.selectedRunItem}
+        run={model.view === "runs" ? model.selectedRun : null}
+        item={model.view === "runs" ? model.selectedRunItem : null}
         components={model.projectCases.map((testCase) => testCase.component)}
         offline={model.connection === "demo"}
         onClose={close}

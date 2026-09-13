@@ -1,3 +1,4 @@
+import { PortfolioIcon } from "../icon/PortfolioIcon";
 import { OrganizationExtras } from "../../management/presentation/extras/OrganizationExtras";
 import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
 import { organizationCopy } from "../../management/model/copy";
@@ -6,7 +7,7 @@ import { useOrganizationManagement } from "../../management/state/useOrganizatio
 import { InlineOrganizationTitle } from "../inline/InlineOrganizationTitle";
 import { InlineOrganizationMarkdown } from "../inline/InlineOrganizationMarkdown";
 import { OrganizationHeaderSlot } from "../header/OrganizationHeaderSlot";
-import { PiArchive, PiBriefcaseDuotone, PiPlus, PiArrowCounterClockwise } from "react-icons/pi";
+import { PiArchive, PiPlus, PiArrowCounterClockwise } from "react-icons/pi";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
 import type { PortfolioCopy } from "../../model/copy";
@@ -28,7 +29,7 @@ export function PortfolioDetail({ actionsTargetId, state, workspaceId, canManage
   const active = portfolio.status === "active";
   const projects = state.projects.items.filter((item) => `${item.name} ${item.key}`.toLocaleLowerCase().includes(state.search.trim().toLocaleLowerCase()));
   return <>
-    <header className={styles.heading}><PiBriefcaseDuotone className={styles.portfolioIcon} size={24} aria-hidden="true" /><InlineOrganizationTitle key={`${portfolio.id}:${tab}`} value={portfolio.name} label={copy.portfolioTitle} disabled={management.disabled || tab !== "about"} onSave={(name) => management.save({ name })} />
+    <header className={styles.heading}><PortfolioIcon size={24} /><InlineOrganizationTitle key={`${portfolio.id}:${tab}`} value={portfolio.name} label={copy.portfolioTitle} disabled={management.disabled || tab !== "about"} onSave={(name) => management.save({ name })} />
       {canManage && <OrganizationHeaderSlot targetId={actionsTargetId}>
         <button type="button" className={styles.iconButton} disabled={state.command.pending || !state.portfolio.data?.etag}
           aria-label={active ? copy.archive : copy.restore} title={active ? copy.archive : copy.restore}

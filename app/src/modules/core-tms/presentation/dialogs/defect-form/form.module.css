@@ -1,0 +1,40 @@
+.panel { width: min(980px, 100vw) !important; --cases-text: var(--ink); --cases-strong: var(--ink); --cases-muted: var(--muted); --cases-secondary-text: var(--ink); --cases-hover: var(--control-hover); --cases-primary: #3574f0; --cases-link: #3574f0; --cases-control-border: var(--line); --cases-raised: var(--control-hover); }
+.panel > header { padding: 20px 28px !important; gap: 10px; align-items: center; }
+.panel > header > div { flex: 1; min-width: 0; }
+.panel > header h2 { font-size: 17px !important; font-weight: 600; }
+.panel > header p { margin-top: 5px; font-size: 12px !important; line-height: 1.5; overflow-wrap: anywhere; }
+.panel > header > button { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; box-shadow: none; }
+.panel > header > .save { color: #fff; background: #3574f0; border-color: transparent; }
+.panel > header > .save:hover { background: #2867e4; }
+.panel > header > button:focus-visible { outline: 1px solid #79a5ed; outline-offset: 3px; }
+.panel > header > button:disabled { opacity: .55; }
+.closing { pointer-events: none; }
+.form { display: flex; flex: 1; flex-direction: column; min-height: 0; font-size: 13px; color: var(--ink); }
+.body { flex: 1; min-height: 0; overflow-y: auto; padding: 28px 28px 44px; scrollbar-gutter: stable; }
+.titleField { display: flex; flex-direction: column; gap: 9px; margin-bottom: 32px; }
+.titleField label, .linkField label { font-size: 12px; color: var(--muted); }
+.titleField > input, .linkField > input { width: 100%; box-sizing: border-box; border: 1px solid var(--line) !important; border-radius: 13px !important; background: transparent !important; color: var(--ink); box-shadow: none !important; outline: none !important; transition: border-color 150ms ease; }
+.titleField > input { padding: 13px 15px; font-size: 22px; line-height: 1.4; font-weight: 600; }
+.titleField > input::placeholder { color: var(--muted); opacity: .75; }
+.titleField > input:focus, .linkField > input:focus { border-color: #79a5ed !important; }
+.titleField > input[aria-invalid="true"] { border-color: var(--danger, #c96c70) !important; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: 40px; align-items: start; }
+.content { display: flex; flex-direction: column; min-width: 0; gap: 25px; }
+.linkField { display: flex; flex-direction: column; gap: 9px; }
+.linkField > input { padding: 10px 12px; min-height: 40px; font-size: 13px; }
+.validation { color: var(--danger, #c96c70); font-size: 12px; }
+.spinner { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 760px) {
+  .panel > header { padding: 16px 20px !important; }
+  .body { padding: 22px 20px 36px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .layout > aside { grid-row: 1; max-width: 460px; width: 100%; }
+  .titleField { margin-bottom: 24px; }
+  .titleField > input { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.panel { --tms-focus-ring: transparent; --tms-focus-border: #79a5ed; }
+.panel.panel .form.form :is(input, textarea, select):is(:focus, :focus-visible) { box-shadow: none !important; }
+.panel.panel .form.form .titleField > input[aria-invalid="true"] { border-color: var(--danger, #c96c70) !important; }
