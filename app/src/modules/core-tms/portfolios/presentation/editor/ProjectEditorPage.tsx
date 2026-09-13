@@ -1,3 +1,4 @@
+import { PortfolioIcon } from "../icon/PortfolioIcon";
 import { OrganizationExtras } from "../../management/presentation/extras/OrganizationExtras";
 import { WorkflowSelect } from "../../management/presentation/WorkflowSelect";
 import { organizationCopy } from "../../management/model/copy";
@@ -67,7 +68,7 @@ export function ProjectEditorPage({ actionsTargetId, workspaceId, canReadAttachm
         pattern="[A-Z][A-Z0-9]{1,11}" value={form.key} onChange={(event) => form.setKey(event.target.value.replace(/[^a-z0-9]/gi, "").toUpperCase())}
         placeholder={formCopy.keyPlaceholder} aria-describedby={`${formId}-key-hint`} />{attempted && errors.key && <span className={css.limit} role="alert">{errors.key}</span>}
       </div>
-      <div className={css.property}><span>{copy.portfolio}</span><AnimatedSelect label={copy.portfolio} value={form.portfolioId ?? ""} options={options}
+      <div className={css.property}><span>{copy.portfolio}</span><AnimatedSelect label={copy.portfolio} value={form.portfolioId ?? ""} options={options.map(option => ({ ...option, icon: option.value ? <PortfolioIcon size={17} /> : undefined }))}
         disabled={form.pending} onChange={(value) => form.setPortfolioId(value || null)} />
         {portfolios.error && <button type="button" className={styles.textButton} onClick={portfolios.retry}>{copy.optionsError} {copy.retry}</button>}
         {portfolios.cursor && <button type="button" className={styles.textButton} disabled={portfolios.loading} onClick={portfolios.more}>{copy.portfolioMore}</button>}

@@ -1,11 +1,12 @@
 import { Check, ChevronDown } from "lucide-react";
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState, type ReactNode } from "react";
 import { useAnchoredPopup } from "../popup/useAnchoredPopup";
 import styles from "./animated-select.module.css";
 
 export type AnimatedSelectOption = {
   value: string;
   label: string;
+  icon?: ReactNode;
 };
 
 export function AnimatedSelect({
@@ -75,7 +76,7 @@ export function AnimatedSelect({
           }
         }}
       >
-        <span>{selected?.label ?? "—"}</span>
+        <span className={selected?.icon ? styles.optionLabel : undefined}>{selected?.icon}<span>{selected?.label ?? "—"}</span></span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
       <div
@@ -122,7 +123,7 @@ export function AnimatedSelect({
                 closeAndRestoreFocus();
               }}
             >
-              <span>{option.label}</span>
+              <span className={option.icon ? styles.optionLabel : undefined}>{option.icon}<span>{option.label}</span></span>
               {active && <Check size={15} aria-hidden="true" />}
             </button>
           );

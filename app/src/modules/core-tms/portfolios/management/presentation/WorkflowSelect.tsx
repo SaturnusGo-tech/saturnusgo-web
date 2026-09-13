@@ -7,6 +7,6 @@ export function WorkflowSelect({ value, disabled, onChange }: { value: WorkflowP
   const { locale } = useTmsLocale();
   const copy = organizationCopy(locale);
   return <AnimatedSelect compact className={css.phase} label={copy.phase} value={value} disabled={disabled}
-    options={workflowPhases.map((phase) => ({ value: phase, label: copy.phases[phase] }))}
+    options={workflowPhases.map((phase) => ({ value: phase, label: copy.phases[phase], icon: <span className={css.phaseDot} data-phase={phase} aria-hidden="true" /> }))}
     onChange={(value) => { if (workflowPhases.includes(value as WorkflowPhase)) onChange(value as WorkflowPhase); }} />;
 }

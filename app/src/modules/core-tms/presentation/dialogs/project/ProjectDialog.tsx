@@ -1,3 +1,4 @@
+import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
 import { PiInfo, PiLockKey, PiPlus, PiSpinnerGap } from "react-icons/pi";
 import { useId } from "react";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -47,7 +48,7 @@ export function ProjectDialog({ workspaceId, project, projectEtag, portfolioId, 
         <label className={styles.field}><span>{copy.description}<small>{copy.optional}</small></span>
           <textarea disabled={form.pending || offline} maxLength={20000} value={form.description} onChange={(event) => form.setDescription(event.target.value)} placeholder={copy.descriptionPlaceholder} rows={3} /></label>
         <div className={styles.field}><span>{catalogCopy.portfolio}<small>{copy.optional}</small></span>
-          <AnimatedSelect label={catalogCopy.portfolio} value={form.portfolioId ?? ""} options={options}
+          <AnimatedSelect label={catalogCopy.portfolio} value={form.portfolioId ?? ""} options={options.map(option => ({ ...option, icon: option.value ? <PortfolioIcon size={17} /> : undefined }))}
             disabled={form.pending || offline} onChange={(value) => form.setPortfolioId(value || null)} />
           {portfolios.loading && <small role="status">{catalogCopy.loading}</small>}
           {portfolios.error && <button type="button" className={styles.inlineAction} onClick={portfolios.retry}>{catalogCopy.optionsError} {catalogCopy.retry}</button>}

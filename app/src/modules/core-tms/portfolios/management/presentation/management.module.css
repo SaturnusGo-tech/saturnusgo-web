@@ -23,3 +23,14 @@
 
 .phase [role="listbox"] { width: max-content; min-width: 185px; max-width: min(280px, 85vw); }
 .phase [role="option"] > span { overflow: visible; text-overflow: clip; }
+
+.phaseDot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #29955d; flex: 0 0 9px; }
+.phaseDot[data-phase="new"] { background: transparent; border: 2.5px solid #29955d; }
+.phaseDot[data-phase="in_progress"] { background: #3981e8; }
+.phaseDot[data-phase="in_review"] { background: #9b68cc; }
+.phaseDot[data-phase="on_hold"] { background: #d99525; }
+:global(.dark) .phaseDot { background: #55bd85; }
+:global(.dark) .phaseDot[data-phase="new"] { background: transparent; border-color: #55bd85; }
+:global(.dark) .phaseDot[data-phase="in_progress"] { background: #6da4f4; }
+:global(.dark) .phaseDot[data-phase="in_review"] { background: #b48add; }
+:global(.dark) .phaseDot[data-phase="on_hold"] { background: #edb34f; }

@@ -21,3 +21,7 @@
 @media (prefers-reduced-motion: reduce) { .trigger, .trigger > svg, .menu { transition: none; } }
 
 .textTrigger { background: transparent !important; border: 0 !important; border-bottom: 1px solid var(--tms-border, #d3d5da) !important; border-radius: 0 !important; box-shadow: none !important; padding: 6px 0 !important; }
+
+.optionLabel { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.optionLabel > :first-child { flex-shrink: 0; }
+.optionLabel > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
