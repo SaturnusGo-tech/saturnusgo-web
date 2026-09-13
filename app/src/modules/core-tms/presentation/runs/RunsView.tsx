@@ -2,6 +2,7 @@ import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, X, XCircle } 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
+import { MarkdownField } from "../cases/inspector/markdown/MarkdownField";
 import { ScenarioMarkdown } from "../cases/inspector/steps/markdown/ScenarioMarkdown";
 import { StepActualEditor } from "./actual/StepActualEditor";
 import { executableSteps } from "../../helpers/cases/caseRevision";
@@ -83,11 +84,11 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
             {verificationContext}
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
-              <p>{selectedItem.snapshot.description || (locale === "ru" ? "Описание не указано." : "No description.")}</p>
+              <MarkdownField value={selectedItem.snapshot.description ?? ""} label={locale === "ru" ? "Описание" : "Description"} emptyLabel={locale === "ru" ? "Описание не указано." : "No description."} allowAttachments={false} />
             </section>
             <section className={runStyles.contentSection}>
               <header><h2>{t("runs.preconditions")}</h2></header>
-              <p>{selectedItem.snapshot.preconditions || (locale === "ru" ? "Предусловия не указаны." : "No preconditions.")}</p>
+              <MarkdownField value={selectedItem.snapshot.preconditions ?? ""} label={t("runs.preconditions")} emptyLabel={locale === "ru" ? "Предусловия не указаны." : "No preconditions."} allowAttachments={false} />
             </section>
             <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`}>
               <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span></header>
@@ -102,7 +103,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
                       <span className={`${runStyles.executionBadge} ${runStyles[`execution_${status}`]}`}>{statusIcon[status]}{localizedLabel(locale, status)}</span>
                     </div>
                     <div className={runStyles.stepExpected} role="cell"><small>{t("runs.expected")}</small><ScenarioMarkdown value={step.expectedResult || "—"} label={t("runs.expected")} /></div>
-                    <div className={runStyles.stepActual} role="cell"><small>{t("runs.actual")}</small>{["passed", "failed", "blocked"].includes(status) && attemptWritable ? <StepActualEditor key={`${selectedItem.id}:${attempt.attemptNo}:${step.id}`} order={step.order} value={result?.actualResult ?? ""} onChange={(value) => onStepActual(step.id, value)} onSave={(value) => onSaveStepActual(step.id, status, value)} onDirtyChange={(dirty) => { if (currentEditScope.current === editScope) setDirtySteps((current) => dirty ? Array.from(new Set([...current, step.id])) : current.filter((id) => id !== step.id)); }} /> : <span>{result?.actualResult || "—"}</span>}</div>
+                    <div className={runStyles.stepActual} role="cell"><small>{t("runs.actual")}</small>{["passed", "failed", "blocked"].includes(status) && attemptWritable ? <StepActualEditor key={`${selectedItem.id}:${attempt.attemptNo}:${step.id}`} order={step.order} value={result?.actualResult ?? ""} onChange={(value) => onStepActual(step.id, value)} onSave={(value) => onSaveStepActual(step.id, status, value)} onDirtyChange={(dirty) => { if (currentEditScope.current === editScope) setDirtySteps((current) => dirty ? Array.from(new Set([...current, step.id])) : current.filter((id) => id !== step.id)); }} /> : <ScenarioMarkdown value={result?.actualResult || "—"} label={t("runs.actual")} />}</div>
                     {attemptWritable && <div className={runStyles.stepActions} role="cell"><button aria-label={`${t("runs.passStep")} ${step.order}`} title={t("runs.passStep")} disabled={executionPending || dirtySteps.length > 0} className={status === "passed" ? runStyles.actionPassActive : ""} onClick={() => onStepStatus(step.id, "passed")}><Check size={15} /></button><button aria-label={`${t("runs.failStep")} ${step.order}`} title={t("runs.failStep")} disabled={executionPending || dirtySteps.length > 0} className={status === "failed" ? runStyles.actionFailActive : ""} onClick={() => onStepStatus(step.id, "failed")}><X size={15} /></button><button aria-label={`${t("runs.blockStep")} ${step.order}`} title={t("runs.blockStep")} disabled={executionPending || dirtySteps.length > 0} className={status === "blocked" ? runStyles.actionBlockActive : ""} onClick={() => onStepStatus(step.id, "blocked")}><Ban size={14} /></button></div>}
                   </article>;
                 })}
