@@ -39,15 +39,14 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated, ini
             <ParentFolderPicker inline label={copy.parent} searchLabel={copy.searchParent} emptyLabel={copy.noFolders} value={parent} options={parents} onChange={setParent} />
           </div>
         </div>
-        <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
+        {cleanName && <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
           <Folder size={16} aria-hidden="true" />
           <span><small>{copy.path}</small><strong><FolderBreadcrumb path={name.trim() ? path : parent} root={copy.root} /></strong>{duplicate && <em>{copy.duplicate}</em>}</span>
-        </div>
+        </div>}
       </div>
       {!validParent && <p role="alert" className={styles.error}>{locale === "ru" ? "Выберите существующую родительскую папку." : "Select an existing parent folder."}</p>}
       {error && <p role="alert" className={styles.error}>{error}</p>}
       <div className={styles.footer}>
-        <button type="button" className={shared.textButton} onClick={onClose}>{copy.cancel}</button>
         <button className={shared.primaryButton} disabled={!cleanName || duplicate || busy || !validParent || cleanName.includes("/")}>
           <FolderPlus size={15} /> {editing ? (locale === "ru" ? "Сохранить" : "Save") : copy.create}
         </button>

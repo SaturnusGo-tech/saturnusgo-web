@@ -18,3 +18,7 @@
 @keyframes shimmer { to { background-position: -200% 0; } }
 @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .menu, .skeleton { animation: none; } }
+
+.selectionFooter { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 2px 12px; font-size:13px; color:var(--muted); }
+.selectionFooter button { border:0; border-radius:999px; padding:9px 18px; background:var(--tms-accent, #3674ed); color:#fff; cursor:pointer; }
+.selectionFooter button:disabled { opacity:.45; cursor:default; }

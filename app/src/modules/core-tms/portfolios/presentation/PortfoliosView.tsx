@@ -1,3 +1,4 @@
+import { CatalogActionDialog } from "../lifecycle/presentation/dialog/CatalogActionDialog";
 import { useId } from "react";
 import { useProjectTab } from "../navigation/project/useProjectTab";
 import { PiCaretRight } from "react-icons/pi";
@@ -56,6 +57,7 @@ export function PortfoliosView(props: PortfoliosViewProps) {
       portfolioId={creationPortfolioId ?? currentPortfolio?.id} portfolioName={currentPortfolio?.name} onCancel={state.cancelEditor} onCreated={state.created} onUpdated={state.updated} />}
     {canManage && state.dialog === "attach" && <AttachProjectDialog workspaceId={props.workspaceId} copy={copy} pending={state.command.pending}
       error={state.command.error} onClose={close} onAttach={state.attach} />}
+    {canManage && state.catalogActions.target && <CatalogActionDialog state={state.catalogActions} />}
     {canManage && state.dialog === "archive" && <ArchivePortfolioDialog copy={copy} pending={state.command.pending} error={state.command.error} onClose={close} onConfirm={state.transition} />}
   </section>;
 }

@@ -1,6 +1,6 @@
 export const importCopy = {
   ru: {
-    title: "Импорт тест-кейсов", subtitle: "Загрузите JSON — Falcon подготовит кейсы и папки.",
+    title: "Импорт тест-кейсов", subtitle: "Добавьте тест-кейсы и папки из JSON.",
     choose: "Выбрать JSON", replace: "Другой файл", format: "JSON с тест-кейсами · до 5 МБ",
     destination: "Куда импортировать", root: "Корень проекта", search: "Найти папку", noFolder: "Папки не найдены",
     preview: "Структура после импорта", cases: "Кейсов в файле", newFolders: "Новых папок", existingFolders: "Существующих папок",
@@ -14,7 +14,7 @@ export const importCopy = {
     files: "Перетащите JSON сюда", folderHint: "Включая пустые папки из файла.",
   },
   en: {
-    title: "Import test cases", subtitle: "Upload JSON — Falcon will prepare cases and folders.",
+    title: "Import test cases", subtitle: "Add test cases and folders from JSON.",
     choose: "Choose JSON", replace: "Choose another file", format: "Test-case JSON · up to 5 MB",
     destination: "Import destination", root: "Project root", search: "Find a folder", noFolder: "No folders found",
     preview: "Structure after import", cases: "Cases in file", newFolders: "New folders", existingFolders: "Existing folders",

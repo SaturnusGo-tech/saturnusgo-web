@@ -55,9 +55,9 @@ function ImportSession(props: ImportCasesDialogProps & { projects: Project[]; on
       <div className={css.location}>
       <fieldset className={css.destination} disabled={state.locked || state.busy || state.phase === "reading"}>
         <legend>{locale === "ru" ? "Проект" : "Project"}</legend>
-        <AnimatedSelect label={locale === "ru" ? "Проект для импорта" : "Import project"} value={props.project.id}
+        {props.projects.length === 1 ? <div className={css.singleProject}>{props.project.name}</div> : <AnimatedSelect label={locale === "ru" ? "Проект для импорта" : "Import project"} value={props.project.id}
           options={props.projects.map(project => ({ value: project.id, label: project.name }))}
-          disabled={state.locked || state.busy || state.phase === "reading"} onChange={props.onProjectChange} />
+          disabled={state.locked || state.busy || state.phase === "reading"} onChange={props.onProjectChange} />}
       </fieldset>
         {state.context && <fieldset className={css.destination} disabled={state.locked || state.busy}>
           <legend>{copy.destination}</legend>
@@ -96,17 +96,16 @@ function ImportSession(props: ImportCasesDialogProps & { projects: Project[]; on
       {(state.phase === "partial" || state.phase === "stopped") && <p className={css.hint}>{copy.partialRule}</p>}
       {state.error && <p role="alert" className={css.error}>{state.error}</p>}
       {state.failed.length > 0 && <details className={css.failures}><summary>{copy.errors}: {state.failed.length}</summary>
-        <ul>{state.failed.map((item, index) => <li key={index}><strong>{item.sourceKey}</strong> — {item.message}</li>)}</ul>
+        <ul>{state.failed.map((item, index) => <li key={index}><strong>{item.sourceKey}</strong>: {item.message}</li>)}</ul>
       </details>}
       {!state.context && state.error && <button type="button" className={styles.secondaryButton} onClick={state.retryContext}>{copy.retryLoad}</button>}
     </div>
-    <footer className={css.footer}>
-      <button type="button" className={styles.secondaryButton} onClick={state.busy ? state.stop : close}>
-        {state.busy ? copy.stop : state.phase === "success" ? copy.close : copy.cancel}</button>
-      {state.phase !== "success" && <button type="button" className={styles.primaryButton}
+    {state.phase !== "success" && <footer className={css.footer}>
+      {state.busy && <button type="button" className={styles.textButton} onClick={state.stop}>{copy.stop}</button>}
+      <button type="button" className={styles.primaryButton}
         disabled={state.busy || (!state.external.active && (!state.plan || !hasContent)) || state.phase === "reading" || !state.context}
         onClick={() => void state.start()}>{state.busy && <LoaderCircle size={15} className={styles.spin} />}
-        {state.phase === "converting" ? (locale === "ru" ? "Подготовка…" : "Preparing…") : state.locked ? copy.retry : copy.start}</button>}
-    </footer>
+        {state.phase === "converting" ? (locale === "ru" ? "Подготовка…" : "Preparing…") : state.locked ? copy.retry : copy.start}</button>
+    </footer>}
   </Modal>;
 }

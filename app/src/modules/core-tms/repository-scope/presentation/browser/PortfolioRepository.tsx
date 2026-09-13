@@ -14,7 +14,7 @@ import css from "./portfolio-repository.module.css";
 
 export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
-  const id = model.repositoryScope.portfolioId!;
+  const id = model.repositoryScope.key;
   const resource = model.portfolioRepository;
   const resize = useRepositoryWidth();
   const [collapsed, setCollapsed] = useNavigationValue<string[]>(`repository:${id}:collapsed`, []);
@@ -43,21 +43,21 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
     } catch { setError(true); } finally { setOpening(null); }
   }
   return <aside ref={resize.ref} style={resize.style} data-repository-tree className={`${shared.repository} ${css.pane}`}
-    aria-label={ru ? "Репозиторий портфеля" : "Portfolio repository"}>
+    aria-label={ru ? "Репозиторий проектов" : "Project repository"}>
     <header className={shared.heading}><strong>{ru ? "Репозиторий" : "Repository"}</strong></header>
     <SelectionControls state={filters} ru={ru} disabled={locked} onResetExtra={() => setSelectedProjects([])} extraSections={[{
       id: "projects", label: ru ? "Проекты" : "Projects", icon: <FolderKanban size={13} />,
       active: selectedProjects.length > 0, summary: selectedProjects.length ? String(selectedProjects.length) : (ru ? "Все" : "All"),
-      render: () => <RunFilterOptions label={ru ? "Проекты портфеля" : "Portfolio projects"} multiple
+      render: () => <RunFilterOptions label={ru ? "Проекты" : "Projects"} multiple
         selected={selectedProjects.length ? selectedProjects : ["all"]} placeholder={ru ? "Найти проект" : "Find a project"}
         options={[{ value: "all", label: ru ? "Все проекты" : "All projects" }, ...(resource.catalog?.projects ?? []).map(project => ({ value: project.id, label: project.name }))]}
         onChange={value => setSelectedProjects(current => togglePortfolioProject(current, value))} />,
     }]} />
-    <div className={css.caption}><strong>{resource.catalog?.portfolio.name ?? (ru ? "Портфель" : "Portfolio")}</strong>
+    <div className={css.caption}><strong>{resource.catalog?.portfolio?.name ?? (ru ? `Проекты · ${resource.catalog?.projects.length ?? 0}` : `Projects · ${resource.catalog?.projects.length ?? 0}`)}</strong>
       {!resource.loading && !resource.error && ![...branches.values()].some(branch => branch === null) && <span>{filters.visible.length}</span>}</div>
     {error && <p className={css.message} role="alert">{ru ? "Не удалось открыть кейс. Попробуйте ещё раз." : "Could not open the case. Please try again."}</p>}
     <div className={shared.treeScroll} aria-busy={resource.loading || Boolean(opening)}>
-      {resource.error && <div className={shared.loadError} role="alert"><span>{ru ? "Портфель недоступен или не удалось загрузить проекты." : "The portfolio is unavailable or its projects could not be loaded."}</span>
+      {resource.error && <div className={shared.loadError} role="alert"><span>{ru ? "Не удалось загрузить выбранные проекты или портфели." : "The selected projects or portfolios could not be loaded."}</span>
         <button type="button" onClick={resource.retry}>{ru ? "Повторить" : "Retry"}</button></div>}
       {resource.loading && <div className={shared.skeleton} role="status" aria-label={ru ? "Загрузка кейсов портфеля" : "Loading portfolio cases"}><i /><i /><i /></div>}
       {projects.map(project => {
@@ -70,7 +70,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
             <button type="button" disabled={locked} aria-expanded={expanded} onClick={() => setCollapsed(current => current.includes(project.id) ? current.filter(value => value !== project.id) : [...current, project.id])}>
               <ChevronDown size={14} className={css.chevron} data-open={expanded} /><Folder size={16} /><strong>{project.name}</strong>{branch && <small>{cases.length}</small>}</button>
             <button type="button" disabled={locked} aria-label={`${ru ? "Открыть только проект" : "Open project only"}: ${project.name}`}
-              title={ru ? "Только этот проект" : "Only this project"} onClick={() => model.repositoryScope.select(null, project.id)}><ArrowUpRight size={16} /></button>
+              title={ru ? "Только этот проект" : "Only this project"} onClick={async () => { if (await model.chooseProject(project.id)) model.repositoryScope.select(null, project.id); }}><ArrowUpRight size={16} /></button>
           </div>
           {expanded && <div className={css.contents}>
             {branch === null ? <div className={shared.loadError} role="alert"><span>{ru ? "Кейсы проекта не загружены" : "Project cases could not be loaded"}</span><button type="button" onClick={resource.retry}>{ru ? "Повторить" : "Retry"}</button></div>
@@ -80,7 +80,7 @@ export function PortfolioRepository({ model }: { model: WorkspaceModel }) {
           </div>}
         </section>;
       })}
-      {!resource.loading && !resource.error && !resource.catalog?.projects.length && <p className={css.message}>{ru ? "В портфеле пока нет активных проектов" : "This portfolio has no active projects yet"}</p>}
+      {!resource.loading && !resource.error && !resource.catalog?.projects.length && <p className={css.message}>{ru ? "В выбранной области нет активных проектов" : "No active projects in this scope"}</p>}
       {!resource.loading && !resource.error && filtered && !filters.visible.length && <p className={css.message}>{ru ? "Кейсы не найдены. Измените поиск или фильтры." : "No matching cases. Adjust the search or filters."}</p>}
     </div>
     <div {...resize.handleProps} className={shared.resizeHandle} role="separator" tabIndex={0} aria-orientation="vertical"

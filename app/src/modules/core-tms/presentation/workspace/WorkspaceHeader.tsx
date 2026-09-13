@@ -88,7 +88,7 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.view !== "api" && model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && !model.repositoryScope.portfolioId && model.project && <div className={shellStyles.headerMeta}>
+      {model.view !== "api" && model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && !model.repositoryScope.aggregate && model.project && <div className={shellStyles.headerMeta}>
         {model.view === "runs" && model.selectedRun && <div className={shellStyles.runTime}><RunClock run={model.selectedRun} /></div>}
         <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
           title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>

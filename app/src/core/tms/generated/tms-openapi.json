@@ -1008,7 +1008,7 @@
           "Projects"
         ],
         "summary": "Update a project",
-        "description": "Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH. portfolioId assigns an existing active same-workspace portfolio; null unassigns. This changes only the project association and never copies cases, changes project identity, or grants permissions. Concurrent assignments use the project version.",
+        "description": "Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects only accept a PATCH containing portfolioId: null to detach without restoring. portfolioId assigns an existing active same-workspace portfolio; null unassigns. This changes only the project association and never copies cases, changes project identity, or grants permissions. Concurrent assignments use the project version.",
         "operationId": "updateProject",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -8064,7 +8064,7 @@
           "Portfolios"
         ],
         "summary": "Archive a portfolio",
-        "description": "Archives this organizational portfolio. Projects, cases, and workspace permissions are unchanged. New assignments to an archived portfolio are rejected; existing associations can be removed through project PATCH.",
+        "description": "Atomically archives the portfolio and its active projects, preserving cases, results and history. Previously archived projects are unchanged. Requires workspace project:manage capability and a current portfolio ETag.",
         "operationId": "archivePortfolio",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
@@ -8079,9 +8079,6 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -8103,6 +8100,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         }
       }
@@ -8136,9 +8136,6 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -8159,8 +8156,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "description": "Restores the portfolio and only projects archived by its latest cascade. Previously archived or subsequently detached projects remain unchanged."
       }
     },
     "/workspaces/{workspaceId}/members": {
@@ -15817,6 +15818,63 @@
             "$ref": "#/components/responses/ConnectorUnavailable"
           }
         }
+      }
+    },
+    "/portfolios/{portfolioId}/remove": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/PortfolioIdPath"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Delete an empty portfolio",
+        "operationId": "removePortfolio",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PortfolioResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "description": "Removes the portfolio from all catalogs. Any linked project, including archived projects, rejects removal with 409 PORTFOLIO_NOT_EMPTY. Historical audit and references are retained. Idempotent retries return the deletion receipt; subsequent reads return 404."
       }
     }
   },
@@ -31471,7 +31529,7 @@
           "projectCount": {
             "type": "integer",
             "minimum": 0,
-            "description": "Count of active projects currently associated with this portfolio; aggregated for at most 100 portfolio IDs per request."
+            "description": "Number of linked projects, including archived projects."
           },
           "workflowPhase": {
             "$ref": "#/components/schemas/OrganizationWorkflowPhase"

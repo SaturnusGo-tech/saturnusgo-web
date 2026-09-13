@@ -1,3 +1,5 @@
+import { CatalogActionMenu } from "../../lifecycle/presentation/CatalogActionMenu";
+import type { CatalogAction } from "../../lifecycle/model/action";
 import { PortfolioIcon } from "../icon/PortfolioIcon";
 import { PiCaretRight, PiFolderSimpleDuotone } from "react-icons/pi";
 import type { Project } from "../../../../../core/tms/contracts/legacy-contract";
@@ -8,7 +10,8 @@ import type { Portfolio, PortfolioRoute } from "../../model/portfolio";
 import type { PortfolioCopy } from "../../model/copy";
 import styles from "../styles/portfolios.module.css";
 
-export function CatalogTable({ portfolios, projects, workspaceId, copy, onNavigate }: {
+export function CatalogTable({ portfolios, projects, workspaceId, copy, onNavigate, onAction }: {
+  onAction?: (action: CatalogAction) => void;
   portfolios: readonly Portfolio[]; projects: readonly Project[]; workspaceId: string; copy: PortfolioCopy; onNavigate: (route: PortfolioRoute) => void;
 }) {
   const { locale } = useTmsLocale();
@@ -21,7 +24,7 @@ export function CatalogTable({ portfolios, projects, workspaceId, copy, onNaviga
         </button></td>
         <td className={styles.quiet}>{formatCount(locale, item.projectCount, ["project", "projects"], ["проект", "проекта", "проектов"])}</td>
         <td><ResponsibleName workspaceId={workspaceId} identityId={item.responsibleIdentityId} /></td>
-        <td><PiCaretRight aria-hidden="true" /></td>
+        <td><div className={styles.rowActions}><PiCaretRight aria-hidden="true" />{onAction && <CatalogActionMenu target={{ kind: "portfolio", item }} onAction={onAction} />}</div></td>
       </tr>)}
       {projects.map((item) => <tr key={`project:${item.id}`}>
         <td><button type="button" className={styles.rowLink} onClick={() => onNavigate({ kind: "project", id: item.id })}>
@@ -29,7 +32,7 @@ export function CatalogTable({ portfolios, projects, workspaceId, copy, onNaviga
         </button></td>
         <td><code className={styles.key}>{item.key}</code></td>
         <td><ResponsibleName workspaceId={workspaceId} identityId={item.responsibleIdentityId ?? null} /></td>
-        <td><PiCaretRight aria-hidden="true" /></td>
+        <td><div className={styles.rowActions}><PiCaretRight aria-hidden="true" />{onAction && <CatalogActionMenu target={{ kind: "project", item }} onAction={onAction} />}</div></td>
       </tr>)}
     </tbody>
   </table></div>;

@@ -4,6 +4,8 @@ import type { TmsHttpClient } from "../../../../core/tms/transport/http";
 import { loadPortfolioProjects, loadRepositoryPortfolios } from "../data/repository-catalog";
 import { loadPortfolioRepository, loadRepositoryProject } from "../data/repository-content";
 
+import { loadSelectedRepository } from "../data/selection/selected-repository";
+
 const signal = () => new AbortController().signal;
 const portfolio = { id: "portfolio", workspaceId: "workspace", status: "active", name: "Portfolio", description: "", checklist: [] };
 const project = (id: string) => ({ id, workspaceId: "workspace", portfolioId: "portfolio", name: id, status: "active" });
@@ -75,4 +77,48 @@ test("cancellation stops publishing project results and scheduling more projects
   });
   await assert.rejects(loadPortfolioRepository(api, "workspace", "portfolio", controller.signal, () => {}, () => published++));
   assert.equal(published, 0); assert.ok(requests <= 3);
+});
+
+
+test("multiple projects load all selected pages without fetching unrelated case data", async () => {
+  const loaded: string[] = []; let selected: string[] = [];
+  const api = http(async path => {
+    const query = new URL(path, "https://test").searchParams;
+    if (path.startsWith("/projects?")) return query.has("cursor")
+      ? page([project("second")]) : page([project("first"), project("unrelated")], "next");
+    if (path.startsWith("/test-cases")) {
+      assert.ok(["first", "second"].includes(query.get("projectId")!));
+    }
+    return page([]);
+  });
+  await loadSelectedRepository(api, "workspace", { projectIds: ["first", "second"], portfolioIds: [] }, signal(),
+    catalog => { selected = catalog.projects.map(item => item.id); }, id => loaded.push(id));
+  assert.deepEqual(selected, ["first", "second"]); assert.deepEqual(loaded.sort(), ["first", "second"]);
+});
+
+test("multiple portfolio selection combines their projects and excludes unselected portfolios", async () => {
+  const api = { ...http(async path => {
+    if (path.startsWith("/projects?")) {
+      const id = new URL(path, "https://test").searchParams.get("portfolioId")!;
+      assert.ok(["one", "two"].includes(id));
+      return page([{ ...project(`${id}-project`), portfolioId: id }]);
+    }
+    return page([]);
+  }), getResource: async (path: string) => ({ data: { ...portfolio, id: path.split("/").slice(-1)[0] }, etag: '"1"' }) } as unknown as TmsHttpClient;
+  const loaded: string[] = [];
+  await loadSelectedRepository(api, "workspace", { projectIds: [], portfolioIds: ["one", "two"] }, signal(),
+    catalog => assert.equal(catalog.projects.length, 2), id => loaded.push(id));
+  assert.deepEqual(loaded.sort(), ["one-project", "two-project"]);
+});
+
+test("cancelling a multiple-project selection never publishes late case results", async () => {
+  const controller = new AbortController(); let published = 0;
+  const api = http(async path => {
+    if (path.startsWith("/projects?")) return page([project("one"), project("two")]);
+    if (path.startsWith("/test-cases")) controller.abort();
+    return page([]);
+  });
+  await assert.rejects(loadSelectedRepository(api, "workspace", { projectIds: ["one", "two"], portfolioIds: [] }, controller.signal,
+    () => {}, () => published++));
+  assert.equal(published, 0);
 });

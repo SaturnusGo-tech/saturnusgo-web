@@ -28,9 +28,9 @@ export async function savePortfolio(http: TmsHttpClient, workspaceId: string, dr
   return { data: mapPortfolio(result.data), etag: result.etag };
 }
 
-export async function transitionPortfolio(http: TmsHttpClient, id: string, action: "archive" | "restore", etag: string, operationKey: string, signal?: AbortSignal) {
-  const path = `/portfolios/${encodeURIComponent(id)}${action === "restore" ? "/restore" : ""}`;
-  const result = await http.mutateResource<Api["Portfolio"]>(path, action === "restore" ? "POST" : "DELETE", undefined,
+export async function transitionPortfolio(http: TmsHttpClient, id: string, action: "archive" | "restore" | "remove", etag: string, operationKey: string, signal?: AbortSignal) {
+  const path = `/portfolios/${encodeURIComponent(id)}${action === "archive" ? "" : `/${action}`}`;
+  const result = await http.mutateResource<Api["Portfolio"]>(path, action === "archive" ? "DELETE" : "POST", undefined,
     { ifMatch: etag, idempotencyKey: operationKey, signal });
   return { data: mapPortfolio(result.data), etag: result.etag };
 }

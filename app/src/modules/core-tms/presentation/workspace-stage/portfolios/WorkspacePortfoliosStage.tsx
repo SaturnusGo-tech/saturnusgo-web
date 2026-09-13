@@ -17,5 +17,6 @@ export function WorkspacePortfoliosStage({ model }: { model: WorkspaceModel }) {
     }}
     onProjectCreated={(project) => model.setData((current) => ({ ...current,
       projects: current.projects.some((item) => item.id === project.id) ? current.projects.map((item) => item.id === project.id ? project : item) : [...current.projects, project] }))}
+    onCatalogChanged={model.retryBootstrap}
     onProjectUpdated={model.acceptProjectUpdate} />;
 }

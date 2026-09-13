@@ -24,7 +24,7 @@ export function useWorkspaceModel() {
   const state = useWorkspaceState();
   const derived = useWorkspaceDerived(state);
   const repositoryScope = useRepositoryScope(state.data.workspace.id, state.projectId, state.view === "cases");
-  const portfolioRepository = usePortfolioRepository(state.data.workspace.id, repositoryScope.portfolioId, state.connection === "connected");
+  const portfolioRepository = usePortfolioRepository(state.data.workspace.id, repositoryScope.portfolioId, state.connection === "connected" && state.view === "cases", repositoryScope.projectIds, repositoryScope.portfolioIds);
   const folders = useWorkspaceFolders(state, derived);
   const selectRepositoryFolder = useFolderNavigation(state, folders);
   const workspace = useWorkspaceActions(state);

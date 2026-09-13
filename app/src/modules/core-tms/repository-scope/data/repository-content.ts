@@ -11,7 +11,7 @@ export async function loadRepositoryProject(http: TmsHttpClient, workspaceId: st
   return { cases: cases.items, folders };
 }
 
-export type PortfolioCatalog = Awaited<ReturnType<typeof loadPortfolioProjects>>;
+export type PortfolioCatalog = Omit<Awaited<ReturnType<typeof loadPortfolioProjects>>, "portfolio"> & { portfolio: Awaited<ReturnType<typeof loadPortfolioProjects>>["portfolio"] | null };
 export type RepositoryProject = Awaited<ReturnType<typeof loadRepositoryProject>>;
 
 export async function loadPortfolioRepository(http: TmsHttpClient, workspaceId: string, portfolioId: string, signal: AbortSignal,

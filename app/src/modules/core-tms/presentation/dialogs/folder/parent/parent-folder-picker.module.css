@@ -6,10 +6,10 @@
 .trigger:focus-visible { outline: 2px solid var(--tms-focus-ring); outline-offset: 2px; }
 .browser { position: fixed; inset: auto; margin: 0; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 24px rgb(0 0 0 / 10%); overflow: auto; z-index: 100; animation: folderPopupEnter 160ms ease-out; }
 .browser[data-inline] { position: static; margin: 0; box-shadow: none; animation: none; }
-.search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; color: var(--muted); background: transparent; }
+.search { display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 0; border-radius: 8px; color: var(--muted); background: var(--control-bg, transparent); }
 .picker .search input { width: 100%; min-width: 0; min-height: 32px; height: 32px; padding: 0; font-size: 12px; border: 0; background: transparent !important; box-shadow: none !important; outline: none !important; }
 .search:focus-within { border-color: var(--tms-focus-border); }
-.list { max-height: min(290px, 34dvh); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; padding-top: 8px; scroll-padding-block: 5px; }
+.list { max-height: min(290px, 34dvh); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; padding-top: 0; scroll-padding-block: 5px; }
 .row { display: flex; align-items: center; gap: 1px; min-width: 0; margin-block: 3px; }
 .row > button { color: var(--ink); background: transparent; border: 0; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer; }
 .row .disclosure { flex: 0 0 20px; width: 20px; height: 32px; display: grid; place-items: center; color: var(--muted); padding: 0; }
@@ -27,5 +27,7 @@
 :global(.dark) .browser { background: var(--nav-raised, var(--paper)); }
 @media (prefers-reduced-motion: reduce) { .trigger > svg { transition: none; } .browser { animation: none; } }
 
-.picker .browser .search[data-input-shell] { border-radius: 0; box-shadow: none !important; }
+.picker .browser .search[data-input-shell] { border-radius: 8px; box-shadow: none !important; }
 .picker .browser .search[data-input-shell]:focus-within { box-shadow: none !important; border-bottom-color: var(--tms-focus-border); }
+
+.list[data-search] { margin-top: 6px; }

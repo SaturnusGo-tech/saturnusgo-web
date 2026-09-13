@@ -30,3 +30,16 @@ test("portfolio browsing never leaks into another workspace or another feature",
   assert.equal(new URL(other).searchParams.has("repositoryPortfolioId"), false);
   assert.equal(readRepositoryPortfolio(scoped.replace("portfolio", "%3Cscript%3E")), null);
 });
+
+test("multiple project and portfolio selections survive case navigation without leaking to other features", async () => {
+  const { readRepositorySelection } = await import("../navigation/repository-scope");
+  const scoped = repositoryScopeUrl(base, "w", "a", null, { portfolioIds: [], projectIds: ["a", "b", "a"] });
+  assert.deepEqual(readRepositorySelection(scoped, "w").projectIds, ["a", "b"]);
+  const opened = buildCaseDeepLink(scoped, { workspaceId: "w", projectId: "b", caseId: "case-b" });
+  assert.deepEqual(readRepositorySelection(opened, "w").projectIds, ["a", "b"]);
+  const reports = buildWorkspaceDeepLink(opened, { workspaceId: "w", projectId: "b", view: "reports", runId: null });
+  assert.deepEqual(readRepositorySelection(reports, "w").projectIds, []);
+  const portfolios = repositoryScopeUrl(base, "w", "a", null, { portfolioIds: ["p1", "p2"], projectIds: [] });
+  assert.deepEqual(readRepositorySelection(portfolios, "w").portfolioIds, ["p1", "p2"]);
+  assert.deepEqual(readRepositorySelection(portfolios, "foreign"), { portfolioIds: [], projectIds: [] });
+});

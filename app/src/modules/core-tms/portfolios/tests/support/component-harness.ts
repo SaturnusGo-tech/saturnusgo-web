@@ -4,7 +4,7 @@ import ts from "typescript";
 
 type Slot = { value?: unknown; deps?: readonly unknown[]; cleanup?: () => void };
 export type Node = { type: string; props: Record<string, unknown> };
-export function componentHarness(initialHref = "https://tms.example/work/") {
+export function componentHarness(initialHref = "https://tms.example/work/", globals: Record<string, unknown> = {}) {
   let cursor = 0;
   let effects: (() => void)[] = [];
   const slots: Slot[] = [];
@@ -39,7 +39,7 @@ export function componentHarness(initialHref = "https://tms.example/work/") {
     const jsx = (type: string, props: Record<string, unknown>) => ({ type, props });
     runInNewContext(ts.transpileModule(readFileSync(url, "utf8"), {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021, jsx: ts.JsxEmit.ReactJSX },
-    }).outputText, { module, exports: module.exports, AbortController, JSON, URL, window, crypto: globalThis.crypto,
+    }).outputText, { ...globals, module, exports: module.exports, AbortController, JSON, URL, window, crypto: globalThis.crypto,
       require: (name: string) => name === "react" ? react : name === "react/jsx-runtime" ? { jsx, jsxs: jsx }
         : name.endsWith("content-transition") ? { transitionContent: (update: () => void) => update() }
         : name.endsWith(".css") ? { default: proxy } : resolve(name) ?? proxy });

@@ -1,5 +1,6 @@
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
+import { useAnchoredPopup } from "../popup/useAnchoredPopup";
 import styles from "./animated-select.module.css";
 
 export type AnimatedSelectOption = {
@@ -31,14 +32,9 @@ export function AnimatedSelect({
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
   const selected = options[selectedIndex] ?? options[0];
 
-  useEffect(() => {
-    if (!open) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [open]);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const dismiss = useCallback(() => setOpen(false), []);
+  useAnchoredPopup(open, false, rootRef, triggerRef, menuRef, dismiss);
 
   function optionButtons() {
     return Array.from(rootRef.current?.querySelectorAll<HTMLButtonElement>("[role='option']") ?? []);
@@ -83,6 +79,8 @@ export function AnimatedSelect({
         <ChevronDown size={16} aria-hidden="true" />
       </button>
       <div
+        ref={menuRef}
+        popover="manual"
         className={styles.menu}
         id={menuId}
         role="listbox"

@@ -3,7 +3,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import { sortFolderOptions } from "./folder-options";
 import { folderChoiceAncestors, folderChoiceRows } from "./tree/folder-choice-tree";
 import { FolderBreadcrumb } from "../breadcrumb/FolderBreadcrumb";
-import { useFolderPopup } from "./popup/useFolderPopup";
+import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
 import css from "./parent-folder-picker.module.css";
 
 export function ParentFolderPicker({ value, options, label, searchLabel, emptyLabel, onChange, inline = false }: {
@@ -19,7 +19,7 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
   const search = useRef<HTMLInputElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const dismiss = useCallback(() => setOpen(false), []);
-  useFolderPopup(open, inline, root, trigger, menu, dismiss);
+  useAnchoredPopup(open, inline, root, trigger, menu, dismiss);
   const visible = folderChoiceRows(sortFolderOptions(options), expanded, query);
   function close() { if (!inline) { setOpen(false); trigger.current?.focus(); } }
   function buttons() { return Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []); }
@@ -37,11 +37,11 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
       <PiCaretDown size={14} aria-hidden="true" />
     </button>}
     {(open || inline) && <div ref={menu} popover={inline ? undefined : "manual"} className={css.browser} data-inline={inline || undefined}>
-      <div className={css.search} data-input-shell><PiMagnifyingGlass size={15} aria-hidden="true" />
+      {options.length > 1 && <div className={css.search} data-input-shell><PiMagnifyingGlass size={15} aria-hidden="true" />
         <input ref={search} value={query} aria-label={searchLabel} placeholder={searchLabel} onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => { if (event.key === "ArrowDown") { event.preventDefault(); buttons()[0]?.focus(); } }} />
-      </div>
-      <div className={css.list} id={id} role="listbox" aria-label={label} onKeyDown={(event) => {
+      </div>}
+      <div className={css.list} data-search={options.length > 1 || undefined} id={id} role="listbox" aria-label={label} onKeyDown={(event) => {
         const items = buttons(); const index = items.indexOf(document.activeElement as HTMLButtonElement);
         if (event.key === "ArrowDown" || event.key === "ArrowUp") {
           event.preventDefault(); const next = index + (event.key === "ArrowDown" ? 1 : -1);
@@ -53,9 +53,9 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
         if (row && event.key === "ArrowLeft" && expanded.has(row.value)) { event.preventDefault(); toggle(row.value); }
       }}>
         {visible.map((option) => <div className={css.row} key={option.value} style={{ paddingLeft: query ? 0 : Math.min(option.depth, 10) * 18 }}>
-          <button type="button" className={css.disclosure} tabIndex={-1} aria-hidden={!option.hasChildren || undefined}
+          {option.hasChildren && !query && <button type="button" className={css.disclosure} tabIndex={-1} aria-hidden={!option.hasChildren || undefined}
             aria-label={option.name} aria-expanded={option.hasChildren ? expanded.has(option.value) : undefined} disabled={!option.hasChildren}
-            onClick={() => toggle(option.value)}>{option.hasChildren && (expanded.has(option.value) ? <PiCaretDown size={12} /> : <PiCaretRight size={12} />)}</button>
+            onClick={() => toggle(option.value)}>{option.hasChildren && (expanded.has(option.value) ? <PiCaretDown size={12} /> : <PiCaretRight size={12} />)}</button>}
           <button type="button" role="option" aria-selected={option.value === value}
             tabIndex={option.value === value || (!visible.some((item) => item.value === value) && option === visible[0]) ? 0 : -1}
             onClick={() => { onChange(option.value); close(); }}>

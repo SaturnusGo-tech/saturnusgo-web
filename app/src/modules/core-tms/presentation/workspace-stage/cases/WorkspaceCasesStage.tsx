@@ -3,9 +3,9 @@ import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { CasesView } from "../../cases/CasesView";
 
 export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
-  const selectionAllowed = !model.repositoryScope.portfolioId || model.portfolioRepository.catalog?.projects.some(project => project.id === model.selectedCase?.projectId);
-  return <CasesView key={model.repositoryScope.portfolioId ?? model.project!.id}
-    repository={model.repositoryScope.portfolioId ? <PortfolioRepository key={model.repositoryScope.portfolioId} model={model} /> : undefined}
+  const selectionAllowed = !model.repositoryScope.aggregate || model.portfolioRepository.catalog?.projects.some(project => project.id === model.selectedCase?.projectId);
+  return <CasesView key={model.repositoryScope.aggregate ? model.repositoryScope.key : model.project?.id}
+    repository={model.repositoryScope.aggregate ? <PortfolioRepository key={model.repositoryScope.key} model={model} /> : undefined}
     folders={model.folders}
     onImport={() => model.setDialog("import-cases")}
     query={model.query}

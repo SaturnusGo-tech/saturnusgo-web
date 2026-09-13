@@ -22,7 +22,7 @@ test("switching portfolios cancels old work and ignores late catalog, cases and 
   requests[0].catalog(catalog("first")); requests[0].project("project1", { cases: [], folders: [] }); requests[0].reject(new Error("late"));
   await setImmediate();
   const current = render("second");
-  assert.equal(current.catalog?.portfolio.id, "second"); assert.equal(current.error, false);
+  assert.equal(current.catalog?.portfolio?.id, "second"); assert.equal(current.error, false);
   assert.equal(current.branches.has("project1"), false); assert.equal(current.branches.has("project2"), true);
   h.dispose();
 });

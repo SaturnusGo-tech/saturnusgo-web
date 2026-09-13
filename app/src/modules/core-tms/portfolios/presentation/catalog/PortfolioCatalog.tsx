@@ -30,7 +30,7 @@ export function PortfolioCatalog({ state, workspaceId, canManage, copy }: { stat
         onChange={(value) => state.setStatus(value as "active" | "archived")} />
     </div>
     <ResourceFeedback catalog hasContent={!empty} copy={copy} loading={loading} error={state.portfolioList.error ?? state.projects.error} retry={state.refresh} />
-    {!empty && <CatalogTable portfolios={portfolios} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} />}
+    {!empty && <CatalogTable portfolios={portfolios} projects={projects} workspaceId={workspaceId} copy={copy} onNavigate={state.navigate} onAction={canManage ? state.catalogActions.open : undefined} />}
     {empty && !loading && !state.portfolioList.error && !state.projects.error && <section className={styles.empty}>
       <h2>{query ? copy.noResults : copy.emptyTitle}</h2>
       <p>{query ? copy.noResultsHint : copy.emptyHint}</p>

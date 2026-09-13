@@ -343,7 +343,7 @@ export interface paths {
         head?: never;
         /**
          * Update a project
-         * @description Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects reject PATCH. portfolioId assigns an existing active same-workspace portfolio; null unassigns. This changes only the project association and never copies cases, changes project identity, or grants permissions. Concurrent assignments use the project version.
+         * @description Updates mutable fields on an active project. Archive and restore are explicit lifecycle operations; archived projects only accept a PATCH containing portfolioId: null to detach without restoring. portfolioId assigns an existing active same-workspace portfolio; null unassigns. This changes only the project association and never copies cases, changes project identity, or grants permissions. Concurrent assignments use the project version.
          */
         patch: operations["updateProject"];
         trace?: never;
@@ -2332,7 +2332,7 @@ export interface paths {
         post?: never;
         /**
          * Archive a portfolio
-         * @description Archives this organizational portfolio. Projects, cases, and workspace permissions are unchanged. New assignments to an archived portfolio are rejected; existing associations can be removed through project PATCH.
+         * @description Atomically archives the portfolio and its active projects, preserving cases, results and history. Previously archived projects are unchanged. Requires workspace project:manage capability and a current portfolio ETag.
          */
         delete: operations["archivePortfolio"];
         options?: never;
@@ -2358,7 +2358,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived portfolio */
+        /**
+         * Restore an archived portfolio
+         * @description Restores the portfolio and only projects archived by its latest cascade. Previously archived or subsequently detached projects remain unchanged.
+         */
         post: operations["restorePortfolio"];
         delete?: never;
         options?: never;
@@ -4026,6 +4029,31 @@ export interface paths {
         get: operations["readApiSourceSpecification"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}/remove": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Delete an empty portfolio
+         * @description Removes the portfolio from all catalogs. Any linked project, including archived projects, rejects removal with 409 PORTFOLIO_NOT_EMPTY. Historical audit and references are retained. Idempotent retries return the deletion receipt; subsequent reads return 404.
+         */
+        post: operations["removePortfolio"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6811,7 +6839,7 @@ export interface components {
             responsibleIdentityId: components["schemas"]["Identifier"] | null;
             rowVersion: number;
             archivedAt: components["schemas"]["Timestamp"] | null;
-            /** @description Count of active projects currently associated with this portfolio; aggregated for at most 100 portfolio IDs per request. */
+            /** @description Number of linked projects, including archived projects. */
             projectCount: number;
             workflowPhase: components["schemas"]["OrganizationWorkflowPhase"];
             checklist: components["schemas"]["OrganizationChecklist"];
@@ -16696,6 +16724,35 @@ export interface operations {
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ConnectorUnavailable"];
+        };
+    };
+    removePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["PortfolioResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
         };
     };
 }

@@ -1,18 +1,24 @@
 import { useLayoutEffect, type RefObject } from "react";
-export function useFolderPopup(open: boolean, inline: boolean, root: RefObject<HTMLDivElement | null>,
+
+export function useAnchoredPopup(open: boolean, inline: boolean, root: RefObject<HTMLDivElement | null>,
   trigger: RefObject<HTMLButtonElement | null>, menu: RefObject<HTMLDivElement | null>, onClose: () => void) {
   useLayoutEffect(() => {
     const element = menu.current;
     if (!open || inline || !element) return;
-    if (element.showPopover) element.showPopover();
+    element.showPopover?.();
     const position = () => {
       const bounds = trigger.current?.getBoundingClientRect();
       if (!bounds) return;
-      const width = Math.min(Math.max(bounds.width, 300), innerWidth - 24);
+      const gap = 6; const edge = 12;
+      const width = Math.min(bounds.width, innerWidth - edge * 2);
+      const below = innerHeight - bounds.bottom - gap - edge;
+      const above = bounds.top - gap - edge;
+      const upwards = below < Math.min(element.scrollHeight, 220) && above > below;
+      const available = Math.min(320, Math.max(48, upwards ? above : below));
       element.style.width = `${width}px`;
-      element.style.left = `${Math.max(12, Math.min(bounds.left, innerWidth - width - 12))}px`;
-      element.style.top = `${bounds.bottom + 6}px`;
-      element.style.maxHeight = `${Math.max(70, innerHeight - bounds.bottom - 18)}px`;
+      element.style.maxHeight = `${available}px`;
+      element.style.left = `${Math.max(edge, Math.min(bounds.left, innerWidth - width - edge))}px`;
+      element.style.top = `${Math.max(edge, upwards ? bounds.top - gap - Math.min(element.scrollHeight, available) : bounds.bottom + gap)}px`;
     };
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) onClose(); };
     position(); window.addEventListener("resize", position); window.addEventListener("scroll", position, true);
