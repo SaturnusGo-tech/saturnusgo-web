@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { defaultWorkingRun } from "../../runs/model/history/run-history";
 import type { TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { resolveSelectedCase } from "../../test-cases/navigation/selection/selected-case";
@@ -52,7 +53,7 @@ export function useWorkspaceDerived(
   const activeProjectRuns = projectRuns.filter(isAuthoritativelyActiveRun);
   const selectedRun =
     state.selectedRunId ? projectRuns.find((item) => item.id === state.selectedRunId) ?? null
-      : activeProjectRuns[0] ?? projectRuns.find((item) => !item.archivedAt) ?? null;
+      : defaultWorkingRun(projectRuns);
   const selectedRunItem = state.selectedRunItemDetail?.id === state.selectedRunItemId
     ? state.selectedRunItemDetail
     : null;

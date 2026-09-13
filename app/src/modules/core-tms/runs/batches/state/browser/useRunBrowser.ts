@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { nextRunAfterFinish } from "../../../model/history/run-history";
 import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../../../core/tms/idempotency/pending-operation";
@@ -12,7 +13,8 @@ import { runRepositoryEntries, type RunRepositoryEntry } from "../../model/repos
 type Action = "start" | "pause" | "resume" | "complete" | "archive" | "restore";
 export function useRunBrowser(input: { workspaceId: string; selected: TestRunSummary | null; selectedId?: string | null;
   knownRuns: TestRunSummary[]; connected: boolean; ru: boolean;
-  onUpdate: (runs: TestRunSummary[]) => void; onRefreshSelected: () => void }) {
+  onUpdate: (runs: TestRunSummary[]) => void; onRefreshSelected: () => void;
+  onFinished?: (next: TestRunSummary | null) => void }) {
   const http = useTmsHttpClient(); const [batches, setBatches] = useState<RunBatch[]>([]);
   const [batchesWorkspace, setBatchesWorkspace] = useState("");
   const [loadedScope, setLoadedScope] = useState("");
@@ -105,7 +107,13 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
           : transitionRun(http, input.selected.id, action, prepared.etag!, prepared.key))).data];
       }
       command.current = null; operation.current = null; setIncomplete(false);
-      if (token === generation.current) { latest.current.onUpdate(updated); latest.current.onRefreshSelected(); setRevision((n) => n + 1); }
+      if (token === generation.current) {
+        latest.current.onUpdate(updated);
+        if ((action === "complete" || action === "archive") && latest.current.onFinished) {
+          latest.current.onFinished(nextRunAfterFinish(choices, updated));
+        } else latest.current.onRefreshSelected();
+        setRevision((n) => n + 1);
+      }
     } catch (err) {
       const failure = toTmsMutationFailure(err);
       if (failure.code && failure.code !== "INTERNAL_ERROR") { command.current = null; operation.current = null; }

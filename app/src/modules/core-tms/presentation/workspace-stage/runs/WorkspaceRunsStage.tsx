@@ -32,6 +32,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
       <div style={{ flex: 1, minHeight: 0 }}>
       <RunsView
+        onCreate={model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage") ? () => model.openRunDialog() : undefined}
         verificationContext={<VerificationRunContext run={model.selectedRun} item={execution.selectedItem}
           connected={model.connection === "connected"} onOpenDefect={model.openDefect}
           onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {

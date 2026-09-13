@@ -1,4 +1,5 @@
 import type { RunRepositoryModel } from "./state/useRunRepository";
+import { isWorkingRun } from "../../../runs/model/history/run-history";
 import { RunIncompleteDialog } from "../completion/RunIncompleteDialog";
 import { RunCasesSkeleton } from "../loading/RunCasesSkeleton";
 import { RunAssignmentTools } from "../assignment/RunAssignmentTools";
@@ -28,7 +29,7 @@ export function RunRepositoryBrowser({ model, repository, draftDirty = false, li
     <RunRepositoryHeader ru={ru} run={run} choices={browser.choices} value={activeChoice} canManage={canManage}
       disabled={browser.busy || assignments.busy || lifecycleBlocked} startBlocked={startBlocked || browser.loading}
       onCreate={()=>model.openRunDialog()} onAction={action=>void browser.act(action)}
-      onChoose={id=>{const next=browser.choices.find(c=>c.id===id)?.runs[0];if(next)choose(next.id,next.projectId);}}/>
+      onChoose={id=>{const runs=browser.choices.find(c=>c.id===id)?.runs;const next=runs?.find(isWorkingRun)??runs?.[0];if(next)choose(next.id,next.projectId);}}/>
     <SelectionControls disabled={lifecycleBlocked} inline state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
       onSelectAll={assignments.selecting && canAssign && !assignments.busy ? () => assignments.toggleScope(visible.map((c) => c.id)) : undefined}
       tools={<button type="button" className={css.refresh} aria-label={ru ? "Обновить" : "Refresh"} onClick={browser.refresh} disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked}><RefreshCw size={14} /></button>}/>

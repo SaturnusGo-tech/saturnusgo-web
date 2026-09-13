@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { defaultWorkingRun } from "../../runs/model/history/run-history";
 import type { TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../core/tms/idempotency/pending-operation";
@@ -39,12 +40,12 @@ export function useRunArchive(
         },
       );
       operation.current = null;
-      const remaining = derived.projectRuns.filter((item) => !item.archivedAt && item.id !== run.id);
+      const next = defaultWorkingRun(derived.projectRuns.filter((item) => item.id !== run.id));
       state.setData((current) => ({
         ...current,
         runs: current.runs.map((item) => item.id === run.id ? archived.data : item),
       }));
-      state.setSelectedRunId(remaining[0]?.id ?? null);
+      state.setSelectedRunId(next?.id ?? null);
       state.setSelectedRunItemId(null);
       notify(t("runs.removed", { key: run.key }));
     } catch (error) {

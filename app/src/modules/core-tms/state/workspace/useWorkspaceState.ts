@@ -1,4 +1,5 @@
 import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
+import { defaultWorkingRun } from "../../runs/model/history/run-history";
 import { useEffect, useState } from "react";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -74,8 +75,7 @@ export function useWorkspaceState() {
     const initialCase = resolveSelectedCase(data.testCases, initialProjectId,
       !destination.view || destination.view === "cases" || isProjectCaseContext(window.location.href, initialProjectId) ? linked.caseId : null);
     const initialRunId = destination.runId
-      ?? data.runs.find((item) => item.projectId === initialProjectId && item.status === "active" && !item.archivedAt)?.id
-      ?? data.runs.find((item) => item.projectId === initialProjectId && !item.archivedAt)?.id ?? null;
+      ?? defaultWorkingRun(data.runs, initialProjectId)?.id ?? null;
     const initialView = destination.view ?? (linked.caseId ? "cases" : view);
     history.begin({ workspaceId: data.workspace.id,
       projectId: initialProjectId, view: initialView, runId: initialRunId, caseId: initialCase?.id ?? "" });

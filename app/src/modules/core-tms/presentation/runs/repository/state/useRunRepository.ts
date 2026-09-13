@@ -14,7 +14,11 @@ export function useRunRepository(model: WorkspaceModel, ru: boolean) {
     knownRuns: model.data.runs, connected: model.connection === "connected", ru,
     onUpdate: (runs) => model.setData((current) => ({ ...current,
       runs: [...current.runs.filter((r) => !runs.some((next) => r.id === next.id)), ...runs] })),
-    onRefreshSelected: model.retryRunResource });
+    onRefreshSelected: model.retryRunResource,
+    onFinished: (next) => {
+      if (next) model.setProjectId(next.projectId);
+      model.setSelectedRunId(next?.id ?? null); model.setSelectedRunItemId(null);
+    } });
   const [confirmedRevision, setConfirmedRevision] = useState(0);
   const remembered = useRef({ workspaceId: model.data.workspace.id, items: new Map<string, RunItemSummary>() });
   if (remembered.current.workspaceId !== model.data.workspace.id) remembered.current = { workspaceId: model.data.workspace.id, items: new Map() };

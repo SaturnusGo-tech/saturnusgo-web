@@ -1,6 +1,6 @@
 import { hookHarness } from "../../../navigation/browser/tests/project/hook-harness";
 import { createWorkspaceShell } from "../../../../../../core/tms/fallback/bootstrap";
-import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import type { TestCaseSummary, TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import * as caseLinks from "../../../../test-cases/navigation/case-deep-link";
 import * as workspaceLinks from "../../../navigation/workspace-deep-link";
 import { isProjectCaseContext } from "../../../../test-cases/navigation/project/project-case-context";
@@ -19,9 +19,10 @@ export function workspaceHarness(href = `${projectHref}&caseId=c`) {
       { id: "c", projectId: "p", folderPath: "/Платежи/Переводы", folderId: "transfers", archivedAt: null },
       { id: "c2", projectId: "p", folderPath: "/Профиль", folderId: "profile", archivedAt: null },
       { id: "foreign", projectId: "other", folderPath: "/Other", folderId: "foreign-folder", archivedAt: null },
-    ] as TestCaseSummary[], runs: [], suites: [] };
+    ] as TestCaseSummary[], runs: [] as TestRunSummary[], suites: [] };
   const bootstrap = { data, generation: 1, connection: "connected", setData() {}, retryBootstrap() {} };
   function resolve(name: string): unknown {
+    if (name.endsWith("run-history")) return { defaultWorkingRun };
     if (name.endsWith("project-case-context")) return { isProjectCaseContext };
     if (name.endsWith("case-deep-link")) return caseLinks;
     if (name.endsWith("workspace-deep-link")) return workspaceLinks;
@@ -43,3 +44,4 @@ export function workspaceHarness(href = `${projectHref}&caseId=c`) {
   const stateHook = h.load<{ useWorkspaceState: typeof useWorkspaceState }>(new URL("../../useWorkspaceState.ts", import.meta.url), resolve).useWorkspaceState;
   return { h, bootstrap, render: () => h.settle(stateHook) };
 }
+import { defaultWorkingRun } from "../../../../runs/model/history/run-history";

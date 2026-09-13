@@ -1,4 +1,5 @@
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
+import { defaultWorkingRun } from "../../runs/model/history/run-history";
 
 export function useWorkspaceActions(
   state: ReturnType<typeof useWorkspaceState>,
@@ -29,9 +30,7 @@ export function useWorkspaceActions(
         "",
     );
     state.setSelectedRunId(
-      runs.find((item) => item.projectId === nextProjectId && item.status === "active" && !item.archivedAt)?.id ??
-        runs.find((item) => item.projectId === nextProjectId && !item.archivedAt)?.id ??
-        null,
+      defaultWorkingRun(runs, nextProjectId)?.id ?? null,
     );
     state.setSelectedRunItemId(null);
     state.setSelectedCaseDetail(null);

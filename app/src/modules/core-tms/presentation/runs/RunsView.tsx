@@ -22,6 +22,7 @@ import runStyles from "./runs.module.css";
 type RunsViewProps = {
   executionPending?: boolean; emptyFiltered?: boolean;
   verificationContext?: ReactNode;
+  onCreate?: () => void;
   navigation: ReactNode; onDirtyChange?: (dirty: boolean) => void;
   workspaceId: string;
   offline: boolean;
@@ -41,7 +42,7 @@ type RunsViewProps = {
   onArchive: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
+export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
@@ -60,7 +61,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
   const runNavigator = navigation;
   if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
   if (selectedRun && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
-  if (!selectedRun || !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{navigation}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
+  if (!selectedRun || !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{navigation}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");

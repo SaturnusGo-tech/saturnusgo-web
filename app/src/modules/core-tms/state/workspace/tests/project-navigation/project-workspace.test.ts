@@ -1,6 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { projectHref, workspaceHarness } from "./workspace-harness";
+import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+
+test("opening runs without a deep link selects current work and stays empty when only history remains", () => {
+  for (const hasDraft of [true, false]) {
+    const app = workspaceHarness("https://tms.example/work/?workspaceId=w&projectId=p&view=runs");
+    app.bootstrap.data.runs = [{ id: "old", projectId: "p", status: "completed", archivedAt: null, createdAt: "2026-09-13" } as TestRunSummary];
+    if (hasDraft) app.bootstrap.data.runs.push({ id: "draft", projectId: "p", status: "draft", archivedAt: null, createdAt: "2026-09-12" } as TestRunSummary);
+    const state = app.render();
+    assert.equal(state.selectedRunId, hasDraft ? "draft" : null);
+    assert.equal(new URL(app.h.window.location.href).searchParams.get("runId"), hasDraft ? "draft" : null);
+    app.h.dispose();
+  }
+});
+
+test("explicit historical run links remain readable after default selection changes", () => {
+  const app = workspaceHarness("https://tms.example/work/?workspaceId=w&projectId=p&view=runs&runId=old&runItemId=old-item");
+  app.bootstrap.data.runs = [{ id: "old", projectId: "p", status: "completed", archivedAt: null } as TestRunSummary];
+  const state = app.render(); assert.equal(state.selectedRunId, "old"); assert.equal(state.selectedRunItemId, "old-item");
+  app.h.dispose();
+});
 
 test("workspace bootstrap restores an embedded case and writes its URL without jumping to the global case page", () => {
   const app = workspaceHarness(); const state = app.render();

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { defaultWorkingRun } from "../../runs/model/history/run-history";
 import type { ExecutionStatus, RunItem, RunItemSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { formatTmsMutationFailure, toTmsMutationFailure } from "../../../../core/tms/errors/mutation-failure";
 import { resolvePendingOperation, type PendingOperation } from "../../../../core/tms/idempotency/pending-operation";
@@ -172,6 +173,10 @@ export function useRunActions(
         });
       completeOperation.current = null;
       commitRun(completed.data, completed.etag);
+      if (currentOwner.current === owner) {
+        state.setSelectedRunId(defaultWorkingRun(derived.projectRuns.filter((item) => item.id !== run.id))?.id ?? null);
+        state.setSelectedRunItemId(null);
+      }
     } catch (error) {
       notify(formatTmsMutationFailure(toTmsMutationFailure(error),
         t("actions.runCannotComplete")));
