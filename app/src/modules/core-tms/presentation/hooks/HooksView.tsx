@@ -1,5 +1,10 @@
 "use client";
 
+import { ApiSourceManager } from "../../api-sources/presentation/ApiSourceManager";
+import { ApiTestingView } from "../api-testing/ApiTestingView";
+import { useApiSourceList } from "../../api-sources/state/useApiSourceList";
+import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useCallback, useEffect, useState } from "react";
 
@@ -33,6 +38,9 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const [configurationFailed, setConfigurationFailed] = useState(false);
   const [reload, setReload] = useState(0);
   const connectors = useWorkspaceConnectors();
+  const session = useOptionalTmsSession();
+  const apiEnabled = companyViewAvailable("api", session?.companyCapabilities);
+  const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, apiEnabled && screen === "catalog");
   const open = (target: "catalog" | "youtrack" | Provider) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
@@ -63,6 +71,8 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     return () => controller.abort();
   }, [http, workspaceId, reload]);
 
+  if (screen === "swagger") return canManage ? <ApiSourceManager key={workspaceId} workspaceId={workspaceId} projectId={projectId} onBack={() => open("catalog")} />
+    : <ApiTestingView scope={{ workspaceId, projectId }} canManage={false} />;
   if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
     workspaceId={workspaceId} projectId={projectId} provider={screen} ru={russian} canManage={canManage} capabilities={capabilities} connected={connected}
     onBack={() => open("catalog")} onSaved={refresh} />;
@@ -85,9 +95,10 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
         configuration={configuration}
         status={status}
         statusFailed={statusFailed || configurationFailed}
+        swaggerStatus={!apiEnabled ? "available" : sources.loading ? "checking" : sources.error ? "attention" : sources.items.some(source => source.enabled) ? "connected" : "available"}
         connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
         onOpenConnector={open}
-        onRefresh={refresh}
+        onRefresh={() => { refresh(); sources.refresh(); }}
         onOpenYouTrack={() => open("youtrack")}
       />
     </div>

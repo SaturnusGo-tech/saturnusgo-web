@@ -19,3 +19,5 @@
 .state button { font: inherit; font-size: 13px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--paper); cursor: pointer; }
 .state .primary { background: var(--action); color: #fff; border-color: transparent; margin-top: 12px; }
 @media (max-width: 720px) { .header, .toolTabs { padding-inline: 14px; } .meta { display: none; } .hint { padding-inline: 16px; } .header h1 { font-size: 18px; } }
+.sourceSelector { width: min(360px, 40vw); min-width: 180px; }
+@media(max-width:720px) { .header { flex-wrap:wrap; gap:10px; } .sourceSelector { order:3; width:100%; } }

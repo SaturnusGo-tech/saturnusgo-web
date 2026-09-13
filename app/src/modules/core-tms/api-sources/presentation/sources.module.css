@@ -1,0 +1,25 @@
+.manager { height:100%; min-height:0; overflow:auto; padding:24px 28px; background:var(--paper); color:var(--ink); }
+.manager header { display:flex; align-items:center; gap:20px; margin-bottom:24px; }
+.manager h1 { font-size:21px; font-weight:600; margin:0; }
+.manager button { cursor:pointer; font:inherit; }
+.back { display:flex; align-items:center; gap:7px; background:transparent; border:0; padding:5px 0; color:var(--muted); }
+.primary { margin-left:auto; background:var(--action); border:0; border-radius:24px; padding:10px 17px; color:#fff; display:inline-flex; align-items:center; gap:7px; font-size:13px!important; }
+.search { display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 13px; max-width:420px; color:var(--muted); }
+.manager .search input { outline:none; border:0; background:transparent; width:100%; color:var(--ink); font:inherit; font-size:13px; }
+.search:focus-within { outline:2px solid color-mix(in srgb,var(--action) 24%,transparent); }
+.rows { margin-top:24px; border-top:1px solid var(--line); }
+.row { display:flex; align-items:center; gap:20px; padding:18px 12px; width:100%; text-align:left; color:var(--ink); background:transparent; border:0; border-bottom:1px solid var(--line); }
+.row:hover { background:color-mix(in srgb,var(--ink) 4%,transparent); }
+.row>span:first-child { min-width:0; flex:1; }
+.row strong { display:block; font-size:14px; font-weight:550; }
+.row small { display:block; margin-top:6px; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.projectNames { max-width:35%; color:var(--muted); font-size:12px; }
+.state { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; min-height:280px; color:var(--muted); }
+.state h2 { font-size:18px; font-weight:500; color:var(--ink); }
+.state button { background:transparent; border:1px solid var(--line); color:var(--ink); border-radius:20px; padding:8px 15px; }
+.manager button:disabled { opacity:.5; cursor:default; }
+.manager button:focus-visible { outline:2px solid var(--action); outline-offset:3px; }
+.skeleton { height:230px; margin-top:24px; border-radius:12px; background:repeating-linear-gradient(transparent 0 50px,var(--line) 50px 51px,transparent 51px 68px); animation:pulse 1.2s ease-in-out infinite alternate; }
+@keyframes pulse { to { opacity:.35; } }
+@media(prefers-reduced-motion:reduce) { .skeleton { animation:none; } }
+@media(max-width:720px) { .manager { padding:18px 16px; } .manager header { flex-wrap:wrap; gap:12px; } .manager h1 { font-size:18px; } .back { font-size:12px!important; } .projectNames { display:none; } .primary { padding:9px 13px; } }

@@ -1,3 +1,4 @@
+import { workspaceViewAllowed } from "../../../auth/managed/domain/features/workspace-view-access";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
@@ -17,7 +18,7 @@ function harness() {
   const setItem = (id: string | null) => { selection.runItemId = id; events.push("item"); };
   const setView = (view: string) => { selection.view = view; events.push("view"); };
   const model = {
-    connection: "connected", project: { id: "p" }, data: { workspace: { id: "w" } }, view: "dashboard",
+    connection: "connected", project: { id: "p" }, data: { workspace: { id: "w" }, meta: { authorization: { capabilities: ["integration:read", "integration:manage"] } } }, view: "dashboard",
     chooseProject: async () => { events.push("choose-project"); },
     setSelectedRunId: setRun, setSelectedRunItemId: setItem, setView,
     openRun(runId: string, runItemId: string | null) {
@@ -37,6 +38,7 @@ function harness() {
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+      if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed };
       if (name.endsWith("company-features")) return { companyViewAvailable };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
       if (name.endsWith("workspace-history")) return { visitWorkspace: (next: string) => { href = next; events.push("navigate"); } };

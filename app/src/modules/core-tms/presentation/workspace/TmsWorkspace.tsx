@@ -72,6 +72,7 @@ function LocalizedWorkspace() {
         onToggleCollapsed={toggleSidebar}
         workspaceId={model.data.workspace.id}
         activeRunCount={model.activeProjectRuns.length}
+        userCapabilities={model.data.meta.authorization.capabilities}
       />
       <div className={shellStyles.workspaceColumn}>
         <WorkspaceHeader

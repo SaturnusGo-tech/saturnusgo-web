@@ -14,8 +14,8 @@ import styles from "./catalog.module.css";
 
 type Filter = "all" | "connected" | "attention" | "planned";
 export function IntegrationCatalog({ russian, copy, configuration, status, statusFailed, onRefresh,
-  onOpenYouTrack, connections, connectorState, projectId, onOpenConnector }: {
-  russian: boolean; connections: readonly Connection[]; connectorState: "loading" | "ready" | "error";
+  onOpenYouTrack, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
+  swaggerStatus: IntegrationUiStatus; russian: boolean; connections: readonly Connection[]; connectorState: "loading" | "ready" | "error";
   projectId: string; onOpenConnector: (provider: Provider) => void; copy: HooksCopy;
   configuration: YouTrackConfiguration | null; status: YouTrackIntegrationStatus | null;
   statusFailed: boolean; onRefresh: () => void; onOpenYouTrack: () => void;
@@ -25,7 +25,7 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
   const [filter, setFilter] = useState<Filter>("all");
   const entries = INTEGRATIONS.map((integration) => ({ integration, status: integration.id === "youtrack"
     ? catalogIntegrationStatus(configuration, status, statusFailed)
-    : isProvider(integration.id) ? connectorState === "loading" ? "checking" : connectorState === "error" ? "attention"
+    : integration.id === "swagger" ? swaggerStatus : isProvider(integration.id) ? connectorState === "loading" ? "checking" : connectorState === "error" ? "attention"
       : connections.some((c) => c.provider === integration.id && c.projectId === projectId && c.enabled) ? "connected" : "available" : "planned" }));
   const search = query.trim().toLocaleLowerCase();
   const visible = entries.filter(({ integration, status: state }) => (group === "all" || integration.group === group)

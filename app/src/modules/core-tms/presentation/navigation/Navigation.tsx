@@ -1,4 +1,4 @@
-import { useWorkspaceConnectors } from "../../connectors/application/context/WorkspaceConnectorContext";
+import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { PiBriefcaseDuotone } from "react-icons/pi";
@@ -51,6 +51,7 @@ export function Navigation({
   onToggleCollapsed,
   workspaceId,
   activeRunCount,
+  userCapabilities,
 }: {
   view: View;
   onChange: (view: View) => void;
@@ -59,12 +60,11 @@ export function Navigation({
   onToggleCollapsed: () => void;
   workspaceId: string;
   activeRunCount: number;
+  userCapabilities: readonly string[];
 }) {
   const { locale, t } = useTmsLocale();
   const session = useOptionalTmsSession();
-  const { swaggerConnected } = useWorkspaceConnectors();
-  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities) &&
-    (candidate !== "api" || swaggerConnected);
+  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities) && workspaceViewAllowed(candidate, userCapabilities);
   const navigate = (next: View) => {
     if (next === "suites" && view === "suites" && window.location.search.includes("suiteId=")) {
       const url = new URL(window.location.href); url.searchParams.delete("suiteId");
@@ -117,7 +117,7 @@ export function Navigation({
                 active ? shellStyles.navigationItemActive : ""
               }`}
               onClick={() => navigate(item.id)}
-              disabled={disabled && item.id !== "help" && item.id !== "portfolios"}
+              disabled={disabled && item.id !== "help" && item.id !== "portfolios" && item.id !== "api"}
               aria-label={accessibleLabel}
               aria-current={active ? "page" : undefined}
               title={collapsed ? label : undefined}

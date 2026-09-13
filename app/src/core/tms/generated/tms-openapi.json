@@ -3296,7 +3296,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -4904,7 +4904,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -5643,7 +5643,7 @@
         ],
         "operationId": "getSwaggerSpecification",
         "summary": "Load the project Swagger specification",
-        "description": "Requires integration:read. Retrieves a single OpenAPI 2.0, 3.0 or 3.1 JSON/YAML document from a public HTTPS URL using optional encrypted specification credentials. External refs and redirects are rejected. Response is no-store.",
+        "description": "Legacy route: returns 409 API_SOURCE_MIGRATED. Use the workspace API source specification endpoint.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -5714,7 +5714,8 @@
           "503": {
             "$ref": "#/components/responses/ConnectorUnavailable"
           }
-        }
+        },
+        "deprecated": true
       },
       "parameters": [
         {
@@ -5864,7 +5865,7 @@
         ],
         "operationId": "getConnectorConfiguration",
         "summary": "Read project integration configuration",
-        "description": "Returns data=null with a version-zero ETag until configured.",
+        "description": "Requires integration:manage. Returns data=null with a version-zero ETag until configured. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -5934,7 +5935,7 @@
         ],
         "operationId": "replaceConnectorConfiguration",
         "summary": "Verify and replace integration configuration",
-        "description": "Real provider access and destination checks precede activation. The remote resource binding is immutable. Pending work is cancelled on pause; active deliveries must finish before configuration can change. Secrets omitted from the request are preserved.",
+        "description": "Real provider access and destination checks precede activation. The remote resource binding is immutable. Pending work is cancelled on pause; active deliveries must finish before configuration can change. Secrets omitted from the request are preserved. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -6026,7 +6027,7 @@
         ],
         "operationId": "discoverConnectorResources",
         "summary": "Verify credentials and discover real service resources",
-        "description": "Performs read-only provider calls. Does not save credentials or create an external object.",
+        "description": "Performs read-only provider calls. Does not save credentials or create an external object. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -6866,7 +6867,7 @@
         ],
         "operationId": "disconnectConnector",
         "summary": "Disconnect the current integration binding",
-        "description": "Archives the connection, cancels pending deliveries and preserves historical external links. Active deliveries must finish first. A subsequent save may bind a different remote resource. Does not revoke credentials at the provider. Returns a version-zero ETag.",
+        "description": "Archives the connection, cancels pending deliveries and preserves historical external links. Active deliveries must finish first. A subsequent save may bind a different remote resource. Does not revoke credentials at the provider. Returns a version-zero ETag. Swagger configuration has migrated to /integrations/api-sources. Legacy Swagger configuration, discovery, specification and disconnect return 409 API_SOURCE_MIGRATED; other providers are unchanged.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -15310,6 +15311,513 @@
           }
         }
       }
+    },
+    "/integrations/api-sources": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listApiSources",
+        "summary": "List reusable APIs for projects or a portfolio",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "projectIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 12900,
+              "description": "Comma-separated active project identifiers; union. Mutually exclusive with portfolioId."
+            }
+          },
+          {
+            "name": "portfolioId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "catalog",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSourceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "description": "Requires integration:read and a project or portfolio context. catalog=true requires integration:manage and lists all sources in the workspace, including unassigned and disabled ones. Empty portfolios return no sources. Results use a stable identifier cursor."
+      },
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "createApiSource",
+        "summary": "Connect one API to selected projects or all projects",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSourceEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSourceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/api-sources/{sourceId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getApiSource",
+        "summary": "Read API configuration; requires integration:manage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "sourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSourceEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "updateApiSource",
+        "summary": "Update shared documentation, project bindings or enabled state",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "sourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSourceEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSourceInput"
+              }
+            }
+          }
+        },
+        "x-tms-concurrency": "required",
+        "description": "Requires integration:manage. If-Match is api-source:<id>:<version> in quotes. allProjects=true requires an empty projectIds array and includes future active projects. Empty projectIds with allProjects=false detaches every project. Omitted credentials preserve stored values only for the same auth mode. Source-wide changes affect all linked projects. Scope-only edits and disabling work during upstream outages."
+      }
+    },
+    "/integrations/api-sources/{sourceId}/specification": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "readApiSourceSpecification",
+        "summary": "Read documentation for an API accessible in the selected project context",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "sourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "projectIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 12900,
+              "description": "Comma-separated active project identifiers; union. Mutually exclusive with portfolioId."
+            }
+          },
+          {
+            "name": "portfolioId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Validated specification for the enabled project connection. Credentials are never returned.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerSpecificationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ConnectorUnavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -20865,6 +21373,10 @@
           "AI_SCHEMA_INVALID",
           "AI_UNKNOWN_CASE_ID",
           "AI_UNKNOWN_CHANGED_FILE",
+          "AI_WRITING_OUTPUT_INVALID",
+          "AI_WRITING_RATE_LIMITED",
+          "AI_WRITING_REFUSED",
+          "AI_WRITING_UNAVAILABLE",
           "AMBIGUOUS_WORKFLOW_NAME",
           "ANALYSIS_BUSY",
           "ANALYSIS_NOT_FOUND",
@@ -20872,6 +21384,12 @@
           "ANALYTICS_SCOPE_TOO_LARGE",
           "ANALYTICS_TEMPORARILY_UNAVAILABLE",
           "ANALYTICS_WINDOW_TOO_LARGE",
+          "API_SOURCE_ACCESS_DENIED",
+          "API_SOURCE_CONTEXT_REQUIRED",
+          "API_SOURCE_MIGRATED",
+          "API_SOURCE_NAME_REQUIRED",
+          "API_SOURCE_NOT_FOUND",
+          "API_SOURCE_SCOPE_INVALID",
           "ATTACHMENT_DIGEST_MISMATCH",
           "AUTHENTICATION_REQUIRED",
           "BAD_REQUEST",
@@ -20892,6 +21410,7 @@
           "CONFLICT",
           "CONNECTION_BINDING_IMMUTABLE",
           "CONNECTION_BUSY",
+          "CONNECTION_DISABLED",
           "CONNECTION_LIMIT_EXCEEDED",
           "CONNECTION_NOT_FOUND",
           "CREDENTIALS_REQUIRED",
@@ -20992,11 +21511,7 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
-          "AI_WRITING_UNAVAILABLE",
-          "AI_WRITING_RATE_LIMITED",
-          "AI_WRITING_REFUSED",
-          "AI_WRITING_OUTPUT_INVALID"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
         ]
       },
       "ValidationIssue": {
@@ -31836,7 +32351,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -32459,7 +32974,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -32560,7 +33075,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -35174,6 +35689,176 @@
             "$ref": "#/components/schemas/PageMeta"
           }
         }
+      },
+      "ApiSourceInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "allProjects": {
+            "type": "boolean"
+          },
+          "projectIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "sourceUrl": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "authMode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "basic",
+              "bearer"
+            ]
+          },
+          "secrets": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "username": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "password": {
+                "type": "string",
+                "maxLength": 4096,
+                "writeOnly": true
+              },
+              "apiToken": {
+                "type": "string",
+                "maxLength": 8192,
+                "writeOnly": true
+              }
+            },
+            "required": []
+          }
+        },
+        "required": [
+          "name",
+          "enabled",
+          "allProjects",
+          "projectIds",
+          "sourceUrl",
+          "authMode",
+          "secrets"
+        ]
+      },
+      "ApiSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "allProjects": {
+            "type": "boolean"
+          },
+          "projectIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "sourceUrl": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "authMode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "basic",
+              "bearer"
+            ]
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "checkedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "credentialsConfigured": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "id",
+          "name",
+          "enabled",
+          "allProjects",
+          "projectIds",
+          "sourceUrl",
+          "authMode",
+          "rowVersion",
+          "checkedAt",
+          "credentialsConfigured"
+        ]
+      },
+      "ApiSourceEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ApiSource"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ApiSourceList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSource"
+            },
+            "maxItems": 100
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
       }
     }
   }

@@ -1,3 +1,4 @@
+import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { WorkspaceNotifications } from "../../notifications/composition/WorkspaceNotifications";
 import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -75,9 +76,12 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "notifications") return <WorkspaceNotifications key={model.data.workspace.id} workspaceId={model.data.workspace.id}/>;
   if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
   if (model.view === "cases" && model.repositoryScope.portfolioId) return <WorkspaceCasesStage model={model} />;
+  if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
+    scope={{ workspaceId: model.data.workspace.id, projectId: model.projectId }} canManage={model.canManageIntegrations} />;
   if (!model.project) {
     return (
       <ProjectOnboarding
@@ -104,8 +108,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "shared-steps") {
     return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
   }
-  if (model.view === "api") return <ApiTestingView key={`${model.data.workspace.id}:${model.project.id}`}
-    scope={{ workspaceId: model.data.workspace.id, projectId: model.project.id }} canManage={model.canManageIntegrations} />;
   if (model.view === "suites") {
     return (
       <SuitesView
