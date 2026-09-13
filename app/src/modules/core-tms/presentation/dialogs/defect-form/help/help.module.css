@@ -1,8 +1,8 @@
 .root { position: relative; display: inline-flex; flex: 0 0 auto; }
-.root > button { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; box-shadow: none; }
-.root > button:hover { color: var(--ink); background: var(--control-hover); }
+.root > button { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--tms-text-muted, #71717a); cursor: pointer; box-shadow: none; }
+.root > button:hover { color: var(--tms-text, #18181b); background: var(--tms-bg-hover, #f4f4f5); }
 .root > button:focus-visible { outline: 1px solid #79a5ed; outline-offset: 2px; }
-.popover { position: absolute; z-index: 80; right: 0; top: calc(100% + 5px); width: min(270px, calc(100vw - 60px)); padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: none; animation: appear 150ms ease-out; }
+.popover { position: absolute; z-index: 80; right: 0; top: calc(100% + 5px); width: min(270px, calc(100vw - 60px)); padding: 14px 16px; border: 1px solid var(--tms-border, #e4e4e7); border-radius: 14px; background: var(--tms-bg-elevated, #ffffff); color: var(--tms-text, #18181b); box-shadow: none; animation: appear 150ms ease-out; }
 .popover p { margin: 0 0 10px; font-size: 12px; line-height: 1.6; }
 .popover a { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #5b91f0; text-decoration: none; }
 .popover a:hover { text-decoration: underline; }

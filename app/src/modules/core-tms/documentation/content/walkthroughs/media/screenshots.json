@@ -1,127 +1,51 @@
 {
-  "confluence-01-connection": {
-    "width": 1087,
-    "height": 814
+  "swagger-01-catalog-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "confluence-02-events": {
-    "width": 1087,
-    "height": 814
+  "swagger-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "github-01-connection": {
-    "width": 1087,
-    "height": 814
+  "swagger-02-auth-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "github-02-automation": {
-    "width": 1087,
-    "height": 814
+  "swagger-03-operations-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "github-03-rule": {
-    "width": 1087,
-    "height": 814
+  "swagger-04-request-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "integrations-01-catalog": {
-    "width": 1087,
-    "height": 814
+  "company-profile-menu-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "jira-01-connection": {
-    "width": 1087,
-    "height": 814
+  "company-profile-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "jira-02-automation": {
-    "width": 1087,
-    "height": 814
+  "company-password-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "jira-03-log": {
-    "width": 1087,
-    "height": 814
+  "company-members-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "linear-01-connection": {
-    "width": 1087,
-    "height": 814
+  "company-member-create-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "linear-02-events": {
-    "width": 1087,
-    "height": 814
+  "company-member-detail-20260914": {
+    "width": 1728,
+    "height": 1020
   },
-  "settings-01-general": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-02-appearance": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-03-exchange": {
-    "width": 1280,
-    "height": 720
-  },
-  "settings-04-edit-project": {
-    "width": 1087,
-    "height": 814
-  },
-  "shared-01-library": {
-    "width": 1280,
-    "height": 720
-  },
-  "shared-02-editor-assets": {
-    "width": 1280,
-    "height": 720
-  },
-  "shared-03-saved": {
-    "width": 1280,
-    "height": 720
-  },
-  "shared-04-insert-menu": {
-    "width": 1280,
-    "height": 720
-  },
-  "shared-05-in-case": {
-    "width": 1087,
-    "height": 814
-  },
-  "slack-01-connection": {
-    "width": 1087,
-    "height": 814
-  },
-  "slack-02-events": {
-    "width": 1087,
-    "height": 814
-  },
-  "slack-03-log": {
-    "width": 1087,
-    "height": 814
-  },
-  "trello-01-connection": {
-    "width": 1087,
-    "height": 814
-  },
-  "trello-02-events": {
-    "width": 1087,
-    "height": 814
-  },
-  "company-login": {
-    "width": 1280,
-    "height": 720
-  },
-  "company-mfa": {
-    "width": 1280,
-    "height": 720
-  },
-  "company-profile": {
-    "width": 1280,
-    "height": 720
-  },
-  "company-members": {
-    "width": 1280,
-    "height": 720
-  },
-  "company-member-create": {
-    "width": 1280,
-    "height": 720
-  },
-  "company-member-detail": {
-    "width": 1280,
-    "height": 720
+  "company-settings-20260914": {
+    "width": 1728,
+    "height": 1020
   },
   "case-05-saved-20260913": {
     "width": 1728,
@@ -211,6 +135,74 @@
     "width": 1728,
     "height": 1020
   },
+  "slack-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "slack-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "slack-03-log-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "github-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "github-02-automation-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "github-03-rule-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "integrations-02-communication-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "confluence-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "confluence-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-02-automation-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-03-log-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "integrations-01-catalog-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "linear-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "linear-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "trello-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "trello-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
   "organization-01-catalog-20260913": {
     "width": 1728,
     "height": 1020
@@ -283,6 +275,46 @@
     "width": 1728,
     "height": 1020
   },
+  "settings-01-general-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "settings-04-edit-project-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "settings-02-appearance-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "settings-03-exchange-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "settings-05-session-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-01-library-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-02-editor-assets-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-03-edit-action-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-04-insert-menu-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-05-in-case-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
   "workspace-03-project-20260913": {
     "width": 1728,
     "height": 1020
@@ -350,21 +382,5 @@
   "marker-02-preview-20260913": {
     "width": 1728,
     "height": 1020
-  },
-  "swagger-01-connection": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-02-auth": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-03-operations": {
-    "width": 1087,
-    "height": 814
-  },
-  "swagger-04-request": {
-    "width": 1087,
-    "height": 814
   }
 }
