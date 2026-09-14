@@ -117,12 +117,10 @@ test("narrow dashboard preserves all risk columns inside its own scroll containe
   assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.hotspotHeader, \.hotspotRow\s*\{\s*min-width: 650px;/);
 });
 
-test("run flow keeps case pass rate separate from count-based trend series", () => {
-  const trendStyles = readFileSync(new URL("../charts/trend.module.css", import.meta.url), "utf8");
+test("run flow keeps percentages out of count-based trend series", () => {
   assert.doesNotMatch(trend, /dataKey="passRate"/);
-  assert.match(trend, /className=\{styles\.flowRate\}/);
-  assert.match(trend, /dashboard\.casePassRate/);
-  assert.match(trendStyles, /\.flowRate\s*\{/);
+  assert.match(trend, /dashboard\.launchTrend/);
+  assert.match(trend, /dashboard\.outcomeTrend/);
 });
 
 test("risk rows use one coverage bar and a distinct pass-rate score", () => {

@@ -12,6 +12,7 @@ import { DetailPage, DetailState, DetailFooter } from "../detail/DetailPage";
 import { DetailToolbar, emptyDetailFilters, type DetailSort } from "../detail/toolbar/DetailToolbar";
 import { sortDetailRows } from "../detail/toolbar/sort-rows";
 import { ComponentRail } from "../detail/components/ComponentRail";
+import { DrillCaseTree } from "../detail/cases/DrillCaseTree";
 import { GroupedChecks } from "../detail/groups/GroupedChecks";
 import { groupRunRecords } from "../detail/groups/group-records";
 import { compactRunTitle } from "../workbench/rows/title/compact-run-title";
@@ -73,6 +74,8 @@ export function DashboardDrillInspector(props: Props) {
     <div aria-busy={props.loading}>
       <DetailState loading={props.loading && !props.page} error={props.error ? t("dashboard.drillError") : null} empty={Boolean(props.page) && !rows.length} filtered={filtered} onRetry={props.onRetry} />
       {props.selected.filter.entity === "run_item" ? <GroupedChecks groups={groupRunRecords(rows, props.data)} onOpenRow={props.onOpenRow} />
+        : props.selected.filter.entity === "test_case" ? <DrillCaseTree rows={rows} workspaceId={props.data.workspace.id}
+          selection={componentContext && canCreateRun ? selection : undefined} onSelection={setSelection} onOpenRow={props.onOpenRow} />
         : <DashboardDrillTable rows={rows} onOpenRow={props.onOpenRow} selection={componentContext && canCreateRun ? selection : undefined} onSelection={setSelection}
           prioritySort={sort === "priority_desc" ? "desc" : sort === "priority_asc" ? "asc" : null}
           onPrioritySort={() => setSort(value => value === "priority_desc" ? "priority_asc" : "priority_desc")} />}

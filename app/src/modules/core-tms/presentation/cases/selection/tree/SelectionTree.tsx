@@ -9,7 +9,7 @@ import local from "./selection-tree.module.css";
 
 type Props = {
   cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; selected: ReadonlySet<string>;
-  ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string;
+  preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string;
   onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   trailing?: (item: TestCaseSummary) => ReactNode;
   onOpen?: (item: TestCaseSummary) => void; heading?: ReactNode; accessory?: (item: TestCaseSummary) => ReactNode;
@@ -17,12 +17,14 @@ type Props = {
 export function SelectionTree(props: Props) {
   const tree = useMemo(() => {
     const result = buildFolderTree(props.folders, props.cases, false, props.includeArchived);
+    const rank = new Map(props.cases.map((item, index) => [item.id, index]));
     function prepare(nodes: FolderNode[]): FolderNode[] {
       return nodes.filter((node) => node.caseIds.length > 0).map((node) => ({ ...node,
+        cases: props.preserveCaseOrder ? [...node.cases].sort((a, b) => rank.get(a.id)! - rank.get(b.id)!) : node.cases,
         selectableCaseIds: node.caseIds, children: prepare(node.children) }));
     }
     return { ...result, roots: prepare(result.roots) };
-  }, [props.folders, props.cases, props.includeArchived]);
+  }, [props.folders, props.cases, props.includeArchived, props.preserveCaseOrder]);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const expanded = new Set(props.folders.filter((folder) => !collapsed.has(folder.id)).map((folder) => folder.id));
   const open = props.onOpen ?? ((item: TestCaseSummary) => props.onToggle(item.id));
