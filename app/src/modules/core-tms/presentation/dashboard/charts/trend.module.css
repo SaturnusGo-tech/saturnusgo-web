@@ -75,3 +75,18 @@
   .legend { gap: 6px 14px; padding-inline: 14px; }
   .footer { padding-inline: 14px; }
 }
+
+.modes { display: inline-flex; gap: 3px; margin: 0 18px 18px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
+.modes button { border: 0; background: transparent; color: var(--muted); padding: 7px 15px; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 600; }
+.modes button:focus-visible { outline: 2px solid var(--trend-launched); outline-offset: 2px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+.series[data-visible="false"] .dot { background: transparent !important; border: 1px solid var(--muted); }
+.series[data-visible="false"] .toggle { opacity: .6; }
+.legend { gap: 12px 24px; border-top: 0; padding-top: 8px; padding-bottom: 18px; }
+.series { flex-direction: column; align-items: flex-start; gap: 0; }
+.series .toggle { font-size: 12px; }
+.series .drill { margin-left: 14px; gap: 8px; }
+.drill strong { font-size: 22px; font-weight: 600; letter-spacing: -.03em; }
+.footer { border-top: 0; padding-top: 0; }
+.chart { height: 240px; }

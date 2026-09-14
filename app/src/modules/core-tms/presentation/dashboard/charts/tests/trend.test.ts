@@ -38,6 +38,7 @@ function nodes(value: any): Node[] {
 }
 const find = (tree: Node, type: string) => nodes(tree).find((node) => node.type === type)!;
 const button = (tree: Node, label: string) => nodes(tree).find((node) => node.type === "button" && node.props["aria-label"]?.startsWith(label))!;
+const results = (tree: Node) => nodes(tree).find((node) => node.type === "button" && node.props.children === "dashboard.outcomeTrend")!.props.onClick();
 const data: DashboardSnapshot = {
   generatedAt: "2026-09-07T12:00:00Z", query: { workspaceId: "workspace", projectId: "project", period: "7d" },
   metrics: { passRate: 50, casePassRate: 75, currentCases: 0, casesCreated: 0, runsLaunched: 3, completedRuns: 2, passedRuns: 1,
@@ -55,17 +56,20 @@ test("chart uses authoritative daily run counts, while case pass rate stays a se
   assert.equal(find(tree, "YAxis").props.allowDecimals, false);
   assert.equal(find(tree, "YAxis").props.domain[0], 0);
   assert.equal(nodes(tree).some((node) => ["Line", "Area"].includes(node.type) && node.props.dataKey === "passRate"), false);
-  button(tree, "dashboard.casePassRate: 75%").props.onClick();
-  assert.equal(h.drills[0].filter.entity, "run_item");
-  assert.equal((h.drills[0].filter as { status: string }).status, "passed");
+  assert.equal(nodes(tree).filter((node) => node.type === "Line").length, 0);
+  results(tree); const outcomes = h.render();
+  assert.equal(nodes(outcomes).some((node) => node.type === "Area"), false);
+  assert.equal(nodes(outcomes).filter((node) => node.type === "Line").length, 6);
+  button(outcomes, "dashboard.open.run: failed, 1").props.onClick();
+  assert.equal(h.drills[0].filter.entity, "run");
 });
 
 test("keyboard date selection includes zero days and preserves exact day drills and unknown pass rate", () => {
   const h = harness(); let tree = h.render();
+  results(tree); tree = h.render();
   const picker = find(tree, "AnimatedSelect");
   assert.equal(picker.props.options.length, 3);
   picker.props.onChange(data.trend[1].start); tree = h.render();
-  assert.equal(button(tree, "dashboard.casePassRate: —").props.disabled, true);
   assert.equal(nodes(tree).some((node) => node.props["aria-label"]?.includes("—%")), false);
   button(tree, "dashboard.open.run: failed, 0").props.onClick();
   assert.equal(h.drills[0].filter.entity, "run");
@@ -78,7 +82,8 @@ test("keyboard date selection includes zero days and preserves exact day drills 
 
 test("series toggles keep one count series visible without changing drill counts", () => {
   const h = harness(); let tree = h.render();
-  for (const name of ["dashboard.launched", "passed", "failed", "blocked", "dashboard.incomplete", "dashboard.notStarted"]) {
+  results(tree); tree = h.render();
+  for (const name of ["passed", "failed", "blocked", "dashboard.incomplete", "dashboard.notStarted"]) {
     button(tree, `dashboard.hideSeries: ${name}`).props.onClick(); tree = h.render();
   }
   assert.equal(button(tree, "dashboard.hideSeries: dashboard.aborted").props.disabled, true);
@@ -92,6 +97,7 @@ test("series toggles keep one count series visible without changing drill counts
 test("reduced motion disables chart animation and stale date selection cannot reuse a previous window", () => {
   const h = harness(true); let tree = h.render();
   assert.equal(nodes(tree).filter((node) => ["Area", "Line"].includes(node.type)).every((node) => node.props.isAnimationActive === false), true);
+  results(tree); tree = h.render();
   find(tree, "AnimatedSelect").props.onChange(data.trend[0].start);
   tree = h.render({ ...data, trend: [data.trend[1]] });
   assert.equal(find(tree, "AnimatedSelect").props.value, "all");
