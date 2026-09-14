@@ -34,6 +34,6 @@ export function DrillCaseTree({ rows, workspaceId, selection, onSelection, onOpe
       selected={selected} selectable={Boolean(selection)} includeArchived preserveCaseOrder hideRedundantRootCount ru={ru}
       onToggle={(id) => scope([id])} onScope={scope}
       onOpen={(item) => { const row = projectRows.find((row) => row.id === item.id); if (row) onOpenRow(row); }}
-      heading={<strong>{projectRows[0].project}</strong>} />;
+      heading={<><strong>{projectRows[0].project}</strong><span>{projectRows.length}</span></>} />;
   })}</>;
 }
