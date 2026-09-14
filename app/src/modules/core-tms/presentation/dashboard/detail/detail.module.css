@@ -36,7 +36,7 @@
 .state strong { font-weight: 500; color: var(--ink); font-size: 15px; }
 .state p { margin: 0; font-size: 12px; max-width: 350px; line-height: 1.6; }
 .failure { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; color: var(--dash-danger); font-size: 12px; }
-.footer { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; min-height: 58px; }
+.footer { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 11px; padding-block: 16px; }
 .rail { width: 226px; flex: 0 0 226px; padding: 29px 15px; border-right: 1px solid var(--line); background: var(--canvas); }
 .rail h2 { font-size: 13px; font-weight: 550; margin: 0 10px 23px; }
 .rail .search { margin-bottom: 15px; flex: 0 0 36px; }

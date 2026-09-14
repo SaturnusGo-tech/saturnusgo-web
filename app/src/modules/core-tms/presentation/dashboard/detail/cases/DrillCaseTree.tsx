@@ -31,9 +31,9 @@ export function DrillCaseTree({ rows, workspaceId, selection, onSelection, onOpe
     const catalog = state.catalog[projectId];
     const byId = new Map(catalog.cases.map((item) => [item.id, item]));
     return <SelectionTree key={projectId} cases={projectRows.map((row) => byId.get(row.id)!)} folders={catalog.folders}
-      selected={selected} selectable={Boolean(selection)} includeArchived preserveCaseOrder ru={ru}
+      selected={selected} selectable={Boolean(selection)} includeArchived preserveCaseOrder hideRedundantRootCount ru={ru}
       onToggle={(id) => scope([id])} onScope={scope}
       onOpen={(item) => { const row = projectRows.find((row) => row.id === item.id); if (row) onOpenRow(row); }}
-      heading={<><strong>{projectRows[0].project}</strong><span>{projectRows.length}</span></>} />;
+      heading={<strong>{projectRows[0].project}</strong>} />;
   })}</>;
 }

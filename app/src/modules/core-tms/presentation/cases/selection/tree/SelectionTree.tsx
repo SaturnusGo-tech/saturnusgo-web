@@ -9,7 +9,7 @@ import local from "./selection-tree.module.css";
 
 type Props = {
   cases: TestCaseSummary[]; folders: readonly RepositoryFolder[]; selected: ReadonlySet<string>;
-  preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string;
+  hideRedundantRootCount?: boolean; preserveCaseOrder?: boolean; ru: boolean; disabled?: boolean; selectable?: boolean; includeArchived?: boolean; activeId?: string;
   onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   trailing?: (item: TestCaseSummary) => ReactNode;
   onOpen?: (item: TestCaseSummary) => void; heading?: ReactNode; accessory?: (item: TestCaseSummary) => ReactNode;
@@ -32,7 +32,7 @@ export function SelectionTree(props: Props) {
     data-readonly={!props.selectable || undefined}>
     {props.heading && <div className={local.heading}>{props.heading}</div>}
     <div className={css.treeScroll}><ul className={css.tree}>
-      {tree.roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0}
+      {tree.roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} hideRootCount={props.hideRedundantRootCount && node.caseIds.length === props.cases.length}
         expanded={expanded} selected={props.selected} selectedFolder="" activeCaseId={props.activeId ?? ""}
         ru={props.ru} locked={Boolean(props.disabled)} canManage={false} canSelect={props.selectable} allowArchivedSelection={props.includeArchived}
         trailing={props.trailing} accessory={props.accessory} onExpand={(id) => setCollapsed((current) => { const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next; })}

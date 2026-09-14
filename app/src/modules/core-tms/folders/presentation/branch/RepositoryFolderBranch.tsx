@@ -10,6 +10,7 @@ import { DragClickContext } from "../dnd/drag-click";
 import css from "../styles/repository.module.css";
 
 export type FolderBranchProps = {
+  hideRootCount?: boolean;
   trailing?: (item: TestCaseSummary) => ReactNode;
   canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
   node: FolderNode; depth: number; expanded: ReadonlySet<string>; selected: ReadonlySet<string>;
@@ -42,7 +43,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       <button ref={drag.setNodeRef} {...drag.attributes} {...drag.listeners} type="button" className={css.folderName} title={folder.name}
         disabled={props.locked} aria-disabled={props.locked || undefined}
         onClick={() => { if (!props.locked && Date.now() > suppress.current) { props.onFolder(folder.path, folder.id); if (!open) props.onExpand(folder.id); } }}>
-        {open ? <PiFolderOpenDuotone size={18} /> : <PiFolderSimpleDuotone size={18} />}<span>{folder.name}</span><small>{node.caseIds.length}</small>
+        {open ? <PiFolderOpenDuotone size={18} /> : <PiFolderSimpleDuotone size={18} />}<span>{folder.name}</span>{!(props.hideRootCount && depth === 0) && <small>{node.caseIds.length}</small>}
       </button>
       {props.canManage && <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>}
     </div>

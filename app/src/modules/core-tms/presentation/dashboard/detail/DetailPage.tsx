@@ -40,11 +40,12 @@ export function DetailState({ loading, error, empty, filtered, onRetry }: {
   </div>;
 }
 
-export function DetailFooter({ shown, total, more, loading, onMore }: {
+export function DetailFooter({ more, loading, onMore }: {
   shown: number; total?: number; more: boolean; loading: boolean; onMore: () => void;
 }) {
-  const { locale, t } = useTmsLocale();
-  return <footer className={styles.footer}><span>{locale === "ru" ? "Показано" : "Showing"} {shown}{total !== undefined ? ` / ${total}` : ""}</span>
-    {more && <button type="button" className={styles.quiet} onClick={onMore} disabled={loading}>{loading && <LoaderCircle className={surface.spin} size={14} />}{t("dashboard.loadMore")}</button>}
+  const { t } = useTmsLocale();
+  if (!more) return null;
+  return <footer className={styles.footer}>
+    <button type="button" className={styles.quiet} onClick={onMore} disabled={loading}>{loading && <LoaderCircle className={surface.spin} size={14} />}{t("dashboard.loadMore")}</button>
   </footer>;
 }
