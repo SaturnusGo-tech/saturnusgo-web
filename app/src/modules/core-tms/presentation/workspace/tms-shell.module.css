@@ -322,9 +322,6 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   text-align: left;
 }
 
-.brandButton:hover {
-  background: var(--sidebar-hover);
-}
 
 .tessiqMark {
   width: 40px;

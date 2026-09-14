@@ -98,7 +98,7 @@ export function DashboardTrendChart({ snapshot, onOpenDrill, onPeriodChange }: {
                 isAnimationActive={reduceMotion === false} animationDuration={220} />
               {controls.filter((item) => item.key !== "launched").map((item) => (
                 <Line key={item.key} dataKey={item.key} name={item.label} type="linear" hide={hidden.includes(item.key)}
-                  stroke={item.color} strokeWidth={1.5} strokeDasharray={DASHES[item.key]} connectNulls={false}
+                  stroke={item.color} strokeWidth={2} strokeDasharray={DASHES[item.key]} connectNulls={false}
                   dot={snapshot.trend.length === 1 ? { r: 3 } : false}
                   activeDot={(point) => <Dot {...point} r={4} cursor="pointer" onClick={() => onOpenDrill(inBucket(item.drill, point.index))} />}
                   isAnimationActive={reduceMotion === false} animationDuration={220} />

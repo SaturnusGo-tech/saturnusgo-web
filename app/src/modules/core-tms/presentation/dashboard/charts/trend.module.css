@@ -1,17 +1,27 @@
 .panel {
-  --trend-launched: var(--ink);
-  --trend-passed: color-mix(in srgb, var(--dash-success) 85%, var(--muted));
-  --trend-failed: color-mix(in srgb, var(--dash-danger) 85%, var(--muted));
-  --trend-blocked: color-mix(in srgb, var(--dash-warning) 50%, var(--muted));
-  --trend-incomplete: color-mix(in srgb, var(--ink) 72%, var(--paper));
-  --trend-not_started: var(--muted);
-  --trend-aborted: color-mix(in srgb, var(--ink) 52%, var(--paper));
+  --trend-launched: #2563eb;
+  --trend-passed: #16a34a;
+  --trend-failed: #e53935;
+  --trend-blocked: #d97706;
+  --trend-incomplete: #64748b;
+  --trend-not_started: #858e9b;
+  --trend-aborted: #9333ea;
   --trend-grid: color-mix(in srgb, var(--ink) 9%, transparent);
   min-width: 0;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 15px;
+}
+
+:global(.dark) .panel {
+  --trend-launched: #60a5fa;
+  --trend-passed: #22c55e;
+  --trend-failed: #fb5353;
+  --trend-blocked: #fbbf24;
+  --trend-incomplete: #9ca3af;
+  --trend-not_started: #737d8f;
+  --trend-aborted: #c084fc;
 }
 
 .heading {
