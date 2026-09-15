@@ -1,0 +1,11 @@
+.menu { position:relative; flex:none; }
+.menu summary { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; cursor:pointer; list-style:none; color:inherit; }
+.menu summary::-webkit-details-marker { display:none; }
+.menu summary:hover,.menu[open] summary { background:var(--admin-hover); color:var(--admin-text); }
+.menu summary:focus-visible { outline:2px solid var(--admin-blue); outline-offset:2px; }
+.items { position:absolute; z-index:20; right:0; top:calc(100% + 6px); width:230px; padding:6px; border:1px solid var(--admin-line); border-radius:12px; background:var(--admin-menu); color:var(--admin-text); box-shadow:0 8px 24px rgb(0 0 0 / 12%); }
+.items button { width:100%; display:flex; align-items:center; gap:10px; border:0; background:transparent; padding:11px 10px; font:inherit; font-size:14px; text-align:left; color:inherit; border-radius:7px; cursor:pointer; }
+.items button:hover:not(:disabled) { background:var(--admin-hover); }
+.items .danger { color:var(--admin-danger); }
+
+.menu[data-above="true"] .items { top:auto; bottom:calc(100% + 6px); }

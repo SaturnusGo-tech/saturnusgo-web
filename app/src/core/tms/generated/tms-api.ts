@@ -14792,6 +14792,8 @@ export interface operations {
                 search?: string;
                 /** @description Company/member changes, authentication activity, or all events. */
                 category?: "all" | "changes" | "access";
+                /** @description Exact employee identity. Includes actions by this employee and membership changes targeting them, within the authorized company scope. */
+                memberId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -14836,6 +14838,8 @@ export interface operations {
                 search?: string;
                 /** @description Company/member changes, authentication activity, or all events. */
                 category?: "all" | "changes" | "access";
+                /** @description Exact employee identity. Includes actions by this employee and membership changes targeting them, within the authorized company scope. */
+                memberId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -14880,6 +14884,8 @@ export interface operations {
                 search?: string;
                 /** @description Company/member changes, authentication activity, or all events. */
                 category?: "all" | "changes" | "access";
+                /** @description Exact employee identity. Includes actions by this employee and membership changes targeting them, within the authorized company scope. */
+                memberId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

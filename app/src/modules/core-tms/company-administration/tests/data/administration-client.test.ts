@@ -60,3 +60,17 @@ void test("session confirmation sends credentials only in a private POST body an
   assert.deepEqual(JSON.parse(String(captured?.init.body)), proof);
   assert.equal(new Headers(captured?.init.headers).has("idempotency-key"), false);
 });
+
+void test("employee activity uses exact identity filtering with bounded pagination", async () => {
+  let requested = "";
+  const http = createTmsHttpClient({ apiBase: "https://falcon.example.test/api/v1", credentials: "include", production: true,
+    fetch: async (url) => { requested = String(url); return new Response(JSON.stringify({ data: [], meta: { nextCursor: null } })); } });
+  await createAdministrationClient(http).journal(false, null, "event-30", new AbortController().signal,
+    { memberId: "employee-42", category: "all", search: "HOST-TC-1" });
+  const url = new URL(requested);
+  assert.equal(url.pathname, "/api/v1/company/audit");
+  assert.equal(url.searchParams.get("memberId"), "employee-42");
+  assert.equal(url.searchParams.get("search"), "HOST-TC-1");
+  assert.equal(url.searchParams.get("cursor"), "event-30");
+  assert.equal(url.searchParams.get("limit"), "30");
+});

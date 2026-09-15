@@ -27,7 +27,7 @@ export function createAdministrationClient(http: TmsHttpClient): AdministrationP
     companyOptions: (signal) => get<CompanyOptions>("/platform/company-options", signal),
     ownCompany: (signal) => get<Company>("/company", signal),
     journal: (platform, id, cursor, signal, filter) => list<AdministrationEvent>(platform
-      ? (id ? `/platform/companies/${encodeURIComponent(id)}/audit` : "/platform/audit") : "/company/audit", filter?.search ?? "", cursor, signal, { category: filter?.category ?? "all" }),
+      ? (id ? `/platform/companies/${encodeURIComponent(id)}/audit` : "/platform/audit") : "/company/audit", filter?.search ?? "", cursor, signal, { category: filter?.category ?? "all", ...(filter?.memberId ? { memberId: filter.memberId } : {}) }),
     avatar: (id, signal) => get(avatarPath(id), signal),
     uploadAvatar: async (id, version, file, key, signal) => {
       const imageBase64 = await avatarFileBase64(file, signal);

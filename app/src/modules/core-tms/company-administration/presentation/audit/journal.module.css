@@ -24,3 +24,11 @@
 .loading > div { display:grid; grid-template-columns:2fr 1fr 1fr; gap:40px; padding:29px 0; border-bottom:1px solid var(--admin-line); }
 .loading i { height:18px; border-radius:4px; background:var(--admin-hover); }
 @media(max-width:760px) { .toolbar { align-items:stretch; flex-direction:column; gap:12px; } .table table { min-width:530px; } }
+
+.journal[data-member="true"] .header { margin-bottom:20px; }
+.journal[data-member="true"] .header h1 { font-size:18px; letter-spacing:-.3px; }
+.journal[data-member="true"] .toolbar { flex-wrap:wrap; gap:12px; }
+.journal[data-member="true"] .search { flex:1; min-width:170px; }
+.journal[data-member="true"] .table { overflow:auto; }
+.journal[data-member="true"] table { font-size:13px; }
+.journal[data-member="true"] th,.journal[data-member="true"] td { padding:16px 10px; }

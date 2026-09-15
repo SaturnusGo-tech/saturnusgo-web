@@ -22,4 +22,4 @@ export class AdministrationError extends Error {
   constructor(readonly code: string, readonly requestId?: string | null) { super(code); }
 }
 
-export type JournalFilter = Pick<NonNullable<operations["getCompanyAudit"]["parameters"]["query"]>, "search" | "category">;
+export type JournalFilter = Pick<NonNullable<operations["getCompanyAudit"]["parameters"]["query"]>, "search" | "category" | "memberId">;

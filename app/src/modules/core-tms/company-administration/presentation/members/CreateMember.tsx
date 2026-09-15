@@ -1,5 +1,6 @@
 "use client";
 
+import { UserRoundPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MemberDraft, MemberMutation } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -33,10 +34,10 @@ export function CreateMember({ client, owner, onBack, onCreated, onBusy }: {
     });
   }}>
     <header className={styles.header}><h2>{locale === "ru" ? "Новый сотрудник" : "New person"}</h2>
-      <div><button type="button" disabled={command.pending} onClick={onBack}>{copy.cancel}</button>
+      <div><button type="button" aria-label={copy.cancel} disabled={command.pending} onClick={onBack}><X size={20} /></button>
         <button className={styles.primary} type="submit" disabled={command.pending}>{command.pending ? (locale === "ru" ? "Создаём…" : "Creating…") : copy.create}</button></div>
     </header>
-    <div className={styles.body}>
+    <div className={`${styles.body} ${styles.createBody}`}><UserRoundPlus className={styles.createAvatar} size={64} strokeWidth={1.3} />
       <input className={styles.name} aria-label={locale === "ru" ? "Имя и фамилия" : "Full name"} placeholder={locale === "ru" ? "Имя и фамилия" : "Full name"}
         autoComplete="off" maxLength={200} required value={draft.name} disabled={command.pending}
         onChange={(event) => setDraft({ ...draft, name: event.target.value })} />

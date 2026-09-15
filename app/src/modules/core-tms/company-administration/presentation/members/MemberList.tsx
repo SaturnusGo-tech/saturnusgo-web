@@ -1,5 +1,7 @@
 "use client";
 
+import type { SignedInCompanySession } from "../../../auth/managed/domain/managed-access";
+import type { MemberChange } from "../../domain/administration";
 import { Plus, Search, UserRoundPlus } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -10,7 +12,8 @@ import { ResourceState } from "../common/ResourceState";
 import { MemberDirectoryRow } from "../directory/MemberDirectoryRow";
 import styles from "../directory/directory.module.css";
 
-export function MemberList({ client, onOpen, onCreate, selectedId, creating, version, disabled }: {
+export function MemberList({ client, session, onAction, onOpen, onCreate, selectedId, creating, version, disabled }: {
+  readonly session: SignedInCompanySession; readonly onAction: (id: string, change: MemberChange | "edit") => void;
   readonly client: AdministrationPort; readonly onOpen: (id: string) => void; readonly onCreate: () => void;
   readonly selectedId: string | null; readonly creating: boolean; readonly version: number; readonly disabled: boolean;
 }) {
@@ -36,6 +39,7 @@ export function MemberList({ client, onOpen, onCreate, selectedId, creating, ver
       {list.loading ? <div className={styles.skeletons} aria-label={locale === "ru" ? "Загрузка сотрудников" : "Loading people"}>
         {[0, 1, 2].map((item) => <div className={styles.skeletonRow} key={item}><i /><span /><span /></div>)}
       </div> : list.items.map((member) => <MemberDirectoryRow key={member.identityId} member={member} client={client}
+        onAction={onAction} canEdit={member.status !== "revoked" && (session.identity.owner || member.role !== "workspace_admin")} canManage={!member.owner && member.identityId !== session.identity.id && (session.identity.owner || member.role !== "workspace_admin") && member.status !== "revoked"}
         selected={selectedId === member.identityId && !creating} disabled={disabled} onOpen={onOpen} />)}
       {!list.loading && !list.error && !list.items.length && <p className={styles.empty}>{copy.noMembers}</p>}
       {list.error && <ResourceState loading={false} error={list.error} retry={list.refresh} />}

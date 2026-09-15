@@ -34,3 +34,9 @@
 @media(max-width:1350px) { .header { padding:0 28px; } .body { padding:35px 28px; } .name { font-size:32px; } .field { grid-template-columns:130px minmax(0,1fr); gap:12px; } }
 @media(max-width:600px) { .header { height:72px; padding:0 20px; gap:12px; } .header > div { gap:16px; } .body { padding:25px 20px; } .name { font-size:28px; } .field { grid-template-columns:1fr; gap:4px; } .field input { margin-left:-12px; width:calc(100% + 12px); } .field button[aria-haspopup="listbox"] { padding-left:0; } .handoff { padding:25px 20px; } }
 @media(prefers-reduced-motion:reduce) { .field input,.additional > summary svg { transition:none; } }
+
+.createBody { max-width:780px; margin:0 auto; padding-top:32px; }
+.createAvatar { padding:16px; width:80px; height:80px; border-radius:16px; background:var(--admin-hover); color:var(--admin-muted); margin-bottom:28px; }
+.createBody .name { font-size:30px; font-weight:500; }
+.createBody .field { border-bottom:0; min-height:76px; }
+.createBody .field input { border-color:var(--admin-line); background:var(--admin-bg); }
