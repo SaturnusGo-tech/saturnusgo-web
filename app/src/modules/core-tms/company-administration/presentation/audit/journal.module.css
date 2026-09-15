@@ -8,27 +8,13 @@
 .search:focus-within { border-color:var(--admin-blue); }
 .toolbar button[aria-haspopup] { width:max-content; gap:10px; padding:10px; background:transparent; border-color:transparent; }
 .toolbar [role="listbox"] { min-width:210px; left:auto; right:0; background:var(--admin-menu); }
-.table { overflow:auto; }
-.table table { width:100%; border-collapse:collapse; text-align:left; }
-.table th { color:var(--admin-muted); font-size:12px; font-weight:450; padding:12px 20px 14px 0; border-bottom:1px solid var(--admin-line); }
-.table td { padding:20px 24px 20px 0; border-bottom:1px solid var(--admin-line); vertical-align:top; }
-.table th:first-child { width:56%; }
-.table th:last-child,.table td:last-child { padding-right:0; text-align:right; white-space:nowrap; color:var(--admin-muted); }
-.action { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-.target { display:block; color:var(--admin-muted); margin-top:5px; font-size:13px; }
-.details { margin-top:6px; color:var(--admin-muted); font-size:12px; }
-.details summary { cursor:pointer; width:max-content; }
-.details code { display:block; padding:10px 0 0; overflow-wrap:anywhere; }
 .more { display:block; padding:12px; margin:18px auto; border:0; background:transparent; color:var(--admin-blue); font:inherit; cursor:pointer; }
 .empty { color:var(--admin-muted); padding:45px 0; }
-.loading > div { display:grid; grid-template-columns:2fr 1fr 1fr; gap:40px; padding:29px 0; border-bottom:1px solid var(--admin-line); }
+.loading > div { display:grid; grid-template-columns:28px 1fr 45px; gap:14px; padding:22px 0; }
 .loading i { height:18px; border-radius:4px; background:var(--admin-hover); }
-@media(max-width:760px) { .toolbar { align-items:stretch; flex-direction:column; gap:12px; } .table table { min-width:530px; } }
+@media(max-width:760px) { .toolbar { align-items:stretch; flex-direction:column; gap:12px; } }
 
 .journal[data-member="true"] .header { margin-bottom:20px; }
 .journal[data-member="true"] .header h1 { font-size:18px; letter-spacing:-.3px; }
 .journal[data-member="true"] .toolbar { flex-wrap:wrap; gap:12px; }
 .journal[data-member="true"] .search { flex:1; min-width:170px; }
-.journal[data-member="true"] .table { overflow:auto; }
-.journal[data-member="true"] table { font-size:13px; }
-.journal[data-member="true"] th,.journal[data-member="true"] td { padding:16px 10px; }

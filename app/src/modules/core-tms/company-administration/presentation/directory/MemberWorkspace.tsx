@@ -25,7 +25,10 @@ export function MemberWorkspace({ client, session, id, creating, onBack, onOpen,
   return <div className={styles.workspace} data-open={open}>
     <MemberList client={client} session={session} onAction={(identityId, change) => { setAction({ id: identityId, change }); onOpen(identityId); }} onOpen={onOpen} onCreate={onCreate} selectedId={id} creating={creating} version={version} disabled={busy} />
     <div className={styles.detailHost}>
-      <div className={styles.placeholder}>{locale === "ru" ? "Выберите сотрудника" : "Select a person"}</div>
+      {!open && <div className={styles.placeholder}>
+        <img src="/falcon/illustrations/employee-directory.png" width={288} height={192} alt="" />
+        <p>{locale === "ru" ? "Выберите сотрудника" : "Select a person"}</p>
+      </div>}
       <AnimatePresence mode="wait" initial={false}>
         {open && <AdministrationPanel key={creating ? "create" : id} busy={busy} onClose={onBack}
           label={creating ? (locale === "ru" ? "Новый сотрудник" : "New person") : (locale === "ru" ? "Карточка сотрудника" : "Person details")}>

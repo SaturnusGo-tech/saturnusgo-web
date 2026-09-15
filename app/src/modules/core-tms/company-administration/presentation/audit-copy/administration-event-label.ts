@@ -1,3 +1,4 @@
+import { productEventLabel } from "../activity-model/product-event-label";
 import { activityLabel } from "../../../localization/activity/label";
 const labels: Record<string, readonly [string, string]> = {
   "company.created": ["Компания создана", "Company created"],
@@ -36,5 +37,9 @@ const labels: Record<string, readonly [string, string]> = {
   "platform.operator_recover": ["Восстановлен доступ оператора", "Operator access recovered"],
 };
 export function administrationEventLabel(action: string, locale: "ru" | "en"): string {
-  return labels[action]?.[locale === "ru" ? 0 : 1] ?? activityLabel(locale, action);
+  const known = labels[action]?.[locale === "ru" ? 0 : 1];
+  if (known) return known;
+  const legacy = activityLabel(locale, action);
+  return legacy !== action.replaceAll(".", " ") ? legacy : productEventLabel(action, locale)
+    ?? (locale === "ru" ? "Служебное событие" : "Service event");
 }

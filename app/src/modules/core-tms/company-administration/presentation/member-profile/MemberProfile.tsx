@@ -40,7 +40,7 @@ export function MemberProfile({ member, client, disabled, canManage, editing, on
           <dt>{ru ? "Добавлен" : "Added"}</dt><dd><time dateTime={member.createdAt}>{new Date(member.createdAt).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}</time></dd>
         </dl>
       </aside>
-      <div className={styles.activity}><AdministrationJournal key={`${member.identityId}:${member.version}`} client={client} platform={false} memberId={member.identityId} /></div>
+      <div className={styles.activity}><AdministrationJournal key={`${member.identityId}:${member.version}`} client={client} platform={false} memberId={member.identityId} subjectName={member.name} /></div>
     </div>}
   </div>;
 }

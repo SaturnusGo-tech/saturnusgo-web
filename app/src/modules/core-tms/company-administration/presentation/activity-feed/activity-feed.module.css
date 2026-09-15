@@ -1,0 +1,28 @@
+.feed { min-width:0; }
+.day + .day { margin-top:30px; }
+.day h2 { margin:0 0 18px; font-size:12px; font-weight:500; color:var(--admin-muted); }
+.feed ol { padding:0; margin:0; list-style:none; }
+.entry { position:relative; display:flex; gap:13px; padding:0 0 22px; }
+.entry:not(:last-child)::before { content:""; position:absolute; left:14px; top:30px; bottom:0; width:1px; background:var(--admin-line); }
+.icon { position:relative; flex-shrink:0; width:29px; height:29px; border-radius:50%; display:grid; place-items:center; color:var(--admin-blue); background:color-mix(in srgb,var(--admin-blue) 9%,transparent); }
+.icon[data-tone="access"] { color:#9773de; background:rgb(151 115 222 / 10%); }
+.icon[data-tone="defect"] { color:#e67666; background:rgb(230 118 102 / 10%); }
+.icon[data-tone="file"] { color:var(--admin-muted); background:var(--admin-hover); }
+.content { flex:1; min-width:0; padding-top:4px; }
+.line { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
+.line strong { font-size:14px; font-weight:500; line-height:1.5; }
+.line time { flex-shrink:0; font-size:12px; color:var(--admin-muted); font-variant-numeric:tabular-nums; }
+.target { margin:5px 0 0; font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
+.actor { margin:4px 0 0; font-size:12px; color:var(--admin-muted); }
+.details { margin-top:7px; color:var(--admin-muted); font-size:11px; }
+.details summary,.service > summary { list-style:none; display:flex; align-items:center; gap:5px; width:fit-content; cursor:pointer; border-radius:4px; }
+.details summary::-webkit-details-marker,.service > summary::-webkit-details-marker { display:none; }
+.details summary:hover,.service > summary:hover { color:var(--admin-text); }
+.details[open] > summary svg,.service[open] > summary svg { transform:rotate(180deg); }
+.details dl { display:grid; grid-template-columns:110px minmax(0,1fr); gap:8px 12px; margin:12px 0 0; padding:12px; background:var(--admin-hover); border-radius:8px; }
+.details dd { margin:0; overflow-wrap:anywhere; }
+.service { margin:0 0 16px 42px; }
+.service > summary { color:var(--admin-muted); font-size:12px; padding:5px 0; gap:7px; }
+.service > summary span { font-variant-numeric:tabular-nums; opacity:.8; }
+.service ol { margin-top:16px; }
+@media(max-width:600px) { .line { gap:10px; } .details dl { grid-template-columns:1fr; } }
