@@ -7,6 +7,12 @@
 .panel button:focus-visible, .result:focus-visible { outline: 2px solid #5188ef; outline-offset: 2px; }
 .header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .header strong { display: block; font-size: 14px; font-weight: 600; }
+.header .dragHandle { flex: 1; min-width: 0; justify-content: flex-start; gap: 10px; padding: 2px 0; text-align: left; background: transparent; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.header .dragHandle:hover:not(:disabled) { background: transparent; }
+.heading { min-width: 0; }
+.grip { margin-left: auto; flex-shrink: 0; color: var(--writing-muted); opacity: .45; transition: opacity .16s ease; }
+.dragHandle:hover .grip, .dragHandle:focus-visible .grip, .panel[data-dragging] .grip { opacity: 1; }
+.panel[data-dragging] .dragHandle { cursor: grabbing; }
 .scope { display: block; font-size: 11px; color: var(--writing-muted); margin-top: 1px; }
 .header .close { margin-left: auto; align-self: flex-start; background: transparent; padding: 5px; width: 28px; min-height: 28px; color: var(--writing-muted); }
 .prompt { display: flex; align-items: flex-end; gap: 8px; padding: 10px 10px 10px 12px; border: 1px solid var(--writing-line); border-radius: 11px; transition: border-color .16s ease; }
@@ -17,7 +23,7 @@
 .prompt .microphone { width: 30px; min-height: 30px; padding: 5px; border-radius: 50%; color: var(--writing-muted); background: transparent; }
 .prompt .microphone[data-active] { color: #3478ee; background: color-mix(in srgb, #3478ee 12%, var(--writing-bg)); }
 .panel[data-color-mode="dark"] .microphone[data-active] { color: #82b3ff; }
-.microphoneHint { position: absolute; right: -38px; bottom: calc(100% + 10px); width: min(260px, calc(100vw - 70px)); padding: 9px 11px; z-index: 1; background: var(--writing-bg); color: var(--writing-ink); border: 1px solid var(--writing-line); border-radius: 9px; box-shadow: 0 3px 12px #0001; font-size: 11px; line-height: 1.5; pointer-events: none; visibility: hidden; opacity: 0; transition: opacity .15s ease; }
+.microphoneHint { position: absolute; right: -38px; bottom: calc(100% + 10px); width: max-content; max-width: min(260px, calc(100vw - 70px)); padding: 9px 11px; z-index: 1; background: var(--writing-bg); color: var(--writing-ink); border: 1px solid var(--writing-line); border-radius: 9px; box-shadow: 0 3px 12px #0001; font-size: 11px; line-height: 1.5; pointer-events: none; visibility: hidden; opacity: 0; transition: opacity .15s ease; }
 .microphoneWrap:hover .microphone:not([data-active]) + .microphoneHint, .microphone:focus-visible:not([data-active]) + .microphoneHint { visibility: visible; opacity: 1; }
 .dictationStatus { color: var(--writing-muted); font-size: 12px; line-height: 1.5; margin: 9px 0 0; }
 .spinner { animation: microphoneSpin 1s linear infinite; }

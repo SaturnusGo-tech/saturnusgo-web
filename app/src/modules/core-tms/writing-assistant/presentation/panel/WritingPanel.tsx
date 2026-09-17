@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { motion, useIsPresent, useReducedMotion } from "framer-motion";
-import { ArrowUp, Check, LoaderCircle, Mic, RotateCcw, Square, X } from "lucide-react";
+import { ArrowUp, Check, GripVertical, LoaderCircle, Mic, RotateCcw, Square, X } from "lucide-react";
 import { useColorMode } from "../../../../../shared/_hooks/useColorMode";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { stripRawHtml } from "../../../presentation/cases/inspector/markdown/code/stripRawHtml";
@@ -22,7 +22,7 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
   const tooLong = target.text.length > 30000;
   const dictation = useWritingDictation({ instruction, onChange: setInstruction, ru, workspaceId, target,
     enabled: present && !request.busy && !tooLong });
-  const { panel, position } = useWritingPopup(anchor, () => { dictation.cancel(); request.cancel(); onClose(false); });
+  const { panel, position, dragging, handle } = useWritingPopup(anchor, () => { dictation.cancel(); request.cancel(); onClose(false); }, present);
   const { theme } = useColorMode();
   const reduced = useReducedMotion();
   const titleId = useId();
@@ -41,7 +41,7 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
     onClose(false);
   }
   return createPortal(<motion.div ref={panel} className={css.panel} style={{ ...position, pointerEvents: present ? undefined : "none" }} aria-hidden={!present || undefined}
-    data-color-mode={theme === "dark" ? "dark" : "light"} data-writing-popup
+    data-color-mode={theme === "dark" ? "dark" : "light"} data-writing-popup data-dragging={dragging || undefined}
     role="dialog" aria-label={ru ? "Спросить Falcon AI" : "Ask Falcon AI"} aria-labelledby={titleId}
     initial={{ opacity: 0, y: reduced ? 0 : -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduced ? 0 : -4 }}
     transition={{ duration: reduced ? 0 : .18, ease: "easeOut" }}
@@ -55,9 +55,15 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
         event.stopPropagation();
       }
     }}>
-    <header className={css.header}><span className={sphere.sphere} aria-hidden="true" />
-      <div><strong id={titleId}>{ru ? "Спросить Falcon AI" : "Ask Falcon AI"}</strong>
-        <span className={css.scope}>{target.selected ? (ru ? "Выделенный текст" : "Selected text") : (ru ? "Весь текст поля" : "Entire field")}</span></div>
+    <header className={css.header}>
+      <button type="button" className={css.dragHandle} {...handle}
+        aria-label={ru ? "Переместить окно Falcon AI" : "Move Falcon AI window"}
+        title={ru ? "Удерживайте заголовок и перетащите. С клавиатуры: стрелки." : "Hold the header and drag. Keyboard: arrow keys."}>
+        <span className={sphere.sphere} aria-hidden="true" />
+        <span className={css.heading}><strong id={titleId}>{ru ? "Спросить Falcon AI" : "Ask Falcon AI"}</strong>
+          <span className={css.scope}>{target.selected ? (ru ? "Выделенный текст" : "Selected text") : (ru ? "Весь текст поля" : "Entire field")}</span></span>
+        <GripVertical size={16} className={css.grip} aria-hidden="true" />
+      </button>
       <button type="button" className={css.close} onClick={close} aria-label={ru ? "Закрыть Falcon AI" : "Close Falcon AI"}><X size={16} /></button>
     </header>
     <div className={css.prompt}>
@@ -72,9 +78,7 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
           aria-pressed={dictation.active} aria-describedby={`${dictationId}-hint`} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
           {dictation.state === "starting" || dictation.state === "transcribing" ? <LoaderCircle className={css.spinner} size={16} /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
         </button>
-        <span id={`${dictationId}-hint`} className={css.microphoneHint} role="tooltip">{dictation.active ? microphoneLabel : (ru
-          ? "Диктовать команду. После остановки запись отправится в OpenAI для распознавания."
-          : "Dictate a command. After you stop, the recording is sent to OpenAI for transcription.")}</span>
+        <span id={`${dictationId}-hint`} className={css.microphoneHint} role="tooltip">{microphoneLabel}</span>
       </span>
       <button type="button" className={css.send} disabled={!instruction.trim() || request.busy || tooLong || dictation.active}
         aria-label={ru ? "Отправить запрос" : "Send request"} onClick={() => void request.run("custom", instruction)}><ArrowUp size={17} /></button>
