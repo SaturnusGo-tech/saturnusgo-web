@@ -13,6 +13,15 @@
 .prompt:focus-within { border-color: #74a1ef; }
 .prompt textarea { flex: 1; width: 100%; min-width: 0; min-height: 42px; max-height: 120px; padding: 0; resize: vertical; border: 0; outline: 0; box-shadow: none; color: var(--writing-ink); background: transparent; font: inherit; font-size: 13px; line-height: 1.55; }
 .prompt textarea::placeholder { color: var(--writing-muted); }
+.microphoneWrap { position: relative; flex-shrink: 0; }
+.prompt .microphone { width: 30px; min-height: 30px; padding: 5px; border-radius: 50%; color: var(--writing-muted); background: transparent; }
+.prompt .microphone[data-active] { color: #3478ee; background: color-mix(in srgb, #3478ee 12%, var(--writing-bg)); }
+.panel[data-color-mode="dark"] .microphone[data-active] { color: #82b3ff; }
+.microphoneHint { position: absolute; right: -38px; bottom: calc(100% + 10px); width: min(260px, calc(100vw - 70px)); padding: 9px 11px; z-index: 1; background: var(--writing-bg); color: var(--writing-ink); border: 1px solid var(--writing-line); border-radius: 9px; box-shadow: 0 3px 12px #0001; font-size: 11px; line-height: 1.5; pointer-events: none; visibility: hidden; opacity: 0; transition: opacity .15s ease; }
+.microphoneWrap:hover .microphone:not([data-active]) + .microphoneHint, .microphone:focus-visible:not([data-active]) + .microphoneHint { visibility: visible; opacity: 1; }
+.dictationStatus { color: var(--writing-muted); font-size: 12px; line-height: 1.5; margin: 9px 0 0; }
+.spinner { animation: microphoneSpin 1s linear infinite; }
+@keyframes microphoneSpin { to { transform: rotate(360deg); } }
 .prompt .send { width: 30px; min-height: 30px; padding: 5px; color: #fff; background: #3478ee; border-radius: 50%; }
 .prompt .send:hover:not(:disabled), .footer .apply:hover { background: #2869d9; }
 .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -27,4 +36,4 @@
 .loadingFooter { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; color: var(--writing-muted); }
 .loadingFooter button { background: transparent; }
 @keyframes shimmer { to { background-position: -250% 0; } }
-@media (prefers-reduced-motion: reduce) { .loading > span { animation: none; }.panel button, .prompt { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .loading > span, .spinner { animation: none; }.panel button, .prompt, .microphoneHint { transition: none; } }

@@ -1,12 +1,13 @@
 import { useEffect, useId, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { motion, useIsPresent, useReducedMotion } from "framer-motion";
-import { ArrowUp, Check, RotateCcw, X } from "lucide-react";
+import { ArrowUp, Check, LoaderCircle, Mic, RotateCcw, Square, X } from "lucide-react";
 import { useColorMode } from "../../../../../shared/_hooks/useColorMode";
 import { MarkdownField } from "../../../presentation/cases/inspector/markdown/MarkdownField";
 import { stripRawHtml } from "../../../presentation/cases/inspector/markdown/code/stripRawHtml";
 import type { WritingTarget } from "../../model/target";
 import { useWritingRequest } from "../../state/useWritingRequest";
+import { useWritingDictation } from "../../dictation/state/useWritingDictation";
 import { useWritingPopup } from "./useWritingPopup";
 import sphere from "../writing.module.css";
 import css from "./writing-panel.module.css";
@@ -18,14 +19,18 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
   const [instruction, setInstruction] = useState("");
   const request = useWritingRequest(workspaceId, target, ru);
   const present = useIsPresent();
-  const { panel, position } = useWritingPopup(anchor, () => { request.cancel(); onClose(false); });
+  const tooLong = target.text.length > 30000;
+  const dictation = useWritingDictation({ instruction, onChange: setInstruction, ru, workspaceId, target,
+    enabled: present && !request.busy && !tooLong });
+  const { panel, position } = useWritingPopup(anchor, () => { dictation.cancel(); request.cancel(); onClose(false); });
   const { theme } = useColorMode();
   const reduced = useReducedMotion();
   const titleId = useId();
-  const tooLong = target.text.length > 30000;
+  const dictationId = useId();
+  const microphoneLabel = dictation.active ? (ru ? "Остановить диктовку" : "Stop dictation") : (ru ? "Диктовать команду" : "Dictate a command");
   const result = stripRawHtml(request.result);
   useEffect(() => { if (!present) { request.cancel(); panel.current?.setAttribute("inert", ""); } }, [present]);
-  function close() { request.cancel(); onClose(); }
+  function close() { dictation.cancel(); request.cancel(); onClose(); }
   function apply() {
     if (!target.apply(result)) {
       request.setError(ru ? "Не удалось применить ответ. Ваш текст сохранён. Закройте окно и отправьте новый запрос." : "Could not apply this response. Your text is unchanged. Close this window and start a new request.");
@@ -56,14 +61,29 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
     <div className={css.prompt}>
       <textarea aria-label={ru ? "Что нужно сделать с текстом?" : "What should change?"}
         placeholder={ru ? "Что нужно сделать? Например, оформить текст в Markdown…" : "What should change? For example, format this in Markdown…"}
-        rows={2} value={instruction} maxLength={2000} disabled={request.busy} onChange={(event) => setInstruction(event.target.value)}
-        onKeyDown={(event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && instruction.trim() && !request.busy && !tooLong) { event.preventDefault(); void request.run("custom", instruction); } }} />
-      <button type="button" className={css.send} disabled={!instruction.trim() || request.busy || tooLong}
+        rows={2} value={instruction} maxLength={2000} disabled={request.busy} readOnly={dictation.active}
+        aria-describedby={dictation.active || dictation.error ? dictationId : undefined} onChange={(event) => setInstruction(event.target.value)}
+        onKeyDown={(event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && instruction.trim() && !request.busy && !tooLong && !dictation.active) { event.preventDefault(); void request.run("custom", instruction); } }} />
+      <span className={css.microphoneWrap}>
+        <button type="button" className={css.microphone} data-active={dictation.active || undefined}
+          disabled={request.busy || tooLong || dictation.state === "stopping"} aria-label={microphoneLabel}
+          aria-pressed={dictation.active} aria-describedby={`${dictationId}-hint`} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
+          {dictation.state === "starting" || dictation.state === "stopping" ? <LoaderCircle className={css.spinner} size={16} /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
+        </button>
+        <span id={`${dictationId}-hint`} className={css.microphoneHint} role="tooltip">{dictation.active ? microphoneLabel : (ru
+          ? "Диктовать команду. Браузер может передавать аудио своей службе распознавания."
+          : "Dictate a command. Your browser may send audio to its speech recognition service.")}</span>
+      </span>
+      <button type="button" className={css.send} disabled={!instruction.trim() || request.busy || tooLong || dictation.active}
         aria-label={ru ? "Отправить запрос" : "Send request"} onClick={() => void request.run("custom", instruction)}><ArrowUp size={17} /></button>
     </div>
+    {(dictation.active || dictation.error) && <p id={dictationId} className={dictation.error ? css.error : css.dictationStatus}
+      role={dictation.error ? "alert" : "status"}>{dictation.error || (dictation.state === "starting"
+        ? (ru ? "Подключаем микрофон…" : "Connecting microphone…") : dictation.state === "stopping"
+        ? (ru ? "Завершаем диктовку…" : "Finishing dictation…") : (ru ? "Диктуйте команду. Нажмите стоп, чтобы проверить текст." : "Dictate your command. Press stop to review the text."))}</p>}
     <div className={css.shortcuts}>
-      <button type="button" disabled={!target.text.trim() || request.busy || tooLong} onClick={() => void request.run("improve")}>{ru ? "Улучшить текст" : "Improve text"}</button>
-      <button type="button" disabled={!target.text.trim() || request.busy || tooLong} onClick={() => void request.run("correct")}>{ru ? "Исправить ошибки" : "Fix mistakes"}</button>
+      <button type="button" disabled={!target.text.trim() || request.busy || tooLong || dictation.active} onClick={() => void request.run("improve")}>{ru ? "Улучшить текст" : "Improve text"}</button>
+      <button type="button" disabled={!target.text.trim() || request.busy || tooLong || dictation.active} onClick={() => void request.run("correct")}>{ru ? "Исправить ошибки" : "Fix mistakes"}</button>
     </div>
     {tooLong && <p className={css.error} role="alert">{ru ? "Выделите фрагмент до 30 000 символов." : "Select up to 30,000 characters."}</p>}
     {request.busy && <div className={css.loading} role="status" aria-label={ru ? "Falcon AI готовит текст" : "Falcon AI is writing"}>
@@ -75,8 +95,8 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
       <div className={css.result} tabIndex={0} aria-label={ru ? "Предложенный текст" : "Suggested text"}>
         <MarkdownField value={result} label={ru ? "Предложенный текст" : "Suggested text"} allowAttachments={false} />
       </div>
-      <footer className={css.footer}><button type="button" onClick={request.retry}><RotateCcw size={14} />{ru ? "Иначе" : "Try again"}</button>
-        <button type="button" className={css.apply} onClick={apply}><Check size={15} />{target.selected ? (ru ? "Заменить выделенное" : "Replace selection") : (ru ? "Заменить текст" : "Replace text")}</button></footer>
+      <footer className={css.footer}><button type="button" disabled={dictation.active} onClick={request.retry}><RotateCcw size={14} />{ru ? "Иначе" : "Try again"}</button>
+        <button type="button" className={css.apply} disabled={dictation.active} onClick={apply}><Check size={15} />{target.selected ? (ru ? "Заменить выделенное" : "Replace selection") : (ru ? "Заменить текст" : "Replace text")}</button></footer>
     </motion.div>}
   </motion.div>, document.body);
 }
