@@ -1,40 +1,38 @@
 import { useEffect, useRef, useState } from "react";
+import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import type { WritingTarget } from "../../model/target";
-import { createDictationSession } from "../application/createDictationSession";
-import type { DictationRecognition, DictationState } from "../model/recognition";
+import { createAudioRecording } from "../application/createAudioRecording";
+import { transcribeDictation } from "../data/transcribe";
+import type { DictationState } from "../model/errors";
 import { dictationError } from "./messages";
 
-type RecognitionWindow = Window & {
-  SpeechRecognition?: new () => DictationRecognition;
-  webkitSpeechRecognition?: new () => DictationRecognition;
-};
 const limit = 2000;
 export function appendDictation(base: string, speech: string) {
   const words = speech.trim();
-  return (base + (words && base && !/\s$/.test(base) ? " " : "") + words).slice(0, limit);
+  const complete = base + (words && base && !/\s$/.test(base) ? " " : "") + words;
+  return { value: complete.slice(0, limit).replace(/[\uD800-\uDBFF]$/, ""), truncated: complete.length > limit };
 }
 
 export function useWritingDictation({ instruction, onChange, ru, enabled, workspaceId, target }: {
   instruction: string; onChange: (value: string) => void; ru: boolean; enabled: boolean;
   workspaceId: string; target: WritingTarget;
 }) {
+  const http = useTmsHttpClient();
   const [state, setState] = useState<DictationState>("idle");
+  const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
-  const session = useRef<ReturnType<typeof createDictationSession> | null>(null);
+  const [notice, setNotice] = useState("");
+  const recording = useRef<ReturnType<typeof createAudioRecording> | null>(null);
+  const pending = useRef<AbortController | null>(null);
   const generation = useRef(0);
-  const confirmed = useRef(instruction);
   const latest = useRef({ instruction, onChange }); latest.current = { instruction, onChange };
   function dispose() {
     generation.current += 1;
-    session.current?.abort(); session.current = null;
+    recording.current?.abort(); recording.current = null;
+    pending.current?.abort(); pending.current = null;
   }
-  function cancel() {
-    if (session.current) latest.current.onChange(confirmed.current);
-    dispose(); setState("idle");
-  }
-  useEffect(() => {
-    cancel(); setError("");
-  }, [workspaceId, target, ru]);
+  function cancel() { dispose(); setState("idle"); }
+  useEffect(() => { cancel(); setError(""); setNotice(""); }, [workspaceId, target, ru]);
   useEffect(() => dispose, []);
   useEffect(() => { if (!enabled) cancel(); }, [enabled]);
   useEffect(() => {
@@ -44,36 +42,46 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
   }, []);
 
   function start() {
-    if (!enabled || session.current) return;
-    setError("");
-    const browser = window as RecognitionWindow;
-    const Recognition = browser.SpeechRecognition ?? browser.webkitSpeechRecognition;
-    if (!Recognition || !window.isSecureContext) { setError(dictationError("unavailable", ru)); return; }
+    if (!enabled || recording.current || pending.current) return;
+    setError(""); setNotice("");
     if (latest.current.instruction.length >= limit) {
       setError(ru ? "В команде уже 2000 символов." : "The command already has 2,000 characters."); return;
     }
-    const base = latest.current.instruction;
-    confirmed.current = base;
-    const id = ++generation.current;
-    session.current = createDictationSession({ recognition: () => new Recognition(), language: ru ? "ru-RU" : "en-US",
-      onState: (next) => {
-        if (id !== generation.current) return;
-        setState(next);
-        if (next === "idle") { latest.current.onChange(confirmed.current); session.current = null; }
+    const base = latest.current.instruction, id = ++generation.current;
+    setState("starting"); setElapsed(0);
+    const current = () => id === generation.current;
+    recording.current = createAudioRecording({
+      onReady: () => { if (current()) setState("listening"); },
+      onElapsed: (seconds) => { if (current()) setElapsed(seconds); },
+      onProcessing: () => { if (current()) setState("transcribing"); },
+      onError: (problem) => {
+        if (!current()) return;
+        recording.current = null; setState("idle"); setError(dictationError(problem, ru));
       },
-      onTranscript: ({ final, interim }) => {
-        if (id !== generation.current) return;
-        confirmed.current = appendDictation(base, final);
-        const draft = appendDictation(base, [final, interim].filter(Boolean).join(" "));
-        latest.current.onChange(draft);
-        if (draft.length >= limit) {
-          setError(ru ? "Достигнут лимит: 2000 символов." : "The 2,000-character limit has been reached.");
-          session.current?.stop();
-        }
+      onComplete: (wav) => {
+        if (!current()) return;
+        recording.current = null;
+        const request = new AbortController(); pending.current = request;
+        void transcribeDictation(http, workspaceId, wav, ru ? "ru" : "en", request.signal).then((text) => {
+          if (!current() || request.signal.aborted) return;
+          if (latest.current.instruction !== base) {
+            setError(ru ? "Команда уже изменена. Продиктуйте дополнение ещё раз." : "The command has changed. Dictate your addition again."); return;
+          }
+          const next = appendDictation(base, text);
+          latest.current.onChange(next.value);
+          if (next.truncated) setNotice(ru ? "Диктовка сокращена до лимита 2000 символов. Проверьте команду." : "Dictation was trimmed to the 2,000-character limit. Review the command.");
+        }).catch((problem) => {
+          if (current() && !request.signal.aborted) setError(dictationError(problem, ru));
+        }).finally(() => {
+          if (current()) { pending.current = null; setState("idle"); }
+        });
       },
-      onError: (code) => { if (id === generation.current) setError(dictationError(code, ru)); },
     });
-    session.current.start();
+    recording.current.start();
   }
-  return { state, active: state !== "idle", error, start, cancel, stop: () => session.current?.stop() };
+  function stop() {
+    if (state === "starting" || state === "transcribing") cancel();
+    else void recording.current?.stop();
+  }
+  return { state, elapsed, active: state !== "idle", error, notice, start, cancel, stop };
 }

@@ -8,9 +8,9 @@ export class GatewayRequestError extends Error {
   constructor(status, code) { super(code); this.status = status; this.code = code; }
 }
 
-async function readBody(request) {
+async function readBody(request, maximumBytes) {
   if (!request.body) return new Uint8Array();
-  if (Number(request.headers.get("content-length") ?? 0) > MAXIMUM_BODY_BYTES) {
+  if (Number(request.headers.get("content-length") ?? 0) > maximumBytes) {
     throw new GatewayRequestError(413, "PAYLOAD_TOO_LARGE");
   }
   const reader = request.body.getReader();
@@ -21,7 +21,7 @@ async function readBody(request) {
       const next = await reader.read();
       if (next.done) break;
       length += next.value.length;
-      if (length > MAXIMUM_BODY_BYTES) throw new GatewayRequestError(413, "PAYLOAD_TOO_LARGE");
+      if (length > maximumBytes) throw new GatewayRequestError(413, "PAYLOAD_TOO_LARGE");
       chunks.push(next.value);
     }
   } finally { await reader.cancel(); }
@@ -33,6 +33,8 @@ async function readBody(request) {
 
 export async function signedApiRequest(request, env, audience) {
   const incoming = new URL(request.url);
+  const dictation = request.method === "POST" &&
+    /^\/api\/v1\/workspaces\/[A-Za-z0-9_-]{1,160}\/ai\/dictation$/.test(incoming.pathname);
   if (!HEX_KEY.test(env.FALCON_MANAGED_GATEWAY_KEY ?? "")) throw new GatewayRequestError(503, "GATEWAY_UNAVAILABLE");
   const api = new URL(env.FALCON_API_ORIGIN);
   if (api.protocol !== "https:" || api.username || api.password || api.pathname !== "/" || api.search || api.hash ||
@@ -58,7 +60,7 @@ export async function signedApiRequest(request, env, audience) {
   if (cookie) headers.set("cookie", cookie);
   const timestamp = String(Date.now());
   const clientIp = request.headers.get("cf-connecting-ip") ?? "";
-  const body = await readBody(request);
+  const body = await readBody(request, dictation ? 2_570_000 : MAXIMUM_BODY_BYTES);
   const canonical = JSON.stringify(["falcon-gateway-v1", request.method, incoming.pathname + incoming.search,
     incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)]);
   const key = await crypto.subtle.importKey("raw", Uint8Array.from(env.FALCON_MANAGED_GATEWAY_KEY.match(/../g),
@@ -70,5 +72,6 @@ export async function signedApiRequest(request, env, audience) {
   api.pathname = incoming.pathname;
   api.search = incoming.search;
   return new Request(api, { method: request.method, headers, redirect: "manual",
-    signal: AbortSignal.timeout(45000), ...(["GET", "HEAD"].includes(request.method) ? {} : { body }) });
+    signal: AbortSignal.any([request.signal, AbortSignal.timeout(dictation ? 70000 : 45000)]),
+    ...(["GET", "HEAD"].includes(request.method) ? {} : { body }) });
 }

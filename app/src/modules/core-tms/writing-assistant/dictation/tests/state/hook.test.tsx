@@ -2,124 +2,105 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { act } from "react-test-renderer";
 import { hookHarness, target } from "./hook-harness";
-import { result } from "../harness";
+import { flush } from "../support/browser";
+import { TmsApiError } from "../../../../../../core/tms/transport/http";
 
-for (const prefixed of [false, true]) {
-  test(`recognition requires a click and supports the ${prefixed ? "prefixed" : "standard"} browser API`, (t) => {
-    const h = hookHarness(t, { prefixed, text: "Перепиши" });
-    assert.equal(h.instances.length, 0);
-    assert.equal(h.get().active, false);
-    const recognition = h.start();
-    assert.equal(recognition.starts, 1);
-    assert.equal(recognition.lang, "ru-RU");
-    act(() => recognition.onstart?.());
-    act(() => recognition.onresult?.(result([["корректнее", true]])));
-    act(() => recognition.onend?.());
-    assert.equal(h.text(), "Перепиши корректнее");
-    assert.equal(h.get().active, false);
-    assert.equal(h.applied(), 0);
-    assert.equal(h.networkCalls(), 0);
-  });
-}
-
-test("interim words are replaced, finalized words are preserved, and repeat sessions append once", (t) => {
-  const h = hookHarness(t, { text: "Уточни" });
-  const first = h.start(); act(() => first.onstart?.());
-  act(() => first.onresult?.(result([["шаг", false]])));
-  assert.equal(h.text(), "Уточни шаг");
-  act(() => first.onresult?.(result([["шаги", true], ["сце", false]], 1)));
-  assert.equal(h.text(), "Уточни шаги сце");
-  act(() => first.onresult?.(result([["шаги", true], ["сценария", true]], 1)));
-  act(() => first.onend?.());
-  const second = h.start(); act(() => second.onstart?.());
-  act(() => second.onresult?.(result([["и оформи Markdown", true]])));
-  act(() => second.onend?.());
-  assert.equal(h.text(), "Уточни шаги сценария и оформи Markdown");
-  assert.equal(h.applied(), 0);
-  assert.equal(h.networkCalls(), 0);
+test("only a click starts capture; stop uploads canonical WAV and a successful result appends once", async (t) => {
+  const h = hookHarness(t, { text: "Перепиши" });
+  assert.equal(h.browser.contexts.length, 0); assert.equal(h.requests.length, 0);
+  await h.start(); h.samples();
+  assert.equal(h.get().state, "listening"); assert.equal(h.text(), "Перепиши"); assert.equal(h.requests.length, 0);
+  await h.stop();
+  assert.equal(h.get().state, "transcribing");
+  assert.deepEqual(h.browser.tracks.map((track) => track.stops), [1, 1]);
+  assert.equal(h.requests.length, 1); assert.equal(h.requests[0].path, "/workspaces/workspace-a/ai/dictation");
+  assert.equal(h.requests[0].body.language, "ru"); assert.equal(h.requests[0].method, "POST");
+  const wav = Buffer.from(h.requests[0].body.audio, "base64");
+  assert.equal(wav.toString("ascii", 0, 4), "RIFF"); assert.equal(wav.readUInt32LE(24), 16000);
+  assert.equal(wav.length, 16044);
+  await h.reply("корректнее"); assert.equal(h.text(), "Перепиши корректнее"); assert.equal(h.get().state, "idle");
+  await h.start(); h.samples(); await h.stop(); await h.reply("и добавь Markdown");
+  assert.equal(h.text(), "Перепиши корректнее и добавь Markdown"); assert.equal(h.applied(), 0);
+  assert.ok(h.requests.every((request) => request.path.endsWith("/ai/dictation")));
 });
 
-test("cancel preserves typed and confirmed text and rejects all late results", (t) => {
-  const h = hookHarness(t, { text: "Typed command" });
-  const recognition = h.start(); act(() => recognition.onstart?.());
-  act(() => recognition.onresult?.(result([["confirmed", true], ["uncertain", false]])));
-  const lateResult = recognition.onresult, lateError = recognition.onerror;
-  act(() => h.get().cancel());
-  assert.equal(h.text(), "Typed command confirmed");
-  assert.equal(recognition.aborts, 1);
-  act(() => { lateResult?.(result([["Late text", true]])); lateError?.({ error: "network" }); });
-  assert.equal(h.text(), "Typed command confirmed");
-  assert.equal(h.get().error, "");
+test("cancelling recording drops audio and never changes the manual command", async (t) => {
+  const h = hookHarness(t, { text: "Manual command" }); await h.start(); h.samples();
+  act(() => h.get().cancel()); await flush();
+  assert.equal(h.text(), "Manual command"); assert.equal(h.requests.length, 0);
+  assert.deepEqual(h.browser.tracks.map((track) => track.stops), [1, 1]);
 });
 
-test("permission errors preserve a typed command and remain visible after returning to idle", (t) => {
-  const h = hookHarness(t, { text: "Не потеряй команду" });
-  const recognition = h.start();
-  act(() => recognition.onerror?.({ error: "not-allowed" }));
-  assert.equal(h.text(), "Не потеряй команду");
-  assert.equal(h.get().state, "idle");
-  assert.match(h.get().error, /микрофон/i);
-  assert.equal(recognition.aborts, 1);
+test("cancelling transcription aborts HTTP and ignores a late successful response", async (t) => {
+  const h = hookHarness(t, { text: "Manual" }); await h.start(); h.samples(); await h.stop();
+  act(() => h.get().cancel()); assert.equal(h.requests[0].signal?.aborted, true);
+  await h.reply("Late words"); assert.equal(h.text(), "Manual"); assert.equal(h.get().state, "idle");
 });
 
 for (const [name, update] of [
   ["disabled", { enabled: false }], ["workspace", { workspaceId: "workspace-b" }],
   ["target", { target: target() }], ["language", { ru: false }],
 ] as const) {
-  test(`${name} change stops capture, removes interim text, and rejects a stale callback`, (t) => {
-    const h = hookHarness(t, { text: "Typed" });
-    const recognition = h.start(); act(() => recognition.onstart?.());
-    act(() => recognition.onresult?.(result([["confirmed", true], ["uncertain", false]])));
-    const late = recognition.onresult;
-    h.update(update);
-    assert.equal(recognition.aborts, 1);
-    assert.equal(h.get().state, "idle");
-    assert.equal(h.text(), "Typed confirmed");
-    act(() => late?.(result([["Wrong context", true]])));
-    assert.equal(h.text(), "Typed confirmed");
+  test(`${name} change aborts transcription and ignores responses from the old context`, async (t) => {
+    const h = hookHarness(t, { text: "Typed" }); await h.start(); h.samples(); await h.stop();
+    h.update(update); assert.equal(h.requests[0].signal?.aborted, true);
+    await h.reply("Wrong context"); assert.equal(h.text(), "Typed"); assert.equal(h.get().state, "idle");
   });
 }
 
-test("unmount aborts a pending permission request without publishing new text", (t) => {
-  const h = hookHarness(t, { text: "Preserved" });
-  const recognition = h.start(), lateStart = recognition.onstart, lateResult = recognition.onresult;
-  h.unmount();
-  const count = h.changes.length;
-  act(() => { lateStart?.(); lateResult?.(result([["Stale", true]])); });
-  assert.equal(recognition.aborts, 1);
-  assert.equal(h.changes.length, count);
+test("unmount cancels an unresolved microphone permission request and releases a late grant", async (t) => {
+  const h = hookHarness(t, { text: "Typed", browser: { pendingMedia: true } }); h.startSync(); h.unmount();
+  h.browser.permission.resolve(h.browser.stream); await flush();
+  assert.deepEqual(h.browser.tracks.map((track) => track.stops), [1, 1]);
+  assert.equal(h.browser.contexts[0].closes, 1); assert.equal(h.requests.length, 0); assert.equal(h.changes.length, 0);
 });
 
-test("hiding the page stops the microphone and keeps only confirmed dictation", (t) => {
-  const h = hookHarness(t, { text: "Typed" });
-  const recognition = h.start(); act(() => recognition.onstart?.());
-  act(() => recognition.onresult?.(result([["done", true], ["draft", false]])));
+test("hiding the page cancels capture without uploading audio", async (t) => {
+  const h = hookHarness(t, { text: "Typed" }); await h.start(); h.samples();
   act(() => { h.document.hidden = true; h.document.dispatchEvent(new Event("visibilitychange")); });
-  assert.equal(recognition.aborts, 1);
-  assert.equal(h.text(), "Typed done");
+  assert.deepEqual(h.browser.tracks.map((track) => track.stops), [1, 1]);
+  assert.equal(h.requests.length, 0); assert.equal(h.text(), "Typed");
 });
 
-test("the limit also applies to recognition results and stops capture at 2000 characters", (t) => {
-  const h = hookHarness(t, { text: "x".repeat(1995) });
-  const recognition = h.start(); act(() => recognition.onstart?.());
-  act(() => recognition.onresult?.(result([["more speech", true]])));
-  assert.equal(h.text().length, 2000);
-  assert.equal(recognition.stops, 1);
-  assert.equal(h.get().state, "stopping");
-  assert.match(h.get().error, /2000/);
-  act(() => recognition.onend?.());
-  assert.equal(h.text(), `${"x".repeat(1995)} more`);
-  h.start();
-  assert.equal(h.instances.length, 1);
+test("permission rejection and provider failures preserve typed text", async (t) => {
+  const h = hookHarness(t, { text: "Manual", browser: { pendingMedia: true } }); h.startSync();
+  await act(async () => { h.browser.permission.reject({ name: "NotAllowedError" }); await flush(); });
+  assert.equal(h.get().state, "idle"); assert.match(h.get().error, /микрофон/); assert.equal(h.text(), "Manual");
+  assert.equal(h.requests.length, 0);
 });
 
-for (const mode of ["unavailable", "insecure", "disabled"] as const) {
-  test(`${mode} speech does not create capture and keeps manual text`, (t) => {
-    const h = hookHarness(t, { text: "Manual", [mode]: true, ...(mode === "disabled" ? { config: { enabled: false } } : {}) });
-    h.start();
-    assert.equal(h.instances.length, 0);
-    assert.equal(h.text(), "Manual");
-    assert.equal(h.get().state, "idle");
-    assert.equal(h.networkCalls(), 0);
+for (const [status, code] of [[429, "DICTATION_RATE_LIMITED"], [503, "DICTATION_UNAVAILABLE"], [422, "DICTATION_EMPTY"]] as const) {
+  test(`${code} leaves the manual command untouched with a readable error`, async (t) => {
+    const h = hookHarness(t, { text: "Manual" }); await h.start(); h.samples(); await h.stop();
+    await act(async () => { h.requests[0].reply.reject(new TmsApiError("Provider error", status, null, code)); await flush(); });
+    assert.equal(h.get().state, "idle"); assert.ok(h.get().error); assert.equal(h.text(), "Manual");
   });
 }
+
+test("short and silent recordings remain local", async (t) => {
+  const h = hookHarness(t, { text: "Manual" }); await h.start(); h.samples(100); await h.stop();
+  assert.match(h.get().error, /коротк/); assert.equal(h.requests.length, 0); assert.equal(h.text(), "Manual");
+  await h.start(); h.samples(24000, 0); await h.stop();
+  assert.match(h.get().error, /не слышен/); assert.equal(h.requests.length, 0);
+});
+
+test("transcription exceeding 2000 characters shows a truncation notice without automatic submission", async (t) => {
+  const h = hookHarness(t, { text: "x".repeat(1995) }); await h.start(); h.samples(); await h.stop();
+  await h.reply("more words here");
+  assert.equal(h.text(), `${"x".repeat(1995)} more`); assert.match(h.get().notice, /сокращена/);
+  assert.equal(h.applied(), 0); assert.equal(h.requests.length, 1);
+});
+
+test("a command edited externally while transcribing is not overwritten", async (t) => {
+  const h = hookHarness(t, { text: "Old command" }); await h.start(); h.samples(); await h.stop();
+  h.edit("New manual command"); await h.reply("dictation");
+  assert.equal(h.text(), "New manual command"); assert.match(h.get().error, /изменена/);
+});
+
+test("a stalled final audio flush does not upload a partial command", async (t) => {
+  const h = hookHarness(t, { text: "Manual", browser: { noFlush: true } });
+  await h.start(); h.samples(); await h.stop();
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 450)); });
+  assert.equal(h.requests.length, 0); assert.equal(h.text(), "Manual"); assert.ok(h.get().error);
+  assert.equal(h.get().state, "idle"); assert.equal(h.browser.contexts[0].closes, 1);
+});

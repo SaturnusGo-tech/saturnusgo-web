@@ -68,6 +68,7 @@ test("serves the Falcon landing from the isolated Pages namespace", async (conte
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
   assert.match(response.headers.get("permissions-policy"), /camera=\(\)/);
+  assert.match(response.headers.get("permissions-policy"), /microphone=\(self\)/);
   assert.match(response.headers.get("strict-transport-security"), /max-age=31536000/);
   assert.equal(response.headers.get("etag"), '"landing"');
   assert.equal(response.headers.has("set-cookie"), false);

@@ -50,7 +50,7 @@ const CONTENT_SECURITY_POLICY = [
 ].join("; ");
 const SECURITY_HEADERS = Object.freeze({
   "content-security-policy": CONTENT_SECURITY_POLICY,
-  "permissions-policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+  "permissions-policy": "camera=(), geolocation=(), microphone=(self), payment=(), usb=()",
   "referrer-policy": "strict-origin-when-cross-origin",
   "strict-transport-security": "max-age=31536000; includeSubDomains",
   "x-content-type-options": "nosniff",

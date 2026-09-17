@@ -27,7 +27,9 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
   const reduced = useReducedMotion();
   const titleId = useId();
   const dictationId = useId();
-  const microphoneLabel = dictation.active ? (ru ? "Остановить диктовку" : "Stop dictation") : (ru ? "Диктовать команду" : "Dictate a command");
+  const microphoneLabel = dictation.state === "transcribing" ? (ru ? "Отменить распознавание" : "Cancel transcription")
+    : dictation.state === "starting" ? (ru ? "Отменить запись" : "Cancel recording")
+    : dictation.active ? (ru ? "Остановить диктовку" : "Stop dictation") : (ru ? "Диктовать команду" : "Dictate a command");
   const result = stripRawHtml(request.result);
   useEffect(() => { if (!present) { request.cancel(); panel.current?.setAttribute("inert", ""); } }, [present]);
   function close() { dictation.cancel(); request.cancel(); onClose(); }
@@ -62,25 +64,26 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
       <textarea aria-label={ru ? "Что нужно сделать с текстом?" : "What should change?"}
         placeholder={ru ? "Что нужно сделать? Например, оформить текст в Markdown…" : "What should change? For example, format this in Markdown…"}
         rows={2} value={instruction} maxLength={2000} disabled={request.busy} readOnly={dictation.active}
-        aria-describedby={dictation.active || dictation.error ? dictationId : undefined} onChange={(event) => setInstruction(event.target.value)}
+        aria-describedby={dictation.active || dictation.error || dictation.notice ? dictationId : undefined} onChange={(event) => setInstruction(event.target.value)}
         onKeyDown={(event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && instruction.trim() && !request.busy && !tooLong && !dictation.active) { event.preventDefault(); void request.run("custom", instruction); } }} />
       <span className={css.microphoneWrap}>
         <button type="button" className={css.microphone} data-active={dictation.active || undefined}
-          disabled={request.busy || tooLong || dictation.state === "stopping"} aria-label={microphoneLabel}
+          disabled={request.busy || tooLong} aria-label={microphoneLabel}
           aria-pressed={dictation.active} aria-describedby={`${dictationId}-hint`} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
-          {dictation.state === "starting" || dictation.state === "stopping" ? <LoaderCircle className={css.spinner} size={16} /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
+          {dictation.state === "starting" || dictation.state === "transcribing" ? <LoaderCircle className={css.spinner} size={16} /> : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={17} />}
         </button>
         <span id={`${dictationId}-hint`} className={css.microphoneHint} role="tooltip">{dictation.active ? microphoneLabel : (ru
-          ? "Диктовать команду. Браузер может передавать аудио своей службе распознавания."
-          : "Dictate a command. Your browser may send audio to its speech recognition service.")}</span>
+          ? "Диктовать команду. После остановки запись отправится в OpenAI для распознавания."
+          : "Dictate a command. After you stop, the recording is sent to OpenAI for transcription.")}</span>
       </span>
       <button type="button" className={css.send} disabled={!instruction.trim() || request.busy || tooLong || dictation.active}
         aria-label={ru ? "Отправить запрос" : "Send request"} onClick={() => void request.run("custom", instruction)}><ArrowUp size={17} /></button>
     </div>
-    {(dictation.active || dictation.error) && <p id={dictationId} className={dictation.error ? css.error : css.dictationStatus}
-      role={dictation.error ? "alert" : "status"}>{dictation.error || (dictation.state === "starting"
-        ? (ru ? "Подключаем микрофон…" : "Connecting microphone…") : dictation.state === "stopping"
-        ? (ru ? "Завершаем диктовку…" : "Finishing dictation…") : (ru ? "Диктуйте команду. Нажмите стоп, чтобы проверить текст." : "Dictate your command. Press stop to review the text."))}</p>}
+    {(dictation.active || dictation.error || dictation.notice) && <p id={dictationId} className={dictation.error ? css.error : css.dictationStatus}
+      role={dictation.error ? "alert" : "status"}>{dictation.error || dictation.notice || (dictation.state === "starting"
+        ? (ru ? "Подключаем микрофон…" : "Connecting microphone…") : dictation.state === "transcribing"
+        ? (ru ? "Распознаём команду…" : "Transcribing your command…") : <>{ru ? "Запись" : "Recording"}
+          <span aria-hidden="true"> · {Math.floor(dictation.elapsed / 60)}:{String(dictation.elapsed % 60).padStart(2, "0")} / 1:00</span></>)}</p>}
     <div className={css.shortcuts}>
       <button type="button" disabled={!target.text.trim() || request.busy || tooLong || dictation.active} onClick={() => void request.run("improve")}>{ru ? "Улучшить текст" : "Improve text"}</button>
       <button type="button" disabled={!target.text.trim() || request.busy || tooLong || dictation.active} onClick={() => void request.run("correct")}>{ru ? "Исправить ошибки" : "Fix mistakes"}</button>

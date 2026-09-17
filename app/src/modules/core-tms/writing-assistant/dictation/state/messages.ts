@@ -1,14 +1,22 @@
-export function dictationError(code: string, ru: boolean) {
+import { TmsApiError } from "../../../../../core/tms/transport/http";
+import { DictationFailure } from "../model/errors";
+
+export function dictationError(problem: unknown, ru: boolean) {
+  const code = problem instanceof DictationFailure ? problem.code : problem instanceof TmsApiError ? problem.code : "unknown";
   const messages: Record<string, [string, string]> = {
-    unavailable: ["Диктовка недоступна в этом браузере. Можно использовать системную диктовку в поле команды.", "Dictation is unavailable in this browser. You can use system dictation in the command field."],
+    unavailable: ["Запись голоса недоступна в этом браузере. Введите команду текстом.", "Audio recording is unavailable in this browser. Type your command."],
     "not-allowed": ["Разрешите доступ к микрофону в настройках браузера и попробуйте снова.", "Allow microphone access in your browser settings and try again."],
-    "service-not-allowed": ["Браузер не разрешает распознавание речи. Можно использовать системную диктовку.", "Speech recognition is disabled in this browser. You can use system dictation."],
     "audio-capture": ["Микрофон недоступен. Проверьте подключение и доступ к нему.", "Microphone unavailable. Check its connection and permissions."],
-    "no-speech": ["Речь не распознана. Попробуйте ещё раз.", "No speech recognized. Please try again."],
-    network: ["Не удалось связаться со службой диктовки браузера. Попробуйте снова или введите команду.", "Cannot reach the browser's dictation service. Try again or type your command."],
-    "language-not-supported": ["Браузер не поддерживает диктовку на этом языке. Можно использовать системную диктовку.", "This dictation language is not supported by your browser. You can use system dictation."],
+    "too-short": ["Запись слишком короткая. Нажмите микрофон и произнесите команду.", "The recording is too short. Press the microphone and say your command."],
+    silent: ["Голос не слышен. Проверьте микрофон и попробуйте ещё раз.", "No voice detected. Check your microphone and try again."],
     "startup-timeout": ["Микрофон не запустился. Проверьте разрешение в браузере и попробуйте снова.", "Microphone did not start. Check browser permissions and try again."],
-    unknown: ["Не удалось запустить диктовку. Введённый текст сохранён.", "Could not start dictation. Your typed text is preserved."],
+    DICTATION_EMPTY: ["Речь не распознана. Попробуйте ещё раз.", "No speech recognized. Please try again."],
+    DICTATION_INVALID_AUDIO: ["Не удалось обработать запись. Попробуйте продиктовать команду ещё раз.", "Could not process the recording. Please dictate your command again."],
+    DICTATION_RATE_LIMITED: ["Лимит диктовки достигнут. Можно ввести команду текстом.", "The dictation limit has been reached. You can type your command."],
+    DICTATION_UNAVAILABLE: ["Диктовка временно недоступна. Попробуйте ещё раз или введите команду.", "Dictation is temporarily unavailable. Try again or type your command."],
+    unknown: ["Не удалось распознать команду. Введённый текст сохранён.", "Could not transcribe the command. Your typed text is preserved."],
   };
+  if (problem instanceof TmsApiError && problem.status === 401) return ru ? "Войдите в аккаунт и повторите диктовку." : "Sign in and try dictation again.";
+  if (problem instanceof TmsApiError && problem.status === 403) return ru ? "У вас нет доступа к диктовке в этом пространстве." : "You do not have access to dictation in this workspace.";
   return (messages[code] ?? messages.unknown)[ru ? 0 : 1];
 }

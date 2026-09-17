@@ -3296,7 +3296,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -4904,7 +4904,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -15906,6 +15906,124 @@
         },
         "description": "Removes the portfolio from all catalogs. Any linked project, including archived projects, rejects removal with 409 PORTFOLIO_NOT_EMPTY. Historical audit and references are retained. Idempotent retries return the deletion receipt; subsequent reads return 404."
       }
+    },
+    "/workspaces/{workspaceId}/ai/dictation": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "transcribeWorkspaceInstruction",
+        "tags": [
+          "Writing assistant"
+        ],
+        "summary": "Dictate an instruction without applying or rewriting it",
+        "description": "Active workspace editors may transcribe recorded speech through gpt-4o-mini-transcribe. Viewers and non-members are forbidden. Accepts only canonical 44-byte-header WAV, PCM mono 16000 Hz signed 16-bit little-endian, from 0.3 to 60 seconds. Audio length and format are verified server-side. JSON body limit 2570000 bytes. Audio is processed transiently and is not stored in Falcon. No source documents are sent. Durable per-member calendar-month duration and per-minute request budgets apply, with a default 100 minutes per member per workspace per UTC calendar month and five requests per minute, plus provider-wide limits. Duration is rounded up to seconds; failed provider requests retain their reservation. No automatic retries. The client must display the recognized instruction for review and require explicit submission.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recognized instruction; no user content has been changed",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "description": "DICTATION_INVALID_AUDIO for invalid format/duration or DICTATION_EMPTY for no detected speech",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "DICTATION_RATE_LIMITED; request or duration budget exhausted, or provider rate limit. Monthly quotas reset at the next UTC calendar month.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "60 seconds (minimum suggested retry delay)"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -21599,7 +21717,11 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
+          "DICTATION_INVALID_AUDIO",
+          "DICTATION_RATE_LIMITED",
+          "DICTATION_UNAVAILABLE",
+          "DICTATION_EMPTY"
         ]
       },
       "ValidationIssue": {
@@ -35947,6 +36069,56 @@
           "data",
           "nextCursor"
         ]
+      },
+      "DictationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "audio",
+          "language"
+        ],
+        "properties": {
+          "audio": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2560060,
+            "contentEncoding": "base64",
+            "description": "Base64 encoded canonical mono PCM WAV recording, at most 60 seconds."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "ru",
+              "en"
+            ]
+          }
+        }
+      },
+      "DictationResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          }
+        }
+      },
+      "DictationResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DictationResult"
+          }
+        }
       }
     }
   }
