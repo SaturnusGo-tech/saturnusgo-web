@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { INTEGRATIONS } from "../../../core-tms/presentation/hooks/catalog/integration-definitions";
 import styles from "../landing.module.css";
 
-const planned = new Set(["gitlab", "jenkins", "teamcity"]);
-
 export function IntegrationMarquee() {
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -41,7 +39,6 @@ export function IntegrationMarquee() {
                     />
                   )}
                   <span>{name}</span>
-                  {planned.has(id) && <small>Скоро</small>}
                 </li>
               ))}
             </ul>

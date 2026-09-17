@@ -61,9 +61,7 @@ test("landing shows the complete canonical integration catalog with accessible m
   assert.match(marquee, /aria-pressed=\{paused\}/);
   assert.match(marquee, /Остановить строку интеграций/);
   assert.match(marquee, /Запустить строку интеграций/);
-  // Planned connectors stay discoverable without claiming they are available.
-  for (const id of ["gitlab", "jenkins", "teamcity"]) assert.ok(marquee.includes(`"${id}"`));
-  assert.match(marquee, /planned\.has\(id\)[\s\S]*?<small>Скоро<\/small>/);
+  assert.doesNotMatch(marquee, /Скоро/);
   const youTrackMark = resolve(root, "public/falcon/integrations/youtrack.svg");
   assert.equal(existsSync(youTrackMark), true);
   assert.ok(statSync(youTrackMark).size > 0);

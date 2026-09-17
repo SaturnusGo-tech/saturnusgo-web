@@ -83,7 +83,7 @@ Scrolling remains native; section links retain real URL anchors and use smooth b
 
 ## Integration brand strip
 
-The scrolling strip uses the existing Falcon integration catalog: Swagger, YouTrack, Jira, Linear, Trello, GitHub, GitLab, Jenkins, TeamCity, Slack and Confluence. GitLab, Jenkins and TeamCity retain the visible label **«Скоро»**; inclusion in the strip must not imply that those connections are available today.
+The scrolling strip uses the existing Falcon integration catalog: Swagger, YouTrack, Jira, Linear, Trello, GitHub, GitLab, Jenkins, TeamCity, Slack and Confluence. The 17 September revision removes the «Скоро» badges from the public brand strip. This presentation change does not enable connectors or alter their availability inside Falcon. The owner plans GitLab, Jenkins and TeamCity implementation separately, with 19 September as the target.
 
 One accessible list describes the eleven brands. Any duplicate list used for a continuous visual loop is hidden from accessibility APIs. Users can pause the strip; it also pauses when the pointer is over the brand window or the document is hidden, and it respects reduced-motion preferences. Hovering or focusing the pause button itself does not force a pause, so its Resume action takes effect immediately with either a click or keyboard activation. The single YouTrack video appears below the strip.
 

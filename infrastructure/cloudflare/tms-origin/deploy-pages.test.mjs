@@ -115,7 +115,8 @@ for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard",
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
     if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack" && extension === "mp4") continue;
-    write("out/falcon/landing/2026-09-production/" + id + "." + extension, "demo asset\\n");
+    const mediaId = ["projects", "youtrack"].includes(id) ? id + "-20260913" : ["runs", "suites"].includes(id) ? id + "-20260917" : id;
+    write("out/falcon/landing/2026-09-production/" + mediaId + "." + extension, "demo asset\\n");
   }
 }
 write("out/falcon/landing/hero.webp", "falcon hero\\n");
@@ -188,7 +189,7 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     "falcon atmosphere\n",
   );
   assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09-production/youtrack.mp4"), "utf8"),
+    readFileSync(join(fixture.pages, "falcon/landing/2026-09-production/youtrack-20260913.mp4"), "utf8"),
     "demo asset\n",
   );
   assert.equal(
@@ -246,7 +247,7 @@ test("fails closed when a required video is missing", (context) => {
   const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
   const result = deploy(fixture, "--publish", { OMIT_VIDEO: "1" });
   assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*runs\.mp4/);
+  assert.match(result.stderr, /Required public asset is missing.*runs-20260917\.mp4/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
@@ -264,7 +265,7 @@ test("fails closed when the current integration demonstration is missing", (cont
   const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
   const result = deploy(fixture, "--publish", { OMIT_INTEGRATION_VIDEO: "1" });
   assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*youtrack\.mp4/);
+  assert.match(result.stderr, /Required public asset is missing.*youtrack-20260913\.mp4/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
