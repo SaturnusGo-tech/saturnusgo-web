@@ -12,9 +12,11 @@ export function WritingAction({ ru, capture, tabIndex, onOpenChange }: {
   const scope = useWorkspacePeople();
   const button = useRef<HTMLButtonElement>(null);
   const sequence = useRef(0);
+  const pending = useRef<WritingTarget | null | undefined>(undefined);
   const [session, setSession] = useState<{ id: number; target: WritingTarget; workspaceId: string } | null>(null);
   const title = ru ? "Спросить Falcon AI" : "Ask Falcon AI";
   useEffect(() => { setSession(null); }, [scope.workspaceId]);
+  useEffect(() => session?.target.highlight?.(), [session]);
   function close(restore = true) {
     if (restore) session?.target.restore();
     setSession(null); onOpenChange?.(false);
@@ -22,10 +24,18 @@ export function WritingAction({ ru, capture, tabIndex, onOpenChange }: {
   return <>
     <button ref={button} type="button" className={css.sphereButton} aria-label={title} title={title}
       aria-haspopup="dialog" aria-expanded={Boolean(session)} tabIndex={tabIndex}
-      disabled={!scope.workspaceId || scope.offline} onMouseDown={(event) => event.preventDefault()}
-      onClick={() => {
+      disabled={!scope.workspaceId || scope.offline}
+      onPointerDown={(event) => {
+        if (event.button !== 0 || !event.isPrimary) return;
+        event.preventDefault();
+        pending.current = session ? undefined : capture();
+      }}
+      onPointerCancel={() => { pending.current = undefined; }}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={(event) => {
         if (session) { close(); return; }
-        const target = capture();
+        const target = event.detail === 0 || pending.current === undefined ? capture() : pending.current;
+        pending.current = undefined;
         if (target) { setSession({ id: ++sequence.current, target, workspaceId: scope.workspaceId }); onOpenChange?.(true); }
       }}><span className={css.sphere} aria-hidden="true" /></button>
     <AnimatePresence>{session && session.workspaceId === scope.workspaceId && <WritingPanel

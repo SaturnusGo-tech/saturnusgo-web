@@ -1,9 +1,11 @@
-import { getSelectionAsMarkdown } from "@mdxeditor/editor";
 import { $getRoot, $getSelection, $isElementNode, $isRangeSelection, $setSelection, HISTORY_PUSH_TAG,
-  type BaseSelection, type LexicalEditor, type LexicalNode } from "lexical";
+  type LexicalEditor, type LexicalNode } from "lexical";
 import type { WritingTarget } from "../../../../../../writing-assistant/model/target";
 import { fullMarkdown, type MarkdownExportParameters } from "./serialization/markdownSerialization";
 import { animateReplacement } from "./motion/animateReplacement";
+import { captureSelection, selectionRanges } from "./visual/captureSelection";
+import { exportFragment } from "./serialization/fragment/exportFragment";
+import { highlightRanges } from "../../../../../../writing-assistant/presentation/selection/rangeHighlight";
 
 /** Capture node positions, not a string search: duplicate text must never redirect an edit. */
 export function captureMarkdownTarget(editor: LexicalEditor, parameters: MarkdownExportParameters,
@@ -13,18 +15,14 @@ export function captureMarkdownTarget(editor: LexicalEditor, parameters: Markdow
   if (!element?.isConnected || !editor.isEditable()) return null;
   const root: HTMLElement = element;
   const original = contentSnapshot(editor);
-  let selection: BaseSelection | null = null;
-  editor.getEditorState().read(() => {
-    const current = $getSelection();
-    selection = current?.clone() ?? null;
-  }, { editor });
-  const captured = selection as BaseSelection | null;
+  const captured = captureSelection(editor, root);
   const selected = Boolean(captured && (!$isRangeSelection(captured) || !captured.isCollapsed()));
   let text: string;
   try {
-    text = selected ? getSelectionAsMarkdown(editor, parameters) : fullMarkdown(editor, parameters);
+    text = selected && captured ? exportFragment(editor, captured, parameters) : fullMarkdown(editor, parameters);
   } catch { return null; }
   if (selected && !text.trim()) return null;
+  const ranges = selectionRanges(editor, root, captured, selected);
   let applied = false;
   const unchanged = () => !applied && editor.isEditable() && editor.getRootElement() === root && root.isConnected
     && contentSnapshot(editor) === original;
@@ -34,7 +32,7 @@ export function captureMarkdownTarget(editor: LexicalEditor, parameters: Markdow
     root.focus({ preventScroll: true });
   }
   return {
-    text, selected, restore,
+    text, selected, restore, highlight: () => highlightRanges(root, ranges, unchanged),
     apply(markdown) {
       if (!unchanged() || !markdown.trim() || !canImport(markdown)) return false;
       let committed = false;

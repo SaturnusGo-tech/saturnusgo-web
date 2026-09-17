@@ -6,6 +6,7 @@ import { createEmptyHistoryState, registerHistory } from "@lexical/history";
 import { captureMarkdownTarget } from "../../captureMarkdownTarget";
 import { markdownExportParameters, fullMarkdown } from "../../serialization/markdownSerialization";
 import { canImportMarkdown, insertPartialMarkdown } from "../../serialization/validateMarkdown";
+import { highlightPlugin } from "../../../../highlight/editor/highlightPlugin";
 
 /** Actual configured MDXEditor import/export and insertion signals, without a DOM renderer. */
 export function longWritingHarness() {
@@ -14,7 +15,7 @@ export function longWritingHarness() {
     corePlugin: (params: { suppressHtmlProcessing: boolean; onChange: () => void }) => RealmPlugin;
   };
   const plugins = [corePlugin({ suppressHtmlProcessing: true, onChange() {} }), headingsPlugin(), listsPlugin(), quotePlugin(), tablePlugin(),
-    linkPlugin(), codeBlockPlugin({ codeBlockEditorDescriptors: [{ priority: 0, match: () => true, Editor: () => null }] })];
+    linkPlugin(), highlightPlugin(), codeBlockPlugin({ codeBlockEditorDescriptors: [{ priority: 0, match: () => true, Editor: () => null }] })];
   plugins.forEach((plugin) => plugin.init?.(realm));
   const editor = createEditor({ nodes: realm.getValue(usedLexicalNodes$), onError: (error) => { throw error; } });
   editor._headless = true; editor.focus = () => {};
@@ -37,5 +38,5 @@ export function longWritingHarness() {
     walk($getRoot());
     return { counts, emptyParagraphs, totalNodes, text: $getRoot().getTextContent() };
   });
-  return { editor, capture, importSaved, wholeField, shape, read: () => fullMarkdown(editor, parameters) };
+  return { editor, parameters, capture, importSaved, wholeField, shape, read: () => fullMarkdown(editor, parameters) };
 }

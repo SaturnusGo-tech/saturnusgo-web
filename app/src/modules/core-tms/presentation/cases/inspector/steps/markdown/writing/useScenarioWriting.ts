@@ -1,5 +1,6 @@
 import { useRef, type RefObject } from "react";
 import { replaceWritingSelection, type WritingTarget } from "../../../../../../writing-assistant/model/target";
+import { highlightTextarea } from "../../../../../../writing-assistant/presentation/selection/overlay/textareaHighlight";
 
 export function useScenarioWriting(value: string, input: RefObject<HTMLTextAreaElement | null>,
   history: { boundary: () => void; record: (next: string) => void }, onPreview: () => void) {
@@ -13,6 +14,7 @@ export function useScenarioWriting(value: string, input: RefObject<HTMLTextAreaE
     const end = selected ? node.selectionEnd : source.length;
     history.boundary();
     return { text: source.slice(start, end), selected,
+      highlight: () => highlightTextarea(node, source, start, end),
       restore: () => requestAnimationFrame(() => { if (node.isConnected) { node.focus({ preventScroll: true }); node.setSelectionRange(start, end); } }),
       apply: (markdown) => {
         if (!node.isConnected) return false;

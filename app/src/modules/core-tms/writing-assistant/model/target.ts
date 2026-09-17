@@ -3,6 +3,7 @@ export type WritingTarget = {
   selected: boolean;
   apply: (markdown: string) => boolean;
   restore: () => void;
+  highlight?: () => (() => void);
 };
 export type WritingActionKind = "improve" | "correct" | "custom";
 
