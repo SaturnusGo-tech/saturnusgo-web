@@ -24,7 +24,7 @@ export function NavigationUtilityMenu({workspaceId,disabled,settingsActive,helpA
         <span className={shellStyles.navigationLabel}>{t("nav.help")}</span>
       </button>
       <SupportContact workspaceId={workspaceId} />
-      <button type="button" className={`${shellStyles.navigationUtilityButton} ${notificationsActive ? shellStyles.navigationUtilityButtonActive : ""}`} onClick={onOpenNotifications} aria-current={notificationsActive ? "page" : undefined}>
+      <button type="button" className={`${shellStyles.navigationUtilityButton} ${shellStyles.navigationNotifications} ${notificationsActive ? shellStyles.navigationUtilityButtonActive : ""}`} onClick={onOpenNotifications} aria-current={notificationsActive ? "page" : undefined}>
         <span className={shellStyles.navigationIcon} aria-hidden="true"><Bell size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.notifications")}</span>
       </button>

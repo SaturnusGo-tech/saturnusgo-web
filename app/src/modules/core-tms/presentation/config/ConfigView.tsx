@@ -1,4 +1,4 @@
-import { Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
+import { Bell, Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useState } from "react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
@@ -10,16 +10,17 @@ import { ProjectSettings } from "./sections/ProjectSettings";
 import { EnvironmentSettings } from "./sections/EnvironmentSettings";
 import { settingsCopy, settingsSections, type SettingsSection } from "./navigation/settings-sections";
 import css from "./config.module.css";
+import shellStyles from "../workspace/tms-shell.module.css";
 
 type ConfigViewProps = {
-  environments: Environment[]; project?: Project;
+  environments: Environment[]; project?: Project; onOpenNotifications: () => void;
   onCreate: () => void; onEditEnvironment: (id: string) => void;
   onToggleEnvironment: (id: string) => void; onEditProject: () => void;
   onToggleProject: () => void; exchangeEnabled: boolean; onCasesImported: () => Promise<unknown>;
 };
 const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, account: UserRound };
 export function ConfigView(props: ConfigViewProps) {
-  const { locale } = useTmsLocale();
+  const { locale, t } = useTmsLocale();
   const copy = settingsCopy[locale];
   const [section, setSection] = useState<SettingsSection>("general");
   return <div className={css.page} data-testid="config-view">
@@ -35,6 +36,11 @@ export function ConfigView(props: ConfigViewProps) {
               onClick={() => transitionContent(() => setSection(id))}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
           </div>;
         })}
+        <div className={shellStyles.compactSettingsNotifications}>
+          <button type="button" onClick={props.onOpenNotifications} data-testid="settings-notifications">
+            <Bell size={16} aria-hidden="true" />{t("nav.notifications")}
+          </button>
+        </div>
       </nav>
     </aside>
     <div className={css.content}>

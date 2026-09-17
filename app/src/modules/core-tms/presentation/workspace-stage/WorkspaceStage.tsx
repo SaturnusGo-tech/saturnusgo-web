@@ -143,6 +143,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "config") {
     return (
       <ConfigView key={model.project.id}
+        onOpenNotifications={() => model.setView("notifications")}
         environments={model.projectEnvironments}
         project={model.project}
         onCreate={model.openNewEnvironment}

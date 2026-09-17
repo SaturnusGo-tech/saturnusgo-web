@@ -791,3 +791,24 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 
 .runTime { display: flex; align-items: center; flex-shrink: 0; padding: 0 12px; color: var(--ink); font-size: 13px; }
 .runTime time { font-weight: 750; letter-spacing: .02em; }
+
+/* Compact laptop viewports; physical screen diagonal is not exposed by browsers. */
+.compactSettingsNotifications { display: none; }
+
+@media (max-width: 1440px) and (max-height: 820px) {
+  .brandArea {
+    height: 56px;
+    flex-basis: 56px;
+    padding-inline: 19px;
+  }
+  .brandButton { height: 36px; gap: 12px; }
+  .tessiqMark { width: 30px; height: 30px; flex-basis: 30px; }
+  .tessiqWordmark { font-size: 18px; }
+  .navigationNotifications { display: none; }
+  .compactSettingsNotifications { display: block; }
+}
+
+/* The mobile navigation already omits utility actions. Keep notifications reachable. */
+@media (max-width: 760px) {
+  .compactSettingsNotifications { display: block; }
+}
