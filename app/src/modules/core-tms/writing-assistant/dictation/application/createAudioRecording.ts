@@ -6,6 +6,7 @@ import { prepareRecording } from "../processing/prepareRecording";
 type Options = {
   onReady: () => void;
   onElapsed: (seconds: number) => void;
+  onLevel?: (level: number) => void;
   onProcessing: () => void;
   onComplete: (wav: ArrayBuffer) => void;
   onError: (error: unknown) => void;
@@ -18,7 +19,7 @@ const schedule = (callback: () => void, milliseconds: number) => {
 
 export function createAudioRecording(options: Options) {
   let capture: AudioCapture | null = null, ended = false, ready = false, stopping = false;
-  let rate = 0, total = 0, elapsed = -1;
+  let rate = 0, total = 0, elapsed = -1, energy = 0, measured = 0;
   let chunks: Float32Array[] = [];
   let cancelTimer: (() => void) | undefined;
   function abort() {
@@ -60,11 +61,17 @@ export function createAudioRecording(options: Options) {
           const chunk = bounded.slice();
           for (let i = 0; i < chunk.length; i++) {
             if (!Number.isFinite(chunk[i])) chunk[i] = 0;
+            energy += chunk[i] * chunk[i]; measured++;
           }
           chunks.push(chunk); total += chunk.length;
         }
-        const seconds = Math.floor(total / rate);
-        if (elapsed !== seconds) { elapsed = seconds; options.onElapsed(seconds); }
+        const seconds = Math.floor(total / rate * 10) / 10;
+        if (elapsed !== seconds) {
+          elapsed = seconds; options.onElapsed(seconds);
+          const rms = measured ? Math.sqrt(energy / measured) : 0;
+          options.onLevel?.(rms > 0 ? Math.max(0, Math.min(1, (20 * Math.log10(rms) + 70) / 60)) : 0);
+          energy = 0; measured = 0;
+        }
         if (total >= Math.floor(rate * maximumRecordingSeconds) && !stopping) void stop();
       },
       onLimit: () => { void stop(); }, onError: fail,

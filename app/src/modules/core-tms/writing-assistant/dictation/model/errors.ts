@@ -1,5 +1,5 @@
 export type DictationState = "idle" | "starting" | "listening" | "transcribing";
-export type RecordingError = "not-allowed" | "audio-capture" | "unavailable" | "startup-timeout" | "too-short" | "silent";
+export type RecordingError = "not-allowed" | "audio-capture" | "audio-interrupted" | "no-input" | "unavailable" | "startup-timeout" | "too-short" | "silent";
 export class DictationFailure extends Error {
   constructor(readonly code: RecordingError) { super(code); this.name = "DictationFailure"; }
 }

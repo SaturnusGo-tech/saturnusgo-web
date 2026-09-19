@@ -7,11 +7,14 @@ export function deferred<T>() {
   return { promise, resolve, reject };
 }
 export const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
-export function browserHarness(options: { rate?: number; pendingMedia?: boolean; pendingModule?: boolean; pendingResume?: boolean; noFlush?: boolean } = {}) {
+export function browserHarness(options: { rate?: number; pendingMedia?: boolean; pendingModule?: boolean; pendingResume?: boolean; pendingResumeCalls?: number[]; noFlush?: boolean; initiallyMuted?: boolean } = {}) {
   const permission = deferred<MediaStream>(), module = deferred<void>(), resumed = deferred<void>();
-  const tracks = [{ stops: 0, onended: null as null | (() => void), stop() { this.stops++; } },
-    { stops: 0, onended: null as null | (() => void), stop() { this.stops++; } }];
-  const stream = { getTracks: () => tracks } as unknown as MediaStream;
+  const tracks = Array.from({ length: 2 }, () => ({ stops: 0, muted: Boolean(options.initiallyMuted),
+    onended: null as null | (() => void), onmute: null as null | (() => void), onunmute: null as null | (() => void),
+    setMuted(value: boolean) { this.muted = value; if (value) this.onmute?.(); else this.onunmute?.(); },
+    stop() { this.stops++; } }));
+  const stream = { getTracks: () => tracks, getAudioTracks: () => tracks } as unknown as MediaStream;
+  const constraints: Array<MediaStreamConstraints | undefined> = [];
   let mediaCalls = 0;
   const contexts: Context[] = [], nodes: Worklet[] = [];
   class Connection {
@@ -21,13 +24,21 @@ export function browserHarness(options: { rate?: number; pendingMedia?: boolean;
   }
   class Context {
     sampleRate = options.rate ?? 48000;
+    state = "suspended"; onstatechange: null | (() => void) = null;
+    resumeStates: string[] = [];
     resumes = 0; closes = 0; modules: string[] = [];
     destination = {};
     source = new Connection(); gainNode = Object.assign(new Connection(), { gain: { value: 1 } });
     audioWorklet = { addModule: (path: string) => { this.modules.push(path); return options.pendingModule ? module.promise : Promise.resolve(); } };
     constructor() { contexts.push(this); }
-    resume() { this.resumes++; return options.pendingResume ? resumed.promise : Promise.resolve(); }
-    close() { this.closes++; return Promise.resolve(); }
+    setState(state: string) { this.state = state; this.onstatechange?.(); }
+    resume() {
+      this.resumes++; this.resumeStates.push(this.state);
+      return (options.pendingResume || options.pendingResumeCalls?.includes(this.resumes) ? resumed.promise : Promise.resolve()).then(() => {
+        if (this.state !== "closed") this.setState("running");
+      });
+    }
+    close() { this.closes++; this.setState("closed"); return Promise.resolve(); }
     createMediaStreamSource() { return this.source; }
     createGain() { return this.gainNode; }
   }
@@ -49,7 +60,7 @@ export function browserHarness(options: { rate?: number; pendingMedia?: boolean;
     constructor() { super(); nodes.push(this); }
     samples(samples: Float32Array) { this.port.onmessage?.({ data: { type: "samples", samples } }); }
   }
-  const media = () => { mediaCalls++; return options.pendingMedia ? permission.promise : Promise.resolve(stream); };
+  const media = (value?: MediaStreamConstraints) => { mediaCalls++; constraints.push(value); return options.pendingMedia ? permission.promise : Promise.resolve(stream); };
   const dependencies: CaptureDependencies = {
     secure: () => true, context: () => new Context() as unknown as AudioContext,
     media, node: () => new Worklet() as unknown as AudioWorkletNode,
@@ -68,5 +79,5 @@ export function browserHarness(options: { rate?: number; pendingMedia?: boolean;
     } });
     return document;
   }
-  return { tracks, stream, permission, module, resumed, contexts, nodes, dependencies, install, mediaCalls: () => mediaCalls };
+  return { tracks, stream, permission, module, resumed, contexts, nodes, dependencies, install, constraints, mediaCalls: () => mediaCalls };
 }

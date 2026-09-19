@@ -7,7 +7,7 @@ import { MarkdownField } from "../../../presentation/cases/inspector/markdown/Ma
 import { stripRawHtml } from "../../../presentation/cases/inspector/markdown/code/stripRawHtml";
 import type { WritingTarget } from "../../model/target";
 import { maximumInstructionCharacters } from "../../model/limits";
-import { maximumRecordingSeconds } from "../../dictation/model/audio";
+import { RecordingStatus } from "../../dictation/presentation/RecordingStatus";
 import { useWritingRequest } from "../../state/useWritingRequest";
 import { useWritingDictation } from "../../dictation/state/useWritingDictation";
 import { useWritingPopup } from "./useWritingPopup";
@@ -88,10 +88,10 @@ export function WritingPanel({ target, workspaceId, ru, anchor, onClose }: {
         aria-label={ru ? "Отправить запрос" : "Send request"} onClick={() => void request.run("custom", instruction)}><ArrowUp size={17} /></button>
     </div>
     {(dictation.active || dictation.error || dictation.notice) && <p id={dictationId} className={dictation.error ? css.error : css.dictationStatus}
-      role={dictation.error ? "alert" : "status"}>{dictation.error || dictation.notice || (dictation.state === "starting"
+      role={dictation.error ? "alert" : "status"} aria-live={dictation.state === "listening" && !dictation.error ? "off" : undefined}>{dictation.error || dictation.notice || (dictation.state === "starting"
         ? (ru ? "Подключаем микрофон…" : "Connecting microphone…") : dictation.state === "transcribing"
-        ? (ru ? "Распознаём команду…" : "Transcribing your command…") : <>{ru ? "Запись" : "Recording"}
-          <span aria-hidden="true"> · {Math.floor(dictation.elapsed / 60)}:{String(dictation.elapsed % 60).padStart(2, "0")} / {maximumRecordingSeconds / 60}:00</span></>)}</p>}
+        ? (ru ? "Распознаём команду…" : "Transcribing your command…") : dictation.state === "listening"
+        ? <RecordingStatus elapsed={dictation.elapsed} level={dictation.level} ru={ru} /> : null)}</p>}
     {commandTooLong && !dictation.notice && <p className={css.error} role="alert">{ru ? "Сократите команду до 16 000 символов перед отправкой." : "Shorten the command to 16,000 characters before sending."}</p>}
     <div className={css.shortcuts}>
       <button type="button" disabled={!target.text.trim() || request.busy || tooLong || dictation.active} onClick={() => void request.run("improve")}>{ru ? "Улучшить текст" : "Improve text"}</button>

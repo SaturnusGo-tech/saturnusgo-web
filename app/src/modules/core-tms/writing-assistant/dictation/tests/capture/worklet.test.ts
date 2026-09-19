@@ -35,3 +35,26 @@ test("worklet enforces its own 300-second bound and signals the limit exactly on
   assert.equal(messages.filter((message) => message.type === "limit").length, 1);
   assert.equal(messages.reduce((count, message) => count + (message.samples?.length ?? 0), 0), 8 * 300);
 });
+
+for (const oppositeGain of [-1, -.8]) {
+  test(`phase-opposed stereo microphones preserve speech at gain ${oppositeGain}`, () => {
+    const { instance, messages } = processor();
+    const speech = Float32Array.from({ length: 128 }, (_, index) => Math.sin(index / 6) * .5);
+    const opposite = speech.map((sample) => sample * oppositeGain);
+    instance.process([[speech, opposite]], [[new Float32Array(128)]]);
+    instance.port.onmessage?.({ data: { type: "stop" } });
+    assert.deepEqual(messages[0].samples, speech);
+    assert.equal(messages[1].type, "stopped");
+  });
+}
+
+test("mono input and pauses retain every sample without invented signal", () => {
+  const { instance, messages } = processor();
+  const speech = Float32Array.from({ length: 128 }, (_, index) => Math.sin(index / 5) * .0001);
+  instance.process([[]], [[new Float32Array(128)]]);
+  instance.process([[speech]], [[new Float32Array(128)]]);
+  instance.process([[new Float32Array(128)]], [[new Float32Array(128)]]);
+  instance.port.onmessage?.({ data: { type: "stop" } });
+  assert.deepEqual(messages[0].samples, Float32Array.from([...speech, ...new Float32Array(128)]));
+  assert.equal(messages[1].type, "stopped");
+});

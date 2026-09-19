@@ -7,6 +7,8 @@ export function dictationError(problem: unknown, ru: boolean) {
     unavailable: ["Запись голоса недоступна в этом браузере. Введите команду текстом.", "Audio recording is unavailable in this browser. Type your command."],
     "not-allowed": ["Разрешите доступ к микрофону в настройках браузера и попробуйте снова.", "Allow microphone access in your browser settings and try again."],
     "audio-capture": ["Микрофон недоступен. Проверьте подключение и доступ к нему.", "Microphone unavailable. Check its connection and permissions."],
+    "audio-interrupted": ["Запись микрофона прервалась. Повторите диктовку.", "Microphone recording was interrupted. Please dictate again."],
+    "no-input": ["Микрофон не передаёт звук. Проверьте выбранный микрофон в браузере.", "The microphone is not sending audio. Check the microphone selected in your browser."],
     "too-short": ["Запись слишком короткая. Нажмите микрофон и произнесите команду.", "The recording is too short. Press the microphone and say your command."],
     silent: ["Голос не слышен. Проверьте микрофон и попробуйте ещё раз.", "No voice detected. Check your microphone and try again."],
     "startup-timeout": ["Микрофон не запустился. Проверьте разрешение в браузере и попробуйте снова.", "Microphone did not start. Check browser permissions and try again."],

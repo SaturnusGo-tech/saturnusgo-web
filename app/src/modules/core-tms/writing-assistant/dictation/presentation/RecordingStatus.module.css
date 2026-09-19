@@ -1,0 +1,7 @@
+.status { display: inline-flex; align-items: center; gap: 8px; min-height: 18px; color: var(--writing-muted); }
+.meter { display: inline-flex; align-items: center; gap: 2px; width: 23px; height: 18px; flex-shrink: 0; }
+.bar { display: block; width: 3px; border-radius: 2px; background: var(--writing-line); transition: background-color .1s ease; }
+.bar[data-active] { background: var(--cases-primary, #3478ee); }
+.timer { color: var(--writing-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.limit { color: var(--writing-muted); }
+@media (prefers-reduced-motion: reduce) { .bar { transition: none; } }

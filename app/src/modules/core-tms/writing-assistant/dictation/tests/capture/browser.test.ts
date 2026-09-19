@@ -12,7 +12,9 @@ test("capture resumes audio in the click turn and connects only a silent graph",
   assert.equal(ready, 0);
   await flush();
   const context = browser.contexts[0], node = browser.nodes[0];
-  assert.equal(ready, 1); assert.deepEqual(context.modules, ["/falcon/ai/dictation-capture.worklet.js?v=20260919"]);
+  assert.equal(ready, 0); assert.equal(context.resumes, 2);
+  assert.deepEqual(context.modules, ["/falcon/ai/dictation-capture.worklet.js?v=20260919-capture"]);
+  node.samples(new Float32Array([.05])); assert.equal(ready, 1);
   assert.deepEqual(context.source.connected, [node]); assert.deepEqual(node.connected, [context.gainNode]);
   assert.equal(context.gainNode.gain.value, 0);
   node.lastBatch = new Float32Array([.1, .2]);
@@ -20,7 +22,7 @@ test("capture resumes audio in the click turn and connects only a silent graph",
   assert.deepEqual(browser.tracks.map((track) => track.stops), [1, 1]);
   assert.equal(context.closes, 0);
   await stopped;
-  assert.equal(samples.length, 1); assert.equal(samples[0].length, 2);
+  assert.equal(samples.length, 2); assert.equal(samples[1].length, 2);
   assert.equal(context.closes, 1); assert.equal(node.port.closed, 1);
 });
 

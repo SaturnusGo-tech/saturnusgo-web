@@ -20,6 +20,7 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
   const http = useTmsHttpClient();
   const [state, setState] = useState<DictationState>("idle");
   const [elapsed, setElapsed] = useState(0);
+  const [level, setLevel] = useState(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const recording = useRef<ReturnType<typeof createAudioRecording> | null>(null);
@@ -31,7 +32,7 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
     recording.current?.abort(); recording.current = null;
     pending.current?.abort(); pending.current = null;
   }
-  function cancel() { dispose(); setState("idle"); }
+  function cancel() { dispose(); setState("idle"); setLevel(0); }
   useEffect(() => { cancel(); setError(""); setNotice(""); }, [workspaceId, target]);
   useEffect(() => { if (instruction.length <= limit) setNotice(""); }, [instruction]);
   useEffect(() => dispose, []);
@@ -49,11 +50,12 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
       setError(ru ? "Сократите команду перед следующей диктовкой." : "Shorten your command before dictating more."); return;
     }
     const base = latest.current.instruction, id = ++generation.current;
-    setState("starting"); setElapsed(0);
+    setState("starting"); setElapsed(0); setLevel(0);
     const current = () => id === generation.current;
     recording.current = createAudioRecording({
       onReady: () => { if (current()) setState("listening"); },
       onElapsed: (seconds) => { if (current()) setElapsed(seconds); },
+      onLevel: (value) => { if (current()) setLevel(value); },
       onProcessing: () => { if (current()) setState("transcribing"); },
       onError: (problem) => {
         if (!current()) return;
@@ -84,5 +86,5 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
     if (state === "starting" || state === "transcribing") cancel();
     else void recording.current?.stop();
   }
-  return { state, elapsed, active: state !== "idle", error, notice, start, cancel, stop };
+  return { state, elapsed, level, active: state !== "idle", error, notice, start, cancel, stop };
 }
