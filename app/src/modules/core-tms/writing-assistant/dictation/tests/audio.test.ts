@@ -37,8 +37,8 @@ test("downsampling suppresses out-of-band audio instead of aliasing it into spee
   assert.ok(rms < .01, `Out-of-band RMS ${rms}`);
 });
 
-test("WAV duration is capped by samples to 60 seconds and does not add silence to short captures", () => {
-  assert.equal(encodeMonoWav([new Float32Array(16000 * 61)], 16000).byteLength, 1920044);
+test("WAV duration is capped by samples to 300 seconds and does not add silence to short captures", () => {
+  assert.equal(encodeMonoWav([new Float32Array(16000 * 301)], 16000).byteLength, 9600044);
   assert.equal(encodeMonoWav([new Float32Array(4800)], 48000).byteLength, 3244);
   assert.throws(() => encodeMonoWav([], 0), /sample rate/);
 });

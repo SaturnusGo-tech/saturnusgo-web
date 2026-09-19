@@ -1,5 +1,5 @@
 export const dictationSampleRate = 16000;
-export const maximumRecordingSeconds = 60;
+export const maximumRecordingSeconds = 300;
 const phases = 512, radius = 16;
 
 function resamplingKernels(sampleRate: number) {

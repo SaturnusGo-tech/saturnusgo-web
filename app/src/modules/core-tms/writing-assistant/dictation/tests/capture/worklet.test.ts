@@ -29,9 +29,9 @@ test("worklet mixes stereo to mono, outputs silence and flushes a partial last b
   assert.equal(messages.length, 2); assert.ok(output.every((sample) => sample === 0));
 });
 
-test("worklet enforces its own 60-second bound and signals the limit exactly once", () => {
+test("worklet enforces its own 300-second bound and signals the limit exactly once", () => {
   const { instance, messages } = processor(8);
-  for (let i = 0; i < 6; i++) instance.process([[new Float32Array(128).fill(.2)]], [[new Float32Array(128)]]);
+  for (let i = 0; i < 20; i++) instance.process([[new Float32Array(128).fill(.2)]], [[new Float32Array(128)]]);
   assert.equal(messages.filter((message) => message.type === "limit").length, 1);
-  assert.equal(messages.reduce((count, message) => count + (message.samples?.length ?? 0), 0), 8 * 60);
+  assert.equal(messages.reduce((count, message) => count + (message.samples?.length ?? 0), 0), 8 * 300);
 });

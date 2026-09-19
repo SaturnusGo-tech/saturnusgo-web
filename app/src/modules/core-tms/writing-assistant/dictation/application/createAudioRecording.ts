@@ -1,6 +1,7 @@
 import { createBrowserCapture, type AudioCapture, type CaptureCallbacks } from "../capture/browserCapture";
 import { encodeMonoWav, maximumRecordingSeconds } from "../model/audio";
 import { DictationFailure } from "../model/errors";
+import { prepareRecording } from "../processing/prepareRecording";
 
 type Options = {
   onReady: () => void;
@@ -17,7 +18,7 @@ const schedule = (callback: () => void, milliseconds: number) => {
 
 export function createAudioRecording(options: Options) {
   let capture: AudioCapture | null = null, ended = false, ready = false, stopping = false;
-  let rate = 0, total = 0, elapsed = -1, energy = 0, peak = 0;
+  let rate = 0, total = 0, elapsed = -1;
   let chunks: Float32Array[] = [];
   let cancelTimer: (() => void) | undefined;
   function abort() {
@@ -32,9 +33,8 @@ export function createAudioRecording(options: Options) {
     try {
       await capture?.stop();
       if (ended) return;
-      if (!rate || total / rate < .3) throw new DictationFailure("too-short");
-      if (Math.sqrt(energy / total) < .0005 && peak < .003) throw new DictationFailure("silent");
-      const wav = encodeMonoWav(chunks, rate);
+      if (!rate || total / rate < .12) throw new DictationFailure("too-short");
+      const wav = encodeMonoWav(prepareRecording(chunks, rate), rate);
       abort(); options.onComplete(wav);
     } catch (error) { fail(error); }
   }
@@ -60,7 +60,6 @@ export function createAudioRecording(options: Options) {
           const chunk = bounded.slice();
           for (let i = 0; i < chunk.length; i++) {
             if (!Number.isFinite(chunk[i])) chunk[i] = 0;
-            energy += chunk[i] * chunk[i]; peak = Math.max(peak, Math.abs(chunk[i]));
           }
           chunks.push(chunk); total += chunk.length;
         }

@@ -60,7 +60,7 @@ export async function signedApiRequest(request, env, audience) {
   if (cookie) headers.set("cookie", cookie);
   const timestamp = String(Date.now());
   const clientIp = request.headers.get("cf-connecting-ip") ?? "";
-  const body = await readBody(request, dictation ? 2_570_000 : MAXIMUM_BODY_BYTES);
+  const body = await readBody(request, dictation ? 12_810_000 : MAXIMUM_BODY_BYTES);
   const canonical = JSON.stringify(["falcon-gateway-v1", request.method, incoming.pathname + incoming.search,
     incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)]);
   const key = await crypto.subtle.importKey("raw", Uint8Array.from(env.FALCON_MANAGED_GATEWAY_KEY.match(/../g),
@@ -72,6 +72,6 @@ export async function signedApiRequest(request, env, audience) {
   api.pathname = incoming.pathname;
   api.search = incoming.search;
   return new Request(api, { method: request.method, headers, redirect: "manual",
-    signal: AbortSignal.any([request.signal, AbortSignal.timeout(dictation ? 70000 : 45000)]),
+    signal: AbortSignal.any([request.signal, AbortSignal.timeout(dictation ? 130000 : 45000)]),
     ...(["GET", "HEAD"].includes(request.method) ? {} : { body }) });
 }

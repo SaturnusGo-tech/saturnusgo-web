@@ -17,9 +17,9 @@ export function hookHarness(t: TestContext, options: {
   let tree: ReactTestRenderer | undefined;
   t.after(() => { if (tree) act(() => tree?.unmount()); });
   const browser = browserHarness(options.browser), document = browser.install(t);
-  const requests: { path: string; method: string; body: { audio: string; language: string }; signal?: AbortSignal; reply: ReturnType<typeof deferred<{ text: string }>> }[] = [];
+  const requests: { path: string; method: string; body: { audio: string; language?: string }; signal?: AbortSignal; reply: ReturnType<typeof deferred<{ text: string }>> }[] = [];
   const changes: string[] = []; let applied = 0;
-  const http = { mutate: (path: string, method: string, body: { audio: string; language: string }, signal?: AbortSignal) => {
+  const http = { mutate: (path: string, method: string, body: { audio: string; language?: string }, signal?: AbortSignal) => {
     const reply = deferred<{ text: string }>(); requests.push({ path, method, body, signal, reply }); return reply.promise;
   } } as TmsHttpClient;
   let config: Config = { enabled: true, ru: true, workspaceId: "workspace-a", target: {
@@ -36,7 +36,7 @@ export function hookHarness(t: TestContext, options: {
   return { browser, document, requests, changes, get: () => state, text: () => text, applied: () => applied,
     start: async () => { await act(async () => { state.start(); await flush(); }); },
     startSync: () => act(() => state.start()),
-    samples: (count = 24000, value = .2) => act(() => browser.nodes[browser.nodes.length - 1].samples(new Float32Array(count).fill(value))),
+    samples: (count = 24000, value = .2) => act(() => browser.nodes[browser.nodes.length - 1].samples(Float32Array.from({ length: count }, (_, i) => Math.sin(i / 10) * value))),
     stop: async () => { await act(async () => { state.stop(); await flush(); }); },
     reply: async (text: string) => { await act(async () => { requests[requests.length - 1].reply.resolve({ text }); await flush(); }); },
     update: (next: Partial<Config>) => { config = { ...config, ...next }; act(() => tree?.update(render())); },

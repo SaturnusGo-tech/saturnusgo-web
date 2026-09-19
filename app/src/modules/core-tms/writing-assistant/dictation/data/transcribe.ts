@@ -3,9 +3,9 @@ import type { components } from "../../../../../core/tms/generated/tms-api";
 import { wavBase64 } from "../model/audio";
 
 export async function transcribeDictation(http: TmsHttpClient, workspaceId: string, wav: ArrayBuffer,
-  language: "ru" | "en", signal: AbortSignal) {
+  signal: AbortSignal) {
   signal.throwIfAborted();
-  const body: components["schemas"]["DictationRequest"] = { audio: wavBase64(wav), language };
+  const body: components["schemas"]["DictationRequest"] = { audio: wavBase64(wav) };
   const result = await http.mutate<components["schemas"]["DictationResult"]>(
     `/workspaces/${encodeURIComponent(workspaceId)}/ai/dictation`, "POST", body, signal,
   );

@@ -73,21 +73,21 @@ test("company host parsing leaves the legacy origin alone until migration and re
   assert.equal(companyHost("tms.saturnusgo.com", { ...env, FALCON_LEGACY_HOST_MANAGED: "true" }), "tenant");
 });
 
-test("only dictation accepts the bounded 60-second PCM payload, and caller cancellation reaches the API", async () => {
+test("only dictation accepts the bounded five-minute PCM payload, and caller cancellation reaches the API", async () => {
   const endpoint = `/api/v1/workspaces/workspace-a/ai/dictation`;
   const controller = new AbortController();
   const request = (path, size, method = "POST", declared) => new Request(`https://${host}${path}`, {
     method, body: "x".repeat(size), signal: controller.signal,
     headers: { origin: `https://${host}`, ...(declared ? { "content-length": String(declared) } : {}) },
   });
-  const forwarded = await signedApiRequest(request(endpoint, 2_560_100), env, "tenant");
-  assert.equal((await forwarded.arrayBuffer()).byteLength, 2_560_100);
+  const forwarded = await signedApiRequest(request(endpoint, 12_800_100), env, "tenant");
+  assert.equal((await forwarded.arrayBuffer()).byteLength, 12_800_100);
   controller.abort();
   assert.equal(forwarded.signal.aborted, true);
   let calls = 0;
   const send = () => { calls++; throw new Error("must not send"); };
-  for (const input of [request(endpoint, 2_570_001), request(endpoint, 1, "POST", 2_570_001),
-    request(endpoint, 2_560_100, "PATCH"), request(endpoint + "/other", 2_560_100)]) {
+  for (const input of [request(endpoint, 12_810_001), request(endpoint, 1, "POST", 12_810_001),
+    request(endpoint, 12_800_100, "PATCH"), request(endpoint + "/other", 12_800_100)]) {
     assert.equal((await proxyCompanyApi(input, env, "tenant", send)).status, 413);
   }
   assert.equal(calls, 0);

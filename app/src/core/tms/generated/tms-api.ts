@@ -4076,7 +4076,7 @@ export interface paths {
         put?: never;
         /**
          * Dictate an instruction without applying or rewriting it
-         * @description Active workspace editors may transcribe recorded speech through gpt-4o-mini-transcribe. Viewers and non-members are forbidden. Accepts only canonical 44-byte-header WAV, PCM mono 16000 Hz signed 16-bit little-endian, from 0.3 to 60 seconds. Audio length and format are verified server-side. JSON body limit 2570000 bytes. Audio is processed transiently and is not stored in Falcon. No source documents are sent. Durable per-member calendar-month duration and per-minute request budgets apply, with a default 100 minutes per member per workspace per UTC calendar month and five requests per minute, plus provider-wide limits. Duration is rounded up to seconds; failed provider requests retain their reservation. No automatic retries. The client must display the recognized instruction for review and require explicit submission.
+         * @description Active workspace editors may transcribe recorded speech through gpt-4o-mini-transcribe. Viewers and non-members are forbidden. Accepts only canonical 44-byte-header WAV, PCM mono 16000 Hz signed 16-bit little-endian, from 0.12 to 300 seconds. Audio length and format are verified server-side. JSON body limit 12810000 bytes. Audio is processed transiently and is not stored in Falcon. No source documents are sent. Durable per-member calendar-month duration and per-minute request budgets apply, with a default 100 minutes per member per workspace per UTC calendar month and five requests per minute, plus provider-wide limits. Duration is rounded up to seconds; failed provider requests retain their reservation. No automatic retries. The client must display the recognized instruction for review and require explicit submission. Spoken language is detected from audio; a legacy language field is ignored. Quiet speech is not rejected based on whole-recording average volume. Transcripts are returned without translation, profanity filtering, summarization or client-side truncation.
          */
         post: operations["transcribeWorkspaceInstruction"];
         delete?: never;
@@ -7840,10 +7840,14 @@ export interface components {
             nextCursor: string | null;
         };
         DictationRequest: {
-            /** @description Base64 encoded canonical mono PCM WAV recording, at most 60 seconds. */
+            /** @description Base64 encoded canonical mono PCM WAV recording, from 0.12 through 300 seconds. */
             audio: string;
-            /** @enum {string} */
-            language: "ru" | "en";
+            /**
+             * @deprecated
+             * @description Legacy UI locale, accepted but ignored. The spoken language is detected from audio.
+             * @enum {string}
+             */
+            language?: "ru" | "en";
         };
         DictationResult: {
             text: string;

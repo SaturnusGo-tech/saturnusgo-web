@@ -20,8 +20,12 @@ const browserDependencies: CaptureDependencies = {
     if (!Constructor) throw new DictationFailure("unavailable");
     return new Constructor();
   },
-  media: () => navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }, video: false }),
-  node: (context) => new AudioWorkletNode(context, "falcon-dictation-capture", { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] }),
+  media: () => navigator.mediaDevices.getUserMedia({ audio: {
+    channelCount: 1, echoCancellation: true, noiseSuppression: false, autoGainControl: true,
+  }, video: false }),
+  node: (context) => new AudioWorkletNode(context, "falcon-dictation-capture", {
+    numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1],
+  }),
 };
 
 export function createBrowserCapture(callbacks: CaptureCallbacks, dependencies = browserDependencies): AudioCapture {
@@ -56,7 +60,7 @@ export function createBrowserCapture(callbacks: CaptureCallbacks, dependencies =
       if (!context.audioWorklet) throw new DictationFailure("unavailable");
       // Resume synchronously in the click handler, before asking for microphone permission.
       const resumed = context.resume();
-      const loaded = context.audioWorklet.addModule("/falcon/ai/dictation-capture.worklet.js");
+      const loaded = context.audioWorklet.addModule("/falcon/ai/dictation-capture.worklet.js?v=20260919");
       const media = dependencies.media().then((value) => {
         if (closed) value.getTracks().forEach((track) => track.stop());
         else stream = value;

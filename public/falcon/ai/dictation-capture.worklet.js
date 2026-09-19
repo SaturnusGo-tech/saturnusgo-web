@@ -4,7 +4,7 @@ class FalconDictationCapture extends AudioWorkletProcessor {
     this.buffer = new Float32Array(2048);
     this.filled = 0;
     this.total = 0;
-    this.maximum = Math.floor(sampleRate * 60);
+    this.maximum = Math.floor(sampleRate * 300);
     this.active = true;
     this.port.onmessage = (event) => {
       if (event.data?.type !== "stop") return;

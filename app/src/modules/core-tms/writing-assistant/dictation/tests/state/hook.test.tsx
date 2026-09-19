@@ -14,7 +14,7 @@ test("only a click starts capture; stop uploads canonical WAV and a successful r
   assert.equal(h.get().state, "transcribing");
   assert.deepEqual(h.browser.tracks.map((track) => track.stops), [1, 1]);
   assert.equal(h.requests.length, 1); assert.equal(h.requests[0].path, "/workspaces/workspace-a/ai/dictation");
-  assert.equal(h.requests[0].body.language, "ru"); assert.equal(h.requests[0].method, "POST");
+  assert.equal(h.requests[0].body.language, undefined); assert.equal(h.requests[0].method, "POST");
   const wav = Buffer.from(h.requests[0].body.audio, "base64");
   assert.equal(wav.toString("ascii", 0, 4), "RIFF"); assert.equal(wav.readUInt32LE(24), 16000);
   assert.equal(wav.length, 16044);
@@ -39,7 +39,7 @@ test("cancelling transcription aborts HTTP and ignores a late successful respons
 
 for (const [name, update] of [
   ["disabled", { enabled: false }], ["workspace", { workspaceId: "workspace-b" }],
-  ["target", { target: target() }], ["language", { ru: false }],
+  ["target", { target: target() }],
 ] as const) {
   test(`${name} change aborts transcription and ignores responses from the old context`, async (t) => {
     const h = hookHarness(t, { text: "Typed" }); await h.start(); h.samples(); await h.stop();
@@ -84,10 +84,10 @@ test("short and silent recordings remain local", async (t) => {
   assert.match(h.get().error, /не слышен/); assert.equal(h.requests.length, 0);
 });
 
-test("transcription exceeding 2000 characters shows a truncation notice without automatic submission", async (t) => {
-  const h = hookHarness(t, { text: "x".repeat(1995) }); await h.start(); h.samples(); await h.stop();
+test("transcription exceeding the command limit preserves the entire transcript without automatic submission", async (t) => {
+  const h = hookHarness(t, { text: "x".repeat(15995) }); await h.start(); h.samples(); await h.stop();
   await h.reply("more words here");
-  assert.equal(h.text(), `${"x".repeat(1995)} more`); assert.match(h.get().notice, /сокращена/);
+  assert.equal(h.text(), `${"x".repeat(15995)} more words here`); assert.match(h.get().notice, /Вся диктовка сохранена/);
   assert.equal(h.applied(), 0); assert.equal(h.requests.length, 1);
 });
 

@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import type { WritingTarget } from "../../model/target";
+import { maximumInstructionCharacters as limit } from "../../model/limits";
 import { createAudioRecording } from "../application/createAudioRecording";
 import { transcribeDictation } from "../data/transcribe";
 import type { DictationState } from "../model/errors";
 import { dictationError } from "./messages";
 
-const limit = 2000;
 export function appendDictation(base: string, speech: string) {
   const words = speech.trim();
   const complete = base + (words && base && !/\s$/.test(base) ? " " : "") + words;
-  return { value: complete.slice(0, limit).replace(/[\uD800-\uDBFF]$/, ""), truncated: complete.length > limit };
+  return { value: complete, overLimit: complete.length > limit };
 }
 
 export function useWritingDictation({ instruction, onChange, ru, enabled, workspaceId, target }: {
@@ -32,7 +32,8 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
     pending.current?.abort(); pending.current = null;
   }
   function cancel() { dispose(); setState("idle"); }
-  useEffect(() => { cancel(); setError(""); setNotice(""); }, [workspaceId, target, ru]);
+  useEffect(() => { cancel(); setError(""); setNotice(""); }, [workspaceId, target]);
+  useEffect(() => { if (instruction.length <= limit) setNotice(""); }, [instruction]);
   useEffect(() => dispose, []);
   useEffect(() => { if (!enabled) cancel(); }, [enabled]);
   useEffect(() => {
@@ -45,7 +46,7 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
     if (!enabled || recording.current || pending.current) return;
     setError(""); setNotice("");
     if (latest.current.instruction.length >= limit) {
-      setError(ru ? "В команде уже 2000 символов." : "The command already has 2,000 characters."); return;
+      setError(ru ? "Сократите команду перед следующей диктовкой." : "Shorten your command before dictating more."); return;
     }
     const base = latest.current.instruction, id = ++generation.current;
     setState("starting"); setElapsed(0);
@@ -62,14 +63,14 @@ export function useWritingDictation({ instruction, onChange, ru, enabled, worksp
         if (!current()) return;
         recording.current = null;
         const request = new AbortController(); pending.current = request;
-        void transcribeDictation(http, workspaceId, wav, ru ? "ru" : "en", request.signal).then((text) => {
+        void transcribeDictation(http, workspaceId, wav, request.signal).then((text) => {
           if (!current() || request.signal.aborted) return;
           if (latest.current.instruction !== base) {
             setError(ru ? "Команда уже изменена. Продиктуйте дополнение ещё раз." : "The command has changed. Dictate your addition again."); return;
           }
           const next = appendDictation(base, text);
           latest.current.onChange(next.value);
-          if (next.truncated) setNotice(ru ? "Диктовка сокращена до лимита 2000 символов. Проверьте команду." : "Dictation was trimmed to the 2,000-character limit. Review the command.");
+          if (next.overLimit) setNotice(ru ? "Вся диктовка сохранена. Сократите команду до 16 000 символов перед отправкой." : "Full dictation preserved. Shorten the command to 16,000 characters before sending.");
         }).catch((problem) => {
           if (current() && !request.signal.aborted) setError(dictationError(problem, ru));
         }).finally(() => {

@@ -20,19 +20,19 @@ function harness() {
 
 test("stop waits for the last worklet batch, emits one canonical WAV and releases capture", async () => {
   const h = harness(); h.callbacks.onReady();
-  h.callbacks.onSamples(new Float32Array(8000).fill(.1), 16000);
+  h.callbacks.onSamples(Float32Array.from({ length: 8000 }, (_, i) => Math.sin(i) * .1), 16000);
   const ending = h.recorder.stop(); void h.recorder.stop();
   assert.equal(h.wavs.length, 0); assert.equal(h.stopped(), 1);
-  h.callbacks.onSamples(new Float32Array(4000).fill(.1), 16000);
+  h.callbacks.onSamples(Float32Array.from({ length: 4000 }, (_, i) => Math.sin(i) * .1), 16000);
   h.stopResult.resolve(); await ending;
   assert.equal(h.wavs.length, 1); assert.equal(h.wavs[0].byteLength, 24044);
   assert.equal(h.aborted(), 1); assert.equal(h.timers.size, 0);
 });
 
 test("abort while flushing publishes no recording and ignores late capture callbacks", async () => {
-  const h = harness(); h.callbacks.onReady(); h.callbacks.onSamples(new Float32Array(8000).fill(.1), 16000);
+  const h = harness(); h.callbacks.onReady(); h.callbacks.onSamples(Float32Array.from({ length: 8000 }, (_, i) => Math.sin(i) * .1), 16000);
   const stopping = h.recorder.stop(); h.recorder.abort();
-  h.callbacks.onSamples(new Float32Array(4000).fill(.1), 16000); h.callbacks.onError(new Error("Late"));
+  h.callbacks.onSamples(Float32Array.from({ length: 4000 }, (_, i) => Math.sin(i) * .1), 16000); h.callbacks.onError(new Error("Late"));
   h.stopResult.resolve(); await stopping;
   assert.equal(h.wavs.length, 0); assert.equal(h.errors.length, 0); assert.equal(h.aborted(), 1);
 });
@@ -46,19 +46,19 @@ for (const [name, samples] of [["too-short", new Float32Array(100).fill(.1)], ["
   });
 }
 
-test("sample count bounds an oversized batch to exactly 60 seconds and auto-stops once", async () => {
+test("sample count bounds an oversized batch to exactly 300 seconds and auto-stops once", async () => {
   const h = harness(); h.callbacks.onReady();
-  h.callbacks.onSamples(new Float32Array(16000 * 61).fill(.1), 16000); h.callbacks.onLimit();
-  assert.equal(h.stopped(), 1); assert.deepEqual(h.seconds, [60]);
+  h.callbacks.onSamples(Float32Array.from({ length: 16000 * 301 }, (_, i) => Math.sin(i) * .1), 16000); h.callbacks.onLimit();
+  assert.equal(h.stopped(), 1); assert.deepEqual(h.seconds, [300]);
   h.stopResult.resolve(); await new Promise<void>((resolve) => setImmediate(resolve));
-  assert.equal(h.wavs[0].byteLength, 1920044); assert.equal(h.wavs.length, 1);
+  assert.equal(h.wavs[0].byteLength, 9600044); assert.equal(h.wavs.length, 1);
 });
 
 test("permission wait and listening time are bounded and cancel cleans all timers", () => {
   const h = harness(); h.timers.get(60000)?.();
   assert.equal((h.errors[0] as DictationFailure).code, "startup-timeout");
   assert.equal(h.aborted(), 1); assert.equal(h.timers.size, 0);
-  const running = harness(); running.callbacks.onReady(); running.timers.get(60000)?.();
+  const running = harness(); running.callbacks.onReady(); running.timers.get(300000)?.();
   assert.equal(running.stopped(), 1); running.recorder.abort(); assert.equal(running.timers.size, 0);
 });
 
