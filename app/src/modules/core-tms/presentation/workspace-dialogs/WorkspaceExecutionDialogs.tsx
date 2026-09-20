@@ -68,14 +68,18 @@ export function WorkspaceExecutionDialogs({
       />
     );
   }
-  if (model.dialog === "defect" && model.project) {
+  const source = model.dialog === "case-defect" && model.caseDefectSource?.workspaceId === model.data.workspace.id
+    ? model.caseDefectSource : undefined;
+  if ((model.dialog === "defect" && model.project) || source) {
     return (
       <DefectDialog
         workspaceId={model.data.workspace.id}
-        projectId={model.project.id}
-        run={model.view === "runs" ? model.selectedRun : null}
-        item={model.view === "runs" ? model.selectedRunItem : null}
-        components={model.projectCases.map((testCase) => testCase.component)}
+        key={source?.testCase.id ?? "standalone"}
+        projectId={source?.testCase.projectId ?? model.project!.id}
+        sourceCase={source}
+        run={!source && model.view === "runs" ? model.selectedRun : null}
+        item={!source && model.view === "runs" ? model.selectedRunItem : null}
+        components={model.data.testCases.filter(testCase => testCase.projectId === (source?.testCase.projectId ?? model.project?.id)).map(testCase => testCase.component)}
         offline={model.connection === "demo"}
         onClose={close}
         onCreated={(defect) => {
@@ -85,6 +89,7 @@ export function WorkspaceExecutionDialogs({
           }));
           close();
           model.notify(t("actions.defectCreated", { key: defect.key }));
+          if (source) model.caseCollaboration.refreshDefects();
         }}
       />
     );

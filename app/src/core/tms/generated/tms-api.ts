@@ -5176,7 +5176,8 @@ export interface components {
             readyForTest: boolean;
             reportedAt: components["schemas"]["Timestamp"];
             reportedByIdentityId: components["schemas"]["Identifier"];
-            occurrence: components["schemas"]["TestCaseLinkedDefectOccurrence"];
+            /** @description Null for a direct case defect; returned only when includeDirect=true. */
+            occurrence: components["schemas"]["TestCaseLinkedDefectOccurrence"] | null;
             /** Format: uri */
             falconUrl: string;
             youTrack: components["schemas"]["DefectExternalIssue"] | null;
@@ -5555,6 +5556,8 @@ export interface components {
             createdByIdentityId: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            /** @description Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation. */
+            sourceCaseId?: components["schemas"]["Identifier"] | null;
         };
         DefectCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -5573,6 +5576,8 @@ export interface components {
             stepId?: components["schemas"]["Identifier"] | null;
             expectedResult?: components["schemas"]["LongText"];
             actualResult?: components["schemas"]["LongText"];
+            /** @description Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation. */
+            sourceCaseId?: components["schemas"]["Identifier"] | null;
         } & unknown;
         DefectPatchRequest: {
             title?: string;
@@ -9994,6 +9999,8 @@ export interface operations {
                 cursor?: components["parameters"]["Cursor"];
                 /** @description Requested page size. */
                 limit?: components["parameters"]["Limit"];
+                /** @description Include defects created directly from this case without a run. Such records have occurrence=null. */
+                includeDirect?: boolean;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */

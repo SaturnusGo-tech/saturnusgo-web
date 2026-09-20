@@ -72,7 +72,7 @@ export function CaseActivityTab(props: Props) {
         className={`${css.loadState} ${css.sectionLoadState}`}
       ><span>{ru ? "История багов доступна после подключения к серверу" : "Bug history is available when connected to the server"}</span></div>}
       {props.model.defects.status === "ready" && <div className={css.defectList}>{props.model.defects.items.map((defect) => <CaseDefectRecord
-        key={defect.occurrence.id}
+        key={defect.occurrence?.id ?? defect.defectId}
         locale={props.locale}
         languageTag={props.languageTag}
         caseId={props.testCase?.id ?? ""}

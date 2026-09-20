@@ -13,11 +13,13 @@ import { useYouTrackRouteOptions } from "../../../defects/presentation/use-youtr
 import { defectRouteChoices } from "../../../defects/presentation/defect-route-choices";
 import { getDefectDialogCopy } from "./copy";
 import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
+import type { DefectCaseSource } from "../../../defects/model/case-source";
 type DefectDialogProps = {
+  sourceCase?: DefectCaseSource;
   workspaceId: string; projectId: string; run: TestRunSummary | null; item: RunItem | null; components: string[];
   offline: boolean; onClose: () => void; onCreated: (defect: Defect) => void;
 };
-export function DefectDialog({ workspaceId, projectId, run, item, components, offline, onClose,
+export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, components, offline, onClose,
   onCreated }: DefectDialogProps) {
   const http = useTmsHttpClient();
   const attachments = useAttachmentClient();
@@ -36,7 +38,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
     : undefined;
   const fallbackComponent = locale === "ru" ? "Основной продукт" : "Core product";
   const projectComponents = Array.from(new Set([
-    item?.snapshot.component,
+    item?.snapshot.component ?? sourceCase?.revision.component,
     ...components,
   ].map((value) => value?.trim()).filter((value): value is string => Boolean(value))));
   const componentOptions = projectComponents.length > 0 ? projectComponents : [fallbackComponent];
@@ -47,14 +49,14 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   const [title, setTitle] = useState(
     item
       ? `${item.snapshot.title} ${copy.failsOn} ${run?.environment.name ?? copy.testEnvironment}`
-      : "",
+      : sourceCase?.revision.title ?? "",
   );
-  const [description, setDescription] = useState(item?.snapshot.description ?? "");
+  const [description, setDescription] = useState(item?.snapshot.description ?? sourceCase?.revision.description ?? "");
   const [actual, setActual] = useState(
     attempt?.actualResult ?? "",
   );
   const [expected, setExpected] = useState(failedStep?.expectedResult ?? "");
-  const [priority, setPriority] = useState<Defect["priority"]>("high");
+  const [priority, setPriority] = useState<Defect["priority"]>(sourceCase?.revision.priority ?? "high");
   const [assigneeIdentityId, setAssignee] = useState<string | null>(null);
   const [severity, setSeverity] = useState<Defect["severity"]>("high");
   const [reproducibility, setReproducibility] = useState("Always");
@@ -64,10 +66,10 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
   useEffect(() => {
     if (configurationVersion !== 1 || !enabled || integrationChoice) return;
     const suggested = inferLegacyDefectIntegrationTarget(
-      item?.snapshot.tags ?? [], item?.snapshot.component ?? component,
+      item?.snapshot.tags ?? sourceCase?.revision.tags ?? [], item?.snapshot.component ?? sourceCase?.revision.component ?? component,
     );
     if (suggested && youTrackOptions.some((option) => option.value === suggested)) setIntegrationChoice(suggested);
-  }, [component, configurationVersion, enabled, integrationChoice, item, youTrackOptions]);
+  }, [component, configurationVersion, enabled, integrationChoice, item, sourceCase, youTrackOptions]);
   const automaticRouting = offline || (youTrackStatus === "ready" && (configurationVersion === 2 || !enabled));
   const routing = resolveDefectIntegrationChoice(integrationChoice, automaticRouting);
   const routeOptions = offline ? [{ value: "", label: copy.projectIntegrations }]
@@ -90,6 +92,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
     const payload: Omit<Defect,
       "id" | "key" | "createdAt" | "attachmentIds" | "linkIds" | "externalIssue"> = {
       projectId,
+      ...(sourceCase ? { sourceCaseId: sourceCase.testCase.id } : {}),
       title,
       description,
       severity,
@@ -115,7 +118,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, components, of
     }
   }
   return <DefectForm workspaceId={workspaceId} offline={offline}
-    context={item ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}` : undefined}
+    context={item ? `${item.caseKey} · ${run?.name} · ${run?.environment.name}` : sourceCase ? `${sourceCase.testCase.key} · ${sourceCase.revision.title}` : undefined}
     value={{ title, description, actualResult: actual, expectedResult: expected, component, severity, priority,
       reproducibility, assigneeIdentityId, link }}
     onChange={patch => {

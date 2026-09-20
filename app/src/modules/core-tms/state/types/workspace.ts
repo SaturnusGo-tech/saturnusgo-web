@@ -14,6 +14,7 @@ export type Dialog =
   | "environment"
   | "run"
   | "defect"
+  | "case-defect"
   | null;
 
 export type CaseFilters = {

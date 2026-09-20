@@ -81,6 +81,7 @@ export type Suite = SuiteSummary & {
 };
 
 export type Defect = {
+  sourceCaseId?: string | null;
   id: string;
   projectId: string;
   key: string;

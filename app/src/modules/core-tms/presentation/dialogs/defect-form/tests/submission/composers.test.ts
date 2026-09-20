@@ -9,7 +9,8 @@ import { defectRouteChoices } from "../../../../../defects/presentation/defect-r
 import type { createDefect } from "../../../../../application/defects/createDefect";
 
 test("both entry points save edited Markdown, fields and attachments, preserve context, and retry the same operation", async () => {
-  for (const inline of [false, true]) {
+  for (const mode of ["standalone", "run", "case"]) {
+    const inline = mode === "run", direct = mode === "case";
     const h = componentHarness(); const calls: Parameters<typeof createDefect>[0][] = [];
     let fail = true, created = 0;
     const resolve = (name: string) => {
@@ -34,10 +35,17 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     const item = { id: "item", caseKey: "TC-1", activeAttemptNo: 1, snapshot: { title: "Case", component: "Orders", tags: [] },
       attempts: [{ attemptNo: 1, actualResult: "Old actual", stepResults: [{ stepId: "step", status: "failed" }] }] };
     const props = { workspaceId: "w", projectId: "p", run: inline ? { id: "run", environment: { name: "QA", baseUrl: "" } } : null,
-      item: inline ? item : null, step: { id: "step", order: 1, action: "Open" }, components: ["Orders"], offline: false,
+      item: inline ? item : null, sourceCase: direct ? { workspaceId: "w",
+        testCase: { id: "source-case", key: "TC-2", projectId: "p" },
+        revision: { title: "Source title", description: "**Source description**", component: "Billing", priority: "low", tags: [] } } : undefined, step: { id: "step", order: 1, action: "Open" }, components: ["Orders"], offline: false,
       onClose() {}, onCreated: () => { created++; } };
     const View = inline ? module.InlineDefectComposer : module.DefectDialog;
     const render = () => h.render(() => View(props as never)) as unknown as Node;
+    if (direct) {
+      const value = render().props.value as Record<string, unknown>;
+      assert.equal(value.title, "Source title"); assert.equal(value.description, "**Source description**");
+      assert.equal(value.component, "Billing"); assert.equal(value.priority, "low");
+    }
     const markdown = "## Actual\n\n**Empty** order history.\n\n- No rows\n- No message";
     const file = { name: "evidence.png", size: 100 };
     invoke(render(), "onChange", { title: "Missing orders", description: "After login", actualResult: markdown,
@@ -49,7 +57,7 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     assert.equal((render().props.value as { actualResult: string }).actualResult, markdown);
     fail = false; await invoke(render(), "onSubmit", { preventDefault() {} });
     assert.equal(created, 1); assert.equal(calls[0].operationKey, calls[1].operationKey);
-    const saved = calls[1]; assert.equal(saved.payload.actualResult, markdown);
+    const saved = calls[1]; assert.equal(saved.payload.sourceCaseId, direct ? "source-case" : undefined); assert.equal(saved.payload.actualResult, markdown);
     assert.equal(saved.payload.expectedResult, "# Expected\n\nOrder list");
     assert.equal(saved.payload.runId, inline ? "run" : null); assert.equal(saved.payload.stepId, inline ? "step" : null);
     assert.equal(saved.payload.runItemId, inline ? "item" : null); assert.equal(saved.payload.priority, "medium");

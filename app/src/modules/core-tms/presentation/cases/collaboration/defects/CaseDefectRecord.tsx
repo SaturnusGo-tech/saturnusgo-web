@@ -28,8 +28,8 @@ type Props = {
 export function CaseDefectRecord(props: Props) {
   const { defect, model } = props;
   const ru = props.locale === "ru";
-  const confirming = model.confirmingOccurrenceId === defect.occurrence.id;
-  const mutationFailure = model.confirmationFailure?.occurrenceId === defect.occurrence.id
+  const confirming = model.confirmingOccurrenceId === (defect.occurrence?.id ?? defect.defectId);
+  const mutationFailure = model.confirmationFailure?.occurrenceId === (defect.occurrence?.id ?? defect.defectId)
     ? model.confirmationFailure.reason : null;
   const terminal = defect.status === "verified" || defect.status === "closed";
   const transition = defect.youTrackTransition;
@@ -66,7 +66,7 @@ export function CaseDefectRecord(props: Props) {
           {ru ? "Баг зарегистрирован" : "Bug reported"} · {formatTime(defect.reportedAt, props.languageTag)}
           {" · "}{defectStepLabel(props.locale, defect.occurrence)}
         </small>
-        {defect.occurrence.stepAction && <p className={css.stepSnapshot}>{defect.occurrence.stepAction}</p>}
+        {defect.occurrence?.stepAction && <p className={css.stepSnapshot}>{defect.occurrence.stepAction}</p>}
       </div>
       <span className={css.statusBadge} data-status={defect.status}>
         {localizedLabel(props.locale, defect.status)}
@@ -133,7 +133,7 @@ export function CaseDefectRecord(props: Props) {
         ? "В Falcon установлен финальный статус; подтверждение точным ретестом не зарегистрировано."
         : "Falcon has a final status; no exact retest confirmation is recorded."}
     </div>}
-    {!terminal && <footer className={css.verification}>
+    {!terminal && defect.occurrence && <footer className={css.verification}>
       {blocked && <p>{blocked}</p>}
       {defect.fixConfirmationBlockedReason === "retest_required" && model.canConfirmFix && props.onRunCase && <button
         type="button" className={css.retestButton} onClick={props.onRunCase}
@@ -141,7 +141,7 @@ export function CaseDefectRecord(props: Props) {
       <button
         type="button"
         disabled={!allowed || confirming}
-        aria-describedby={blocked ? `defect-block-${defect.occurrence.id}` : undefined}
+        aria-describedby={blocked ? `defect-block-${(defect.occurrence?.id ?? defect.defectId)}` : undefined}
         onClick={() => { void model.confirmFix(defect); }}
       ><ShieldCheck size={14} />{confirming
         ? (ru ? "Подтверждение…" : "Confirming…")
@@ -149,7 +149,7 @@ export function CaseDefectRecord(props: Props) {
         : reconciliationFailed ? (ru ? "Требуется обновление" : "Refresh required")
         : mutationFailure ? (ru ? "Повторить подтверждение" : "Retry confirmation")
         : (ru ? "Баг исправлен после ретеста" : "Confirm fixed after retest")}</button>
-      {blocked && <span id={`defect-block-${defect.occurrence.id}`} className={css.srOnly}>{blocked}</span>}
+      {blocked && <span id={`defect-block-${(defect.occurrence?.id ?? defect.defectId)}`} className={css.srOnly}>{blocked}</span>}
     </footer>}
     {mutationFailure && <div className={css.inlineError} role="alert">
       {collaborationFailureLabel(props.locale, mutationFailure)}

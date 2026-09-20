@@ -40,6 +40,7 @@ export async function createDefect(input: {
   }
   const body = {
     projectId: input.payload.projectId,
+    ...(input.payload.sourceCaseId ? { sourceCaseId: input.payload.sourceCaseId } : {}),
     title: input.payload.title,
     description: input.payload.description,
     severity: input.payload.severity,

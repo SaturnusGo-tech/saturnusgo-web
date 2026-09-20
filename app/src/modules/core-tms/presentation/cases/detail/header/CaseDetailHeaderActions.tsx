@@ -1,5 +1,5 @@
 import {
-  Archive, Check, Copy, Files, Link2, Maximize2, Minimize2,
+  Archive, Bug, Check, Copy, Files, Link2, Maximize2, Minimize2,
   MoreHorizontal, Play, RotateCcw, X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +18,7 @@ type Props = {
   onRunCase: () => void;
   onToggleFullscreen: () => void;
   onClone: () => void;
+  onCreateDefect?: () => void;
   onArchive: () => void;
   onClose?: () => void;
 };
@@ -102,6 +103,13 @@ export function CaseDetailHeaderActions(props: Props) {
             setMenuOpen(false);
             props.onClone();
           }}><Files size={14} />{ru ? "Создать копию" : "Create a copy"}</button>
+          {item && props.onCreateDefect && <button type="button" role="menuitem"
+            disabled={archived || props.editorOpen} title={archived ? restoreTitle : undefined}
+            onClick={() => {
+              if (archived || props.editorOpen) return;
+              setMenuOpen(false);
+              props.onCreateDefect?.();
+            }}><Bug size={14} />{ru ? "Завести баг-репорт" : "Create bug report"}</button>}
         </div>}
       </div>}
       <button type="button" className={inspector.iconButton} onClick={props.onToggleFullscreen}

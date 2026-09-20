@@ -5,6 +5,7 @@ export function mapDefect(dto: components["schemas"]["Defect"]): Defect {
   return {
     id: dto.id,
     projectId: dto.projectId,
+    sourceCaseId: dto.sourceCaseId ?? null,
     key: dto.key,
     title: dto.title,
     description: dto.description,

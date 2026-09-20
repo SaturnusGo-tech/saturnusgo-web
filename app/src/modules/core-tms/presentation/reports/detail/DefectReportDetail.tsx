@@ -13,6 +13,7 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedComponentLabel, localizedLabel } from "../../../localization/format/labels";
 import { DefectDiscussion } from "./discussion/DefectDiscussion";
 import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShareItem";
+import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
 import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import type { DefectRetest } from "../../../runs/verification/state/defect/useDefectRetest";
 import { DefectRetestAction } from "./retest/DefectRetestAction";
@@ -88,7 +89,11 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
                 onClick={() => onOpenRun(defect.runId!, defect.runItemId)}>{run ? `${run.key} · ${run.name}` : defect.runId}</button></dd></div>
               <div><dt>{t("reports.runItem")}</dt><dd>{defect.runItemId || "—"}</dd></div>
               <div><dt>{t("reports.step")}</dt><dd>{defect.stepId || "—"}</dd></div>
-            </dl> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}
+            </dl> : defect.sourceCaseId ? <a className={detail.originLink} href={buildCaseDeepLink(
+              typeof window === "undefined" ? "https://tms.saturnusgo.com/" : window.location.href,
+              { projectId: defect.projectId, caseId: defect.sourceCaseId })}>
+              {locale === "ru" ? "Открыть тест-кейс" : "Open test case"}
+            </a> : <p className={surface.mutedText}>{t("reports.noRunContext")}</p>}
           </DetailSection>
         </main>
         <aside className={surface.sideRail} aria-label={t("reports.properties")}>

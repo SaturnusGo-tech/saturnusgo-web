@@ -2,7 +2,8 @@ import { usePortfolioRepository } from "../../repository-scope/state/usePortfoli
 import { useRepositoryScope } from "../../repository-scope/state/useRepositoryScope";
 import { useFolderNavigation } from "../../folders/navigation/useFolderNavigation";
 import { useWorkspaceFolders } from "../../folders/state/workspace/useWorkspaceFolders";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { DefectCaseSource } from "../../defects/model/case-source";
 import { useCaseActions } from "../case-actions/useCaseActions";
 import { useRunActions } from "../run-actions/useRunActions";
 import { useRunArchive } from "../run-archive/useRunArchive";
@@ -39,6 +40,18 @@ export function useWorkspaceModel() {
   const runStart = useRunStart(state, derived);
   const caseBulk = useCaseBulkActions(state, derived, workspace.notify);
   const capabilities = state.data.meta.authorization.capabilities;
+  const [caseDefectSource, setCaseDefectSource] = useState<DefectCaseSource | null>(null);
+  const canCreateDefect = capabilities.includes("defect:manage");
+  useEffect(() => {
+    if (state.dialog !== "case-defect" || caseDefectSource?.workspaceId !== state.data.workspace.id) setCaseDefectSource(null);
+  }, [state.dialog, state.data.workspace.id, caseDefectSource?.workspaceId]);
+  function openCaseDefect() {
+    if (!canCreateDefect || !derived.selectedCase || !derived.selectedRevision
+      || derived.selectedCase.archivedAt || state.dialog) return;
+    setCaseDefectSource({ workspaceId: state.data.workspace.id,
+      testCase: derived.selectedCase, revision: derived.selectedRevision });
+    state.setDialog("case-defect");
+  }
   const caseCollaboration = useCaseCollaboration({
     active: state.view === "cases" || state.view === "portfolios",
     connected: state.connection === "connected",
@@ -93,6 +106,7 @@ export function useWorkspaceModel() {
     selectedDefectResource,
     sharedSteps,
     verification, defectRetest,
+    caseDefectSource, openCaseDefect, canCreateDefect,
     canManageIntegrations: capabilities.includes("integration:manage"),
   };
 }

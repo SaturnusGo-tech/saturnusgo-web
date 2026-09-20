@@ -24,7 +24,7 @@ type Input = {
 };
 
 const commentKey = (comment: TestCaseComment) => comment.id;
-const defectKey = (defect: CaseLinkedDefect) => defect.occurrence.id;
+const defectKey = (defect: CaseLinkedDefect) => defect.occurrence?.id ?? defect.defectId;
 import { scheduleVisibleDefectRefresh } from "../defect-refresh/visible-defect-refresh";
 export { scheduleVisibleDefectRefresh, DEFECT_VISIBLE_REFRESH_INTERVAL } from "../defect-refresh/visible-defect-refresh";
 
@@ -143,7 +143,7 @@ export function useCaseCollaboration(input: Input) {
 
   const confirmFix = useCallback(async (defect: CaseLinkedDefect) => {
     if (!available || !input.canConfirmFix || confirmingOccurrenceId
-      || !canConfirmDefectFix(defect)) return false;
+      || !defect.occurrence || !canConfirmDefectFix(defect)) return false;
     const signature = JSON.stringify({
       defectId: defect.defectId, etag: defect.defectEtag, evidence: defect.eligibleRetest,
     });

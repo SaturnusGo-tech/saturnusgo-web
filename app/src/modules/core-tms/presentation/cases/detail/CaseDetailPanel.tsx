@@ -38,6 +38,7 @@ export type CaseDetailPanelProps = {
   onNew: (folder?: string) => void;
   onEdit: () => void;
   onClone: () => void;
+  onCreateDefect?: () => void;
   onArchive: () => void;
   onRunCase: () => void;
   fullscreen: boolean;
@@ -146,6 +147,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onRunCase={runCase}
         onToggleFullscreen={props.onToggleFullscreen}
         onClone={props.onClone}
+        onCreateDefect={props.onCreateDefect}
         onArchive={props.onArchive}
         onClose={props.onClose}
       />

@@ -21,7 +21,7 @@ const defaultTimers: TimerApi = {
 
 export function pendingDefectTransitionSignature(defects: readonly CaseLinkedDefect[]) {
   return defects.filter(hasPendingYouTrackWork)
-    .map((defect) => `${defect.occurrence.id}:${!defect.youTrack
+    .map((defect) => `${defect.occurrence?.id ?? defect.defectId}:${!defect.youTrack
       ? `creation:${defect.youTrackCreation!.status}` : defect.youTrackTransition!.status}`)
     .join("|");
 }

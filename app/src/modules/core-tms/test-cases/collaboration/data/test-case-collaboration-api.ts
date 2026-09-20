@@ -48,6 +48,7 @@ export async function listTestCaseDefects(
   signal?: AbortSignal,
 ) {
   const query = pageQuery(projectId, cursor);
+  query.set("includeDirect", "true");
   const page = await http.get<Api["TestCaseLinkedDefectListEnvelope"]>(
     `/test-cases/${caseId}/defects?${query}`, signal,
   );
@@ -74,7 +75,7 @@ export async function confirmDefectFix(
 function mapLinkedDefect(dto: Api["TestCaseLinkedDefect"]): CaseLinkedDefect {
   return {
     ...dto,
-    occurrence: { ...dto.occurrence },
+    occurrence: dto.occurrence ? { ...dto.occurrence } : null,
     youTrack: dto.youTrack ? { ...dto.youTrack } : null,
     youTrackCreation: dto.youTrackCreation ? { ...dto.youTrackCreation } : null,
     statusHistory: dto.statusHistory.map((event) => ({ ...event })),

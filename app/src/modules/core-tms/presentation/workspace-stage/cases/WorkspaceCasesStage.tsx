@@ -26,6 +26,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     onNew={model.openNewCase}
     onEdit={model.openEditCase}
     onClone={model.cloneCase}
+    onCreateDefect={model.canCreateDefect ? model.openCaseDefect : undefined}
     onArchive={model.toggleArchiveCase}
     onRunCase={() => model.selectedCase
       && model.openRunDialog({ caseIds: [model.selectedCase.id] })}

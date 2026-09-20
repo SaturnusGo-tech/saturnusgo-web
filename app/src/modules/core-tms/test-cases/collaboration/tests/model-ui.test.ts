@@ -141,7 +141,7 @@ test("collaboration resources and mutations are isolated by project and case", (
 test("step labels use the immutable occurrence snapshot", () => {
   assert.equal(defectStepLabel("ru", defect(null).occurrence), "Шаг 2");
   assert.equal(defectStepLabel("en", {
-    ...defect(null).occurrence, stepId: null, stepOrder: null, stepAction: null,
+    ...defect(null).occurrence!, stepId: null, stepOrder: null, stepAction: null,
   }), "Entire test case");
   assert.equal(youTrackTargetLabel("ru", "Acceptance"), "Приёмка");
   assert.equal(youTrackTargetLabel("en", "Staging"), "Staging");
@@ -185,7 +185,7 @@ test("collaboration UI exposes real links, cursor retry, and durable sync truth"
   assert.match(comments, /<time dateTime=\{comment\.createdAt\}>/);
   assert.doesNotMatch(comments, /<form/);
   assert.match(activity, /model\.retryDefects/); assert.match(activity, /model\.loadMoreDefects/);
-  assert.match(activity, /key=\{defect\.occurrence\.id\}/);
+  assert.match(activity, /key=\{defect\.occurrence\?\.id \?\? defect\.defectId\}/);
   assert.match(activity, /aria-busy="true"/);
   assert.doesNotMatch(activity, /status === "error"\) return/);
   assert.match(activity, /&& !props\.model\.defects\.refreshFailed/);

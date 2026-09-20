@@ -1883,6 +1883,16 @@
           },
           {
             "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "includeDirect",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Include defects created directly from this case without a run. Such records have occurrence=null."
           }
         ],
         "responses": {
@@ -23728,7 +23738,15 @@
             "$ref": "#/components/schemas/Identifier"
           },
           "occurrence": {
-            "$ref": "#/components/schemas/TestCaseLinkedDefectOccurrence"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TestCaseLinkedDefectOccurrence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null for a direct case defect; returned only when includeDirect=true."
           },
           "falconUrl": {
             "type": "string",
@@ -25663,6 +25681,17 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "sourceCaseId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation."
           }
         }
       },
@@ -25764,6 +25793,17 @@
           },
           "actualResult": {
             "$ref": "#/components/schemas/LongText"
+          },
+          "sourceCaseId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Direct source test case in the same project, without creating a run. Mutually exclusive with runId, runItemId and stepId; immutable after creation."
           }
         },
         "allOf": [

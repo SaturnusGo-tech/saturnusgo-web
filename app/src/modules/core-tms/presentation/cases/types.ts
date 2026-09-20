@@ -30,6 +30,7 @@ export type CasesViewProps = {
   onNew: (folderPath?: string) => void;
   onEdit: () => void;
   onClone: () => void;
+  onCreateDefect?: () => void;
   onArchive: () => void;
   onRunCase: () => void;
   onRunCases: (caseIds: string[]) => void;

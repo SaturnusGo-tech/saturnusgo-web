@@ -119,6 +119,7 @@ export function CasesView(props: CasesViewProps) {
             onNew={view.createCase}
             onEdit={props.onEdit}
             onClone={props.onClone}
+            onCreateDefect={props.onCreateDefect}
             onArchive={props.onArchive}
             onRunCase={props.onRunCase}
             fullscreen={view.detailFullscreen}

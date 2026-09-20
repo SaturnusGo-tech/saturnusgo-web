@@ -56,7 +56,7 @@ export function defectStepLabel(
   locale: TmsLocale,
   occurrence: CaseLinkedDefect["occurrence"],
 ) {
-  if (!occurrence.stepId) return locale === "ru" ? "Весь тест-кейс" : "Entire test case";
+  if (!occurrence?.stepId) return locale === "ru" ? "Весь тест-кейс" : "Entire test case";
   return occurrence.stepOrder === null
     ? (locale === "ru" ? "Шаг теста" : "Test step")
     : `${locale === "ru" ? "Шаг" : "Step"} ${occurrence.stepOrder}`;
@@ -74,7 +74,7 @@ export function activityActorLabel(actor: string) {
 }
 
 export function hasExactFixVerification(defect: CaseLinkedDefect) {
-  return defect.fixVerification?.occurrenceId === defect.occurrence.id;
+  return Boolean(defect.occurrence && defect.fixVerification?.occurrenceId === defect.occurrence?.id);
 }
 
 export function fixVerificationSourceLabel(
@@ -85,13 +85,13 @@ export function fixVerificationSourceLabel(
   const verification = defect.fixVerification;
   if (!verification) return "";
   const ru = locale === "ru";
-  if (verification.occurrenceId === defect.occurrence.id) {
+  if (verification.occurrenceId === defect.occurrence?.id) {
     return ru ? "этого баг-репорта" : "this bug report";
   }
   if (verification.testCaseId !== currentCaseId) {
     return ru ? "другого тест-кейса" : "another test case";
   }
-  if (verification.stepId !== null && verification.stepId === defect.occurrence.stepId) {
+  if (verification.stepId !== null && verification.stepId === defect.occurrence?.stepId) {
     return ru ? "другого прогона этого шага" : "another run of this step";
   }
   return ru ? "другого баг-репорта этого тест-кейса" : "another report in this test case";

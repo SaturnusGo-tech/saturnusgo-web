@@ -53,7 +53,7 @@ export type CaseLinkedDefect = {
     stepOrder: number | null;
     stepAction: string | null;
     createdAt: string;
-  };
+  } | null;
   falconUrl: string;
   youTrack: null | {
     id: string;
@@ -119,7 +119,7 @@ export function readyDefectCount(defects: readonly CaseLinkedDefect[]) {
 }
 
 export function canConfirmDefectFix(defect: CaseLinkedDefect) {
-  return defect.readyForTest
+  return defect.occurrence !== null && defect.readyForTest
     && defect.fixConfirmationBlockedReason === null
     && defect.eligibleRetest !== null
     && defect.eligibleRetest.occurrenceId === defect.occurrence.id;
