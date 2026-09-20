@@ -39,8 +39,8 @@ export function InspectorDetails({ revision, editing, autoFocus = true, ru, onPa
     <div><dt>{labels.owner}</dt><dd><ResponsibleName workspaceId={workspaceId} offline={offline} identityId={revision.ownerIdentityId} /></dd></div>
     <div><dt>{ru ? "Автор ревизии" : "Revision author"}</dt><dd><ResponsibleName workspaceId={workspaceId} offline={offline} identityId={revision.createdBy || null} /></dd></div>
     {testCaseId && <CaseAuthor caseId={testCaseId} />}
-    {rows.map(([label, value]) => <div key={label}>
-    <dt>{label}</dt><dd>{value || labels.empty}</dd>
+    {rows.map(([label, value]) => <div className={css.scrollableSummaryRow} key={label}>
+    <dt>{label}</dt><dd className={css.summaryScroll} tabIndex={0} role="region" aria-label={label}>{value || labels.empty}</dd>
     </div>)}
   </dl>;
 }

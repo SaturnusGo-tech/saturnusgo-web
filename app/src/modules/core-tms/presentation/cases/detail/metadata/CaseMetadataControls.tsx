@@ -28,6 +28,7 @@ type Props = {
   editing: boolean;
   autoFocus?: boolean;
   showLabels?: boolean;
+  inlineLabels?: boolean;
   onChange?: (revision: TestCaseRevision) => void;
 };
 
@@ -41,7 +42,7 @@ export function CaseMetadataControls(props: Props) {
       [ru ? "Тип" : "Type", <TypeBadge key="type" locale={props.locale} type={props.revision.type} />],
       [ru ? "Оценка" : "Estimate", <EstimateBadge key="estimate" locale={props.locale} minutes={props.revision.estimatedMinutes} />],
     ] as const;
-    return <div className={`${styles.controls} ${styles.readControls}`}>
+    return <div className={`${styles.controls} ${styles.readControls} ${props.inlineLabels ? styles.inlineLabels : ""}`}>
       {badges.map(([label, badge]) => props.showLabels
         ? <div className={styles.labelledControl} key={label}><span className={styles.controlLabel}>{label}</span>{badge}</div>
         : badge)}
@@ -90,7 +91,7 @@ export function CaseMetadataControls(props: Props) {
     ? discardedProcedureCount(props.revision, pendingType) : 0;
 
   return <>
-    <div className={styles.controls}>
+    <div className={`${styles.controls} ${props.inlineLabels ? styles.inlineLabels : ""}`}>
       {labelled(ru ? "Статус" : "Status", <MetadataSelect label={ru ? "Статус" : "Status"} value={props.revision.lifecycle} options={lifecycle} onChange={(value) => update("lifecycle", value)} autoFocus={props.autoFocus} />)}
       {labelled(ru ? "Приоритет" : "Priority", <MetadataSelect label={ru ? "Приоритет" : "Priority"} value={props.revision.priority} options={priority} onChange={(value) => update("priority", value)} />)}
       {labelled(ru ? "Тип" : "Type", <MetadataSelect label={ru ? "Тип" : "Type"} value={props.revision.type} options={type} onChange={requestTypeChange} />)}
