@@ -166,8 +166,3 @@
 
 .menu:popover-open { position:fixed; inset:auto; margin:0; left:var(--menu-left); top:var(--menu-top); min-width:var(--menu-width); max-width:min(220px,calc(100vw - 24px)); }
 .menu::backdrop { background:transparent; pointer-events:none; }
-
-.inlineLabels { gap: 8px; }
-.inlineLabels .labelledControl { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: center; gap: 12px; min-height: 28px; }
-.inlineLabels .labelledControl > :last-child { justify-self: end; min-width: 0; max-width: 100%; }
-.inlineLabels .labelledControl > .select { width: 100%; }

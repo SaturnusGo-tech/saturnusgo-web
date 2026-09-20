@@ -47,6 +47,7 @@
 .section > header { min-height: 28px; display: flex; align-items: center; gap: 7px; padding: 0 0 8px; }
 .section > header h3 { margin: 0; color: var(--cases-strong); font-size: 14px; font-weight: 650; line-height: 1.3; }
 .section > header .iconButton { margin-left: auto; opacity: .45; }
+.sideRail .section > header .iconButton { margin-left: 0; }
 .section:hover > header .iconButton, .section > header .iconButton:focus-visible { opacity: 1; }
 .sideRail .section > header h3 { font-size: 13px; }
 .sectionBody { min-width: 0; transition: opacity 140ms ease; }
@@ -145,12 +146,3 @@
 .borderedMarkdown > div { border: 1px solid var(--cases-control-border); border-radius: 12px; padding: 8px; min-width: 0; }
 .borderedMarkdown > div:focus-within { border-color: var(--cases-primary); }
 .titleInput[aria-invalid="true"] { border-color: #b4494f; }
-
-.sideRail .railFacts, .sideRail .compactSummary > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: start; gap: 12px; min-height: 28px; margin: 0; }
-.sideRail .railFacts strong, .sideRail .compactSummary dd { min-width: 0; max-width: 100%; margin: 0; text-align: right; }
-.sideRail .compactSummary { gap: 10px; }
-.sideRail .compactSummary dt, .sideRail .railFacts > span { padding-top: 3px; }
-.sideRail .compactSummary dd > span { max-width: 100%; }
-.sideRail .compactSummary > .scrollableSummaryRow { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-.sideRail .summaryScroll { overflow-x: auto; overscroll-behavior-x: contain; white-space: nowrap; overflow-wrap: normal; text-align: left; scrollbar-width: thin; scrollbar-color: var(--cases-control-border) transparent; padding-bottom: 4px; }
-.summaryScroll:focus-visible { outline: 2px solid var(--cases-primary); outline-offset: 2px; border-radius: 4px; }
