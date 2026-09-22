@@ -42,9 +42,10 @@
 .tag { display: block; padding: 7px 10px; margin: 0 3px; border-radius: 8px; background: var(--cases-control); }
 .footer { display: grid; gap: 10px; flex-shrink: 0; margin-top: 16px; padding: 12px 4px 2px; border-top: 1px solid var(--cases-row-border); }
 .archive { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--cases-muted); font-size: 11px; }
-.archive input { appearance: none; flex-shrink: 0; width: 30px; height: 18px; margin: 0; border-radius: 999px; background: var(--cases-control-border); border: 0; cursor: pointer; position: relative; }
+.panel .archive input { appearance: none; flex: 0 0 30px; width: 30px; height: 18px; margin: 0; border-radius: 999px; background: var(--cases-control-border); border: 0; cursor: pointer; position: relative; }
 .archive input::after { content: ""; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px; border-radius: 50%; background: #fff; transition: transform 120ms ease; }
-.archive input:checked { background: var(--cases-primary); }
+.panel .archive input:checked { background: var(--cases-primary); }
+.panel .archive input:focus-visible { outline: 1px solid var(--cases-primary) !important; outline-offset: 2px; box-shadow: none; }
 .archive input:checked::after { transform: translateX(12px); }
 .footer .reset { justify-self: start; padding: 4px 0; background: transparent; color: var(--cases-link); font-size: 12px; }
 .empty { margin: 18px 8px; color: var(--cases-muted); font-size: 12px; }
