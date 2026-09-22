@@ -50,3 +50,17 @@ test("a newly created subfolder remains visible under a search filter and its co
   assert.ok((after.props.node as ReturnType<typeof buildFolderTree>["roots"][number]).children.some(node => node.folder.id === "created"));
   app.dispose();
 });
+
+test("a drop destination remains expanded when it gains direct cases, including after a repeated reveal", () => {
+  const app = browserHarness();
+  const branches = () => find(app.renderTree(), node => node.type === "RepositoryFolderBranch");
+  const pay = branches().find(node => (node.props.node as { folder: { id: string } }).folder.id === "pay")!;
+  assert.ok((pay.props.expanded as ReadonlySet<string>).has("pay"));
+  const reveal = pay.props.onReveal as (id: string) => void;
+  reveal("pay"); reveal("pay");
+  app.props.testCases = app.props.testCases.map(item => item.id === "profile-case" ? { ...item, folderId: "pay", folderPath: "/Payments" } : item);
+  const after = branches().find(node => (node.props.node as { folder: { id: string } }).folder.id === "pay")!;
+  assert.ok((after.props.expanded as ReadonlySet<string>).has("pay"), "Direct cases must not close their previously open destination");
+  assert.ok((after.props.node as ReturnType<typeof buildFolderTree>["roots"][number]).cases.some(item => item.id === "profile-case"));
+  app.dispose();
+});

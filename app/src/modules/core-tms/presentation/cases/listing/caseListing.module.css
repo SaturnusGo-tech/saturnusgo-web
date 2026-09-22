@@ -103,8 +103,7 @@
 
 .groupPopover { left: 66px; }
 .actionPopover { top: 34px; right: 0; width: 184px; min-width: 184px; padding: 3px; }
-.actionPopover button svg,
-.filterMenuHeader > button svg { margin: 0 !important; }
+.actionPopover button svg { margin: 0 !important; }
 .popover button { width: 100%; min-height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 7px; color: var(--cases-secondary-text); background: transparent; border: 0; border-radius: 3px; cursor: pointer; text-align: left; }
 .popover button:hover,
 .popover .optionActive { color: var(--cases-strong); background: var(--cases-hover-strong); }
@@ -132,33 +131,8 @@
   line-height: 1;
   pointer-events: none;
 }
-.filterPanel { right: 0; width: 264px; max-height: min(362px, calc(100vh - 112px)); overflow: hidden; padding: 3px; }
-.filterMenuHeader { height: 32px; display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; padding: 0 2px; border-bottom: 1px solid var(--cases-row-border); }
-.filterMenuHeader strong { grid-column: 2; color: var(--cases-strong); font-size: 11px; font-weight: 600; }
-.filterMenuHeader > .backButton { grid-column: 1; grid-row: 1; }
-.filterMenuHeader > .closeButton { grid-column: 3; grid-row: 1; }
-.filterMenuHeader > button { min-height: 24px; justify-content: center; padding: 0; }
-.filterMenuBody { padding: 3px 0 0; max-height: min(316px, calc(100dvh - 170px)); overflow-y: auto; scrollbar-width: thin; }
-.filterMenuBody > button { min-height: 29px; }
-.filterMenuBody > button > span:not(.checkboxMark) { min-width: 0; flex: 1; }
-.filterMenuBody > button small { max-width: 86px; margin-left: auto; overflow: hidden; color: var(--cases-faint); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
-.filterMenuBody > button svg:last-child { flex: 0 0 auto; margin-left: 0; color: var(--cases-muted); }
-.compactTag { min-height: 34px; display: grid; grid-template-columns: 54px 1fr; align-items: center; gap: 6px; padding: 3px 7px; color: var(--cases-secondary-text); font-size: 11px; }
-.compactTag input,
-.facetSearch input { min-width: 0; height: 26px; padding: 0 7px; color: var(--cases-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; outline: 0; }
-.compactTag input:focus,
-.facetSearch:focus-within { border-color: var(--tms-focus-border); box-shadow: 0 0 0 2px var(--tms-focus-ring); }
-.checkboxMark { width: 14px; height: 14px; display: grid; place-items: center; flex: 0 0 14px !important; color: var(--cases-on-primary); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; }
-[aria-checked="true"] > .checkboxMark { background: var(--cases-primary); border-color: var(--cases-primary); }
-.resetButton { justify-content: center; margin-top: 3px; color: var(--cases-link) !important; border-top: 1px solid var(--cases-row-border) !important; border-radius: 0 !important; font-size: 10px; }
-.facetSearch { height: 32px; display: flex; align-items: center; gap: 6px; margin: 5px; padding: 0 7px; color: var(--cases-muted); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; }
-.facetSearch input { height: auto; flex: 1; padding: 0; background: transparent; border: 0; }
-.facetOptions { max-height: 244px; overflow: auto; padding: 0 2px 2px; scrollbar-color: var(--cases-control-border) transparent; }
-.facetOptions button { min-height: 28px; justify-content: space-between; }
-.facetOptions button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.facetOptions button + button { border-top: 1px solid var(--cases-row-border); border-radius: 0; }
-.noOptions { min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 8px; color: var(--cases-faint); font-size: 10px; text-align: center; }
 
+.noOptions { min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 8px; color: var(--cases-faint); font-size: 10px; text-align: center; }
 .qlSuggestions { top: 34px; left: 0; width: min(360px, calc(100% - 2px)); max-height: 224px; overflow: auto; transform-origin: top left; }
 .qlSyntax { display: flex; gap: 12px; padding: 4px 7px 6px; color: var(--cases-faint); border-bottom: 1px solid var(--cases-row-border); font-size: 9px; }
 .qlSyntax span { display: inline-flex; align-items: center; gap: 4px; }
@@ -273,7 +247,6 @@
   .segmentButton { width: 30px; padding: 0; }
 }
 
-.filterMenuBody small[data-active] { color: var(--cases-primary); }
 
 .qlHelp { padding: 5px 2px 0; color: var(--cases-muted); font-size: 11px; line-height: 1.45; }
 .qlHelp[data-error] { color: var(--cases-danger, #be555f); }

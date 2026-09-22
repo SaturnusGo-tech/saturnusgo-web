@@ -18,8 +18,6 @@
 .controls .create:hover:not(:disabled) { background: #2d68dc; }
 .create > :is(span,svg) { color: #fff; }
 .filter { position: relative; }
-.filter > div { left: -86px; right: auto; max-width: min(300px, calc(100vw - 40px)); border-radius: 13px; box-shadow: 0 10px 30px #0002; }
-.filter > div button { border-radius: 8px; }
 .ql > div > label { border-radius: 9px; }
 .ql > div > div { max-width: calc(100vw - 40px); border-radius: 12px; }
 .selection { display: grid; grid-template-columns: 0fr; min-width: 0; flex: 1; opacity: 0; visibility: hidden; transition: grid-template-columns 240ms cubic-bezier(.22,.61,.36,1), opacity 180ms ease, visibility 0s 240ms; }
@@ -30,14 +28,13 @@
 .selection button:hover:not(:disabled) { background: var(--cases-hover); }
 .controls { container: repository-controls / inline-size; }
 .filter { position: static; }
-.filter > div { left: 0; top: calc(100% + 5px); width: 100%; }
 @container repository-controls (max-width: 400px) { .tools .tool > span { display: none; } }
 @media(prefers-reduced-motion:reduce) { .selection { transition: none; } }
 .controls .tool { border: 0; background: transparent; cursor: pointer; }
 
 .controls[data-inline=true]{display:grid;grid-template-columns:minmax(120px,1fr) auto;align-items:center;gap:8px;margin-bottom:8px}
 .controls[data-inline=true] .searchRow{min-width:0}.controls[data-inline=true] .tools{margin:0;gap:5px}
-.controls[data-inline=true] .filter>div{left:auto;right:0}.controls[data-inline=true]>div:last-child:not(.tools):not(.searchRow){grid-column:1/-1}
+.controls[data-inline=true]>div:last-child:not(.tools):not(.searchRow){grid-column:1/-1}
 
 .queryHint { display: block; font-size: 11px; color: var(--cases-muted); margin: 6px 0; }
 

@@ -1,15 +1,16 @@
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
-import { PointerSensor, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { PointerSensor, pointerWithin, type CollisionDetection, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import type { PointerSensorOptions } from "@dnd-kit/core";
 import ts from "typescript";
-import { dragCaseIds } from "../../../model/tree";
+import { canDropRepositoryDrag, repositoryDrag } from "../../../model/drag/repository-drop";
 import type { FolderMutationResult, FolderResource, RepositoryFolder } from "../../../model/folder";
 import type { RepositoryDragContext } from "../RepositoryDragContext";
 
 type Element = { type: unknown; props: Record<string, unknown> };
 type ContextProps = {
   sensors: { sensor: typeof PointerSensor; options: PointerSensorOptions }[];
+  collisionDetection: CollisionDetection;
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onDragCancel: () => void;
@@ -56,12 +57,13 @@ export function dragHarness(selected = new Set<string>()) {
           return [slots[index], (next: unknown) => { slots[index] = next; }];
         },
         useRef(current: unknown) { const index = cursor++; return slots[index] ?? (slots[index] = { current }); },
+        useEffect() {},
       };
-      if (name === "@dnd-kit/core") return { DndContext: "DndContext", DragOverlay: "DragOverlay", PointerSensor,
+      if (name === "@dnd-kit/core") return { DndContext: "DndContext", DragOverlay: "DragOverlay", PointerSensor, pointerWithin,
         useSensor: (sensor: unknown, options: unknown) => ({ sensor, options }), useSensors: (...sensors: unknown[]) => sensors };
-      if (name === "react-icons/pi") return { PiFilesDuotone: "FilesIcon" };
-      if (name.endsWith("model/tree")) return { dragCaseIds };
-      if (name.endsWith("drag-click")) return { DragClickContext: { Provider: "DragClickProvider" } };
+      if (name === "react-icons/pi") return { PiFilesDuotone: "FilesIcon", PiFolderSimpleDuotone: "FolderIcon" };
+      if (name.endsWith("repository-drop")) return { canDropRepositoryDrag, repositoryDrag };
+      if (name.endsWith("drag-click")) return { DragClickContext: { Provider: "DragClickProvider" }, RepositoryDragSelectionContext: { Provider: "DragSelectionProvider" } };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };
       throw new Error(`Unexpected import ${name}`);
     },
@@ -72,12 +74,15 @@ export function dragHarness(selected = new Set<string>()) {
     context().onDragStart({ active, activatorEvent: new Event("pointerdown") });
   }
   function drop(active: ReturnType<typeof caseDrag> | ReturnType<typeof folderDrag>, target: string | null | undefined, over = true) {
+    if (!selection().active) start(active);
     context().onDragEnd({ active, activatorEvent: new Event("pointerup"), collisions: null, delta: { x: 0, y: 0 },
       over: over ? { id: "destination", disabled: false, data: { current: { folderId: target } },
         rect: { top: 0, left: 0, right: 100, bottom: 40, width: 100, height: 40 } } : null });
   }
   const preview = () => elements(render(), (element) => element.props.className === "dragPreview");
+  const label = () => elements(preview(), element => element.type === "span")[0]?.props.children;
+  const selection = () => elements(render(), element => element.type === "DragSelectionProvider")[0].props.value as { active: boolean; caseIds: ReadonlySet<string>; folderId: string | null };
   const alerts = () => elements(render(), (element) => element.props.role === "alert");
-  return { props, moves, updates, render, context, start, drop, preview, alerts,
+  return { props, moves, updates, render, context, start, drop, preview, label, selection, alerts,
     suppressUntil: () => (elements(render(), (element) => element.type === "DragClickProvider")[0].props.value as { current: number }).current };
 }

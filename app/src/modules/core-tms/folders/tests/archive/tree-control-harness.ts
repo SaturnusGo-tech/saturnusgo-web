@@ -23,7 +23,8 @@ export function treeControl(path: string, exportName: string) {
     require(name: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("useDisclosureMotion")) return { useDisclosureMotion: (open: boolean) => ({ ref: { current: null }, present: open }) };
-      if (name === "react") return { useRef: (current: unknown) => ({ current }), useContext: () => ({ current: 0 }) };
+      if (name === "react") return { useRef: (current: unknown) => ({ current }), useContext: () => ({ current: 0, active: false, caseIds: new Set(), folderId: null }) };
+      if (name.endsWith("useFolderDropReveal")) return { useFolderDropReveal() {} };
       if (name === "@dnd-kit/core") return {
         useDraggable({ disabled }: { disabled: boolean }) {
           dragStates.push(disabled);
@@ -35,7 +36,7 @@ export function treeControl(path: string, exportName: string) {
       if (name.endsWith("RepositoryCaseLeaf")) return { RepositoryCaseLeaf: "CaseLeaf" };
       if (name.endsWith("RepositoryQuickAdd")) return { RepositoryQuickAdd: "RepositoryQuickAdd" };
       if (name.endsWith("CaseQuickAdd")) return { CaseQuickAdd: "CaseQuickAdd" };
-      if (name.endsWith("drag-click")) return { DragClickContext: {} };
+      if (name.endsWith("drag-click")) return { DragClickContext: {}, RepositoryDragSelectionContext: {} };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };
       throw new Error(`Unexpected import ${name}`);
     },

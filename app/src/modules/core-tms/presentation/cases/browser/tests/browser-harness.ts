@@ -16,7 +16,7 @@ import { elements } from "../../bulk/action/tests/bulk-harness";
 export { elements };
 function runtime() {
   const h = hookHarness("https://tms.example/work/?workspaceId=w&projectId=p&view=cases");
-  Object.assign(h.react, { useDeferredValue: <T>(value: T) => value, useMemo<T>(compute: () => T, dependencies: readonly unknown[]) {
+  Object.assign(h.react, { useContext: () => ({ active: false, caseIds: new Set(), folderId: null }), useDeferredValue: <T>(value: T) => value, useMemo<T>(compute: () => T, dependencies: readonly unknown[]) {
     const ref = h.react.useRef<{ deps?: readonly unknown[]; value?: T }>({}) as { current: { deps?: readonly unknown[]; value?: T } };
     if (!ref.current.deps || dependencies.some((value, i) => !Object.is(value, ref.current.deps?.[i]))) ref.current = { deps: dependencies, value: compute() };
     return ref.current.value;

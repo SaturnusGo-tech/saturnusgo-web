@@ -2,7 +2,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { useContext, type ReactNode } from "react";
 import { PiListChecks } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
-import { DragClickContext } from "../dnd/drag-click";
+import { DragClickContext, RepositoryDragSelectionContext } from "../dnd/drag-click";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 import { CaseQuickAdd } from "./CaseQuickAdd";
 import css from "../styles/repository.module.css";
@@ -13,10 +13,11 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canM
   item: TestCaseSummary; depth: number; selected: boolean; active: boolean; locked: boolean; canManage: boolean;
   ru: boolean; onToggle: (id: string) => void; onOpen: (item: TestCaseSummary) => void;
 }) {
-  const drag = useDraggable({ id: `tree-case:${item.id}`, data: { kind: "case", caseId: item.id }, disabled: locked || !canManage || Boolean(item.archivedAt) });
+  const drag = useDraggable({ id: `tree-case:${item.id}`, data: { kind: "case", caseId: item.id, name: item.title, archived: Boolean(item.archivedAt) }, disabled: locked || !canManage || Boolean(item.archivedAt) });
   const suppress = useContext(DragClickContext);
+  const moving = useContext(RepositoryDragSelectionContext);
   const quickCreate = creation && canManage && !item.archivedAt;
-  return <li className={css.leaf} data-quick-create={quickCreate || undefined} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} style={{ opacity: drag.isDragging ? .35 : 1 }}>
+  return <li className={css.leaf} data-quick-create={quickCreate || undefined} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} data-drag-source={moving.caseIds.has(item.id) || undefined}>
     <span className={css.caseRail} aria-hidden="true" />
     <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || (Boolean(item.archivedAt) && !allowArchivedSelection)}
       aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />

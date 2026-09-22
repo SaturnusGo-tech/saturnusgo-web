@@ -1,5 +1,5 @@
 import { useDroppable } from "@dnd-kit/core";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PiArchiveDuotone, PiFolderPlusDuotone, PiUploadSimple, PiPlus } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
@@ -10,6 +10,8 @@ import { RepositoryFolderBranch } from "../branch/RepositoryFolderBranch";
 import { RepositoryCaseLeaf } from "../case/RepositoryCaseLeaf";
 import { FolderActionsDialog } from "../actions/FolderActionsDialog";
 import { useRepositoryWidth, REPOSITORY_MIN, REPOSITORY_MAX } from "../resize/useRepositoryWidth";
+import { RepositoryDragSelectionContext } from "../dnd/drag-click";
+import { RepositoryDropReveal } from "./RepositoryDropReveal";
 import css from "../styles/repository.module.css";
 
 export function RepositoryFolders(props: {
@@ -20,6 +22,7 @@ export function RepositoryFolders(props: {
   controls?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; onArchiveChange?: (archived: boolean) => void;
 }) {
   const { resource, ru } = props;
+  const moving = useContext(RepositoryDragSelectionContext);
   const resize = useRepositoryWidth();
   const [revealed, setExpanded] = useState<Set<string>>(new Set());
   const [overrides, setOverrides] = useState<Map<string, boolean>>(new Map());
@@ -54,7 +57,7 @@ export function RepositoryFolders(props: {
     }
     return props.filtered ? prune(tree.roots) : tree.roots;
   }, [tree, props.filtered, resource.items, createdFolderId, props.selectedFolderId]);
-  const drop = useDroppable({ id: "folder:root", data: { folderId: null }, disabled: props.locked || archive });
+  const drop = useDroppable({ id: "folder:root", data: { folderId: null }, disabled: props.locked || archive || !resource.canManage || resource.busy || resource.loading });
   useEffect(() => {
     const selected = resource.items.find((item) => item.id === props.selectedFolderId);
     if (selected) setArchive(Boolean(selected.archivedAt));
@@ -74,8 +77,15 @@ export function RepositoryFolders(props: {
     setExpanded((current) => new Set([...current, ...resource.items.filter((folder) => paths.some((path) => path === folder.path || path.startsWith(`${folder.path}/`))).map((folder) => folder.id)]));
   }, [props.filtered, props.cases, resource.items]);
   function toggle(id: string) { setOverrides((current) => new Map(current).set(id, !expanded.has(id))); }
+  function reveal(id: string) {
+    const destination = resource.items.find(folder => folder.id === id && !folder.archivedAt);
+    if (!destination) return;
+    const ids = resource.items.filter(folder => folder.id === id || destination.path.startsWith(`${folder.path}/`)).map(folder => folder.id);
+    setOverrides(current => ids.every(key => current.get(key) === true) ? current : new Map([...current, ...ids.map(key => [key, true] as const)]));
+  }
   return <aside ref={resize.ref} style={resize.style} data-resizing={resize.resizing || undefined} data-selection={props.selectionMode || undefined} data-repository-tree className={css.repository} aria-label={ru ? "Папки и тест-кейсы" : "Folders and test cases"}>
-    <header ref={drop.setNodeRef} className={css.heading} data-drop={drop.isOver || undefined}>
+    {moving.active && <RepositoryDropReveal onReveal={reveal} />}
+    <header className={css.heading}>
       <button className={css.repositoryTitle} disabled={props.locked} title={ru ? "Показать все тест-кейсы" : "Show all test cases"}
         onClick={() => { setArchive(false); props.onFolder(""); }}>{ru ? "Репозиторий" : "Repository"}</button><div>
       <button disabled={props.locked || !resource.canManage} onClick={props.onImport} className={css.headerAction} aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}><PiUploadSimple size={16} /><span>{ru ? "Импорт" : "Import"}</span></button>
@@ -83,14 +93,15 @@ export function RepositoryFolders(props: {
       <button className={css.newCase} disabled={props.locked || !resource.canManage || archive} onClick={() => props.onCreate()} aria-label={ru ? "Новый тест-кейс" : "New test case"} title={ru ? "Новый тест-кейс" : "New test case"}><PiPlus size={18} /></button>
     </div></header>
     {props.controls}
-    <div className={css.treeHeading}><span>{archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>
-      <button aria-pressed={archive} aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button></div>
+    <div ref={drop.setNodeRef} className={css.treeHeading} data-drag-root={moving.active || undefined} data-drop={drop.isOver || undefined}>
+      <span>{moving.active ? (ru ? "В корень репозитория" : "Move to repository root") : archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>
+      <button disabled={moving.active} aria-pressed={archive} aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button></div>
     <div className={css.treeScroll} aria-busy={resource.loading}>
       {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected}
           creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
-          canManage={resource.canManage} onExpand={toggle} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
+          canManage={resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
         {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
           creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
         {!roots.length && !tree.unfiled.length && !resource.error && <li className={css.empty}>{props.filtered ? (ru ? "Тест-кейсы не найдены. Измените поиск или фильтры." : "No matching test cases. Adjust the search or filters.") : archive ? (ru ? "В архиве пока пусто" : "The archive is empty") : (ru ? "Создайте первую папку или импортируйте структуру из JSON." : "Create your first folder or import a structure from JSON.")}</li>}

@@ -29,7 +29,7 @@ export function RepositoryControls({ props, view, locale }: {
       <button ref={qlButton} type="button" className={css.tool} aria-label={ru ? "QL-запрос" : "QL query"} aria-expanded={qlOpen} aria-controls={qlId} data-active={Boolean(view.qlQuery) || undefined}
         onClick={() => { setQlOpen(!qlOpen); if (!qlOpen) requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus()); }}>QL</button>
       <div className={css.filter}>
-        <button ref={filterButton} type="button" className={css.tool} onClick={() => view.setFilterOpen(!view.filterOpen)} aria-expanded={view.filterOpen}
+        <button ref={filterButton} type="button" className={css.tool} onClick={() => view.setFilterOpen(!view.filterOpen)} aria-expanded={view.filterOpen} aria-haspopup="dialog" aria-controls="case-filter-panel"
           aria-label={active ? (ru ? `Фильтры, активно: ${active}` : `Filters, active: ${active}`) : (ru ? "Фильтры" : "Filters")}
           title={ru ? "Фильтры" : "Filters"} data-testid="case-filter-toggle"><PiFunnelSimple size={16} />{active > 0 && <b>{active}</b>}</button>
         {view.filterOpen && <CaseFilterMenu locale={locale} filters={props.filters} facets={view.facetFilters} options={view.facetOptions}

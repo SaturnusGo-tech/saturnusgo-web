@@ -20,7 +20,7 @@ test("the real configured sensor waits 260ms before an unselected case can be dr
   assert.equal(h.moves.length, 0);
   context.mock.timers.tick(1);
   assert.equal(pointer.counts.starts, 1);
-  assert.equal((h.preview()[0].props.children as unknown[])[1], "1 cases");
+  assert.equal(h.label(), "Test case");
   pointer.move(90, 75); pointer.release();
   assert.equal(pointer.counts.moves, 1);
   assert.deepEqual(h.moves[0].ids, ["transfers-unselected"]);

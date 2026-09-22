@@ -87,7 +87,8 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
     + readFileSync(new URL("../../../toolbar/ql/CaseQlAutocomplete.tsx", import.meta.url), "utf8")
     + readFileSync(new URL("../../../toolbar/ql/suggestions/query-suggestions.ts", import.meta.url), "utf8")
     + readFileSync(new URL("../../query/vocabulary/fields.ts", import.meta.url), "utf8");
-  const css = readFileSync(new URL("../../../listing/caseListing.module.css", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../../toolbar/filter/filter-panel.module.css", import.meta.url), "utf8");
+  const popup = readFileSync(new URL("../../../toolbar/filter/useFilterPopup.ts", import.meta.url), "utf8");
   assert.match(popovers, /role="combobox"/);
   assert.match(popovers, /aria-autocomplete="list"/);
   assert.match(popovers, /suggestions: suggestions\.slice\(0, 12\)/);
@@ -96,14 +97,20 @@ test("toolbar exposes keyboard QL autocomplete and bounded contextual facets", (
   assert.doesNotMatch(popovers, /suggestions\.slice\(0, 10\)\.map/);
   assert.match(popovers, /\["ArrowDown", "ArrowUp"\]\.includes\(event\.key\)/);
   assert.match(popovers, /"ArrowDown", "ArrowUp", "Home", "End"/);
-  assert.match(popovers, /data-filter-section="folders"/);
-  assert.match(popovers, /returnSectionRef/);
+  assert.match(popovers, /role="tablist" aria-orientation="vertical"/);
+  assert.match(popovers, /role="tabpanel"/);
+  assert.match(popovers, /popover="manual" role="dialog"/);
+  assert.match(popovers, /data-filter-section=\{item\.id\}/);
   assert.match(popovers, /status: "lifecycle"/);
   assert.match(popovers, /role="listbox"[^>]*aria-multiselectable=/);
   assert.match(popovers, /Поиск папок/);
   assert.match(popovers, /Поиск компонентов/);
-  assert.match(css, /\.filterPanel \{[^}]*max-height: min\(362px/s);
-  assert.match(css, /\.facetOptions \{[^}]*max-height: 244px/s);
+  assert.match(css, /\.panel \{[^}]*max-width: calc\(100vw - 24px\)/s);
+  assert.match(css, /\.content \{[^}]*overflow: auto/s);
+  assert.match(css, /\.content \[role=listbox\] \{[^}]*max-height: 240px/s);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(popup, /showPopover/);
+  assert.match(popup, /Math\.min\(480, available\)/);
   assert.doesNotMatch(toolbar, /filterField|facetList/);
 });
 

@@ -1,4 +1,30 @@
-# Import library and repository toolbar QA
+# Repository filters and drag QA, 2026-09-23
+
+Approved source: the **right-hand filter panel only** in
+`/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-1b529b3d-1d11-4d44-98f4-83f7eca034d2.png`.
+The user explicitly excluded the new-folder redesign. Existing folder-dialog files have no diff against the published `a5daf101` source.
+
+Evidence: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-filters-drag-20260923/evidence/`.
+Source image and `filters-dark.png` were viewed together in the same comparison call. The source is a paired concept board; only its filter portion is relevant. Actual screenshots use native 1280 × 720 CSS px, without zoom; the layout retains Falcon's compact typography rather than scaling the whole board.
+
+## Review result
+
+- Layout: two columns, categories left, options right, close at top right, archive/reset below options. No nested cards or drilldown pages.
+- Typography: existing Geist; 14 px panel title, 13 px navigation and options, 11–12 px secondary controls. No oversized type.
+- Theme: existing Falcon tokens for graphite/light surfaces, faint edge, 16 px radius, restrained shadow, calm blue selected rows. Status/priority rings remain readable in both themes.
+- Content: actual domain values replace the generated reference's fictional review status. No new statuses introduced. Existing fields and custom run filters are preserved.
+- Icons: existing Lucide outline family; selected values use a separate check. Hover and selected backgrounds are independent.
+- Responsive: `filters-narrow.png` verifies 390 × 600. `filters-short.png` verifies 700 × 360 with internal scrolling and reachable footer. Temporary viewport overrides were reset.
+- Keyboard: vertical tab navigation, right-arrow entry into options, Escape close/focus restoration verified. Inputs and buttons retain focus indications.
+- Drag: `multi-case-pickup.png` shows compact stacked preview and subdued selected source rows; `multi-case-result-dark.png` shows the destination still open after a cross-folder move.
+
+Fixed during QA: destination could collapse when its first direct cases arrived; explicit idempotent reveal now survives data refresh. Fixed short-height popup clipping by allowing content to shrink and using full available height when neither side of the trigger has enough space.
+
+Verdict: **PASS for approved filters and repository drag scope**. This is not a claim of exact whole-screen pixel parity: the reference also redesigned folder creation and the surrounding toolbar, which were excluded from this request.
+
+---
+
+# Previous: Import library and repository toolbar QA
 
 Date: 2026-09-22. Local branch `feature/import-file-library`; no deployment.
 

@@ -1,0 +1,24 @@
+.dragPreview {
+  position: relative; isolation: isolate; display: flex; align-items: center; gap: 9px;
+  width: max-content; max-width: min(320px, 75vw); min-height: 42px; padding: 10px 13px;
+  border-radius: 13px; border: 1px solid color-mix(in srgb, var(--tms-text, #222) 12%, transparent);
+  background: color-mix(in srgb, var(--tms-bg-panel, #fff) 94%, transparent); color: var(--tms-text, #222);
+  box-shadow: 0 8px 24px #0002; backdrop-filter: blur(12px); font-size: 12px; pointer-events: none;
+  animation: pickup 190ms cubic-bezier(.2,.7,.3,1) both;
+}
+.dragPreview > svg { flex: 0 0 auto; color: #7292d5; }
+.dragPreview > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dragPreview > b { flex: 0 0 auto; display: grid; place-items: center; min-width: 23px; height: 23px; padding: 0 5px;
+  border-radius: 99px; background: #3478f6; color: #fff; font-size: 11px; font-variant-numeric: tabular-nums; }
+.dragPreview[data-stacked]::before, .dragPreview[data-stacked]::after {
+  content: ""; position: absolute; z-index: -1; inset: 0; border: inherit; border-radius: inherit;
+  background: var(--tms-bg-panel, #fff); pointer-events: none; transform-origin: 50% 0;
+}
+.dragPreview[data-stacked]::before { transform: translateY(5px) scale(.96); opacity: .65; animation: stack-near 210ms ease-out; }
+.dragPreview[data-stacked]::after { z-index: -2; transform: translateY(10px) scale(.91); opacity: .35; filter: blur(.35px); animation: stack-far 240ms ease-out; }
+.errorToast { position: fixed; z-index: 150; bottom: 28px; left: 50%; transform: translateX(-50%); border-radius: 12px; padding: 12px 18px; max-width: 480px; background: var(--tms-bg-elevated, #fff); color: var(--tms-text, #222); box-shadow: 0 5px 30px #0003; display: flex; gap: 12px; font-size: 12px; }
+.errorToast button { background: transparent; color: inherit; border: 0; cursor: pointer; }
+@keyframes pickup { from { opacity: .45; transform: scale(.96); filter: blur(2px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
+@keyframes stack-near { from { transform: translateY(15px) scale(.94); opacity: 0; } }
+@keyframes stack-far { from { transform: translateY(25px) scale(.87); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dragPreview, .dragPreview::before, .dragPreview::after { animation: none !important; filter: none !important; } }
