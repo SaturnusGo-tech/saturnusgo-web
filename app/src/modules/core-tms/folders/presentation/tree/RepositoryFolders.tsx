@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { PiArchiveDuotone, PiFolderPlusDuotone, PiUploadSimple } from "react-icons/pi";
+import { PiArchiveDuotone, PiFolderPlusDuotone, PiUploadSimple, PiPlus } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
 import { defaultFolderExpansion, resolveFolderExpansion } from "../../model/expansion/default-expansion";
@@ -59,8 +59,9 @@ export function RepositoryFolders(props: {
     <header ref={drop.setNodeRef} className={css.heading} data-drop={drop.isOver || undefined}>
       <button className={css.repositoryTitle} disabled={props.locked} title={ru ? "Показать все тест-кейсы" : "Show all test cases"}
         onClick={() => { setArchive(false); props.onFolder(""); }}>{ru ? "Репозиторий" : "Repository"}</button><div>
-      <button disabled={props.locked || !resource.canManage} onClick={props.onImport} aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}><PiUploadSimple size={16} /></button>
-      <button disabled={props.locked || !resource.canManage} onClick={props.onNewFolder} aria-label={ru ? "Новая папка" : "New folder"}><PiFolderPlusDuotone size={18} /></button>
+      <button disabled={props.locked || !resource.canManage} onClick={props.onImport} className={css.headerAction} aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}><PiUploadSimple size={16} /><span>{ru ? "Импорт" : "Import"}</span></button>
+      <button disabled={props.locked || !resource.canManage} onClick={props.onNewFolder} className={`${css.headerAction} ${css.newFolder}`} title={ru ? "Новая папка" : "New folder"} aria-label={ru ? "Новая папка" : "New folder"}><PiFolderPlusDuotone size={18} /><span>{ru ? "Новая папка" : "New folder"}</span></button>
+      <button className={css.newCase} disabled={props.locked || !resource.canManage || archive} onClick={() => props.onCreate()} aria-label={ru ? "Новый тест-кейс" : "New test case"} title={ru ? "Новый тест-кейс" : "New test case"}><PiPlus size={18} /></button>
     </div></header>
     {props.controls}
     <div className={css.treeHeading}><span>{archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>

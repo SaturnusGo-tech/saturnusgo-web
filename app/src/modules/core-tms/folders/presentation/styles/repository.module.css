@@ -82,3 +82,16 @@
 .repository[data-resizing] { user-select: none; }
 
 .repository[data-selection] .treeScroll input[type="checkbox"] { opacity: 1; }
+
+.repository { container: repository-pane / inline-size; }
+.heading > div { align-items: center; gap: 7px; }
+.heading .headerAction { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; height: 30px; padding: 0 10px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--cases-text) 4%, var(--cases-bg)); color: var(--cases-text) !important; font-size: 12px; white-space: nowrap; transition: background 150ms ease; }
+.heading .headerAction > svg { color: #6a8ccf; }
+.heading .newFolder { background: transparent; }
+.heading .newFolder > svg { color: #927bb4; }
+.heading .headerAction:hover:not(:disabled) { background: color-mix(in srgb, var(--cases-text) 8%, var(--cases-bg)); }
+.heading .newCase { flex-shrink: 0; width: 29px; height: 29px; border-radius: 50%; background: var(--cases-primary); color: #fff !important; }
+.heading .newCase:hover:not(:disabled) { background: #2868dd; }
+.heading .repositoryTitle { font-size: 15px; font-weight: 600; }
+@container repository-pane (max-width: 450px) { .heading .newFolder { padding: 0; width: 32px; } .newFolder span { display: none; } .heading { padding-inline: 3px; gap: 5px; } .heading > div { gap: 5px; } .heading .repositoryTitle { font-size: 13px; } .heading .headerAction { padding-inline: 7px; } }
+@container repository-pane (max-width: 265px) { .heading { flex-wrap: wrap; row-gap: 10px; } .heading > div { margin-left: auto; } }

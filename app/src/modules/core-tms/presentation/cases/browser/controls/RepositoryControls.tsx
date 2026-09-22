@@ -1,5 +1,5 @@
 import { useId, useRef, useState } from "react";
-import { PiCheckSquare, PiFunnelSimple, PiMagnifyingGlass, PiPlus, PiX } from "react-icons/pi";
+import { PiFunnelSimple, PiMagnifyingGlass, PiX } from "react-icons/pi";
 import type { CasesViewProps } from "../../types";
 import type { useCasesViewController } from "../../view/useCasesViewController";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -22,17 +22,10 @@ export function RepositoryControls({ props, view, locale }: {
   function closeFilters() { view.setFilterOpen(false); filterButton.current?.focus(); }
   return <div className={css.controls} data-case-popover-root>
     <div className={css.searchRow}>
-    <label className={css.search} data-input-shell><PiMagnifyingGlass size={16} aria-hidden="true" />
+    <div className={css.search} data-input-shell><PiMagnifyingGlass size={16} aria-hidden="true" />
       <input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
         aria-label={ru ? "Поиск по ID, названию, ответственному, папке, компоненту или тегу" : "Search by ID, title, assignee, folder, component, or tag"} />
       {props.query && <button type="button" onClick={() => props.onQuery("")} aria-label={ru ? "Очистить поиск" : "Clear search"}><PiX size={14} /></button>}
-    </label>
-      <button type="button" className={css.create} disabled={locked || view.folderArchived} onClick={() => view.createCase()}
-        title={view.folderArchived ? (ru ? "Выберите активную папку" : "Select an active folder") : undefined}><PiPlus size={15} /><span>{ru ? "Новый кейс" : "New case"}</span></button>
-    </div>
-    <div className={css.tools}>
-      <button type="button" className={css.tool} disabled={locked} aria-pressed={view.selectionMode} onClick={view.toggleSelectionMode}
-        aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"} title={ru ? "Выбрать тест-кейсы" : "Select test cases"}><PiCheckSquare size={16} /><span>{ru ? "Выбрать" : "Select"}</span></button>
       <button ref={qlButton} type="button" className={css.tool} aria-label={ru ? "QL-запрос" : "QL query"} aria-expanded={qlOpen} aria-controls={qlId} data-active={Boolean(view.qlQuery) || undefined}
         onClick={() => { setQlOpen(!qlOpen); if (!qlOpen) requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus()); }}>QL</button>
       <div className={css.filter}>
@@ -43,6 +36,11 @@ export function RepositoryControls({ props, view, locale }: {
           onFilters={props.onFilters} onFacets={view.setFacetFilters} onClose={closeFilters}
           />}
       </div>
+    </div>
+      <button type="button" className={`${css.tool} ${css.select}`} disabled={locked} aria-pressed={view.selectionMode} onClick={view.toggleSelectionMode}
+        aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"}><span>{view.selectionMode ? (ru ? "Готово" : "Done") : (ru ? "Выбрать" : "Select")}</span></button>
+    </div>
+    <div className={css.tools}>
       <div className={css.selection} data-open={view.selectionMode || undefined} aria-hidden={!view.selectionMode}
         ref={(element) => { if (element) element.inert = !view.selectionMode; }}>
         <div className={css.selectionActions}>

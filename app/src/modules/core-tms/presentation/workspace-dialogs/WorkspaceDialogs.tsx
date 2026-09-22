@@ -1,4 +1,3 @@
-import { ImportCasesDialog } from "../../test-cases/exchange/presentation/ImportCasesDialog";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
@@ -40,10 +39,6 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (model.dialog === "import-cases" && model.project) return <ImportCasesDialog project={model.project}
-    workspaceId={model.data.workspace.id} folders={model.folders.items}
-    initialFolderId={model.folders.items.find((folder) => folder.path === model.selectedFolder && !folder.archivedAt)?.id ?? null}
-    onClose={close} onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />;
   if (model.dialog === "folder" && model.project) {
     return (
       <FolderDialog

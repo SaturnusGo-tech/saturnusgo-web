@@ -1,3 +1,4 @@
+import type { SaveImportSource } from "../../library/model/import-file";
 import { useExternalImport } from "../normalization/use-external-import";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -10,10 +11,10 @@ import { prepareImportFolders } from "../../data/folders/prepare-import-folders"
 import { TEST_CASE_IMPORT_BYTES, type TestCaseExchangeDocument } from "../../model/test-case-exchange";
 import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange";
 
-type Phase = "loading" | "idle" | "reading" | "ready" | "converting" | "folders" | "importing" | "partial" | "success" | "stopped";
+type Phase = "loading" | "idle" | "reading" | "ready" | "saving" | "converting" | "folders" | "importing" | "partial" | "success" | "stopped";
 type Context = Awaited<ReturnType<typeof loadImportContext>>;
 export function useImportCases(props: Readonly<{ project: Project; folders?: readonly RepositoryFolder[];
-  locale?: "ru" | "en"; workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown> }>) {
+  locale?: "ru" | "en"; workspaceId?: string; initialFolderId?: string | null; onImported: () => Promise<unknown>; saveSource: SaveImportSource }>) {
   const http = useTmsHttpClient();
   const [context, setContext] = useState<Context | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
@@ -28,6 +29,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
   const [reload, setReload] = useState(0);
   const alive = useRef(true);
   const controller = useRef<AbortController | null>(null);
+  const sourceFile = useRef<File | null>(null);
   const fileGeneration = useRef(0);
   const scopeGeneration = useRef(0);
   const successful = useRef<readonly number[]>([]);
@@ -67,7 +69,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
   async function selectFile(file: File | undefined) {
     if (!file || locked || running.current) return;
     const generation = ++fileGeneration.current;
-    external.reset();
+    external.reset(); sourceFile.current = null;
     setDocument(null); setFileName(file.name); setError(""); setFailed([]); setPhase("reading");
     setCompleted(0); setAttempted(0); successful.current = [];
     try {
@@ -77,11 +79,11 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
       if (!alive.current || generation !== fileGeneration.current) return;
       const schema = typeof raw === "object" && raw !== null && "schemaVersion" in raw ? raw.schemaVersion : null;
       if (schema !== "saturnusgo.tms.test-cases.v1" && schema !== "saturnusgo.tms.test-cases.v2") {
-        external.reset(raw); setPhase("idle"); return;
+        sourceFile.current = file; external.reset(raw); setPhase("idle"); return;
       }
       const parsed = parseTestCaseExchange(text);
       if (!alive.current || generation !== fileGeneration.current) return;
-      setDocument(parsed); setPhase("ready");
+      sourceFile.current = file; setDocument(parsed); setPhase("ready");
     } catch (failure) {
       if (alive.current && generation === fileGeneration.current) {
         setError(failure instanceof Error ? failure.message : "Invalid JSON."); setPhase("idle");
@@ -89,7 +91,7 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
     }
   }
   async function start() {
-    if (!context || running.current || phase === "reading" || (!document && !external.active)) return;
+    if (!sourceFile.current || !context || running.current || phase === "reading" || (!document && !external.active)) return;
     const generation = scopeGeneration.current;
     const current = () => alive.current && generation === scopeGeneration.current;
     const abort = new AbortController();
@@ -97,6 +99,11 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
     setError(""); setFailed([]);
     let changed = false;
     try {
+      setLocked(true); setPhase("saving");
+      const folderId = context.folders.find(folder => folder.path === destination)?.id ?? null;
+      await props.saveSource(sourceFile.current, context.scope, folderId, abort.signal);
+      abort.signal.throwIfAborted();
+      if (!current()) return;
       let ready = document;
       if (!ready) {
         setPhase("converting");
@@ -144,6 +151,6 @@ export function useImportCases(props: Readonly<{ project: Project; folders?: rea
   }
   return { context, phase, external, error: error || preview.message, document, fileName, destination,
     setDestination, completed, attempted, failed, locked, plan: preview.plan,
-    busy: phase === "converting" || external.busy || phase === "folders" || phase === "importing", selectFile, start,
+    busy: phase === "saving" || phase === "converting" || external.busy || phase === "folders" || phase === "importing", selectFile, start,
     stop: () => { controller.current?.abort(); external.stop(); }, retryContext: () => setReload((value) => value + 1) };
 }

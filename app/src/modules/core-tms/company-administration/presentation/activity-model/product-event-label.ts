@@ -1,4 +1,5 @@
 const labels: Record<string, readonly [string, string]> = {
+  "case_import.file.saved": ["Сохранён исходный файл импорта", "Import source file saved"],
   "attachment.read_grant.issued": ["Разрешён доступ к вложению", "Attachment access authorized"],
   "attachment.read_grant.denied": ["Доступ к вложению отклонён", "Attachment access denied"],
   "attachment.upload_intent.created": ["Подготовлена загрузка вложения", "Attachment upload prepared"],

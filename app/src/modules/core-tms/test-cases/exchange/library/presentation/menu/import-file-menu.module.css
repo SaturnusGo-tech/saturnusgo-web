@@ -1,0 +1,9 @@
+.root { position: relative; }
+.trigger { display: grid; place-items: center; width: 34px; height: 34px; border: 0; background: transparent; color: var(--tms-text, var(--ink)); border-radius: 10px; cursor: pointer; }
+.trigger:hover { background: var(--tms-bg-hover, #f1f3f7); }
+.menu { position: fixed; inset: auto; margin: 0; padding: 6px; overflow: auto; background: var(--tms-bg-panel, #fff); color: var(--tms-text, #20232b); border: 1px solid var(--tms-border, #e0e3e9); border-radius: 14px; box-shadow: 0 8px 26px #0002; }
+.menu button { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 38px; border: 0; border-radius: 9px; background: transparent; color: inherit; text-align: left; padding: 9px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.menu button:hover, .menu button:focus-visible { background: var(--tms-bg-hover, #f1f3f7); }
+.menu .danger { color: var(--tms-danger, #dc343b); }
+.menu button:disabled, .trigger:disabled { opacity: .45; cursor: default; }
+.trigger:focus-visible, .menu button:focus-visible { outline: 2px solid #3478f6; outline-offset: 1px; }

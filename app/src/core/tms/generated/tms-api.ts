@@ -4085,6 +4085,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/import-files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List retained case-import source files; newest first. Every read requires workspace access. A receipt does not imply successful creation of all cases. */
+        get: operations["listImportFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/projects/{projectId}/import-files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read a retained source file receipt. Object storage URLs are never included. */
+        get: operations["getImportFile"];
+        put?: never;
+        /**
+         * Retain an immutable import source receipt. PUT is idempotent by attachment ID; changing its folder/author returns CONFLICT. Requires a finalized JSON project attachment uploaded by this principal (max 5 MiB) and test_case:manage. Existing attachment download/deletion APIs apply.
+         * @description Registers one immutable source-file receipt. The finalized attachment ID is the durable idempotency identity. Repeating the same author and destination returns the original receipt; a different author or destination conflicts. Does not create or modify test cases.
+         */
+        post: operations["saveImportFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -7859,6 +7897,34 @@ export interface components {
         };
         DictationResponse: {
             data: components["schemas"]["DictationResult"];
+        };
+        ImportFile: {
+            workspaceId: string;
+            projectId: string;
+            id: string;
+            destinationPath: string;
+            createdBy: string;
+            fileName: string;
+            folderId: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            byteSize: number;
+            /** @enum {string} */
+            status: "pending" | "ready" | "failed" | "quarantined" | "deleting" | "deleted";
+        };
+        ImportFileEnvelope: {
+            data: components["schemas"]["ImportFile"];
+        };
+        ImportFileSaveRequest: {
+            folderId: string | null;
+        };
+        ImportFileListEnvelope: {
+            data: components["schemas"]["ImportFile"][];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
         };
     };
     responses: {
@@ -16874,6 +16940,151 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+        };
+    };
+    listImportFiles: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+                /** @description Case-insensitive literal substring of filename or recorded destination. */
+                q?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportFileListEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getImportFile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportFileEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    saveImportFile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+                projectId: string;
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportFileSaveRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportFileEnvelope"];
+                };
+            };
+            /** @description Invalid scope, folder or body */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Immutable receipt conflict or file not ready */
+            409: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source exceeds 5 MiB */
+            413: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source is not JSON */
+            415: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
         };
     };
 }

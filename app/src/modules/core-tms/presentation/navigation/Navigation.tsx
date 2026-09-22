@@ -103,7 +103,7 @@ export function Navigation({
       <div className={shellStyles.navigationItems}>
         {navigationItems.filter((item) => available(item.id)).map((item) => {
           const label = t(item.labelKey);
-          const active = (!disabled || item.id === "help" || item.id === "portfolios") && view === item.id;
+          const active = (!disabled || item.id === "help" || item.id === "portfolios") && (view === item.id || view === "imports" && item.id === "cases");
           const runActive = item.id === "runs" && activeRunCount > 0;
           const accessibleLabel = runActive
             ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}`

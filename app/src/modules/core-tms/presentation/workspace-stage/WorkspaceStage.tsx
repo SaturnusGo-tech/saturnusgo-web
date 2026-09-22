@@ -1,3 +1,4 @@
+import { ImportCasesPage } from "../../test-cases/exchange/library/presentation/page/ImportCasesPage";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { WorkspaceNotifications } from "../../notifications/composition/WorkspaceNotifications";
 import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
@@ -90,6 +91,10 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "imports") return <ImportCasesPage key={model.data.workspace.id} project={model.project}
+    workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}
+    initialFolderId={model.selectedFolderId} onProjectChange={id => void model.chooseProject(id)}
+    onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />;
   if (model.view === "dashboard") {
     return (
       <DashboardView
@@ -152,7 +157,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         onEditProject={model.openEditProject}
         onToggleProject={model.toggleProject}
         exchangeEnabled={model.connection === "connected"}
-        onCasesImported={async () => { await model.loadProject(model.project!.id); }}
+        onImport={() => model.setView("imports")}
       />
     );
   }

@@ -16,7 +16,7 @@ type ConfigViewProps = {
   environments: Environment[]; project?: Project; onOpenNotifications: () => void;
   onCreate: () => void; onEditEnvironment: (id: string) => void;
   onToggleEnvironment: (id: string) => void; onEditProject: () => void;
-  onToggleProject: () => void; exchangeEnabled: boolean; onCasesImported: () => Promise<unknown>;
+  onToggleProject: () => void; exchangeEnabled: boolean; onImport: () => void;
 };
 const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, account: UserRound };
 export function ConfigView(props: ConfigViewProps) {
@@ -49,7 +49,7 @@ export function ConfigView(props: ConfigViewProps) {
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>
         {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
         {id === "environments" && <EnvironmentSettings environments={props.environments} onCreate={props.onCreate} onEdit={props.onEditEnvironment} onToggle={props.onToggleEnvironment} />}
-        {id === "exchange" && props.project && <ProjectCaseExchange enabled={props.exchangeEnabled} project={props.project} onImported={props.onCasesImported} />}
+        {id === "exchange" && props.project && <ProjectCaseExchange enabled={props.exchangeEnabled} project={props.project} onImport={props.onImport} />}
         {id === "appearance" && <AppearanceSettings />}
         {id === "account" && <AccountSettings />}
       </section>)}

@@ -7,7 +7,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
   return <CasesView key={model.repositoryScope.aggregate ? model.repositoryScope.key : model.project?.id}
     repository={model.repositoryScope.aggregate ? <PortfolioRepository key={model.repositoryScope.key} model={model} /> : undefined}
     folders={model.folders}
-    onImport={() => model.setDialog("import-cases")}
+    onImport={() => model.setView("imports")}
     query={model.query}
     onQuery={model.setQuery}
     testCases={model.projectCases}

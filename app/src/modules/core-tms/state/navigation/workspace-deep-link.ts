@@ -33,6 +33,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const projectTab = url.searchParams.get("projectTab");
   const portfolioTab = url.searchParams.get("portfolioTab");
   const embeddedCases = isProjectCaseContext(href, input.projectId);
+  const importFile = url.searchParams.get("importFile");
   const folderId = url.searchParams.get("folderId");
   const suiteId = url.searchParams.get("suiteId");
   const article = url.searchParams.get("article"); const section = url.hash;
@@ -55,6 +56,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
       && /^[A-Za-z0-9._:-]{1,128}$/.test(catalogProjectId)) url.searchParams.set("catalogProjectId", catalogProjectId);
   }
   if ((input.view === "cases" || (input.view === "portfolios" && embeddedCases)) && sameScope && folderId && /^[A-Za-z0-9._:-]{1,128}$/.test(folderId)) url.searchParams.set("folderId", folderId);
+  if (input.view === "imports" && sameScope && importFile && /^[A-Za-z0-9._:-]{1,128}$/.test(importFile)) url.searchParams.set("importFile", importFile);
   if (input.view === "suites" && sameScope && suiteId && /^[A-Za-z0-9._:-]{1,128}$/.test(suiteId)) url.searchParams.set("suiteId", suiteId);
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
   if (input.view === "profile" && section === "#security") url.hash = section;

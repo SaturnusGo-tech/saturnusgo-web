@@ -40,3 +40,14 @@
 .controls[data-inline=true] .filter>div{left:auto;right:0}.controls[data-inline=true]>div:last-child:not(.tools):not(.searchRow){grid-column:1/-1}
 
 .queryHint { display: block; font-size: 11px; color: var(--cases-muted); margin: 6px 0; }
+
+.searchRow { gap: 8px; }
+.search { min-width: 0; height: 37px; padding-right: 5px; border-radius: 11px; background: var(--cases-control); }
+.controls .search .tool { flex-shrink: 0; height: 25px; min-width: 27px; padding: 0 5px; border-radius: 7px; }
+.search > .tool { font-size: 10px; background: var(--cases-raised); border: 1px solid var(--cases-row-border); }
+.search .filter { border-left: 1px solid var(--cases-row-border); padding-left: 5px; margin-left: 3px; }
+.controls .select { padding: 0 7px; font-size: 12px; border-radius: 999px; color: var(--cases-secondary-text); }
+.controls .select[aria-pressed=true] { color: var(--cases-link); }
+.tools:has(.selection:not([data-open])) { display: none; }
+.controls { gap: 7px; margin-inline: 3px; }
+@container repository-controls (max-width: 350px) { .controls .select { padding-inline: 2px; font-size: 11px; } .search { gap: 6px; padding-left: 8px; } }
