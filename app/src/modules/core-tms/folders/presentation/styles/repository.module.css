@@ -57,6 +57,14 @@
 .caseButton svg { color: #8e9ebf; flex-shrink: 0; margin-top: 0; }
 .caseButton > span { font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
 .caseButton small { font-size: 10px; display: block; color: var(--cases-muted); }
+.leaf[data-quick-create] { grid-template-columns: 20px 14px minmax(0, 1fr) 25px; }
+.leaf[data-quick-create] > .caseButton { grid-column: 3; }
+.caseAddButton { grid-column: 4; align-self: center; display: grid; place-items: center; width: 25px; height: 27px;
+  padding: 0; border-radius: 50%; opacity: 0; visibility: hidden; color: var(--cases-muted); transition: opacity 100ms ease; }
+.leaf:hover > .caseAddButton, .leaf:focus-within > .caseAddButton { opacity: 1; visibility: visible; }
+.caseAddButton:hover:not(:disabled), .caseAddButton:focus-visible { color: var(--cases-primary); }
+@media (hover: none) { .caseAddButton { opacity: 1; visibility: visible; } }
+@media (prefers-reduced-motion: reduce) { .caseAddButton { transition: none; } }
 .emptyFolder { color: var(--cases-muted); font-size: 11px; line-height: 16px; padding: 9px 0 9px 42px; }
 .empty { margin: 20px 10px; max-width: 220px; font-size: 12px; color: var(--cases-muted); line-height: 1.7; }
 .hint { color: var(--cases-muted); font-size: 10px; line-height: 1.6; margin: 12px 9px 0; }

@@ -1,0 +1,29 @@
+.anchor { min-width: 0; --quick-add-height: 34px; }
+.reveal { grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; min-width: 0;
+  transition: grid-template-rows 180ms cubic-bezier(.22,.61,.36,1), opacity 150ms ease, visibility 180ms; }
+.clip { min-height: 0; overflow: hidden; }
+.anchor:hover > .reveal:not([data-disabled]), .anchor:has(:focus-visible) > .reveal:not([data-disabled]), .reveal[data-open] {
+  grid-template-rows: 1fr; opacity: 1; visibility: visible;
+}
+.action { display: flex; align-items: center; gap: 7px; min-height: var(--quick-add-height, 43px); width: 100%;
+  padding: 5px 9px 5px 42px; border: 0; border-radius: 9px; background: transparent; text-align: left;
+  color: var(--cases-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.action:hover:not(:disabled) { color: var(--cases-primary); background: color-mix(in srgb, var(--cases-primary) 7%, var(--cases-bg)); }
+.action svg { flex-shrink: 0; color: #7b96d0; }
+.form { margin: 0; padding: 3px 4px 5px 38px; min-width: 0; }
+.fields { display: flex; align-items: center; gap: 6px; min-height: 32px; }
+.fields input { display: block; flex: 1; min-width: 0; width: 100%; height: 30px; margin: 0; opacity: 1; padding: 4px 8px;
+  border: 1px solid var(--cases-control-border); border-radius: 8px; background: var(--cases-bg); color: var(--cases-text); font: inherit; font-size: 12px; }
+.fields input::placeholder { color: var(--cases-muted); }
+.fields input:focus { border-color: var(--cases-primary); outline: none; }
+.form .fields input:focus-visible { outline: none !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--cases-primary) 13%, transparent); }
+.fields .confirm, .fields .cancel { display: grid; place-items: center; flex: 0 0 27px; width: 27px; height: 27px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; }
+.fields .confirm { background: var(--cases-primary); color: #fff; }
+.fields .confirm:hover:not(:disabled) { background: #2868dd; }
+.fields .cancel { background: transparent; color: var(--cases-muted); }
+.fields .cancel:hover:not(:disabled) { background: var(--cases-hover); color: var(--cases-text); }
+.error { font-size: 11px; line-height: 1.45; color: var(--tms-danger, #d74c60); margin: 5px 0 0; overflow-wrap: anywhere; }
+.spin { animation: spin 700ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (hover: none) { .anchor > .reveal:not([data-disabled]) { grid-template-rows: 1fr; opacity: 1; visibility: visible; } }
+@media (prefers-reduced-motion: reduce) { .reveal { transition: none; } .spin { animation: none; } }

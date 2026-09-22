@@ -7,9 +7,13 @@ import type { FolderNode } from "../../model/tree";
 import type { RepositoryFolder } from "../../model/folder";
 import { RepositoryCaseLeaf } from "../case/RepositoryCaseLeaf";
 import { DragClickContext } from "../dnd/drag-click";
+import type { RepositoryCreation } from "../../model/creation/repository-creation";
+import { RepositoryQuickAdd } from "../creation/RepositoryQuickAdd";
+import quick from "../creation/quick-add.module.css";
 import css from "../styles/repository.module.css";
 
 export type FolderBranchProps = {
+  creation?: RepositoryCreation;
   hideRootCount?: boolean;
   trailing?: (item: TestCaseSummary) => ReactNode;
   canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
@@ -32,6 +36,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
   const drag = useDraggable({ id: `drag-folder:${folder.id}`, data: { kind: "folder", folderId: folder.id, name: folder.name }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
   const suppress = useContext(DragClickContext);
   return <li className={css.branch} data-depth={depth}>
+    <div className={quick.anchor}>
     <div ref={drop.setNodeRef} className={css.folderRow} data-selected={(props.selectedFolderId ? props.selectedFolderId === folder.id : !folder.archivedAt && props.selectedFolder === folder.path) || undefined}
       data-drop={drop.isOver || undefined} style={{ opacity: drag.isDragging ? .4 : 1 }}>
       <button ref={disclosure} type="button" className={css.disclosure} aria-expanded={open} aria-controls={open ? childrenId : undefined}
@@ -47,6 +52,9 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       </button>
       {props.canManage && <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>}
     </div>
+    {props.creation && props.canManage && !folder.archivedAt && <RepositoryQuickAdd target={{ kind: "folder", id: folder.id, name: folder.name }}
+      creation={props.creation} disabled={props.locked} ru={ru} />}
+    </div>
     {motion.present && <div ref={(element) => { motion.ref.current = element; if (element) element.inert = !open; }} className={css.branchChildren} aria-hidden={!open || undefined}>
       <button type="button" className={css.branchGuide} aria-expanded="true" aria-controls={childrenId}
         aria-label={`${ru ? "Свернуть ветку" : "Collapse branch"} ${folder.name}`}
@@ -54,7 +62,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       <ul id={childrenId} className={css.children}>
       {node.children.map((child) => <RepositoryFolderBranch key={child.folder.id} {...props} node={child} depth={depth + 1} />)}
       {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
-        trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
+        creation={folder.archivedAt ? undefined : props.creation} trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
       {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder}>{ru ? "Папка пуста" : "Empty folder"}</li>}
       </ul>
     </div>}

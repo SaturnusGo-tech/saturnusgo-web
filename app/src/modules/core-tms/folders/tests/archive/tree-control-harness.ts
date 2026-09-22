@@ -33,6 +33,8 @@ export function treeControl(path: string, exportName: string) {
       };
       if (name === "react-icons/pi") return new Proxy({}, { get: () => "Icon" });
       if (name.endsWith("RepositoryCaseLeaf")) return { RepositoryCaseLeaf: "CaseLeaf" };
+      if (name.endsWith("RepositoryQuickAdd")) return { RepositoryQuickAdd: "RepositoryQuickAdd" };
+      if (name.endsWith("CaseQuickAdd")) return { CaseQuickAdd: "CaseQuickAdd" };
       if (name.endsWith("drag-click")) return { DragClickContext: {} };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };
       throw new Error(`Unexpected import ${name}`);
