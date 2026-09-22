@@ -5,6 +5,8 @@ import test from "node:test";
 import ts from "typescript";
 import type { useFilterPopup } from "../useFilterPopup";
 
+// This VM checks placement and event ownership, not CSS layout. Native Safari and
+// Chromium must verify intrinsic popup height; see docs/repository-filters-drag-2026-09-23.md.
 function popup(viewport = { width: 900, height: 700 }, bounds = { left: 760, top: 600, bottom: 628 }) {
   const listeners = new Map<string, (event: unknown) => void>();
   let cleanup: (() => void) | undefined, reference: { current: unknown } | undefined;

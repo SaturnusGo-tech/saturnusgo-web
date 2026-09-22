@@ -20,7 +20,9 @@ Source image and `filters-dark.png` were viewed together in the same comparison 
 
 Fixed during QA: destination could collapse when its first direct cases arrived; explicit idempotent reveal now survives data refresh. Fixed short-height popup clipping by allowing content to shrink and using full available height when neither side of the trigger has enough space.
 
-Verdict: **PASS for approved filters and repository drag scope**. This is not a claim of exact whole-screen pixel parity: the reference also redesigned folder creation and the surrounding toolbar, which were excluded from this request.
+Safari follow-up: the first Chromium-only check missed WebKit collapsing the automatic height of nested flex/grid content. Changed the body/content flex basis to `auto` and gave the grid a shrinkable row. Native Safari now renders the complete panel in light and dark themes; status selection changes the result list, category selection and the archive switch work. Evidence: `filters-safari-dark-fixed.png` and `filters-safari-light-fixed.png` (native Safari window 1024 × 768). The fixture now includes the real RepositoryControls search ancestor. Its global input-shell rule also required a scoped switch background override. Chromium 700 × 360 reports panel y=12, height=336, footer bottom=335; the viewport override was cleared. Native Safari narrow/drawer cases are a future regression checklist, not a claim of tests completed in this pass.
+
+Verdict: **PASS for approved filters and repository drag scope, including the reported Safari clipping fix**. This is not a claim of exact whole-screen pixel parity: the reference also redesigned folder creation and the surrounding toolbar, which were excluded from this request.
 
 ---
 
