@@ -22,7 +22,7 @@ export function PilotSection() {
             <p>Обсудим состав команды, перенос кейсов и нужные интеграции до начала работы.</p>
           </div>
         </div>
-        <a href="https://t.me/bysieger" target="_blank" rel="noopener noreferrer" className={styles.contact}>
+        <a href="https://t.me/falcon_tms" target="_blank" rel="noopener noreferrer" className={styles.contact}>
           <SiTelegram size={17} aria-hidden="true" /> Связаться с нами
         </a>
       </Reveal>

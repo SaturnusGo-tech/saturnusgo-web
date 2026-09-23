@@ -115,10 +115,10 @@ export function FalconLanding() {
           </h2>
           <p className={styles.pilotLead}>Напишите нам в Telegram. Ответим на вопросы о продукте,
             интеграциях и условиях подключения.</p>
-          <a className={styles.primaryButton} href="https://t.me/bysieger" target="_blank" rel="noopener noreferrer">
+          <a className={styles.primaryButton} href="https://t.me/falcon_tms" target="_blank" rel="noopener noreferrer">
             <SiTelegram size={18} aria-hidden="true" /> Связаться с нами
           </a>
-          <p className={styles.telegramHandle}>Telegram · @bysieger</p>
+          <p className={styles.telegramHandle}>Telegram · @falcon_tms</p>
         </Reveal>
         <div className={styles.footerMeta}>
           <FalconBrand inverse />
