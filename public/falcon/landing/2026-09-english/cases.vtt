@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.617
+Select the preconditions and ask Falcon AI.
+
+2
+00:00:03.617 --> 00:00:10.083
+Explain the change while preserving the important details.
+
+3
+00:00:10.083 --> 00:00:13.283
+Send the instruction to Falcon AI.
+
+4
+00:00:13.283 --> 00:00:19.783
+Falcon AI turns the draft into a numbered checklist.
+
+5
+00:00:19.783 --> 00:00:23.450
+Review the answer and replace the selected text.
+
+6
+00:00:23.450 --> 00:00:31.617
+Apply the change and save the test case.

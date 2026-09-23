@@ -1,4 +1,5 @@
 "use client";
+import { useLandingLocale } from "../localization/context/LandingLocaleProvider";
 import { LoaderCircle, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import type { ProductDemo } from "../content/demos";
@@ -13,8 +14,9 @@ export function ProductVideo({
   demo: ProductDemo;
   priority?: boolean;
 }) {
+  const { locale, copy: { player: copy } } = useLandingLocale();
   const player = useProductPlayback();
-  const timeline = useProductTimeline(player.video);
+  const timeline = useProductTimeline(player.video, copy.of);
   const id = useId();
   const [hasPlayed, setHasPlayed] = useState(false);
   const [captionsEnabled, setCaptionsEnabled] = useState(true);
@@ -43,15 +45,15 @@ export function ProductVideo({
             <track
               kind="captions"
               src={demo.captions}
-              srcLang="ru"
-              label="Русский"
+              srcLang={locale}
+              label={copy.track}
               default
             />
           )}
         </video>
         {!hasPlayed && !player.failed && (
           <div className={styles.cover} aria-hidden="true">
-            <span>FALCON / В РАБОТЕ</span>
+            <span>{copy.cover}</span>
             <div><strong>{demo.title}</strong><p>{demo.description}</p></div>
           </div>
         )}
@@ -66,8 +68,8 @@ export function ProductVideo({
               }}
               aria-label={
                 player.starting
-                  ? `Отменить запуск: ${demo.title}`
-                  : `Воспроизвести видео: ${demo.title}`
+                  ? `${copy.cancel}: ${demo.title}`
+                  : `${copy.play}: ${demo.title}`
               }
             >
               {player.starting ? (
@@ -85,24 +87,24 @@ export function ProductVideo({
         {priority && <link rel="preload" as="image" href={demo.poster} />}
         {player.failed && (
           <div className={styles.error} role="status">
-            <p>Видео не загрузилось</p>
+            <p>{copy.failed}</p>
             <button onClick={player.retry}>
               <RotateCcw size={16} aria-hidden="true" />
-              Повторить
+              {copy.retry}
             </button>
           </div>
         )}
         <div
           className={styles.controls}
-          aria-label={`Управление видео: ${demo.title}`}
+          aria-label={`${copy.controls}: ${demo.title}`}
         >
           <button
             ref={playbackControl}
             onClick={player.toggle}
             aria-label={
               player.playing || player.starting
-                ? `Пауза: ${demo.title}`
-                : `Смотреть: ${demo.title}`
+                ? `${copy.pause}: ${demo.title}`
+                : `${copy.watch}: ${demo.title}`
             }
             disabled={!player.interactive || player.failed}
           >
@@ -127,15 +129,15 @@ export function ProductVideo({
             step="any"
             defaultValue={0}
             disabled={!player.duration || player.failed}
-            aria-label={`Позиция видео: ${demo.title}`}
+            aria-label={`${copy.position}: ${demo.title}`}
             onPointerDown={timeline.beginScrub}
             onKeyDown={timeline.onKeyDown}
             onChange={(event) => timeline.seek(event.target.valueAsNumber)}
           />
-          <span className={styles.silent}>Без звука</span>
+          <span className={styles.silent}>{copy.silent}</span>
           <button
             type="button"
-            aria-label={`Русские подписи: ${demo.title}`}
+            aria-label={`${copy.captions}: ${demo.title}`}
             aria-pressed={captionsEnabled}
             onClick={() => {
               const enabled = !captionsEnabled;
@@ -149,7 +151,7 @@ export function ProductVideo({
           </button>
           <button
             disabled={!player.interactive}
-            aria-label={`На весь экран: ${demo.title}`}
+            aria-label={`${copy.fullscreen}: ${demo.title}`}
             onClick={() => {
               const video = player.video.current as
                 | (HTMLVideoElement & { webkitEnterFullscreen?: () => void })
@@ -171,7 +173,7 @@ export function ProductVideo({
           <p id={`${id}-description`}>{demo.description}</p>
         </div>
         <details className={styles.transcript}>
-          <summary>Что в видео</summary>
+          <summary>{copy.transcript}</summary>
           <p>{demo.transcript}</p>
         </details>
       </figcaption>

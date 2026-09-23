@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.317
+Create a run from the test repository.
+
+2
+00:00:05.317 --> 00:00:10.783
+Name the release iteration.
+
+3
+00:00:10.783 --> 00:00:21.300
+Describe the scope of this regression.
+
+4
+00:00:21.300 --> 00:00:26.900
+Set the build that will be tested.
+
+5
+00:00:26.900 --> 00:00:35.817
+Assign an owner and select the checks.
+
+6
+00:00:35.817 --> 00:00:41.233
+Create the run with all 30 test cases.
+
+7
+00:00:41.233 --> 00:00:46.033
+Start the run when the team is ready.
+
+8
+00:00:46.033 --> 00:00:51.350
+Record the result of the first step.
+
+9
+00:00:51.350 --> 00:00:55.967
+Continue through the expected results.
+
+10
+00:00:55.967 --> 00:01:00.867
+Pass the case and move to the next check.

@@ -1,0 +1,29 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:07.317
+Mark the steps that meet their expected results.
+
+2
+00:00:07.317 --> 00:00:12.683
+Flag the step that failed.
+
+3
+00:00:12.683 --> 00:00:19.700
+Save what actually happened.
+
+4
+00:00:19.700 --> 00:00:25.117
+Report a bug directly from the failed check.
+
+5
+00:00:25.117 --> 00:00:31.467
+Create the report with its testing context.
+
+6
+00:00:31.467 --> 00:00:38.967
+Review the bug and its original test step.
+
+7
+00:00:38.967 --> 00:00:46.717
+Return to the run to inspect the recorded failure.

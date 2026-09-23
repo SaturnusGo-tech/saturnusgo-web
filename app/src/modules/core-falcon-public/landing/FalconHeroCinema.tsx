@@ -1,4 +1,5 @@
 "use client";
+import { useLandingLocale } from "./localization/context/LandingLocaleProvider";
 import { ArrowDown, Play } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
@@ -9,6 +10,7 @@ import {
 } from "./motion/useLandingScrollProgress";
 
 export function FalconHeroCinema() {
+  const { copy } = useLandingLocale();
   const section = useRef<HTMLElement>(null);
   const motionEnabled = useLandingMotionEnabled();
   const progress = useLandingScrollProgress(section, motionEnabled, "hero");
@@ -35,27 +37,26 @@ export function FalconHeroCinema() {
         style={motionEnabled ? { y } : { y: 0 }}
       />
       <div className={styles.heroInner}>
-        <p className={styles.eyebrow}>Falcon / Управление тестированием</p>
+        <p className={styles.eyebrow}>Falcon / {copy.category}</p>
         <h1 id="falcon-hero-title">
-          Управляйте
+          {copy.heroTitle[0]}
           <br />
-          тестированием.
+          {copy.heroTitle[1]}
         </h1>
         <p className={styles.heroLead}>
-          Планируйте проверки, запускайте тесты
-          <br className={styles.desktopBreak} /> и отслеживайте исправления в одном рабочем пространстве.
+          {copy.heroLead}
         </p>
         <a href="#product" className={styles.watchLink}>
           <span>
             <Play size={17} fill="currentColor" aria-hidden="true" />
           </span>
-          Посмотреть Falcon
+          {copy.watch}
         </a>
       </div>
       <a
         className={styles.scrollLink}
         href="#product"
-        aria-label="Перейти к демонстрации продукта"
+        aria-label={copy.scroll}
       >
         <ArrowDown size={19} aria-hidden="true" />
       </a>

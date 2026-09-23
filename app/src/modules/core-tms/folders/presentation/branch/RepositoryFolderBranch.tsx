@@ -41,7 +41,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
   useFolderDropReveal(drop.isOver && moving.active, open, folder.id, props.onReveal);
   return <li className={css.branch} data-depth={depth} data-drag-source={moving.folderId === folder.id || undefined}>
     <div className={quick.anchor}>
-    <div ref={drop.setNodeRef} className={css.folderRow} data-selected={(props.selectedFolderId ? props.selectedFolderId === folder.id : !folder.archivedAt && props.selectedFolder === folder.path) || undefined}
+    <div ref={drop.setNodeRef} className={css.folderRow} data-repository-folder-row data-selected={(props.selectedFolderId ? props.selectedFolderId === folder.id : !folder.archivedAt && props.selectedFolder === folder.path) || undefined}
       data-drop={drop.isOver || undefined}>
       <button ref={disclosure} type="button" className={css.disclosure} aria-expanded={open} aria-controls={open ? childrenId : undefined}
         aria-label={`${open ? (ru ? "Свернуть" : "Collapse") : (ru ? "Раскрыть" : "Expand")} ${folder.name}`}

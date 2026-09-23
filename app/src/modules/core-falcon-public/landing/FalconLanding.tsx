@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SiTelegram } from "react-icons/si";
@@ -6,17 +7,24 @@ import { FalconHeader } from "./FalconHeader";
 import { FalconHeroCinema } from "./FalconHeroCinema";
 import { FalconIntegrations } from "./FalconIntegrations";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, workflow, projectStory, resultsStory } from "./content/demos";
+import * as russian from "./content/demos";
+import * as english from "./content/demos.en";
+import { LandingLocaleProvider, useLandingLocale } from "./localization/context/LandingLocaleProvider";
 import { PilotSection } from "./pilot/PilotSection";
 import { Reveal } from "./motion/Reveal";
 import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
 
 export function FalconLanding() {
+  return <LandingLocaleProvider><LandingContent /></LandingLocaleProvider>;
+}
+function LandingContent() {
+  const { locale, copy } = useLandingLocale();
+  const { demos, workflow, projectStory, resultsStory } = locale === "ru" ? russian : english;
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-landing-locale={locale} lang={locale}>
       <a className={styles.skipLink} href="#product">
-        К содержанию
+        {copy.skip}
       </a>
       <FalconHeader />
       <main>
@@ -28,11 +36,11 @@ export function FalconLanding() {
         >
           <ProductStory story={projectStory} headingId="projects-title" />
           <Reveal className={styles.videoReveal} variant="media">
-            <ProductVideo demo={demos.projects} priority />
+            <ProductVideo key={locale} demo={demos.projects} priority />
           </Reveal>
         </section>
-        <nav className={styles.chapterNav} aria-label="Возможности Falcon">
-          <a href="#product">Портфели и проекты</a>
+        <nav className={styles.chapterNav} aria-label={copy.chapters}>
+          <a href="#product">{copy.projects}</a>
           {workflow.map((item) => (
             <a key={item.id} href={`#${item.id}`}>
               {item.label}
@@ -48,54 +56,23 @@ export function FalconLanding() {
           >
             <ProductStory story={item} headingId={`${item.id}-title`} />
             <Reveal className={styles.videoReveal} variant="media">
-              <ProductVideo demo={demos[item.id]} />
+              <ProductVideo key={locale} demo={demos[item.id]} />
             </Reveal>
           </section>
         ))}
         <section className={styles.workflowSection} id="results" aria-labelledby="results-title">
           <ProductStory story={resultsStory} headingId="results-title" />
           <Reveal className={styles.videoReveal} variant="media">
-            <ProductVideo demo={demos.dashboard} />
+            <ProductVideo key={locale} demo={demos.dashboard} />
           </Reveal>
         </section>
         <FalconIntegrations />
         <PilotSection />
         <section className={styles.faq} aria-labelledby="faq-title">
-          <h2 id="faq-title">Перед началом работы</h2>
-          <div>
-            <details>
-              <summary>Как подключить Falcon?</summary>
-              <p>
-                Свяжитесь с нами в Telegram. Обсудим размер команды,
-                нужные интеграции и условия подключения. После согласования создадим
-                пространство компании и выдадим доступ администратору.
-              </p>
-            </details>
-            <details>
-              <summary>Можно перенести существующие тест-кейсы?</summary>
-              <p>
-                Да. В репозитории кейсов доступны импорт и экспорт.
-                Поддерживаемые форматы и требования к полям описаны в разделе
-                «Помощь» вашего рабочего пространства.
-              </p>
-            </details>
-            <details>
-              <summary>Как команда проверяет исправленные дефекты?</summary>
-              <p>
-                Укажите связанные кейсы в баг-репорте. Когда дефект перейдёт на
-                проверку, кнопка «Проверить исправления» откроет прогон с
-                соответствующими сценариями.
-              </p>
-            </details>
-            <details>
-              <summary>Как сотрудники получают доступ?</summary>
-              <p>
-                Администратор компании добавляет сотрудников в своей панели
-                и назначает им роли. Команда входит в Falcon по адресу компании.
-                Количество сотрудников определяется условиями подключения.
-              </p>
-            </details>
-          </div>
+          <h2 id="faq-title">{copy.faqTitle}</h2>
+          <div>{copy.faq.map(item => <details key={item.question}>
+            <summary>{item.question}</summary><p>{item.answer}</p>
+          </details>)}</div>
         </section>
       </main>
       <footer className={styles.footer} id="contact">
@@ -109,22 +86,18 @@ export function FalconLanding() {
           loading="lazy"
         />
         <Reveal className={styles.footerCta}>
-          <h2>
-            Обсудим
-            <br />подключение Falcon.
-          </h2>
-          <p className={styles.pilotLead}>Напишите нам в Telegram. Ответим на вопросы о продукте,
-            интеграциях и условиях подключения.</p>
+          <h2>{copy.footerTitle[0]}<br />{copy.footerTitle[1]}</h2>
+          <p className={styles.pilotLead}>{copy.footerLead}</p>
           <a className={styles.primaryButton} href="https://t.me/falcon_tms" target="_blank" rel="noopener noreferrer">
-            <SiTelegram size={18} aria-hidden="true" /> Связаться с нами
+            <SiTelegram size={18} aria-hidden="true" /> {copy.contact}
           </a>
           <p className={styles.telegramHandle}>Telegram · @falcon_tms</p>
         </Reveal>
         <div className={styles.footerMeta}>
-          <FalconBrand inverse />
-          <span>Управление тестированием</span>
+          <FalconBrand inverse label={copy.home} />
+          <span>{copy.category}</span>
           <Link href="/cloud-login/">
-            Войти в компанию <ArrowRight size={14} aria-hidden="true" />
+            {copy.companyLogin} <ArrowRight size={14} aria-hidden="true" />
           </Link>
           <small>© {new Date().getFullYear()} Falcon</small>
         </div>

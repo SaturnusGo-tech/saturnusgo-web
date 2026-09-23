@@ -1,0 +1,24 @@
+import type { ProductDemo, ProductStory } from "./demos";
+const root = "/falcon/landing/2026-09-english";
+const demo = (id: string, title: string, description: string, transcript: string): ProductDemo => ({ id, title, description, transcript, src: `${root}/${id}.mp4`, poster: `${root}/${id}.webp`, captions: `${root}/${id}.vtt` });
+export const demos = {
+  projects: demo("projects", "Portfolios and projects", "Separate test repositories. A shared view of your products.", "Create a project, give it a key and place it in a portfolio. Browse the related projects, then open the Mobile Banking repository and one of its test cases."),
+  cases: demo("cases", "Refining a test case with Falcon AI", "Make preconditions clear without losing the details.", "Select the preconditions of a demonstration case and ask Falcon AI to turn them into a concise English checklist. Review the real response, apply it and save a new revision."),
+  runs: demo("runs", "A test run for your team", "Assign checks and give each tester their own queue.", "Create a release iteration, describe its scope, set the build and assign an owner. Select 30 cases, start the run and record step results before moving to the next check."),
+  suites: demo("suites", "Reusable test suites", "Keep a set of checks ready for the next run.", "Create a dynamic suite that selects cases tagged smoke. Review the 15 matching checks, save the suite and start a new execution with its own results."),
+  defects: demo("defects", "From a failed check to a bug report", "Keep the scenario and the failure together.", "Record the failed step and its actual result. Create a bug report with the testing context, open the report and return to the original run to inspect the failure."),
+  dashboard: demo("dashboard", "Quality metrics", "Follow a project metric to the work behind it.", "Review the team's work and run results, then open the defects behind a project metric. Figures reflect the demonstration project at the time of recording."),
+  integrations: demo("youtrack", "Falcon and YouTrack", "Connected bug reports and status updates in both directions.", "Report a bug from a failed test step and choose its YouTrack delivery route. Open the saved report with the linked YouTrack issue, then return to the original run. Delivery waits are shortened in the video."),
+} as const;
+export const projectStory: ProductStory = {
+  label: "Portfolios and projects", title: "Each product has its own checks",
+  paragraphs: ["Group related projects into a portfolio. Each project keeps its own test cases, scenarios and expected results.", "Browse the whole portfolio, a few projects or just one. Change the scope without leaving the repository."],
+};
+export const workflow = [
+  { id: "cases", label: "Test cases", title: "From a description to a test case", paragraphs: ["Describe the check in your own words. Falcon AI helps refine and format the text. Shared steps save you from writing the same actions again.", "Save the scenario, preconditions and expected results in the right folder. Your team can use it in runs and test suites."] },
+  { id: "runs", label: "Test runs", title: "One run. A clear queue for every tester.", paragraphs: ["Add whole folders or select individual scenarios. Assign the checks and start a run for the environment you need.", "Filter by assignee to see both their checks and their execution order. Each tester can work through their part of the run."] },
+  { id: "suites", label: "Test suites", title: "Build a suite once. Run it again.", paragraphs: ["Group checks for smoke testing, regression or a part of your product. Pick the cases from the same folder tree you use in the repository.", "Adjust the selection and create fresh runs from it. Each run retains its own results."] },
+  { id: "defects", label: "Defects", title: "A bug report with the testing context", paragraphs: ["Create a bug report directly from a failed step. Keep the scenario, actual and expected results, assignee and discussion together.", "When the fix is ready, return to the linked case, run the verification and confirm the result."] },
+] as const;
+export const resultsStory: ProductStory = { label: "Results", title: "See the checks behind each metric", paragraphs: ["Track the team's queue, run results and open defects on the project dashboard.", "Open the cases, runs or bug reports behind a metric to understand what needs attention next."] };
+export const integrationStory: ProductStory = { label: "Integrations", title: "Development in your tracker. Testing in Falcon.", paragraphs: ["Send defects to YouTrack with their testing context. Linked statuses show the team when a fix is ready to verify.", "Open the developer's issue from Falcon and return through the backlink. Once you confirm the retest, Falcon sends the result to YouTrack."] };

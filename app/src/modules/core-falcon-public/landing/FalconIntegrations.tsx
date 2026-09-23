@@ -1,10 +1,15 @@
+"use client";
+import { useLandingLocale } from "./localization/context/LandingLocaleProvider";
+import * as russian from "./content/demos";
+import * as english from "./content/demos.en";
 import { ProductVideo } from "./media/ProductVideo";
-import { demos, integrationStory } from "./content/demos";
 import { Reveal } from "./motion/Reveal";
 import { IntegrationMarquee } from "./motion/IntegrationMarquee";
 import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
 export function FalconIntegrations() {
+  const { locale } = useLandingLocale();
+  const { demos, integrationStory } = locale === "ru" ? russian : english;
   return (
     <section
       className={styles.integrationScene}
@@ -14,7 +19,7 @@ export function FalconIntegrations() {
       <ProductStory story={integrationStory} headingId="integrations-title" />
       <IntegrationMarquee />
       <Reveal className={styles.videoReveal} variant="media">
-        <ProductVideo demo={demos.integrations} />
+        <ProductVideo key={locale} demo={demos.integrations} />
       </Reveal>
     </section>
   );

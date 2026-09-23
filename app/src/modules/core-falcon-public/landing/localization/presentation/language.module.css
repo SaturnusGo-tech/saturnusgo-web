@@ -1,0 +1,9 @@
+.root { position: relative; flex-shrink: 0; }
+.trigger { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px; border: 0; border-radius: 22px; background: transparent; color: #e5e7eb; cursor: pointer; font: inherit; font-size: 11px; }
+.trigger:hover, .trigger[aria-expanded="true"] { background: #ffffff0f; color: #fff; }
+.panel { position: absolute; right: 0; top: calc(100% + 8px); width: 200px; padding: 6px; border: 1px solid #ffffff1f; border-radius: 16px; background: #171b21; box-shadow: 0 14px 38px #0005; animation: enter 140ms ease-out; }
+.panel button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 0; padding: 12px; border-radius: 11px; background: transparent; color: #e5e7eb; text-align: left; cursor: pointer; font: inherit; font-size: 13px; }
+.panel button:hover, .panel button:focus-visible { background: #ffffff0d; }
+@keyframes enter { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .panel { animation: none; } }
+@media (max-width: 480px) { .trigger span { display: none; } .trigger { padding: 0 10px; } }

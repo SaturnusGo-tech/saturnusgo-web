@@ -679,3 +679,12 @@
   .headerActions { gap: 14px; }
   .footerCta h2 { font-size: 39px; }
 }
+
+/* Keep SSR useful for crawlers and reveal the browser's Russian preference after hydration. */
+:global(html[data-falcon-landing-locale="ru"]) .page[data-landing-locale="en"] { visibility: hidden; }
+.page[data-landing-locale="en"] main, .page[data-landing-locale="en"] .footer { animation: languageRevealEn 180ms ease-out; }
+.page[data-landing-locale="ru"] main, .page[data-landing-locale="ru"] .footer { animation: languageRevealRu 180ms ease-out; }
+@keyframes languageRevealEn { from { opacity: .7; } to { opacity: 1; } }
+@keyframes languageRevealRu { from { opacity: .7; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .page[data-landing-locale] main, .page[data-landing-locale] .footer { animation: none; } }
+@media (max-width: 600px) { .headerActions { gap: 8px; } .headerInner { gap: 10px; padding-right: 14px; } }

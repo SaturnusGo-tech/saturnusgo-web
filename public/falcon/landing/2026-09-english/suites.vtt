@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.967
+Create a reusable test suite.
+
+2
+00:00:04.967 --> 00:00:11.067
+Name the suite for its purpose.
+
+3
+00:00:11.067 --> 00:00:15.633
+Choose which checks belong in the suite.
+
+4
+00:00:15.633 --> 00:00:22.250
+Use the smoke tag to select the release checks.
+
+5
+00:00:22.250 --> 00:00:27.400
+Review the matching cases before saving.
+
+6
+00:00:27.400 --> 00:00:33.267
+Save the suite for future runs.
+
+7
+00:00:33.267 --> 00:00:41.450
+Open the saved suite and start a run.
+
+8
+00:00:41.450 --> 00:00:51.117
+Name this execution of the smoke suite.
+
+9
+00:00:51.117 --> 00:00:58.133
+Create a fresh run with its own results.
+
+10
+00:00:58.133 --> 00:01:02.350
+Start working through the selected cases.

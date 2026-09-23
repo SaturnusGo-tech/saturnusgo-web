@@ -10,11 +10,13 @@ import { htmlLanguageForPath, isFalconPublicPath } from "../../../../../../share
 
 const root = process.cwd();
 
-test("Falcon public routes keep their Russian document language", () => {
-  for (const pathname of ["/", "/signup", "/signup/", "/cloud-login/"]) {
+test("Falcon landing owns its language independently from company entry", () => {
+  for (const pathname of ["/signup", "/signup/", "/cloud-login/"]) {
     assert.equal(isFalconPublicPath(pathname), true);
     assert.equal(htmlLanguageForPath(pathname, "en"), "ru");
   }
+  assert.equal(htmlLanguageForPath("/", "ru"), "en");
+  assert.equal(htmlLanguageForPath("/", "es", "ru"), "ru");
   assert.equal(isFalconPublicPath("/testcases/umbrella-home/work/"), false);
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
@@ -24,10 +26,10 @@ test("Falcon landing has one company login action and accessible chapter navigat
   const landing = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconLanding.tsx"), "utf8");
   assert.match(header, /href="\/cloud-login\/"/);
   assert.doesNotMatch(header + landing, /href="\/signup\/"|Создать аккаунт/);
-  assert.match(header, /aria-label="Навигация по лендингу"/);
-  assert.match(landing, /href="#product">\s*К содержанию/);
+  assert.match(header, /aria-label=\{copy.navigation\}/);
+  assert.match(landing, /href="#product">\s*\{copy.skip\}/);
   assert.match(landing, /aria-labelledby="projects-title"/);
-  assert.match(landing, /aria-label="Возможности Falcon"/);
+  assert.match(landing, /aria-label=\{copy.chapters\}/);
   assert.doesNotMatch(landing, /analytics-dashboard\.jpg|case-repository\.jpg|run-builder\.jpg/);
 });
 
@@ -56,11 +58,11 @@ test("landing shows the complete canonical integration catalog with accessible m
   assert.match(section, /<IntegrationMarquee\s*\/>/);
   assert.match(marquee, /import\s*\{\s*INTEGRATIONS\s*\}\s*from[^;]*integration-definitions/);
   assert.match(marquee, /INTEGRATIONS\.map/);
-  assert.match(marquee, /aria-label=\{\s*duplicate\s*\?\s*undefined\s*:\s*"Каталог интеграций Falcon"\s*\}/);
+  assert.match(marquee, /aria-label=\{\s*duplicate\s*\?\s*undefined\s*:\s*copy\.catalog\s*\}/);
   assert.match(marquee, /aria-hidden=\{duplicate \|\| undefined\}/);
   assert.match(marquee, /aria-pressed=\{paused\}/);
-  assert.match(marquee, /Остановить строку интеграций/);
-  assert.match(marquee, /Запустить строку интеграций/);
+  assert.match(marquee, /copy.pauseMarquee/);
+  assert.match(marquee, /copy.resumeMarquee/);
   assert.doesNotMatch(marquee, /Скоро/);
   const youTrackMark = resolve(root, "public/falcon/integrations/youtrack.svg");
   assert.equal(existsSync(youTrackMark), true);
@@ -74,12 +76,12 @@ test("video markup requires manual playback and exposes labeled player controls"
   assert.doesNotMatch(video, /\bautoPlay\b|\bautoplay\b|\bloop\b/);
   assert.match(video, /\bplaysInline\b/);
   assert.match(video, /aria-label=\{demo\.title\}/);
-  assert.match(source, /Воспроизвести видео: \$\{demo\.title\}/);
-  assert.match(source, /Пауза: \$\{demo\.title\}/);
-  assert.match(source, /Позиция видео: \$\{demo\.title\}/);
-  assert.match(source, /На весь экран: \$\{demo\.title\}/);
+  assert.match(source, /\$\{copy\.play\}: \$\{demo\.title\}/);
+  assert.match(source, /\$\{copy\.pause\}: \$\{demo\.title\}/);
+  assert.match(source, /\$\{copy\.position\}: \$\{demo\.title\}/);
+  assert.match(source, /\$\{copy\.fullscreen\}: \$\{demo\.title\}/);
   assert.match(source, /kind="captions"/);
-  assert.match(source, /<summary>Что в видео<\/summary>/);
+  assert.match(source, /<summary>\{copy.transcript\}<\/summary>/);
 });
 
 test("company entry uses one rounded input surface with neutral outer focus", () => {

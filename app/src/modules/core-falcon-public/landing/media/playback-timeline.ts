@@ -14,6 +14,7 @@ export function connectPlaybackTimeline(
   range: HTMLInputElement,
   elapsed: HTMLElement,
   clock: TimelineClock,
+  of = "из",
 ) {
   let frame: number | null = null;
   let waiting = false;
@@ -36,7 +37,7 @@ export function connectPlaybackTimeline(
     if (!dragging) range.value = String(position);
     const text = formatPlaybackTime(position);
     if (elapsed.textContent !== text) elapsed.textContent = text;
-    const label = `${text} из ${formatPlaybackTime(duration)}`;
+    const label = `${text} ${of} ${formatPlaybackTime(duration)}`;
     if (label !== lastLabel) {
       range.setAttribute("aria-valuetext", label);
       lastLabel = label;

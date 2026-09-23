@@ -1,11 +1,13 @@
 "use client";
 
+import { useLandingLocale } from "../localization/context/LandingLocaleProvider";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { INTEGRATIONS } from "../../../core-tms/presentation/hooks/catalog/integration-definitions";
 import styles from "../landing.module.css";
 
 export function IntegrationMarquee() {
+  const { copy } = useLandingLocale();
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
@@ -22,7 +24,7 @@ export function IntegrationMarquee() {
             <ul
               key={String(duplicate)}
               className={styles.marqueeGroup}
-              aria-label={duplicate ? undefined : "Каталог интеграций Falcon"}
+              aria-label={duplicate ? undefined : copy.catalog}
               aria-hidden={duplicate || undefined}
             >
               {INTEGRATIONS.map(({ id, name, icon: Icon }) => (
@@ -51,8 +53,8 @@ export function IntegrationMarquee() {
         onClick={() => setPaused(!paused)}
         aria-label={
           paused
-            ? "Запустить строку интеграций"
-            : "Остановить строку интеграций"
+            ? copy.resumeMarquee
+            : copy.pauseMarquee
         }
         aria-pressed={paused}
       >

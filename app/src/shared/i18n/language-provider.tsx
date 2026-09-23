@@ -123,7 +123,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = htmlLanguageForPath(pathname, LOCALE_META[locale].htmlLang);
+    document.documentElement.lang = htmlLanguageForPath(pathname, LOCALE_META[locale].htmlLang, document.documentElement.dataset.falconLandingLocale);
     document.documentElement.dataset.locale = locale;
   }, [locale, pathname]);
 

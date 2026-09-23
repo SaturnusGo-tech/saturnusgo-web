@@ -1,29 +1,21 @@
+"use client";
+import { useLandingLocale } from "../localization/context/LandingLocaleProvider";
 import { SiTelegram } from "react-icons/si";
 import { Reveal } from "../motion/Reveal";
 import styles from "./pilot.module.css";
 
 export function PilotSection() {
+  const { copy } = useLandingLocale();
   return (
     <section className={styles.section} aria-labelledby="company-title">
       <Reveal>
-        <p className={styles.label}>Для вашей команды</p>
-        <h2 id="company-title">Falcon для вашей компании</h2>
+        <p className={styles.label}>{copy.companyLabel}</p>
+        <h2 id="company-title">{copy.companyTitle}</h2>
         <div className={styles.points}>
-          <div>
-            <h3>Пространство компании</h3>
-            <p>Отдельный адрес для входа и доступ к проектам вашей компании.</p>
-          </div>
-          <div>
-            <h3>Управление доступом</h3>
-            <p>Администратор добавляет сотрудников, назначает роли и отключает доступ.</p>
-          </div>
-          <div>
-            <h3>Подключение Falcon</h3>
-            <p>Обсудим состав команды, перенос кейсов и нужные интеграции до начала работы.</p>
-          </div>
+          {copy.companyPoints.map(point => <div key={point.title}><h3>{point.title}</h3><p>{point.text}</p></div>)}
         </div>
         <a href="https://t.me/falcon_tms" target="_blank" rel="noopener noreferrer" className={styles.contact}>
-          <SiTelegram size={17} aria-hidden="true" /> Связаться с нами
+          <SiTelegram size={17} aria-hidden="true" /> {copy.contact}
         </a>
       </Reveal>
     </section>

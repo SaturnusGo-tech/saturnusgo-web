@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./falconBrand.module.css";
 
-export function FalconBrand({ inverse = false }: { readonly inverse?: boolean }) {
+export function FalconBrand({ inverse = false, label = "Falcon: на главную" }: { readonly inverse?: boolean; readonly label?: string }) {
   return (
-    <Link className={styles.brand} href="/" aria-label="Falcon: на главную">
+    <Link className={styles.brand} href="/" aria-label={label}>
       <Image
         src={inverse ? "/falcon/falcon-mark-light.png" : "/falcon/falcon-mark-dark.png"}
         alt=""

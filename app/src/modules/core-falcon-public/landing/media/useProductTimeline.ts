@@ -3,7 +3,7 @@
 import { useEffect, useRef, type KeyboardEvent, type RefObject } from "react";
 import { connectPlaybackTimeline } from "./playback-timeline";
 
-export function useProductTimeline(video: RefObject<HTMLVideoElement | null>) {
+export function useProductTimeline(video: RefObject<HTMLVideoElement | null>, of = "из") {
   const range = useRef<HTMLInputElement>(null);
   const elapsed = useRef<HTMLSpanElement>(null);
   const timeline = useRef<ReturnType<typeof connectPlaybackTimeline> | null>(
@@ -21,6 +21,7 @@ export function useProductTimeline(video: RefObject<HTMLVideoElement | null>) {
         cancelFrame: (id) => cancelAnimationFrame(id),
         hidden: () => document.hidden,
       },
+      of,
     );
     timeline.current = connection;
     document.addEventListener("visibilitychange", connection.visibilityChanged);
@@ -38,7 +39,7 @@ export function useProductTimeline(video: RefObject<HTMLVideoElement | null>) {
       window.removeEventListener("pointercancel", connection.endScrub);
       window.removeEventListener("blur", connection.endScrub);
     };
-  }, [video]);
+  }, [video, of]);
 
   return {
     range,
