@@ -31,7 +31,7 @@ test("English copy is complete and each demo uses its own localized media", () =
   assert.equal(Object.keys(english.demos).length, 7);
   for (const key of Object.keys(russian.demos) as (keyof typeof russian.demos)[]) {
     assert.notEqual(english.demos[key].src, russian.demos[key].src);
-    assert.match(english.demos[key].captions, /2026-09-english\/.+\.vtt$/);
+    assert.match(english.demos[key].captions, /2026-09-english-v2\/.+\.vtt$/);
   }
 });
 

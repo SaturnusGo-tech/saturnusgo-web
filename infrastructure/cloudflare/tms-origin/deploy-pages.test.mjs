@@ -115,6 +115,9 @@ for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard",
   for (const extension of ["mp4", "webp", "vtt"]) {
     if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
     if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack" && extension === "mp4") continue;
+    if (!(process.env.OMIT_ENGLISH_CAPTIONS === "1" && id === "cases" && extension === "vtt")) {
+      write("out/falcon/landing/2026-09-english-v2/" + id + "." + extension, "English demo asset\\n");
+    }
     const mediaId = ["projects", "youtrack"].includes(id) ? id + "-20260913" : ["runs", "suites"].includes(id) ? id + "-20260917" : id;
     write("out/falcon/landing/2026-09-production/" + mediaId + "." + extension, "demo asset\\n");
   }
@@ -299,4 +302,13 @@ test("fails closed when local Pages main is not exactly origin/main", (context) 
 
   assert.equal(result.status, 11);
   assert.match(result.stderr, /not exactly synchronized/);
+});
+
+test("fails closed when an English caption track is missing", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_ENGLISH_CAPTIONS: "1" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*2026-09-english-v2\/cases\.vtt/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });

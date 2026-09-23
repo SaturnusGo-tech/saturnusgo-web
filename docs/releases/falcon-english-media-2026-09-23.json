@@ -2,10 +2,41 @@
   "recordedAt": "2026-09-23",
   "locale": "en",
   "renderer": "Recordly",
+  "assetRoot": "/falcon/landing/2026-09-english-v2/",
+  "cursor": "Original telemetry, bounded 180ms render-only movement; Recordly camera export without second cursor overlay",
   "captions": "WebVTT",
   "films": [
     {
       "id": "projects",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 11,
+      "decodedAlignment": [
+        {
+          "frame": 115,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1003,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 2575,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -13,13 +44,13 @@
       "files": [
         {
           "name": "projects.mp4",
-          "bytes": 1968321,
-          "sha256": "5f10df20a35ec5fdcc9cd53de1be08925f4f4dec3a91259cf354c029aac47510"
+          "bytes": 1826641,
+          "sha256": "4478a8246ab94585670c5f1f091d09f13346367c636b4245b31c5d9b414e7220"
         },
         {
           "name": "projects.webp",
-          "bytes": 12178,
-          "sha256": "3d92910d131ddbc62650cf58e66f8fae3e432e9fc0453e7ce0e24193580444ba"
+          "bytes": 11952,
+          "sha256": "6dab440f81c43cbcf6656eee5716405661fcb04ed5a36c37a90173a6c0beeb61"
         },
         {
           "name": "projects.vtt",
@@ -30,6 +61,35 @@
     },
     {
       "id": "cases",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 6,
+      "decodedAlignment": [
+        {
+          "frame": 47,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 650,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1508,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1492,
       "height": 1054,
       "fps": "60/1",
@@ -37,13 +97,13 @@
       "files": [
         {
           "name": "cases.mp4",
-          "bytes": 1921120,
-          "sha256": "64cf7077f29b11d022272efa3027de0ca7f4330017773fd7227966a54265e222"
+          "bytes": 1865104,
+          "sha256": "472b02cb040013965e559172177de763d55ab0d16767d17d6f2665d78fd4e275"
         },
         {
           "name": "cases.webp",
-          "bytes": 67092,
-          "sha256": "f04cca72f1f8d310c53c45f3662fee8aa63be4344d608ecb04dd705f63212a37"
+          "bytes": 65040,
+          "sha256": "a71768ce35c473789bae8d62e3252907345dbdff1d1d7640556aaea25f8026ab"
         },
         {
           "name": "cases.vtt",
@@ -54,6 +114,35 @@
     },
     {
       "id": "runs",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 14,
+      "decodedAlignment": [
+        {
+          "frame": 63,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1838,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 3485,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -61,13 +150,13 @@
       "files": [
         {
           "name": "runs.mp4",
-          "bytes": 4506163,
-          "sha256": "909078c0e8b1f534753033d620818f3994f7b43508ad9da3a0dd93b6ea5ed289"
+          "bytes": 4245610,
+          "sha256": "213471f994d078cb9a5d0a178dfc0a8c06ead8d92534a25110be95744ec1c7fd"
         },
         {
           "name": "runs.webp",
-          "bytes": 40782,
-          "sha256": "1843c475ea5ea78c478435ae0d4ff4ac7d25c8b3dc0ec155bef4709719b70f4b"
+          "bytes": 39636,
+          "sha256": "49c02fb740b33f0003d1f6486c3c50ddd6efeabd2c0af02ceb8e58a1523efead"
         },
         {
           "name": "runs.vtt",
@@ -78,6 +167,35 @@
     },
     {
       "id": "suites",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 12,
+      "decodedAlignment": [
+        {
+          "frame": 102,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1149,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 3548,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -85,13 +203,13 @@
       "files": [
         {
           "name": "suites.mp4",
-          "bytes": 2654270,
-          "sha256": "fcd9368c75f514913994dbcb73962fb9ea03b2a0f1bb5fb1186dc0f9cb9789de"
+          "bytes": 2500173,
+          "sha256": "5fdc838526eb75c4f8bbdfeb41262081f0a4721d74597db8f8bbce389a88c218"
         },
         {
           "name": "suites.webp",
-          "bytes": 33146,
-          "sha256": "0488158c0e8bee15eed94ec2ece317ae9557d6c73d5c5024449f97c1bacb3262"
+          "bytes": 32284,
+          "sha256": "69f2f218a0d7073b293866eb08abc5c88c9cfad9d91ccc17edcfda87e1d56c66"
         },
         {
           "name": "suites.vtt",
@@ -102,6 +220,35 @@
     },
     {
       "id": "defects",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 8,
+      "decodedAlignment": [
+        {
+          "frame": 136,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1001,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 2486,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -109,13 +256,13 @@
       "files": [
         {
           "name": "defects.mp4",
-          "bytes": 3402658,
-          "sha256": "1155fd65450fd1fc9f6196d40be22c27bc3169169672daf82329e1ca0c87300d"
+          "bytes": 3337236,
+          "sha256": "79f1d7e6877d9966996e76ba109cab0de9278b2999e2975e7b89dad84a820e37"
         },
         {
           "name": "defects.webp",
-          "bytes": 62600,
-          "sha256": "67fe8032230eef173521032b8b43a2a3b82644452963655ecb54cc31c8a4171f"
+          "bytes": 62630,
+          "sha256": "669ed6fb686509c8ead33adaf169562e46fec7e53068dc36a285ade3d0995be3"
         },
         {
           "name": "defects.vtt",
@@ -126,6 +273,35 @@
     },
     {
       "id": "dashboard",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 3,
+      "decodedAlignment": [
+        {
+          "frame": 79,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 525,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 961,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -133,13 +309,13 @@
       "files": [
         {
           "name": "dashboard.mp4",
-          "bytes": 918934,
-          "sha256": "aa8f2b0bf15561ccd708c69f91ce68ba0aa1762989ef2a4bb40da27101bc2f25"
+          "bytes": 880702,
+          "sha256": "11797746f103702924f3a20df40021087bbf180624d13611e1c69629943abcc5"
         },
         {
           "name": "dashboard.webp",
-          "bytes": 13264,
-          "sha256": "75e3811a9cb7f294efbe07f9386f1cca731777a6c138b7c6b9dbd76f56664608"
+          "bytes": 12372,
+          "sha256": "faa1c5f6b07796379b581b27d08576095f03aa26671cea0e88b7dcc1be37786d"
         },
         {
           "name": "dashboard.vtt",
@@ -150,6 +326,35 @@
     },
     {
       "id": "youtrack",
+      "cursorMaxTransitionMs": 180,
+      "secondCursorOverlay": false,
+      "observedClicks": 6,
+      "decodedAlignment": [
+        {
+          "frame": 137,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 911,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        },
+        {
+          "frame": 1692,
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "hotspotErrorPx": 0
+        }
+      ],
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
@@ -157,13 +362,13 @@
       "files": [
         {
           "name": "youtrack.mp4",
-          "bytes": 2954258,
-          "sha256": "d32af1c6b6f4b432fb0f574e625fd969687d1f5ebbdb2f685adcee39fcc51968"
+          "bytes": 2862500,
+          "sha256": "b2519020472a463fce19803a178c7cd60490f05a81c27271ad2a955f4a391573"
         },
         {
           "name": "youtrack.webp",
-          "bytes": 62694,
-          "sha256": "de26029667f97e38e66436870b97fc5289be4773b72851e225a728ab74319400"
+          "bytes": 62570,
+          "sha256": "b5364ad276960c422aea5702642375547cf30e9e8dec78914d00b38fd8007632"
         },
         {
           "name": "youtrack.vtt",

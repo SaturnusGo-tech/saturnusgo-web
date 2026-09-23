@@ -1,5 +1,5 @@
 import type { ProductDemo, ProductStory } from "./demos";
-const root = "/falcon/landing/2026-09-english";
+const root = "/falcon/landing/2026-09-english-v2";
 const demo = (id: string, title: string, description: string, transcript: string): ProductDemo => ({ id, title, description, transcript, src: `${root}/${id}.mp4`, poster: `${root}/${id}.webp`, captions: `${root}/${id}.vtt` });
 export const demos = {
   projects: demo("projects", "Portfolios and projects", "Separate test repositories. A shared view of your products.", "Create a project, give it a key and place it in a portfolio. Browse the related projects, then open the Mobile Banking repository and one of its test cases."),

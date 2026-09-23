@@ -21,7 +21,7 @@ continue under an English description. Playback is manual and media load lazily.
 ## English recordings
 
 Seven independent MP4/WebP/WebVTT sets live in
-`public/falcon/landing/2026-09-english/`. UI and demonstration data are English.
+`public/falcon/landing/2026-09-english-v2/`. UI and demonstration data are English.
 Captions describe the actual recorded actions; supporting product text may explain
 capabilities beyond that particular example.
 
@@ -38,7 +38,12 @@ capabilities beyond that particular example.
 - YouTrack: real demonstration defect delivery and the resulting linked issue.
 
 Recordings use actual browser frames and pointer events. Recordly composes 60 fps
-exports with 1.25× focus regions and smooth pointer movement. Long service waits may
+exports with 1.25× focus regions. The corrected cursor pass holds position during
+idle intervals and limits travel to 180 ms. A render-only cursor layer uses the
+original telemetry and exact click coordinates, then Recordly exports the camera
+motion with its second cursor overlay disabled. Original recordings, input events
+and timestamps are preserved. This avoids interpolating a short move across a
+multi-second pause. Versioned media URLs prevent cached first exports from playing. Long service waits may
 be cut, but results and user interactions are not fabricated. Posters come from the
 finished films and captions are optional tracks rather than text burned into the UI.
 
