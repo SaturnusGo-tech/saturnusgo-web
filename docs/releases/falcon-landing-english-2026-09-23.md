@@ -21,7 +21,7 @@ continue under an English description. Playback is manual and media load lazily.
 ## English recordings
 
 Seven independent MP4/WebP/WebVTT sets live in
-`public/falcon/landing/2026-09-english-v2/`. UI and demonstration data are English.
+`public/falcon/landing/2026-09-english-final/`. UI and demonstration data are English.
 Captions describe the actual recorded actions; supporting product text may explain
 capabilities beyond that particular example.
 

@@ -2,7 +2,7 @@
   "recordedAt": "2026-09-23",
   "locale": "en",
   "renderer": "Recordly",
-  "assetRoot": "/falcon/landing/2026-09-english-v2/",
+  "assetRoot": "/falcon/landing/2026-09-english-final/",
   "cursor": "Original telemetry, bounded 180ms render-only movement; Recordly camera export without second cursor overlay",
   "captions": "WebVTT",
   "films": [
