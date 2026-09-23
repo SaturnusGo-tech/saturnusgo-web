@@ -21,7 +21,7 @@ continue under an English description. Playback is manual and media load lazily.
 ## English recordings
 
 Seven independent MP4/WebP/WebVTT sets live in
-`public/falcon/landing/2026-09-english-final/`. UI and demonstration data are English.
+`public/falcon/landing/2026-09-english-natural/`. UI and demonstration data are English.
 Captions describe the actual recorded actions; supporting product text may explain
 capabilities beyond that particular example.
 
@@ -38,14 +38,24 @@ capabilities beyond that particular example.
 - YouTrack: real demonstration defect delivery and the resulting linked issue.
 
 Recordings use actual browser frames and pointer events. Recordly composes 60 fps
-exports with 1.25× focus regions. The corrected cursor pass holds position during
-idle intervals and limits travel to 180 ms. A render-only cursor layer uses the
-original telemetry and exact click coordinates, then Recordly exports the camera
-motion with its second cursor overlay disabled. Original recordings, input events
-and timestamps are preserved. This avoids interpolating a short move across a
-multi-second pause. Versioned media URLs prevent cached first exports from playing. Long service waits may
-be cut, but results and user interactions are not fabricated. Posters come from the
-finished films and captions are optional tracks rather than text burned into the UI.
+exports with 1.25× focus regions and its smooth camera preset. Cursor travel uses
+distance-aware 350–850 ms easing, with stationary holds between actions and exact
+recorded click targets. Recordly's second cursor overlay is disabled.
+
+After review of the first English cut, only text-entry fragments were recaptured
+with real character-by-character input. The typing passages were individually
+retimed to remove artificial keyboard delays (roughly 3–4 seconds for a short
+sentence), without accelerating the surrounding UI actions. The original Falcon
+AI instruction already had progressive input and was retained. Unchanged original
+captures and retake frames remain outside the repository; each retimed take has
+an editorial timing manifest. Loading waits and incomplete loading-only tails were
+removed from the edit. A few already-loaded real frames have short reading holds,
+and the portfolio selection/save actions have an 800 ms editorial pause to prevent
+a cross-screen pointer jump. These presentation cuts do not establish API performance.
+
+Versioned media URLs separate this revision from both rejected cursor exports.
+Posters come from the finished films; captions are optional WebVTT tracks. Results,
+AI responses and the YouTrack delivery come from the real original interactions.
 
 The local recording workspace is isolated from customer data. A separately authorized
 English demonstration case was created in production for Falcon AI; existing cases
