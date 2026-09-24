@@ -118,6 +118,7 @@ for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard",
     if (!(process.env.OMIT_ENGLISH_CAPTIONS === "1" && id === "cases" && extension === "vtt")) {
       write("out/falcon/landing/2026-09-english-final/" + id + "." + extension, "English demo asset\\n");
     }
+    if (id === "youtrack") write("out/falcon/landing/2026-09-english-natural/youtrack-navigation." + extension, "YouTrack navigation asset\\n");
     const mediaId = ["projects", "youtrack"].includes(id) ? id + "-20260913" : ["runs", "suites"].includes(id) ? id + "-20260917" : id;
     write("out/falcon/landing/2026-09-production/" + mediaId + "." + extension, "demo asset\\n");
   }

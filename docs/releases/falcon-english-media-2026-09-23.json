@@ -350,7 +350,7 @@
         "max": 850
       },
       "secondCursorOverlay": false,
-      "observedClicks": 7,
+      "observedClicks": 6,
       "decodedAlignment": [
         {
           "frame": 47,
@@ -361,7 +361,7 @@
           "hotspotErrorPx": 0
         },
         {
-          "frame": 813,
+          "frame": 527,
           "offset": {
             "x": 0,
             "y": 0
@@ -369,7 +369,7 @@
           "hotspotErrorPx": 0
         },
         {
-          "frame": 1212,
+          "frame": 1090,
           "offset": {
             "x": 0,
             "y": 0
@@ -380,24 +380,29 @@
       "width": 1728,
       "height": 1118,
       "fps": "60/1",
-      "durationMs": 22850,
+      "durationMs": 26400,
       "files": [
         {
-          "name": "youtrack.mp4",
-          "bytes": 1841382,
-          "sha256": "87c21dc61bb9daa2c7f14012ddcc1acf7f3a9ea7a78f215fe216fb9116cb8ac6"
+          "name": "youtrack-navigation.mp4",
+          "bytes": 1980924,
+          "sha256": "eb1781e005907ac32f5d8f28db4136e93217608459c6b9d01ff351feeb9f1b7e"
         },
         {
-          "name": "youtrack.webp",
-          "bytes": 77992,
-          "sha256": "e8bf7bafc96d5efbaa4008da73fed8118047923d561dd7272ea6969f16f23723"
+          "name": "youtrack-navigation.webp",
+          "bytes": 113582,
+          "sha256": "3315a8251c21b8b71b6de3ce79de876169a574184aae6543d543b06c334116d1"
         },
         {
-          "name": "youtrack.vtt",
-          "bytes": 510,
-          "sha256": "8d7a7a8c1c24461b0b77299d8a94e8a44a88d6afc2b7920cce533061b36acbdd"
+          "name": "youtrack-navigation.vtt",
+          "bytes": 584,
+          "sha256": "0f8bb3698549dc3199bc42f8ea7a848ee368aeb98a8174b4ff6d558db18fc25b"
         }
-      ]
+      ],
+      "recordedAt": "2026-09-24",
+      "scope": "Real Falcon issue-link click followed by the actual YouTrack issue, reproduction steps and results. No reverse-navigation or status-change demonstration.",
+      "externalUi": "YouTrack profile set to English for capture, then restored to Russian. Project-defined field names remain in the existing project language.",
+      "framing": "Native YouTrack frame letterboxed horizontally; source pixels preserved."
     }
-  ]
+  ],
+  "updatedAt": "2026-09-24"
 }

@@ -1,0 +1,29 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.567
+Report a bug from the failed test step.
+
+2
+00:00:02.567 --> 00:00:08.233
+Give the report a clear title and choose its delivery route.
+
+3
+00:00:08.233 --> 00:00:12.833
+Choose the YouTrack delivery route.
+
+4
+00:00:12.833 --> 00:00:16.350
+Create the bug with its YouTrack delivery route.
+
+5
+00:00:16.350 --> 00:00:19.050
+Open the linked issue in YouTrack.
+
+6
+00:00:19.050 --> 00:00:22.250
+The issue includes the reproduction steps and testing context.
+
+7
+00:00:22.250 --> 00:00:26.400
+Compare the expected and actual results directly in YouTrack.

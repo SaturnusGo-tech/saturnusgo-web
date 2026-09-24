@@ -29,6 +29,7 @@ export const requiredPublicAssets = Object.freeze([
   ...["projects-20260913", "cases", "runs-20260917", "suites-20260917", "defects", "dashboard", "youtrack-20260913"].flatMap((id) =>
     ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-production/${id}.${extension}`),
   ),
+  ...["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-english-natural/youtrack-navigation.${extension}`),
   ...["projects", "cases", "runs", "suites", "defects", "dashboard", "youtrack"].flatMap((id) =>
     ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-english-final/${id}.${extension}`),
   ),

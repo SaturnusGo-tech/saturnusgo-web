@@ -1,6 +1,6 @@
 import type { ProductDemo, ProductStory } from "./demos";
 const root = "/falcon/landing/2026-09-english-natural";
-const demo = (id: string, title: string, description: string, transcript: string): ProductDemo => ({ id, title, description, transcript, src: `${root}/${id}.mp4`, poster: `${root}/${id}.webp`, captions: `${root}/${id}.vtt` });
+const demo = (id: string, title: string, description: string, transcript: string, mediaId = id): ProductDemo => ({ id, title, description, transcript, src: `${root}/${mediaId}.mp4`, poster: `${root}/${mediaId}.webp`, captions: `${root}/${mediaId}.vtt` });
 export const demos = {
   projects: demo("projects", "Portfolios and projects", "Separate test repositories. A shared view of your products.", "Create a project, give it a key and place it in a portfolio. Browse the related projects, then open the Mobile Banking repository and one of its test cases."),
   cases: demo("cases", "Refining a test case with Falcon AI", "Make preconditions clear without losing the details.", "Select the preconditions of a demonstration case and ask Falcon AI to turn them into a concise English checklist. Review the real response, apply it and save a new revision."),
@@ -8,7 +8,7 @@ export const demos = {
   suites: demo("suites", "Reusable test suites", "Keep a set of checks ready for the next run.", "Create a dynamic suite that selects cases tagged smoke. Review the 15 matching checks, save the suite and start a new execution with its own results."),
   defects: demo("defects", "From a failed check to a bug report", "Keep the scenario and the failure together.", "Record the failed step and its actual result. Create a bug report with the testing context, open the report and return to the original run to inspect the failure."),
   dashboard: demo("dashboard", "Quality metrics", "Follow a project metric to the work behind it.", "Review the team's work and run results, then open the defects behind a project metric. Figures reflect the demonstration project at the time of recording."),
-  integrations: demo("youtrack", "Falcon and YouTrack", "Connected bug reports and status updates in both directions.", "Report a bug from a failed test step and choose its YouTrack delivery route. Open the saved report with the linked YouTrack issue, then return to the original run. Delivery waits are shortened in the video."),
+  integrations: demo("youtrack", "Falcon and YouTrack", "Open the developer’s issue with the testing context intact.", "Report a bug from a failed test step and choose its YouTrack delivery route. Follow the saved report’s issue link into YouTrack to review the reproduction steps, testing context, expected result and actual result. Delivery waits are shortened in the video.", "youtrack-navigation"),
 } as const;
 export const projectStory: ProductStory = {
   label: "Portfolios and projects", title: "Each product has its own checks",
