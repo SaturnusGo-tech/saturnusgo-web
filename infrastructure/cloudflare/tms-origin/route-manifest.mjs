@@ -30,6 +30,9 @@ export const requiredPublicAssets = Object.freeze([
     ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-production/${id}.${extension}`),
   ),
   ...["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-english-natural/youtrack-navigation.${extension}`),
+  ...["dashboard-direct", "youtrack-cycle-direct"].flatMap((id) =>
+    ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-english-natural/${id}.${extension}`),
+  ),
   ...["projects", "cases", "runs", "suites", "defects", "dashboard", "youtrack"].flatMap((id) =>
     ["mp4", "webp", "vtt"].map((extension) => `/falcon/landing/2026-09-english-final/${id}.${extension}`),
   ),

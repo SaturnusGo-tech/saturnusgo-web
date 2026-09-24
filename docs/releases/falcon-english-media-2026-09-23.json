@@ -1,9 +1,9 @@
 {
   "recordedAt": "2026-09-23",
   "locale": "en",
-  "renderer": "Recordly",
+  "renderer": "Per film: five retained Recordly films; dashboard and YouTrack use direct browser capture + FFmpeg",
   "assetRoot": "/falcon/landing/2026-09-english-natural/",
-  "cursor": "Observed telemetry, 350–850ms distance-aware visual easing with exact click targets. Smooth Recordly camera without duplicate pointer overlay.",
+  "cursor": "See per-film provenance. Direct replacements use an original vector pointer with observed click coordinates, 320\u2013620ms render-only easing and no camera motion.",
   "editing": "Approved text-entry retakes with typing-only retiming. Loading omissions and short real-frame reading holds. Original AI and YouTrack results retained. Not a performance benchmark.",
   "captions": "WebVTT",
   "films": [
@@ -289,119 +289,71 @@
     },
     {
       "id": "dashboard",
+      "recordedAt": "2026-09-24",
+      "renderer": "Direct browser capture + FFmpeg",
+      "recordly": false,
+      "cameraMotion": false,
+      "playbackSpeed": 1,
       "cursorTransitionMs": {
-        "min": 350,
-        "max": 850
+        "min": 320,
+        "max": 620
       },
-      "secondCursorOverlay": false,
-      "observedClicks": 3,
-      "decodedAlignment": [
-        {
-          "frame": 79,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        },
-        {
-          "frame": 469,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        },
-        {
-          "frame": 575,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        }
-      ],
-      "width": 1728,
-      "height": 1118,
+      "width": 1920,
+      "height": 1242,
       "fps": "60/1",
-      "durationMs": 13700,
+      "durationMs": 26800.0,
+      "provenance": "falcon-direct-media-2026-09-24.md",
       "files": [
         {
-          "name": "dashboard.mp4",
-          "bytes": 405176,
-          "sha256": "9502155e3ed34133127b3e7c62d4a50aa2c0fda352f42ce3afaf501346223877"
+          "name": "dashboard-direct.mp4",
+          "bytes": 1013609,
+          "sha256": "c69bf8574176f9b2d4cc922abacb618df942d4ebd0fa1fa2ef74eb5f069ff8e4"
         },
         {
-          "name": "dashboard.webp",
-          "bytes": 44070,
-          "sha256": "869f320b643a34cc48c663ba0a4a94e70e7ed939c8ba89ddbdda5013038a5c0e"
+          "name": "dashboard-direct.webp",
+          "bytes": 16888,
+          "sha256": "4130edb3d053f634dfc0c67eadd8e49d357e503de5e671b9fc2c33f74f7ec53d"
         },
         {
-          "name": "dashboard.vtt",
-          "bytes": 245,
-          "sha256": "25282728c2690078a4c7a12e575c012f3dac7da443856943f832a5877cf191e6"
+          "name": "dashboard-direct.vtt",
+          "bytes": 504,
+          "sha256": "694fdb9509cfb306c84714b7473cc1a84479bc3418ce676e16660bddc5722146"
         }
       ]
     },
     {
       "id": "youtrack",
+      "recordedAt": "2026-09-24",
+      "renderer": "Direct browser capture + FFmpeg",
+      "recordly": false,
+      "cameraMotion": false,
+      "playbackSpeed": 1,
       "cursorTransitionMs": {
-        "min": 350,
-        "max": 850
+        "min": 320,
+        "max": 620
       },
-      "secondCursorOverlay": false,
-      "observedClicks": 6,
-      "decodedAlignment": [
-        {
-          "frame": 47,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        },
-        {
-          "frame": 527,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        },
-        {
-          "frame": 1090,
-          "offset": {
-            "x": 0,
-            "y": 0
-          },
-          "hotspotErrorPx": 0
-        }
-      ],
-      "width": 1728,
-      "height": 1118,
+      "width": 1920,
+      "height": 1438,
       "fps": "60/1",
-      "durationMs": 26400,
+      "durationMs": 56150.0,
+      "provenance": "falcon-direct-media-2026-09-24.md",
       "files": [
         {
-          "name": "youtrack-navigation.mp4",
-          "bytes": 1980924,
-          "sha256": "eb1781e005907ac32f5d8f28db4136e93217608459c6b9d01ff351feeb9f1b7e"
+          "name": "youtrack-cycle-direct.mp4",
+          "bytes": 4598082,
+          "sha256": "c2e181b026ad0e63ef83a0a552faae044097e4d778eae9c0b57034d1cbcc0134"
         },
         {
-          "name": "youtrack-navigation.webp",
-          "bytes": 113582,
-          "sha256": "3315a8251c21b8b71b6de3ce79de876169a574184aae6543d543b06c334116d1"
+          "name": "youtrack-cycle-direct.webp",
+          "bytes": 21562,
+          "sha256": "cb98cc2010eeb4fa7c313cfb6586d4f5b8e482edb591983f34b4e1a01d31132f"
         },
         {
-          "name": "youtrack-navigation.vtt",
-          "bytes": 584,
-          "sha256": "0f8bb3698549dc3199bc42f8ea7a848ee368aeb98a8174b4ff6d558db18fc25b"
+          "name": "youtrack-cycle-direct.vtt",
+          "bytes": 1014,
+          "sha256": "d477a2f8a0dca307b4ed3ff7c72983f439565505f68374d18c89aea2e68542e0"
         }
-      ],
-      "recordedAt": "2026-09-24",
-      "scope": "Real Falcon issue-link click followed by the actual YouTrack issue, reproduction steps and results. No reverse-navigation or status-change demonstration.",
-      "externalUi": "YouTrack profile set to English for capture, then restored to Russian. Project-defined field names remain in the existing project language.",
-      "framing": "Native YouTrack frame letterboxed horizontally; source pixels preserved."
+      ]
     }
   ],
   "updatedAt": "2026-09-24"

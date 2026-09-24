@@ -1,0 +1,17 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.900 line:92% size:90%
+Transfers has one failed check.
+Start with the component that needs attention.
+
+00:00:08.000 --> 00:00:16.600 line:92% size:90%
+Open the count to see exactly which check failed
+and the run it belongs to.
+
+00:00:16.700 --> 00:00:21.700 line:92% size:90%
+Follow that check to its recorded steps
+on build 2.8.0-rc.1.
+
+00:00:21.800 --> 00:00:26.750 line:92% size:90%
+Expected: both balances update.
+Actual: Savings updates only after signing in again.

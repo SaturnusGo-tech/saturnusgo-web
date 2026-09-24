@@ -119,6 +119,7 @@ for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard",
       write("out/falcon/landing/2026-09-english-final/" + id + "." + extension, "English demo asset\\n");
     }
     if (id === "youtrack") write("out/falcon/landing/2026-09-english-natural/youtrack-navigation." + extension, "YouTrack navigation asset\\n");
+    if (["dashboard", "youtrack"].includes(id)) write("out/falcon/landing/2026-09-english-natural/" + (id === "dashboard" ? "dashboard-direct" : "youtrack-cycle-direct") + "." + extension, "Direct recording asset\\n");
     const mediaId = ["projects", "youtrack"].includes(id) ? id + "-20260913" : ["runs", "suites"].includes(id) ? id + "-20260917" : id;
     write("out/falcon/landing/2026-09-production/" + mediaId + "." + extension, "demo asset\\n");
   }

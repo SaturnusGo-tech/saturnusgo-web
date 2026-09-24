@@ -1,0 +1,33 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.950 line:92% size:90%
+Report the failed step to YouTrack,
+with the test context and both results attached.
+
+00:00:08.050 --> 00:00:11.500 line:92% size:90%
+Falcon keeps the bug linked
+to the original run and the developer's issue.
+
+00:00:11.700 --> 00:00:19.700 line:92% size:90%
+In YouTrack, the developer moves the fix
+to the testing stage.
+
+00:00:19.900 --> 00:00:28.700 line:92% size:90%
+Falcon receives Ready for QA.
+Start a linked retest on the fixed build, 2.8.0-rc.2.
+
+00:00:28.900 --> 00:00:39.300 line:8% size:90%
+Record the successful check and its actual result.
+The original failed run remains in the history.
+
+00:00:39.500 --> 00:00:47.100 line:8% size:90%
+After the retest passes,
+confirm the fix against its recorded evidence.
+
+00:00:47.300 --> 00:00:50.750 line:8% size:90%
+Falcon marks the fix Verified
+and confirms the YouTrack transition to Done.
+
+00:00:50.950 --> 00:00:56.100 line:92% size:90%
+Back in YouTrack: the task is Done,
+updated by TMS Integration.
