@@ -1,3 +1,12 @@
+## Minimal shell insets · 26 September 2026
+
+User approved production publication including the preceding dark-surface and sidebar-motion refinement.
+
+- Desktop shell padding2px on every side; sidebar/workspace gap4px, identical in both themes.
+- Mobile shell sides/top2px, open navigation reservation64px; bottom rail58px at bottom2px, gap4px. Collapsed reservation2px.
+- Live 883×695: sidebar x2/y2/height691; workspace x74/y2/right881/bottom693; no document horizontal overflow.
+- 14 existing presentation, motion and repository-width checks passed. Independent review found no blocker. Worker/backend/dependencies unchanged.
+
 ## Dark surface, density and sidebar motion refinement · 26 September 2026
 
 Local preview only; follows production source `3ca2cee2d`.

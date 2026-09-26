@@ -861,8 +861,8 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 @media (max-width: 760px) {
   .shell[data-appearance="glass"] .workspaceColumn,
   .shell[data-appearance="glass"][data-sidebar="collapsed"] .workspaceColumn { height: 100%; border-radius: 20px; }
-  .shell[data-appearance="glass"] .navigation { inset: auto 6px 6px; width: calc(100% - 12px); height: 58px; border-radius: 20px; }
-  .shell[data-appearance="glass"] .navigationCollapsed { transform: translateY(calc(100% + 12px)); }
+  .shell[data-appearance="glass"] .navigation { inset: auto 2px 2px; width: calc(100% - 4px); height: 58px; border-radius: 20px; }
+  .shell[data-appearance="glass"] .navigationCollapsed { transform: translateY(calc(100% + 4px)); }
   .shell[data-appearance="glass"] .stage { height: 100%; }
   .shell[data-appearance="glass"] .brandArea { display: none; }
   .shell[data-appearance="glass"] .navigationUtilities { border: 0; }

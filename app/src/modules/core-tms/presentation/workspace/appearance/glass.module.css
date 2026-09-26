@@ -18,8 +18,8 @@
   --line: var(--glass-border);
   --line-strong: rgb(40 40 36 / 22%);
   --control-hover: var(--glass-hover);
-  padding: 6px;
-  gap: 8px;
+  padding: 2px;
+  gap: 4px;
   background-color: #eae9e6;
   background-image: var(--glass-wallpaper);
   background-position: center;
@@ -49,6 +49,6 @@
   background-color: #161617;
 }
 @media (max-width: 760px) {
-  .glass.glass[data-appearance="glass"] { padding: 6px 6px 70px; gap: 0; }
-  .glass.glass[data-appearance="glass"][data-sidebar="collapsed"] { padding-bottom: 6px; }
+  .glass.glass[data-appearance="glass"] { padding: 2px 2px 64px; gap: 0; }
+  .glass.glass[data-appearance="glass"][data-sidebar="collapsed"] { padding-bottom: 2px; }
 }
