@@ -28,7 +28,7 @@ export function useVerificationQueue(projectId: string, enabled: boolean, ru: bo
         ? (ru ? "Нет доступа к очереди проверки." : "You cannot access the verification queue.")
         : error instanceof TmsApiError && error.status === 409
         ? (ru ? "Очередь изменилась во время загрузки. Обновите её." : "The queue changed while loading. Refresh it.")
-        : (ru ? "Не удалось загрузить исправления. Нажмите «Проверить исправления», чтобы повторить." : "Could not load the fixes. Select Verify fixes to retry.");
+        : (ru ? "Не удалось загрузить исправления. Обновите страницу, чтобы повторить." : "Could not load the fixes. Refresh the page to retry.");
       setResource((old) => ({ ...old, scope, pending: false, error: message }));
       return null;
     }

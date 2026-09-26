@@ -5,6 +5,6 @@ export function showVerificationControl(state: {
 }): boolean {
   if (!state.enabled) return false;
   if (state.unresolved || state.pendingStart) return true;
-  if (state.data) return state.data.totalCases > 0;
-  return Boolean(state.error);
+  // A failed request is not evidence that there are fixes to verify.
+  return (state.data?.totalCases ?? 0) > 0;
 }

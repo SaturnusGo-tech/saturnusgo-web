@@ -108,10 +108,6 @@
 @media (prefers-reduced-motion: reduce) { .branch, .leaf { transition: none; } .branch[data-drag-source], .leaf[data-drag-source] { filter: none; } }
 
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository { padding-top: 18px; border-color: var(--glass-border); background: transparent; }
-:global(.dark [data-appearance="glass"] [data-testid="cases-view"]) .repository {
-  border: 1px solid var(--glass-border); border-radius: 22px;
-  background: var(--glass-panel); box-shadow: var(--glass-shadow);
-}
 :global([data-appearance="glass"] [data-testid="cases-view"]) :is(.folderRow, .leaf) { border-radius: 12px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-weight: 600; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }

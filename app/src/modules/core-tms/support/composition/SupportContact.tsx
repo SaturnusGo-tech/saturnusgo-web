@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { MessageCircle } from "lucide-react";
+import { MessageCircleMore } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -44,7 +44,7 @@ export function SupportContact({workspaceId}:{workspaceId:string}) {
   }
   const close=()=>{if(!model.busy&&!capturing)setOpen(false);};
   return <><button type="button" className={nav.navigationUtilityButton} onClick={show} title={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
-    <span className={nav.navigationIcon} aria-hidden="true"><MessageCircle size={20}/></span><span className={nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
+    <span className={nav.navigationIcon} aria-hidden="true"><MessageCircleMore size={20}/></span><span className={nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
   </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/><AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
     initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.18}}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>

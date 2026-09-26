@@ -1,21 +1,21 @@
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
-import { PiBriefcaseDuotone } from "react-icons/pi";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import {
   ChevronsLeft,
   ChevronsRight,
   CircleHelp,
-  Code2,
-  FileBarChart,
-  FolderKanban,
-  LayoutDashboard,
-  Link2,
-  ListChecks,
-  Repeat2,
-  PlayCircle,
-  Settings,
+  Braces,
+  ChartNoAxesCombined,
+  Files,
+  PanelsTopLeft,
+  BriefcaseBusiness,
+  Webhook,
+  Layers,
+  Blocks,
+  Play,
+  SlidersHorizontal,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { TmsMessageKey } from "../../localization/catalog/messages";
@@ -30,16 +30,16 @@ const navigationItems: Array<{
   labelKey: TmsMessageKey;
   icon: ReactNode;
 }> = [
-  { id: "dashboard", labelKey: "nav.dashboard", icon: <LayoutDashboard size={20} /> },
-  { id: "portfolios", labelKey: "nav.portfolios", icon: <PiBriefcaseDuotone size={21} /> },
-  { id: "cases", labelKey: "nav.cases", icon: <FolderKanban size={20} /> },
-  { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Repeat2 size={20} /> },
-  { id: "api", labelKey: "nav.apiTesting", icon: <Code2 size={20} /> },
-  { id: "runs", labelKey: "nav.runs", icon: <PlayCircle size={20} /> },
-  { id: "suites", labelKey: "nav.suites", icon: <ListChecks size={20} /> },
-  { id: "hooks", labelKey: "nav.hooks", icon: <Link2 size={20} /> },
-  { id: "reports", labelKey: "nav.reports", icon: <FileBarChart size={20} /> },
-  { id: "config", labelKey: "nav.config", icon: <Settings size={20} /> },
+  { id: "dashboard", labelKey: "nav.dashboard", icon: <PanelsTopLeft size={20} /> },
+  { id: "portfolios", labelKey: "nav.portfolios", icon: <BriefcaseBusiness size={20} /> },
+  { id: "cases", labelKey: "nav.cases", icon: <Files size={20} /> },
+  { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Blocks size={20} /> },
+  { id: "api", labelKey: "nav.apiTesting", icon: <Braces size={20} /> },
+  { id: "runs", labelKey: "nav.runs", icon: <Play size={20} /> },
+  { id: "suites", labelKey: "nav.suites", icon: <Layers size={20} /> },
+  { id: "hooks", labelKey: "nav.hooks", icon: <Webhook size={20} /> },
+  { id: "reports", labelKey: "nav.reports", icon: <ChartNoAxesCombined size={20} /> },
+  { id: "config", labelKey: "nav.config", icon: <SlidersHorizontal size={20} /> },
   { id: "help", labelKey: "nav.help", icon: <CircleHelp size={20} /> },
 ];
 

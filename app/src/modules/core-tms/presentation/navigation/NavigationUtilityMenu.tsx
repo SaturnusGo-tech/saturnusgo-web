@@ -1,4 +1,4 @@
-import { Bell, CircleHelp, Settings } from "lucide-react";
+import { Bell, CircleHelp, SlidersHorizontal } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { SupportContact } from "../../support/composition/SupportContact";
 import shellStyles from "../workspace/tms-shell.module.css";
@@ -15,7 +15,7 @@ export function NavigationUtilityMenu({workspaceId,disabled,settingsActive,helpA
         disabled={disabled}
         aria-current={settingsActive ? "page" : undefined}
       >
-        <span className={shellStyles.navigationIcon} aria-hidden="true"><Settings size={20} /></span>
+        <span className={shellStyles.navigationIcon} aria-hidden="true"><SlidersHorizontal size={20} /></span>
         <span className={shellStyles.navigationLabel}>{t("nav.config")}</span>
       </button>
       <button type="button" className={`${shellStyles.navigationUtilityButton} ${helpActive ? shellStyles.navigationUtilityButtonActive : ""}`}

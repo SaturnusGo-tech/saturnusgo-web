@@ -14,7 +14,12 @@ test("an interrupted verification remains recoverable after its queue is consume
   assert.equal(showVerificationControl({ ...base, data: { totalCases: 0 }, unresolved: true }), true);
   assert.equal(showVerificationControl({ ...base, data: { totalCases: 0 }, pendingStart: true }), true);
 });
-test("unknown queue failure exposes retry, but never bypasses access permissions", () => {
-  assert.equal(showVerificationControl({ ...base, error: "load failed" }), true);
+test("unknown queue failure does not invent available fixes", () => {
+  assert.equal(showVerificationControl({ ...base, error: "load failed" }), false);
+  assert.equal(showVerificationControl({ ...base, data: { totalCases: 3 }, error: "refresh failed" }), true);
+  assert.equal(showVerificationControl({ ...base, data: { totalCases: 0 }, error: "refresh failed" }), false);
+});
+test("available fixes and pending recovery never bypass access permissions", () => {
+  assert.equal(showVerificationControl({ ...base, enabled: false, data: { totalCases: 3 } }), false);
   assert.equal(showVerificationControl({ ...base, enabled: false, unresolved: true, error: "load failed" }), false);
 });

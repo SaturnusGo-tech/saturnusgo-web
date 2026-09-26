@@ -15,12 +15,3 @@
 }
 
 :global([data-appearance="glass"]) .empty { background: transparent; }
-:global(.dark [data-appearance="glass"]) .panes { gap: 12px; }
-:global(.dark [data-appearance="glass"]) .panes .detail {
-  border: 1px solid var(--glass-border); border-radius: 22px;
-  background: var(--glass-panel); box-shadow: var(--glass-shadow);
-}
-:global(.dark [data-appearance="glass"]) .empty { background: transparent; }
-@container cases-workspace (max-width: 719px) {
-  :global(.dark [data-appearance="glass"]) .panes { gap: 0; }
-}
