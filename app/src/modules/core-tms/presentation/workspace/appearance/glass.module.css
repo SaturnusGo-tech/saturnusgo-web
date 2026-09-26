@@ -18,8 +18,8 @@
   --line: var(--glass-border);
   --line-strong: rgb(40 40 36 / 22%);
   --control-hover: var(--glass-hover);
-  padding: 12px;
-  gap: 12px;
+  padding: 6px;
+  gap: 8px;
   background-color: #eae9e6;
   background-image: var(--glass-wallpaper);
   background-position: center;
@@ -29,8 +29,8 @@
 :global(.dark) .glass.glass[data-appearance="glass"] {
   --glass-text: #f2f2f0;
   --glass-muted: #a5a5a2;
-  --glass-panel: rgb(12 12 12 / 86%);
-  --glass-panel-strong: #191919;
+  --glass-panel: rgb(13 13 15 / 96%);
+  --glass-panel-strong: #111113;
   --glass-border: rgb(255 255 250 / 12%);
   --glass-hover: rgb(255 255 250 / 7%);
   --glass-selected: rgb(255 255 250 / 11%);
@@ -38,9 +38,15 @@
   --glass-active-ink: #111111;
   --glass-accent: #6ea4ff;
   --glass-shadow: 0 12px 38px rgb(0 0 0 / 20%), inset 0 1px 0 rgb(255 255 250 / 4%);
-  --glass-wallpaper: radial-gradient(ellipse at 12% 0%, #454543 0%, transparent 58%), radial-gradient(ellipse at 95% 100%, #343433 0%, transparent 62%);
+  --glass-wallpaper: radial-gradient(ellipse at 12% 0%, #242425 0%, transparent 58%), radial-gradient(ellipse at 95% 100%, #1c1c1d 0%, transparent 62%);
   --line-strong: rgb(255 255 250 / 22%);
-  background-color: #242423;
+  --tms-bg-canvas: #111113;
+  --tms-bg-panel: #111113;
+  --tms-bg-elevated: #19191c;
+  --tms-bg-sidebar: #0d0d0f;
+  --paper: var(--glass-panel-strong);
+  --control: var(--tms-bg-elevated);
+  background-color: #161617;
 }
 @media (max-width: 760px) {
   .glass.glass[data-appearance="glass"] { padding: 6px 6px 70px; gap: 0; }

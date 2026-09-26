@@ -1,3 +1,18 @@
+## Dark surface, density and sidebar motion refinement · 26 September 2026
+
+Local preview only; follows production source `3ca2cee2d`.
+
+- Shared outer padding: 12→6px; pane gap: 12→8px; repository header top inset: 18→12px; shell header side inset: 20→14px. Typography unchanged.
+- Dark wallpaper base #161617 with subdued neutral gradients; dark page/panel tokens use the existing suite canvas #111113. Elevated controls retain a distinct #19191c surface.
+- Sidebar desktop layout has one flex-basis transition. Row icon anchors, utility positions and the 38px toggle height remain stable. Circle/pill uses the same radius; profile/admin labels fade without display toggles. Mobile bottom navigation is preserved.
+- Live 1440×900: sidebar x/y6, height888; collapsed buttons40×40; expanded width240. Both themes inspected. Suite canvas remains rgb(17,17,19).
+- Recorded collapse: 50 frames, width240→68 with intermediate values; icon x30, utilities y716, toggle y847 stay constant. Expanded final width240 confirmed. Opening frame capture timed out; no opening frame-rate claim.
+- 680×800: no document horizontal overflow; mobile nav labels remain hidden with no rotation.
+- Reduced-motion emulation: sidebar/container/item/toggle transition durations all0s. Emulation restored.
+- Typecheck, architecture1207files,14 existing presentation/motion/repository-width tests and diff whitespace checks passed.
+- Admin/profile geometry reviewed in code; local session does not display managed account links. Safari was not separately exercised.
+- Screenshots and collapse-frame evidence: `../output/falcon-depth-spacing-20260926/`.
+
 # Нейтральная палитра и навигация · 2026-09-26
 
 **final result: passed** для локального просмотра уточнений пользователя. Предыдущий glass v1 опубликован с исходным кодом `adc9ad4aa1ae62ee6dc0ca74c89c848ac8202f5b`; изменения ниже проверены на стенде и в этот релиз не входят.

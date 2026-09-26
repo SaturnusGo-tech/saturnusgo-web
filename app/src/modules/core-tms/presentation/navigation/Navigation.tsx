@@ -4,7 +4,6 @@ import { companyViewAvailable } from "../../auth/managed/domain/features/company
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import {
   ChevronsLeft,
-  ChevronsRight,
   CircleHelp,
   Braces,
   ChartNoAxesCombined,
@@ -155,7 +154,7 @@ export function Navigation({
         title={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}
       >
         <span className={shellStyles.navigationIcon} aria-hidden="true">
-          {collapsed ? <ChevronsRight size={19} /> : <ChevronsLeft size={19} />}
+          <ChevronsLeft size={19} />
         </span>
         <span className={shellStyles.navigationLabel}>
           {t(collapsed ? "nav.expandSidebarShort" : "nav.collapseSidebarShort")}
