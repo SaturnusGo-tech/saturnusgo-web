@@ -106,3 +106,24 @@
 .branch, .leaf { transition: opacity 160ms ease, filter 160ms ease; }
 .branch[data-drag-source], .leaf[data-drag-source] { opacity: .34; filter: blur(.45px); }
 @media (prefers-reduced-motion: reduce) { .branch, .leaf { transition: none; } .branch[data-drag-source], .leaf[data-drag-source] { filter: none; } }
+
+:global([data-appearance="glass"] [data-testid="cases-view"]) .repository { padding-top: 18px; border-color: var(--glass-border); background: transparent; }
+:global(.dark [data-appearance="glass"] [data-testid="cases-view"]) .repository {
+  border: 1px solid var(--glass-border); border-radius: 22px;
+  background: var(--glass-panel); box-shadow: var(--glass-shadow);
+}
+:global([data-appearance="glass"] [data-testid="cases-view"]) :is(.folderRow, .leaf) { border-radius: 12px; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-weight: 600; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .folderRow { padding-block: 3px; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .caseButton > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+
+:global([data-appearance="glass"] [data-testid="cases-view"]) .repository { --repository-guide: var(--glass-border); }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .leaf[data-active] { background: var(--glass-selected); }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-size: 13px !important; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .caseButton > span { font-size: 13px; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .repository :is(button, input):focus-visible { outline-color: var(--glass-accent) !important; }
+@container repository-pane (min-width: 360px) {
+  :global([data-appearance="glass"] [data-testid="cases-view"]) .heading .newFolder { width: auto; padding-inline: 7px; }
+  :global([data-appearance="glass"] [data-testid="cases-view"]) .newFolder span { display: inline; }
+}

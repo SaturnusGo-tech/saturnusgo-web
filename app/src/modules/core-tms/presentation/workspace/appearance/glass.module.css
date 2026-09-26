@@ -1,0 +1,44 @@
+/* Opt-in experiment. The shipping workspace keeps its original appearance. */
+.glass.glass[data-appearance="glass"] {
+  --glass-text: #202938;
+  --glass-muted: #657286;
+  --glass-panel: rgb(255 255 255 / 56%);
+  --glass-panel-strong: #f9fbff;
+  --glass-border: rgb(120 140 170 / 20%);
+  --glass-hover: rgb(130 153 186 / 12%);
+  --glass-selected: rgb(115 151 222 / 15%);
+  --glass-active: #252b35;
+  --glass-active-ink: #fff;
+  --glass-accent: #3574f0;
+  --glass-primary: #2868dd;
+  --glass-shadow: 0 10px 36px rgb(44 65 97 / 5%), inset 0 1px 0 rgb(255 255 255 / 72%);
+  --glass-wallpaper: url("/falcon/experimental/glass-light.webp");
+  --ink: var(--glass-text);
+  --muted: var(--glass-muted);
+  --line: var(--glass-border);
+  --line-strong: rgb(120 140 170 / 32%);
+  --control-hover: var(--glass-hover);
+  padding: 12px;
+  gap: 12px;
+  background: #e6edf6 var(--glass-wallpaper) center / cover no-repeat;
+}
+:global(.dark) .glass.glass[data-appearance="glass"] {
+  --glass-text: #edf1f7;
+  --glass-muted: #a5b2c4;
+  --glass-panel: rgb(30 37 46 / 78%);
+  --glass-panel-strong: #222a34;
+  --glass-border: rgb(166 190 216 / 18%);
+  --glass-hover: rgb(165 187 211 / 10%);
+  --glass-selected: rgb(152 182 216 / 15%);
+  --glass-active: #edf1f5;
+  --glass-active-ink: #1c232c;
+  --glass-accent: #6ea4ff;
+  --glass-shadow: 0 12px 38px rgb(0 0 0 / 12%), inset 0 1px 0 rgb(216 231 246 / 5%);
+  --glass-wallpaper: url("/falcon/experimental/glass-dark.webp");
+  --line-strong: rgb(166 190 216 / 30%);
+  background-color: #171b22;
+}
+@media (max-width: 760px) {
+  .glass.glass[data-appearance="glass"] { padding: 6px 6px 70px; gap: 0; }
+  .glass.glass[data-appearance="glass"][data-sidebar="collapsed"] { padding-bottom: 6px; }
+}

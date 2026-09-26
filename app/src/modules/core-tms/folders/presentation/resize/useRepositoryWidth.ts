@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 
-const KEY = "tms.folders.width.v1";
+const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT === "true";
+const KEY = glassEnabled ? "tms.folders.width.glass.v1" : "tms.folders.width.v1";
 export const REPOSITORY_MIN = 240;
 export const REPOSITORY_MAX = 620;
 export const REPOSITORY_DEFAULT = 304;
+const initialWidth = glassEnabled ? 400 : REPOSITORY_DEFAULT;
 export function repositoryWidth(preference: number, available: number) {
   return Math.round(Math.max(REPOSITORY_MIN, Math.min(preference, REPOSITORY_MAX, Math.max(REPOSITORY_MIN, available - 420))));
 }
 export function useRepositoryWidth() {
   const ref = useRef<HTMLElement>(null);
-  const preferred = useRef(REPOSITORY_DEFAULT);
+  const preferred = useRef(initialWidth);
   const frame = useRef<number | null>(null);
   const drag = useRef<{ id: number; x: number; width: number } | null>(null);
-  const [width, setWidth] = useState(REPOSITORY_DEFAULT);
+  const [width, setWidth] = useState(initialWidth);
   const [resizing, setResizing] = useState(false);
   function apply() {
     const next = repositoryWidth(preferred.current, ref.current?.parentElement?.clientWidth ?? 1200);
@@ -50,7 +52,7 @@ export function useRepositoryWidth() {
         if (frame.current === null) frame.current = requestAnimationFrame(() => { frame.current = null; apply(); });
       },
       onPointerUp: finish, onPointerCancel: finish,
-      onDoubleClick() { preferred.current = REPOSITORY_DEFAULT; apply(); remember(); },
+      onDoubleClick() { preferred.current = initialWidth; apply(); remember(); },
       onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
         const delta = event.key === "ArrowLeft" ? -20 : event.key === "ArrowRight" ? 20 : 0;
         if (!delta && event.key !== "Home" && event.key !== "End") return;

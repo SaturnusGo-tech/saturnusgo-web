@@ -15,3 +15,5 @@
 @container dashboard-widget (min-width: 400px) { .statuses { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @container dashboard-widget (max-width: 300px) { .heading, .summary, .statuses { padding-inline: 14px; } }
 @container dashboard-widget (min-width: 700px) { .statuses { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }

@@ -12,3 +12,5 @@
 .panel .outcomes button:hover { color: var(--action); }
 .outcomes button:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; border-radius: 4px; }
 @container dashboard-widget (max-width: 300px) { .heading, .composition, .outcomes { padding-inline: 14px; } }
+
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }

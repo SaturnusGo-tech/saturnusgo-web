@@ -35,3 +35,7 @@
 .arrows button:hover:not([aria-disabled="true"]) { background: var(--control-hover); border-color: var(--line-strong); }
 @media (max-width: 640px) { .heading { padding-inline: 16px; }.page { padding-inline: 16px; }.footer { padding-inline: 16px; } }
 @media (prefers-reduced-motion: reduce) { .track, .progress span, .drillArrow { transition: none; } }
+
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .arrows button { border-radius: 50%; }
+:global([data-appearance="glass"]) .progress span[data-current="true"] { background: var(--ink); }

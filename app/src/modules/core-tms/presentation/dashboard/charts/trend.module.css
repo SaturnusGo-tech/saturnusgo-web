@@ -90,3 +90,11 @@
 .drill strong { font-size: 22px; font-weight: 600; letter-spacing: -.03em; }
 .footer { border-top: 0; padding-top: 0; }
 .chart { height: 240px; }
+
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .modes { border-radius: 999px; background: var(--control); }
+:global([data-appearance="glass"]) .modes button { border-radius: 999px; }
+:global([data-appearance="glass"]) .modes button[aria-pressed="true"] { color: var(--dashboard-selection-ink); background: var(--dashboard-selection); }
+:global([data-appearance="glass"]) :is(.bucketSelect, .periodSelect) > button { border-radius: 999px; }
+:global([data-appearance="glass"]) .series button { border-radius: 8px; }
+:global([data-appearance="glass"]) .toggle:disabled { opacity: 1; }

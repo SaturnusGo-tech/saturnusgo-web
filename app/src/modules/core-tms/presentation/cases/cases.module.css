@@ -870,3 +870,18 @@
 }
 
 @media(max-width:650px) { .workspace:has([aria-label="Folders and test cases"]), .workspace:has([aria-label="Папки и тест-кейсы"]) { flex-direction: column; } }
+
+/* The repository's colors are scoped to this experiment, including its inspector. */
+:global([data-appearance="glass"]) .workspace {
+  --cases-bg: var(--glass-panel-strong); --cases-deep: var(--glass-panel-strong);
+  --cases-raised: var(--glass-panel-strong); --cases-hover: var(--glass-hover);
+  --cases-hover-strong: var(--glass-selected); --cases-border: var(--glass-border);
+  --cases-row-border: var(--glass-border); --cases-control: var(--glass-panel-strong);
+  --cases-control-border: var(--glass-border); --cases-icon-bg: var(--glass-hover);
+  --cases-muted: var(--glass-muted); --cases-faint: var(--glass-muted);
+  --cases-icon: var(--glass-muted); --cases-text: var(--glass-text);
+  --cases-strong: var(--glass-text); --cases-secondary-text: var(--glass-text);
+  --cases-link: var(--glass-accent); --cases-primary: var(--glass-primary);
+  background: transparent;
+}
+:global([data-appearance="glass"]) .detailPanel { background: transparent; }

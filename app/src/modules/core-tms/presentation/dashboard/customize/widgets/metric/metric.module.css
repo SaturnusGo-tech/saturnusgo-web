@@ -39,3 +39,13 @@
 :global(.dark) .metric[data-hero="true"] { background: linear-gradient(140deg, #356cf2 0%, #2d5cdb 58%, #2448bd 100%); border-color: #5077e9; }
 @media (max-width: 640px) { .metric { min-height: 157px; padding: 16px; }.value { font-size: 34px; }.glyph { width: 30px; height: 30px; }.metric[data-hero="true"] { min-height: 260px; }.metric[data-hero="true"] .value { font-size: 80px; } }
 @media (prefers-reduced-motion: reduce) { .metric { transition: none; } }
+
+:global([data-appearance="glass"]) .metric { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .metric:hover:not(:disabled) { background: var(--glass-panel-strong, #f8faff); }
+:global([data-appearance="glass"]) .metric[data-hero="true"] {
+  color: #f6f8fc; background: #26323f url("/falcon/experimental/glass-dark.webp") center / cover;
+  border-color: rgb(110 140 176 / 28%); box-shadow: inset 0 1px 0 #ffffff15, var(--dashboard-shadow);
+}
+:global([data-appearance="glass"]) .metric[data-hero="true"]:hover:not(:disabled) { background-color: #324052; filter: brightness(1.05); }
+:global([data-appearance="glass"]) .metric[data-hero="true"] :is(.metricText small, .footer) { color: #d5dfe9; }
+:global([data-appearance="glass"]) .metric[data-hero="true"] .glyph { border-radius: 16px; color: #e4ebf3; background: #ffffff0d; }

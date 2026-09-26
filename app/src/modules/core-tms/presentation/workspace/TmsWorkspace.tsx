@@ -20,6 +20,9 @@ import motion from "./motion/motion.module.css";
 import "./motion/motion.css";
 import { transitionContent } from "./motion/transition/content-transition";
 import { usePageAppearance } from "./motion/usePageAppearance";
+import appearance from "./appearance/glass.module.css";
+
+const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT === "true";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
@@ -60,7 +63,8 @@ function LocalizedWorkspace() {
     <WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
     <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected"}>
     <div
-      className={`${styles.app} ${shellStyles.shell}`}
+      className={`${styles.app} ${shellStyles.shell} ${glassEnabled ? appearance.glass : ""}`}
+      data-appearance={glassEnabled ? "glass" : undefined}
       data-sidebar={sidebarCollapsed ? "collapsed" : "expanded"}
       data-testid="tms-workspace"
     >

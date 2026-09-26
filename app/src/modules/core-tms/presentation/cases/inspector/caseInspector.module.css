@@ -146,3 +146,16 @@
 .borderedMarkdown > div { border: 1px solid var(--cases-control-border); border-radius: 12px; padding: 8px; min-width: 0; }
 .borderedMarkdown > div:focus-within { border-color: var(--cases-primary); }
 .titleInput[aria-invalid="true"] { border-color: #b4494f; }
+
+:global([data-appearance="glass"]) .shell { background: transparent; }
+:global([data-appearance="glass"]) .caseHeader { border-color: var(--glass-border); }
+:global([data-appearance="glass"]) :is(.iconButton, .headerTextButton, .addButton) { border-radius: 999px; }
+:global([data-appearance="glass"]) .headerActions .headerQuarantineButton { background: var(--glass-hover); border-radius: 999px; }
+:global([data-appearance="glass"]) .headerActionMenu { padding: 6px; border-radius: 16px; background: var(--glass-panel-strong); box-shadow: var(--glass-shadow); }
+:global([data-appearance="glass"]) .headerActionMenu > button { border-radius: 10px; }
+:global([data-appearance="glass"]) .titleRow h2 { font-size: clamp(20px, 2.8cqi, 25px); }
+:global([data-appearance="glass"]) .editStep { border-radius: 14px; }
+
+@container case-inspector (min-width: 621px) {
+  :global([data-appearance="glass"]) .sideRail { border-left: 1px solid var(--glass-border); padding-left: 22px; }
+}

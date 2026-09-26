@@ -105,3 +105,23 @@
 .grid[data-align-rows="true"] .widget { display: flex; flex-direction: column; }
 .grid[data-align-rows="true"] .widgetContent { flex: 1; display: flex; flex-direction: column; }
 .grid[data-align-rows="true"] .widgetContent > * { flex: 1; height: auto; }
+
+:global([data-appearance="glass"]) .header { border-bottom: 0; padding-bottom: 8px; }
+:global([data-appearance="glass"]) .toolbar { padding-bottom: 8px; border-bottom-color: var(--line); gap: 8px 16px; }
+:global([data-appearance="glass"]) .sectionNavigation { min-height: 40px; gap: 4px; }
+:global([data-appearance="glass"]) .sectionNavigation button { min-height: 34px; padding: 7px 13px; border: 0; border-radius: 999px; }
+:global([data-appearance="glass"]) .sectionNavigation button:hover { background: var(--control-hover); }
+:global([data-appearance="glass"]) .sectionNavigation button[aria-current] { background: var(--dashboard-selection); color: var(--dashboard-selection-ink); }
+:global([data-appearance="glass"]) :is(.primary, .secondary, .quiet, .editButton) { border-radius: 999px; }
+:global([data-appearance="glass"]) .editButton { background: var(--control); color: var(--ink); padding-inline: 13px; }
+:global([data-appearance="glass"]) .secondary { background: var(--paper); border-color: var(--line); }
+:global([data-appearance="glass"]) .sections { gap: 32px; }
+:global([data-appearance="glass"]) .dashboardSection { gap: 16px; }
+:global([data-appearance="glass"]) :is(.widget, .unavailable, .dragPreview, .failure) { border-radius: 22px; }
+:global([data-appearance="glass"]) .editingWidget { outline-color: var(--line-strong); }
+:global([data-appearance="glass"]) .widgetTools { padding-inline: 9px; border-radius: 22px 22px 0 0; }
+:global([data-appearance="glass"]) .widgetTools button { border-radius: 999px; }
+:global([data-appearance="glass"]) .editingWidget .widgetContent > :is(section, button) { border-radius: 0 0 22px 22px; }
+:global([data-appearance="glass"]) .page.page [aria-haspopup="listbox"] { border-radius: 999px; }
+:global([data-appearance="glass"]) .page.page [role="listbox"] { border-radius: 16px; background: var(--glass-panel-strong, #f8faff); box-shadow: var(--glass-shadow, 0 12px 30px #182d4820); }
+:global([data-appearance="glass"]) .page.page [role="listbox"] [role="option"] { border-radius: 10px; }

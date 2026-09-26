@@ -59,3 +59,11 @@
   .selection > span { display: none; }.catalog .back { max-width: 65%; }.heading h1 { font-size: 25px; }.entry { grid-template-columns: 108px minmax(0, 1fr) 25px; gap: 10px; padding: 8px; }.thumbnail { height: 90px; }.description h3 { font-size: 12px; }.description p { font-size: 10px; }.badge { font-size: 8px; padding: 3px 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .entry { transition: none; } }
+
+:global([data-appearance="glass"]) .catalog :is(.returnButton, .search, .install) { border-radius: 999px; }
+:global([data-appearance="glass"]) .sidebar nav button { border-radius: 12px; border-color: transparent; padding-left: 12px; }
+:global([data-appearance="glass"]) .sidebar nav button[aria-pressed="true"] { background: var(--dashboard-selection); color: var(--dashboard-selection-ink); border-color: transparent; }
+:global([data-appearance="glass"]) .sidebar nav button[aria-pressed="true"] svg { color: inherit; }
+:global([data-appearance="glass"]) .entry { border-radius: 20px; background: var(--paper); }
+:global([data-appearance="glass"]) .entry[data-selected="true"] { border-color: var(--line-strong); background: var(--glass-selected, var(--control-hover)); box-shadow: none; }
+:global([data-appearance="glass"]) :is(.thumbnail, .catalog .selectEntry) { border-radius: 14px; }

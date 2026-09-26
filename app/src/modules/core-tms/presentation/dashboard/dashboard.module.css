@@ -291,3 +291,28 @@
 :global(.dark) .page { --action: #91aaff; --dash-blue: #809af1; --dash-success: #69b998; --dash-danger: #eb7c8c; --dash-warning: #d5b368; --dash-violet: #af93dd; --dash-orange: #e0a062; }
 
 .chartPanel, .operationsPanel { border-radius: 18px; }
+
+/* The glass workspace is opt-in; ordinary dashboard themes retain their palette. */
+:global([data-appearance="glass"]) .page {
+  --ink: var(--glass-text, #252d3d);
+  --muted: var(--glass-muted, #657084);
+  --line: var(--glass-border, rgb(110 126 153 / 17%));
+  --line-strong: color-mix(in srgb, var(--ink) 20%, transparent);
+  --canvas: transparent;
+  --paper: var(--glass-panel, rgb(255 255 255 / 65%));
+  --control: color-mix(in srgb, var(--ink) 5%, transparent);
+  --control-hover: var(--glass-hover, rgb(98 121 160 / 9%));
+  --action: var(--glass-accent, #356ce5);
+  --dashboard-selection: var(--glass-active, #293240);
+  --dashboard-selection-ink: var(--glass-active-ink, #fff);
+  --dashboard-shadow: 0 4px 18px rgb(24 45 72 / 3%);
+}
+:global([data-appearance="glass"]) .page.page[data-dashboard-workspace] { background: transparent; }
+:global([data-appearance="glass"]) :is(.chartPanel, .operationsPanel, .library) {
+  border-radius: 22px; box-shadow: var(--dashboard-shadow);
+}
+:global([data-appearance="glass"]) .refreshButton { border-radius: 50%; background: var(--control); border-color: transparent; }
+:global([data-appearance="glass"]) .chartTooltip {
+  border-radius: 15px; background: var(--glass-panel-strong, #f8faff); box-shadow: var(--glass-shadow, 0 12px 30px #182d4820);
+}
+:global([data-appearance="glass"]) :is(.chartControls button, .linkMetric, .rowActions button, .rowActions a) { border-radius: 999px; }

@@ -30,3 +30,6 @@
 .admin[data-collapsed="true"] span { display:none; }
 @media(max-width:760px) { .admin { width:48px; padding:9px; justify-content:center; } .admin span { display:none; } }
 @media(prefers-reduced-motion:reduce) { .admin { transition:none; } }
+
+:global([data-appearance="glass"]) .profile { border-radius: 999px; margin-top: 6px; }
+:global([data-appearance="glass"]) .admin { border-radius: 999px; }

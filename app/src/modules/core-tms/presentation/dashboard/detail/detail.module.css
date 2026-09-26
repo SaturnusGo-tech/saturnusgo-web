@@ -61,3 +61,16 @@
   .rail nav { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
   .rail nav button { flex-shrink: 0; }
 }
+
+:global([data-appearance="glass"]) .page.page.page { background: transparent; }
+:global([data-appearance="glass"]) .rail { background: var(--control); }
+:global([data-appearance="glass"]) :is(.search, .quiet, .filterButton, .sort > button) { border-radius: 999px; }
+:global([data-appearance="glass"]) .search { background: var(--control); border-color: transparent; }
+:global([data-appearance="glass"]) .rail nav button { border-radius: 12px; }
+:global([data-appearance="glass"]) .rail nav button[aria-current="page"] { background: var(--glass-selected, var(--control-hover)); }
+:global([data-appearance="glass"]) .tabs { gap: 5px; padding-bottom: 9px; }
+:global([data-appearance="glass"]) .tabs > button { align-self: center; min-height: 33px; padding: 7px 12px; border-radius: 999px; }
+:global([data-appearance="glass"]) .tabs > button[aria-current="page"] { color: var(--dashboard-selection-ink); background: var(--dashboard-selection); box-shadow: none; }
+:global([data-appearance="glass"]) .tabs > button[aria-current="page"] > span { color: inherit; opacity: .8; }
+:global([data-appearance="glass"]) .tabs > button[data-action] { margin-bottom: 0; }
+:global([data-appearance="glass"]) .popover { border-radius: 18px; background: var(--glass-panel-strong, #f8faff); box-shadow: var(--glass-shadow, 0 12px 30px #182d4820); }

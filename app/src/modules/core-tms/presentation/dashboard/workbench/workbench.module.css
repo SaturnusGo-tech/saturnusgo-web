@@ -143,3 +143,15 @@
 
 .row .rowTitle strong { text-align: left; }
 @media (prefers-reduced-motion: reduce) { .continue svg { transition: none; } }
+
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .tabs { gap: 5px; padding-block: 2px 9px; }
+:global([data-appearance="glass"]) .tabs button { min-height: 32px; padding: 6px 10px; border: 0; border-radius: 999px; }
+:global([data-appearance="glass"]) .tabs button[aria-selected="true"] { color: var(--dashboard-selection-ink); background: var(--dashboard-selection); }
+:global([data-appearance="glass"]) .tabs button > span { border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
+:global([data-appearance="glass"]) .queuePanel .tabs { gap: 5px; }
+:global([data-appearance="glass"]) .queuePanel .tabs button { min-height: 32px; padding-bottom: 6px; }
+:global([data-appearance="glass"]) :is(.filters input, .filters select, .filters button, .state button, .filterSelect > button, .loadMore) { border-radius: 999px; }
+:global([data-appearance="glass"]) .row { width: calc(100% - 16px); margin: 4px 8px; border-radius: 13px; padding-inline: 10px; }
+:global([data-appearance="glass"]) .row.runRow { padding-inline: 12px; }
+:global([data-appearance="glass"]) .rows li + li { border-top-color: transparent; }

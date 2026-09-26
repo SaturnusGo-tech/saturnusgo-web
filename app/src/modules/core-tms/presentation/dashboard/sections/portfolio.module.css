@@ -39,3 +39,9 @@
 .dataNote { display: flex; align-items: flex-start; gap: 6px; margin: 0; padding: 0 18px 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .dataNote svg { flex: 0 0 auto; margin-top: 2px; }
 @container dashboard-widget (max-width: 340px) { .panelHeading { padding-inline: 14px; }.hotspotTable { margin-inline: 14px; } }
+
+:global([data-appearance="glass"]) .operationsPanel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .hotspotTable { border: 0; border-radius: 12px; }
+:global([data-appearance="glass"]) .hotspotHeader { background: var(--control); }
+:global([data-appearance="glass"]) .hotspotRow > div + div { border-left: 0; }
+:global([data-appearance="glass"]) .hotspotRow:hover { background: var(--control-hover); }
