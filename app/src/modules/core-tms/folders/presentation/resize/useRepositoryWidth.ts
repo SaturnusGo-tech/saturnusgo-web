@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 
-const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT === "true";
+const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false";
 const KEY = glassEnabled ? "tms.folders.width.glass.v1" : "tms.folders.width.v1";
 export const REPOSITORY_MIN = 240;
 export const REPOSITORY_MAX = 620;

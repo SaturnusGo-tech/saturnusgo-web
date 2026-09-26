@@ -22,7 +22,7 @@ import { transitionContent } from "./motion/transition/content-transition";
 import { usePageAppearance } from "./motion/usePageAppearance";
 import appearance from "./appearance/glass.module.css";
 
-const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT === "true";
+const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false";
 
 function LocalizedWorkspace() {
   const model = useWorkspaceModel();
