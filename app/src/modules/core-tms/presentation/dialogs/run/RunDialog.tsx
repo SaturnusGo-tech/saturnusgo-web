@@ -30,6 +30,7 @@ export function RunDialog(props: Props) {
   const scope = (ids: readonly string[]) => state.setCaseIds((current) => ids.every((id) => current.includes(id))
     ? current.filter((id) => !ids.includes(id)) : [...new Set([...current, ...ids])]);
   const suite = props.data.suites.find((item) => item.id === state.suiteId);
+  const iteration = state.iterations.find((item) => item.id === state.iterationId);
   return <Modal title={ru ? "Новый прогон" : "New test run"} onClose={close} wide drawer
     panelClassName={`${styles.runPanel} ${closing ? styles.closing : ""}`}>
     <form className={styles.form} onSubmit={async (event) => {
@@ -38,10 +39,36 @@ export function RunDialog(props: Props) {
     }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
       <div className={styles.body} aria-busy={state.loading || state.busy}
         ref={(element) => { if (element) element.inert = state.busy; }}>
-        <RunIterationFields state={state} ru={ru} />
+        <div className={styles.content}>
+          <RunIterationFields state={state} ru={ru} />
+          <section className={styles.scope} aria-label={ru ? "Тест-кейсы прогона" : "Run test cases"}>
+            <div className={styles.projects}><h3>{ru ? "Тест-кейсы" : "Test cases"}</h3></div>
+            {suite && <div className={styles.suite}><span>{suite.name}</span><small>{ru ? "Состав набора определит сервер" : "Suite membership is resolved by the server"}</small>
+              <button type="button" aria-label={ru ? "Убрать набор" : "Remove suite"} onClick={() => state.setSuiteId("")}><X size={14} /></button></div>}
+            <SelectionControls state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
+            {state.loading && <RunCasesSkeleton />}
+            {!state.loading && state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
+              folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable
+              disabled={state.loading || (Boolean(suite) && id === props.project.id)} onToggle={toggle} onScope={scope}
+              heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>
+                <span>{filters.visible.filter((c) => c.projectId === id).length}</span></>} />)}
+            {!state.loading && !filters.visible.length && <p className={styles.hint}>{ru ? "Нет подходящих тест-кейсов" : "No matching test cases"}</p>}
+            {state.loadFailed && <button type="button" className={styles.secondary} onClick={state.reload}>{ru ? "Повторить загрузку" : "Retry loading"}</button>}
+          </section>
+        </div>
         <aside className={styles.properties} aria-label={ru ? "Свойства прогона" : "Run properties"}>
           <section className={styles.propertySection}>
             <h3>{ru ? "Назначение" : "Assignment"}</h3>
+            <div className={styles.railField}><span>{ru ? "Проекты" : "Projects"}</span>
+              <AnimatedMultiSelect textOnly label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
+                options={props.data.projects.filter((p) => p.status !== "archived").map((p) => ({ value: p.id, label: p.name }))}
+                allLabel={ru ? "Выберите проекты" : "Choose projects"} selectedLabel={ru ? "Проекты" : "Projects"}
+                onChange={state.setProjectIds} /></div>
+            {!state.iterationId ? <label className={styles.railField}><span>{ru ? "Теги" : "Tags"}</span>
+              <input value={state.tags} onChange={(event) => state.setTags(event.target.value)}
+                placeholder={ru ? "Через запятую" : "Separated by commas"} /></label>
+              : <div className={styles.railField}><span>{ru ? "Теги" : "Tags"}</span>
+                <div className={styles.tagValue}>{iteration?.tags.join(", ") || "—"}</div></div>}
             <div className={styles.railField}><span>{ru ? "Ответственный" : "Assignee"}</span>
               <ResponsiblePicker workspaceId={props.data.workspace.id} value={state.assignee}
                 onChange={state.setAssignee} offline={props.offline} disabled={state.busy} /></div>
@@ -56,24 +83,6 @@ export function RunDialog(props: Props) {
             projects={props.data.projects.filter((project) => state.projectIds.includes(project.id))}
             disabled={state.busy || props.offline} ru={ru} />
         </aside>
-        <section className={styles.scope} aria-label={ru ? "Тест-кейсы прогона" : "Run test cases"}>
-        <div className={styles.projects}><h3>{ru ? "Тест-кейсы" : "Test cases"}</h3>
-          <AnimatedMultiSelect textOnly label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
-            options={props.data.projects.filter((p) => p.status !== "archived").map((p) => ({ value: p.id, label: p.name }))}
-            allLabel={ru ? "Выберите проекты" : "Choose projects"} selectedLabel={ru ? "Проекты" : "Projects"}
-            onChange={state.setProjectIds} /></div>
-        {suite && <div className={styles.suite}><span>{suite.name}</span><small>{ru ? "Состав набора определит сервер" : "Suite membership is resolved by the server"}</small>
-          <button type="button" aria-label={ru ? "Убрать набор" : "Remove suite"} onClick={() => state.setSuiteId("")}><X size={14} /></button></div>}
-        <SelectionControls state={filters} ru={ru} onSelectAll={() => scope(filters.visible.filter((item) => !state.suiteId || item.projectId !== props.project.id).map((item) => item.id))} />
-        {state.loading && <RunCasesSkeleton />}
-        {!state.loading && state.projectIds.map((id) => <SelectionTree key={id} cases={filters.visible.filter((c) => c.projectId === id)}
-          folders={state.catalog[id]?.folders ?? []} selected={selected} ru={ru} selectable
-          disabled={state.loading || (Boolean(suite) && id === props.project.id)} onToggle={toggle} onScope={scope}
-          heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>
-            <span>{filters.visible.filter((c) => c.projectId === id).length}</span></>} />)}
-        {!state.loading && !filters.visible.length && <p className={styles.hint}>{ru ? "Нет подходящих тест-кейсов" : "No matching test cases"}</p>}
-        {state.loadFailed && <button type="button" className={styles.secondary} onClick={state.reload}>{ru ? "Повторить загрузку" : "Retry loading"}</button>}
-        </section>
       </div>
       {state.error && <div className={styles.feedback}><FormError message={state.error} /></div>}
       <footer className={styles.footer}><span>{ru ? "Выбрано кейсов" : "Selected cases"}: {state.caseIds.length}{suite ? ` + ${suite.name}` : ""}</span>

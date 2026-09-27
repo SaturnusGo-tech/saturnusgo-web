@@ -19,15 +19,12 @@ export function RunIterationFields({ state, ru }: {
         <div className={css.description}><MarkdownField appearance="plain" compact allowAttachments={false} label={ru ? "Описание итерации" : "Iteration description"}
           value={state.description} onChange={state.setDescription} /></div>
       </div>
-      <label className={css.fieldRow}><span>{ru ? "Теги" : "Tags"}</span><input value={state.tags} onChange={(event) => state.setTags(event.target.value)}
-          placeholder={ru ? "Через запятую" : "Separated by commas"} /></label>
     </>}
     {iteration && <>
       <div className={css.narrative}><h3>{ru ? "Описание итерации" : "Iteration description"}</h3>
         <MarkdownField appearance="plain" compact allowAttachments={false} label={ru ? "Описание итерации" : "Iteration description"}
           value={iteration.description} emptyLabel={ru ? "Описание не указано" : "No description"} />
       </div>
-      <div className={css.fieldRow}><span>{ru ? "Теги" : "Tags"}</span><span>{iteration.tags.join(", ") || "—"}</span></div>
     </>}
   </section>;
 }
