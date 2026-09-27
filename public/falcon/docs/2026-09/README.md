@@ -1,38 +1,43 @@
-# Falcon guide screenshots — 8–9 September 2026
+# Falcon guide screenshots, September 2026 edition
 
-Actual Falcon UI captures from the isolated **Falcon Guide** educational project.
-Test case: opening and searching the built-in guide. The deliberately unsuccessful
-run is labelled as an educational example, not a confirmed product defect.
-Integration forms contain no credentials and were not enabled for these captures.
-The defect form was not submitted to an external tracker. The environment form
-uses the reserved example.com domain and is shown before saving.
+All images are real Falcon browser captures. No controls or contents were generated,
+retouched or rearranged. Each image keeps the interface theme used during capture.
+Intrinsic dimensions are recorded in documentation/content/walkthroughs/media/screenshots.json.
 
-Images are actual browser captures stored as JPEG, without generated interface elements or retouching.
-Their dimensions are recorded in the documentation source's screenshots.json.
-Light/dark mode applies to the guide itself; each image retains the actual theme
-in which the interface was captured. No user or customer workspace records are
-included. Case keys, run keys and filenames shown here refer to teaching data.
+## 28 September refresh
 
-The `organization-*` screenshots are actual UI captures from the isolated local
-QA workspace on 9 September 2026, with real portfolio/project and test-case APIs.
-The catalogue remains unchanged. Portfolio Projects and workflow captures use
-light mode; the workflow image shows a saved status, one completed checklist item,
-the canonical Markdown composer and a posted comment. It contains no attachment.
-The legacy `organization-03-project-dialog` ID denotes a full-page project form.
-The dark creation previews are unsaved: project «Оплата счетов» (BILLS) and
-portfolio «Мобильный банк». The dark overview shows saved project
-«Переводы между счетами» (TRANSFER), its testing plan and loaded discussion composer.
+Files ending in `-20260928.jpg` were captured at 1440×900 from the isolated local
+Demo workspace, project Payments, using the current Falcon frontend and backend.
+Original PNGs were converted to JPEG at quality 86, without resizing or cropping.
+Names such as Anna Taylor, Payments and the case/run keys refer to demo data.
 
-The six `organization-folder-*` images show the current two-pane repository:
-the light tree image has no case selected on the right; dark selection shows
-PERSONAL-TC-1 and PERSONAL-TC-2 with the first case open and all bulk actions visible.
-The dark create preview is «Переводы по номеру телефона» inside Платежи → Переводы;
-the move preview shows two selected cases and the current destination breadcrumb.
-`organization-folder-05-import` shows the initial file selection state with the
-Платежи → Переводы destination; no file or preview is displayed yet. It replaces
-the old `organization-folder-05-import-preview` asset. The archive image shows
-an empty archive and an already-open active case, not a restore action.
+The refreshed workflows cover case creation and product classification, custom field
+configuration, the folder tree and selection/move dialogs, the separate import page,
+all five settings sections, run creation/editing/execution, sidebar modes, notification
+preferences and metric drill-down. The import page deliberately shows empty file history:
+no uploaded source file or completed import is claimed in these images.
 
-Original 1536 × 1024 PNG captures are converted to JPEG at quality 90 with chroma
-subsampling disabled, without cropping, resizing, retouching or generated UI.
-The source-to-export checksum audit is in the ignored local design QA directory.
+Case PAY-TC-34, Open Falcon help, was created with one step. Its Guide walkthrough
+run was created as a draft with Anna Taylor as run owner and no case executor.
+The iOS version was changed from 3.0.0 (128) to 3.0.0 (129) through the run selector's
+pencil. No Android file was uploaded in this example. Help was actually opened and
+its article tree/search verified before saving the step result and completing the run.
+
+The Platform field definition, Bill payments product value, Release checks folder,
+project edit and move destination forms are unsaved previews; their captions state
+that distinction. Existing Transfers QA under Mobile banking was used in the saved
+case. Notification screenshots show disabled browser delivery and an unconfigured
+Telegram bot, alongside actual events from the isolated demo run.
+
+## Retained earlier illustrations
+
+Unchanged integration, administration, revision-history, shared-step and other
+workflows retain their earlier captures. Their dated filenames identify the source
+session, mainly 13–14 September at 1728×1020; earlier images may use other dimensions.
+They use the educational Falcon Guide, Учебное приложение and Umbrella-Host data.
+The old environment form and empty folder archive are explicitly labelled as earlier
+teaching examples in their captions. They are not presented as new 28 September captures.
+
+Integration forms contain no credentials and were not connected for capture. Example
+defects were not sent to external trackers. Images are loaded lazily, and opening
+an image does not submit any form or modify project data.

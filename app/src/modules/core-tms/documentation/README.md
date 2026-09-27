@@ -43,13 +43,16 @@ Do not generate or retouch interface controls, expose credentials, or capture
 customer records. Clearly label hypothetical defects and unsaved setup forms.
 
 Store JPEG captures under `public/falcon/docs/<edition>/`. The current edition
-includes the 13–14 September 2026 refresh of projects, portfolios, environments,
-cases, folders, AI, markers, import/export, suites, runs, defects and dashboard.
-These captures use a 1728-pixel-wide browser viewport (1728×1020 captured content),
-with collapsed navigation and neutral guide data. Versioned `-20260913` filenames
-avoid stale image caches. Unchanged integration and administration illustrations
-retain their original capture dates. `media/screenshots.json` records each image's
-intrinsic dimensions; `screenshotStep` restricts references to this inventory.
+includes the 28 September 2026 refresh of run creation/editing/execution,
+managed custom fields, case creation, folder selection/movement, import destination,
+settings, notifications, sidebar modes and dashboard classification filters.
+These captures use a 1440×900 browser viewport with neutral Payments demo data.
+Versioned `-20260928` filenames avoid stale image caches. Unchanged workflows
+retain their 13–14 September captures (1728×1020) or earlier edition images.
+The guide text is Russian, with English control aliases for updated workflows;
+it does not have a separate English article catalog.
+`media/screenshots.json` records actual intrinsic dimensions for every image;
+`screenshotStep` restricts references to this inventory.
 When replacing captures, update dimensions and provenance together. The visual
 catalog tests check JPEG headers, size limits, coverage and discoverability.
 

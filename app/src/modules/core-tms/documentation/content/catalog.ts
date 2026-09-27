@@ -1,3 +1,7 @@
+import { navigationArticle } from "./navigation/sidebar";
+import { settingsArticle } from "./navigation/settings";
+import { customFieldsArticle } from "./custom-fields/overview";
+import { customFieldValuesArticle } from "./custom-fields/values";
 import { coloredMarkerArticle } from "./writing/marker";
 import { writingAssistantArticle } from "./writing/assistant";
 import { supportArticle } from "./support/contact";
@@ -36,7 +40,7 @@ export const docGroups = [
 ] as const;
 export const docArticles: readonly DocArticle[] = [
   supportArticle,
-  ...gettingStarted, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, writingAssistantArticle, coloredMarkerArticle, caseCommentsArticle, ...caseOrganization,
+  ...gettingStarted, navigationArticle, settingsArticle, ...companyAccessArticles, portfoliosArticle, dashboardArticle, ...caseAuthoring, customFieldsArticle, customFieldValuesArticle, writingAssistantArticle, coloredMarkerArticle, caseCommentsArticle, ...caseOrganization,
   suitesArticle, ...executionArticles, ...defectArticles, notificationsArticle, ...notificationChannelArticles, integrationOverview,
   boardAndYouTrack[1], ...trackerArticles, boardAndYouTrack[0], githubArticle,
   ...communicationArticles, swaggerArticle, ...plannedIntegrations, troubleshootingArticle, toolsArticle, ...referenceArticles,

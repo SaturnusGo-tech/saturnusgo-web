@@ -1,53 +1,13 @@
 {
-  "swagger-01-catalog-20260914": {
+  "ai-01-request-20260913": {
     "width": 1728,
     "height": 1020
   },
-  "swagger-01-connection-20260914": {
+  "ai-02-preview-20260913": {
     "width": 1728,
     "height": 1020
   },
-  "swagger-02-auth-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "swagger-03-operations-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "swagger-04-request-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-profile-menu-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-profile-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-password-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-members-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-member-create-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-member-detail-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "company-settings-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "case-05-saved-20260913": {
+  "ai-03-replaced-20260913": {
     "width": 1728,
     "height": 1020
   },
@@ -63,99 +23,43 @@
     "width": 1728,
     "height": 1020
   },
-  "case-01-library-20260913": {
+  "case-04-ready-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "case-05-saved-20260913": {
     "width": 1728,
     "height": 1020
   },
-  "case-02-context-20260913": {
+  "case-05-saved-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "company-member-create-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "case-03-add-step-20260913": {
+  "company-member-detail-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "case-04-ready-20260913": {
+  "company-members-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "revision-01-edit-20260913": {
+  "company-password-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "edit-02-saved-20260913": {
+  "company-profile-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "edit-03-history-20260913": {
+  "company-profile-menu-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "defect-01-context-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "defect-02-fields-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-01-tree-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-02-create-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-03-selection-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-04-move-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-05-import-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "import-02-destination-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "import-03-export-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-folder-06-archive-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "slack-01-connection-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "slack-02-events-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "slack-03-log-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "github-01-connection-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "github-02-automation-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "github-03-rule-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "integrations-02-communication-20260914": {
+  "company-settings-20260914": {
     "width": 1728,
     "height": 1020
   },
@@ -164,166 +68,6 @@
     "height": 1020
   },
   "confluence-02-events-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "jira-01-connection-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "jira-02-automation-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "jira-03-log-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "integrations-01-catalog-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "linear-01-connection-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "linear-02-events-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "trello-01-connection-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "trello-02-events-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-01-catalog-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-05-portfolio-create-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-02-portfolio-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-07-workflow-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-03-project-dialog-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-06-markdown-edit-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "organization-04-project-overview-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "run-01-library-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "run-02-scope-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "run-03-target-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "run-04-started-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "execute-01-result-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "execute-02-steps-passed-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "execute-03-complete-action-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "execute-04-completed-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "suite-01-create-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "suite-02-list-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "suite-03-detail-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "settings-01-general-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "settings-04-edit-project-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "settings-02-appearance-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "settings-03-exchange-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "settings-05-session-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "shared-01-library-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "shared-02-editor-assets-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "shared-03-edit-action-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "shared-04-insert-menu-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "shared-05-in-case-20260914": {
-    "width": 1728,
-    "height": 1020
-  },
-  "workspace-03-project-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "workspace-04-portfolio-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "workspace-v2-01-settings-20260913": {
-    "width": 1728,
-    "height": 1020
-  },
-  "workspace-v2-02-environment-20260913": {
     "width": 1728,
     "height": 1020
   },
@@ -355,19 +99,99 @@
     "width": 1728,
     "height": 1020
   },
-  "dashboard-08-records-20260913": {
+  "dashboard-08-records-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "defect-01-context-20260913": {
     "width": 1728,
     "height": 1020
   },
-  "ai-01-request-20260913": {
+  "defect-02-fields-20260913": {
     "width": 1728,
     "height": 1020
   },
-  "ai-02-preview-20260913": {
+  "defect-routing-light-20260914": {
     "width": 1728,
     "height": 1020
   },
-  "ai-03-replaced-20260913": {
+  "edit-02-saved-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "edit-03-history-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "execute-01-result-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "execute-03-complete-action-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "execute-04-completed-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "fields-01-catalog-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "fields-02-definition-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "fields-03-product-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "fields-04-case-picker-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "github-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "github-02-automation-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "github-03-rule-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "import-02-destination-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "integrations-01-catalog-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "integrations-02-communication-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-02-automation-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "jira-03-log-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "linear-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "linear-02-events-20260914": {
     "width": 1728,
     "height": 1020
   },
@@ -379,7 +203,211 @@
     "width": 1728,
     "height": 1020
   },
-  "defect-routing-light-20260914": {
+  "navigation-02-context-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "navigation-03-collapsed-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "notifications-01-overview-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "notifications-02-browser-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "notifications-03-inbox-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-01-catalog-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-02-portfolio-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-03-project-dialog-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-04-project-overview-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-05-portfolio-create-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-06-markdown-edit-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-07-workflow-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "organization-folder-01-tree-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-folder-02-create-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-folder-03-selection-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-folder-04-move-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-folder-05-import-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "organization-folder-06-archive-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "revision-01-edit-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "run-01-library-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "run-03-target-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "run-04-started-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "run-edit-01-selector-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "run-edit-02-settings-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "run-edit-03-saved-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "settings-01-general-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "settings-02-appearance-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "settings-03-exchange-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "settings-04-edit-project-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "settings-05-session-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "shared-01-library-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-02-editor-assets-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-03-edit-action-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-04-insert-menu-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "shared-05-in-case-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "slack-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "slack-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "slack-03-log-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-01-create-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-02-list-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "suite-03-detail-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-01-catalog-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-02-auth-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-03-operations-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "swagger-04-request-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "trello-01-connection-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "trello-02-events-20260914": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-03-project-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-04-portfolio-20260913": {
+    "width": 1728,
+    "height": 1020
+  },
+  "workspace-v2-01-settings-20260928": {
+    "width": 1440,
+    "height": 900
+  },
+  "workspace-v2-02-environment-20260913": {
     "width": 1728,
     "height": 1020
   }

@@ -59,6 +59,6 @@ test("every published screenshot has accurate dimensions and fits the asset budg
 test("instructions, outcomes and image descriptions participate in documentation search", () => {
   const article = articleById.get("create-test-case")!;
   assert.ok(searchArticles([article], "начальное состояние").length);
-  assert.ok(searchArticles([article], "GUIDEWEB-TC-1").length);
+  assert.ok(searchArticles([article], "PAY-TC-34").length);
   assert.ok(searchArticles(docArticles, "учебный прогон").some((result) => result.article.id === "create-run"));
 });
