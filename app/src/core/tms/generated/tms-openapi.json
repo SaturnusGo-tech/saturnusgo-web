@@ -303,6 +303,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -966,6 +969,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -1527,6 +1533,37 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -1580,6 +1617,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -1631,6 +1671,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -1715,6 +1758,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       },
@@ -1758,6 +1804,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -1846,6 +1895,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2049,6 +2101,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2098,6 +2153,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2466,6 +2524,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2553,8 +2614,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
-        }
+        },
+        "description": "Edit metadata of an unarchived draft, active or paused run. Name, description, run owner, tags and platform builds may be edited without changing run-item snapshots, executors, results or execution state. Environment is immutable. Legacy build and configuration fields remain editable only in draft. Completed, aborted and archived runs are immutable. Requires a matching run ETag and an idempotency key. Metadata changes are audited; platform build replacements preserve earlier immutable revisions."
       },
       "delete": {
         "tags": [
@@ -2603,6 +2668,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2659,6 +2727,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2712,6 +2783,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2766,6 +2840,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2822,6 +2899,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -2978,6 +3058,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -3043,6 +3126,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -3188,6 +3274,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -3306,7 +3395,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -4366,6 +4455,37 @@
               "maximum": 100,
               "default": 20
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -4507,6 +4627,37 @@
                 "uncovered"
               ]
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -4631,6 +4782,37 @@
                 "skipped"
               ]
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -4730,6 +4912,37 @@
               "type": "boolean",
               "default": false
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -4876,6 +5089,37 @@
             "schema": {
               "$ref": "#/components/schemas/Identifier"
             }
+          },
+          {
+            "name": "productGroupId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            },
+            "description": "Stable catalog value identifier."
+          },
+          {
+            "name": "regression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
           }
         ],
         "responses": {
@@ -4914,7 +5158,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -7406,6 +7650,9 @@
           },
           "502": {
             "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "x-tms-concurrency": "required",
@@ -7520,6 +7767,9 @@
           },
           "502": {
             "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "x-tms-concurrency": "required",
@@ -7762,6 +8012,9 @@
           },
           "502": {
             "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "x-tms-concurrency": "required",
@@ -8413,6 +8666,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8562,6 +8818,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8657,6 +8916,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8753,6 +9015,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "x-tms-idempotency": "required",
@@ -8825,6 +9090,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8907,6 +9175,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -13608,6 +13879,9 @@
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -13677,6 +13951,9 @@
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -14441,6 +14718,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "description": "Requires an active run."
@@ -14495,6 +14775,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "description": "Requires a paused run. Preserves its first start timestamp and accumulated duration."
@@ -14617,6 +14900,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -14771,6 +15057,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -14913,6 +15202,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -14996,6 +15288,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -16367,6 +16662,882 @@
         },
         "x-tms-idempotency": "not-applicable",
         "description": "Registers one immutable source-file receipt. The finalized attachment ID is the durable idempotency identity. Repeating the same author and destination returns the original receipt; a different author or destination conflicts. Does not create or modify test cases."
+      }
+    },
+    "/projects/{projectId}/custom-fields": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listCustomFields",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "List CustomField",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
+              "default": "active"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldListResponse"
+          }
+        },
+        "x-tms-pagination": "cursor"
+      },
+      "post": {
+        "operationId": "createCustomField",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Create CustomField",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "201": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getCustomField",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Get CustomField",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateCustomField",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Update CustomField",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldPatchRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/archive": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "archiveCustomField",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Archive CustomField",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/restore": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "restoreCustomField",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Restore CustomField",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/values": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listCustomFieldValues",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "List CustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
+              "default": "active"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "parentValueId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "description": "Optional product group; omit to include unclassified legacy values and all groups."
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueListResponse"
+          }
+        },
+        "x-tms-pagination": "cursor"
+      },
+      "post": {
+        "operationId": "createCustomFieldValue",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Create CustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "201": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldValueCreateRequest"
+              }
+            }
+          }
+        },
+        "description": "Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable."
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "valueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getCustomFieldValue",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Get CustomFieldValue",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateCustomFieldValue",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Update CustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldValuePatchRequest"
+              }
+            }
+          }
+        },
+        "description": "Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable."
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}/archive": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "valueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "archiveCustomFieldValue",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Archive CustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "description": "Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable."
+      }
+    },
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}/restore": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "fieldId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        },
+        {
+          "name": "valueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "restoreCustomFieldValue",
+        "tags": [
+          "Custom fields"
+        ],
+        "summary": "Restore CustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "description": "Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable."
       }
     }
   },
@@ -18748,6 +19919,107 @@
           },
           "X-Next-Cursor": {
             "$ref": "#/components/headers/XNextCursor"
+          }
+        }
+      },
+      "CustomFieldResponse": {
+        "description": "Custom field catalog record.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CustomFieldEnvelope"
+            }
+          }
+        }
+      },
+      "CustomFieldListResponse": {
+        "description": "Bounded project custom field catalog.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CustomFieldListEnvelope"
+            }
+          }
+        }
+      },
+      "CustomFieldValueResponse": {
+        "description": "Custom field catalog record.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          },
+          "Idempotency-Replayed": {
+            "$ref": "#/components/headers/IdempotencyReplayed"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CustomFieldValueEnvelope"
+            }
+          }
+        }
+      },
+      "CustomFieldValueListResponse": {
+        "description": "Bounded project custom field catalog.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CustomFieldValueListEnvelope"
+            }
+          }
+        }
+      },
+      "ReleaseWritePaused": {
+        "description": "Case, run, catalog or project creation writes are temporarily paused for a coordinated schema upgrade. Retry the same idempotent command after Retry-After seconds. Reads and unrelated notification or attachment access remain available.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "Retry-After": {
+            "description": "Delay in seconds before retrying the same command.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 30
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
           }
         }
       }
@@ -21361,7 +22633,11 @@
           "etag",
           "createdAt",
           "updatedAt",
-          "sortAt"
+          "sortAt",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "id": {
@@ -21429,6 +22705,29 @@
           },
           "sortAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -21580,7 +22879,11 @@
           "status",
           "attemptNo",
           "eventAt",
-          "sortAt"
+          "sortAt",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "id": {
@@ -21649,6 +22952,29 @@
           },
           "sortAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -22065,7 +23391,8 @@
           "DICTATION_INVALID_AUDIO",
           "DICTATION_RATE_LIMITED",
           "DICTATION_UNAVAILABLE",
-          "DICTATION_EMPTY"
+          "DICTATION_EMPTY",
+          "SERVICE_UNAVAILABLE"
         ]
       },
       "ValidationIssue": {
@@ -23168,7 +24495,11 @@
           "attachmentIds",
           "changeNote",
           "createdBy",
-          "createdAt"
+          "createdAt",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "revision": {
@@ -23266,6 +24597,29 @@
           },
           "createdAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         },
         "allOf": [
@@ -23503,6 +24857,14 @@
           },
           "changeNote": {
             "$ref": "#/components/schemas/ShortText"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSelection"
+            },
+            "description": "Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false."
           }
         },
         "allOf": [
@@ -23652,6 +25014,14 @@
           },
           "changeNote": {
             "$ref": "#/components/schemas/ShortText"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSelection"
+            },
+            "description": "Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false."
           }
         }
       },
@@ -24366,7 +25736,11 @@
           "etag",
           "createdAt",
           "updatedAt",
-          "folderId"
+          "folderId",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "id": {
@@ -24469,6 +25843,29 @@
                 "type": "null"
               }
             ]
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -24486,7 +25883,11 @@
           "estimatedMinutes",
           "changeNote",
           "createdBy",
-          "createdAt"
+          "createdAt",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "revision": {
@@ -24541,6 +25942,29 @@
           },
           "createdAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -25396,6 +26820,36 @@
           },
           "configuration": {
             "$ref": "#/components/schemas/StringMap"
+          },
+          "ownerIdentityId": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Run responsible person, independent of run-item executors. Null clears the owner."
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "description": "Run-local tags. Empty array clears. Tags are trimmed, unique and must not contain control characters."
+          },
+          "platformBuilds": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/RunPlatformBuildInput"
+            },
+            "description": "Full replacement of current Android/iOS builds. Omission preserves; empty array clears. Previous build references and their private artifacts remain retained as immutable history."
           }
         }
       },
@@ -32984,7 +34438,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -33607,7 +35061,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -33708,7 +35162,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -35926,7 +37380,11 @@
           "component",
           "tags",
           "estimatedMinutes",
-          "folderPath"
+          "folderPath",
+          "customFields",
+          "productGroupId",
+          "productId",
+          "regression"
         ],
         "properties": {
           "title": {
@@ -35977,6 +37435,29 @@
               "null"
             ],
             "description": "Folder path captured on creation; null for historical runs without folder snapshots."
+          },
+          "customFields": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldSnapshot"
+            }
+          },
+          "productGroupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "regression": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -36831,6 +38312,515 @@
         "discriminator": {
           "propertyName": "platform"
         }
+      },
+      "CustomField": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "archivedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedBy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "displayName"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "identifier": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9._-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "boolean",
+              "number",
+              "integer"
+            ]
+          },
+          "multiple": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "systemKey": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "product_group",
+              "product",
+              "regression",
+              null
+            ]
+          },
+          "parentFieldId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "projectId",
+          "archivedAt",
+          "rowVersion",
+          "createdAt",
+          "updatedAt",
+          "updatedBy",
+          "identifier",
+          "name",
+          "type",
+          "multiple",
+          "required",
+          "systemKey",
+          "parentFieldId"
+        ]
+      },
+      "CustomFieldValue": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "archivedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedBy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "displayName"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fieldId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "parentValueId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isLegacy": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "projectId",
+          "archivedAt",
+          "rowVersion",
+          "createdAt",
+          "updatedAt",
+          "updatedBy",
+          "fieldId",
+          "value",
+          "label",
+          "parentValueId",
+          "isLegacy"
+        ]
+      },
+      "CustomFieldCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9._-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "boolean",
+              "number",
+              "integer"
+            ]
+          },
+          "multiple": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "identifier",
+          "name",
+          "type",
+          "multiple",
+          "required"
+        ]
+      },
+      "CustomFieldPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9._-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "boolean",
+              "number",
+              "integer"
+            ]
+          },
+          "multiple": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "minProperties": 1
+      },
+      "CustomFieldValueCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ],
+            "minLength": 1,
+            "maxLength": 500,
+            "minimum": -1000000000000000,
+            "maximum": 1000000000000000,
+            "description": "Primitive matching the field type. Integer fields require whole numbers. Strings use Unicode NFKC, case and whitespace normalization for duplicate checks."
+          },
+          "parentValueId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "confirmedSimilarValueIds": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "CustomFieldValuePatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ],
+            "minLength": 1,
+            "maxLength": 500,
+            "minimum": -1000000000000000,
+            "maximum": 1000000000000000,
+            "description": "Primitive matching the field type. Integer fields require whole numbers. Strings use Unicode NFKC, case and whitespace normalization for duplicate checks."
+          },
+          "parentValueId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "confirmedSimilarValueIds": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        },
+        "required": [],
+        "minProperties": 1
+      },
+      "CustomFieldSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fieldId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "valueIds": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        },
+        "required": [
+          "fieldId",
+          "valueIds"
+        ]
+      },
+      "CustomFieldValueSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "parentValueId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "value",
+          "label",
+          "parentValueId"
+        ]
+      },
+      "CustomFieldSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fieldId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "boolean",
+              "number",
+              "integer"
+            ]
+          },
+          "systemKey": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "product_group",
+              "product",
+              "regression",
+              null
+            ]
+          },
+          "values": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldValueSnapshot"
+            }
+          }
+        },
+        "required": [
+          "fieldId",
+          "name",
+          "type",
+          "systemKey",
+          "values"
+        ]
+      },
+      "CustomFieldEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomField"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CustomFieldListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CustomField"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CustomFieldValueEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomFieldValue"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CustomFieldValueListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldValue"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       }
     }
   }

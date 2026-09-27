@@ -1,3 +1,4 @@
+import { copyCaseFields } from "../../../../../../core/tms/contracts/custom-fields/case-fields";
 import type { RunItemSummary, TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "../../../../folders/model/folder";
 export type RunRepositoryEntry = { runId: string; projectId: string; item: RunItemSummary; testCase: TestCaseSummary };
@@ -7,7 +8,7 @@ export function runRepositoryEntries(runId: string, projectId: string, items: Ru
     return { runId, projectId, item, testCase: { id: item.id, projectId, key: item.caseKey,
       title: p?.title ?? item.caseKey, folderPath: p?.folderPath ?? "/", currentRevision: item.revision,
       type: p?.type ?? "manual", lifecycle: p?.lifecycle ?? "ready", priority: p?.priority ?? "medium",
-      component: p?.component ?? "", tags: p?.tags ?? [], estimatedMinutes: p?.estimatedMinutes ?? null,
+      ...copyCaseFields(p ?? {}), component: p?.component ?? "", tags: p?.tags ?? [], estimatedMinutes: p?.estimatedMinutes ?? null,
       ownerIdentityId: item.assigneeIdentityId, revisionCount: item.revision, archivedAt: item.archivedAt ?? null,
       createdAt: item.createdAt, updatedAt: item.updatedAt, etag: "" } };
   });

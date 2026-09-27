@@ -159,3 +159,10 @@
 @container case-inspector (min-width: 621px) {
   :global([data-appearance="glass"]) .sideRail { border-left: 1px solid var(--glass-border); padding-left: 22px; }
 }
+
+.additionalInput>div { padding:10px 12px; }
+.additionalInput textarea { height:72px!important; min-height:60px!important; padding:8px 10px!important; }
+
+.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { min-height:80px; }
+.additionalInput [data-editor-shell] :global(.mdxeditor-root-contenteditable),
+.additionalInput [data-editor-shell] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]) { min-height:44px; padding:7px 10px; }

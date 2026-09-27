@@ -33,6 +33,7 @@ function revisionWrite(revision: TestCaseRevision) {
     lifecycle: revision.lifecycle,
     priority: revision.priority,
     component: revision.component,
+    customFields: revision.customFields?.map(field => ({ fieldId: field.fieldId, valueIds: field.values.map(value => value.id) })),
     ownerIdentityId: revision.ownerIdentityId,
     tags: normalizeRevisionTags(revision.tags),
     estimatedMinutes: revision.estimatedMinutes,

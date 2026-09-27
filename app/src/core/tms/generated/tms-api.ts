@@ -768,7 +768,10 @@ export interface paths {
         delete: operations["archiveRun"];
         options?: never;
         head?: never;
-        /** Edit a draft run */
+        /**
+         * Edit a draft run
+         * @description Edit metadata of an unarchived draft, active or paused run. Name, description, run owner, tags and platform builds may be edited without changing run-item snapshots, executors, results or execution state. Environment is immutable. Legacy build and configuration fields remain editable only in draft. Completed, aborted and archived runs are immutable. Requires a matching run ETag and an idempotency key. Metadata changes are audited; platform build replacements preserve earlier immutable revisions.
+         */
         patch: operations["updateRun"];
         trace?: never;
     };
@@ -4123,6 +4126,224 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/custom-fields": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** List CustomField */
+        get: operations["listCustomFields"];
+        put?: never;
+        /** Create CustomField */
+        post: operations["createCustomField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Get CustomField */
+        get: operations["getCustomField"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update CustomField */
+        patch: operations["updateCustomField"];
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/archive": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive CustomField */
+        post: operations["archiveCustomField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/restore": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore CustomField */
+        post: operations["restoreCustomField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/values": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** List CustomFieldValue */
+        get: operations["listCustomFieldValues"];
+        put?: never;
+        /**
+         * Create CustomFieldValue
+         * @description Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable.
+         */
+        post: operations["createCustomFieldValue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /** Get CustomFieldValue */
+        get: operations["getCustomFieldValue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update CustomFieldValue
+         * @description Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable.
+         */
+        patch: operations["updateCustomFieldValue"];
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}/archive": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive CustomFieldValue
+         * @description Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable.
+         */
+        post: operations["archiveCustomFieldValue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-fields/{fieldId}/values/{valueId}/restore": {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore CustomFieldValue
+         * @description Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable.
+         */
+        post: operations["restoreCustomFieldValue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4718,6 +4939,11 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             sortAt: components["schemas"]["Timestamp"];
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         };
         DashboardAnalyticsRunProgress: {
             total: components["schemas"]["AnalyticsCount"];
@@ -4768,6 +4994,11 @@ export interface components {
             /** @description Parent run completedAt or abortedAt, used as the immutable half-open period and cursor basis. */
             eventAt: components["schemas"]["Timestamp"];
             sortAt: components["schemas"]["Timestamp"];
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         };
         DashboardAnalyticsDefectOccurrence: {
             runId: components["schemas"]["Identifier"];
@@ -4822,7 +5053,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DUPLICATE_CASE_ID" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SIGNING_SECRET_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DICTATION_EMPTY";
+        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DUPLICATE_CASE_ID" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SIGNING_SECRET_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DICTATION_EMPTY" | "SERVICE_UNAVAILABLE";
         ValidationIssue: {
             field: string;
             code: string;
@@ -5071,6 +5302,11 @@ export interface components {
             changeNote: components["schemas"]["ShortText"];
             createdBy: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         } & (unknown & unknown & unknown);
         TestCase: {
             id: components["schemas"]["Identifier"];
@@ -5109,6 +5345,8 @@ export interface components {
             steps?: components["schemas"]["TestStepInput"][];
             checklist?: components["schemas"]["ChecklistItemInput"][];
             changeNote?: components["schemas"]["ShortText"];
+            /** @description Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false. */
+            customFields?: components["schemas"]["CustomFieldSelection"][];
         } & (unknown & unknown & unknown);
         TestCasePatchRequest: {
             folderPath?: string;
@@ -5130,6 +5368,8 @@ export interface components {
             steps?: components["schemas"]["TestStepInput"][];
             checklist?: components["schemas"]["ChecklistItemInput"][];
             changeNote?: components["schemas"]["ShortText"];
+            /** @description Stable registered value IDs. PATCH merges supplied fields by fieldId; empty valueIds clears an optional field. Omitted fields are retained. Product requires its explicit matching group, except an existing unclassified legacy value. Regression defaults to false. */
+            customFields?: components["schemas"]["CustomFieldSelection"][];
         };
         TestCaseCloneRequest: {
             title?: string;
@@ -5291,6 +5531,11 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             folderId: components["schemas"]["Identifier"] | null;
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         };
         TestCaseRevisionSummary: {
             revision: number;
@@ -5305,6 +5550,11 @@ export interface components {
             changeNote: components["schemas"]["ShortText"];
             createdBy: components["schemas"]["Identifier"];
             createdAt: components["schemas"]["Timestamp"];
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         };
         TestCaseEnvelope: {
             data: components["schemas"]["TestCase"];
@@ -5478,6 +5728,12 @@ export interface components {
             description?: components["schemas"]["LongText"];
             build?: components["schemas"]["ShortText"];
             configuration?: components["schemas"]["StringMap"];
+            /** @description Run responsible person, independent of run-item executors. Null clears the owner. */
+            ownerIdentityId?: components["schemas"]["Identifier"] | null;
+            /** @description Run-local tags. Empty array clears. Tags are trimmed, unique and must not contain control characters. */
+            tags?: string[];
+            /** @description Full replacement of current Android/iOS builds. Omission preserves; empty array clears. Previous build references and their private artifacts remain retained as immutable history. */
+            platformBuilds?: components["schemas"]["RunPlatformBuildInput"][];
         };
         RunAbortRequest: {
             reason: components["schemas"]["LongText"];
@@ -7787,6 +8043,11 @@ export interface components {
             estimatedMinutes: number | null;
             /** @description Folder path captured on creation; null for historical runs without folder snapshots. */
             folderPath: string | null;
+            customFields: components["schemas"]["CustomFieldSnapshot"][];
+            productGroupId: string | null;
+            productId: string | null;
+            /** @default false */
+            regression: boolean;
         };
         RunAssignmentRequest: {
             runId: string;
@@ -7970,6 +8231,109 @@ export interface components {
             platform: "ios";
             /** @description Version text or an absolute HTTP(S) app URL. Control characters, unsafe or malformed URL schemes and URL credentials are rejected. */
             reference: string;
+        };
+        CustomField: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            /** Format: date-time */
+            archivedAt: string | null;
+            rowVersion: number;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            updatedBy: {
+                id: components["schemas"]["Identifier"];
+                displayName: string;
+            } | null;
+            identifier: string;
+            name: string;
+            /** @enum {string} */
+            type: "string" | "boolean" | "number" | "integer";
+            multiple: boolean;
+            required: boolean;
+            /** @enum {string|null} */
+            systemKey: "product_group" | "product" | "regression" | null;
+            parentFieldId: string | null;
+        };
+        CustomFieldValue: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            /** Format: date-time */
+            archivedAt: string | null;
+            rowVersion: number;
+            createdAt: components["schemas"]["Timestamp"];
+            updatedAt: components["schemas"]["Timestamp"];
+            updatedBy: {
+                id: components["schemas"]["Identifier"];
+                displayName: string;
+            } | null;
+            fieldId: components["schemas"]["Identifier"];
+            value: string | number | boolean;
+            label: string;
+            parentValueId: string | null;
+            isLegacy: boolean;
+        };
+        CustomFieldCreateRequest: {
+            identifier: string;
+            name: string;
+            /** @enum {string} */
+            type: "string" | "boolean" | "number" | "integer";
+            multiple: boolean;
+            required: boolean;
+        };
+        CustomFieldPatchRequest: {
+            identifier?: string;
+            name?: string;
+            /** @enum {string} */
+            type?: "string" | "boolean" | "number" | "integer";
+            multiple?: boolean;
+            required?: boolean;
+        };
+        CustomFieldValueCreateRequest: {
+            /** @description Primitive matching the field type. Integer fields require whole numbers. Strings use Unicode NFKC, case and whitespace normalization for duplicate checks. */
+            value: string | number | boolean;
+            parentValueId?: string | null;
+            confirmedSimilarValueIds?: components["schemas"]["Identifier"][];
+        };
+        CustomFieldValuePatchRequest: {
+            /** @description Primitive matching the field type. Integer fields require whole numbers. Strings use Unicode NFKC, case and whitespace normalization for duplicate checks. */
+            value?: string | number | boolean;
+            parentValueId?: string | null;
+            confirmedSimilarValueIds?: components["schemas"]["Identifier"][];
+        };
+        CustomFieldSelection: {
+            fieldId: components["schemas"]["Identifier"];
+            valueIds: components["schemas"]["Identifier"][];
+        };
+        CustomFieldValueSnapshot: {
+            id: components["schemas"]["Identifier"];
+            value: string | number | boolean;
+            label: string;
+            parentValueId: string | null;
+        };
+        CustomFieldSnapshot: {
+            fieldId: components["schemas"]["Identifier"];
+            name: string;
+            /** @enum {string} */
+            type: "string" | "boolean" | "number" | "integer";
+            /** @enum {string|null} */
+            systemKey: "product_group" | "product" | "regression" | null;
+            values: components["schemas"]["CustomFieldValueSnapshot"][];
+        };
+        CustomFieldEnvelope: {
+            data: components["schemas"]["CustomField"];
+        };
+        CustomFieldListEnvelope: {
+            data: components["schemas"]["CustomField"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        CustomFieldValueEnvelope: {
+            data: components["schemas"]["CustomFieldValue"];
+        };
+        CustomFieldValueListEnvelope: {
+            data: components["schemas"]["CustomFieldValue"][];
+            meta: components["schemas"]["PageMeta"];
         };
     };
     responses: {
@@ -8971,6 +9335,64 @@ export interface components {
                 "application/json": components["schemas"]["DefectGroupListEnvelope"];
             };
         };
+        /** @description Custom field catalog record. */
+        CustomFieldResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CustomFieldEnvelope"];
+            };
+        };
+        /** @description Bounded project custom field catalog. */
+        CustomFieldListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CustomFieldListEnvelope"];
+            };
+        };
+        /** @description Custom field catalog record. */
+        CustomFieldValueResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueEnvelope"];
+            };
+        };
+        /** @description Bounded project custom field catalog. */
+        CustomFieldValueListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueListEnvelope"];
+            };
+        };
+        /** @description Case, run, catalog or project creation writes are temporarily paused for a coordinated schema upgrade. Retry the same idempotent command after Retry-After seconds. Reads and unrelated notification or attachment access remain available. */
+        ReleaseWritePaused: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                /** @description Delay in seconds before retrying the same command. */
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
     };
     parameters: {
         /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -9324,6 +9746,7 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getVerificationQueue: {
@@ -9623,6 +10046,7 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getProject: {
@@ -9905,6 +10329,12 @@ export interface operations {
                 /** @description Stable folder ID; root selects cases without a folder. Omit for all folders. */
                 folderId?: string;
                 includeDescendants?: boolean;
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -9942,6 +10372,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     bulkMutateTestCases: {
@@ -9966,6 +10397,7 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["TestCaseBulkPreconditionFailed"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getTestCase: {
@@ -10015,6 +10447,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     reviseTestCase: {
@@ -10044,6 +10477,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listTestCaseComments: {
@@ -10098,6 +10532,7 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listTestCaseLinkedDefects: {
@@ -10207,6 +10642,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     cloneTestCase: {
@@ -10232,6 +10668,7 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listSuites: {
@@ -10439,6 +10876,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getRun: {
@@ -10490,6 +10928,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     updateRun: {
@@ -10519,6 +10958,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     restoreRun: {
@@ -10548,6 +10988,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     startRun: {
@@ -10576,6 +11017,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     completeRun: {
@@ -10604,6 +11046,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     abortRun: {
@@ -10632,6 +11075,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listRunItems: {
@@ -10712,6 +11156,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     updateStepResult: {
@@ -10743,6 +11188,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listRunItemAttempts: {
@@ -10823,6 +11269,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listDefects: {
@@ -11409,6 +11856,12 @@ export interface operations {
                 /** @description Exclusive UTC bound. Required only with period=custom and cannot be in the future. */
                 to?: components["parameters"]["AnalyticsToQuery"];
                 dimensionLimit?: number;
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -11452,6 +11905,12 @@ export interface operations {
                 component?: string;
                 componentIsEmpty?: boolean;
                 coverage?: "covered" | "uncovered";
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -11493,6 +11952,12 @@ export interface operations {
                 component?: string;
                 componentIsEmpty?: boolean;
                 itemStatus?: "passed" | "failed" | "blocked" | "skipped";
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -11532,6 +11997,12 @@ export interface operations {
                 status?: "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
                 component?: string;
                 componentIsEmpty?: boolean;
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -11578,6 +12049,12 @@ export interface operations {
                 activeOnly?: boolean;
                 runId?: components["schemas"]["Identifier"];
                 testCaseId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productGroupId?: components["schemas"]["Identifier"];
+                /** @description Stable catalog value identifier. */
+                productId?: components["schemas"]["Identifier"];
+                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
+                regression?: "true" | "false";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -12791,6 +13268,7 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     approveImpactScope: {
@@ -12843,6 +13321,7 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     retryImpactAnalysis: {
@@ -12948,6 +13427,7 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
             502: components["responses"]["BadGateway"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     acknowledgeImpactGap: {
@@ -13285,6 +13765,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getRepositoryFolder: {
@@ -13369,6 +13850,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     archiveRepositoryFolder: {
@@ -13415,6 +13897,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     restoreRepositoryFolder: {
@@ -13457,6 +13940,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     moveRepositoryFolderCases: {
@@ -13499,6 +13983,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     archiveRepositoryFolderCases: {
@@ -13541,6 +14026,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listProjectComments: {
@@ -15742,6 +16228,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     updateTestCaseComment: {
@@ -15784,6 +16271,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listDefectComments: {
@@ -16213,6 +16701,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     resumeRun: {
@@ -16241,6 +16730,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listRunBatches: {
@@ -16313,6 +16803,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listRunIterations: {
@@ -16386,6 +16877,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getRunBatch: {
@@ -16458,6 +16950,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     organizeRunItems: {
@@ -16499,6 +16992,7 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     rewriteWorkspaceMarkdown: {
@@ -17130,6 +17624,397 @@ export interface operations {
                 };
             };
             500: components["responses"]["InternalError"];
+        };
+    };
+    listCustomFields: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                status?: "active" | "archived" | "all";
+                search?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createCustomField: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldCreateRequest"];
+            };
+        };
+        responses: {
+            201: components["responses"]["CustomFieldResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    getCustomField: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateCustomField: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldPatchRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["CustomFieldResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    archiveCustomField: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    restoreCustomField: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    listCustomFieldValues: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+                status?: "active" | "archived" | "all";
+                search?: string;
+                parentValueId?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldValueListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createCustomFieldValue: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueCreateRequest"];
+            };
+        };
+        responses: {
+            201: components["responses"]["CustomFieldValueResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    getCustomFieldValue: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldValueResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateCustomFieldValue: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldValuePatchRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["CustomFieldValueResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    archiveCustomFieldValue: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldValueResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    restoreCustomFieldValue: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                projectId: components["schemas"]["Identifier"];
+                fieldId: components["schemas"]["Identifier"];
+                valueId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["CustomFieldValueResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
 }

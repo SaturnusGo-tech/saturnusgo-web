@@ -17,8 +17,10 @@ function validDrill(value: unknown): value is DashboardDrill {
   if (f.entity !== "run_item" && (!text(f.basis) || !entities[f.entity].includes(f.basis))) return false;
   if (f.entity === "run" && f.basis !== "completed" &&
     (f.component !== undefined || f.componentIsEmpty || f.itemStatus !== undefined)) return false;
-  const strings = ["component", "status", "type", "tag", "coverage", "outcome", "itemStatus", "severity", "runId", "testCaseId"];
-  const flags = ["componentIsEmpty", "untagged", "hasLink", "activeOnly"];
+  const strings = ["component", "status", "type", "tag", "coverage", "outcome", "itemStatus", "severity", "runId", "testCaseId", "productGroupId", "productId"];
+  const flags = ["componentIsEmpty", "untagged", "hasLink", "activeOnly", "regression"];
+  if ([f.productGroupId, f.productId].some(value => value !== undefined &&
+    (!text(value, 128) || !/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(value)))) return false;
   return Object.entries(f).every(([key, field]) => ["entity", "basis"].includes(key) || strings.includes(key) && text(field) || flags.includes(key) && typeof field === "boolean");
 }
 export function readDrillRoute(href: string): DrillRoute | null {

@@ -15,6 +15,7 @@ import {
   Blocks,
   Play,
   SlidersHorizontal,
+  TextCursorInput,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { TmsMessageKey } from "../../localization/catalog/messages";
@@ -32,6 +33,7 @@ const navigationItems: Array<{
   { id: "dashboard", labelKey: "nav.dashboard", icon: <PanelsTopLeft size={20} /> },
   { id: "portfolios", labelKey: "nav.portfolios", icon: <BriefcaseBusiness size={20} /> },
   { id: "cases", labelKey: "nav.cases", icon: <Files size={20} /> },
+  { id: "custom-fields", labelKey: "nav.customFields", icon: <TextCursorInput size={20} /> },
   { id: "shared-steps", labelKey: "nav.sharedSteps", icon: <Blocks size={20} /> },
   { id: "api", labelKey: "nav.apiTesting", icon: <Braces size={20} /> },
   { id: "runs", labelKey: "nav.runs", icon: <Play size={20} /> },

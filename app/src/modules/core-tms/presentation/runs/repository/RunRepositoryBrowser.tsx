@@ -16,7 +16,7 @@ import { statusIcon } from "../../status/executionStatus";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import css from "./run-repository.module.css";
 
-export function RunRepositoryBrowser({ model, repository, draftDirty = false, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; repository: RunRepositoryModel; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
+export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty = false, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; repository: RunRepositoryModel; onEditRun?: () => void; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
   const { browser, rows, run, assignments, runFilters, cases, filters, visible, groups, lookup } = repository;
   const choose = (runId: string, projectId: string, itemId: string | null = null) => {
@@ -26,7 +26,7 @@ export function RunRepositoryBrowser({ model, repository, draftDirty = false, li
   const canAssign = canManage && Boolean(run && !run.archivedAt && ["draft","active","paused"].includes(run.status));
   const activeChoice = browser.batch?.id ?? model.selectedRun?.id ?? "";
   return <aside className={css.browser} aria-label={ru ? "Кейсы прогона" : "Run repository"}>
-    <RunRepositoryHeader ru={ru} run={run} detailsRun={model.selectedRun ?? run} choices={browser.choices} value={activeChoice} canManage={canManage}
+    <RunRepositoryHeader onEdit={canManage && !draftDirty && !lifecycleBlocked && !browser.loading ? onEditRun : undefined} ru={ru} run={run} choices={browser.choices} value={activeChoice} canManage={canManage}
       disabled={browser.busy || assignments.busy || lifecycleBlocked} startBlocked={startBlocked || browser.loading}
       onCreate={()=>model.openRunDialog()} onAction={action=>void browser.act(action)}
       onChoose={id=>{const runs=browser.choices.find(c=>c.id===id)?.runs;const next=runs?.find(isWorkingRun)??runs?.[0];if(next)choose(next.id,next.projectId);}}/>

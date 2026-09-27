@@ -332,3 +332,47 @@ final capture shows the popover beside the selector without covering case text.
 No remaining actionable P0/P1/P2 visual findings in the inspected states.
 
 final result: passed
+
+## Managed custom fields and run editing — 2026-09-27
+
+Scope follows the supplied seven Custom Fields screenshots: flat catalog rows,
+compact definition/value forms, anchored search/create menus, neutral Falcon
+colors and existing typography. Built-in Product group, Product and Regression
+replace component entry; the dashboard and repository use stable value IDs.
+Historical components remain readable as unclassified Products.
+
+Browser evidence is in
+`/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-custom-fields-20260927/`:
+`catalog-light.png`, `field-editor-light.png`, `case-similar-value-dark.png`,
+`run-owner-dark.png`, `run-selector-edit-light.png`, `run-editor-light.png`.
+The final selector screenshot supersedes the earlier header/pencil position.
+
+At 1280 × 720, verified both themes, catalog creation, value creation, case
+creation with Product group/Product/Regression=false, explicit similarity
+warning and choosing the existing value, vector folder path, and combined
+Product + false filtering returning only the saved case. Created standalone
+String field and Beta value through the UI; actor/time and persisted value shown.
+
+Edited an active demo run's iOS reference to 3.0.1 (302) and owner to Emma Wilson.
+Header and About run refreshed; the selected case remained assigned to Noah
+Davis. The pencil now appears only beside the selected run in its dropdown,
+before the checkmark. Copy-key and revision labels are absent from execution.
+About run remains beside case status/assignee. An overlay stacking issue found
+in review was fixed with the existing AppOverlay host; the global header no
+longer overlaps the editor. No horizontal document overflow in these captures.
+
+Selection search contracts from 353 to 274 CSS px while Select all and checkboxes
+are revealed; transitions use 180–240 ms and have reduced-motion overrides.
+Dropdown search is bounded and scrollable. Focus/keyboard behavior, lifecycle
+permissions, concurrent edit recovery and retry identity have focused tests.
+Folder input retains inline new-path creation and root placement.
+
+Full frontend adapters gate: 804 tests passed before final placement refinements;
+additional selector17 and folder6 focused tests passed. Final typecheck,
+architecture1268 and contract regeneration passed. Backend806 full tests passed;
+release maintenance additions have a separate final verification record.
+Physical Safari and mobile-device testing were not performed. Local private
+artifact delivery is covered by backend tests; this browser rejects the local
+storage TLS certificate, which was not bypassed.
+
+final result: passed for inspected states

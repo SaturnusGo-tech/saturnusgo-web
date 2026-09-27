@@ -1,0 +1,7 @@
+.fields { display:flex; flex-direction:column; gap:14px; min-width:0; }
+.field { display:grid; gap:6px; min-width:0; }
+.field>span,.facts dt { color:var(--cases-muted); font-size:12px; }
+.field b { color:var(--cases-secondary-text); font-weight:500; }
+.facts { margin:0; display:grid; gap:12px; }
+.facts>div { display:grid; gap:4px; min-width:0; }
+.facts dd { margin:0; font-size:13px; overflow-wrap:anywhere; }

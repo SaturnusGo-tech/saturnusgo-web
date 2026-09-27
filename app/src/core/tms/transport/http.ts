@@ -45,6 +45,7 @@ export class TmsApiError extends Error {
     readonly requestId: string | null,
     readonly code: TmsApiErrorCode = "HTTP_ERROR",
     readonly validationField: string | null = null,
+    readonly details: Readonly<Record<string, unknown>> | null = null,
   ) {
     super(message);
     this.name = "TmsApiError";
@@ -77,7 +78,8 @@ async function responseError(response: Response): Promise<TmsApiError> {
   const details = error?.details;
   const field = details && typeof details === "object" && "field" in details
     ? boundedString(details.field, 128) : null;
-  return new TmsApiError(message, response.status, requestId, code ?? "HTTP_ERROR", field);
+  return new TmsApiError(message, response.status, requestId, code ?? "HTTP_ERROR", field,
+    details && typeof details === "object" && !Array.isArray(details) ? details as Readonly<Record<string, unknown>> : null);
 }
 
 function concurrencyEtag(response: Response): string | null {

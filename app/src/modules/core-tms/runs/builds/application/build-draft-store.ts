@@ -67,6 +67,11 @@ export function createBuildDraftStore(client: PrivateAttachmentClient | null, ch
   }
   return {
     current, snapshot: () => drafts, uploading: () => uploads.size > 0,
+    hydrateExisting(projectId: string, artifact: AttachmentMetadata | null, androidVersion: string, iosReference: string) {
+      if (artifact) { protectedIds.add(artifact.id); retainedIds.add(artifact.id); }
+      cancel(projectId); discardUnconfirmed(projectId); discard(current(projectId).artifact);
+      patch(projectId, { ...emptyBuildDraft(), artifact, androidVersion, iosReference, phase: artifact ? "ready" : "idle" });
+    },
     setAndroidVersion: (projectId: string, androidVersion: string) => patch(projectId, { androidVersion }),
     setIosReference: (projectId: string, iosReference: string) => patch(projectId, { iosReference }),
     chooseFile(projectId: string, file: File) {

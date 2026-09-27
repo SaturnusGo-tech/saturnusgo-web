@@ -3,11 +3,11 @@ import { useNavigationValue } from "../../../state/navigation/context/useNavigat
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Bootstrap } from "../../../../../core/tms/contracts/legacy-contract";
-import type { DashboardAnalyticsQuery, DashboardDrill, DashboardDrillPage, DashboardDrillRow } from "../../../dashboards/model/dashboard-analytics";
+import type { DashboardAnalyticsQuery, DashboardDrill, DashboardDrillPage, DashboardDrillRow, DashboardProductFilters } from "../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
 import { DashboardDrillTable } from "./table/DashboardDrillTable";
-import { activeDrillTab, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab } from "./dashboard-drill-navigation";
+import { activeDrillTab, dashboardProductScope, filterDashboardRows, relatedDashboardDrill, type DashboardDrillTab } from "./dashboard-drill-navigation";
 import { DetailPage, DetailState, DetailFooter } from "../detail/DetailPage";
 import { DetailToolbar, emptyDetailFilters, type DetailSort } from "../detail/toolbar/DetailToolbar";
 import { sortDetailRows } from "../detail/toolbar/sort-rows";
@@ -19,7 +19,7 @@ import { compactRunTitle } from "../workbench/rows/title/compact-run-title";
 import styles from "../detail/detail.module.css";
 
 type Props = {
-  data: Bootstrap; components: string[]; query: DashboardAnalyticsQuery; origin: DashboardDrill; selected: DashboardDrill;
+  data: Bootstrap; query: DashboardAnalyticsQuery; origin: DashboardDrill; selected: DashboardDrill;
   page: DashboardDrillPage | null; loading: boolean; error: boolean; scopeLabel: string;
   onSelectDrill: (drill: DashboardDrill) => void; onSelectComponent: (drill: DashboardDrill) => void;
   onOpenEntity: (tab: DashboardDrillTab, drill: DashboardDrill) => void;
@@ -38,13 +38,13 @@ export function DashboardDrillInspector(props: Props) {
     return { ...row, title: compactRunTitle(row.title, row.project, known?.build ?? null) };
   }), [filters, props.page, sort, props.data.runs]);
   const originFilter = props.origin.filter;
-  const componentContext = originFilter.component !== undefined || originFilter.componentIsEmpty || props.origin.id.startsWith("component-context:");
+  const componentContext = originFilter.component !== undefined || originFilter.componentIsEmpty || props.origin.id.startsWith("component-context:") || props.origin.id.startsWith("product-context:") || originFilter.productId || originFilter.productGroupId || originFilter.regression !== undefined;
   const component = originFilter.componentIsEmpty ? "" : originFilter.component;
-  const title = componentContext ? component === "" ? (ru ? "Без компонента" : "No component") : component ?? (ru ? "Все компоненты" : "All components") : props.origin.label;
+  const title = props.origin.id.startsWith("product-context:") ? props.origin.label : componentContext ? component === "" ? (ru ? "Без продукта" : "No product") : component ?? (ru ? "Все продукты" : "All products") : props.origin.label;
   const total = props.page?.total ?? (props.page && !props.page.nextCursor ? props.page.rows.length : undefined);
   const displayTab = props.selected.filter.entity;
   const tabOrigin = originFilter.entity === "run_item" ? { ...props.origin, id: `${props.origin.id}:component-scope`, filter: { entity: "test_case" as const, basis: "current" as const,
-    ...(originFilter.component !== undefined ? { component: originFilter.component } : {}), ...(originFilter.componentIsEmpty ? { componentIsEmpty: true } : {}) } } : props.origin;
+    ...dashboardProductScope(originFilter), ...(originFilter.component !== undefined ? { component: originFilter.component } : {}), ...(originFilter.componentIsEmpty ? { componentIsEmpty: true } : {}) } } : props.origin;
   const tabs: Array<{ id: string; drill: DashboardDrill | null; label: string }> = (["test_case", "run", "defect"] as const).map(id => {
     const drill = relatedDashboardDrill(tabOrigin, id);
     const completed = drill?.filter.entity === "run" && drill.filter.basis === "completed";
@@ -52,13 +52,15 @@ export function DashboardDrillInspector(props: Props) {
       : t(id === "test_case" ? "dashboard.testCases" : id === "run" ? "dashboard.runs" : "dashboard.defects") };
   });
   if (originFilter.entity === "run_item") tabs.splice(2, 0, { id: "run_item", drill: props.origin, label: ru ? "Проверки" : "Checks" });
-  const chooseComponent = (next?: string) => props.onSelectComponent({ id: `component-context:${next ?? "all"}`, label: next ?? (ru ? "Все компоненты" : "All components"),
+  const chooseProduct = (next: DashboardProductFilters, label?: string) => props.onSelectComponent({
+    id: `product-context:${JSON.stringify(next)}`, label: label ?? (ru ? "Продукты" : "Products"),
     projectId: props.origin.projectId ?? props.query.projectId, window: props.origin.window,
-    filter: { entity: "test_case", basis: "current", ...(next === "" ? { componentIsEmpty: true } : next !== undefined ? { component: next } : {}) } });
+    filter: { entity: "test_case", basis: "current", ...next } });
+  const productProjectId = props.origin.projectId ?? props.query.projectId;
   const statuses = [...new Set(props.page?.rows.flatMap(row => row.status ? [row.status] : []) ?? [])];
   const filtered = Boolean(filters.query || Object.entries(filters).some(([key, value]) => key !== "query" && value.length));
   return <DetailPage title={title} context={`${props.scopeLabel} · ${t(`dashboard.period.${props.query.period}`)}`} count={componentContext ? undefined : total}
-    onBack={props.onClose} rail={componentContext ? <ComponentRail components={props.components} selected={component} onSelect={chooseComponent} /> : undefined}
+    onBack={props.onClose} rail={productProjectId ? <ComponentRail workspaceId={props.query.workspaceId} projectId={productProjectId} filter={originFilter} onSelect={chooseProduct} /> : undefined}
     action={{ label: t(tab === "run" ? "dashboard.runs" : tab === "defect" ? "nav.reports" : "dashboard.testCases"), onClick: () => props.onOpenEntity(tab, props.selected) }}>
     {componentContext ? <nav className={styles.tabs} aria-label={t("dashboard.detailSections")}>
       {tabs.map(item => <button type="button" key={item.id} disabled={!item.drill} aria-current={displayTab === item.id ? "page" : undefined}

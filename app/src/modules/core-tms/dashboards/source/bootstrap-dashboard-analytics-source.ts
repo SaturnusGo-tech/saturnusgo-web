@@ -1,3 +1,4 @@
+import { hasDashboardProducts, matchesDashboardProducts } from "../model/products/dashboard-products";
 import type { Bootstrap, Defect, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import type {
   DashboardAnalyticsQuery, DashboardAnalyticsSource, DashboardDrillPage,
@@ -62,11 +63,15 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
   return Object.freeze({
     async summary(query: DashboardAnalyticsQuery, signal?: AbortSignal) {
       signal?.throwIfAborted();
+      if (hasDashboardProducts(query)) throw new Error("Product analytics require the server projection.");
       return createDashboardSnapshot(data, query);
     },
     async drill(request: DashboardDrillRequest, signal?: AbortSignal) {
       signal?.throwIfAborted();
-      const { filter } = request.drill;
+      const filter = { ...request.query, ...request.drill.filter };
+      if (filter.entity !== "test_case" && hasDashboardProducts(filter)) {
+        throw new Error("Historical product analytics require the server projection.");
+      }
       const projectId = request.drill.projectId ?? request.query.projectId;
       const window = range(data, request);
       const inWindow = (value: string | null | undefined) => {
@@ -80,6 +85,7 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
         rows = data.testCases.filter(inProject).filter((item) => {
           if (filter.basis === "current" && item.archivedAt) return false;
           if (filter.basis === "created" && !inWindow(item.createdAt)) return false;
+          if (!matchesDashboardProducts(item, filter)) return false;
           if (filter.type && item.type !== filter.type) return false;
           if (filter.tag && !item.tags.includes(filter.tag)) return false;
           if (filter.untagged && item.tags.length > 0) return false;
@@ -90,7 +96,10 @@ export function createBootstrapDashboardAnalyticsSource(data: Bootstrap): Dashbo
           id: item.id, entity: "test_case" as const, projectId: item.projectId,
           key: item.key, title: item.title, project: projectLabel(item.projectId),
           detail: item.tags.map((tag) => `#${tag}`).join(" "), type: item.type,
-          component: item.component, priority: item.priority, tags: item.tags,
+          component: item.component, productId: item.productId, productGroupId: item.productGroupId, regression: item.regression ?? false,
+          product: item.customFields?.find(field => field.systemKey === "product")?.values[0]?.label,
+          productGroup: item.customFields?.find(field => field.systemKey === "product_group")?.values[0]?.label,
+          priority: item.priority, tags: item.tags,
           status: item.lifecycle, occurredAt: filter.basis === "created" ? item.createdAt : item.updatedAt,
           links: data.externalLinks.filter((link) => link.owner.kind === "test_case" && link.owner.caseId === item.id && link.status === "active")
             .map((link) => ({ label: link.label, url: link.targetUri })),

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
-import { localizedComponentLabel } from "../../../localization/format/labels";
+import { CaseCustomFields } from "./fields/CaseCustomFields";
+import { FolderPathPicker } from "./placement/FolderPathPicker";
 import type { TmsLocale } from "../../../localization/model/locale";
 import { CaseMetadataControls } from "../detail/metadata/CaseMetadataControls";
 import { InspectorDetails } from "./details/InspectorDetails";
@@ -91,7 +92,6 @@ export function CaseInspectorContent({
   if (creating && editor) return <CaseCreationSections locale={locale} revision={value}
     editor={editor} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} />;
   return <div className={`${css.content} ${css.overviewLayout}`}>
-    {editor && <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>}
     <main className={css.primaryColumn}>
       <InspectorSectionView title={ru ? "Описание" : "Description"} {...controls("description")}>
         <MarkdownField appearance="plain" onRequestEdit={!readOnly && !editor?.submitting && !editor?.attachmentsPending ? () => begin("description") : undefined} attachmentKey="description" value={value.description} label={ru ? "Описание" : "Description"}
@@ -111,16 +111,9 @@ export function CaseInspectorContent({
       </InspectorSectionView>
     </main>
     <aside className={css.sideRail} aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
-      <InspectorSectionView title={ru ? "Расположение" : "Placement"} {...controls("component")}>
-        {sectionEditing("component") && editor ? <div className={css.compactFields}>
-          <label><span>{ru ? "Компонент" : "Component"}</span><input autoFocus={!creating} list="case-inspector-components"
-            value={value.component} onChange={(event) => patch({ component: event.target.value })} /></label>
-          <datalist id="case-inspector-components">{editor.components.map((component) => <option key={component} value={component} />)}</datalist>
-          <label><span>{ru ? "Папка" : "Folder"}</span><input list="case-inspector-folders" value={editor.folderPath}
-            onChange={(event) => editor.onFolderPath(normalizeFolder(event.target.value))} /></label>
-        </div> : <div className={css.railFacts}>
-          <span>{ru ? "Компонент" : "Component"}</span><strong>{localizedComponentLabel(locale, value.component) || (ru ? "Не указан" : "Not specified")}</strong>
-        </div>}
+      <InspectorSectionView title={ru ? "Поля" : "Custom fields"} {...controls("component")}>
+        {sectionEditing("component") && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
+        <CaseCustomFields projectId={editor?.projectId} revision={value} editing={sectionEditing("component")} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} {...controls("properties")}>
         <CaseMetadataControls locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
@@ -132,7 +125,6 @@ export function CaseInspectorContent({
     </aside>
   </div>;
 }
-function normalizeFolder(value: string) { return value.startsWith("/") ? value : `/${value}`; }
 function attachmentBelongsToSection(section: InspectorSection, fieldKey: string) {
   if (section === "description" || section === "preconditions") return fieldKey === section;
   if (section === "details") return fieldKey === "test-data";

@@ -1,3 +1,5 @@
+import { CaseCustomFields } from "../fields/CaseCustomFields";
+import { FolderPathPicker } from "../placement/FolderPathPicker";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
 import { useRef, useState } from "react";
 import type { TmsLocale } from "../../../../localization/model/locale";
@@ -24,8 +26,6 @@ export function CaseCreationSections({
   const ru = locale === "ru";
   const patch = (next: Partial<TestCaseRevision>) => editor.onChange({ ...revision, ...next });
   return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout}`}>
-    <datalist id="case-inspector-folders">{editor.folders.map((folder) => <option key={folder} value={folder} />)}</datalist>
-    <datalist id="case-inspector-components">{editor.components.map((component) => <option key={component} value={component} />)}</datalist>
     <main className={css.primaryColumn}>
       <CreationNarrativeSection section="description" title={ru ? "Описание" : "Description"}
         value={revision.description} ru={ru} onChange={(description) => patch({ description })} />
@@ -38,13 +38,10 @@ export function CaseCreationSections({
     </main>
     <aside className={css.sideRail} aria-label={ru ? "Свойства нового тест-кейса" : "New test case properties"}>
       <CreationSection title={ru ? "Расположение" : "Placement"}>
-        <div className={css.railFields}>
-          <label><span>{ru ? "Компонент" : "Component"}</span><input list="case-inspector-components"
-            value={revision.component} onChange={(event) => patch({ component: event.target.value })}
-            placeholder={ru ? "Добавить компонент" : "Add component"} /></label>
-          <label><span>{ru ? "Папка" : "Folder"}</span><input list="case-inspector-folders"
-            value={editor.folderPath} onChange={(event) => editor.onFolderPath(normalizeFolder(event.target.value))} /></label>
-        </div>
+        <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />
+      </CreationSection>
+      <CreationSection title={ru ? "Поля" : "Custom fields"}>
+        <CaseCustomFields projectId={editor.projectId} revision={revision} editing canCreate={editor.canCreateFieldValues} disabled={editor.submitting} ru={ru} onPatch={patch} />
       </CreationSection>
       <CreationSection title={ru ? "Свойства" : "Properties"}>
         <CaseMetadataControls locale={locale} revision={revision} editing showLabels onChange={editor.onChange} />
@@ -83,5 +80,3 @@ function CreationSection({ title, children }: { title: string; children: React.R
     <div className={css.sectionBody}>{children}</div>
   </section>;
 }
-
-function normalizeFolder(value: string) { return value.startsWith("/") ? value : `/${value}`; }

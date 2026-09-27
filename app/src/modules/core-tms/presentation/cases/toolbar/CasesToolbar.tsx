@@ -1,3 +1,4 @@
+import { fieldFilterCount } from "../model/fields/case-field-filters";
 import { useEffect, useId, useRef, useState } from "react";
 import { PiCheck as Check, PiCaretDown as ChevronDown, PiFilePlusLight as FilePlus2, PiFunnelSimple as Filter,
   PiFolderPlusLight as FolderPlus, PiList as List, PiTreeStructure as ListTree, PiDotsThree as MoreHorizontal,
@@ -45,7 +46,7 @@ export function CasesToolbar(props: Props) {
     : props.selectedFolder ? props.selectedFolder.split("/").filter(Boolean).join(" / ") : (ru ? "Все тест-кейсы" : "All test cases");
   const lockedTitle = ru ? "Сначала сохраните или отмените изменения в редакторе" : "Save or cancel the editor changes first";
   const createTitle = props.folderArchived ? (ru ? "Восстановите папку или выберите активную, чтобы создать кейс" : "Restore this folder or select an active folder to create a case") : props.interactionLocked ? lockedTitle : undefined;
-  const activeFilterCount = Number(props.filters.type !== "all") + Number(props.filters.priority !== "all") + Number(props.filters.lifecycle !== "all")
+  const activeFilterCount = fieldFilterCount(facets) + Number(props.filters.type !== "all") + Number(props.filters.priority !== "all") + Number(props.filters.lifecycle !== "all")
     + Number(Boolean(props.filters.tag.trim())) + Number(props.filters.includeArchived) + facets.folders.length + facets.components.length + (facets.owners?.length ?? 0);
   const text = {
     list: ru ? "Список" : "List", dynamic: ru ? "Группы" : "Dynamic groups", group: ru ? "Группировать:" : "Group by:",

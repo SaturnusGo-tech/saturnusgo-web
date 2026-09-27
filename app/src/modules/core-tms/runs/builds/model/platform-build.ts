@@ -18,7 +18,7 @@ export function platformBuildError(draft: BuildDraft, projectId: string, ru: boo
   if (draft.iosReference.trim().length > 500) return ru ? "Версия или ссылка iOS: до 500 символов." : "iOS version or link: up to 500 characters.";
   const iosError = iosReferenceError(draft.iosReference, ru); if (iosError) return iosError;
   if (draft.file || draft.androidVersion.trim() || draft.artifact) {
-    if (!draft.artifact) return ru ? "Загрузите файл сборки Android перед созданием прогона." : "Upload the Android build file before creating the run.";
+    if (!draft.artifact) return ru ? "Загрузите файл сборки Android перед сохранением прогона." : "Upload the Android build file before saving the run.";
     if (draft.artifact.projectId !== projectId || draft.artifact.kind !== "file" || draft.artifact.owner.kind !== "project"
       || draft.artifact.owner.projectId !== projectId || draft.artifact.status !== "ready") {
       return ru ? "Выберите готовую сборку Android из этого проекта." : "Choose a ready Android build from this project.";

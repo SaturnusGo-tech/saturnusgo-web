@@ -111,10 +111,10 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--cases-on-primary\)/);
 });
 
-test("case content and properties use the TestOps-inspired two-column hierarchy", () => {
+test("case content and editable custom fields retain the two-column hierarchy", () => {
   assert.match(content, /overviewLayout/);
   assert.match(content, /<main className=\{css\.primaryColumn\}>[\s\S]*Описание[\s\S]*Предусловия[\s\S]*Сценарий/);
-  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Расположение[\s\S]*Свойства[\s\S]*Дополнительно/);
+  assert.match(content, /<aside className=\{css\.sideRail\}[\s\S]*Поля[\s\S]*<FolderPathPicker[\s\S]*<CaseCustomFields[\s\S]*Свойства[\s\S]*Дополнительно/);
   assert.match(content, /controls\("properties"\)[\s\S]*<CaseMetadataControls/);
 });
 
@@ -139,7 +139,7 @@ test("rich text is scoped to narrative test-case fields", () => {
 test("section snapshots and rich field labels remain interaction-safe", () => {
   assert.match(content, /if \(snapshots\.current\[section\]\) return/);
   assert.match(section, /!props\.persistentEditing && !active/);
-  assert.match(details, /className=\{`\$\{css\.wideField\} \$\{css\.markdownControl\} \$\{css\.borderedMarkdown\}`\}/);
+  assert.match(details, /<div className=\{`[^`]*css\.markdownControl[^`]*`\}><span>\{labels\.testData\}<\/span><MarkdownField/);
   const markdownInsideLabel = /<label[^>]*>(?:(?!<\/label>)[\s\S])*<MarkdownField/;
   assert.doesNotMatch(details, markdownInsideLabel);
   assert.doesNotMatch(scenarioStep, /MarkdownField/);

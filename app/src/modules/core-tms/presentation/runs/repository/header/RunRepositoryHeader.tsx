@@ -2,10 +2,9 @@ import { Pause, Play, Plus, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import { RunSelector } from "./RunSelector";
-import { RunDetailsPopover } from "../details/RunDetailsPopover";
 import css from "./run-header.module.css";
-export function RunRepositoryHeader({ru,run,detailsRun,choices,value,disabled,startBlocked,onChoose,onCreate,onAction,canManage}:{
-  ru:boolean;run?:TestRunSummary;detailsRun?:TestRunSummary;choices:{id:string;name:string;tags:string[];runs:TestRunSummary[]}[];value:string;
+export function RunRepositoryHeader({ru,run,onEdit,choices,value,disabled,startBlocked,onChoose,onCreate,onAction,canManage}:{
+  ru:boolean;run?:TestRunSummary;onEdit?:()=>void;choices:{id:string;name:string;tags:string[];runs:TestRunSummary[]}[];value:string;
   disabled:boolean;startBlocked:boolean;canManage:boolean;onChoose:(id:string)=>void;onCreate:()=>void;
   onAction:(action:"start"|"pause"|"resume"|"complete")=>void;
 }) {
@@ -15,8 +14,7 @@ export function RunRepositoryHeader({ru,run,detailsRun,choices,value,disabled,st
   const label=run?.status==="active" ? (ru?"Приостановить прогон":"Pause run") :
     run?.status==="paused" ? (ru?"Продолжить прогон":"Resume run") : (ru?"Запустить прогон":"Start run");
   return <div className={css.header}>
-    <RunSelector ru={ru} choices={choices} value={value} onChoose={onChoose} disabled={disabled}/>
-    {detailsRun && <RunDetailsPopover key={detailsRun.id} run={detailsRun} ru={ru} />}
+    <RunSelector onEdit={onEdit} ru={ru} choices={choices} value={value} onChoose={onChoose} disabled={disabled}/>
     {canManage && <div className={css.actions}>
       <button type="button" className={css.newRun} onClick={onCreate} disabled={disabled}><Plus size={14}/>{ru?"Новый прогон":"New run"}</button>
       {executable && <button type="button" className={css.play} aria-label={label} title={label}

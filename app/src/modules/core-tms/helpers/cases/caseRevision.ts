@@ -13,7 +13,7 @@ export function createEmptyRevision(locale: TmsLocale = "en"): TestCaseRevision 
     type: "manual",
     lifecycle: "draft",
     priority: "medium",
-    component: locale === "ru" ? "Основной продукт" : "Core product",
+    component: "",
     ownerIdentityId: null,
     tags: [],
     estimatedMinutes: 5,

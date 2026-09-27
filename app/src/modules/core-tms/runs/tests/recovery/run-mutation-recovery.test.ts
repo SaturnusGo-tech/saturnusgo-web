@@ -17,7 +17,7 @@ const item: Api["RunItem"] = {
   id: "item-1", caseId: "case-1", caseKey: "TMS-TC-1", revision: 1,
   assigneeIdentityId: null, status: "not_run", attemptCount: 1, activeAttemptNo: 1,
   createdAt: time, updatedAt: time,
-  snapshot: { revision: 1, title: "Checkout", description: "", preconditions: "",
+  snapshot: { customFields: [], productGroupId: null, productId: null, regression: false, revision: 1, title: "Checkout", description: "", preconditions: "",
     type: "manual", lifecycle: "ready", priority: "high", component: "Checkout",
     ownerIdentityId: null, tags: [], estimatedMinutes: 2, testData: "", steps: [],
     checklist: [], attachmentIds: [], changeNote: "Created", createdBy: "identity-1",

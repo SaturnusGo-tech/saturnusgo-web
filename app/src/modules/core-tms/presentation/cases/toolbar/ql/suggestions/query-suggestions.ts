@@ -3,9 +3,9 @@ import type { QueryMember } from "../../../model/query/match";
 export type QuerySuggestion = { value: string; label: string; detail?: string; field: boolean };
 const fields = [
  ["key", "ID", "ID"], ["title", "Название", "Title"], ["lifecycle", "Статус", "Status"], ["priority", "Приоритет", "Priority"],
- ["folder", "Папка", "Folder"], ["component", "Компонент", "Component"], ["tag", "Тег", "Tag"], ["type", "Тип", "Type"], ["owner", "Ответственный", "Assignee"],
+ ["folder", "Папка", "Folder"], ["product", "Продукт", "Product"], ["productGroup", "Группа продуктов", "Product group"], ["regression", "Регресс", "Regression"], ["tag", "Тег", "Tag"], ["type", "Тип", "Type"], ["owner", "Ответственный", "Assignee"],
 ];
-const enums: Record<string, string[]> = { lifecycle: ["ready", "draft", "deprecated", "archived"], priority: ["critical", "high", "medium", "low"], type: ["manual", "checklist", "automated"] };
+const enums: Record<string, string[]> = { regression: ["true", "false"], lifecycle: ["ready", "draft", "deprecated", "archived"], priority: ["critical", "high", "medium", "low"], type: ["manual", "checklist", "automated"] };
 export function querySuggestions(query: string, caret: number, options: { ru: boolean; folders: string[]; components: string[]; tags?: string[]; members?: readonly QueryMember[] }) {
  const before = query.slice(0, caret);
  const qualified = /([\p{L}\w]+)\s*(:|!=|==|=|~)\s*("[^"]*"?|'[^']*'?|«[^»]*»?|[^\s(),]*)$/u.exec(before);
@@ -24,7 +24,7 @@ export function querySuggestions(query: string, caret: number, options: { ru: bo
  if (!field) suggestions = fields.filter(([key, ru, en]) => normalize(`${key} ${ru} ${en} ${Object.keys(fieldAliases).filter(alias => fieldAliases[alias] === key).join(" ")}`).includes(needle))
    .map(([value, ru, en]) => ({ value, label: options.ru ? ru : en, field: true }));
  else {
-  const dynamic = field === "folder" ? options.folders : field === "component" ? options.components : field === "tag" ? options.tags ?? [] : enums[field] ?? [];
+  const dynamic = field === "folder" ? options.folders : (field === "component" || field === "product") ? options.components : field === "tag" ? options.tags ?? [] : enums[field] ?? [];
   suggestions = field === "owner" ? [{ value: "unassigned", label: options.ru ? "Не назначен" : "Not assigned", field: false },
     ...(options.members ?? []).map(member => ({ value: member.email || member.name, label: member.name, detail: member.email ?? undefined, field: false }))]
     : dynamic.map(value => ({ value, label: options.ru && enums[field!] ? valueAliases[value]?.[1] ?? value : value, field: false }));

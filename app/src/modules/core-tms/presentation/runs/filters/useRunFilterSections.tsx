@@ -1,3 +1,4 @@
+import { caseFieldOptions } from "../../cases/model/fields/case-field-filters";
 import { useEffect, useState } from "react";
 import { Bot, Box, CircleCheck, CircleDot, Flag, Folder, FolderKanban, ListTree, Tags, Users } from "lucide-react";
 import type { RunRepositoryEntry } from "../../../runs/batches/model/repository/run-repository";
@@ -14,13 +15,16 @@ export function useRunFilterSections({workspaceId,scope,projects,rows,ru}:{works
   const all=ru?"Все":"All";const label=(v:string)=>localizedLabel(ru?"ru":"en",v);
   const unique=(values:string[])=>[...new Set(values)].sort().map(value=>({value,label:value}));
   const enumOptions=(values:string[])=>values.map(value=>({value,label:label(value)}));
+  const custom=caseFieldOptions(rows.map(row=>row.testCase));
   const definitions:{id:keyof RunFilterState;label:string;icon:React.ReactNode;options:{value:string;label:string}[]}[]=[
     {id:"projects",label:ru?"Проекты":"Projects",icon:<FolderKanban size={13}/>,options:projects.map(p=>({value:p.id,label:p.name}))},
     {id:"results",label:ru?"Результаты":"Results",icon:<CircleCheck size={13}/>,options:enumOptions(["not_run","in_progress","passed","failed","blocked","skipped"])},
-    {id:"groups",label:ru?"Группировка":"Group by",icon:<ListTree size={13}/>,options:[{value:"project",label:ru?"По проектам":"By project"},{value:"component",label:ru?"По компонентам":"By component"},{value:"tag",label:ru?"По тегам":"By tag"}]},
+    {id:"groups",label:ru?"Группировка":"Group by",icon:<ListTree size={13}/>,options:[{value:"project",label:ru?"По проектам":"By project"},{value:"component",label:ru?"По продуктам":"By product"},{value:"tag",label:ru?"По тегам":"By tag"}]},
     {id:"folders",label:ru?"Папки":"Folders",icon:<Folder size={13}/>,options:unique(rows.flatMap(r=>{
       const parts=r.testCase.folderPath.split("/").filter(Boolean);return ["/",...parts.map((_,i)=>"/"+parts.slice(0,i+1).join("/"))];}))},
-    {id:"components",label:ru?"Компоненты":"Components",icon:<Box size={13}/>,options:unique(rows.map(r=>r.testCase.component)).map(o=>({...o,label:o.value?localizedComponentLabel(ru?"ru":"en",o.value):(ru?"Без компонента":"No component")}))},
+    {id:"productGroups",label:ru?"Группы продуктов":"Product groups",icon:<Box size={13}/>,options:(custom.productGroups??[]).map(o=>({value:o.id,label:o.label}))},
+    {id:"products",label:ru?"Продукты":"Products",icon:<Box size={13}/>,options:(custom.products??[]).map(o=>({value:o.id,label:o.label}))},
+    {id:"regression",label:ru?"Регресс":"Regression",icon:<CircleCheck size={13}/>,options:[{value:"true",label:"true"},{value:"false",label:"false"}]},
     {id:"types",label:ru?"Тип":"Type",icon:<Bot size={13}/>,options:enumOptions(["manual","checklist","automated"])},
     {id:"priorities",label:ru?"Приоритет":"Priority",icon:<Flag size={13}/>,options:enumOptions(["critical","high","medium","low"])},
     {id:"statuses",label:ru?"Статус":"Status",icon:<CircleDot size={13}/>,options:enumOptions(["ready","draft","deprecated"])},

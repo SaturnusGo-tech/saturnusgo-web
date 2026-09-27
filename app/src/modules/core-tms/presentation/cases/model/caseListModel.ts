@@ -1,3 +1,4 @@
+import { caseFieldOptions, matchesFieldFilters, type FieldFilters, type FieldOptions } from "./fields/case-field-filters";
 import { parseCaseQuery } from "./query/parse";
 import { caseSearchValues, matchesCaseQuery, type CaseQueryContext } from "./query/match";
 import { normalizeQueryText as normalized } from "./query/vocabulary/fields";
@@ -10,8 +11,8 @@ import type { CaseListRow, CaseSort } from "../types";
 export type CaseListViewMode = "list" | "dynamic";
 export type CaseGroupBy = "none" | "folder" | "component" | "priority" | "lifecycle";
 export type CaseRowGroup = { key: string; value: string; rows: CaseListRow[] };
-export type CaseFacetFilters = { folders: string[]; components: string[]; owners?: string[] };
-export type CaseFacetOptions = { folders: string[]; components: string[] };
+export type CaseFacetFilters = FieldFilters & { folders: string[]; components: string[]; owners?: string[] };
+export type CaseFacetOptions = FieldOptions & { folders: string[]; components: string[] };
 
 const priorityRank = { low: 0, medium: 1, high: 2, critical: 3 } as const;
 const lifecycleRank = { draft: 0, ready: 1, deprecated: 2, archived: 3 } as const;
@@ -36,6 +37,7 @@ export function resolveDependentCaseFacets(rows: CaseListRow[], facets: CaseFace
   const allFolders = new Set(rows.flatMap((row) => folderPrefixes(row.folderPath)));
   return {
     folders: [...allFolders].sort(collator.compare),
+    ...caseFieldOptions(componentRows.map(row => row.testCase)),
     components: [...new Set(componentRows.map((row) => row.testCase.component).filter(Boolean))].sort(collator.compare),
   };
 }
@@ -76,7 +78,7 @@ export function filterCaseRows(rows: CaseListRow[], query: { titleQuery?: string
     const folderMatches = matchesFolder(row, query.facets?.folders ?? []);
     const componentMatches = !query.facets?.components.length || query.facets.components.includes(row.testCase.component);
     const ownerMatches = !query.facets?.owners?.length || query.facets.owners.includes(row.testCase.ownerIdentityId ?? "unassigned");
-    return titleMatches && folderMatches && componentMatches && ownerMatches && matchesCaseQuery(parsed.root, values);
+    return matchesFieldFilters(row.testCase, query.facets) && titleMatches && folderMatches && componentMatches && ownerMatches && matchesCaseQuery(parsed.root, values);
   });
 }
 

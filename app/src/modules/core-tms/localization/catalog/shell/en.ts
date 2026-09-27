@@ -34,6 +34,7 @@ export const enShellMessages = {
   "nav.portfolios": "Portfolios & projects",
   "nav.dashboard": "Dashboard",
   "nav.cases": "Test cases",
+  "nav.customFields": "Custom fields",
   "nav.sharedSteps": "Shared steps",
   "nav.apiTesting": "API Testing",
   "nav.runs": "Test runs",

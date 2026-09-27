@@ -3,13 +3,15 @@ export type DashboardCaseType = "manual" | "checklist" | "automated";
 export type DashboardRunOutcome = "passed" | "failed" | "blocked" | "incomplete" | "not_started" | "aborted";
 export type DashboardExecutionStatus = "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
 
-export type DashboardAnalyticsQuery = {
+export type DashboardProductFilters = { productGroupId?: string; productId?: string; regression?: boolean };
+
+export type DashboardAnalyticsQuery = DashboardProductFilters & {
   workspaceId: string;
   projectId?: string;
   period: DashboardPeriod;
 };
 
-export type DashboardDrillFilter =
+export type DashboardDrillFilter = DashboardProductFilters & (
   | {
       entity: "test_case";
       basis: "current" | "created";
@@ -46,7 +48,7 @@ export type DashboardDrillFilter =
       activeOnly?: boolean;
       runId?: string;
       testCaseId?: string;
-    };
+    });
 
 export type DashboardDrill = {
   id: string;
@@ -77,6 +79,11 @@ export type DashboardDrillRow = {
   detail: string;
   type?: string;
   component?: string;
+  productGroupId?: string | null;
+  productId?: string | null;
+  regression?: boolean;
+  productGroup?: string;
+  product?: string;
   priority?: string;
   tags?: string[];
   runId?: string;

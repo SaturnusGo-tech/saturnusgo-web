@@ -1,6 +1,7 @@
-export type CaseQlField = "text" | "key" | "title" | "lifecycle" | "priority" | "component" | "folder" | "tag" | "type" | "owner";
+export type CaseQlField = "product" | "productGroup" | "regression" | "text" | "key" | "title" | "lifecycle" | "priority" | "component" | "folder" | "tag" | "type" | "owner";
 export const normalizeQueryText = (value: string | null | undefined) => (value ?? "").normalize("NFKC").toLowerCase().replaceAll("ё", "е").trim();
 export const fieldAliases: Record<string, CaseQlField> = {
+ product: "product", продукт: "product", productgroup: "productGroup", product_group: "productGroup", группа: "productGroup", regression: "regression", регресс: "regression",
  text: "text", текст: "text", id: "key", key: "key", ид: "key", title: "title", name: "title", название: "title",
  status: "lifecycle", state: "lifecycle", lifecycle: "lifecycle", статус: "lifecycle", состояние: "lifecycle",
  priority: "priority", приоритет: "priority", component: "component", functionality: "component", компонент: "component",

@@ -1,3 +1,4 @@
+import type { CaseFields } from "./custom-fields/case-fields";
 import type { TestCaseRevision, TestRunSummary } from "./execution-contract";
 export type {
   ExecutionStatus, RunAttempt, RunAttemptSummary, RunItem, RunItemSummary, RunProgress,
@@ -31,7 +32,7 @@ export type Environment = {
   status?: "active" | "archived";
 };
 
-export type TestCaseSummary = {
+export type TestCaseSummary = CaseFields & {
   id: string;
   projectId: string;
   key: string;

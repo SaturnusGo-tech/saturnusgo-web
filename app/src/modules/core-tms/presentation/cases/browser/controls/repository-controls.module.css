@@ -45,6 +45,26 @@
 .search .filter { border-left: 1px solid var(--cases-row-border); padding-left: 5px; margin-left: 3px; }
 .controls .select { padding: 0 7px; font-size: 12px; border-radius: 999px; color: var(--cases-secondary-text); }
 .controls .select[aria-pressed=true] { color: var(--cases-link); }
-.tools:has(.selection:not([data-open])) { display: none; }
+.tools:has(.selection:not([data-open])) { pointer-events: none; }
 .controls { gap: 7px; margin-inline: 3px; }
 @container repository-controls (max-width: 350px) { .controls .select { padding-inline: 2px; font-size: 11px; } .search { gap: 6px; padding-left: 8px; } }
+
+/* Keep the action mounted so the search contracts continuously on selection. */
+.controls[data-inline=true] { display:flex; flex-wrap:wrap; }
+.controls[data-inline=true] .searchRow { flex:1 1 100px; }
+.controls[data-inline=true] .tools { flex:0 0 auto; }
+.controls[data-inline=true] .ql { width:100%; }
+.selectAllReveal { display:grid; grid-template-columns:0fr; min-width:0; opacity:0; visibility:hidden; transform:translateY(3px); transition:grid-template-columns 220ms cubic-bezier(.2,.7,.3,1),opacity 180ms ease,transform 220ms ease,visibility 0s 220ms; }
+.selectAllReveal > button { min-width:0; overflow:hidden; padding-inline:0 !important; transition:padding 220ms ease; }
+.selectAllReveal[data-open] { grid-template-columns:1fr; opacity:1; visibility:visible; transform:translateY(0); transition-delay:0s; }
+.selectAllReveal[data-open] > button { padding-inline:5px !important; }
+@media(prefers-reduced-motion:reduce) { .selectAllReveal { transition:none; transform:none; } }
+
+.controls:not([data-inline]) { grid-template-columns:minmax(120px,1fr) auto; align-items:center; }
+.controls:not([data-inline]) .tools { min-width:0; }
+.controls:not([data-inline]) .ql,.controls .queryHint { grid-column:1/-1; }
+.controls:not([data-inline]) .selection { width:0; overflow:hidden; transition:width 220ms cubic-bezier(.2,.7,.3,1),opacity 180ms ease,visibility 0s 220ms; }
+.controls:not([data-inline]) .selection[data-open] { width:110px; }
+.controls:not([data-inline]) .selectionActions { display:grid;gap:0; }
+.controls:not([data-inline]) .selectionActions>button { height:20px;font-size:10px;text-align:left; }
+@media(prefers-reduced-motion:reduce) { .controls:not([data-inline]) .selection,.selectAllReveal>button { transition:none; } }

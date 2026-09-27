@@ -1,3 +1,4 @@
+import { caseFieldFilterSections } from "./fields/CaseFieldFilterSections";
 import { useRef, useState, type ReactNode, type KeyboardEvent } from "react";
 import { Bot, Box, Check, Circle, CircleDot, Flag, Folder, Search, Tags, Users, X } from "lucide-react";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
@@ -24,7 +25,7 @@ type FilterProps = {
 export function CaseFilterMenu(props: FilterProps) {
   const ru = props.locale === "ru";
   const people = useWorkspacePeople();
-  const sections = [...(props.extraSections ?? [])];
+  const sections = [...(props.extraSections ?? []), ...(!props.customSectionsOnly ? caseFieldFilterSections(props.facets, props.options, props.onFacets, ru) : [])];
   if (!props.customSectionsOnly && !sections.some(item => item.id === "owner" || item.id === "assignee")) {
     sections.unshift({ id: "owner", label: ru ? "Ответственные" : "Assignees", icon: <Users size={16} />,
       active: Boolean(props.facets.owners?.length), summary: String(props.facets.owners?.length || (ru ? "Все" : "All")),
@@ -46,7 +47,6 @@ export function CaseFilterMenu(props: FilterProps) {
   };
   const navigation = [...sections, ...(!props.customSectionsOnly ? [
     { id: "folders", label: labels.folders, icon: <Folder size={16} />, active: !!props.facets.folders.length, summary: String(props.facets.folders.length) },
-    { id: "components", label: labels.components, icon: <Box size={16} />, active: !!props.facets.components.length, summary: String(props.facets.components.length) },
     { id: "type", label: labels.type, icon: <Bot size={16} />, active: props.filters.type !== "all", summary: "" },
     { id: "priority", label: labels.priority, icon: <Flag size={16} />, active: props.filters.priority !== "all", summary: "" },
     { id: "lifecycle", label: labels.lifecycle, icon: <CircleDot size={16} />, active: props.filters.lifecycle !== "all", summary: "" },

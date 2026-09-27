@@ -1,3 +1,4 @@
+import { fieldFilterCount } from "../../model/fields/case-field-filters";
 import { useId, useRef, useState } from "react";
 import { PiFunnelSimple, PiMagnifyingGlass, PiX } from "react-icons/pi";
 import type { CasesViewProps } from "../../types";
@@ -16,7 +17,7 @@ export function RepositoryControls({ props, view, locale }: {
   const qlButton = useRef<HTMLButtonElement>(null);
   const filterButton = useRef<HTMLButtonElement>(null);
   const locked = Boolean(props.editor || props.folders?.busy);
-  const active = Number(props.filters.type !== "all") + Number(props.filters.priority !== "all")
+  const active = fieldFilterCount(view.facetFilters) + Number(props.filters.type !== "all") + Number(props.filters.priority !== "all")
     + Number(props.filters.lifecycle !== "all") + Number(Boolean(props.filters.tag.trim()))
     + Number(props.filters.includeArchived) + view.facetFilters.folders.length + view.facetFilters.components.length + (view.facetFilters.owners?.length ?? 0);
   function closeFilters() { view.setFilterOpen(false); filterButton.current?.focus(); }

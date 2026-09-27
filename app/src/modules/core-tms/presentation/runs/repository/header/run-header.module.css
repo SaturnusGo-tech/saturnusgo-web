@@ -23,3 +23,12 @@
 .archiveToggle svg{transition:transform .18s ease}.archiveToggle .expanded{transform:rotate(180deg)}
 .archiveList{animation:appear .16s ease-out}.empty{margin:0;padding:8px;color:var(--cases-muted);font-size:12px}
 @media(prefers-reduced-motion:reduce){.archiveToggle svg{transition:none}.archiveList{animation:none}}
+
+.choices{max-height:230px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px}
+.choice{display:flex;align-items:center;gap:4px;min-height:32px;padding-right:8px;border-radius:7px;color:var(--cases-text)}
+.choice:hover,.choice:focus-within,.choice[data-selected=true]{background:var(--cases-hover)}
+.choice[data-selected=true]{color:var(--cases-primary)}.choice>svg{flex-shrink:0}
+.choose{flex:1;min-width:0;display:flex;align-items:center;padding:6px 8px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;border-radius:7px}
+.choose>span{min-width:0;overflow:hidden;text-overflow:ellipsis}.choose small{display:block;font-size:10px;color:var(--cases-muted);overflow:hidden;text-overflow:ellipsis}
+.edit{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:26px;height:28px;padding:0;border:0;border-radius:0;background:none;color:var(--cases-muted);box-shadow:none;cursor:pointer}
+.edit:hover{color:var(--cases-text)}.choose:focus-visible,.edit:focus-visible{outline:2px solid currentColor;outline-offset:-2px}

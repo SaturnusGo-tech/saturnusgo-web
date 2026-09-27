@@ -1,6 +1,7 @@
+import { RunDetailsPopover } from "../repository/details/RunDetailsPopover";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
-import { Copy, Play, Trash2, X } from "lucide-react";
+import { Play, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -57,7 +58,6 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
         <div className={runStyles.runContext}><span>{locale === "ru" ? `Кейс ${itemIndex + 1} из ${itemCount}` : `Case ${itemIndex + 1} of ${itemCount}`}</span></div>
         <div className={runStyles.headerActions} ref={actionsRef}>
           {canStart && <button type="button" className={styles.primaryButton} disabled={startPending || archivePending} onClick={onStart} data-testid="start-existing-run"><Play size={16} />{startPending ? (locale === "ru" ? "Запускаем…" : "Starting…") : (locale === "ru" ? "Начать прогон" : "Start run")}</button>}
-          <button className={`${styles.iconButton} ${runStyles.headerIconButton}`} aria-label={t("runs.copyCaseKey")} title={t("runs.copyCaseKey")} onClick={() => navigator.clipboard?.writeText(item.caseKey)}><Copy size={17} /></button>
           {canArchive && !run.archivedAt && (
             <button ref={archiveButtonRef} className={`${styles.iconButton} ${runStyles.headerIconButton} ${runStyles.archiveButton}`} aria-label={t("runs.removeFromList")} title={t("runs.removeFromList")} aria-expanded={confirmOpen} onClick={() => setConfirmOpen((current) => !current)}><Trash2 size={17} /></button>
           )}
@@ -78,9 +78,9 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
         <h1>{item.snapshot.title}<span>#{item.caseKey}</span></h1>
         <div className={runStyles.headerByline}>
           <span className={`${runStyles.executionBadge} ${runStyles[`execution_${item.status}`]}`}>{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
-          <span>{t("cases.revision", { revision: item.revision })}</span>
           <span>{locale === "ru" ? "Исполнитель кейса:" : "Case assignee:"}</span>
           <ResponsibleName workspaceId={workspaceId} identityId={item.assigneeIdentityId} offline={offline} />
+          <RunDetailsPopover key={run.id} run={run} ru={locale === "ru"} />
         </div>
       </div>
     </header>

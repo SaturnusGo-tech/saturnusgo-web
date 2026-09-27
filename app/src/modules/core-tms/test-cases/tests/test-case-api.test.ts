@@ -11,19 +11,19 @@ type Api = components["schemas"];
 const time = "2026-08-28T00:00:00.000Z";
 const revision: Api["TestCaseRevision"] = {
   revision: 3, title: "Sign in", description: "", preconditions: "", type: "automated",
-  lifecycle: "ready", priority: "critical", component: "Auth", ownerIdentityId: null,
+  lifecycle: "ready", priority: "critical", customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth", ownerIdentityId: null,
   tags: ["smoke"], estimatedMinutes: 3, testData: "", steps: [], checklist: [],
   attachmentIds: [], changeNote: "Clarified", createdBy: "identity-1", createdAt: time,
 };
 const summary: Api["TestCaseRevisionSummary"] = {
   revision: 3, title: "Sign in", type: "automated", lifecycle: "ready", priority: "critical",
-  component: "Auth", ownerIdentityId: null, estimatedMinutes: 3, changeNote: "Clarified",
+  customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth", ownerIdentityId: null, estimatedMinutes: 3, changeNote: "Clarified",
   createdBy: "identity-1", createdAt: time,
 };
 const caseSummary = (id: number): Api["TestCaseSummary"] => ({
   id: `case-${id}`, projectId: "project-1", key: `HOST-TC-${id}`,
   folderId: null, folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "automated",
-  lifecycle: "ready", priority: "medium", component: "Host", ownerIdentityId: null,
+  lifecycle: "ready", priority: "medium", customFields: [], productGroupId: null, productId: null, regression: false, component: "Host", ownerIdentityId: null,
   tags: ["Host", "Ui"], estimatedMinutes: 2, revisionCount: 1, archivedAt: null,
   createdAt: time, updatedAt: time, etag: `"case-${id}:1"`,
 });

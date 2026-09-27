@@ -45,6 +45,8 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     sharedSteps={model.sharedSteps.items}
     onResolveSharedStep={model.sharedSteps.resolve}
     editor={model.dialog === "case" ? {
+      projectId: model.selectedCase?.projectId ?? model.project?.id,
+      canCreateFieldValues: model.data.meta.authorization.capabilities.includes("test_case:manage"),
       mode: model.editing ? "edit" : "create",
       value: model.caseDraft,
       folderPath: model.caseFolderPath,

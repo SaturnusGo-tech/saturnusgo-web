@@ -1,3 +1,4 @@
+import { fieldFilterCount } from "../model/fields/case-field-filters";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
 import { useMemberDirectory } from "../../../workspace/members/state/directory/useMemberDirectory";
 import { transitionContent } from "../../workspace/motion/transition/content-transition";
@@ -65,7 +66,7 @@ export function useCasesViewController(
   }), sort, languageTag), [baseRows, facetFilters, languageTag, deferredQl, queryContext, sort]);
   const rows = useMemo(() => matchingRows.filter(({ testCase }) => (!props.folders || folderScope.includes(testCase))
     && (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)), [matchingRows, props.folders, folderScope, props.filters.includeArchived]);
-  const treeFiltered = Boolean(props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length || facetFilters.owners?.length
+  const treeFiltered = Boolean(fieldFilterCount(facetFilters) || props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length || facetFilters.owners?.length
     || props.filters.type !== "all" || props.filters.priority !== "all" || props.filters.lifecycle !== "all" || props.filters.tag.trim());
   const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
     !testCase.archivedAt && Boolean(testCase.etag)

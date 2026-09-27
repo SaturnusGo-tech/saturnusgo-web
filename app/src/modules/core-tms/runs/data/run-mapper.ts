@@ -1,3 +1,4 @@
+import { copyCaseFields } from "../../../../core/tms/contracts/custom-fields/case-fields";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import type {
   RunAttempt,
@@ -50,7 +51,7 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
 
 export function mapRunItemSummary(dto: Api["RunItemSummary"]): RunItemSummary {
   return {
-    archivedAt: dto.archivedAt ?? null, rowVersion: dto.rowVersion, preview: dto.preview,
+    archivedAt: dto.archivedAt ?? null, rowVersion: dto.rowVersion, preview: dto.preview ? { ...dto.preview, ...copyCaseFields(dto.preview), tags: [...dto.preview.tags] } : undefined,
     id: dto.id,
     caseId: dto.caseId,
     caseKey: dto.caseKey,

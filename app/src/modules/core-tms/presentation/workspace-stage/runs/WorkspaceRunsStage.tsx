@@ -1,3 +1,6 @@
+import type { TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
+import { canEditRunMetadata } from "../../../runs/edit/model/run-edit";
+import { RunEditDialog } from "../../../runs/edit/presentation/RunEditDialog";
 import { VerificationRunContext } from "../../../runs/verification/presentation/context/VerificationRunContext";
 import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
 import { visitWorkspace } from "../../../state/navigation/browser/workspace-history";
@@ -12,6 +15,7 @@ import { useImpactList } from "../../../impact/application/list/useImpactList";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
 import { TessiqLoader } from "../../common/loading/TessiqLoader";
 export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
+  const [editingRun, setEditingRun] = useState<TestRunSummary | null>(null);
   const [executionDirty, setExecutionDirty] = useState(false);
   const { t, locale } = useTmsLocale();
   const repository = useRunRepository(model, locale === "ru");
@@ -27,6 +31,9 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   const scopeLoading = model.connection === "connected" && Boolean(model.selectedRun || model.selectedRunId)
     && !model.runResourceReady;
   if (scopeLoading && !model.selectedRun) return <TessiqLoader pane label={t("common.loading")} testId="run-resource-loading" />;
+  const onEditRun = model.selectedRun && canEditRunMetadata(model.selectedRun) && model.connection === "connected"
+    && !executionDirty && !execution.pending && model.data.meta.authorization.capabilities.includes("run:manage")
+    ? () => setEditingRun(model.selectedRun) : undefined;
   return (
     <div style={{ height: "100%", minHeight: 0, display: "flex", flexDirection: "column", gap: 10 }}>
       {impactEnabled && <RunImpactSummary state={impact} scope={impactScope} ru={locale === "ru"} />}
@@ -38,7 +45,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
           onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {
             workspaceId: model.data.workspace.id, projectId: model.project!.id, caseId,
           }, { activity: true }))} />}
-        navigation={<RunRepositoryBrowser model={model} repository={repository} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={impactEnabled && (!impact.ready || Boolean(impact.error) || impact.items.some((item) => !item.approved))} />}
+        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={impactEnabled && (!impact.ready || Boolean(impact.error) || impact.items.some((item) => !item.approved))} />}
         onDirtyChange={setExecutionDirty}
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
@@ -70,6 +77,12 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         }}
       />
       </div>
+      {editingRun && <RunEditDialog key={editingRun.id} run={editingRun} workspaceId={model.data.workspace.id}
+        onClose={() => setEditingRun(null)} onSaved={run => {
+          model.setData(current => ({ ...current, runs: current.runs.map(item => item.id === run.id ? run : item) }));
+          setEditingRun(null); repository.browser.refresh(); model.retryRunResource();
+          model.notify(locale === "ru" ? "Настройки прогона сохранены" : "Run settings saved");
+        }} />}
     </div>
   );
 }

@@ -9,7 +9,7 @@ export function item(): RunItem {
     id: "item-1", caseId: "case-1", caseKey: "QA-TC-1", revision: 1,
     assigneeIdentityId: null, status: "in_progress", attemptCount: 2, activeAttemptNo: 2,
     createdAt: time, updatedAt: time,
-    snapshot: { revision: 1, title: "Verify immutable source", description: "", preconditions: "",
+    snapshot: { customFields: [], productGroupId: null, productId: null, regression: false, revision: 1, title: "Verify immutable source", description: "", preconditions: "",
       type: "manual", lifecycle: "ready", priority: "high", component: "GitHub",
       ownerIdentityId: null, tags: [], estimatedMinutes: null, testData: "",
       steps: [{ id: "step-1", order: 1, action: "Inspect source", expectedResult: "SHA matches", required: true, attachmentIds: [], sharedStepId: null, sharedStep: null }],

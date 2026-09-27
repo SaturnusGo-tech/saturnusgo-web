@@ -1,3 +1,4 @@
+import { caseFieldOptions, fieldFilterCount } from "../../model/fields/case-field-filters";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { useMemberDirectory } from "../../../../workspace/members/state/directory/useMemberDirectory";
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -17,7 +18,7 @@ export function useSelectionFilters(cases: TestCaseSummary[], initial: InitialSe
   const [filters, setFilters] = useState<CaseFilters>(initial.filters ?? { type: "all", priority: "all", lifecycle: "all", tag: "", includeArchived: false });
   const [facets, setFacets] = useState<CaseFacetFilters>(initial.facets ?? { folders: [], components: [] });
   const deferredQuery = useDeferredValue(query); const deferredQl = useDeferredValue(qlQuery);
-  const options = useMemo(() => ({ folders: [...new Set(cases.map((c) => c.folderPath))].sort(),
+  const options = useMemo(() => ({ ...caseFieldOptions(cases), folders: [...new Set(cases.map((c) => c.folderPath))].sort(),
     components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort(), tags: [...new Set(cases.flatMap(item => item.tags))].sort() }), [cases]);
   const visible = useMemo(() => filterCaseRows(cases.filter((c) =>
     (filters.includeArchived || !c.archivedAt) && (filters.type === "all" || c.type === filters.type)
@@ -36,17 +37,20 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
   const [ql, setQl] = useState(false); const [filter, setFilter] = useState(false);
   useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus(); }, [ql]);
   useEffect(() => { if (disabled) { setQl(false); setFilter(false); } }, [disabled]);
-  return <div className={css.controls} data-inline={inline || undefined} data-case-popover-root>
+  return <div className={css.controls} data-inline={inline || undefined} data-selecting={Boolean(onSelectAll) || undefined} data-case-popover-root>
     <div className={css.searchRow}><label className={css.search} data-input-shell><PiMagnifyingGlass size={16} />
       <input disabled={disabled} aria-label={ru ? "Найти тест-кейс" : "Find a test case"} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
         value={state.query} onChange={(e) => state.setQuery(e.target.value)} /></label>{action}</div>
     <div className={css.tools}>
       <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" disabled={disabled} aria-expanded={filter} aria-haspopup="dialog" aria-controls="case-filter-panel"
-        data-active={extraSections?.some((item) => item.active) || Boolean(state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
+        data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
           customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
-      {onSelectAll && <button className={css.tool} type="button" disabled={disabled} onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>}
+      <span className={css.selectAllReveal} data-open={Boolean(onSelectAll) || undefined} aria-hidden={!onSelectAll}
+        ref={element => { if (element) element.inert = !onSelectAll; }}>
+        <button className={css.tool} type="button" disabled={disabled || !onSelectAll} onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>
+      </span>
       {tools}
     </div>
     {ql && <div ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}

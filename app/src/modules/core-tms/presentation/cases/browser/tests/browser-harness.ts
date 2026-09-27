@@ -3,6 +3,7 @@ import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legac
 import { hookHarness } from "../../../../state/navigation/browser/tests/project/hook-harness";
 import * as selection from "../../bulk/selection/caseSelection";
 import * as model from "../../model/caseListModel";
+import * as fields from "../../model/fields/case-field-filters";
 import * as scope from "../../../../folders/model/selection/folder-scope";
 import * as tree from "../../../../folders/model/tree";
 import { formatCount } from "../../../../localization/format/count";
@@ -57,6 +58,7 @@ export function browserHarness() {
     if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
     if (name.endsWith("folder-scope")) return scope;
     if (name.endsWith("caseListModel")) return model;
+    if (name.endsWith("case-field-filters")) return fields;
     if (name.endsWith("format/count")) return { formatCount };
     if (name.endsWith("formatCaseEstimate")) return { formatCaseEstimate };
     if (name.endsWith("useCaseBulkSelection")) return bulk;

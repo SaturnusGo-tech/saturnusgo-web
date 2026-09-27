@@ -1,3 +1,4 @@
+import type { CaseFields } from "./custom-fields/case-fields";
 import type { components } from "../generated/tms-api";
 
 export type ExecutionStatus = "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
@@ -23,7 +24,7 @@ export type SharedStepSnapshot = {
   items: SharedStepItem[];
 };
 
-export type TestCaseRevision = {
+export type TestCaseRevision = CaseFields & {
   revision: number;
   title: string;
   description: string;
@@ -71,7 +72,7 @@ export type RunAttempt = RunAttemptSummary & { stepResults: StepResult[] };
 export type RunItemSummary = {
   archivedAt?: string | null;
   rowVersion?: number;
-  preview?: Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
+  preview?: CaseFields & Pick<TestCaseRevision, "title" | "type" | "lifecycle" | "priority" | "component" | "tags" | "estimatedMinutes"> & { folderPath: string | null };
   id: string;
   caseId: string;
   caseKey: string;

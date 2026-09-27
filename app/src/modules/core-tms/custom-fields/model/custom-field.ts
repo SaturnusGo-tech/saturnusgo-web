@@ -1,0 +1,17 @@
+import type { components } from "../../../../core/tms/generated/tms-api";
+type Api = components["schemas"];
+export type CustomFieldType = Api["CustomField"]["type"];
+export type CustomFieldSystemKey = NonNullable<Api["CustomField"]["systemKey"]>;
+export type CustomFieldStatus = "active" | "archived" | "all";
+export type CustomFieldActor = NonNullable<Api["CustomField"]["updatedBy"]>;
+export type CustomFieldDefinition = Readonly<Api["CustomField"]>;
+export type CustomFieldValue = Readonly<Api["CustomFieldValue"]>;
+export type CustomFieldDraft = Pick<CustomFieldDefinition, "name" | "identifier" | "type" | "multiple" | "required">;
+export type CustomFieldValueDraft = { readonly value: string | number | boolean;
+  readonly parentValueId?: string | null; readonly confirmedSimilarValueIds?: readonly string[] };
+export type CustomFieldSelection = Pick<CustomFieldValue, "id" | "value" | "label" | "parentValueId">;
+export type CustomFieldPage<T> = { readonly items: readonly T[]; readonly nextCursor: string | null };
+export type CustomFieldScope = { readonly workspaceId: string; readonly projectId: string };
+export const customFieldTypes: readonly CustomFieldType[] = ["string", "boolean", "number", "integer"];
+export const fieldEtag = (field: Pick<CustomFieldDefinition, "id" | "rowVersion">) => `"custom-field:${field.id}:v${field.rowVersion}"`;
+export const valueEtag = (value: Pick<CustomFieldValue, "id" | "rowVersion">) => `"custom-field-value:${value.id}:v${value.rowVersion}"`;

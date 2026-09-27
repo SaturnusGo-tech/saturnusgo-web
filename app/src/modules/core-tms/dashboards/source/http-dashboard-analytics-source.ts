@@ -12,7 +12,7 @@ import { createBootstrapDashboardAnalyticsSource } from "./bootstrap-dashboard-a
 
 type Api = components["schemas"];
 const queryKey = (query: DashboardAnalyticsQuery) =>
-  `${query.workspaceId}:${query.projectId ?? "workspace"}:${query.period}`;
+  JSON.stringify([query.workspaceId, query.projectId, query.period, query.productGroupId, query.productId, query.regression]);
 const unavailableRoute = (error: unknown) => error instanceof TmsApiError &&
   error.status === 404 && error.code === "HTTP_ERROR";
 
@@ -26,6 +26,9 @@ function search(request: DashboardDrillRequest) {
     params.set("to", request.drill.window.to);
   } else params.set("period", request.query.period);
   const { entity: _entity, ...filter } = request.drill.filter;
+  for (const key of ["productGroupId", "productId", "regression"] as const) {
+    if (request.query[key] !== undefined) params.set(key, String(request.query[key]));
+  }
   for (const [key, value] of Object.entries(filter)) {
     if (value !== undefined) params.set(key, String(value));
   }
@@ -45,6 +48,9 @@ export function createHttpDashboardAnalyticsSource(http: TmsHttpClient,
       const params = new URLSearchParams({ workspaceId: query.workspaceId,
         period: query.period, dimensionLimit: "20" });
       if (query.projectId) params.set("projectId", query.projectId);
+      for (const key of ["productGroupId", "productId", "regression"] as const) {
+        if (query[key] !== undefined) params.set(key, String(query[key]));
+      }
       try {
         const envelope = await http.get<Api["DashboardAnalyticsSummaryEnvelope"]>(
           `/dashboard-analytics/summary?${params}`, signal);

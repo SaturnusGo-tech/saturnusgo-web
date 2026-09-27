@@ -1,3 +1,4 @@
+import { CaseCustomFields } from "../cases/inspector/fields/CaseCustomFields";
 import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
@@ -119,6 +120,10 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
                 <div><span>{locale === "ru" ? "Тип" : "Type"}</span><TypeBadge locale={locale} type={selectedItem.snapshot.type} /></div>
                 <div><span>{t("runs.estimate")}</span><EstimateBadge locale={locale} minutes={selectedItem.snapshot.estimatedMinutes} /></div>
               </div>
+            </section>
+            <section className={runStyles.railSection}>
+              <header><h2>{locale === "ru" ? "Поля" : "Custom fields"}</h2></header>
+              <CaseCustomFields projectId={selectedRun.projectId} revision={selectedItem.snapshot} editing={false} ru={locale === "ru"} onPatch={() => {}} />
             </section>
           </aside>
         </div>

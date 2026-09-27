@@ -12,7 +12,7 @@ test("maps bounded case summaries without fabricating revision content", () => {
   const dto: Api["TestCaseSummary"] = {
     id: "case-1", projectId: "project-1", key: "UH-TC-1", folderId: null, folderPath: "/Smoke",
     currentRevision: 3, title: "Sign in", type: "automated", lifecycle: "ready",
-    priority: "critical", component: "Auth", ownerIdentityId: null,
+    priority: "critical", customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth", ownerIdentityId: null,
     tags: ["smoke", "ci.backend"], estimatedMinutes: 5, revisionCount: 3, archivedAt: null,
     etag: '"case-1:3"',
     ...timestamps,
@@ -24,7 +24,7 @@ test("maps bounded case summaries without fabricating revision content", () => {
 test("maps full case detail with case links and immutable current revision", () => {
   const current: Api["TestCaseRevision"] = {
     revision: 3, title: "Sign in", description: "Account access", preconditions: "User exists",
-    type: "automated", lifecycle: "ready", priority: "critical", component: "Auth",
+    type: "automated", lifecycle: "ready", priority: "critical", customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth",
     ownerIdentityId: null, tags: ["smoke", "ci.backend"], estimatedMinutes: 5, testData: "qa@example.test",
     steps: [{ id: "step-1", order: 1, action: "Sign in", expectedResult: "Home opens",
       required: true, attachmentIds: ["att-step"], sharedStepId: null, sharedStep: null }],
@@ -47,7 +47,7 @@ test("maps full case detail with case links and immutable current revision", () 
 test("keeps revision history summaries lightweight", () => {
   const dto: Api["TestCaseRevisionSummary"] = {
     revision: 2, title: "Sign in", type: "automated", lifecycle: "ready",
-    priority: "high", component: "Auth", ownerIdentityId: "identity-1",
+    priority: "high", customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth", ownerIdentityId: "identity-1",
     estimatedMinutes: 4, changeNote: "Updated", createdBy: "identity-1",
     createdAt: timestamps.createdAt,
   };

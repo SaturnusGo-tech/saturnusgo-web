@@ -1,11 +1,12 @@
 import type { RunRepositoryEntry } from "../../../runs/batches/model/repository/run-repository";
 export type RunFilterState={owners:string[];projects:string[];results:string[];folders:string[];components:string[];
-  types:string[];priorities:string[];statuses:string[];tags:string[];groups:string[]};
-export const emptyRunFilters=():RunFilterState=>({owners:[],projects:[],results:[],folders:[],components:[],types:[],priorities:[],statuses:[],tags:[],groups:["project"]});
+  types:string[];priorities:string[];statuses:string[];tags:string[];groups:string[];products:string[];productGroups:string[];regression:string[]};
+export const emptyRunFilters=():RunFilterState=>({owners:[],projects:[],results:[],folders:[],components:[],types:[],priorities:[],statuses:[],tags:[],products:[],productGroups:[],regression:[],groups:["project"]});
 export function matchesRunFilters(row:RunRepositoryEntry, f:RunFilterState) {
   const c=row.testCase;const includes=(values:readonly string[],value:string)=>!values.length||values.includes(value);
   return includes(f.projects,row.projectId)&&includes(f.results,row.item.status)&&includes(f.owners,row.item.assigneeIdentityId??"unassigned")
     &&includes(f.types,c.type)&&includes(f.priorities,c.priority)&&includes(f.statuses,c.lifecycle)
+    &&includes(f.products,c.productId??"")&&includes(f.productGroups,c.productGroupId??"")&&includes(f.regression,String(c.regression??false))
     &&includes(f.components,c.component)&&(!f.tags.length||c.tags.some(tag=>f.tags.includes(tag)))
     &&(!f.folders.length||f.folders.some(path=>path==="/"||c.folderPath===path||c.folderPath.startsWith(path+"/")));
 }

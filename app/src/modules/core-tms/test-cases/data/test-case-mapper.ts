@@ -1,3 +1,4 @@
+import { copyCaseFields } from "../../../../core/tms/contracts/custom-fields/case-fields";
 import type { components } from "../../../../core/tms/generated/tms-api";
 import type {
   TestCase,
@@ -34,6 +35,7 @@ export function mapTestCaseRevision(dto: ApiRevision): TestCaseRevision {
     lifecycle: dto.lifecycle,
     priority: dto.priority,
     component: dto.component,
+    ...copyCaseFields(dto),
     ownerIdentityId: dto.ownerIdentityId,
     tags: [...dto.tags],
     estimatedMinutes: dto.estimatedMinutes,
@@ -67,6 +69,7 @@ export function mapTestCaseSummary(dto: ApiSummary): TestCaseSummary {
     lifecycle: dto.lifecycle,
     priority: dto.priority,
     component: dto.component,
+    ...copyCaseFields(dto),
     ownerIdentityId: dto.ownerIdentityId,
     tags: [...dto.tags],
     estimatedMinutes: dto.estimatedMinutes,
@@ -92,6 +95,7 @@ export function mapTestCase(dto: ApiCase): TestCase {
     lifecycle: current.lifecycle,
     priority: current.priority,
     component: current.component,
+    ...copyCaseFields(current),
     ownerIdentityId: current.ownerIdentityId,
     tags: [...current.tags],
     estimatedMinutes: current.estimatedMinutes,

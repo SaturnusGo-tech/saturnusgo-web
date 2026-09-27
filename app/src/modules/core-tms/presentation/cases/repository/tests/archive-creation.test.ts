@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
+import { fieldFilterCount } from "../../model/fields/case-field-filters";
 import { repositoryScope } from "../../../../folders/model/selection/folder-scope";
 
 type Node = { type: string; props: Record<string, unknown> };
@@ -24,6 +25,7 @@ function renderModule(path: string, actionMenu = false) {
       if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "w", offline: true }) };
       if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
       if (name.endsWith("folder-scope")) return { repositoryScope };
+      if (name.endsWith("case-field-filters")) return { fieldFilterCount };
       if (name.endsWith("caseListModel")) return {
         filterCaseRows: (rows: unknown, filters: { titleQuery?: string }) => filters.titleQuery === "missing" ? [] : rows, sortCaseRows: (rows: unknown) => rows,
         resolveDependentCaseFacets: () => ({ folders: [], components: [] }),

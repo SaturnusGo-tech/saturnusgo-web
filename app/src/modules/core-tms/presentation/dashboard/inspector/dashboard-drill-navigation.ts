@@ -7,7 +7,13 @@ export type DashboardDrillTab = "test_case" | "run" | "defect";
 export const activeDrillTab = (filter: DashboardDrillFilter): DashboardDrillTab =>
   filter.entity === "run_item" ? "run" : filter.entity;
 
+export const dashboardProductScope = (filter: DashboardDrillFilter) => ({
+  ...(filter.productGroupId !== undefined ? { productGroupId: filter.productGroupId } : {}),
+  ...(filter.productId !== undefined ? { productId: filter.productId } : {}),
+  ...(filter.regression !== undefined ? { regression: filter.regression } : {}),
+});
 const componentScope = (filter: DashboardDrillFilter) => ({
+  ...dashboardProductScope(filter),
   ...(filter.component !== undefined ? { component: filter.component } : {}),
   ...(filter.componentIsEmpty ? { componentIsEmpty: true as const } : {}),
 });
@@ -26,7 +32,7 @@ export function relatedDashboardDrill(
   let next: DashboardDrillFilter;
   if (tab === "test_case") next = { entity: "test_case", basis: "current", ...shared };
   else if (tab === "run") next = { entity: "run",
-    basis: filter.component !== undefined || filter.componentIsEmpty ? "completed" : "launched", ...shared };
+    basis: filter.component !== undefined || filter.componentIsEmpty || filter.productId || filter.productGroupId || filter.regression !== undefined ? "completed" : "launched", ...shared };
   else next = { entity: "defect", basis: "current", ...shared };
   return {
     id: `${origin.id}:related:${tab}`,
@@ -70,7 +76,7 @@ export type DashboardLocalFilters = {
 export function filterDashboardRows(rows: DashboardDrillRow[], filters: DashboardLocalFilters) {
   const query = filters.query.trim().toLocaleLowerCase();
   return rows.filter((row) => {
-    const haystack = [row.key, row.title, row.project, row.component, row.detail, ...(row.tags ?? [])]
+    const haystack = [row.key, row.title, row.project, row.productGroup, row.product, row.component, row.detail, ...(row.tags ?? [])]
       .filter(Boolean).join(" ").toLocaleLowerCase();
     return (!query || haystack.includes(query)) && (!filters.project.length || filters.project.includes(row.project)) &&
       (!filters.type.length || Boolean(row.type && filters.type.includes(row.type))) &&

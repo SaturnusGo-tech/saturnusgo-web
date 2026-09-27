@@ -18,7 +18,7 @@ export function groupRunRecords(rows: DashboardDrillRow[], data: Bootstrap): Run
       groups.set(key, group);
     }
     const testCase = data.testCases.find(item => item.projectId === row.projectId && item.id === row.testCaseId);
-    group.rows.push({ ...row, component: row.component ?? testCase?.component, type: row.type ?? testCase?.type });
+    group.rows.push({ ...row, component: row.product ?? row.component ?? testCase?.component, type: row.type ?? testCase?.type });
   }
   return [...groups.values()];
 }

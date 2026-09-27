@@ -1,4 +1,5 @@
 import { ImportCasesPage } from "../../test-cases/exchange/library/presentation/page/ImportCasesPage";
+import { CustomFieldsPage } from "../../custom-fields/presentation/catalog/CustomFieldsPage";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { WorkspaceNotifications } from "../../notifications/composition/WorkspaceNotifications";
 import { WorkspaceProfile } from "../../profile/composition/WorkspaceProfile";
@@ -91,6 +92,10 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
+  if (model.view === "custom-fields") return <CustomFieldsPage key={`${model.data.workspace.id}:${model.project.id}`}
+    workspaceId={model.data.workspace.id} projectId={model.project.id} connected={model.connection === "connected"}
+    canManageFields={model.data.meta.authorization.capabilities.includes("project:manage")}
+    canManageValues={model.data.meta.authorization.capabilities.includes("test_case:manage")} />;
   if (model.view === "imports") return <ImportCasesPage key={model.data.workspace.id} project={model.project}
     workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}
     initialFolderId={model.selectedFolderId} onProjectChange={id => void model.chooseProject(id)}

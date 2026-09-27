@@ -35,12 +35,12 @@ export function DashboardDrillFacets({ rows, value, onChange }: {
     });
   };
   return <div aria-label={t("dashboard.refineList")}>
-    {(["type", "project", "component", "status", "priority"] as const).map((key) => {
+    {(["type", "project", "status", "priority"] as const).map((key) => {
       const options = facetValues(rows, key);
       if (!options.length) return null;
       return <fieldset key={key}><legend>{label(key)}</legend>{options.map(([option, count]) => <label key={option}>
         <input type="checkbox" checked={value[key].includes(option)} onChange={() => toggle(key, option)} />
-        <span>{key === "project" || key === "component" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
+        <span>{key === "project" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
       </label>)}</fieldset>;
     })}
     {(Boolean(value.query) || selectedCount > 0) && <button type="button" className={styles.quiet} onClick={() => onChange({

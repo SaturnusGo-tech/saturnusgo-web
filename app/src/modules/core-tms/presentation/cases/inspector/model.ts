@@ -1,3 +1,4 @@
+import { copyCaseFields } from "../../../../../core/tms/contracts/custom-fields/case-fields";
 import type { FormEvent } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import type { PendingCaseAttachment, CaseAttachmentProgress } from "../../../application/evidence/case/pendingCaseAttachment";
@@ -43,6 +44,8 @@ export function caseRevisionAttachmentIds(revision: TestCaseRevision) {
 
 export type CaseInspectorEditor = {
   mode: "edit" | "create";
+  projectId?: string;
+  canCreateFieldValues?: boolean;
   value: TestCaseRevision;
   folderPath: string;
   folders: string[];
@@ -95,6 +98,7 @@ export function inspectorRevisionProblem(
 export function copyInspectorRevision(revision: TestCaseRevision): TestCaseRevision {
   return {
     ...revision,
+    ...copyCaseFields(revision),
     tags: [...revision.tags],
     attachmentIds: [...revision.attachmentIds],
     steps: revision.steps.map((step) => ({
@@ -111,7 +115,7 @@ export function restoreInspectorSection(
   section: InspectorSection,
 ): TestCaseRevision {
   if (section === "description") return { ...current, description: snapshot.description };
-  if (section === "component") return { ...current, component: snapshot.component };
+  if (section === "component") return { ...current, component: snapshot.component, ...copyCaseFields(snapshot) };
   if (section === "properties") return {
     ...current,
     lifecycle: snapshot.lifecycle,
