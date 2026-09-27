@@ -1,0 +1,5 @@
+.builds { min-width: 0; display: grid; gap: 14px; padding-top: 14px; }
+.build { min-width: 0; display: grid; justify-items: start; gap: 6px; font-size: 12px; overflow-wrap: anywhere; }
+.build > strong { color: var(--ink, var(--tms-text, #1f2329)); font-size: 12px; font-weight: 600; }
+.build > a { color: var(--cases-link, #3574f0); max-width: 100%; }
+.build > span { max-width: 100%; }

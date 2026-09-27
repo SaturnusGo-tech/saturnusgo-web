@@ -1,3 +1,5 @@
+import type { components } from "../generated/tms-api";
+
 export type ExecutionStatus = "not_run" | "in_progress" | "passed" | "failed" | "blocked" | "skipped";
 
 export type TestStep = {
@@ -109,6 +111,7 @@ export type TestRunSummary = {
   environment: { id: string | null; key: string; name: string; baseUrl: string };
   suiteId: string | null;
   build: string;
+  platformBuilds?: components["schemas"]["RunPlatformBuild"][];
   configuration: Record<string, string>;
   itemCount: number;
   progress: RunProgress;

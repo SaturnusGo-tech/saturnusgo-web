@@ -8,6 +8,8 @@ import { listFolders } from "../../../../folders/data/folder-api";
 import type { RepositoryFolder } from "../../../../folders/model/folder";
 import { createRunBatch, listRunIterations } from "../../data/batch-api";
 import type { RunBatch, RunIteration } from "../../model/batch";
+import { useRunPlatformBuilds } from "../../../builds/state/useRunPlatformBuilds";
+import { TmsApiError } from "../../../../../../core/tms/transport/http";
 
 type Catalog = { cases: TestCaseSummary[]; folders: RepositoryFolder[] };
 export function useBatchComposer(data: Bootstrap, project: Project, preset: string[], offline: boolean, ru: boolean, presetSuiteId = "") {
@@ -15,6 +17,7 @@ export function useBatchComposer(data: Bootstrap, project: Project, preset: stri
   const [suiteId, setSuiteId] = useState(presetSuiteId);
   const [loadFailed, setLoadFailed] = useState(false);
   const [projectIds, setProjectIds] = useState([project.id]);
+  const platformBuilds = useRunPlatformBuilds(projectIds, offline, ru);
   const [catalog, setCatalog] = useState<Record<string, Catalog>>({});
   const [caseIds, setCaseIds] = useState(presetSuiteId ? [] : preset);
   const [iterations, setIterations] = useState<RunIteration[]>([]);
@@ -67,16 +70,30 @@ export function useBatchComposer(data: Bootstrap, project: Project, preset: stri
       return null;
     }
     const groups = [...new Set([...selected.map((c) => c.projectId), ...(suiteId ? [project.id] : [])])];
+    const buildError = platformBuilds.validate(groups);
+    if (buildError || platformBuilds.uploading) {
+      pending.current = false; setBusy(false);
+      setError(buildError || (ru ? "Дождитесь загрузки сборки." : "Wait for the build upload to finish.")); return null;
+    }
     const body = { ...(iterationId ? { iterationId, iteration: null } : { iterationId: null,
       iteration: { name: name.trim(), description, tags: [...new Set(tags.split(",").map((t) => t.trim()).filter(Boolean))] } }),
-      selections: groups.map((projectId) => ({ projectId, ...(suiteId && projectId === project.id ? { suiteId, caseIds: [] } : { caseIds: selected.filter((c) => c.projectId === projectId).map((c) => c.id) }) })),
+      selections: groups.map((projectId) => ({ projectId, platformBuilds: platformBuilds.selection(projectId),
+        ...(suiteId && projectId === project.id ? { suiteId, caseIds: [] } : { caseIds: selected.filter((c) => c.projectId === projectId).map((c) => c.id) }) })),
       build, assigneeIdentityId: assignee, type: "ad_hoc" as const };
     operation.current = resolvePendingOperation(operation.current, JSON.stringify(body));
-    try { return await createRunBatch(http, data.workspace.id, body, operation.current.key); }
-    catch (error) { if (alive.current) setError(formatTmsMutationFailure(toTmsMutationFailure(error), ru ? "Не удалось создать прогон." : "Could not create run.")); return null; }
+    const artifactIds = platformBuilds.beginSubmission(groups);
+    try {
+      const result = await createRunBatch(http, data.workspace.id, body, operation.current.key);
+      platformBuilds.settleSubmission(artifactIds, "saved"); return result;
+    }
+    catch (error) {
+      const rejected = error instanceof TmsApiError && [400, 401, 403, 404, 413, 415, 422].includes(error.status);
+      platformBuilds.settleSubmission(artifactIds, rejected ? "rejected" : "uncertain");
+      if (alive.current) setError(formatTmsMutationFailure(toTmsMutationFailure(error), ru ? "Не удалось создать прогон." : "Could not create run.")); return null;
+    }
     finally { pending.current = false; if (alive.current) setBusy(false); }
   }
   return { suiteId, setSuiteId, loadFailed, projectIds, setProjectIds, catalog, caseIds, setCaseIds, iterations, iterationId, setIterationId,
-    name, setName, description, setDescription, tags, setTags, assignee, setAssignee, build, setBuild,
+    name, setName, description, setDescription, tags, setTags, assignee, setAssignee, build, setBuild, platformBuilds,
     loading, busy, error, reload: () => { setError(""); setRetry((n) => n + 1); }, allCases, visibleCases, submit };
 }

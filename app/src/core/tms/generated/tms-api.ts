@@ -5445,6 +5445,8 @@ export interface components {
             measuredAt: string;
             /** @description Parent multi-project run. Its lifecycle must be changed through the batch endpoint. */
             batchId?: string | null;
+            /** @description Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access. */
+            platformBuilds?: components["schemas"]["RunPlatformBuild"][];
         };
         RunCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -5462,6 +5464,8 @@ export interface components {
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             /** @default false */
             startImmediately: boolean;
+            /** @description At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds. */
+            platformBuilds?: components["schemas"]["RunPlatformBuildInput"][];
         } & (unknown | unknown);
         RunPatchRequest: {
             name?: string;
@@ -7689,6 +7693,8 @@ export interface components {
             rowVersion: number;
             /** @description Parent multi-project run. Its lifecycle must be changed through the batch endpoint. */
             batchId?: string | null;
+            /** @description Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access. */
+            platformBuilds?: components["schemas"]["RunPlatformBuild"][];
         };
         RunBatch: {
             id: components["schemas"]["Identifier"];
@@ -7709,6 +7715,8 @@ export interface components {
                 projectId: components["schemas"]["Identifier"];
                 caseIds?: components["schemas"]["Identifier"][];
                 suiteId?: components["schemas"]["Identifier"];
+                /** @description At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds. */
+                platformBuilds?: components["schemas"]["RunPlatformBuildInput"][];
             }[];
             type?: components["schemas"]["RunType"];
             build?: string;
@@ -7925,6 +7933,30 @@ export interface components {
                 hasMore: boolean;
                 nextCursor: string | null;
             };
+        };
+        RunPlatformBuildInput: {
+            /** @constant */
+            platform: "android";
+            attachmentId: components["schemas"]["Identifier"];
+            version?: string;
+        } | {
+            /** @constant */
+            platform: "ios";
+            /** @description Version text or an absolute HTTP(S) app URL. Control characters, unsafe or malformed URL schemes and URL credentials are rejected. */
+            reference: string;
+        };
+        RunPlatformBuild: {
+            /** @constant */
+            platform: "android";
+            attachmentId: components["schemas"]["Identifier"];
+            version: string;
+            fileName: string;
+            byteSize: number;
+        } | {
+            /** @constant */
+            platform: "ios";
+            /** @description Version text or an absolute HTTP(S) app URL. Control characters, unsafe or malformed URL schemes and URL credentials are rejected. */
+            reference: string;
         };
     };
     responses: {

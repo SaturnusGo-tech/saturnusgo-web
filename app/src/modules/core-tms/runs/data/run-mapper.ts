@@ -28,6 +28,7 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
     },
     suiteId: dto.suiteId,
     build: dto.build,
+    platformBuilds: (dto.platformBuilds ?? []).map((build) => ({ ...build })),
     configuration: { ...dto.configuration },
     itemCount: dto.itemCount,
     progress: {

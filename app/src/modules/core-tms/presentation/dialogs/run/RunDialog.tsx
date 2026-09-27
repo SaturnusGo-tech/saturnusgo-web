@@ -10,6 +10,8 @@ import { FormError } from "../../common/error/FormError";
 import { AnimatedMultiSelect } from "../../common/select/AnimatedMultiSelect";
 import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
 import { RunIterationFields } from "../run-iteration/RunIterationFields";
+import { ResponsiblePicker } from "../../../workspace/members/presentation/ResponsiblePicker";
+import { RunPlatformBuildFields } from "../../../runs/builds/presentation/fields/RunPlatformBuildFields";
 import styles from "./RunDialog.module.css";
 
 type Props = {
@@ -35,8 +37,26 @@ export function RunDialog(props: Props) {
       if (batch) dismiss(() => props.onCreated(batch.runs[0], batch.runs));
     }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
       <div className={styles.body} aria-busy={state.loading || state.busy} inert={state.busy ? true : undefined}>
-        <RunIterationFields state={state} workspaceId={props.data.workspace.id} offline={props.offline} ru={ru} />
-        <div className={styles.projects}>
+        <RunIterationFields state={state} ru={ru} />
+        <aside className={styles.properties} aria-label={ru ? "Свойства прогона" : "Run properties"}>
+          <section className={styles.propertySection}>
+            <h3>{ru ? "Назначение" : "Assignment"}</h3>
+            <div className={styles.railField}><span>{ru ? "Ответственный" : "Assignee"}</span>
+              <ResponsiblePicker workspaceId={props.data.workspace.id} value={state.assignee}
+                onChange={state.setAssignee} offline={props.offline} disabled={state.busy} /></div>
+            <p className={styles.hint}>{ru ? "Если не выбран, сохранятся ответственные за кейсы." : "Leave unassigned to keep each case’s assignee."}</p>
+          </section>
+          <section className={styles.propertySection}>
+            <label className={styles.railField}><span>{ru ? "Версия релиза" : "Release version"}</span>
+              <input maxLength={500} value={state.build} placeholder={ru ? "Например, 2.8.0" : "For example, 2.8.0"}
+                onChange={(event) => state.setBuild(event.target.value)} /></label>
+          </section>
+          <RunPlatformBuildFields controller={state.platformBuilds}
+            projects={props.data.projects.filter((project) => state.projectIds.includes(project.id))}
+            disabled={state.busy || props.offline} ru={ru} />
+        </aside>
+        <section className={styles.scope} aria-label={ru ? "Тест-кейсы прогона" : "Run test cases"}>
+        <div className={styles.projects}><h3>{ru ? "Тест-кейсы" : "Test cases"}</h3>
           <AnimatedMultiSelect textOnly label={ru ? "Выбрать проекты" : "Choose projects"} values={state.projectIds}
             options={props.data.projects.filter((p) => p.status !== "archived").map((p) => ({ value: p.id, label: p.name }))}
             allLabel={ru ? "Выберите проекты" : "Choose projects"} selectedLabel={ru ? "Проекты" : "Projects"}
@@ -51,11 +71,12 @@ export function RunDialog(props: Props) {
           heading={<><strong>{props.data.projects.find((p) => p.id === id)?.name}</strong>
             <span>{filters.visible.filter((c) => c.projectId === id).length}</span></>} />)}
         {!state.loading && !filters.visible.length && <p className={styles.hint}>{ru ? "Нет подходящих тест-кейсов" : "No matching test cases"}</p>}
-        {state.error && <FormError message={state.error} />}
         {state.loadFailed && <button type="button" className={styles.secondary} onClick={state.reload}>{ru ? "Повторить загрузку" : "Retry loading"}</button>}
+        </section>
       </div>
+      {state.error && <div className={styles.feedback}><FormError message={state.error} /></div>}
       <footer className={styles.footer}><span>{ru ? "Выбрано кейсов" : "Selected cases"}: {state.caseIds.length}{suite ? ` + ${suite.name}` : ""}</span>
-        <button className={styles.primary} type="submit" disabled={state.busy || state.loading || state.loadFailed || (!state.caseIds.length && !suite) || (!state.iterationId && !state.name.trim())}>
+        <button className={styles.primary} type="submit" disabled={state.busy || state.platformBuilds.uploading || state.loading || state.loadFailed || (!state.caseIds.length && !suite) || (!state.iterationId && !state.name.trim())}>
           <Plus size={15} />{state.busy ? (ru ? "Создаём…" : "Creating…") : (ru ? "Создать прогон" : "Create run")}</button></footer>
     </form>
   </Modal>;

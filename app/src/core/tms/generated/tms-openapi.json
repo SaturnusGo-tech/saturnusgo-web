@@ -25236,6 +25236,14 @@
               "null"
             ],
             "description": "Parent multi-project run. Its lifecycle must be changed through the batch endpoint."
+          },
+          "platformBuilds": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/RunPlatformBuild"
+            },
+            "description": "Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access."
           }
         }
       },
@@ -25304,6 +25312,14 @@
           "startImmediately": {
             "type": "boolean",
             "default": false
+          },
+          "platformBuilds": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/RunPlatformBuildInput"
+            },
+            "description": "At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds."
           }
         },
         "oneOf": [
@@ -35502,6 +35518,14 @@
               "null"
             ],
             "description": "Parent multi-project run. Its lifecycle must be changed through the batch endpoint."
+          },
+          "platformBuilds": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/RunPlatformBuild"
+            },
+            "description": "Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access."
           }
         }
       },
@@ -35604,6 +35628,14 @@
                 },
                 "suiteId": {
                   "$ref": "#/components/schemas/Identifier"
+                },
+                "platformBuilds": {
+                  "type": "array",
+                  "maxItems": 2,
+                  "items": {
+                    "$ref": "#/components/schemas/RunPlatformBuildInput"
+                  },
+                  "description": "At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds."
                 }
               },
               "required": [
@@ -36620,6 +36652,117 @@
               }
             }
           }
+        }
+      },
+      "RunPlatformBuildInput": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "platform",
+              "attachmentId"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "const": "android"
+              },
+              "attachmentId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200
+              }
+            },
+            "description": "A finalized private project-owned file in the run project, at most 500 MiB. Any filename extension is accepted. Uploaded bytes, size and SHA-256 must pass normal attachment finalization."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "platform",
+              "reference"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "const": "ios"
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500,
+                "description": "Version text or an absolute HTTP(S) app URL. Control characters, unsafe or malformed URL schemes and URL credentials are rejected."
+              }
+            }
+          }
+        ],
+        "discriminator": {
+          "propertyName": "platform"
+        }
+      },
+      "RunPlatformBuild": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "platform",
+              "attachmentId",
+              "version",
+              "fileName",
+              "byteSize"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "const": "android"
+              },
+              "attachmentId": {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "byteSize": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 524288000
+              }
+            },
+            "description": "A finalized private project-owned file in the run project, at most 500 MiB. Any filename extension is accepted. Uploaded bytes, size and SHA-256 must pass normal attachment finalization."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "platform",
+              "reference"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "const": "ios"
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500,
+                "description": "Version text or an absolute HTTP(S) app URL. Control characters, unsafe or malformed URL schemes and URL credentials are rejected."
+              }
+            }
+          }
+        ],
+        "discriminator": {
+          "propertyName": "platform"
         }
       }
     }

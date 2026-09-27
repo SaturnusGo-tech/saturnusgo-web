@@ -14,6 +14,7 @@ import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunScopeEmpty } from "./empty/RunScopeEmpty";
+import { RunPlatformBuildSummary } from "../../runs/builds/presentation/summary/RunPlatformBuildSummary";
 import { runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
@@ -127,6 +128,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
                 <div><dt>{t("runs.build")}</dt><dd>{selectedRun.build || "-"}</dd></div>
                 <div><dt>{locale === "ru" ? "Прогресс" : "Progress"}</dt><dd>{selectedRun.progress.executed} / {selectedRun.itemCount} · {selectedRun.progress.percent}%</dd></div>
               </dl>
+              <RunPlatformBuildSummary builds={selectedRun.platformBuilds} workspaceId={workspaceId} projectId={selectedRun.projectId} ru={locale === "ru"} />
             </section>
           </aside>
         </div>
