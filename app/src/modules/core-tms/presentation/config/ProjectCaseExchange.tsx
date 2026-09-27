@@ -2,9 +2,9 @@ import { Download, LoaderCircle, Upload } from "lucide-react";
 import type { Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { useExportCases } from "../../test-cases/exchange/state/export/use-export-cases";
-import styles from "../../tms.module.css";
 import { settingsCopy } from "./navigation/settings-sections";
-import surface from "./config.module.css";
+import styles from "../../tms.module.css";
+import css from "./config.module.css";
 
 type ProjectCaseExchangeProps = Readonly<{ enabled: boolean; project: Project; onImport: () => void }>;
 export function ProjectCaseExchange({ enabled, project, onImport }: ProjectCaseExchangeProps) {
@@ -13,17 +13,31 @@ export function ProjectCaseExchange({ enabled, project, onImport }: ProjectCaseE
   const exported = useExportCases(project);
   const message = exported.error || (exported.busy ? t("config.exchangeExporting") : exported.completed !== null
     ? t("config.exchangeExported", { count: exported.completed }) : !enabled
-      ? t("config.exchangeConnectedOnly") : t("config.exchangeFormat"));
-  return <div className={surface.exchange} aria-label={t("config.exchangeTitle")}>
-    <div className={surface.exchangeActions}>
-      <div className={surface.exchangeRow}><div><h3>{locale === "ru" ? "Экспорт" : "Export"}</h3><p>{copy.exportHint}</p></div>
+      ? t("config.exchangeConnectedOnly") : "");
+  return <div className={css.settingsStack} aria-label={t("config.exchangeTitle")}>
+    <div className={css.settingRow}>
+      <div className={css.settingCopy}>
+        <h3 className={css.settingTitle}>{locale === "ru" ? "Экспорт" : "Export"}</h3>
+        <p className={css.settingDescription}>{copy.exportHint}</p>
+      </div>
+      <div className={css.settingControls}>
         <button type="button" className={styles.secondaryButton} disabled={!enabled || exported.busy}
-          onClick={() => void exported.start()}>{exported.busy ? <LoaderCircle className={styles.spin} size={16} /> : <Download size={16} />}{t("config.exchangeExport")}</button></div>
-      <div className={surface.exchangeRow}><div><h3>{locale === "ru" ? "Импорт" : "Import"}</h3>
-        <p>{locale === "ru" ? "Выберите JSON, проверьте дерево папок и место импорта." : "Choose JSON, review the folder tree and destination."}</p></div>
-        <button type="button" className={styles.secondaryButton} disabled={!enabled || exported.busy}
-          onClick={onImport}><Upload size={16} />{t("config.exchangeImport")}</button></div>
+          onClick={() => void exported.start()}>
+          {exported.busy ? <LoaderCircle className={styles.spin} size={16} aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
+          {t("config.exchangeExport")}
+        </button>
+      </div>
     </div>
-    <p className={`${surface.exchangeStatus} ${exported.error ? surface.exchangeError : ""}`} aria-live="polite">{message}</p>
+    <div className={css.settingRow}>
+      <div className={css.settingCopy}>
+        <h3 className={css.settingTitle}>{locale === "ru" ? "Импорт" : "Import"}</h3>
+        <p className={css.settingDescription}>{copy.importHint}</p>
+      </div>
+      <div className={css.settingControls}>
+        <button type="button" className={styles.secondaryButton} disabled={!enabled || exported.busy}
+          onClick={onImport}><Upload size={16} aria-hidden="true" />{t("config.exchangeImport")}</button>
+      </div>
+    </div>
+    <p className={`${css.exchangeStatus} ${exported.error ? css.exchangeError : ""}`} aria-live="polite" role="status">{message}</p>
   </div>;
 }

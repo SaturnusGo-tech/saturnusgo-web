@@ -747,7 +747,14 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   }
 
   .navigationUtilities {
-    display: none;
+    display: block;
+    width: 52px;
+    flex-basis: 52px;
+    padding: 4px;
+  }
+  .navigationUtilities > :not(.navigationNotifications) { display: none; }
+  .navigationUtilities > .navigationNotifications {
+    width: 44px; min-height: 50px; padding: 0; justify-content: center;
   }
 
   .navigationItem:is([data-testid="nav-config"], [data-testid="nav-help"]) {
@@ -806,7 +813,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   .brandButton { height: 36px; gap: 12px; }
   .tessiqMark { width: 30px; height: 30px; flex-basis: 30px; }
   .tessiqWordmark { font-size: 18px; }
-  .navigationNotifications { display: none; }
+  .navigationNotifications { display: flex; }
   .compactSettingsNotifications { display: block; }
 }
 

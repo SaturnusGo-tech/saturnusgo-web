@@ -217,3 +217,65 @@ No remaining actionable P0/P1/P2 visual findings in the inspected states.
 - [x] Local tab retained for review; no production publication.
 
 final result: passed
+
+## Settings and notifications — 2026-09-27
+
+Scope: local glass workspace, settings and notification screens. No deployment.
+The user’s later corrections take precedence over the initial mockup: existing
+Geist typography, original theme previews, unboxed language/account/environment
+sections, and notifications accessible separately from settings.
+
+### Sources and comparison
+
+- Light notification reference: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-79e1e660-aa45-470f-a159-729c70896958.png`.
+- Dark notification reference: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-dd37df16-d202-4ff7-b8bd-dc06bf884731.png`.
+- Captures: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/settings-redesign-20260927/`.
+- Dark reference and `notifications-dark-final.png` inspected in the same image
+  comparison. Rounded sections, thin neutral outlines, channel controls and
+  two-column preferences retained. Serif heading intentionally replaced per
+  user correction. Actual unavailable delivery channels show their real state.
+- `notifications-light-mixed.png` verifies light on/off states;
+  `notifications-dark-mixed.png` verifies dark on/off states.
+- Final settings captures: `appearance-light-final.png`,
+  `appearance-dark-final.png`, `account-dark-final.png`,
+  `environments-light-final.png`. Rejected environment layout retained as
+  `environments-before.png` for comparison.
+- Desktop 1366×900, narrow 883×695, compact 600×800 inspected. Temporary viewport
+  override reset. Narrow screenshots: `appearance-dark-narrow.png`,
+  `notifications-dark-narrow.png`, `exchange-dark-narrow.png`.
+
+### Findings addressed
+
+1. P1: global dark input styling hid enabled switches. Native input remains
+   keyboard accessible; a separate track/thumb span now supplies its visuals.
+   Enabled dark track is #ededed with #171717 thumb; disabled/off is distinct.
+2. P1: decorative fonts and unnecessary disclosure sections. Removed custom
+   font assets and returned to Geist (computed font-style normal). Direct
+   setting rows replace disclosures where there are no secondary options.
+3. P2: over-boxed appearance/language/account. Restored original theme previews,
+   simple radio choices for language, and plain account identity/sign-out row.
+4. P2: environment row showed a copy icon even with an empty URL. Now URL and
+   copy render together only for a nonempty address. Plain rows with small
+   edit/archive icon actions replace the large card and action buttons.
+5. P2: removing the notifications shortcut from settings could remove compact
+   access. Kept its global navigation button visible, including compact mode,
+   and supplied an explicit accessible name.
+
+### Verification
+
+- Theme changes, English/Russian radio selection, project/environment edit
+  dialogs and cancellation, and import navigation exercised locally.
+- Notification category toggled off, persisted through reload, then restored
+  using Space. Accordion collapse/expand checked with click and Enter.
+- All six preferences restored to their initial enabled state. No external
+  messages delivered. Browser push/Telegram delivery is disabled on this stand;
+  those live delivery flows were not tested here.
+- No horizontal document overflow at 883 or 600 CSS px. No captured console
+  errors. Source review preserved archive/restore, export and sign-out callbacks;
+  destructive/account actions were not executed in the shared browser session.
+- Typecheck, architecture check (1207 files), notification worker test and
+  `git diff --check` passed. Production build/deployment not run for this review.
+
+No remaining actionable P0/P1/P2 findings in the inspected states.
+
+final result: passed
