@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import type { RunPlatformBuild } from "../../model/platform-build";
 import { AttachmentLink } from "../../../../attachments/presentation/link/AttachmentLink";
 import css from "./buildSummary.module.css";
@@ -16,7 +17,10 @@ export function RunPlatformBuildSummary({ builds, ru }: {
       <strong>{build.platform === "android" ? "Android" : "iOS"}</strong>
       {build.platform === "android" ? <>
         {build.version && <span>{build.version}</span>}
-        <AttachmentLink attachmentId={build.attachmentId} disposition="attachment" canRemove={false} />
+        <div className={css.download}>
+          <span><Download size={13} aria-hidden="true" />{ru ? "Скачать сборку" : "Download build"}</span>
+          <AttachmentLink key={build.attachmentId} attachmentId={build.attachmentId} disposition="attachment" canRemove={false} />
+        </div>
       </> : webLink(build.reference) ? <a href={webLink(build.reference)!} target="_blank" rel="noopener noreferrer">{build.reference}</a>
         : <span>{build.reference}</span>}
     </div>)}

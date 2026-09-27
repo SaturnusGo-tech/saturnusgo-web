@@ -79,7 +79,7 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
         <div className={runStyles.headerByline}>
           <span className={`${runStyles.executionBadge} ${runStyles[`execution_${item.status}`]}`}>{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
           <span>{t("cases.revision", { revision: item.revision })}</span>
-          <span>{run.name}</span>
+          <span>{locale === "ru" ? "Исполнитель кейса:" : "Case assignee:"}</span>
           <ResponsibleName workspaceId={workspaceId} identityId={item.assigneeIdentityId} offline={offline} />
         </div>
       </div>

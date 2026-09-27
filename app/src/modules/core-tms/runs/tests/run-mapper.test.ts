@@ -16,6 +16,7 @@ const progress: Api["RunProgress"] = {
 test("maps server-owned run progress without embedded items", () => {
   const dto: Api["Run"] = {
     id: "run-1", projectId: "project-1", key: "UH-TR-1", name: "Smoke",
+    ownerIdentityId: "qa-lead", tags: ["release", "mobile"],
     description: "Release smoke", type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
     environment: { id: "env-1", key: "LOCAL", name: "Local", baseUrl: "https://example.test", variableKeys: [] },
     suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 1,
@@ -29,11 +30,18 @@ test("maps server-owned run progress without embedded items", () => {
   assert.equal(run.archivedBy, "identity-2");
   assert.equal(run.archiveReason, "Cleanup");
   assert.equal("items" in run, false);
+  assert.equal(run.ownerIdentityId, "qa-lead");
+  assert.deepEqual(run.tags, ["release", "mobile"]);
+  assert.notEqual(run.tags, dto.tags);
+  const { ownerIdentityId: _owner, tags: _tags, ...legacy } = dto;
+  assert.equal(mapRun(legacy as Api["Run"]).ownerIdentityId, null);
+  assert.deepEqual(mapRun(legacy as Api["Run"]).tags, []);
 });
 
 test("workspace run history aggregates every cursor page including archived runs", async () => {
   const urls: string[] = [];
   const active: Api["Run"] = {
+    ownerIdentityId: null, tags: [],
     id: "run-1", projectId: "project-1", key: "UH-TR-1", name: "Smoke",
     description: "", type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
     environment: { id: "env-1", key: "LOCAL", name: "Local", baseUrl: "https://example.test", variableKeys: [] },

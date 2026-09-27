@@ -25072,7 +25072,9 @@
           "updatedAt",
           "elapsedMilliseconds",
           "activeSince",
-          "measuredAt"
+          "measuredAt",
+          "ownerIdentityId",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -25244,6 +25246,26 @@
               "$ref": "#/components/schemas/RunPlatformBuild"
             },
             "description": "Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access."
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "readOnly": true,
+            "description": "Tags of the linked run iteration; empty for standalone runs."
           }
         }
       },
@@ -25307,7 +25329,7 @@
                 "type": "null"
               }
             ],
-            "description": "An active identity with active workspace membership, or null."
+            "description": "Legacy explicit bulk assignment of every selected run item. Null or omitted preserves individual case-revision owners. This is not the run owner; use ownerIdentityId for run responsibility."
           },
           "startImmediately": {
             "type": "boolean",
@@ -25320,6 +25342,17 @@
               "$ref": "#/components/schemas/RunPlatformBuildInput"
             },
             "description": "At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds."
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors."
           }
         },
         "oneOf": [
@@ -35350,7 +35383,9 @@
           "elapsedMilliseconds",
           "activeSince",
           "measuredAt",
-          "rowVersion"
+          "rowVersion",
+          "ownerIdentityId",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -35526,6 +35561,26 @@
               "$ref": "#/components/schemas/RunPlatformBuild"
             },
             "description": "Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access."
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "readOnly": true,
+            "description": "Tags of the linked run iteration; empty for standalone runs."
           }
         }
       },
@@ -35655,7 +35710,19 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Legacy explicit bulk assignment of every selected run item. Null or omitted preserves individual case-revision owners. This is not the run owner; use ownerIdentityId for run responsibility."
+          },
+          "ownerIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors."
           }
         },
         "required": [

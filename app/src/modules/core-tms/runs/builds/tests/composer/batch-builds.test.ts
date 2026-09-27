@@ -55,6 +55,21 @@ test("unfinished or missing Android files block creation before artifact protect
   assert.equal(f.calls.length, 0); assert.equal(f.protectedScopes.length, 0); f.h.dispose();
 });
 
+test("run owner is sent independently without overriding case assignees", async () => {
+  const f = fixture(); await f.prepare();
+  f.render().setOwnerIdentityId("qa-lead");
+  f.render().setTags("release, mobile, release");
+  await f.render().submit();
+  assert.equal(f.calls[0].body.ownerIdentityId, "qa-lead");
+  assert.equal(Object.prototype.hasOwnProperty.call(f.calls[0].body, "assigneeIdentityId"), false);
+  assert.deepEqual([...f.calls[0].body.iteration!.tags!], ["release", "mobile"]);
+  f.render().setOwnerIdentityId(null); await f.render().submit();
+  assert.equal(f.calls[1].body.ownerIdentityId, null);
+  assert.equal(Object.prototype.hasOwnProperty.call(f.calls[1].body, "assigneeIdentityId"), false);
+  assert.notEqual(f.calls[0].key, f.calls[1].key);
+  f.h.dispose();
+});
+
 test("failed batch requests distinguish definite rejection from an uncertain response", async () => {
   for (const [error, outcome] of [[new TmsApiError("Invalid", 422, null, "VALIDATION_ERROR"), "rejected"], [new Error("Network"), "uncertain"]] as const) {
     const f = fixture(); await f.prepare(); f.fail(error); assert.equal(await f.render().submit(), null);

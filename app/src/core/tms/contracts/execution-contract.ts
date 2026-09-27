@@ -98,6 +98,8 @@ export type RunProgress = {
 
 export type TestRunSummary = {
   batchId?: string | null;
+  ownerIdentityId?: string | null;
+  tags?: string[];
   elapsedMilliseconds?: number;
   activeSince?: string | null;
   measuredAt?: string;

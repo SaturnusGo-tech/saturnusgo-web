@@ -47,6 +47,7 @@ test("iOS accepts version text and HTTP(S), rejecting malformed and credential-b
 test("run mapper keeps legacy references and copies optional platform snapshots", () => {
   const time = "2026-09-27T00:00:00Z";
   const dto: components["schemas"]["Run"] = {
+    ownerIdentityId: null, tags: [],
     id: "run-a", projectId: "project-a", key: "QA-TR-1", name: "Release", description: "", type: "ad_hoc", status: "draft",
     environment: { id: null, key: "", name: "", baseUrl: "", variableKeys: [] }, suiteId: null, suiteResolutionId: null,
     build: "legacy-42", configuration: { legacy: "yes" }, itemCount: 1, attachmentIds: [], createdBy: "identity-a",

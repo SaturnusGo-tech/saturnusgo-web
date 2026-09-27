@@ -18,6 +18,8 @@ export function mapRun(dto: Api["Run"]): TestRunSummary {
     key: dto.key,
     name: dto.name,
     description: dto.description,
+    ownerIdentityId: dto.ownerIdentityId ?? null,
+    tags: [...(dto.tags ?? [])],
     type: dto.type,
     status: dto.status,
     environment: {

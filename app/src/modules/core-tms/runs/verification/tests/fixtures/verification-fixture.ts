@@ -10,6 +10,7 @@ export const queue: VerificationQueueEnvelope = { data: { scopeToken: request.sc
   totalDefects: 80, blockedEntries: 10, entries: [entry] }, meta: { offset: 0, limit: 50, hasMore: false, nextOffset: null } };
 const time = "2026-09-08T12:00:00Z";
 export const run: components["schemas"]["Run"] = {
+  ownerIdentityId: null, tags: [],
   id: "run-1", projectId: "project-1", key: "TR-1", name: request.name, description: "", type: "regression", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
   environment: { id: request.environmentId, key: "QA", name: "QA", baseUrl: "https://example.test", variableKeys: [] },
   suiteId: null, suiteResolutionId: null, build: request.build, configuration: { fixVerificationScope: request.scopeToken },

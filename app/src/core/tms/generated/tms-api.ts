@@ -5447,6 +5447,10 @@ export interface components {
             batchId?: string | null;
             /** @description Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access. */
             platformBuilds?: components["schemas"]["RunPlatformBuild"][];
+            /** @description Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors. */
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
+            /** @description Tags of the linked run iteration; empty for standalone runs. */
+            readonly tags: string[];
         };
         RunCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -5460,12 +5464,14 @@ export interface components {
             build?: components["schemas"]["ShortText"];
             /** @description Public strings only. Secret-like property names are rejected. */
             configuration?: components["schemas"]["StringMap"];
-            /** @description An active identity with active workspace membership, or null. */
+            /** @description Legacy explicit bulk assignment of every selected run item. Null or omitted preserves individual case-revision owners. This is not the run owner; use ownerIdentityId for run responsibility. */
             assigneeIdentityId?: components["schemas"]["Identifier"] | null;
             /** @default false */
             startImmediately: boolean;
             /** @description At most one Android and one iOS build. Omitted or empty preserves legacy creation without platform builds. */
             platformBuilds?: components["schemas"]["RunPlatformBuildInput"][];
+            /** @description Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors. */
+            ownerIdentityId?: components["schemas"]["Identifier"] | null;
         } & (unknown | unknown);
         RunPatchRequest: {
             name?: string;
@@ -7695,6 +7701,10 @@ export interface components {
             batchId?: string | null;
             /** @description Immutable platform builds selected at creation, with at most one per platform; empty for historical runs. Android files are retained while referenced and downloaded using authorized attachment access. */
             platformBuilds?: components["schemas"]["RunPlatformBuild"][];
+            /** @description Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors. */
+            ownerIdentityId: components["schemas"]["Identifier"] | null;
+            /** @description Tags of the linked run iteration; empty for standalone runs. */
+            readonly tags: string[];
         };
         RunBatch: {
             id: components["schemas"]["Identifier"];
@@ -7720,7 +7730,10 @@ export interface components {
             }[];
             type?: components["schemas"]["RunType"];
             build?: string;
+            /** @description Legacy explicit bulk assignment of every selected run item. Null or omitted preserves individual case-revision owners. This is not the run owner; use ownerIdentityId for run responsibility. */
             assigneeIdentityId?: string | null;
+            /** @description Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors. */
+            ownerIdentityId?: components["schemas"]["Identifier"] | null;
         } & ({
             iterationId: string;
             iteration?: null;

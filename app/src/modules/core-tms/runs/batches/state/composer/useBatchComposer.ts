@@ -25,7 +25,7 @@ export function useBatchComposer(data: Bootstrap, project: Project, preset: stri
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
-  const [assignee, setAssignee] = useState<string | null>(null);
+  const [ownerIdentityId, setOwnerIdentityId] = useState<string | null>(null);
   const [build, setBuild] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -79,7 +79,7 @@ export function useBatchComposer(data: Bootstrap, project: Project, preset: stri
       iteration: { name: name.trim(), description, tags: [...new Set(tags.split(",").map((t) => t.trim()).filter(Boolean))] } }),
       selections: groups.map((projectId) => ({ projectId, platformBuilds: platformBuilds.selection(projectId),
         ...(suiteId && projectId === project.id ? { suiteId, caseIds: [] } : { caseIds: selected.filter((c) => c.projectId === projectId).map((c) => c.id) }) })),
-      build, assigneeIdentityId: assignee, type: "ad_hoc" as const };
+      build, ownerIdentityId, type: "ad_hoc" as const };
     operation.current = resolvePendingOperation(operation.current, JSON.stringify(body));
     const artifactIds = platformBuilds.beginSubmission(groups);
     try {
@@ -94,6 +94,6 @@ export function useBatchComposer(data: Bootstrap, project: Project, preset: stri
     finally { pending.current = false; if (alive.current) setBusy(false); }
   }
   return { suiteId, setSuiteId, loadFailed, projectIds, setProjectIds, catalog, caseIds, setCaseIds, iterations, iterationId, setIterationId,
-    name, setName, description, setDescription, tags, setTags, assignee, setAssignee, build, setBuild, platformBuilds,
+    name, setName, description, setDescription, tags, setTags, ownerIdentityId, setOwnerIdentityId, build, setBuild, platformBuilds,
     loading, busy, error, reload: () => { setError(""); setRetry((n) => n + 1); }, allCases, visibleCases, submit };
 }

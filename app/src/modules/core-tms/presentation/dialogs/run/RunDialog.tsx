@@ -69,10 +69,10 @@ export function RunDialog(props: Props) {
                 placeholder={ru ? "Через запятую" : "Separated by commas"} /></label>
               : <div className={styles.railField}><span>{ru ? "Теги" : "Tags"}</span>
                 <div className={styles.tagValue}>{iteration?.tags.join(", ") || "—"}</div></div>}
-            <div className={styles.railField}><span>{ru ? "Ответственный" : "Assignee"}</span>
-              <ResponsiblePicker workspaceId={props.data.workspace.id} value={state.assignee}
-                onChange={state.setAssignee} offline={props.offline} disabled={state.busy} /></div>
-            <p className={styles.hint}>{ru ? "Если не выбран, сохранятся ответственные за кейсы." : "Leave unassigned to keep each case’s assignee."}</p>
+            <div className={styles.railField}><span>{ru ? "Ответственный за прогон" : "Run owner"}</span>
+              <ResponsiblePicker workspaceId={props.data.workspace.id} value={state.ownerIdentityId}
+                onChange={state.setOwnerIdentityId} offline={props.offline} disabled={state.busy} /></div>
+            <p className={styles.hint}>{ru ? "Исполнители кейсов назначаются отдельно." : "Case assignees are assigned separately."}</p>
           </section>
           <section className={styles.propertySection}>
             <label className={styles.railField}><span>{ru ? "Версия релиза" : "Release version"}</span>

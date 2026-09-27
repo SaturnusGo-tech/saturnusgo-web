@@ -3,3 +3,9 @@
 .build > strong { color: var(--ink, var(--tms-text, #1f2329)); font-size: 12px; font-weight: 600; }
 .build > a { color: var(--cases-link, #3574f0); max-width: 100%; }
 .build > span { max-width: 100%; }
+.download { display: grid; gap: 4px; min-width: 0; max-width: 100%; }
+.download > span:first-child { display: inline-flex; align-items: center; gap: 5px; color: var(--runs-muted, var(--cases-muted)); font-size: 11px; }
+.download > span:last-child { max-width: 100%; }
+.download button { min-width: 0; max-width: 100%; display: inline-flex; align-items: flex-start; gap: 5px; padding: 2px 0; border: 0; border-radius: 3px; color: var(--runs-link, var(--cases-link, #3574f0)); background: transparent; text-align: left; overflow-wrap: anywhere; }
+.download button svg { flex-shrink: 0; margin-top: 2px; }
+.download button:hover { text-decoration: underline; }
