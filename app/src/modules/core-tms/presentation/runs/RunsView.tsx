@@ -14,7 +14,6 @@ import { statusIcon } from "../status/executionStatus";
 import { InlineDefectComposer } from "./defect/InlineDefectComposer";
 import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLink";
 import { RunScopeEmpty } from "./empty/RunScopeEmpty";
-import { RunOverview } from "./overview/RunOverview";
 import { runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
@@ -60,10 +59,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     items, selectedItem, selectedRun, runWritable: attemptWritable && !executionPending && dirtySteps.length === 0, navigationBlocked: executionPending || dirtySteps.length > 0, onItemStatus, onSelectItem,
     setReporting,
   });
-  const runNavigator = <>
-    {selectedRun && <RunOverview key={selectedRun.id} run={selectedRun} workspaceId={workspaceId} offline={offline} />}
-    <div className={runStyles.navigator}>{navigation}</div>
-  </>;
+  const runNavigator = <div className={runStyles.navigator}>{navigation}</div>;
   if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
   if (selectedRun && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;

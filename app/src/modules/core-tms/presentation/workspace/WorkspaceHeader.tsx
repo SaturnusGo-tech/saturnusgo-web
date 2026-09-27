@@ -1,7 +1,6 @@
 import { ApiScopeSelector } from "../../api-sources/scope/selector/ApiScopeSelector";
 import { RepositoryScopeSelector } from "../../repository-scope/presentation/selector/RepositoryScopeSelector";
 import {
-  CalendarDays,
   GitBranch,
   Menu,
   Server,
@@ -12,6 +11,7 @@ import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
 import { transitionContent } from "./motion/transition/content-transition";
 import { RunClock } from "../runs/clock/RunClock";
+import { RunHeaderBuilds } from "../../runs/builds/presentation/header/RunHeaderBuilds";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -33,6 +33,7 @@ export function WorkspaceHeader({
   const activeEnvironment = environment?.name ?? model.selectedRun?.environment.name ?? "—";
   const build = model.selectedRun?.build?.trim();
   const activeBuild = !build || /^local[- ]current$/i.test(build) ? "—" : build;
+  const activeRun = model.view === "runs" ? model.selectedRun : null;
   function editEnvironment() {
     if (environment) void model.openEditEnvironment(environment.id);
     else model.openNewEnvironment();
@@ -43,20 +44,8 @@ export function WorkspaceHeader({
       else model.setView("runs");
     });
   }
-  const now = new Date();
-  const today = now.toLocaleDateString(languageTag, {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const localTime = now.toLocaleTimeString(languageTag, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const weekday = now.toLocaleDateString(languageTag, { weekday: "short" });
-
   return (
-    <header className={shellStyles.header}>
+    <header className={`${shellStyles.header} ${activeRun ? shellStyles.runHeader : ""}`}>
       <button
         type="button"
         className={shellStyles.mobileNavigationButton}
@@ -90,29 +79,22 @@ export function WorkspaceHeader({
 
       {model.view !== "api" && model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && !model.repositoryScope.aggregate && model.project && <div className={shellStyles.headerMeta}>
         {model.view === "runs" && model.selectedRun && <div className={shellStyles.runTime}><RunClock run={model.selectedRun} /></div>}
-        <button type="button" className={shellStyles.headerMetaItem} onClick={editEnvironment} disabled={!workspaceReady}
+        <button type="button" className={`${shellStyles.headerMetaItem} ${activeRun ? shellStyles.runEnvironment : ""}`} onClick={editEnvironment} disabled={!workspaceReady}
           title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>
           <Server size={15} aria-hidden="true" />
           <span>
-            <small>{t("header.environment")}</small>
+            {!activeRun && <small>{t("header.environment")}</small>}
             <strong>{activeEnvironment}</strong>
           </span>
         </button>
-        <button type="button" className={shellStyles.headerMetaItem} onClick={openBuild} disabled={!workspaceReady}
+        {activeRun?.platformBuilds?.length ? <RunHeaderBuilds key={activeRun.id} builds={activeRun.platformBuilds} disabled={!workspaceReady} /> : (!activeRun || activeBuild !== "—") && <button type="button" className={shellStyles.headerMetaItem} onClick={openBuild} disabled={!workspaceReady}
           title={t("header.openBuild")} aria-label={`${t("header.openBuild")}: ${activeBuild}`}>
           <GitBranch size={15} aria-hidden="true" />
           <span>
             <small>{t("header.build")}</small>
             <strong>{activeBuild}</strong>
           </span>
-        </button>
-        <div className={shellStyles.headerClock} title={`${weekday}, ${today} ${localTime}`}>
-          <CalendarDays size={15} aria-hidden="true" />
-          <span>
-            <strong>{localTime}</strong>
-            <small>{today}</small>
-          </span>
-        </div>
+        </button>}
       </div>}
     </header>
   );

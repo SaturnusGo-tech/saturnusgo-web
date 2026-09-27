@@ -1,0 +1,17 @@
+.root { flex: 0 0 auto; min-width: 0; }
+.trigger { display: inline-flex; align-items: center; gap: 5px; padding: 5px 2px; border: 0; border-radius: 5px; color: var(--runs-link, var(--cases-link)); background: transparent; font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer; }
+.trigger:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.trigger:focus-visible, .close:focus-visible { outline: 2px solid var(--runs-link, var(--cases-link)); outline-offset: 2px; }
+.panel { position: fixed; inset: auto; z-index: 50; box-sizing: border-box; margin: 0; width: 300px; max-width: calc(100vw - 24px); overflow: auto; overscroll-behavior: contain; padding: 16px 18px 18px; border: 1px solid var(--runs-border, var(--tms-border)); border-radius: 14px; color: var(--runs-text, var(--tms-text)); background: var(--runs-bg, var(--tms-bg-panel)); box-shadow: 0 8px 26px #00000024; font: inherit; font-size: 12px; line-height: 1.5; scrollbar-width: thin; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.header h2 { margin: 0; color: var(--runs-strong, var(--tms-text-strong)); font: inherit; font-size: 14px; font-weight: 600; }
+.close { display: grid; place-items: center; width: 26px; height: 26px; flex: 0 0 auto; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--runs-muted, var(--tms-text-muted)); cursor: pointer; }
+.close:hover { background: var(--runs-hover, var(--tms-bg-hover)); }
+.owner { display: grid; gap: 7px; min-width: 0; }
+.owner > span:first-child { color: var(--runs-muted, var(--tms-text-muted)); font-size: 12px; }
+.owner > span:last-child > span { min-width: 0; overflow-wrap: anywhere; }
+.description { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--runs-row-border, var(--tms-border)); min-width: 0; overflow-wrap: anywhere; }
+.description h3 { margin: 0 0 5px; color: var(--runs-muted, var(--tms-text-muted)); font: inherit; font-size: 12px; font-weight: 400; }
+.description p { margin-block: 0 6px; font-size: 12px; line-height: 1.55; }
+.description p:last-child { margin-bottom: 0; }
+.description > div :is(h1, h2, h3, h4, h5, h6) { font-size: 13px; margin-block: 6px; }

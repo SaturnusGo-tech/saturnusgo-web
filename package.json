@@ -35,7 +35,7 @@
     "test:tms-comment-attachments": "tsx --test app/src/modules/core-tms/test-cases/collaboration/model/attachments/tests/*.test.ts app/src/modules/core-tms/presentation/cases/collaboration/attachments/tests/*.test.tsx",
     "test:tms-api-sources": "tsx --test app/src/modules/core-tms/api-sources/tests/*.test.ts app/src/modules/core-tms/api-sources/tests/state/*.test.tsx",
     "test:tms-defect-identity": "tsx --test app/src/modules/core-tms/defects/browser/tests/expansion/*.test.ts app/src/modules/core-tms/defects/browser/tests/expansion/*.test.tsx app/src/modules/core-tms/presentation/dialogs/defect-form/tests/*.test.ts app/src/modules/core-tms/presentation/dialogs/defect-form/tests/submission/*.test.ts app/src/modules/core-tms/defects/tests/source-case/*.test.ts",
-    "test:tms-run-builds": "tsx --test app/src/modules/core-tms/runs/builds/tests/model/*.test.ts app/src/modules/core-tms/runs/builds/tests/lifecycle/*.test.ts app/src/modules/core-tms/runs/builds/tests/transport/*.test.ts app/src/modules/core-tms/runs/builds/tests/composer/*.test.ts"
+    "test:tms-run-builds": "tsx --test app/src/modules/core-tms/runs/builds/tests/model/*.test.ts app/src/modules/core-tms/runs/builds/tests/lifecycle/*.test.ts app/src/modules/core-tms/runs/builds/tests/transport/*.test.ts app/src/modules/core-tms/runs/builds/tests/composer/*.test.ts app/src/modules/core-tms/runs/builds/tests/download/*.test.tsx"
   },
   "dependencies": {
     "@auth0/auth0-react": "2.24.1",

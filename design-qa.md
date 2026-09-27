@@ -279,3 +279,56 @@ sections, and notifications accessible separately from settings.
 No remaining actionable P0/P1/P2 findings in the inspected states.
 
 final result: passed
+
+## Compact run header, option 3 — 2026-09-27
+
+### Scope and source
+
+Selected reference: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-98df9b8d-b2c7-42d5-aeeb-faf87c0ebad9.png` (1660 × 948).
+The full-width run overview is replaced with compact platform build actions in
+its existing global header and an anchored “About run” action by the run selector.
+The popover contains only run owner and description. Existing case assignees,
+execution controls, fonts, navigation and data models are preserved. Wall-clock
+and date are removed from the global header; the execution timer remains.
+
+### Visual comparison
+
+Source and final implementation were opened together at 1660 × 948.
+Final captures are in
+`/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-compact-run-20260927/`:
+
+- `light-desktop-final.png`: 1660 × 948; compact 52 px header, platform actions,
+  restored execution area and 300 px owner/description popover.
+- `dark-laptop.png`: 1366 × 768; readable neutral controls and popover with the
+  same structure as light mode.
+- `dark-narrow.png`: 600 × 800; header wraps, both builds remain reachable and
+  the popover stays within the viewport.
+
+Checked hierarchy, spacing, typography, color/contrast and interaction states.
+Existing product font sizes and real project/case data intentionally replace the
+illustrative reference text. The captured mobile-build run is a draft, so its
+execution footer is absent by existing behavior; an active run was also checked.
+P2 found during comparison: the selector's flexible width pushed “About run”
+too far right. Fixed the selector sizing and aligned execution actions right;
+final capture shows the popover beside the selector without covering case text.
+
+### Behavior and validation
+
+- Open/close, close button, Escape with focus return, outside click, and bounded
+  scrolling checked. Long descriptions use the existing safe Markdown renderer.
+- Active-run owner Anna Taylor remains separate from case assignee Noah Davis.
+- iOS-only and Android + iOS runs checked. No full attachment name, raw download
+  URL, tags or large overview in the execution header.
+- Download grant is requested once for repeated clicks; request cancellation,
+  client replacement, retryable 401/403/500 errors and unsafe access responses are
+  covered by tests. Storage navigation opens separately, preserving Falcon.
+- Typecheck and architecture gate passed; build/owner/download tests 26/26,
+  run/navigation/filter tests 19/19, Markdown tests 2/2; git diff --check passed.
+- Local attachment access returned 200, but this browser could not reach the
+  local HTTPS storage host. End-to-end file download is deferred to the existing
+  production smoke fixture after deployment; TLS settings are unchanged.
+- No captured UI console errors. No production data was changed for this review.
+
+No remaining actionable P0/P1/P2 visual findings in the inspected states.
+
+final result: passed

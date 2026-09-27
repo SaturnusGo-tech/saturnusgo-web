@@ -37,7 +37,7 @@
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(430px, 44%) minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
   color: var(--runs-text);
   background: var(--runs-bg);
@@ -81,10 +81,10 @@
 .shell :is(button, label[role="button"]) { cursor: pointer; }
 .shell :is(button, input, select, textarea, label[role="button"]):focus-visible { outline: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--runs-text) 24%, transparent); }
 
-.navigator { grid-column: 1; grid-row: 2 / 4; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.navigator { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
 .navigator > aside { flex: 1; }
-.emptyPane { min-width: 0; min-height: 0; display: grid; grid-column: 2; grid-row: 2 / 4; place-items: center; overflow: auto; color: var(--runs-text); background: var(--runs-bg); }
-.detail { min-width: 0; min-height: 0; grid-column: 2; grid-row: 2; overflow: auto; overscroll-behavior: contain; scrollbar-color: var(--runs-border-strong) transparent; color: var(--runs-text); background: var(--runs-bg); }
+.emptyPane { min-width: 0; min-height: 0; display: grid; grid-column: 2; grid-row: 1 / 3; place-items: center; overflow: auto; color: var(--runs-text); background: var(--runs-bg); }
+.detail { min-width: 0; min-height: 0; grid-column: 2; grid-row: 1; overflow: auto; overscroll-behavior: contain; scrollbar-color: var(--runs-border-strong) transparent; color: var(--runs-text); background: var(--runs-bg); }
 .detailTransition { animation: runs-detail-in 210ms cubic-bezier(.2, .72, .3, 1); }
 .detailArchiving { opacity: .58; pointer-events: none; transition: opacity 150ms ease; }
 
@@ -173,7 +173,7 @@
 .evidenceGrid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
 .evidenceGrid > span { min-height: 40px !important; color: var(--runs-text) !important; background: var(--runs-control) !important; border-color: var(--runs-border) !important; }
 
-.footer { min-width: 0; min-height: 54px; display: flex; grid-column: 2; grid-row: 3; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 52px 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); container: run-footer / inline-size; }
+.footer { min-width: 0; min-height: 54px; display: flex; grid-column: 2; grid-row: 2; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 52px 9px 12px; color: var(--runs-text); background: var(--runs-bg); border-top: 1px solid var(--runs-border); container: run-footer / inline-size; }
 .pager, .actions, .completion { min-width: 0; display: flex; align-items: center; gap: 5px; }
 .actions { margin-left: auto; justify-content: flex-end; flex-shrink: 0; }
 .pager { justify-content: flex-start; flex-shrink: 0; }
@@ -193,11 +193,11 @@
   .titleBlock, .utilityRow { padding-inline: 16px; }
 }
 @media (max-width: 720px) {
-  .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(170px, 30vh) minmax(0, 1fr) auto; }
-  .navigator { grid-column: 1; grid-row: 2; }
-  .emptyPane { grid-column: 1; grid-row: 3 / 5; }
-  .detail { grid-column: 1; grid-row: 3; }
-  .footer { z-index: 8; grid-column: 1; grid-row: 4; display: flex; align-items: center; padding: 8px 48px 8px 8px; }
+  .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 38vh) minmax(0, 1fr) auto; }
+  .navigator { grid-column: 1; grid-row: 1; }
+  .emptyPane { grid-column: 1; grid-row: 2 / 4; }
+  .detail { grid-column: 1; grid-row: 2; }
+  .footer { z-index: 8; grid-column: 1; grid-row: 3; display: flex; align-items: center; padding: 8px 48px 8px 8px; }
   .actions, .completion { justify-content: flex-end; }
   .actions > :is(button, label), .completion > button { min-width: 40px; min-height: 40px; flex: 1 1 40px; }
   .actions > :is(.compactAction, .wideAction) { width: auto; min-width: 40px; padding-inline: 8px; }

@@ -800,6 +800,24 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 
 .runTime { display: flex; align-items: center; flex-shrink: 0; padding: 0 12px; color: var(--ink); font-size: 13px; }
 .runTime time { font-weight: 750; letter-spacing: .02em; }
+.runHeader .headerMeta { gap: 6px; }
+.runHeader .runEnvironment { display: flex; height: 32px; }
+.runHeader .runEnvironment strong { font-weight: 500; }
+.runHeader .projectContext { flex-shrink: 1; }
+@media (max-width: 1100px) {
+  .runHeader { gap: 6px; }
+  .runHeader .runTime { padding-inline: 6px; }
+  .runHeader .runEnvironment { padding-inline: 6px; }
+  .runHeader .runEnvironment strong { max-width: 96px; }
+  .runHeader .projectSelectorSlot > div > button:first-child { max-width: 210px; }
+}
+@media (max-width: 760px) {
+  .workspaceColumn:has(.runHeader) { grid-template-rows: auto minmax(0, 1fr); }
+  .runHeader { height: auto; min-height: 52px; flex-wrap: wrap; padding-block: 5px; row-gap: 0; }
+  .runHeader .projectContext { width: auto; flex: 1; }
+  .runHeader .headerMeta { display: flex; width: 100%; height: auto; min-height: 36px; flex-wrap: wrap; justify-content: flex-end; gap: 2px; }
+  .runHeader .runTime { margin-right: auto; font-size: 12px; }
+}
 
 /* Compact laptop viewports; physical screen diagonal is not exposed by browsers. */
 .compactSettingsNotifications { display: none; }
