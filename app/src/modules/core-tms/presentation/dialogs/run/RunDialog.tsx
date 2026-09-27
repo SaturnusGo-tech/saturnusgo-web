@@ -36,7 +36,8 @@ export function RunDialog(props: Props) {
       event.preventDefault(); const batch = await state.submit();
       if (batch) dismiss(() => props.onCreated(batch.runs[0], batch.runs));
     }} ref={(element) => { panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing; }}>
-      <div className={styles.body} aria-busy={state.loading || state.busy} inert={state.busy ? true : undefined}>
+      <div className={styles.body} aria-busy={state.loading || state.busy}
+        ref={(element) => { if (element) element.inert = state.busy; }}>
         <RunIterationFields state={state} ru={ru} />
         <aside className={styles.properties} aria-label={ru ? "Свойства прогона" : "Run properties"}>
           <section className={styles.propertySection}>
