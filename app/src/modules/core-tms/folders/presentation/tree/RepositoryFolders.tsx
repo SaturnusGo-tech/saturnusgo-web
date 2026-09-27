@@ -101,9 +101,9 @@ export function RepositoryFolders(props: {
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected}
           creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
-          canManage={resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
+          canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
         {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
-          creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
+          creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
         {!roots.length && !tree.unfiled.length && !resource.error && <li className={css.empty}>{props.filtered ? (ru ? "Тест-кейсы не найдены. Измените поиск или фильтры." : "No matching test cases. Adjust the search or filters.") : archive ? (ru ? "В архиве пока пусто" : "The archive is empty") : (ru ? "Создайте первую папку или импортируйте структуру из JSON." : "Create your first folder or import a structure from JSON.")}</li>}
       </ul>}
     </div>

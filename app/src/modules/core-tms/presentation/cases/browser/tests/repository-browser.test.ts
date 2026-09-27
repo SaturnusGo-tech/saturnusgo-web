@@ -2,9 +2,32 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { FolderNode } from "../../../../folders/model/tree";
 import { browserHarness, elements } from "./browser-harness";
+import { elements as controls, treeControl } from "../../../../folders/tests/archive/tree-control-harness";
 
 const branches = (value: unknown) => elements(value, (item) => item.type === "RepositoryFolderBranch");
 const nodes = (value: unknown) => branches(value).map((item) => item.props.node as FolderNode);
+
+test("collapsed selection controls cannot receive keyboard focus until Select is enabled", () => {
+  const app = browserHarness();
+  app.props.testCases = [...app.items, { ...app.items[0], id: "unfiled", key: "PAY-9", folderId: null, folderPath: "/" }];
+  const folder = treeControl("branch/RepositoryFolderBranch.tsx", "RepositoryFolderBranch");
+  const leaf = treeControl("case/RepositoryCaseLeaf.tsx", "RepositoryCaseLeaf");
+  function checkboxes() {
+    const tree = app.renderTree();
+    const branch = branches(tree).find(row => (row.props.node as FolderNode).folder.id === "pay")!;
+    const loose = elements(tree, row => row.type === "RepositoryCaseLeaf")[0];
+    return [controls(folder.render(branch.props), "input")[0], controls(leaf.render(loose.props), "input")[0]];
+  }
+  assert.ok(checkboxes().every(input => input.props.disabled === true));
+  app.render().toggleSelectionMode();
+  assert.ok(checkboxes().every(input => input.props.disabled === false));
+  (checkboxes()[1].props.onChange as () => void)();
+  assert.deepEqual(app.render().bulkSelection.selectedIds, ["unfiled"]);
+  assert.equal(checkboxes()[1].props.checked, true);
+  app.render().toggleSelectionMode();
+  assert.ok(checkboxes().every(input => input.props.disabled === true));
+  app.dispose();
+});
 
 test("repository replaces the duplicate table, preserves empty folders and begins without auto-selecting a case", () => {
   const app = browserHarness();

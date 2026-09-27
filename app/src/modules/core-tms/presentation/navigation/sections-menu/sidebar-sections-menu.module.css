@@ -1,0 +1,33 @@
+.root { position: relative; min-width: 0; color: var(--glass-text, var(--sidebar-text)); }
+.root .trigger { display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 10px; border: 0; border-radius: 18px; color: inherit; background: transparent; font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+.trigger > svg { flex: 0 0 20px; color: var(--glass-muted, var(--sidebar-muted)); }
+.trigger > span { white-space: nowrap; }
+.root[data-collapsed] .trigger { width: 36px; padding: 0; margin-inline: auto; justify-content: center; }
+.root[data-collapsed] .trigger > span { display: none; }
+.root .trigger:hover:not(:disabled), .root .trigger[aria-expanded=true] { background: var(--glass-hover, var(--sidebar-menu-hover)); }
+.root .trigger:disabled { opacity: .45; cursor: default; }
+.panel { position: fixed; inset: auto; z-index: 100; box-sizing: border-box; margin: 0; width: 300px; max-width: calc(100vw - 24px); max-height: min(320px, calc(100dvh - 24px)); padding: 10px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; border: 1px solid var(--glass-border, var(--sidebar-menu-border)); border-radius: 16px; color: var(--glass-text, var(--sidebar-menu-text)); background: var(--glass-panel-strong, var(--sidebar-menu-bg)); box-shadow: var(--glass-shadow, var(--sidebar-menu-shadow)); font: inherit; font-size: 12px; line-height: 1.4; }
+.panel button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 8px 4px; }
+.header h2 { margin: 0; font: inherit; font-size: 13px; font-weight: 600; }
+.panel .close { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border-radius: 50%; color: var(--glass-muted, var(--sidebar-menu-muted)); }
+.modes { display: flex; gap: 8px; min-width: 0; margin: 0; padding: 0 4px; border: 0; }
+.modes legend { margin-bottom: 5px; padding: 0; color: var(--glass-muted, var(--sidebar-menu-muted)); font-size: 11px; }
+.modes label { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; cursor: pointer; }
+.modes input { width: 14px; height: 14px; margin: 0; accent-color: var(--glass-text, var(--sidebar-menu-text)); }
+.hint { margin: 5px 4px 9px; color: var(--glass-muted, var(--sidebar-menu-muted)); font-size: 11px; }
+.sections { display: grid; gap: 2px; margin: 0; padding: 7px 0 0; list-style: none; border-top: 1px solid var(--glass-border, var(--sidebar-menu-border)); }
+.sections > li { display: flex; align-items: center; min-width: 0; border-radius: 8px; }
+.sections > li[data-active] { background: var(--glass-selected, var(--sidebar-menu-hover)); }
+.panel .navigate { flex: 1; min-width: 0; min-height: 32px; padding: 5px 8px; text-align: left; border-radius: 8px; overflow-wrap: anywhere; }
+.panel .pin { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; margin-right: 2px; border-radius: 50%; color: var(--glass-muted, var(--sidebar-menu-muted)); }
+.panel .pin[aria-pressed=true] { color: var(--glass-text, var(--sidebar-menu-text)); }
+.pin[aria-pressed=true] svg { fill: currentColor; }
+.panel :is(.close, .navigate, .pin):hover:not(:disabled) { background: var(--glass-hover, var(--sidebar-menu-hover)); }
+.panel button:disabled { opacity: .45; cursor: default; }
+.root :is(button, input):focus-visible { outline: 2px solid var(--glass-text, var(--sidebar-focus)); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .root { flex: 0 0 44px; min-width: 44px; }
+  .root .trigger, .root[data-collapsed] .trigger { width: 44px; height: 36px; padding: 0; justify-content: center; }
+  .trigger > span { display: none; }
+}

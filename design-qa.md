@@ -376,3 +376,45 @@ artifact delivery is covered by backend tests; this browser rejects the local
 storage TLS certificate, which was not bypassed.
 
 final result: passed for inspected states
+
+## 2026-09-28 — Grouped sidebar and consistent selection motion
+
+Source visual truth: `../output/falcon-sidebar-system-20260928/reference.png` (1530 × 1602 pixels). The supplied board is a design-system reference, not a screenshot at a specified browser viewport. Its four states define grouping, collapsed icons, tooltips and contextual navigation. Explicit user constraints override its purple tint and outer frame: retain Falcon's current floating shell, neutral palette and font.
+
+Implementation evidence: `../output/falcon-sidebar-system-20260928/`:
+- `expanded-dark-1440.png`: 1440 × 900 CSS and image pixels, full navigation, dark, English.
+- `expanded-light-1280.png`: 1280 × 720 CSS and image pixels, full navigation, light, English.
+- `expanded-light.png`: earlier light Russian capture at 1280 × 720.
+- `contextual-dark.png`: contextual Testing group plus pinned Hooks; this mode intentionally omits other Management links from the rail.
+- `collapsed-tooltip-dark.png`: same contextual mode, keyboard-focused Dashboard with tooltip; do not compare its item count to full mode.
+- `expanded-dark-1024.png`, `expanded-dark-1366.png`: 1024 × 600 and 1366 × 640 compact notebook checks; main navigation scrolls independently of the fixed footer.
+- `mobile-dark-680-final.png`: 680 × 800 narrow-window regression check.
+- `qa-full-comparison.jpg`: reference and actual dark screenshot combined in one image.
+- `qa-focused-comparison.png`: reference expanded rail crop scaled to 240px wide (source crop 335 × 1040, normalized 240 × 745) beside actual 242px rail crop and actual collapsed contextual rail/tooltip. Different overall heights are intentional: existing utility links and shell geometry are preserved. Actual captures use 1 image pixel per CSS pixel.
+
+### Findings and comparison history
+
+Initial implementation review was **blocked** by four issues: Settings/Help disappeared from mobile navigation; the contextual All sections launcher could be disabled without a project; its tooltip target was hidden; group heading heights snapped on collapse. Fixed by retaining mobile utility controls, disabling individual project-dependent routes only, labelling the launcher button itself, and transitioning heading height/padding with the sidebar. A fifth visual issue, mobile footer buttons aligned above the main row, was corrected with centered footer alignment. Final source build includes this correction.
+
+Post-fix comparison: no actionable P0/P1/P2 differences from the requested direction. Independent visual review of both combined comparisons reached the same result. Collapse alone preserves all ten full-mode route IDs; the shorter contextual capture is not lost navigation. No existing screen layout or outer sidebar geometry was redesigned.
+
+Required fidelity surfaces:
+- **Fonts/typography:** existing project sans font inherited; 13px rows, 10–11px section headings, 17px Falcon wordmark, no italic/display font. Long labels stay on one line. Russian and English labels inspected.
+- **Spacing/layout:** four named groups, 34px compact/38px regular rows, 240px expanded/68px collapsed shell unchanged. Main list gets an independent scroll region at short heights; utilities remain below it. Profile/admin components remain anchored at the bottom when supplied by a signed-in session.
+- **Colors/tokens:** existing neutral glass tokens used in both themes; monochrome active state and thin indicator, no new purple treatment. Existing red active-run marker retains its meaning.
+- **Assets:** existing Falcon light/dark PNG marks reused, existing Lucide SVG icon family retained. No generated/recreated logo.
+- **Copy/content:** only real routes and allowed capabilities; no invented role label, unread count or feature. Contextual mode is explicit, with stable order and per-workspace/per-user pins.
+
+Interaction evidence:
+- All sections opens an anchored bounded 300 × 320px panel; mode and pin changes keep it open; Escape/close restore focus. Contextual mode and Hooks pin survived a reload.
+- Collapsed tooltip rendered on keyboard focus with accessible description. Delegated pointer enter/leave, Escape, fallback and cleanup covered by component tests. Browser console errors checked: none before dependency restart; local project loaded successfully after private dependency installation and dev-server restart (HTTP 200).
+- Expanded and collapsed full mode returned the same ten route IDs.
+- Repository folder chevron right edge 276px, icon left edge 280px outside selection: 4px gap, no reserved checkbox track. During selection the track was observed at 16.742px, then 18px; row Y remained 203px.
+- Run search stayed at Y145.34px and height37px through selection. Input width contracted from 277.33 to198.65px; heading height stayed47.84px. Nested run folder remained at Y238.19px and height34px, with its grid checkbox track observed at17.586px during transition. Shared tree CSS now owns this behavior across repository, runs and other selectors.
+- Reduced-motion CSS disables the new transitions. Capability filtering, scope isolation, corrupted/blocked storage, mode/pin state, popup keyboard behavior and tooltip cleanup have automated coverage.
+
+Verification: architecture1280 files; full adapter chain841 tests passed,0 skipped/failed; TypeScript passed; isolated production build passed,66/66 generated pages, final source hashes matched. Existing unrelated autoprefixer warning in investors-methodology CSS remains. Evidence logs and build result JSON are alongside captures. No production deployment in this task.
+
+Limits: actual account/avatar is absent in this development session, so its placement relies on the retained production component and scoped footer CSS rather than a fabricated profile screenshot. No separate Safari/Windows session was available; responsive checks use browser CSS viewport dimensions, not physical screen inches. Static captures do not quantify frame rate; transition geometry and code paths were checked. Shared dependency directory became empty during the final build pass; this worktree now has its own lockfile-based dependency install, avoiding that shared link.
+
+final result: passed

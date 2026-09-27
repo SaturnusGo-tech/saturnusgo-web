@@ -16,7 +16,7 @@ function cleanPageUrl() {
   const keep=new Set(['workspaceId','projectId','view','caseId','defectId','runId','suiteId','folderId','portfolioId','catalogProjectId']);
   Array.from(url.searchParams.keys()).forEach(key=>{if(!keep.has(key))url.searchParams.delete(key);});return url.href;
 }
-export function SupportContact({workspaceId}:{workspaceId:string}) {
+export function SupportContact({workspaceId,navigationClasses}:{workspaceId:string;navigationClasses?:{button:string;icon:string;label:string}}) {
   const {locale}=useTmsLocale();const ru=locale==='ru';const http=useTmsHttpClient();
   const model=useSupportForm(http,workspaceId,ru);const [open,setOpen]=useState(false);
   const [accepted,setAccepted]=useState<string|null>(null);
@@ -43,8 +43,8 @@ export function SupportContact({workspaceId}:{workspaceId:string}) {
     finally{setCapturing(false);}
   }
   const close=()=>{if(!model.busy&&!capturing)setOpen(false);};
-  return <><button type="button" className={nav.navigationUtilityButton} onClick={show} title={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
-    <span className={nav.navigationIcon} aria-hidden="true"><MessageCircleMore size={20}/></span><span className={nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
+  return <><button type="button" className={navigationClasses?.button ?? nav.navigationUtilityButton} onClick={show} aria-label={ru?'Связаться с нами':'Contact us'} data-nav-label={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
+    <span className={navigationClasses?.icon ?? nav.navigationIcon} aria-hidden="true"><MessageCircleMore size={20}/></span><span className={navigationClasses?.label ?? nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
   </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/><AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
     initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.18}}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>

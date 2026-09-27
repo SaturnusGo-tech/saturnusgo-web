@@ -32,7 +32,7 @@
 @media(prefers-reduced-motion:reduce) { .selection { transition: none; } }
 .controls .tool { border: 0; background: transparent; cursor: pointer; }
 
-.controls[data-inline=true]{display:grid;grid-template-columns:minmax(120px,1fr) auto;align-items:center;gap:8px;margin-bottom:8px}
+.controls[data-inline=true]{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin-bottom:8px}
 .controls[data-inline=true] .searchRow{min-width:0}.controls[data-inline=true] .tools{margin:0;gap:5px}
 .controls[data-inline=true]>div:last-child:not(.tools):not(.searchRow){grid-column:1/-1}
 
@@ -49,16 +49,11 @@
 .controls { gap: 7px; margin-inline: 3px; }
 @container repository-controls (max-width: 350px) { .controls .select { padding-inline: 2px; font-size: 11px; } .search { gap: 6px; padding-left: 8px; } }
 
-/* Keep the action mounted so the search contracts continuously on selection. */
-.controls[data-inline=true] { display:flex; flex-wrap:wrap; }
-.controls[data-inline=true] .searchRow { flex:1 1 100px; }
-.controls[data-inline=true] .tools { flex:0 0 auto; }
-.controls[data-inline=true] .ql { width:100%; }
-.selectAllReveal { display:grid; grid-template-columns:0fr; min-width:0; opacity:0; visibility:hidden; transform:translateY(3px); transition:grid-template-columns 220ms cubic-bezier(.2,.7,.3,1),opacity 180ms ease,transform 220ms ease,visibility 0s 220ms; }
-.selectAllReveal > button { min-width:0; overflow:hidden; padding-inline:0 !important; transition:padding 220ms ease; }
-.selectAllReveal[data-open] { grid-template-columns:1fr; opacity:1; visibility:visible; transform:translateY(0); transition-delay:0s; }
-.selectAllReveal[data-open] > button { padding-inline:5px !important; }
-@media(prefers-reduced-motion:reduce) { .selectAllReveal { transition:none; transform:none; } }
+/* A bounded reveal keeps intrinsic button width from wrapping the search toolbar. */
+.selectAllReveal { display:block; max-width:0; min-width:0; overflow:hidden; opacity:0; visibility:hidden; transition:max-width 220ms cubic-bezier(.22,.61,.36,1),opacity 180ms ease,visibility 0s 220ms; }
+.selectAllReveal > button { min-width:0; }
+.selectAllReveal[data-open] { max-width:112px; opacity:1; visibility:visible; transition-delay:0s; }
+@media(prefers-reduced-motion:reduce) { .selectAllReveal { transition:none; } }
 
 .controls:not([data-inline]) { grid-template-columns:minmax(120px,1fr) auto; align-items:center; }
 .controls:not([data-inline]) .tools { min-width:0; }

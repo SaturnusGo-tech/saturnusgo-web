@@ -62,3 +62,10 @@
 @media (prefers-reduced-motion: reduce) {
   :global([data-appearance="glass"]) :is(.profile .name, .admin span) { transition: none; }
 }
+
+/* Keep the account anchored below the navigation in the grouped sidebar. */
+:global([data-sidebar-system]) .profile.profile { margin-block: 4px 0; border-radius: 12px; }
+:global([data-sidebar-system]) .admin.admin { height: var(--nav-row); min-height: var(--nav-row); margin-block: 3px 0; border-radius: 11px; padding-inline: 10px; }
+@media (max-width: 760px) {
+  :global([data-sidebar-system]) :is(.profile.profile, .admin.admin) { width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 6px; justify-content: center; }
+}

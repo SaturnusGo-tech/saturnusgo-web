@@ -1,12 +1,4 @@
 .root { width: 100%; flex: initial; padding: 0; border: 0; background: transparent; }
 .root > div:last-child { overflow: visible; }
 .heading { display: flex; gap: 7px; align-items: center; padding: 14px 6px 9px; font-size: 12px; font-weight: 600; }
-.root[data-readonly] input[type=checkbox] { opacity:0 !important; visibility:hidden; transform:scale(.65); pointer-events:none; }
-.root[data-readonly] [data-repository-folder-row], .root[data-readonly] li:has(> button) { grid-template-columns:20px 0px minmax(0,1fr) 21px; column-gap:2px; }
-
 .root { max-height: none; }
-
-.root [data-repository-folder-row], .root li:has(> button) { transition:grid-template-columns 220ms cubic-bezier(.2,.7,.3,1),column-gap 220ms ease; }
-.root input[type=checkbox] { transform:scale(1); transition:opacity 180ms ease,transform 220ms cubic-bezier(.2,.7,.3,1),visibility 0s; }
-.root[data-readonly] input[type=checkbox] { transition:opacity 150ms ease,transform 180ms ease,visibility 0s 180ms; }
-@media(prefers-reduced-motion:reduce) { .root [data-repository-folder-row],.root li:has(> button),.root input[type=checkbox] { transition:none; } }

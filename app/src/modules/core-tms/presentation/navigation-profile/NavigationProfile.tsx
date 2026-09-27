@@ -13,11 +13,11 @@ export function NavigationProfile({ collapsed }: { readonly collapsed: boolean }
   const adminLabel = locale === "ru" ? "Админ-панель" : "Admin panel";
   return <>
     {session.administrationPath && <a className={styles.admin} data-collapsed={collapsed}
-      href={session.administrationPath} aria-label={adminLabel} title={adminLabel}>
+      href={session.administrationPath} aria-label={adminLabel} data-nav-label={adminLabel}>
       <ShieldCheck size={19} strokeWidth={1.6} aria-hidden="true" /><span>{adminLabel}</span>
     </a>}
     <ProfileLink className={styles.profile} data-collapsed={collapsed}
-    aria-label={`${label}: ${session.label}`} title={collapsed ? `${session.label} · ${label}` : label}>
+    aria-label={`${label}: ${session.label}`} data-nav-label={`${session.label} · ${label}`}>
     <ManagedAvatarImage className={styles.avatar} name={session.label} hasAvatar={Boolean(session.hasAvatar)} load={session.avatarLoader} version={session.avatarVersion} />
     <span className={styles.name}>{session.label}</span>
   </ProfileLink></>;
