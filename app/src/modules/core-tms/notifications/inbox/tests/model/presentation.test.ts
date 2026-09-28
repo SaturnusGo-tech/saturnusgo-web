@@ -11,6 +11,24 @@ test("production notification links rebase to the current Falcon origin without 
   assert.equal(notificationHref(account, current, "w"), `http://localhost:4542${account}`);
 });
 
+test("managed company notifications rebase to the current origin with their exact authorized workspace and entity", () => {
+  const path = target.replace("workspaceId=w", "workspaceId=workspace_umbrella_home");
+  for (const host of ["umbrella-falcon.saturnusgo.com", "qa-tools-falcon.saturnusgo.com"])
+    for (const origin of ["https://tms.saturnusgo.com", "https://umbrella-falcon.saturnusgo.com", "http://localhost:4542"])
+      assert.equal(notificationHref(`https://${host}${path}`, `${origin}${path}`, "workspace_umbrella_home"), `${origin}${path}`);
+});
+
+test("managed origin acceptance never includes lookalike domains, unowned hostnames, ports, HTTP or another workspace", () => {
+  for (const origin of ["https://evil.example", "https://api.saturnusgo.com", "https://falcon.saturnusgo.com",
+    "https://umbrella-falcon.saturnusgo.com.evil.example", "https://evil.umbrella-falcon.saturnusgo.com",
+    "https://-umbrella-falcon.saturnusgo.com", "https://umbrella--home-falcon.saturnusgo.com",
+    "https://umbrella-falcon.saturnusgo.com:444", "http://umbrella-falcon.saturnusgo.com", "https://user:pass@umbrella-falcon.saturnusgo.com"])
+    assert.equal(notificationHref(`${origin}${target}`, current, "w"), null, origin);
+  const managed = `https://umbrella-falcon.saturnusgo.com${target}`;
+  assert.equal(notificationHref(managed, current, "other"), null);
+  assert.equal(notificationHref(`${managed}&workspaceId=other`, current, "w"), null);
+});
+
 test("malicious or cross-workspace URLs never enter client navigation", () => {
   for (const value of ["javascript:alert(1)", "data:text/html,bad", `https://evil.example${target}`, `//evil.example${target}`,
     `https://tms.saturnusgo.com.evil.example${target}`, `https://user:pass@tms.saturnusgo.com${target}`,

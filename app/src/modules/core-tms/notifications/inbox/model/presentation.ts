@@ -2,11 +2,14 @@
 export function notificationHref(value: string, current: string, workspaceId: string): string | null {
   try {
     const base = new URL(current), target = new URL(value, base);
+    // Company provisioning owns only this exact HTTPS hostname family; navigation still stays on the current origin.
+    const managedOrigin = target.protocol === 'https:' && !target.port && target.hostname.length <= 253
+      && /^[a-z0-9]+(?:-[a-z0-9]+)*-falcon\.saturnusgo\.com$/.test(target.hostname);
     if (!workspaceId || !['http:', 'https:'].includes(base.protocol) || !['http:', 'https:'].includes(target.protocol) || target.username || target.password
       || target.searchParams.getAll('workspaceId').length !== 1
       || target.pathname !== '/testcases/umbrella-home/work/'
       || target.searchParams.get('workspaceId') !== workspaceId
-      || (target.origin !== base.origin && target.origin !== 'https://tms.saturnusgo.com')) return null;
+      || (target.origin !== base.origin && target.origin !== 'https://tms.saturnusgo.com' && !managedOrigin)) return null;
     target.protocol = base.protocol; target.host = base.host;
     return target.href;
   } catch { return null; }
