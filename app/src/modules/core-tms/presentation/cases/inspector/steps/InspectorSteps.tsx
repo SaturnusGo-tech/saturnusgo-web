@@ -22,6 +22,7 @@ import {
 import css from "./scenarioSteps.module.css";
 
 type Props = {
+  layout?: "list" | "grid";
   revision: TestCaseRevision;
   editing: boolean;
   autoFocus?: boolean;
@@ -32,7 +33,7 @@ type Props = {
 };
 
 export function InspectorSteps({
-  revision, editing, autoFocus = true, ru, sharedSteps, onResolveSharedStep, onPatch,
+  layout = "list", revision, editing, autoFocus = true, ru, sharedSteps, onResolveSharedStep, onPatch,
 }: Props) {
   function updateStep(id: string, next: Partial<TestStep>) {
     onPatch({
@@ -84,17 +85,17 @@ export function InspectorSteps({
         </li>)}
       </ol>;
     }
-    return <div className={css.scenarioView}>
+    return <div className={css.scenarioView} data-scenario-layout={layout}>
       {revision.steps.map((step, index) => step.sharedStep
-        ? <SharedStepBlock key={step.id} snapshot={step.sharedStep} order={index + 1}
+        ? <SharedStepBlock layout={layout} key={step.id} snapshot={step.sharedStep} order={index + 1}
           editing={false} ru={ru} sharedSteps={sharedSteps}
           canRemove={false} onAdd={() => undefined} onInsertShared={() => undefined}
           onDuplicate={() => undefined} onRemove={() => undefined} />
-        : <ScenarioStepView key={step.id} step={step} order={index + 1} ru={ru} />)}
+        : <ScenarioStepView layout={layout} key={step.id} step={step} order={index + 1} ru={ru} />)}
     </div>;
   }
 
-  return <div className={css.editor}>
+  return <div className={css.editor} data-scenario-layout={layout}>
     {revision.type === "checklist"
       ? revision.checklist.map((item, index) => <ChecklistRow
           key={item.id}
@@ -113,7 +114,7 @@ export function InspectorSteps({
             .map((entry, order) => ({ ...entry, order: order + 1 })) })}
         />)
       : revision.steps.map((step, index) => step.sharedStep
-        ? <SharedStepBlock key={step.id} snapshot={step.sharedStep} order={index + 1}
+        ? <SharedStepBlock layout={layout} key={step.id} snapshot={step.sharedStep} order={index + 1}
           editing ru={ru} sharedSteps={sharedSteps}
           canRemove={canRemoveInspectorRow(revision.steps.length)}
           onAdd={(withExpected) => addAfter(index, withExpected)}

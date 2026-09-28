@@ -1,3 +1,5 @@
+import { ScenarioLayoutToggle } from "../../common/scenario/ScenarioLayoutToggle";
+import { useScenarioLayout } from "../../common/scenario/useScenarioLayout";
 import { useEffect, useRef, useState } from "react";
 import type { TestCaseRevision } from "../../../../../core/tms/contracts/legacy-contract";
 import { CaseCustomFields } from "./fields/CaseCustomFields";
@@ -25,6 +27,7 @@ export function CaseInspectorContent({
   locale, revision, archived, editor, sharedSteps, onResolveSharedStep, onRequestEdit, testCaseId,
 }: Props) {
   const ru = locale === "ru";
+  const [layout, setLayout] = useScenarioLayout();
   const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
   const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
@@ -104,9 +107,10 @@ export function CaseInspectorContent({
           emptyLabel={ru ? "Предусловия не указаны" : "No preconditions specified"} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Сценарий" : "Scenario"}
+        headingActions={value.type !== "checklist" && <ScenarioLayoutToggle value={layout} onChange={setLayout} ru={ru} />}
         count={value.type === "checklist" ? value.checklist.length : value.steps.length}
         editLabel={ru ? "Изменить сценарий" : "Edit scenario"} {...controls("steps")}>
-        <InspectorSteps revision={value} editing={sectionEditing("steps")} autoFocus={!creating}
+        <InspectorSteps layout={layout} revision={value} editing={sectionEditing("steps")} autoFocus={!creating}
           ru={ru} sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </InspectorSectionView>
     </main>

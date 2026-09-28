@@ -1,7 +1,7 @@
 import { RunDetailsPopover } from "../repository/details/RunDetailsPopover";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
-import { Play, Trash2, X } from "lucide-react";
+import { ChevronDown, Play, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { RunItem, TestRunSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -11,6 +11,7 @@ import styles from "../../../tms.module.css";
 import runStyles from "../runs.module.css";
 
 type Props = {
+  propertiesOpen?: boolean; propertiesId?: string; onToggleProperties?: () => void;
   run: TestRunSummary;
   item: RunItem;
   canArchive: boolean;
@@ -21,7 +22,7 @@ type Props = {
   canStart: boolean; startPending: boolean; onStart: () => void;
 };
 
-export function RunExecutionHeader({ run, item, canArchive, archivePending, itemIndex, itemCount, onArchive, canStart, startPending, onStart }: Props) {
+export function RunExecutionHeader({ propertiesOpen, propertiesId, onToggleProperties, run, item, canArchive, archivePending, itemIndex, itemCount, onArchive, canStart, startPending, onStart }: Props) {
   const { workspaceId, offline } = useWorkspacePeople();
   const { locale, t } = useTmsLocale();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -81,6 +82,9 @@ export function RunExecutionHeader({ run, item, canArchive, archivePending, item
           <span>{locale === "ru" ? "Исполнитель кейса:" : "Case assignee:"}</span>
           <ResponsibleName workspaceId={workspaceId} identityId={item.assigneeIdentityId} offline={offline} />
           <RunDetailsPopover key={run.id} run={run} ru={locale === "ru"} />
+          {onToggleProperties && <button type="button" className={runStyles.propertiesToggle} aria-expanded={propertiesOpen} aria-controls={propertiesId} onClick={onToggleProperties}>
+            {locale === "ru" ? "Свойства" : "Properties"}<ChevronDown size={14} aria-hidden="true" />
+          </button>}
         </div>
       </div>
     </header>

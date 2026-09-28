@@ -7,7 +7,8 @@ import { SavedScenarioAttachments, PendingScenarioAttachments } from "../support
 import { ScenarioMarkdown } from "../markdown/ScenarioMarkdown";
 import css from "../scenarioSteps.module.css";
 
-export function ScenarioStepView({ step, order, ru }: {
+export function ScenarioStepView({ step, order, ru, layout = "list" }: {
+  layout?: "list" | "grid";
   step: TestStep;
   order: number;
   ru: boolean;
@@ -31,9 +32,9 @@ export function ScenarioStepView({ step, order, ru }: {
           label={`${ru ? "Шаг" : "Step"} ${order}`} /></div>
       </div>
     </div>
-    {!collapsed && step.expectedResult && <div className={css.expectedBlock}>
+    {!collapsed && (step.expectedResult || layout === "grid") && <div className={css.expectedBlock}>
       <span className={css.expectedLabel}>{ru ? "Ожидаемый результат" : "Expected result"}</span>
-      <ScenarioMarkdown value={step.expectedResult} label={ru ? "Ожидаемый результат" : "Expected result"} />
+      <ScenarioMarkdown value={step.expectedResult || "—"} label={ru ? "Ожидаемый результат" : "Expected result"} />
     </div>}
     {!collapsed && step.testData && <div className={css.viewData}>
       <span>{ru ? "Тестовые данные" : "Test data"}</span>

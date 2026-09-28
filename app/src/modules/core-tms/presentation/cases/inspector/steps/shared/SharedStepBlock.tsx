@@ -10,9 +10,10 @@ import { ScenarioMarkdown } from "../markdown/ScenarioMarkdown";
 import css from "./sharedStepBlock.module.css";
 
 export function SharedStepBlock({
-  snapshot, order, editing, ru, sharedSteps, canRemove, onAdd, onInsertShared,
+  layout = "list", snapshot, order, editing, ru, sharedSteps, canRemove, onAdd, onInsertShared,
   onDuplicate, onRemove,
 }: {
+  layout?: "list" | "grid";
   snapshot: SharedStepSnapshot;
   order: number;
   editing: boolean;
@@ -25,7 +26,7 @@ export function SharedStepBlock({
   onRemove: () => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  return <article className={css.block}>
+  return <article className={css.block} data-scenario-layout={layout}>
     <header className={css.header}>
       <button type="button" className={css.collapse}
         aria-expanded={!collapsed}
@@ -48,9 +49,9 @@ export function SharedStepBlock({
           <span>{order}.{itemIndex + 1}</span>
           <ScenarioMarkdown value={item.action || (ru ? "Действие не указано" : "No action")} label={ru ? "Действие" : "Action"} />
         </div>
-        {item.expectedResult && <div className={css.expected}>
+        {(item.expectedResult || layout === "grid") && <div className={css.expected}>
           <b>{ru ? "Ожидаемый результат" : "Expected result"}</b>
-          <ScenarioMarkdown value={item.expectedResult} label={ru ? "Ожидаемый результат" : "Expected result"} />
+          <ScenarioMarkdown value={item.expectedResult || "—"} label={ru ? "Ожидаемый результат" : "Expected result"} />
         </div>}
         {item.testData && <div className={css.data}><b>{ru ? "Тестовые данные" : "Test data"}</b>
           <ScenarioMarkdown value={item.testData} label={ru ? "Тестовые данные" : "Test data"} /></div>}

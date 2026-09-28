@@ -1,6 +1,8 @@
+import { ScenarioLayoutToggle } from "../common/scenario/ScenarioLayoutToggle";
+import { useScenarioLayout } from "../common/scenario/useScenarioLayout";
 import { CaseCustomFields } from "../cases/inspector/fields/CaseCustomFields";
 import { Ban, Bug, Check, CheckCircle2, ChevronLeft, ChevronRight, X, XCircle } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { Defect, ExecutionStatus, RunItem, RunItemSummary, TestCaseSummary, TestRunSummary } from "../../../../core/tms/contracts/legacy-contract";
 import { canEditRunAttempt } from "../../application/runs/execution/attempt-editing";
 import { MarkdownField } from "../cases/inspector/markdown/MarkdownField";
@@ -47,6 +49,9 @@ type RunsViewProps = {
 export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
+  const [layout, setLayout] = useScenarioLayout();
+  const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const propertiesId = useId();
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
   useEffect(() => { onDirtyChange?.(dirtySteps.length > 0); return () => onDirtyChange?.(false); }, [dirtySteps.length, onDirtyChange]);
   useEffect(() => {
@@ -77,10 +82,10 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
   return <div className={runStyles.shell} data-testid="runs-view">
     {runNavigator}
     <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
-      <RunExecutionHeader run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive && !selectedRun.batchId} archivePending={archivePending} onArchive={onArchive} canStart={false} startPending={startPending} onStart={onStart} />
+      <RunExecutionHeader propertiesOpen={propertiesOpen} propertiesId={propertiesId} onToggleProperties={() => setPropertiesOpen(open => !open)} run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive && !selectedRun.batchId} archivePending={archivePending} onArchive={onArchive} canStart={false} startPending={startPending} onStart={onStart} />
       {startError && <FormError message={startError} />}
       <div className={runStyles.detailContent}>
-        <div className={runStyles.overviewLayout}>
+        <div className={runStyles.overviewLayout} data-properties-open={propertiesOpen}>
           <div className={runStyles.primaryColumn}>
             {verificationContext}
             <section className={runStyles.contentSection}>
@@ -92,8 +97,8 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
               <MarkdownField value={selectedItem.snapshot.preconditions ?? ""} label={t("runs.preconditions")} emptyLabel={locale === "ru" ? "Предусловия не указаны." : "No preconditions."} allowAttachments={false} />
             </section>
             <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`}>
-              <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span></header>
-              <div className={runStyles.steps} role="table" aria-label={selectedItem.snapshot.title}>
+              <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span><ScenarioLayoutToggle value={layout} onChange={setLayout} ru={locale === "ru"} /></header>
+              <div className={runStyles.steps} data-scenario-layout={layout} role="table" aria-label={selectedItem.snapshot.title}>
                 {executionEntries.map((step, index) => {
                   const result = attempt.stepResults.find((item) => item.stepId === step.id);
                   const status = result?.status ?? "not_run";
@@ -111,7 +116,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
               </div>
             </section>
           </div>
-          <aside className={runStyles.sideRail}>
+          <aside id={propertiesId} hidden={!propertiesOpen} className={runStyles.sideRail} aria-label={locale === "ru" ? "Свойства тест-кейса" : "Test case properties"}>
             <section className={runStyles.railSection}>
               <header><h2>{locale === "ru" ? "Свойства" : "Properties"}</h2></header>
               <div className={runStyles.propertyList}>
@@ -133,7 +138,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     </section>
     {runWritable && <footer className={runStyles.footer} data-run-execution-footer>
       <div className={runStyles.pager}><button className={styles.textButton} aria-label={t("runs.previous")} disabled={executionPending || dirtySteps.length > 0 || currentIndex <= 0} onClick={() => onSelectItem(items[currentIndex - 1]?.id)}><ChevronLeft size={16} /><span className={runStyles.pagerLabel}>{locale === "ru" ? "Предыдущий" : "Previous"}</span></button><button className={styles.textButton} aria-label={t("runs.next")} disabled={executionPending || dirtySteps.length > 0 || currentIndex < 0 || currentIndex >= items.length - 1} onClick={() => onSelectItem(items[currentIndex + 1]?.id)}><span className={runStyles.pagerLabel}>{locale === "ru" ? "Следующий" : "Next"}</span><ChevronRight size={16} /></button></div>
-      <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={`${styles.secondaryButton} ${runStyles.compactAction}`} aria-label={t("runs.block")} title={t("runs.block")} disabled={executionPending || dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.compactActionLabel}>{t("runs.block")}</span></button><button className={`${styles.dangerButton} ${runStyles.compactAction}`} aria-label={t("runs.fail")} title={t("runs.fail")} disabled={executionPending || dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.compactActionLabel}>{t("runs.fail")}</span></button><button className={`${styles.successButton} ${runStyles.compactAction}`} aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={executionPending || !canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.compactActionLabel}>{t("runs.pass")}</span></button></>}{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={executionPending || dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
+      <div className={runStyles.actions}>{selectedRun.status === "active" && <>{attemptWritable && <><button className={runStyles.outcomeAction} data-outcome="blocked" aria-label={t("runs.block")} title={t("runs.block")} disabled={executionPending || dirtySteps.length > 0} onClick={() => onItemStatus("blocked")}><Ban size={16} /><span className={runStyles.outcomeLabel}>{t("runs.block")}</span></button><button className={runStyles.outcomeAction} data-outcome="failed" aria-label={t("runs.fail")} title={t("runs.fail")} disabled={executionPending || dirtySteps.length > 0} onClick={() => onItemStatus("failed")} data-testid="fail-case"><XCircle size={16} /><span className={runStyles.outcomeLabel}>{t("runs.fail")}</span></button><button className={runStyles.outcomeAction} data-outcome="passed" aria-label={t("runs.pass")} onClick={() => onItemStatus("passed")} data-testid="pass-case" disabled={executionPending || !canPass || dirtySteps.length > 0} title={!canPass ? t("runs.passRequiredFirst") : t("runs.pass")}><CheckCircle2 size={16} /><span className={runStyles.outcomeLabel}>{t("runs.pass")}</span></button></>}{failed && failedStep && <button className={`${styles.reportButton} ${runStyles.wideAction}`} type="button" aria-label={t("runs.reportBug")} title={t("runs.reportBug")} onClick={() => setReporting(true)} data-testid="report-defect" disabled={executionPending || dirtySteps.length > 0}><Bug size={16} /><span className={runStyles.mobileActionLabel}>{t("runs.reportBug")}</span></button>}</>}</div>
 
     </footer>}
   </div>;

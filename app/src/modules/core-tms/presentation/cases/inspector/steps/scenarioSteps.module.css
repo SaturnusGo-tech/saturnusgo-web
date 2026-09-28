@@ -392,3 +392,16 @@
 .stepGroup :is(.actionLine, .expectedBlock, .optionalData)[data-input-shell]:is(:hover, :focus-within) { box-shadow: none !important; outline: none !important; }
 
 .stepGroup .expectedBlock[data-input-shell] { border-color: #278c7b !important; border-radius: 0; }
+
+.scenarioView, .editor { container: scenario-content / inline-size; }
+@container scenario-content (min-width: 360px) {
+  :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start; padding: 14px 0; }
+  :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) + :is(.viewGroup, .stepGroup) { border-top: 1px solid var(--cases-row-border); }
+  [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > :is(.viewLines, .actionLines) { grid-column: 1; grid-row: 1; }
+  [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > .expectedBlock { grid-column: 2; grid-row: 1; margin: 0; }
+  [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > :is(.optionalData, .viewData, .savedAttachments, .attachmentControls) { grid-column: 1 / -1; }
+  [data-scenario-layout="grid"] > .stepGroup > .stepMenu { top: 12px; }
+  [data-scenario-layout="grid"] > .stepGroup > .expectedBlock { padding-right: 28px; }
+  [data-scenario-layout="grid"] > .viewGroup[data-collapsed="true"] > .viewLines,
+  [data-scenario-layout="grid"] > .stepGroup:has(.collapseButton[aria-expanded="false"]) > .actionLines { grid-column: 1 / -1; }
+}

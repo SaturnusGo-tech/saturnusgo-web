@@ -21,3 +21,10 @@
 .data b { color: var(--cases-muted); font-size: 10px; font-weight: 550; }
 .block :global([class*="savedAttachments"]) { margin-left: 58px; }
 @container case-inspector (max-width: 500px) { .block { margin-left: 38px; }.header { margin-left: -48px; }.line { grid-template-columns: 34px minmax(0,1fr); }.expected { margin-left: 40px; }.data,.block :global([class*="savedAttachments"]) { margin-left: 52px; } }
+@container scenario-content (min-width: 360px) {
+  .block[data-scenario-layout="grid"] .item { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; row-gap: 6px; align-items: start; padding: 10px 0; }
+  .block[data-scenario-layout="grid"] .item + .item { border-top: 1px solid var(--cases-row-border); }
+  .block[data-scenario-layout="grid"] .line { grid-column: 1; grid-row: 1; }
+  .block[data-scenario-layout="grid"] .expected { grid-column: 2; grid-row: 1; margin: 0; }
+  .block[data-scenario-layout="grid"] .data, .block[data-scenario-layout="grid"] :global([class*="savedAttachments"]) { grid-column: 1 / -1; }
+}

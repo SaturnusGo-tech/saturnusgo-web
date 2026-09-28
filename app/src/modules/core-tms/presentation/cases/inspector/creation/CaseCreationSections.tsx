@@ -1,3 +1,5 @@
+import { ScenarioLayoutToggle } from "../../../common/scenario/ScenarioLayoutToggle";
+import { useScenarioLayout } from "../../../common/scenario/useScenarioLayout";
 import { CaseCustomFields } from "../fields/CaseCustomFields";
 import { FolderPathPicker } from "../placement/FolderPathPicker";
 import type { TestCaseRevision } from "../../../../../../core/tms/contracts/legacy-contract";
@@ -24,6 +26,7 @@ export function CaseCreationSections({
   locale, revision, editor, sharedSteps, onResolveSharedStep,
 }: Props) {
   const ru = locale === "ru";
+  const [layout, setLayout] = useScenarioLayout();
   const patch = (next: Partial<TestCaseRevision>) => editor.onChange({ ...revision, ...next });
   return <div className={`${css.content} ${css.creationContent} ${css.overviewLayout}`}>
     <main className={css.primaryColumn}>
@@ -31,8 +34,8 @@ export function CaseCreationSections({
         value={revision.description} ru={ru} onChange={(description) => patch({ description })} />
       <CreationNarrativeSection section="preconditions" title={ru ? "Предусловия" : "Preconditions"}
         value={revision.preconditions} ru={ru} onChange={(preconditions) => patch({ preconditions })} />
-      <CreationSection title={ru ? "Сценарий" : "Scenario"}>
-        <InspectorSteps revision={revision} editing autoFocus={false} ru={ru}
+      <CreationSection title={ru ? "Сценарий" : "Scenario"} headingActions={<><span className={css.count}>{revision.type === "checklist" ? revision.checklist.length : revision.steps.length}</span>{revision.type !== "checklist" && <ScenarioLayoutToggle value={layout} onChange={setLayout} ru={ru} />}</>}>
+        <InspectorSteps revision={revision} editing layout={layout} autoFocus={false} ru={ru}
           sharedSteps={sharedSteps} onResolveSharedStep={onResolveSharedStep} onPatch={patch} />
       </CreationSection>
     </main>
@@ -74,9 +77,9 @@ function CreationNarrativeSection({ section, title, value, ru, onChange }: {
   </InspectorSectionView>;
 }
 
-function CreationSection({ title, children }: { title: string; children: React.ReactNode }) {
+function CreationSection({ title, children, headingActions }: { title: string; children: React.ReactNode; headingActions?: React.ReactNode }) {
   return <section className={`${css.section} ${css.creationSection}`}>
-    <header><h3>{title}</h3></header>
+    <header><h3>{title}</h3>{headingActions}</header>
     <div className={css.sectionBody}>{children}</div>
   </section>;
 }
