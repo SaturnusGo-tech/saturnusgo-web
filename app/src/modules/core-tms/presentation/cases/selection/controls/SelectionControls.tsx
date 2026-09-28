@@ -2,7 +2,7 @@ import { caseFieldOptions, fieldFilterCount } from "../../model/fields/case-fiel
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { useMemberDirectory } from "../../../../workspace/members/state/directory/useMemberDirectory";
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { PiFunnelSimple, PiMagnifyingGlass } from "react-icons/pi";
+import { PiFunnelSimple, PiMagnifyingGlass, PiX } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { CaseFilters } from "../../../../state/types/workspace";
 import { filterCaseRows, type CaseFacetFilters } from "../../model/caseListModel";
@@ -29,31 +29,38 @@ export function useSelectionFilters(cases: TestCaseSummary[], initial: InitialSe
     .map((row) => row.testCase), [cases, deferredQuery, deferredQl, filters, facets, directory.members]);
   return { query, setQuery, qlQuery, setQlQuery, filters, setFilters, facets, setFacets, options, visible, directory };
 }
-export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools, inline = false, disabled = false }: {
-  disabled?: boolean; inline?: boolean; extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
+export function SelectionControls({ state, ru, onSelectAll, action, extraSections, onResetExtra, tools, inline = false, repository = false, disabled = false }: {
+  disabled?: boolean; inline?: boolean; repository?: boolean; extraSections?: ExtraFilterSection[]; onResetExtra?: () => void; tools?: ReactNode;
   state: ReturnType<typeof useSelectionFilters>; ru: boolean; onSelectAll?: () => void; action?: ReactNode;
 }) {
   const qlButton = useRef<HTMLButtonElement>(null); const qlPanel = useRef<HTMLDivElement>(null);
   const [ql, setQl] = useState(false); const [filter, setFilter] = useState(false);
   useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus(); }, [ql]);
   useEffect(() => { if (disabled) { setQl(false); setFilter(false); } }, [disabled]);
-  return <div className={css.controls} data-inline={inline || undefined} data-selecting={Boolean(onSelectAll) || undefined} data-case-popover-root>
-    <div className={css.searchRow}><label className={css.search} data-input-shell><PiMagnifyingGlass size={16} />
-      <input disabled={disabled} aria-label={ru ? "Найти тест-кейс" : "Find a test case"} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
-        value={state.query} onChange={(e) => state.setQuery(e.target.value)} /></label>{action}</div>
-    <div className={css.tools}>
-      <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
+  const queryTools = <>
+      <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-label={ru ? "QL-запрос" : "QL query"} data-active={Boolean(state.qlQuery) || undefined} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" disabled={disabled} aria-expanded={filter} aria-haspopup="dialog" aria-controls="case-filter-panel"
         data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
           customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
+  </>;
+  return <div className={css.controls} data-inline={inline && !repository || undefined} data-repository-controls={repository || undefined}
+    data-selecting={Boolean(onSelectAll) || undefined} data-case-popover-root>
+    <div className={css.searchRow}><div className={css.search} data-input-shell><PiMagnifyingGlass size={16} aria-hidden="true" />
+      <input disabled={disabled} aria-label={ru ? "Найти тест-кейс" : "Find a test case"} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
+        value={state.query} onChange={(e) => state.setQuery(e.target.value)} />
+      {repository && state.query && <button type="button" disabled={disabled} onClick={() => state.setQuery("")}
+        aria-label={ru ? "Очистить поиск" : "Clear search"}><PiX size={14} /></button>}
+      {repository && queryTools}</div>{action}</div>
+    {!repository && <div className={css.tools}>
+      {queryTools}
       <span className={css.selectAllReveal} data-open={Boolean(onSelectAll) || undefined} aria-hidden={!onSelectAll}
         ref={element => { if (element) element.inert = !onSelectAll; }}>
         <button className={css.tool} type="button" disabled={disabled || !onSelectAll} onClick={onSelectAll}>{ru ? "Выбрать все" : "Select all"}</button>
       </span>
       {tools}
-    </div>
-    {ql && <div ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
+    </div>}
+    {ql && <div className={css.ql} ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
       folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} /></div>}
   </div>;
 }

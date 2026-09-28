@@ -140,3 +140,16 @@ test("default expansion reveals ancestors but not cases, and manual collapse sur
   assert.equal((root.props.expanded as Set<string>).has("transfer"), true);
   app.dispose();
 });
+
+test("the archive control remains mounted while selection actions replace it without retaining focus", () => {
+  const app = browserHarness();
+  const archive = () => elements(app.renderTree(), item => item.props["aria-label"] === "Show archived folders")[0];
+  assert.ok(archive()); assert.equal(archive().props.disabled, false);
+  app.render().toggleSelectionMode();
+  assert.ok(archive(), "the same heading track must survive selection mode");
+  assert.equal(archive().props.disabled, true); assert.equal(archive().props["aria-hidden"], true);
+  assert.equal(archive().props.tabIndex, -1);
+  app.render().toggleSelectionMode();
+  assert.equal(archive().props.disabled, false); assert.equal(archive().props["aria-hidden"], undefined);
+  app.dispose();
+});

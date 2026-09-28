@@ -53,3 +53,6 @@
 .tools { display: flex; align-items: center; gap: 3px; min-width: 0; }
 .controls[data-repository-controls] { grid-template-columns: minmax(0,1fr); }
 @container repository-controls (max-width: 400px) { .tools .tool > span { display: none; } }
+
+/* Reserve the selection toggle width so changing its label never resizes the search. */
+.controls[data-repository-controls] .select { flex: 0 0 78px; padding-inline: 7px; }

@@ -125,5 +125,9 @@
   :global([data-appearance="glass"] [data-testid="cases-view"]) .newFolder span { display: inline; }
 }
 
-.treeHeading { min-height: 36px; gap: 8px; }
+.treeHeading { display: grid; grid-template-columns: minmax(0,1fr) auto; min-height: 39px; gap: 8px; }
+.treeHeading > :not(span) { grid-column: 2; grid-row: 1; justify-self: end; }
+.archiveToggle { opacity: 1; visibility: visible; transition: opacity 180ms ease, visibility 0s; }
+.repository[data-selection] .archiveToggle { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 180ms ease, visibility 0s 180ms; }
+@media (prefers-reduced-motion: reduce) { .archiveToggle, .repository[data-selection] .archiveToggle { transition: none; } }
 .treeHeading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

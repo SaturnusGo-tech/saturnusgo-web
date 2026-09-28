@@ -3,7 +3,6 @@ import { isWorkingRun } from "../../../runs/model/history/run-history";
 import { RunIncompleteDialog } from "../completion/RunIncompleteDialog";
 import { RunCasesSkeleton } from "../loading/RunCasesSkeleton";
 import { RunAssignmentTools } from "../assignment/RunAssignmentTools";
-import { CheckSquare, RefreshCw } from "lucide-react";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../localization/format/labels";
@@ -15,6 +14,8 @@ import { FormError } from "../../common/error/FormError";
 import { statusIcon } from "../../status/executionStatus";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import css from "./run-repository.module.css";
+import controls from "../../cases/browser/controls/repository-controls.module.css";
+import selection from "../../cases/browser/selection/repository-selection.module.css";
 
 export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty = false, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; repository: RunRepositoryModel; onEditRun?: () => void; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
@@ -30,9 +31,11 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
       disabled={browser.busy || assignments.busy || lifecycleBlocked} startBlocked={startBlocked || browser.loading}
       onCreate={()=>model.openRunDialog()} onAction={action=>void browser.act(action)}
       onChoose={id=>{const runs=browser.choices.find(c=>c.id===id)?.runs;const next=runs?.find(isWorkingRun)??runs?.[0];if(next)choose(next.id,next.projectId);}}/>
-    <SelectionControls disabled={lifecycleBlocked} inline state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
-      onSelectAll={assignments.selecting && canAssign && !assignments.busy ? () => assignments.toggleScope(visible.map((c) => c.id)) : undefined}
-      tools={<button type="button" className={css.refresh} aria-label={ru ? "Обновить" : "Refresh"} onClick={browser.refresh} disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked}><RefreshCw size={14} /></button>}/>
+    <SelectionControls disabled={lifecycleBlocked} inline repository state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
+      action={canAssign && <button type="button" className={`${controls.tool} ${controls.select}`}
+        disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked} aria-pressed={assignments.selecting}
+        aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"} onClick={assignments.toggleSelection}>
+        <span>{assignments.selecting ? (ru ? "Готово" : "Done") : (ru ? "Выбрать" : "Select")}</span></button>}/>
     {assignments.error && <FormError message={assignments.error} />}
     {browser.incomplete && <RunIncompleteDialog ru={ru} busy={browser.busy} canArchive={model.canArchiveRun}
       onClose={browser.dismissIncomplete} onArchive={() => void browser.act("archive")} />}
@@ -46,8 +49,13 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
         const scoped = entries;
         return <SelectionTree key={key} includeArchived={filters.filters.includeArchived} cases={scoped} folders={runRepositoryFolders(model.data.workspace.id, projectId, scoped)} selected={assignments.selected} selectable={canAssign && assignments.selecting} disabled={assignments.busy || browser.busy || lifecycleBlocked}
           ru={ru} onScope={assignments.toggleScope} onToggle={assignments.toggle} activeId={model.selectedRunItem?.id}
-          heading={<><strong>{label}</strong><span>{entries.length}</span>{canAssign && <button type="button" className={css.selectCases} disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked}
-            aria-pressed={assignments.selecting} onClick={assignments.toggleSelection}><CheckSquare size={13} />{assignments.selecting ? (ru ? "Снять выбор" : "Clear selection") : (ru ? "Выбрать тест-кейсы" : "Select test cases")}</button>}</>}
+          heading={<><strong className={css.projectName}><span title={label}>{label}</span><small>{entries.length}</small></strong>
+            {canAssign && <div className={selection.commands} role="group" aria-label={ru ? "Выбор тест-кейсов" : "Case selection"}
+              data-open={assignments.selecting || undefined} aria-hidden={!assignments.selecting}
+              ref={element => { if (element) element.inert = !assignments.selecting; }}>
+              <button type="button" disabled={!assignments.selecting || browser.loading || browser.busy || assignments.busy || lifecycleBlocked}
+                onClick={() => assignments.toggleScope(entries.map(item => item.id))}>{ru ? "Выбрать все" : "Select all"}</button>
+            </div>}</>}
           trailing={(item) => <span className={css.assignee}><ResponsibleName workspaceId={model.data.workspace.id}
             identityId={lookup.get(item.id)?.item.assigneeIdentityId ?? null} offline={model.connection !== "connected"} /></span>}
           accessory={(item) => <span title={localizedLabel(locale, lookup.get(item.id)?.item.status ?? "not_run")} className={css.status} data-status={lookup.get(item.id)?.item.status}>{statusIcon[lookup.get(item.id)?.item.status ?? "not_run"]}</span>}
