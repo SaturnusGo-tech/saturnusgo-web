@@ -33,7 +33,7 @@ export function RunEditDialog({ run, workspaceId, onClose, onSaved }: {
             <input value={state.draft.name} maxLength={240} disabled={!state.fieldsEnabled} required
               onChange={event => state.patch({ name: event.target.value })} /></label>
           <label className={css.field}><span>{ru ? "Описание" : "Description"}</span>
-            <textarea value={state.draft.description} maxLength={20000} disabled={!state.fieldsEnabled} rows={4}
+            <textarea value={state.draft.description} maxLength={20000} disabled={!state.fieldsEnabled} rows={2}
               onChange={event => state.patch({ description: event.target.value })} /></label>
           <div className={css.field}><span>{ru ? "Ответственный за прогон" : "Run owner"}</span>
             <ResponsiblePicker workspaceId={workspaceId} value={state.draft.ownerIdentityId} disabled={!state.fieldsEnabled}

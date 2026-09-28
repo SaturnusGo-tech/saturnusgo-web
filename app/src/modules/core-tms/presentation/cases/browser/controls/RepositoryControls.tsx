@@ -21,7 +21,7 @@ export function RepositoryControls({ props, view, locale }: {
     + Number(props.filters.lifecycle !== "all") + Number(Boolean(props.filters.tag.trim()))
     + Number(props.filters.includeArchived) + view.facetFilters.folders.length + view.facetFilters.components.length + (view.facetFilters.owners?.length ?? 0);
   function closeFilters() { view.setFilterOpen(false); filterButton.current?.focus(); }
-  return <div className={css.controls} data-case-popover-root>
+  return <div className={css.controls} data-repository-controls data-case-popover-root>
     <div className={css.searchRow}>
     <div className={css.search} data-input-shell><PiMagnifyingGlass size={16} aria-hidden="true" />
       <input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder={ru ? "Найти тест-кейс" : "Find a test case"}
@@ -40,15 +40,6 @@ export function RepositoryControls({ props, view, locale }: {
     </div>
       <button type="button" className={`${css.tool} ${css.select}`} disabled={locked} aria-pressed={view.selectionMode} onClick={view.toggleSelectionMode}
         aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"}><span>{view.selectionMode ? (ru ? "Готово" : "Done") : (ru ? "Выбрать" : "Select")}</span></button>
-    </div>
-    <div className={css.tools}>
-      <div className={css.selection} data-open={view.selectionMode || undefined} aria-hidden={!view.selectionMode}
-        ref={(element) => { if (element) element.inert = !view.selectionMode; }}>
-        <div className={css.selectionActions}>
-          <button type="button" disabled={locked || !view.selectableVisibleCount} onClick={view.bulkSelection.selectVisible}>{ru ? "Выбрать в папке" : "Select in folder"}</button>
-          <button type="button" disabled={locked || !view.selectableCount} onClick={view.bulkSelection.selectAll}>{ru ? "Выбрать все" : "Select all"}</button>
-        </div>
-      </div>
     </div>
     {view.directory.loading && Boolean(props.query || view.qlQuery) && <span role="status" className={css.queryHint}>{ru ? "Загружаем ответственных…" : "Loading assignees…"}</span>}
     {view.directory.error && <button type="button" className={css.tool} onClick={view.directory.retry}>{ru ? "Не удалось загрузить ответственных. Повторить" : "Could not load assignees. Retry"}</button>}

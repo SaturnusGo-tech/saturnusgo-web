@@ -19,7 +19,7 @@ export function RepositoryFolders(props: {
   activeCaseId: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void; onCreate: (path?: string) => void;
   onNewFolder: () => void; onImport: () => void;
-  controls?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; onArchiveChange?: (archived: boolean) => void;
+  controls?: ReactNode; selectionActions?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; onArchiveChange?: (archived: boolean) => void;
 }) {
   const { resource, ru } = props;
   const moving = useContext(RepositoryDragSelectionContext);
@@ -95,7 +95,8 @@ export function RepositoryFolders(props: {
     {props.controls}
     <div ref={drop.setNodeRef} className={css.treeHeading} data-drag-root={moving.active || undefined} data-drop={drop.isOver || undefined}>
       <span>{moving.active ? (ru ? "В корень репозитория" : "Move to repository root") : archive ? (ru ? "Архив папок" : "Archived folders") : (ru ? "Папки" : "Folders")}</span>
-      <button disabled={moving.active} aria-pressed={archive} aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button></div>
+      {props.selectionActions}
+      {!props.selectionMode && <button disabled={moving.active} aria-pressed={archive} aria-label={ru ? "Показать архив папок" : "Show archived folders"} onClick={() => setArchive(!archive)}><PiArchiveDuotone size={16} /></button>}</div>
     <div className={css.treeScroll} aria-busy={resource.loading}>
       {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>

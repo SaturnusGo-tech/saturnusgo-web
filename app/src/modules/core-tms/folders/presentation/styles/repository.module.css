@@ -19,8 +19,8 @@
 .heading > div { display: flex; gap: 3px; }
 :where(.repository) button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
 .repository button:disabled { opacity: .4; cursor: default; }
-.heading button, .treeHeading button, .menuButton, .disclosure { width: 26px; height: 28px; display: inline-grid; place-items: center; padding: 0; border-radius: 8px; color: var(--cases-muted) !important; }
-.heading button:hover, .treeHeading button:hover, .menuButton:hover { background: var(--cases-hover); }
+.heading button, .treeHeading > button, .menuButton, .disclosure { width: 26px; height: 28px; display: inline-grid; place-items: center; padding: 0; border-radius: 8px; color: var(--cases-muted) !important; }
+.heading button:hover, .treeHeading > button:hover, .menuButton:hover { background: var(--cases-hover); }
 .folderRow[data-selected], .leaf[data-active] { background: color-mix(in srgb, #7995d4 12%, var(--cases-bg)); }
 .leaf[data-selected] { background: color-mix(in srgb, #7995d4 8%, var(--cases-bg)); }
 .treeHeading { display: flex; align-items: center; justify-content: space-between; color: var(--cases-muted); font-size: 11px; padding: 4px 8px 7px; }
@@ -124,3 +124,6 @@
   :global([data-appearance="glass"] [data-testid="cases-view"]) .heading .newFolder { width: auto; padding-inline: 7px; }
   :global([data-appearance="glass"] [data-testid="cases-view"]) .newFolder span { display: inline; }
 }
+
+.treeHeading { min-height: 36px; gap: 8px; }
+.treeHeading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
