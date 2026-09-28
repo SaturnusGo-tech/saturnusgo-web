@@ -27,7 +27,7 @@ export function GuideMessage({ message, navigation, onSource, streaming = false,
   return <article className={css.assistantMessage} aria-label={copy.assistant} aria-busy={streaming || undefined} aria-live={streaming ? "off" : undefined}
     id={message.id ? `guide-message-${message.id}` : undefined} data-guide-message={message.turnId} tabIndex={-1}>
     <span className={css.assistantName}>Falcon AI</span>
-    <GuideMarkdown content={message.content} />
+    <GuideMarkdown content={message.content} streaming={streaming} />
     {streaming && <span className={css.streamingStatus} role="status" aria-label={copy.responding}><span className={css.pulse} /></span>}
     {visuals.map((visual, index) => <GuideVisuals key={visual.key} visual={visual} copy={copy} screenshots={screenshots}
       startIndex={visuals.slice(0, index).reduce((total, group) => total + group.steps.length, 0)} />)}

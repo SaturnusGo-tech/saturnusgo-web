@@ -57,6 +57,7 @@ test("assistant sources open only verified internal article and section links", 
 test("Markdown disables raw HTML, remote media and generated links; citations are separate", () => {
   const h = componentHarness();
   const { GuideMarkdown: render } = h.load<{ GuideMarkdown: typeof GuideMarkdown }>(new URL("../../presentation/messages/GuideMarkdown.tsx", import.meta.url), name => {
+    if (name.endsWith("guide-formatting")) return { guideRemarkPlugins: () => [] };
     if (name === "react-markdown") return { __esModule: true, default: "Markdown" };
   });
   const markdown = nodes(h.render(() => render({ content: "![track](https://external.example/image) <script>bad()</script>" }))).find(node => node.type === "Markdown")!;
