@@ -24,6 +24,9 @@ uses the guide's actual screenshot, instruction and expected result in the curre
 locale. Follow-up questions can focus on a particular step without restating the
 procedure. These are reference illustrations, not a live view of the user's
 workspace, and they do not prove the user has completed an action.
+All selected steps are visible without an additional expansion action. Image
+numbers continue across sections and match follow-up context; the enlarged
+viewer uses the same complete, ordered set of up to eight screenshots.
 
 Opening a source keeps the conversation
 available when the user returns to chat. The in-memory conversation resets on

@@ -19,9 +19,5 @@
 .gallery .thumbnail { order: -1; }
 .gallery .thumbnail img { height: 157px; aspect-ratio: auto; }
 .gallery .stepCopy p { color: var(--docs-muted); font-size: 11px; }
-.more { display: inline-flex; align-items: center; gap: 5px; margin-top: 15px; padding: 5px 0; border: 0; background: transparent; color: var(--docs-copy); font-size: 11px; }
-.more svg { transition: transform 160ms ease; }
-.more[aria-expanded="true"] svg { transform: rotate(180deg); }
 @container falcon-docs (max-width: 900px) { .steps > li { grid-template-columns: minmax(0,1fr) minmax(110px,180px); gap: 15px; } }
 @container falcon-docs (max-width: 700px) { .steps > li { grid-template-columns: 1fr; gap: 9px; } .steps .thumbnail { width: min(100%,280px); } .gallery > li { width: 240px; flex-basis: 240px; } .gallery .thumbnail img { height: 140px; } }
-@media (prefers-reduced-motion: reduce) { .more svg { transition: none; } }

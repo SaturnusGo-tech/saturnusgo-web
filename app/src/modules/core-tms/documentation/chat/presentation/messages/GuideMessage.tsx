@@ -18,11 +18,13 @@ export function GuideMessage({ message, navigation, onSource, streaming = false 
   if (message.role === "user") return <div className={css.userMessage} aria-label={copy.you}>{message.content}</div>;
   const sources = streaming ? [] : visibleCitations(message.citations ?? [], articleById);
   const visuals = streaming ? [] : visibleGuideVisuals(message.visuals, articleById);
+  const screenshots = visuals.flatMap(visual => visual.steps);
   return <article className={css.assistantMessage} aria-label={copy.assistant} aria-busy={streaming || undefined} aria-live={streaming ? "off" : undefined}>
     <span className={css.assistantName}>Falcon AI</span>
     <GuideMarkdown content={message.content} />
     {streaming && <span className={css.streamingStatus} role="status" aria-label={copy.responding}><span className={css.pulse} /></span>}
-    {visuals.map(visual => <GuideVisuals key={visual.key} visual={visual} copy={copy} />)}
+    {visuals.map((visual, index) => <GuideVisuals key={visual.key} visual={visual} copy={copy} screenshots={screenshots}
+      startIndex={visuals.slice(0, index).reduce((total, group) => total + group.steps.length, 0)} />)}
     {sources.length > 0 && <nav className={css.sources} aria-label={copy.sources}>
       <span>{copy.sources}</span>
       {sources.map(source => <a key={`${source.articleId}:${source.sectionId}`} href={navigation.link(source.articleId, source.sectionId)}
