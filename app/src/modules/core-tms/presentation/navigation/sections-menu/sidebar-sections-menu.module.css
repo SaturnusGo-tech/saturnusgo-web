@@ -1,11 +1,4 @@
 .root { position: relative; min-width: 0; color: var(--glass-text, var(--sidebar-text)); }
-.root .trigger { display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 10px; border: 0; border-radius: 18px; color: inherit; background: transparent; font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
-.trigger > svg { flex: 0 0 20px; color: var(--glass-muted, var(--sidebar-muted)); }
-.trigger > span { white-space: nowrap; }
-.root[data-collapsed] .trigger { width: 36px; padding: 0; margin-inline: auto; justify-content: center; }
-.root[data-collapsed] .trigger > span { display: none; }
-.root .trigger:hover:not(:disabled), .root .trigger[aria-expanded=true] { background: var(--glass-hover, var(--sidebar-menu-hover)); }
-.root .trigger:disabled { opacity: .45; cursor: default; }
 .panel { position: fixed; inset: auto; z-index: 100; box-sizing: border-box; margin: 0; width: 300px; max-width: calc(100vw - 24px); max-height: min(320px, calc(100dvh - 24px)); padding: 10px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; border: 1px solid var(--glass-border, var(--sidebar-menu-border)); border-radius: 16px; color: var(--glass-text, var(--sidebar-menu-text)); background: var(--glass-panel-strong, var(--sidebar-menu-bg)); box-shadow: var(--glass-shadow, var(--sidebar-menu-shadow)); font: inherit; font-size: 12px; line-height: 1.4; }
 .panel button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 8px 4px; }
@@ -26,8 +19,6 @@
 .panel :is(.close, .navigate, .pin):hover:not(:disabled) { background: var(--glass-hover, var(--sidebar-menu-hover)); }
 .panel button:disabled { opacity: .45; cursor: default; }
 .root :is(button, input):focus-visible { outline: 2px solid var(--glass-text, var(--sidebar-focus)); outline-offset: 2px; }
-@media (max-width: 760px) {
-  .root { flex: 0 0 44px; min-width: 44px; }
-  .root .trigger, .root[data-collapsed] .trigger { width: 44px; height: 36px; padding: 0; justify-content: center; }
-  .trigger > span { display: none; }
-}
+.context { padding: 5px; border-radius: 12px; }
+.panel .contextAction { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 8px 10px; border-radius: 8px; text-align: left; }
+.contextAction:hover { background: var(--glass-hover, var(--sidebar-menu-hover)); }

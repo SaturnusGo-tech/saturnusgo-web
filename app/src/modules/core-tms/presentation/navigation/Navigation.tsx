@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { ChevronsLeft } from "lucide-react";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
@@ -40,27 +39,23 @@ export function Navigation({ view, onChange, disabled, collapsed, onToggleCollap
     }
     onChange(next);
   };
-  const toggleLabel = t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar");
-  return <nav ref={root} id="tms-navigation" data-sidebar-system data-collapsed={collapsed}
+  return <nav ref={root} id="tms-navigation" data-sidebar-system data-collapsed={collapsed} tabIndex={-1}
     className={`${shellStyles.navigation} ${collapsed ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
     <div className={css.header}>
       <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
         aria-label={t("header.dashboardAria")}>
         <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
       </button>
-      <button type="button" className={css.collapse} onClick={onToggleCollapsed} aria-label={toggleLabel}
-        aria-expanded={!collapsed} data-nav-label={toggleLabel}><ChevronsLeft size={16} aria-hidden="true"/></button>
     </div>
     <div className={css.scroll} data-sidebar-scroll>
       <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} activeRunCount={activeRunCount} onNavigate={navigate}/>
 
     </div>
     <div className={css.footer}>
-      <div className={css.sectionsLauncher}>
-      <SidebarSectionsMenu collapsed={collapsed} availableIds={navigation.availableIds} activeId={navigation.activeId}
+      <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled}/>
-      </div>
       <NavigationUtilityMenu disabled={disabled} settingsActive={!disabled && view === "config"} helpActive={view === "help"}
+        collapsed={collapsed} onToggleCollapsed={onToggleCollapsed}
         notificationsActive={view === "notifications"} onOpenNotifications={() => onChange("notifications")} workspaceId={workspaceId}
         onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
       <NavigationProfile collapsed={collapsed}/>

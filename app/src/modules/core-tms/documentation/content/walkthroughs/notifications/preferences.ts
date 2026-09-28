@@ -1,17 +1,17 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const notificationPreferencesWalkthrough = walkthrough("Категории, каналы и лента уведомлений", [
-  shot("notifications-01-overview-20260928", "Выберите нужные события",
-    "Откройте **Уведомления** (Notifications) в сайдбаре и раскройте **Настройки событий** (Event preferences). Включите нужные категории переключателями: изменения сохраняются сразу и применяются к Telegram и подключённым браузерам.",
-    "В примере включены все шесть категорий. Это выбор событий для отправки, а не подтверждение подключения каналов: браузер и Telegram на снимке ещё не подключены.",
-    "Экран уведомлений с шестью включёнными категориями: прогоны, тест-кейсы, тест-сьюты, назначения, дефекты и интеграции."),
-  shot("notifications-02-browser-20260928", "Проверьте разрешение и состояние канала",
-    "Нажмите заголовок **Уведомления в браузере** (Browser notifications), чтобы увидеть состояние. Если показана просьба разрешить уведомления в настройках сайта, сначала измените разрешение в браузере, обновите Falcon и затем включите переключатель.",
-    "На снимке уведомления выключены, разрешение запрещено и переключатель недоступен. Telegram также не настроен: кнопка **Подключить** (Connect) недоступна. По настройке бота обратитесь к администратору.",
-    "Раскрытый браузерный канал сообщает, что уведомления выключены, и просит разрешение сайта; Telegram показывает Бот ещё не подключён."),
-  shot("notifications-03-inbox-20260928", "Откройте последние события",
-    "Сверните **Настройки событий** и раскройте **Последние события** (Recent activity). Нажмите **Обновить** (Refresh) для загрузки ленты. Заголовок события открывает связанную запись; кнопка с галочкой отмечает событие прочитанным без перехода.",
-    "В учебной ленте видны завершение прогона PAY-TR-11 и обновление результата PAY-TC-34. События доступны внутри Falcon, даже когда Telegram и браузерный канал не подключены.",
-    "Свёрнутые настройки событий и открытые Входящие: Run completed для PAY-TR-11 и Check result updated для PAY-TC-34."),
+export const notificationPreferencesWalkthrough = walkthrough("Notification categories, channels and activity", [
+  shot("notifications-01-overview-20260928-en-20260928", "Choose the events you need",
+    "Open **Notifications** in the sidebar and expand **Event preferences**. Enable the categories you need with their toggles. Changes save immediately and apply to Telegram and connected browsers.",
+    "The example enables all six categories. This chooses events to send; it does not confirm channel connections. Neither the browser nor Telegram is connected in the screenshot.",
+    "Notification screen with all six categories enabled: runs, test cases, test suites, assignments, defects and integrations."),
+  shot("notifications-02-browser-20260928-en-20260928", "Check permission and channel status",
+    "Select **Browser notifications** to view its status. If it asks you to allow notifications in site settings, update the browser permission first, reload Falcon and then enable the toggle.",
+    "The screenshot shows notifications off, permission denied and the toggle disabled. Telegram is also unconfigured, so **Connect** is unavailable. Ask your administrator to configure the bot.",
+    "Expanded browser channel showing notifications off and a request for site permission; Telegram says the bot is not connected yet."),
+  shot("notifications-03-inbox-20260928-en-20260928", "Open recent events",
+    "Collapse **Event preferences** and expand **Recent activity**. Select **Refresh** to load the inbox. An event title opens its linked record; the checkmark marks it read without navigating away.",
+    "The practice inbox shows completion of PAY-TR-11 and a result update for PAY-TC-34. Events remain available inside Falcon even when Telegram and browser notifications are disconnected.",
+    "Collapsed event preferences and open inbox showing Run completed for PAY-TR-11 and Check result updated for PAY-TC-34."),
 ]);

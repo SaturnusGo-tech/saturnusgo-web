@@ -1,15 +1,15 @@
 import { note, paragraph, section, steps, type DocArticle } from "../../model/article";
 export const toolsArticle: DocArticle = {
   id: "api-testing", title: "API Testing", group: "reference",
-  description: "Выберите проекты, подключённый API и сервер для выполнения запросов через Swagger.",
-  keywords: ["API Testing", "Swagger", "OpenAPI", "контракт"], related: ["create-test-case", "integration-overview", "swagger"],
+  description: "Choose projects, a connected API, and a server to execute requests through Swagger.",
+  keywords: ["API Testing", "Swagger", "OpenAPI", "contract"], related: ["create-test-case", "integration-overview", "swagger"],
   sections: [
-    section("setup", "Подключить API проекта", steps(
-      ["Проверьте проект", "Подключение API может использоваться несколькими проектами. Выберите нужные проекты или портфель в переключателе области."],
-      ["Настройте источник", "Откройте Хуки → Swagger. Откройте Подключить API, укажите прямую HTTPS-ссылку на OpenAPI JSON/YAML, доступ к документу и проекты, которые используют этот API."],
-      ["Откройте спецификацию", "В API Testing выберите нужный Сервис API из подключений доступной области. Для выполнения операций выберите Сервер запросов. До выбора сервера спецификацию можно просматривать."])),
-    section("api", "Выполнить запрос", paragraph("Найдите endpoint в Swagger, проверьте сервер и параметры запроса. Если сам API требует авторизацию, используйте **Authorize**. Доступ к спецификации и авторизация запросов — разные настройки."),
-      note("Внешний инструмент", "Для Execute ваш API должен разрешать CORS с адреса Falcon. Запросы и их результаты не превращаются автоматически в выполненные раны Falcon — зафиксируйте проверку и материалы в соответствующем сценарии.")),
-    section("cases", "Сохранить проверку", paragraph("Для повторяемого сценария создайте обычный тест-кейс: опишите входные данные, запрос и ожидаемый ответ. Включите его в тест-сьют или ран. Ранее созданные интеграционные кейсы доступны в общей базе тест-кейсов.")),
+    section("setup", "Connect a project's API", steps(
+      ["Check the project", "An API connection can serve several projects. Select the relevant projects or portfolio in the scope selector."],
+      ["Configure the source", "Open Hooks → Swagger → Connect API. Enter a direct HTTPS OpenAPI JSON/YAML URL, document access, and the projects using this API."],
+      ["Open the specification", "In API Testing, choose the API service from connections within the available scope. Select Request server to execute operations. You can view the specification before choosing a server."])),
+    section("api", "Execute a request", paragraph("Find the endpoint in Swagger and check the server and request parameters. If the API requires authorization, use **Authorize**. Specification access and request authorization are separate settings."),
+      note("External tool", "For Execute, your API must allow CORS from Falcon's address. Requests and responses do not automatically become completed Falcon runs; record the test and evidence in the relevant scenario.")),
+    section("cases", "Save the test", paragraph("For a repeatable scenario, create a standard test case describing the input, request, and expected response. Include it in a suite or run. Previously created integration cases remain available in the shared test repository.")),
   ],
 };

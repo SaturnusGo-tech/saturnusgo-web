@@ -1,41 +1,41 @@
 import { articles, bullets, note, paragraph, section, steps, type DocArticle } from "../../../model/article";
 
 export const caseCommentsArticle: DocArticle = {
-  id: "case-comments", title: "Комментарии, ответы и упоминания", group: "cases",
-  description: "Обсуждайте тест-кейсы и баг-репорты, отвечайте в ветках и приглашайте коллег к проверке.",
-  keywords: ["комментарии", "обсуждение", "ответ", "реплай", "reply", "упоминание", "позвать", "comment", "ссылка на сообщение"],
+  id: "case-comments", title: "Comments, replies, and mentions", group: "cases",
+  description: "Discuss test cases and bug reports, reply in threads, and invite colleagues to review.",
+  keywords: ["comments", "discussion", "response", "reply", "reply", "mention", "invite", "comment", "message link"],
   related: ["create-defect", "edit-test-case", "notifications", "telegram-notifications", "browser-notifications"],
   sections: [
-    section("write", "Написать комментарий", steps(
-      ["Откройте обсуждение", "В карточке тест-кейса или на вкладке **Обзор** баг-репорта найдите раздел **Комментарии** (Comments) с открытым Markdown-редактором. Панель форматирования и поле ввода всегда доступны."],
-      ["Введите текст", "Используйте выделение, списки, чек-листы, код и ссылки на панели форматирования. Кнопка **Отправить** (Post) находится внутри поля справа внизу и становится доступна после ввода текста или загрузки вложения. Максимальная длина сообщения вместе со ссылками на вложения: 10 000 символов."],
-      ["Отправьте", "Нажмите **Отправить** или Cmd+Enter на Mac, Ctrl+Enter на Windows. Пока сообщение сохраняется, повторная отправка заблокирована. При ошибке текст остаётся в редакторе: исправьте причину и повторите попытку."]),
-      note("Доступ к обсуждению", "Комментарии доступны участникам с доступом к соответствующему тест-кейсу или баг-репорту. Возможность писать, изменять и удалять сообщения зависит от роли и прав пользователя.")),
-    section("reply", "Ответить на сообщение", steps(
-      ["Выберите исходное сообщение", "Нажмите стрелку ответа справа от комментария или **⋯ → Ответить** (Reply). Это работает и для первого сообщения, и для любого вложенного ответа."],
-      ["Проверьте контекст", "Falcon плавно прокрутит к общему полю комментария над лентой и установит курсор в него. Под панелью форматирования появится цитата с синей линией. На нижней подложке редактора указаны имя и фотография автора исходного сообщения."],
-      ["Напишите ответ", "Текст вводится под цитатой. Цитата служит контекстом и не добавляется в ваш текст. После отправки сообщение появится в соответствующей ветке: сначала цитата исходного сообщения с синей линией, затем ваш ответ. Если исходный комментарий удалён, вместо цитаты будет отметка об удалении."],
-      ["Измените адресата при необходимости", "Можно нажать «Ответить» у другого сообщения: цитата и адресат заменятся, набранный текст сохранится. Крестик рядом с адресатом снимает ответ и оставляет текст как обычный комментарий. При снятии ответа цитата и нижняя подложка исчезают. Сам редактор остаётся открытым."]),
-      paragraph("Для новых комментариев и ответов используется одно поле. Дополнительные формы под сообщениями не открываются. Ветки можно свернуть кнопкой под сообщением или нажатием на линию ветки; затем раскрыть через **Показать ответы**.")),
-    section("attachments", "Прикрепить изображение или файл", steps(
-      ["Выберите файлы", "Нажмите скрепку слева внизу редактора. Можно выбрать несколько изображений или файлов, до 20 вложений в одном комментарии."],
-      ["Дождитесь загрузки", "Под названием файла отображается синий индикатор загрузки. Пока хотя бы один файл загружается или не сохранён, отправка сообщения недоступна."],
-      ["Исправьте ошибку при необходимости", "Нажмите **Повторить** рядом с проблемным файлом или уберите его крестиком. Остальные вложения и набранный текст сохраняются. После успешной загрузки отправьте комментарий."],
-      ["Откройте вложение", "В опубликованном комментарии нажмите на вложение для просмотра или открытия. При изменении комментария можно добавить новые файлы или убрать ссылки на существующие."]),
-      note("Доступ к файлам", "Вложения сохраняются в приватном хранилище проекта компании. Доступ проверяется сервером. Удаление ссылки из комментария не удаляет сам файл из хранилища проекта.")),
-    section("mentions", "Призвать сотрудника", steps(
-      ["Выберите коллег", "Внутри редактора, рядом со скрепкой, нажмите **Призвать** (Mention). Найдите сотрудника по имени или почте и выберите его из списка. Можно указать до 20 сотрудников компании. Чтобы убрать упоминание, нажмите крестик рядом с именем."],
-      ["Отправьте сообщение", "Уведомления создаются после сохранения комментария. Сам текст с символом @ не заменяет выбор сотрудника в списке."],
-      ["Проверьте каналы", "Личное уведомление приходит выбранным сотрудникам в подключённый Telegram и разрешённые браузерные уведомления при включённой категории «Тест-кейсы» для кейсов или «Дефекты» для баг-репортов. Автор не получает уведомление за упоминание другого человека. Если выбрать самого себя, личное упоминание также работает, в том числе в Telegram."],
-      ["При необходимости сообщите в Slack", "Если Slack подключён к проекту, галочка **Канал Slack проекта** дополнительно отправит сообщение в общий канал проекта. Это не личное сообщение выбранному сотруднику."]),
-      note("Ответ и упоминание", "Связь ответа с исходным сообщением не является упоминанием. Если нужно вызвать уведомление коллеге, выберите его через **Призвать**."),
+    section("write", "Write a comment", steps(
+      ["Open the discussion", "In a test case or a bug report's **Overview** tab, find **Comments** with its open Markdown editor. The formatting toolbar and input are always available."],
+      ["Enter your text", "Use emphasis, lists, checklists, code, and links in the formatting toolbar. **Post** is inside the bottom right of the field and becomes available after you enter text or upload an attachment. The maximum message length, including attachment links, is 10,000 characters."],
+      ["Post it", "Click **Post**, or press Cmd+Enter on Mac or Ctrl+Enter on Windows. Repeat submission is blocked while saving. If an error occurs, your text stays in the editor: resolve the cause and try again."]),
+      note("Discussion access", "Comments are available to members who can access the relevant test case or bug report. Writing, editing, and deleting messages depend on the user's role and permissions.")),
+    section("reply", "Reply to a message", steps(
+      ["Choose the original message", "Click the reply arrow to the right of a comment or **⋯ → Reply**. This works for both the first message and any nested reply."],
+      ["Check the context", "Falcon scrolls smoothly to the shared comment field above the feed and focuses it. A quote with a blue line appears below the formatting toolbar. The editor's lower strip shows the original author's name and photo."],
+      ["Write your reply", "Type below the quote. The quote provides context and is not inserted into your text. After posting, the message appears in the appropriate thread: the original quote with its blue line, followed by your reply. If the original comment was deleted, a deletion marker replaces the quote."],
+      ["Change the recipient if needed", "Click Reply on another message to replace the quote and recipient while keeping your draft. The cross beside the recipient cancels the reply and keeps the text as a normal comment. The quote and lower strip disappear, but the editor stays open."]),
+      paragraph("New comments and replies share one input; no extra forms open beneath messages. Collapse a thread using the button below a message or by clicking its branch line; reopen it with **Show replies**.")),
+    section("attachments", "Attach an image or file", steps(
+      ["Choose files", "Click the paperclip at the bottom left of the editor. Select multiple images or files, up to 20 attachments per comment."],
+      ["Wait for uploads", "A blue upload indicator appears below each filename. Posting is unavailable while any file is uploading or has not been saved."],
+      ["Resolve errors if needed", "Click **Retry** beside a failed file or remove it with the cross. Other attachments and your text are preserved. Post the comment once uploads succeed."],
+      ["Open an attachment", "In a published comment, click an attachment to preview or open it. When editing, you can add new files or remove links to existing ones."]),
+      note("File access", "Attachments are saved in the company's private project storage. The server checks access. Removing a link from a comment does not delete the file from project storage.")),
+    section("mentions", "Mention a colleague", steps(
+      ["Choose colleagues", "Inside the editor, beside the paperclip, click **Mention**. Find an employee by name or email and select them. You can mention up to 20 company employees. Remove a mention with the cross beside the name."],
+      ["Post the message", "Notifications are created after the comment is saved. Typing @ in plain text does not replace selecting an employee from the list."],
+      ["Check delivery channels", "Selected employees receive personal notifications through connected Telegram and permitted browser notifications when the Test cases category is enabled for cases or Defects for bug reports. Authors are not notified for mentioning someone else. Mentioning yourself also works, including in Telegram."],
+      ["Notify Slack if needed", "If Slack is connected to the project, **Project Slack channel** also sends the message to the shared project channel. It is not a direct message to the selected employee."]),
+      note("Replies and mentions", "Replying to a message does not count as a mention. To notify a colleague, select them through **Mention**."),
       articles("telegram-notifications", "browser-notifications", "notifications")),
-    section("manage", "Изменить или удалить комментарий", bullets(
-      "Нажмите карандаш справа от своего сообщения или **⋯ → Изменить** (Edit). Измените текст и нажмите **Сохранить**. У сообщения появится отметка об изменении.",
-      "Для удаления выберите **⋯ → Удалить** (Delete) и подтвердите действие. Ответы сохраняются, а вместо исходного текста остаётся отметка об удалении.",
-      "Администратор и QA-менеджер могут удалять чужие комментарии в пределах своих прав. Если действие недоступно, соответствующая кнопка не отображается.",
-      "При редактировании уведомление получают новые добавленные адресаты. Ранее отправленные сообщения в Telegram и Slack автоматически не изменяются и не удаляются.")),
-    section("share", "Поделиться ссылкой", paragraph("Нажмите значок ссылки рядом с датой или **⋯ → Поделиться** (Share). Скопированная ссылка откроет нужный тест-кейс или баг-репорт, раскроет ветку и прокрутит к конкретному сообщению. Если браузер запретил копирование, появится поле для ручного копирования."),
-      note("Ссылка не выдаёт доступ", "Получателю нужны вход в компанию и права на соответствующий тест-кейс или баг-репорт. Если сообщение недоступно или не удалось загрузить его, Falcon покажет сообщение об этом и предложит повторить загрузку.")),
+    section("manage", "Edit or delete a comment", bullets(
+      "Click the pencil to the right of your message or **⋯ → Edit**. Edit the text and click **Save**. An edited label appears.",
+      "To delete, choose **⋯ → Delete** and confirm. Replies remain, while a deletion marker replaces the original text.",
+      "Administrators and QA managers can delete other people's comments within their permissions. Unavailable actions have no corresponding button.",
+      "When editing, newly added recipients are notified. Previously sent Telegram and Slack messages are not automatically updated or deleted.")),
+    section("share", "Share a link", paragraph("Click the link icon beside the date or **⋯ → Share**. The copied link opens the relevant case or bug report, expands the thread, and scrolls to the specific message. If copying is blocked, a field appears for manual copying."),
+      note("Links do not grant access", "Recipients must sign in to the company and have permission for the relevant case or bug report. If a message is unavailable or fails to load, Falcon explains the issue and offers a retry.")),
   ],
 };

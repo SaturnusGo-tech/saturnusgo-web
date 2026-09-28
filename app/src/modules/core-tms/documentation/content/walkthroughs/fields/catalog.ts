@@ -1,32 +1,32 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const customFieldsWalkthrough = walkthrough("Справочник и настройки поля", [
-  shot("fields-01-catalog-20260928", "Посмотрите поля проекта",
-    "Выберите проект и откройте **Кастомные поля**. В примере это Payments. Сверьте названия, идентификаторы и типы; строка поиска помогает найти нужное поле.",
-    "В каталоге показаны три встроенных поля и дополнительное Release channel QA. Колонки отдельно показывают множественный выбор и обязательность.",
-    "Каталог полей проекта Payments: Группа продуктов, Продукт, Регресс и дополнительное Release channel QA."),
-  shot("fields-02-definition-20260928", "Настройте новое поле",
-    "Нажмите **Создать поле**. Укажите название и уникальный идентификатор, выберите тип и одно или несколько значений. В примере заполнены **Platform**, **platform**, **String**, **Одно**; обязательность выключена. Для создания нажмите **Сохранить**.",
-    "На снимке показана форма до сохранения. Platform в этом примере не создавали. Значения можно добавлять после сохранения определения поля.",
-    "Несохранённое поле Platform с идентификатором platform, типом String, одним значением и выключенной обязательностью."),
-  shot("fields-03-product-20260928", "Откройте значения существующего поля",
-    "Вернитесь в каталог и откройте существующее поле **Продукт**. В разделе **Значения поля** нажмите **Добавить**, выберите группу **Mobile banking** и введите **Bill payments**. Кнопка **Добавить** под формой сохраняет значение.",
-    "На снимке заполнена отдельная форма продукта, а не значения Platform. Bill payments ещё не сохранён; ниже видны ранее существовавшие продукты без группы.",
-    "Настройки встроенного поля Продукт с несохранённым значением Bill payments и родительской группой Mobile banking."),
+export const customFieldsWalkthrough = walkthrough("Field catalog and settings", [
+  shot("fields-01-catalog-20260928-en-20260928", "Review the project's fields",
+    "Select a project and open **Custom fields**. The example uses Payments. Check names, identifiers and types; use search to find a specific field.",
+    "The catalog contains three built-in fields and the additional Release channel QA field. Separate columns show multiple-value support and whether a field is required.",
+    "Payments field catalog showing Product group, Product, Regression and the additional Release channel QA field."),
+  shot("fields-02-definition-20260928-en-20260928", "Define a new field",
+    "Select **Create field**. Enter a name and unique identifier, choose a type, and select one or multiple values. The example uses **Platform**, **platform**, **String** and **Single**, with Required off. Select **Save** to create it.",
+    "The screenshot shows an unsaved form. Platform was not created in this example. You can add values after saving the field definition.",
+    "Unsaved Platform field with identifier platform, String type, a single value and Required switched off."),
+  shot("fields-03-product-20260928-en-20260928", "Open an existing field's values",
+    "Return to the catalog and open **Product**. Review **Field values** and use **Find a value** to locate an existing product. **Add** opens the form for a new value when one is needed.",
+    "The screenshot shows the existing Product catalog with Release QA, Security, Transfers, Payments and Transfers QA. No value-creation form is open and no product has been added in this step.",
+    "Product field settings in Payments with existing values, Find a value, Include archived and the Add control."),
 ]);
 
-export const customFieldValuesWalkthrough = walkthrough("От справочника к значениям в кейсе", [
-  shot("fields-03-product-20260928", "Проверьте группу нового продукта",
-    "При добавлении продукта сначала выберите **Группу продуктов**, затем заполните **Значение**. На снимке подготовлен Bill payments в группе Mobile banking. Сохраняйте через **Добавить** только тот вариант, который нужен команде; **Отмена** закрывает ввод.",
-    "Это пример заполнения до сохранения; его отменили. Следующий шаг использует уже существующий продукт Transfers QA той же группы.",
-    "Форма добавления продукта Bill payments в группу Mobile banking до сохранения в справочник проекта."),
-  shot("fields-04-case-picker-20260928", "Выберите продукт в карточке",
-    "При создании кейса справа в разделе **Поля** выберите группу **Mobile banking**, затем откройте **Продукт**. При необходимости используйте **Найти значение** и нажмите **Transfers QA**.",
-    "Список показывает продукт выбранной группы. После выбора окно закроется, а значение останется в черновике кейса до его создания.",
-    "Черновик Open Falcon help: выбрана группа Mobile banking и открыт список продуктов с поиском и вариантом Transfers QA."),
-  shot("case-05-saved-20260928", "Проверьте сохранённые значения",
-    "Проверьте остальные поля и нажмите **Создать** справа внизу формы. В открывшейся карточке сверяйте выбранную группу, продукт и признак регресса в разделе **Поля**.",
-    "Кейс PAY-TC-34 сохранён как черновик. В нём указаны Mobile banking, Transfers QA и регресс false; сохранение кейса не создаёт повторные записи справочника.",
-    "Сохранённый PAY-TC-34 с группой Mobile banking, продуктом Transfers QA и значением регресса false."),
+export const customFieldValuesWalkthrough = walkthrough("From the catalog to case field values", [
+  shot("fields-03-product-20260928-en-20260928", "Review the product catalog",
+    "Open the existing **Product** field and check its values before editing a case. Use **Find a value** to locate the product. When adding a new product through **Add**, select its product group as well as its name.",
+    "The screenshot shows existing values; entries without a group are marked Unclassified. The next step uses the existing Transfers QA product in the Mobile banking group.",
+    "Payments Product field catalog with existing products and Unclassified labels beneath values that have no group."),
+  shot("fields-04-case-picker-20260928-en-20260928", "Choose a product in an existing case",
+    "Open PAY-TC-34 and select the pencil beside **Custom fields**. Choose **Mobile banking**, then open **Product**. Search with **Find a value** if needed and select **Transfers QA**.",
+    "The screenshot edits the saved Open Falcon help case with Transfers QA selected. **Apply** updates the field editor; the main **Save** button saves the case revision.",
+    "Existing PAY-TC-34 in editing mode with Mobile banking, the open Transfers QA picker and Apply and Save controls."),
+  shot("case-05-saved-20260928-en-20260928", "Check the saved values",
+    "Apply the custom-field changes and select the main **Save** button. In the saved case, review the selected product group, product and regression flag under **Custom fields**.",
+    "PAY-TC-34 has Draft status, Mobile banking, Transfers QA and regression false. Saving the case does not create duplicate entries in the field catalog.",
+    "Saved PAY-TC-34 with Mobile banking as the product group, Transfers QA as the product and regression false."),
 ]);

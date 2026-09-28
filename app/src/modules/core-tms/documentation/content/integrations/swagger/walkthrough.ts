@@ -1,25 +1,17 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../../walkthroughs/media/screenshot-step";
 
-export const swaggerWalkthrough = walkthrough("От адреса OpenAPI до запроса в Swagger", [
-  shot("swagger-01-catalog-20260914", "Откройте подключённые API",
-    "В **Хуки → Swagger** откройте список подключений. Выберите существующий API либо нажмите **Подключить API** для новой спецификации.",
-    "У каждого API показаны адрес документа и связанные проекты. Общую спецификацию не требуется добавлять заново для каждого проекта.",
-    "Каталог подключённых API Falcon с адресами OpenAPI и названиями связанных проектов."),
-  shot("swagger-01-connection-20260914", "Назначьте API нужным проектам",
-    "В настройках укажите прямой URL JSON/YAML и название. В **Используется в проектах** отметьте нужные проекты или всё рабочее пространство. На снимке Petstore связан с Falcon Guide.",
-    "Кнопка **Сохранить API** применяет настройки подключения. Изменения адреса и отключение влияют на все связанные проекты.",
-    "Новая панель настройки API: адрес Petstore, способ доступа и выбор проектов рабочего пространства."),
-  shot("swagger-02-auth-20260914", "Настройте доступ к закрытому документу",
-    "В **Доступ к документации** выберите **Логин и пароль** либо **Bearer token**. Заполните данные доступа к самой спецификации. Публичному Petstore авторизация не требуется.",
-    "На снимке показаны пустые поля необязательной настройки, без сохранения. Эти данные не заменяют авторизацию операций API.",
-    "Настройки API с выбранным доступом Логин и пароль и пустыми полями без секретных данных."),
-  shot("swagger-03-operations-20260914", "Найдите нужную группу операций",
-    "Откройте **API Testing** в глобальном сайдбаре. Выберите адрес в **Сервер запросов** и отфильтруйте список по тегу: в примере введён **store**. Для защищённых запросов используйте **Authorize** с данными доступа к API.",
-    "Список показывает методы и пути выбранного API. Кнопка **Подключения** открывает каталог API, а соседняя кнопка обновления заново читает спецификацию.",
-    "API Testing с фильтром store, сервером Petstore, кнопкой Authorize и списком GET, POST и DELETE."),
-  shot("swagger-04-request-20260914", "Заполните параметры и выполните запрос",
-    "Раскройте **GET /store/order/{orderId}**, нажмите **Try it out** и укажите ID заказа. На снимке подготовлен **orderId = 1**, запрос ещё не отправлен. Нажмите **Execute**, затем проверьте фактические Server response, HTTP-код и тело ответа.",
-    "Раздел Responses ниже описывает контракт, а не результат выполнения. На общем Petstore данные могут меняться: ответ 404 или 500 нужно отличать от ошибки подключения спецификации. Для рабочих проверок используйте своё тестовое окружение.",
-    "Раскрытый GET заказа с параметром orderId, кнопкой Execute и описанием ожидаемых ответов."),
+export const swaggerWalkthrough = walkthrough("Prepare an API connection", [
+  shot("swagger-01-catalog-20260914-en-20260928", "Open connected APIs",
+    "In **Hooks → Swagger**, open the connection list and click **Connect API** to prepare a new specification. This example starts with an empty catalog.",
+    "No API has been connected in this screenshot. A shared API can serve several projects; you do not need a separate connection for each one.",
+    "Empty connected API catalog in Falcon with the Connect API action."),
+  shot("swagger-01-connection-20260914-en-20260928", "Assign the API to projects",
+    "Enter **Petstore** and **https://petstore3.swagger.io/api/v3/openapi.json**. Under **Used in projects**, search for **Payments** in **Find project** and select it. For your own connection, use your specification and project.",
+    "The screenshot is an unsaved settings preview with Payments selected and No authentication chosen. After entering valid details, use the blue **Save API** checkmark at the top right; this example does not show a created connection.",
+    "Unsaved Petstore API settings with the direct OpenAPI URL and Payments selected in the filtered project list."),
+  shot("swagger-02-auth-20260914-en-20260928", "Configure access to a protected document",
+    "Under **Documentation access**, choose **Username and password** or **Bearer token**. Enter credentials for the specification itself. Public Petstore needs no authorization.",
+    "This optional settings preview has empty credential fields and was canceled without saving. These credentials do not replace authorization for API operations; follow the request instructions below after connecting a valid specification.",
+    "API settings with Username and password selected and empty fields containing no secrets."),
 ]);

@@ -1,20 +1,20 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const defectWalkthrough = walkthrough("Заполнение нового баг-репорта", [
-  shot("defect-01-context-20260913",
-    "Назовите проблему и опишите воспроизведение",
-    "В **Отчётах** нажмите **Новый баг-репорт**. Укажите конкретное отклонение в названии, затем откройте описание нажатием на текст или карандаш.",
-    "На снимках явно обозначен учебный пример заполнения формы. Он не является обнаруженным дефектом и не отправлялся в трекер.",
-    "Новая форма баг-репорта с названием учебного примера и описанием воспроизведения."),
-  shot("defect-02-fields-20260913",
-    "Разделите фактический и ожидаемый результат",
-    "Откройте **Фактический результат** и опишите наблюдение. Markdown-редактор поддерживает заголовки, списки, маркер и Falcon AI. Ожидаемое поведение укажите в отдельном поле.",
-    "Кнопка с галочкой у раздела закрывает редактирование поля. Создание всего баг-репорта выполняется отдельно в верхней панели.",
-    "Открытый Markdown-редактор фактического результата в новом сайдбаре баг-репорта."),
-  shot("defect-routing-light-20260914",
-    "Проверьте свойства и передачу",
-    "Укажите компонент, серьёзность, приоритет и воспроизводимость. Добавьте подтверждающие материалы. Вопросик у **Передачи** объясняет назначение маршрута и открывает руководство.",
-    "Перед сохранением проверьте все поля и выбранный маршрут. Пример на снимке оставлен несохранённым, поэтому у него ещё нет ключа дефекта.",
-    "Заполненные результаты учебного дефекта и открытая справка о передаче в трекер."),
+export const defectWalkthrough = walkthrough("Prepare a bug report from a test case", [
+  shot("defect-01-context-20260913-en-20260928",
+    "Check the source case",
+    "Open **PAY-TC-34 · Open Falcon help** and review its scenario and expected result. Use the case's **More actions** menu to start a bug report when an observed discrepancy needs to be recorded.",
+    "The screenshot shows the saved case before its action menu is opened. The following report is explicitly hypothetical; no actual defect was discovered, saved or sent to a tracker in this example.",
+    "Saved PAY-TC-34 Open Falcon help case with its highlighted description, scenario and expected result before opening More actions."),
+  shot("defect-02-fields-20260913-en-20260928",
+    "Separate actual and expected results",
+    "In **New bug report**, enter a specific title and describe the observation under **Actual result**. Keep the intended behavior in **Expected result**. This example is titled **Example only: guide search does not appear** and labels its observation as hypothetical.",
+    "The unsaved form inherits the case description. It describes a visible article list with a missing search field, while the expected result requires both. The top checkmark creates the report; it has not been used in this example.",
+    "Unsaved bug report for PAY-TC-34 with a hypothetical missing-search observation and separate actual and expected results."),
+  shot("defect-routing-light-20260914-en-20260928",
+    "Check properties and delivery",
+    "Review the component, severity, priority, reproducibility and assignee, then open **Delivery**. This example uses Transfers QA, High severity, Medium priority, Always and Not assigned. When a tracker is connected and available, choose the intended delivery route.",
+    "Only **Automatic** appears in this demo because no tracker is enabled. The screenshot does not show an external destination or successful delivery. The example remains unsaved with no defect key, and no external message was sent.",
+    "Hypothetical bug report with the Delivery picker expanded and Automatic as its only available option."),
 ]);

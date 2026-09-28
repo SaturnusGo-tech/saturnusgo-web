@@ -14,10 +14,10 @@ export function CopyButton({ value, label }: { value: string | (() => string); l
   return <span className={styles.copyControl}>
     <button type="button" className={styles.quietButton} onClick={() => void copy()} aria-label={label}>
       {state === "copied" ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
-      <span>{state === "copied" ? "Скопировано" : label}</span>
+      <span>{state === "copied" ? "Copied" : label}</span>
     </button>
     <span className={state === "failed" ? styles.copyError : styles.srOnly} role="status">
-      {state === "copied" ? "Скопировано" : state === "failed" ? "Не удалось скопировать. Выделите текст или скопируйте адрес из браузера." : ""}
+      {state === "copied" ? "Copied" : state === "failed" ? "Could not copy. Select the text or copy the address from your browser." : ""}
     </span>
   </span>;
 }

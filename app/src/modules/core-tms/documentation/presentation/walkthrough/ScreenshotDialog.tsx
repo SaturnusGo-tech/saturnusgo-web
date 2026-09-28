@@ -28,16 +28,16 @@ export function ScreenshotDialog({ steps, selected, onSelect }: {
       if (event.key === "ArrowRight" && selected < steps.length - 1) { event.preventDefault(); onSelect(selected + 1); }
     }}>
     {step && selected !== null && <div className={styles.viewer}>
-      <header><div><span>Шаг {selected + 1} из {steps.length}</span><h2 id={titleId}>{step.title}</h2></div>
-        <button type="button" onClick={() => onSelect(null)} aria-label="Закрыть снимок" autoFocus><X size={20} /></button>
+      <header><div><span>Step {selected + 1} of {steps.length}</span><h2 id={titleId}>{step.title}</h2></div>
+        <button type="button" onClick={() => onSelect(null)} aria-label="Close screenshot" autoFocus><X size={20} /></button>
       </header>
-      <div className={styles.imageScroll} role="region" tabIndex={0} aria-label="Снимок интерфейса; прокрутите для просмотра деталей">
+      <div className={styles.imageScroll} role="region" tabIndex={0} aria-label="Interface screenshot; scroll to see details">
         <img key={step.image.src} src={step.image.src} alt={step.image.alt} width={step.image.width} height={step.image.height} />
       </div>
-      <span className={styles.panHint}>Сдвиньте изображение, чтобы рассмотреть детали.</span>
-      <footer><p id={descriptionId}><InlineText text={step.result} /></p><nav aria-label="Шаги инструкции">
-        <button type="button" disabled={selected === 0} onClick={() => onSelect(selected - 1)} aria-label="Предыдущий снимок"><ArrowLeft size={18} /></button>
-        <button type="button" disabled={selected === steps.length - 1} onClick={() => onSelect(selected + 1)} aria-label="Следующий снимок"><ArrowRight size={18} /></button>
+      <span className={styles.panHint}>Pan the image to see details.</span>
+      <footer><p id={descriptionId}><InlineText text={step.result} /></p><nav aria-label="Walkthrough steps">
+        <button type="button" disabled={selected === 0} onClick={() => onSelect(selected - 1)} aria-label="Previous screenshot"><ArrowLeft size={18} /></button>
+        <button type="button" disabled={selected === steps.length - 1} onClick={() => onSelect(selected + 1)} aria-label="Next screenshot"><ArrowRight size={18} /></button>
       </nav></footer>
     </div>}
   </dialog>;

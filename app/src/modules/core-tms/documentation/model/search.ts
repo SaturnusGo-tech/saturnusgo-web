@@ -12,7 +12,7 @@ export function blockText(block: DocBlock): string {
     case "articles": return "";
   }
 }
-const normalize = (text: string) => text.toLocaleLowerCase("ru").replaceAll("ё", "е").replace(/[**`]/g, "");
+const normalize = (text: string) => text.toLocaleLowerCase("en").replace(/[**`]/g, "");
 export const articleText = (article: DocArticle) => article.sections.map((s) => `${s.title} ${s.blocks.map(blockText).join(" ")}`).join(" ");
 export const readingMinutes = (article: DocArticle) => Math.max(1, Math.ceil(articleText(article).split(/\s+/).length / 180));
 

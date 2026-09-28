@@ -26,6 +26,12 @@ test("every documented article and section is addressable and all cross-links re
     assert.ok(readingMinutes(article) >= 1);
   }
 });
+test("the built-in article catalog and walkthroughs contain English copy", () => {
+  assert.doesNotMatch(JSON.stringify(docGroups), /[\u0400-\u04ff]/u);
+  for (const article of docArticles) {
+    assert.doesNotMatch(JSON.stringify(article), /[\u0400-\u04ff]/u, article.id);
+  }
+});
 test("all catalog services are documented with accurate implementation availability", () => {
   for (const integration of INTEGRATIONS) {
     const article = articleById.get(integration.id);
@@ -34,11 +40,12 @@ test("all catalog services are documented with accurate implementation availabil
     assert.equal(article.status === "planned", !available, integration.id);
   }
 });
-test("search finds Russian tasks, service names and body terms without case or ё sensitivity", () => {
-  assert.equal(searchArticles(docArticles, "удалить кейс")[0]?.article.id, "archive-test-case");
-  assert.equal(searchArticles(docArticles, "SLACK канал")[0]?.article.id, "slack");
+test("search finds English tasks, service names and body terms without case sensitivity", () => {
+  assert.equal(searchArticles(docArticles, "delete case")[0]?.article.id, "archive-test-case");
+  assert.equal(searchArticles(docArticles, "SLACK channel")[0]?.article.id, "slack");
   assert.equal(searchArticles(docArticles, "TeamCity")[0]?.article.id, "teamcity");
-  assert.deepEqual(searchArticles(docArticles, "отчёт").map((r) => r.article.id), searchArticles(docArticles, "отчет").map((r) => r.article.id));
+  assert.ok(searchArticles(docArticles, "report").length > 0);
+  assert.deepEqual(searchArticles(docArticles, "REPORT").map((r) => r.article.id), searchArticles(docArticles, "report").map((r) => r.article.id));
   assert.ok(searchArticles(docArticles, "signing secret").length > 0);
   assert.deepEqual(searchArticles(docArticles, " \n "), []);
   assert.deepEqual(searchArticles(docArticles, "zzznomatchingarticle"), []);

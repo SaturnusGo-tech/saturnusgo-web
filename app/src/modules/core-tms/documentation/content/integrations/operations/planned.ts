@@ -2,37 +2,37 @@ import { articles, note, paragraph, section, steps, type DocArticle } from "../.
 
 export const plannedIntegrations: DocArticle[] = [
   { id: "gitlab", title: "GitLab", group: "integrations", status: "planned",
-    description: "Текущий статус интеграции GitLab и способ сохранить контекст merge request или pipeline в проверке.",
-    keywords: ["GitLab", "гитлаб", "merge request", "pipeline", "CI"], related: ["github", "create-run"],
+    description: "The current GitLab integration status and how to retain merge request or pipeline context in a test.",
+    keywords: ["GitLab", "gitlab", "merge request", "pipeline", "CI"], related: ["github", "create-run"],
     sections: [
-      section("status", "Статус: скоро", note("Подключение пока недоступно", "В каталоге Falcon карточка GitLab помечена «Скоро». Формы подключения, обработчика webhook GitLab и автоматического создания ранов по merge request или pipeline сейчас нет.")),
-      section("today", "Как работать сейчас", steps(
-        ["Создайте ран вручную", "Подберите кейсы или сьют в Falcon, укажите целевое окружение."],
-        ["Зафиксируйте сборку", "Используйте точный commit SHA или идентификатор pipeline, который вы проверяете."],
-        ["Сохраните контекст", "Добавьте ссылку на merge request или pipeline в описание связанного дефекта или материалы проверки, когда это нужно для воспроизведения."],
-        ["Передайте итог команде", "После выполнения используйте ссылку на прогон. Обратный статус в GitLab автоматически не публикуется."])),
-      section("next", "Готовая автоматизация", paragraph("Для репозиториев GitHub уже доступна настройка прогонов по изменениям кода и падениям Actions. Это отдельный коннектор: webhook GitLab нельзя направлять на его endpoint."), articles("github", "test-suites")),
+      section("status", "Status: coming soon", note("Connection is not yet available", "GitLab is marked Coming soon in the Falcon catalog. There is currently no connection form, GitLab webhook handler, or automatic run creation from merge requests or pipelines.")),
+      section("today", "How to work today", steps(
+        ["Create a run manually", "Choose cases or a suite in Falcon and specify the target environment."],
+        ["Record the build", "Use the exact commit SHA or pipeline identifier you are testing."],
+        ["Keep the context", "Add the merge request or pipeline link to a related defect's description or test evidence when needed for reproduction."],
+        ["Share the result with the team", "After execution, use the run link. A return status is not published to GitLab automatically."])),
+      section("next", "Available automation", paragraph("GitHub repositories already support runs from code changes and Actions failures. This is a separate connector; do not send GitLab webhooks to its endpoint."), articles("github", "test-suites")),
     ] },
   { id: "teamcity", title: "TeamCity", group: "integrations", status: "planned",
-    description: "Что доступно для проверок сборок TeamCity до появления встроенного коннектора.",
-    keywords: ["TeamCity", "тимсити", "build configuration", "CI", "сборки"], related: ["create-run", "slack"],
+    description: "What is available for testing TeamCity builds before a built-in connector arrives.",
+    keywords: ["TeamCity", "teamcity", "build configuration", "CI", "builds"], related: ["create-run", "slack"],
     sections: [
-      section("status", "Статус: скоро", note("Автоматический обмен не подключён", "Карточка TeamCity есть в каталоге Falcon со статусом «Скоро». Сейчас нельзя настроить автоматический запуск Falcon по build configuration, импорт результатов или обратную публикацию в TeamCity через эту карточку.")),
-      section("today", "Проверить сборку вручную", steps(
-        ["Выберите проверяемую сборку", "В TeamCity зафиксируйте build number и revision, а также целевой стенд."],
-        ["Запустите нужный набор в Falcon", "Укажите ту же сборку и окружение. Состав запуска выберите по области изменений."],
-        ["Оформите результат", "Запишите фактическое поведение и ссылки на логи в материалах дефекта. Не объявляйте падение CI успешным на основании одного статуса Falcon."])),
-      section("notifications", "Уведомления о ручной проверке", paragraph("Подключённый Slack может сообщать о создании и завершении этого рана. Получение самого события падения TeamCity пока не реализовано."), articles("slack", "execute-run")),
+      section("status", "Status: coming soon", note("Automatic exchange is not connected", "The Falcon catalog includes a TeamCity card marked Coming soon. It does not currently configure automatic Falcon runs by build configuration, result imports, or return publishing to TeamCity.")),
+      section("today", "Test a build manually", steps(
+        ["Choose the build under test", "In TeamCity, record the build number, revision, and target test environment."],
+        ["Run the relevant suite in Falcon", "Specify the same build and environment. Choose tests based on the changed area."],
+        ["Record the result", "Document actual behavior and log links in defect evidence. Do not call a failed CI build successful based solely on one Falcon status."])),
+      section("notifications", "Manual test notifications", paragraph("Connected Slack can report creation and completion of this run. Receiving TeamCity failure events is not implemented yet."), articles("slack", "execute-run")),
     ] },
   { id: "jenkins", title: "Jenkins", group: "integrations", status: "planned",
-    description: "Как учитывать сборки Jenkins в Falcon и какие возможности пока не реализованы.",
-    keywords: ["Jenkins", "дженкинс", "job", "pipeline", "автотесты", "JUnit"], related: ["create-run", "test-suites"],
+    description: "How to track Jenkins builds in Falcon and which features are not yet implemented.",
+    keywords: ["Jenkins", "jenkins", "job", "pipeline", "automated tests", "JUnit"], related: ["create-run", "test-suites"],
     sections: [
-      section("status", "Статус: скоро", note("Коннектор ещё недоступен", "В каталоге Falcon Jenkins помечен «Скоро». Через эту карточку нельзя запустить job, принять pipeline webhook или импортировать JUnit-отчёт.")),
-      section("today", "Зафиксировать ручное тестирование", steps(
-        ["Выберите job и build", "Уточните версию, которая развёрнута на стенде, и зафиксируйте номер сборки."],
-        ["Создайте ран Falcon", "Выберите нужный сьют и окружение. В поле сборки укажите идентификатор проверяемого артефакта."],
-        ["Выполните проверку", "В случае ошибки приложите ссылку на job/build и нужный фрагмент лога к дефекту. Ссылка служит контекстом, а не подключением автоматической синхронизации."])),
-      section("scope", "Автотесты и ручной результат", paragraph("Falcon хранит результаты выполненной в нём проверки. Наличие типа кейса или ссылки на Jenkins не означает, что runner автотестов запущен. Доступная событийная автоматизация описана в статье GitHub."), articles("github", "execute-run")),
+      section("status", "Status: coming soon", note("The connector is not yet available", "Jenkins is marked Coming soon in the Falcon catalog. Its card cannot start a job, receive a pipeline webhook, or import a JUnit report.")),
+      section("today", "Record manual testing", steps(
+        ["Choose the job and build", "Confirm the version deployed to the environment and record the build number."],
+        ["Create a Falcon run", "Choose the relevant suite and environment. Use the tested artifact's identifier in the build field."],
+        ["Execute the test", "If a failure occurs, attach the job/build link and relevant log excerpt to the defect. The link provides context; it does not enable automatic synchronization."])),
+      section("scope", "Automated tests and manual results", paragraph("Falcon stores results of testing performed within it. A case type or Jenkins link does not mean an automated test runner has started. Available event-driven automation is described in the GitHub article."), articles("github", "execute-run")),
     ] },
 ];

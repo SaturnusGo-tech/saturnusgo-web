@@ -1,21 +1,21 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const archiveCaseWalkthrough = walkthrough("Архивирование и восстановление кейса", [
-  shot("case-05-saved-20260913", "Проверьте кейс и нажмите Карантин",
-    "Откройте карточку. Сверьте проект, ключ и название — особенно если в базе есть похожие сценарии. **Карантин** относится ко всему кейсу, а не к одному его шагу.",
-    "Falcon убирает кейс из активной базы. Результаты прежних прогонов сохраняются.",
-    "В верхней части карточки GUIDEWEB-TC-1 видна кнопка Карантин."),
-  shot("archive-01-removed-20260913", "Убедитесь, что кейс в архиве",
-    "После операции карточка показывает **В архиве**, а вместо архивирования появляется **Восстановить**. Закройте карточку, чтобы вернуться в список.",
-    "Кейс больше не участвует в обычной активной выборке. Его можно вернуть без повторного создания.",
-    "Архивная карточка тест-кейса со статусом В архиве и действием Восстановить."),
-  shot("archive-02-filter-20260913", "Найдите архивный кейс позже",
-    "В списке откройте **Фильтры** и включите **Показывать архивные**. Если запись не находится, проверьте также поисковую строку, папку, теги и остальные фильтры.",
-    "В выборке могут отображаться и активные, и архивные записи. Выберите нужную по ключу и статусу.",
-    "Раскрыты фильтры тест-кейсов; доступен переключатель Показывать архивные."),
-  shot("archive-03-restore-20260913", "Верните актуальный сценарий в работу",
-    "Откройте архивную карточку и нажмите **Восстановить**. Затем перечитайте предусловия и ожидания: техническое восстановление не проверяет актуальность требований.",
-    "Кейс возвращается в активную базу с сохранённым ключом. После этого его снова можно включать в прогоны.",
-    "Восстановленный GUIDEWEB-TC-1 вновь отображается в активной базе со статусом Черновик."),
+export const archiveCaseWalkthrough = walkthrough("Archive and restore a test case", [
+  shot("case-05-saved-20260913-en-20260928", "Check the case and select Quarantine",
+    "Open the case details. Verify the project, key and title, especially when similar scenarios exist. **Quarantine** applies to the whole case rather than an individual step.",
+    "Falcon removes the case from the active repository. Results from previous runs are preserved.",
+    "The Quarantine button is visible at the top of the PAY-TC-34 case details."),
+  shot("archive-01-removed-20260913-en-20260928", "Confirm the case is archived",
+    "After the action, the case displays **Archived** and the archive action becomes **Restore**. Close the case details to return to the list.",
+    "The case no longer appears in the normal active selection. You can restore it without creating it again.",
+    "Archived test case details with Archived status and the Restore action."),
+  shot("archive-02-filter-20260913-en-20260928", "Find the archived case later",
+    "In the list, open **Filters** and enable **Include archived**. If the case is missing, also check the search text, folder, tags and other filters.",
+    "The selection may contain both active and archived cases. Use the key and status to choose the correct one.",
+    "Expanded test case filters with the Include archived toggle available."),
+  shot("archive-03-restore-20260913-en-20260928", "Return a current scenario to use",
+    "Open the archived case and select **Restore**. Then reread its preconditions and expectations: restoring a case does not verify that its requirements are current.",
+    "PAY-TC-34 returns to the active repository with Draft status and the same key. The Quarantine action is available again, and you can include the case in runs.",
+    "Restored PAY-TC-34 case appears in the active repository with Draft status."),
 ]);

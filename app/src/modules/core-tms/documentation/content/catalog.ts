@@ -30,13 +30,13 @@ import { notificationChannelArticles } from "./notifications/channels";
 import type { DocArticle } from "../model/article";
 
 export const docGroups = [
-  { id: "start", title: "Начало работы" },
-  { id: "cases", title: "Тестовая база" },
-  { id: "runs", title: "Прогоны и результаты" },
-  { id: "defects", title: "Работа с дефектами" },
-  { id: "notifications", title: "Уведомления" },
-  { id: "integrations", title: "Интеграции" },
-  { id: "reference", title: "Справочник" },
+  { id: "start", title: "Getting started" },
+  { id: "cases", title: "Test repository" },
+  { id: "runs", title: "Runs and results" },
+  { id: "defects", title: "Working with defects" },
+  { id: "notifications", title: "Notifications" },
+  { id: "integrations", title: "Integrations" },
+  { id: "reference", title: "Reference" },
 ] as const;
 export const docArticles: readonly DocArticle[] = [
   supportArticle,

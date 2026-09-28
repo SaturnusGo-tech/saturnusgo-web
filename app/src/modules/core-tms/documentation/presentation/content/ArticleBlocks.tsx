@@ -32,7 +32,7 @@ function Block({ block, navigation }: { block: DocBlock; navigation: Navigation 
       </aside>;
     }
     case "code": return <figure className={styles.codeBlock}>
-      <figcaption><span>{block.caption}</span><CopyButton value={block.text} label="Копировать пример" /></figcaption>
+      <figcaption><span>{block.caption}</span><CopyButton value={block.text} label="Copy example" /></figcaption>
       <pre tabIndex={0} aria-label={block.caption}><code>{block.text}</code></pre><span className={styles.codeLanguage}>{block.language}</span>
     </figure>;
     case "table": return <div className={styles.tableScroll} role="region" aria-label={block.columns.join(" · ")} tabIndex={0}>

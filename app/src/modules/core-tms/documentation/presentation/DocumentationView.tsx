@@ -61,12 +61,12 @@ export function DocumentationView() {
   }, [navigation.articleId, searching]);
 
   function select() { setQuery(""); setTreeOpen(false); }
-  return <section className={styles.root} data-documentation-workspace lang="ru" aria-label="Документация Falcon">
+  return <section className={styles.root} data-documentation-workspace lang="en" aria-label="Falcon documentation">
     <header className={styles.header}>
-      <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? "Скрыть дерево статей" : "Показать дерево статей"}
+      <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? "Hide article tree" : "Show article tree"}
         aria-expanded={treeOpen} aria-controls="documentation-sidebar" onClick={() => setTreeOpen((current) => !current)}>{treeOpen ? <X size={18} /> : <Menu size={18} />}</button>
-      <BookOpen size={17} aria-hidden="true" /><span>Документация</span><span className={styles.headerDivider}>/</span><strong>{searching ? "Поиск" : article?.title ?? "Статья не найдена"}</strong>
-      <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? "Включить тёмную тему" : "Включить светлую тему"}
+      <BookOpen size={17} aria-hidden="true" /><span>Documentation</span><span className={styles.headerDivider}>/</span><strong>{searching ? "Search" : article?.title ?? "Article not found"}</strong>
+      <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? "Switch to dark theme" : "Switch to light theme"}
         onClick={(event) => toggleAnimated({ x: event.clientX, y: event.clientY })}>{isLight ? <Moon size={16} /> : <Sun size={16} />}</button>
     </header>
     <div className={styles.frame}>
@@ -77,13 +77,13 @@ export function DocumentationView() {
         <div ref={scrollRef} className={styles.scroll}>
           {searching ? <SearchResults query={query.trim()} navigation={navigation} onSelect={select} /> : article
             ? <DocumentationArticle key={article.id} article={article} navigation={navigation} />
-            : <section className={styles.searchResults}><span className={styles.eyebrow}>Руководство Falcon</span><h1>Статья не найдена</h1>
-              <p>Возможно, ссылка устарела. Выберите статью в дереве или воспользуйтесь поиском.</p>
-              <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>Открыть руководство</a></section>}
+            : <section className={styles.searchResults}><span className={styles.eyebrow}>Falcon guide</span><h1>Article not found</h1>
+              <p>This link may be outdated. Select an article in the tree or use search.</p>
+              <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>Open the guide</a></section>}
         </div>
-        {!searching && article && <nav className={styles.toc} aria-label="На этой странице"><strong>На этой странице</strong>
+        {!searching && article && <nav className={styles.toc} aria-label="On this page"><strong>On this page</strong>
           {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)} aria-current={activeSection === s.id ? "location" : undefined}>{s.title}</a>)}
-          <div className={styles.tocNote}>Здесь — инструкция.<br />Все изменения выполняются в рабочих разделах Falcon.</div>
+          <div className={styles.tocNote}>This is the guide.<br />Make changes in the Falcon workspace.</div>
         </nav>}
       </div>
     </div>

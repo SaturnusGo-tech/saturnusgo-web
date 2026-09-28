@@ -6,21 +6,27 @@ import * as model from "../../model/sidebar-navigation";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 
 function menu() {
-  const h = componentHarness(); let outside = () => {}; let focus = 0;
+  const h = componentHarness(); let focus = 0;
+  let popup: { kind: "context" | "sections" } | null = null;
+  const dismiss = () => { popup = null; };
   const { SidebarSectionsMenu: renderMenu } = h.load<{ SidebarSectionsMenu: typeof SidebarSectionsMenu }>(
     new URL("../SidebarSectionsMenu.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
       if (name.endsWith("sidebar-navigation")) return model;
-      if (name.endsWith("useAnchoredPopup")) return { useAnchoredPopup: (_open: boolean, _inline: boolean, _root: unknown, _trigger: unknown, _panel: unknown, close: () => void) => { outside = close; } };
+      if (name.endsWith("useSidebarSectionsPopup")) return { useSidebarSectionsPopup: () => ({ popup,
+        root: { current: null }, panel: { current: null }, dismiss,
+        close: () => { dismiss(); focus++; }, openSections: () => { popup = { kind: "sections" }; } }) };
     });
   const navigated: string[] = []; const pinned: string[] = []; const modes: string[] = [];
-  const props: ComponentProps<typeof SidebarSectionsMenu> = { collapsed: false, availableIds: ["hooks", "cases", "dashboard"], activeId: "cases",
+  const props: ComponentProps<typeof SidebarSectionsMenu> = { sidebar: { current: null }, availableIds: ["hooks", "cases", "dashboard"], activeId: "cases",
     preferences: { mode: "all", pinned: ["hooks"] }, disabled: false,
     onMode: value => modes.push(value), onTogglePinned: value => pinned.push(value), onNavigate: value => navigated.push(value) };
   const render = () => nodes(h.render(() => renderMenu(props)));
   const trigger = () => render().find(node => node.props["data-testid"] === "nav-all-sections")!;
-  const open = () => { (trigger().props.ref as { current: unknown }).current = { focus() { focus++; } }; invoke(trigger(), "onClick"); };
-  return { props, render, trigger, open, navigated, pinned, modes, focus: () => focus, outside: () => outside() };
+  const openContext = () => { popup = { kind: "context" }; };
+  const open = () => { openContext(); invoke(trigger(), "onClick"); };
+  return { props, render, trigger, open, openContext, visible: () => popup !== null,
+    navigated, pinned, modes, focus: () => focus, outside: dismiss };
 }
 
 test("all sections lists only allowed routes in canonical order and marks the current page", () => {
@@ -41,28 +47,28 @@ test("pinning and changing modes keep the menu open without navigating", () => {
   const mode = h.render().find(node => node.props["data-sidebar-mode"] === "contextual")!;
   invoke(mode, "onChange");
   assert.deepEqual(h.pinned, ["hooks"]); assert.deepEqual(h.modes, ["contextual"]);
-  assert.deepEqual(h.navigated, []); assert.equal(h.trigger().props["aria-expanded"], true);
+  assert.deepEqual(h.navigated, []); assert.equal(h.visible(), true);
 });
 
 test("navigation and Escape close the popup and restore focus", () => {
   const h = menu(); h.open();
   invoke(h.render().find(node => node.props["data-sidebar-section"] === "hooks")!, "onClick");
-  assert.deepEqual(h.navigated, ["hooks"]); assert.equal(h.trigger().props["aria-expanded"], false); assert.equal(h.focus(), 1);
+  assert.deepEqual(h.navigated, ["hooks"]); assert.equal(h.visible(), false); assert.equal(h.focus(), 1);
   h.open(); let prevented = false; let stopped = false;
   invoke(h.render()[0], "onKeyDown", { key: "Escape", preventDefault() { prevented = true; }, stopPropagation() { stopped = true; } });
   assert.equal(prevented, true); assert.equal(stopped, true); assert.equal(h.focus(), 2);
-  assert.equal(h.trigger().props["aria-expanded"], false);
+  assert.equal(h.visible(), false);
 });
 
 test("outside dismissal preserves pointer focus", () => {
   const h = menu(); h.open(); h.outside();
-  assert.equal(h.trigger().props["aria-expanded"], false); assert.equal(h.focus(), 0);
+  assert.equal(h.visible(), false); assert.equal(h.focus(), 0);
 });
 
 test("without a project the launcher, modes and pins work while only portfolios and API can navigate", () => {
   const h = menu(); h.props.disabled = true; h.props.availableIds = ["cases", "portfolios", "api"];
-  assert.notEqual(h.trigger().props.disabled, true); h.open();
-  assert.equal(h.trigger().props["aria-expanded"], true);
+  h.openContext(); assert.notEqual(h.trigger().props.disabled, true); h.open();
+  assert.equal(h.visible(), true);
   const rows = h.render().filter(node => node.props["data-sidebar-section"]);
   assert.deepEqual(rows.map(node => [node.props["data-sidebar-section"], node.props.disabled]), [["cases", true], ["portfolios", false], ["api", false]]);
   invoke(h.render().find(node => node.props["data-sidebar-mode"] === "contextual")!, "onChange");
@@ -72,10 +78,17 @@ test("without a project the launcher, modes and pins work while only portfolios 
   assert.deepEqual(h.navigated, ["api"]);
 });
 
-test("collapsed trigger retains an accessible name while exposing a label hook", () => {
-  const h = menu(); h.props.collapsed = true;
-  assert.equal(h.trigger().props["aria-label"], "All sections");
-  assert.equal(h.render()[0].props["data-collapsed"], true);
-  assert.equal(h.trigger().props["data-nav-label"], "All sections");
-  assert.equal(h.trigger().props.title, undefined);
+test("context action has menu semantics and opens the sections dialog", () => {
+  const h = menu(); h.openContext();
+  assert.equal(h.trigger().props.role, "menuitem");
+  assert.equal(h.trigger().props["aria-haspopup"], "dialog");
+  assert.equal(h.render().some(node => node.props.role === "menu"), true);
+  invoke(h.trigger(), "onClick");
+  assert.equal(h.render().some(node => node.props.role === "menu"), false);
+  assert.equal(h.render().some(node => node.props.role === "dialog"), true);
+});
+
+test("sections launcher is absent from the resting sidebar", () => {
+  const h = menu();
+  assert.equal(h.render().some(node => node.props["data-testid"] === "nav-all-sections"), false);
 });
