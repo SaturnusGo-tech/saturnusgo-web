@@ -7,13 +7,6 @@ export function notificationClient(http: TmsHttpClient, workspaceId: string): No
   return {
     settings: async (signal) =>
       (await http.get<Schemas["NotificationSettingsResponse"]>(path("/settings"), signal)).data,
-    inbox: async (cursor, signal) => {
-      const p = await http.get<Schemas["NotificationPage"]>(
-        path() + (cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""),
-        signal,
-      );
-      return { items: p.data, next: p.meta.nextCursor };
-    },
     preferences: async (categories, locale, version, signal) => {
       await http.mutateResource(
         path("/settings"),
@@ -38,9 +31,6 @@ export function notificationClient(http: TmsHttpClient, workspaceId: string): No
     },
     disconnect: async (channel, signal, destinationId) => {
       await http.mutate(path("/disconnect"), "POST", { channel, destinationId }, signal);
-    },
-    read: async (id, signal) => {
-      await http.mutate(path(`/${encodeURIComponent(id)}/read`), "POST", undefined, signal);
     },
   };
 }

@@ -1,12 +1,22 @@
 # Falcon guide screenshots: English edition, 28 September 2026
 
-All 96 published JPEGs are real English Falcon browser captures at 1440×900.
+All published JPEGs are real English Falcon browser captures; their dimensions
+are recorded in the screenshot inventory.
 They were captured from the isolated local Demo workspace with neutral Payments
-project data. Original PNGs were converted to JPEG at quality 82, without resizing,
+project data. Original PNGs were converted to JPEG, without resizing,
 cropping or retouching. No interface controls or results were generated.
 Every filename ends in `-en-20260928.jpg` to avoid stale image caches. Older dates
 inside filenames identify the original workflow; all images were recaptured on
-28 September. Previous Russian screenshots are no longer published.
+28 September. The Russian edition is published separately under `2026-09-ru/`.
+
+The notification inbox update replaces ten English and ten Russian screenshots
+of notifications, settings and sidebar preferences with actual 1280×720 captures.
+Their filenames include `-inbox20260928` for fresh asset URLs. Conversion uses
+JPEG quality 88 and 4:4:4 chroma without cropping, resizing or retouching.
+Preferences show all seven categories, blocked browser permission and an
+unconfigured Telegram bot. The inbox shows actual read events from the local
+practice workspace; the English example is light and the Russian example dark.
+No unread indicators or completed channel connections are claimed in these shots.
 
 Intrinsic dimensions and the complete asset inventory are recorded in
 `app/src/modules/core-tms/documentation/content/walkthroughs/media/screenshots.json`.

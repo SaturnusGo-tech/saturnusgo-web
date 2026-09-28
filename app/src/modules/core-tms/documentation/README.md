@@ -43,11 +43,13 @@ No provider credentials belong in frontend code or the documentation corpus.
 
 The guide chat explains documented Falcon procedures and links to source articles
 and sections. It has no tools that create or change projects, cases, runs, builds,
-or settings. Conversation context stays in frontend memory for the current tab;
-it is not a stored chat history. Opening guide articles or guide search preserves
-the conversation. New chat, leaving Help, changing the interface language,
-workspace, or authenticated account clears it. Dictation inserts editable text into the composer.
-The user must send the request explicitly after reviewing it.
+or settings. Conversations are saved on the server for their account and workspace;
+History reopens them, and New chat starts a blank draft without deleting older chats.
+Opening articles or changing the interface language preserves saved conversations.
+Each conversation retains its original text and illustration locale. Shared answer
+links expose one completed exchange to authorized workspace members and can be
+revoked. Dictation inserts editable text into the composer; sending remains explicit.
+See `docs/features/falcon-guide-ai.md` for persistence, access and lifecycle details.
 
 Both typed article catalogs are the authoritative knowledge source. The server
 ships a generated, versioned JSON corpus rather than accepting guide content or

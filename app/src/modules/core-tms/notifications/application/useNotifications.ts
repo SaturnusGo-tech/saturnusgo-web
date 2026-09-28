@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   NotificationClient,
-  NotificationItem,
   NotificationSettings,
   NotificationCategory,
   BrowserNotificationPort,
@@ -12,8 +11,6 @@ export function useNotifications(
   browser: BrowserNotificationPort,
 ) {
   const [settings, setSettings] = useState<NotificationSettings | null>(null);
-  const [items, setItems] = useState<NotificationItem[]>([]);
-  const [next, setNext] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,11 +21,9 @@ export function useNotifications(
   const pending = useRef(false);
   const load = useCallback(
     async (signal: AbortSignal) => {
-      const [s, p] = await Promise.all([client.settings(signal), client.inbox(null, signal)]);
+      const s = await client.settings(signal);
       signal.throwIfAborted();
       setSettings(s);
-      setItems(p.items);
-      setNext(p.next);
       setPermission(browser.permission());
       const fingerprint = await browser.fingerprint();
       signal.throwIfAborted();
@@ -42,7 +37,6 @@ export function useNotifications(
     pending.current = false;
     setBusy(false);
     setConnected(null);
-    setItems([]);
     setLoading(true);
     setError(null);
     setSettings(null);
@@ -77,8 +71,6 @@ export function useNotifications(
   };
   return {
     settings,
-    items,
-    next,
     loading,
     busy,
     error,
@@ -123,18 +115,6 @@ export function useNotifications(
       }),
     changeCategories: (categories: NotificationCategory[]) =>
       action((signal) => client.preferences(categories, locale, settings?.version ?? 0, signal)),
-    markRead: (id: string) => action((signal) => client.read(id, signal)),
-    more: () =>
-      action(async (signal) => {
-        if (!next) return;
-        const page = await client.inbox(next, signal);
-        signal.throwIfAborted();
-        setItems((current) => [
-          ...current,
-          ...page.items.filter((item) => !current.some((old) => old.id === item.id)),
-        ]);
-        setNext(page.next);
-      }, false),
   };
 }
 export type NotificationsState = ReturnType<typeof useNotifications>;

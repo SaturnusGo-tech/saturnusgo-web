@@ -5,10 +5,6 @@ export type NotificationSettings = Schemas["NotificationSettings"];
 export type NotificationCategory = Schemas["NotificationCategory"];
 export interface NotificationClient {
   settings(signal: AbortSignal): Promise<NotificationSettings>;
-  inbox(
-    cursor: string | null,
-    signal: AbortSignal,
-  ): Promise<{ items: NotificationItem[]; next: string | null }>;
   preferences(
     categories: NotificationCategory[],
     locale: "ru" | "en",
@@ -19,7 +15,6 @@ export interface NotificationClient {
   telegramLink(signal: AbortSignal): Promise<string>;
   confirmTelegram(signal: AbortSignal): Promise<void>;
   disconnect(channel: "browser" | "telegram", signal: AbortSignal, id?: string): Promise<void>;
-  read(id: string, signal: AbortSignal): Promise<void>;
 }
 
 export interface BrowserNotificationPort {

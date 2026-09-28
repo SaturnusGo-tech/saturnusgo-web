@@ -84,7 +84,7 @@ test("opening Config from an integration replaces the URL and reload restores Co
   assert.deepEqual(readWorkspaceDeepLink(config), { view: "config", runId: null });
   for (const view of workspaceViews) {
     const href = buildWorkspaceDeepLink(config, { workspaceId: "w", projectId: "p", view, runId: "active" });
-    assert.deepEqual(readWorkspaceDeepLink(href), { view, runId: view === "runs" ? "active" : null });
+    assert.deepEqual(readWorkspaceDeepLink(href), { view: view === "notifications" ? "config" : view, runId: view === "runs" ? "active" : null });
   }
 });
 

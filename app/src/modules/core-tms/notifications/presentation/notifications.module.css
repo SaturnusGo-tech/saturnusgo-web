@@ -142,3 +142,5 @@
   .page button, .page a, .category, .switchTrack, .switchTrack::before, .chevron { transition: none; }
   .skeleton i { animation: none; }
 }
+
+.page[data-embedded="true"] { height: auto; overflow: visible; padding: 0; background: transparent; }

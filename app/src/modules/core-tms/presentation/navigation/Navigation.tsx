@@ -15,9 +15,9 @@ import { NavigationTooltip } from "./tooltip/NavigationTooltip";
 import { SidebarSectionsMenu } from "./sections-menu/SidebarSectionsMenu";
 import css from "./styles/sidebar-system.module.css";
 
-export function Navigation({ view, onChange, disabled, collapsed, onToggleCollapsed, workspaceId, activeRunCount, userCapabilities }: {
+export function Navigation({ view, onChange, disabled, connected, collapsed, onToggleCollapsed, workspaceId, activeRunCount, userCapabilities }: {
   view: View; onChange: (view: View) => void; disabled: boolean; collapsed: boolean;
-  onToggleCollapsed: () => void; workspaceId: string; activeRunCount: number; userCapabilities: readonly string[];
+  onToggleCollapsed: () => void; workspaceId: string; connected: boolean; activeRunCount: number; userCapabilities: readonly string[];
 }) {
   const { t } = useTmsLocale();
   const session = useOptionalTmsSession();
@@ -54,9 +54,9 @@ export function Navigation({ view, onChange, disabled, collapsed, onToggleCollap
     <div className={css.footer}>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled}/>
-      <NavigationUtilityMenu disabled={disabled} settingsActive={!disabled && view === "config"} helpActive={view === "help"}
+      <NavigationUtilityMenu settingsActive={view === "config"} helpActive={view === "help"} connected={connected} subject={session?.subject ?? ''}
         collapsed={collapsed} onToggleCollapsed={onToggleCollapsed}
-        notificationsActive={view === "notifications"} onOpenNotifications={() => onChange("notifications")} workspaceId={workspaceId}
+        workspaceId={workspaceId}
         onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
       <NavigationProfile collapsed={collapsed}/>
     </div>

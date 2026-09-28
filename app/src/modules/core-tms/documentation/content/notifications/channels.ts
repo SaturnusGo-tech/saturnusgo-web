@@ -10,12 +10,12 @@ export const notificationChannelArticles: DocArticle[] = [
     related: ["notifications", "browser-notifications", "company-access"],
     sources: [{ title: "Telegram: how bot start links work", url: "https://core.telegram.org/bots/features#deep-linking" }],
     sections: [
-      section("before", "Before connecting", paragraph("Sign in to your company's Falcon with your own account and open **Notifications**. The bot connects to a personal Telegram chat. Groups and channels are not used for this subscription."),
+      section("before", "Before connecting", paragraph("Sign in to your company's Falcon with your own account. Open **Settings**, then **Notifications** under **Personal settings**. The bot connects to a personal Telegram chat. Groups and channels are not used for this subscription."),
         note("Start from Falcon", "Finding @Falcon_tms_bot in Telegram and pressing Start is not enough. Falcon's Open bot button contains a personal link that associates Telegram with your account and company.")),
       section("connect", "Connect the bot", steps(
         ["Get a link", "In the Telegram row, click Connect, then Open bot."],
         ["Press Start in Telegram", "Check that the correct Telegram profile and @Falcon_tms_bot are open. Press Start. The bot asks you to return to Falcon to confirm."],
-        ["Return to Falcon", "On Notifications, click I pressed Start. Wait for the offer to connect the account bearing your Telegram name."],
+        ["Return to Falcon", "In Settings → Notifications, click I pressed Start. Wait for the offer to connect the account bearing your Telegram name."],
         ["Confirm your account", "Check the name and click Confirm. The expanded section shows Telegram is connected, with Disconnect on the right. Clicking the Telegram heading expands or collapses its details."],
         ["Choose messages", "Enable the categories you want under Event preferences. These preferences are shared by Telegram and the browser."]),
         note("The link lasts 10 minutes", "Press Start and confirm the account in Falcon within that time. The link is single-use. Do not forward it to colleagues: everyone connects the bot from their own account.")),
@@ -28,7 +28,7 @@ export const notificationChannelArticles: DocArticle[] = [
         paragraph("If the bot is blocked in Telegram, unblock it first. Then check the connection in Falcon and reconnect if needed.")),
       section("problems", "If connection is incomplete", table(["What you see", "What to do"],
         ["The bot did not connect after search or a normal Start", "Return to Falcon and use Open bot from your connection flow. An ordinary chat without the personal link cannot identify your Falcon account."],
-        ["The link expired", "Refresh Notifications and click Connect or New link. Open the new link and complete both confirmations within 10 minutes."],
+        ["The link expired", "Reload Settings → Notifications and click Connect or New link. Open the new link and complete both confirmations within 10 minutes."],
         ["Start was pressed, but Falcon does not show a name yet", "Click I pressed Start. Check that you used the latest link from this company. Get a new link if it expired."],
         ["Falcon asks you to confirm someone else's name", "Do not confirm it. Wait until 10 minutes have passed since the link was issued, refresh the page, and reconnect from the correct Telegram profile."],
         ["The bot is not configured; the button is unavailable", "The server channel is not configured. Contact the Falcon administrator. Employees do not need to create a bot or enter a token."],
@@ -48,7 +48,7 @@ export const notificationChannelArticles: DocArticle[] = [
     ],
     sections: [
       section("enable", "Enable on this device", steps(
-        ["Open Falcon in a browser", "Sign in at your company's HTTPS address in a normal Chrome or Safari window and open Notifications."],
+        ["Open Falcon in a browser", "Sign in at your company's HTTPS address in a normal Chrome or Safari window. Open Settings → Notifications under Personal settings."],
         ["Turn on the switch", "In **Browser notifications**, enable the switch on the right. It is available even when the section is collapsed. The permission request appears after your action."],
         ["Allow site notifications", "Allow notifications in the browser's system prompt. If permission was already granted, you may not see another prompt."],
         ["Check the connection", "Click the section heading and wait for **Notifications are enabled in this browser**. Choose categories in **Event preferences**. Both browser permission and the Falcon connection must be enabled."]),

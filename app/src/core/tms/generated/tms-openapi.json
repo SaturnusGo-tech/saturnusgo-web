@@ -13007,6 +13007,19 @@
               "maximum": 30,
               "default": 30
             }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ru",
+                "en"
+              ]
+            },
+            "description": "Render inbox text in this language without changing personal delivery preferences."
           }
         ],
         "responses": {
@@ -19363,6 +19376,142 @@
         },
         "description": "Authenticated same-workspace recipient receives only one explicitly shared question and answer. Missing, revoked, archived, owner-disabled, source-removed or administrator-restricted snapshots are unavailable. Never returns private chatId, turnId, history, owner identity or share-management data."
       }
+    },
+    "/notifications/read-all": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "readAllNotifications",
+        "summary": "Mark all currently visible notifications as read for this member",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSavedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "Notification channel unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "description": "Per-member state replacement or single current challenge. Unique database keys make repeated destination registration and read marking converge."
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/notifications/archive-read": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "archiveReadNotifications",
+        "summary": "Archive only this member’s already-read inbox entries",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSavedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "Notification channel unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "description": "Per-member state replacement or single current challenge. Unique database keys make repeated destination registration and read marking converge."
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
     }
   },
   "components": {
@@ -37487,7 +37636,8 @@
           "cases",
           "suites",
           "integrations",
-          "assignments"
+          "assignments",
+          "access"
         ]
       },
       "NotificationPreferences": {
@@ -37496,7 +37646,7 @@
         "properties": {
           "categories": {
             "type": "array",
-            "maxItems": 6,
+            "maxItems": 7,
             "items": {
               "$ref": "#/components/schemas/NotificationCategory"
             }
@@ -37634,6 +37784,11 @@
           },
           "tag": {
             "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 128,
+            "description": "Allowlisted server event type used for notification icons and presentation."
           }
         },
         "required": [
@@ -37644,7 +37799,8 @@
           "title",
           "body",
           "url",
-          "tag"
+          "tag",
+          "action"
         ]
       },
       "NotificationBrowserSubscription": {
@@ -37719,10 +37875,16 @@
                   "string",
                   "null"
                 ]
+              },
+              "unreadCount": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total unread events visible to this member across all pages."
               }
             },
             "required": [
-              "nextCursor"
+              "nextCursor",
+              "unreadCount"
             ]
           }
         },

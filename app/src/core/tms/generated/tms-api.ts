@@ -4707,6 +4707,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark all currently visible notifications as read for this member
+         * @description Per-member state replacement or single current challenge. Unique database keys make repeated destination registration and read marking converge.
+         */
+        post: operations["readAllNotifications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/archive-read": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive only this member’s already-read inbox entries
+         * @description Per-member state replacement or single current challenge. Unique database keys make repeated destination registration and read marking converge.
+         */
+        post: operations["archiveReadNotifications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8022,7 +8068,7 @@ export interface components {
             };
         };
         /** @enum {string} */
-        NotificationCategory: "runs" | "defects" | "cases" | "suites" | "integrations" | "assignments";
+        NotificationCategory: "runs" | "defects" | "cases" | "suites" | "integrations" | "assignments" | "access";
         NotificationPreferences: {
             categories: components["schemas"]["NotificationCategory"][];
             /** @enum {string} */
@@ -8056,6 +8102,8 @@ export interface components {
             /** Format: uri */
             url: string;
             tag: string;
+            /** @description Allowlisted server event type used for notification icons and presentation. */
+            action: string;
         };
         NotificationBrowserSubscription: {
             /** Format: uri */
@@ -8074,6 +8122,8 @@ export interface components {
             data: components["schemas"]["Notification"][];
             meta: {
                 nextCursor: string | null;
+                /** @description Total unread events visible to this member across all pages. */
+                unreadCount: number;
             };
         };
         NotificationSettingsResponse: {
@@ -16243,6 +16293,8 @@ export interface operations {
                 /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: number;
+                /** @description Render inbox text in this language without changing personal delivery preferences. */
+                locale?: "ru" | "en";
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -19478,6 +19530,90 @@ export interface operations {
                 };
             };
             500: components["responses"]["InternalError"];
+        };
+    };
+    readAllNotifications: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSavedResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            /** @description Notification channel unavailable */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    archiveReadNotifications: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSavedResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            /** @description Notification channel unavailable */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
 }

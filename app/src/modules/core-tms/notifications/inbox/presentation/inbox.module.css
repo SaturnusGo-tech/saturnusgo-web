@@ -1,0 +1,43 @@
+.root { display: contents; }
+.panel { position: fixed; inset: auto; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 18px; background: #fff; color: var(--ink, #202124); box-shadow: 0 18px 64px #0003, 0 3px 12px #0001; overflow: hidden; z-index: 200; font: inherit; }
+.panel[popover]:popover-open { display: flex; flex-direction: column; animation: appear 160ms cubic-bezier(.2,.8,.2,1); }
+.panel:not([popover]) { display: flex; flex-direction: column; }
+:global(.dark) .panel { background: #171719; border-color: #ffffff1c; box-shadow: 0 22px 70px #0008; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 18px 15px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.header h2 { margin: 0; font-size: 18px; line-height: 1.4; font-weight: 630; letter-spacing: -.025em; outline: none; }
+.actions { display: flex; align-items: center; gap: 2px; }
+.actions button { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: none; cursor: pointer; }
+.actions button:hover { color: var(--ink); background: var(--glass-hover, #8881); }
+.actions button:disabled { opacity: .32; cursor: default; }
+.scroll { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line) transparent; padding: 8px; }
+.feed { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.row { border-radius: 12px; background: color-mix(in srgb, var(--ink) 3%, transparent); transition: background-color 160ms ease; }
+.row[data-read="false"] { background: color-mix(in srgb, #3975e8 10%, transparent); }
+.row:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.row[data-read="false"]:hover { background: color-mix(in srgb, #3975e8 15%, transparent); }
+.event { position: relative; display: flex; align-items: flex-start; gap: 13px; padding: 16px 15px; text-decoration: none; color: inherit; border-radius: inherit; }
+.panel .feed .row .event, .panel .feed .row .event:visited { color: var(--ink); }
+.eventIcon { flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.eventIcon[data-kind="defects"] { color: #d96a62; background: #d96a6214; }
+.eventIcon[data-kind="runs"] { color: #398878; background: #39887816; }
+.eventIcon[data-kind="access"] { color: #b88432; background: #b8843215; }
+.copy { min-width: 0; flex: 1; display: grid; gap: 6px; }
+.copy strong { font-size: 13px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.body { font-size: 13px; line-height: 1.5; color: var(--ink-soft, var(--muted)); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 2px; }
+.unreadDot { flex: 0 0 5px; width: 5px; height: 5px; margin-top: 7px; border-radius: 50%; background: #4a82e7; }
+.badge { position: absolute; top: 0; right: -2px; width: 5px; height: 5px; background: #e45861; border-radius: 50%; }
+.empty { min-height: 300px; height: 100%; padding: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--muted); }
+.empty h3 { font-size: 14px; color: var(--ink); margin: 15px 0 6px; font-weight: 550; }
+.empty p { font-size: 12px; line-height: 1.65; max-width: 260px; margin: 0; }
+.error { padding: 12px; display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.error button, .more { border: 0; border-radius: 18px; background: var(--glass-hover, #8881); color: var(--ink); padding: 8px 13px; font: inherit; cursor: pointer; }
+.more { display: block; margin: 14px auto; font-size: 12px; }
+.more:disabled { opacity: .5; }
+.skeleton { display: grid; gap: 6px; }
+.skeleton i { height: 98px; border-radius: 12px; background: color-mix(in srgb, var(--ink) 5%, transparent); animation: pulse 1.3s ease-in-out infinite alternate; }
+.panel :is(a, button):focus-visible { outline: 2px solid #5687e3; outline-offset: -2px; }
+@keyframes appear { from { opacity: 0; transform: translateX(-5px) scale(.99); } to { opacity: 1; transform: none; } }
+@keyframes pulse { to { opacity: .45; } }
+@media(max-width: 480px) { .header { padding: 14px 12px; } .header h2 { font-size: 16px; } .event { padding: 14px 12px; gap: 11px; } }
+@media(prefers-reduced-motion: reduce) { .panel[popover]:popover-open, .skeleton i { animation: none; } .row { transition: none; } }

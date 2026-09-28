@@ -25,10 +25,10 @@ export const navigationArticle: DocArticle = {
     section("collapse", "Make more room for your work", paragraph("On a desktop, click **Collapse** below **Notifications** at the bottom of the sidebar. The collapsed menu shows icons; hover over an icon or focus it with Tab to see its label. Use the same control to expand the menu. Your collapsed view preference is saved in the browser."),
       paragraph("Collapsing the menu and choosing contextual mode are independent: one changes its width, the other changes which items appear. Settings, help, contact, notifications, and the available profile remain at the bottom.")),
     section("utilities", "Personal and utility sections", table(["Item", "Purpose"],
-      ["Settings", "The selected project's details, environments, import and export, theme, language, and current session."],
+      ["Settings", "Project details, environments, import and export; personal appearance, language, notification preferences and current session."],
       ["Help", "This guide, with search, a table of contents, and article links."],
       ["Contact us", "Contact details for the Falcon team. This is separate from notification settings."],
-      ["Notifications", "The event feed and your delivery channel preferences."],
+      ["Notifications bell", "Opens the event feed beside the sidebar. The gear opens Settings → Notifications for delivery channel preferences."],
       ["Admin panel", "Company and employee access management, when available to your account."],
       ["Name and photo", "Open your personal profile, if supported by your sign-in method."])),
     section("availability", "If a section is missing or a button is unavailable", bullets(

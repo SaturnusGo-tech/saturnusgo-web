@@ -1,4 +1,4 @@
-export const settingsSections = ["general", "environments", "exchange", "appearance", "account"] as const;
+export const settingsSections = ["general", "environments", "exchange", "appearance", "notifications", "account"] as const;
 export type SettingsSection = typeof settingsSections[number];
 export const settingsCopy = {
   ru: {
@@ -7,6 +7,7 @@ export const settingsCopy = {
     environments: ["Окружения", "Стенды, на которых команда выполняет проверки."],
     exchange: ["Импорт и экспорт", "Переносите тестовую базу между проектами Falcon."],
     appearance: ["Оформление и язык", "Настройте Falcon под привычный способ работы."],
+    notifications: ["Уведомления", "Выберите события Falcon и каналы, в которых хотите их получать."],
     account: ["Аккаунт и сессия", "Ваш вход в рабочее пространство Falcon."],
     themePreview: "Предпросмотр темы", archiveHint: "Архивный проект сохраняет историю. Его можно восстановить.",
     exportHint: "Скачайте тест-кейсы проекта в формате JSON.",
@@ -19,6 +20,7 @@ export const settingsCopy = {
     environments: ["Environments", "The environments your team uses to run tests."],
     exchange: ["Import and export", "Move your test library between Falcon projects."],
     appearance: ["Appearance and language", "Make Falcon fit the way you work."],
+    notifications: ["Notifications", "Choose which Falcon events to receive and where."],
     account: ["Account and session", "Your access to the Falcon workspace."],
     themePreview: "Theme preview", archiveHint: "Archived projects retain their history and can be restored.",
     exportHint: "Download this project’s test cases as a JSON file.",

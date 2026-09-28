@@ -1,6 +1,6 @@
-import { Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
+import { Bell, Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import { useState } from "react";
+import type { ReactNode } from "react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { AppearanceSettings } from "./settings/AppearanceSettings";
@@ -8,43 +8,46 @@ import { AccountSettings } from "./settings/AccountSettings";
 import { ProjectCaseExchange } from "./ProjectCaseExchange";
 import { ProjectSettings } from "./sections/ProjectSettings";
 import { EnvironmentSettings } from "./sections/EnvironmentSettings";
-import { settingsCopy, settingsSections, type SettingsSection } from "./navigation/settings-sections";
+import { settingsCopy, settingsSections } from "./navigation/settings-sections";
+import { useSettingsSection } from "./navigation/state/useSettingsSection";
 import css from "./config.module.css";
 
 type ConfigViewProps = {
-  environments: Environment[]; project?: Project;
+  environments: Environment[]; project?: Project; notifications?: ReactNode;
   onCreate: () => void; onEditEnvironment: (id: string) => void;
   onToggleEnvironment: (id: string) => void; onEditProject: () => void;
   onToggleProject: () => void; exchangeEnabled: boolean; onImport: () => void;
 };
-const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, account: UserRound };
+const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, notifications: Bell, account: UserRound };
 export function ConfigView(props: ConfigViewProps) {
   const { locale } = useTmsLocale();
   const copy = settingsCopy[locale];
-  const [section, setSection] = useState<SettingsSection>("general");
+  const { section, select } = useSettingsSection(Boolean(props.project));
+  const available = props.project ? settingsSections : settingsSections.filter(id => ["appearance", "notifications", "account"].includes(id));
   return <div className={css.page} data-testid="config-view">
     <aside className={css.sidebar}>
       <h1>{copy.title}</h1>
       <nav aria-label={copy.title}>
-        <div className={css.navLabel}>{copy.projectGroup}<span title={props.project?.name}>{props.project?.name}</span></div>
-        {settingsSections.map((id) => {
+        {props.project && <div className={css.navLabel}>{copy.projectGroup}<span title={props.project.name}>{props.project.name}</span></div>}
+        {available.map((id) => {
           const Icon = icons[id];
           return <div key={id}>
             {id === "appearance" && <div className={css.navLabel}>{copy.personalGroup}</div>}
             <button type="button" aria-current={section === id ? "page" : undefined} aria-controls={`settings-${id}`}
-              onClick={() => transitionContent(() => setSection(id))}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
+              onClick={() => transitionContent(() => select(id))}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
           </div>;
         })}
       </nav>
     </aside>
     <div className={css.content}>
-      {settingsSections.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
+      {available.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
         <header className={css.header}>
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>
         {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
         {id === "environments" && <EnvironmentSettings environments={props.environments} onCreate={props.onCreate} onEdit={props.onEditEnvironment} onToggle={props.onToggleEnvironment} />}
         {id === "exchange" && props.project && <ProjectCaseExchange enabled={props.exchangeEnabled} project={props.project} onImport={props.onImport} />}
         {id === "appearance" && <AppearanceSettings />}
+        {id === "notifications" && section === id && props.notifications}
         {id === "account" && <AccountSettings />}
       </section>)}
     </div>

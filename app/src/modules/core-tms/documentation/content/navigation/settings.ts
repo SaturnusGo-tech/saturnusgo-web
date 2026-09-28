@@ -2,16 +2,17 @@ import { articles, bullets, note, paragraph, section, steps, table, type DocArti
 
 export const settingsArticle: DocArticle = {
   id: "settings", title: "Project and interface settings", group: "reference",
-  description: "General settings, environments, case transfers, appearance, language, and signing out of your current session.",
-  keywords: ["settings", "general", "general", "environments", "environments", "appearance", "appearance", "language", "language", "account", "session", "sign out", "settings"],
+  description: "Project settings, environments, case transfers, appearance, language, personal notifications, and your current session.",
+  keywords: ["settings", "general", "general", "environments", "environments", "appearance", "appearance", "language", "language", "account", "session", "sign out", "settings", "notifications", "personal settings"],
   related: ["navigation", "workspace", "import-export", "permissions", "notifications"],
   sections: [
-    section("open", "Open settings for the right project", paragraph("Select a project in Falcon's top bar and click **Settings** near the bottom of the sidebar. Settings has its own section list on the left. The Project group shows the name of the project your changes apply to."),
+    section("open", "Open settings for the right project", paragraph("Click **Settings** near the bottom of the sidebar. For project settings, first select a project in Falcon's top bar: the **Project** group names the project your changes apply to. **Personal settings** contains appearance, notifications and your account; these sections are available without selecting a project."),
       table(["Section", "What you can configure"],
         ["General", "The project's name, description, and status, and its permanent key for reference."],
         ["Environments", "Test environment URLs and their status."],
         ["Import and export", "Open the import screen or export the project's test cases."],
         ["Appearance and language", "Your theme and interface language in this browser."],
+        ["Notifications", "Your event categories, Telegram connection and browser notifications for this company."],
         ["Account and session", "Your current account and sign-out action."])),
     section("general", "Edit project settings", steps(
       ["Open General", "Check the selected project's name, description, key, and status."],
@@ -38,10 +39,10 @@ export const settingsArticle: DocArticle = {
       ["Create, edit, or archive an environment", "Workspace administrator or QA manager."],
       ["Import cases", "Test case management permission: administrator, QA manager, or tester."],
       ["Export cases", "Permission to read the selected project's test cases."],
-      ["Change theme or language, or sign out", "Personal actions for the current user."]),
+      ["Change theme, language or notification preferences, or sign out", "Personal actions for the current user."]),
       bullets("Having access to a form does not bypass server permission checks. If an action is denied, confirm the project and your role with an administrator.",
         "If another member changed the data and your save is rejected, reopen the form, review the latest values, and apply your changes again.")),
-    section("notifications", "Notifications are separate", paragraph("The event feed, Telegram, and browser notifications are available through **Notifications** in the main menu. They are not listed in project settings."),
+    section("notifications", "Configure personal notifications", paragraph("Under **Personal settings**, open **Notifications** to choose event categories and connect Telegram or browser notifications. Preferences apply to your account in the current company. The bell in the main sidebar opens the event feed beside the menu; its **Notification settings** gear returns to these preferences."),
       articles("notifications")),
   ],
 };

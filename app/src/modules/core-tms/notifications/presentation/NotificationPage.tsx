@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { Bell, Check, ArrowUpRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { NotificationsState } from "../application/useNotifications";
 import type { NotificationCategory } from "../domain/notifications";
 import { NotificationChannels } from "./NotificationChannels";
@@ -17,25 +17,24 @@ const categoryGroups: readonly {
   },
   {
     id: "workflow", ruLabel: "Рабочий процесс", enLabel: "Workflow",
-    categories: [["assignments", "Назначения", "Assignments"], ["defects", "Дефекты", "Defects"], ["integrations", "Интеграции", "Integrations"]],
+    categories: [["assignments", "Назначения", "Assignments"], ["access", "Доступ и роли", "Access and roles"], ["defects", "Дефекты", "Defects"], ["integrations", "Интеграции", "Integrations"]],
   },
 ];
 
-export function NotificationPage({ model: m, ru, onOpen }: {
+export function NotificationPage({ model: m, ru, embedded = false }: {
   model: NotificationsState;
   ru: boolean;
-  onOpen?: (url: string) => void;
+  embedded?: boolean;
 }) {
   const id = useId();
   const [preferencesExpanded, setPreferencesExpanded] = useState(true);
-  const [activityExpanded, setActivityExpanded] = useState(true);
   const settings = m.settings;
   return (
-    <section className={styles.page} data-testid="notification-page">
-      <header className={styles.header}>
+    <section className={styles.page} data-testid="notification-page" data-embedded={embedded || undefined}>
+      {!embedded && <header className={styles.header}>
         <h1>{ru ? "Уведомления" : "Notifications"}</h1>
         <p>{ru ? "Выберите, какие события Falcon получать и где." : "Choose which Falcon events to receive and where."}</p>
-      </header>
+      </header>}
       {m.loading ? (
         <div className={styles.skeleton} role="status" aria-busy="true" aria-label={ru ? "Загрузка уведомлений" : "Loading notifications"}>
           <i /><i /><i />
@@ -94,60 +93,6 @@ export function NotificationPage({ model: m, ru, onOpen }: {
                     ))}
                   </div>
                   <p className={styles.helpNote}>{ru ? "Применяется к Telegram и подключённым браузерам." : "Applies to Telegram and connected browsers."}</p>
-                </div>
-              </section>
-              <section className={styles.section} aria-labelledby={`${id}-activity-title`}>
-                <h2>
-                  <button type="button" className={styles.accordionTrigger} id={`${id}-activity-title`}
-                    aria-expanded={activityExpanded} aria-controls={`${id}-activity`}
-                    onClick={() => setActivityExpanded((value) => !value)}>
-                    <span className={styles.sectionCopy}>
-                      <span className={styles.sectionTitle}>{ru ? "Последние события" : "Recent activity"}</span>
-                      <span className={styles.sectionDescription}>{ru ? "Ваши последние назначения, прогоны и обновления дефектов." : "Your latest assignments, test runs and defect updates."}</span>
-                    </span>
-                    <ChevronDown className={styles.chevron} size={20} aria-hidden="true" />
-                  </button>
-                </h2>
-                <div className={styles.sectionBody} id={`${id}-activity`} hidden={!activityExpanded}>
-                  <div className={styles.feedHeader}>
-                    <span>{ru ? "Входящие" : "Inbox"}</span>
-                    <button type="button" onClick={() => void m.retry()} disabled={m.busy}>{ru ? "Обновить" : "Refresh"}</button>
-                  </div>
-                  {m.items.length === 0 ? (
-                    <div className={styles.empty} role="status">
-                      <Bell size={22} strokeWidth={1.5} aria-hidden="true" />
-                      <h3>{ru ? "Новых событий пока нет" : "No new activity"}</h3>
-                    </div>
-                  ) : (
-                    <ol className={styles.feed} aria-label={ru ? "Последние события" : "Recent activity"}>
-                      {m.items.map((item) => (
-                        <li key={item.id} data-read={item.read}>
-                          <span className={styles.eventIcon} aria-hidden="true">{item.read ? <Check size={18} /> : <Bell size={18} />}</span>
-                          <div className={styles.eventContent}>
-                            <a href={item.url} onClick={(event) => {
-                              void m.markRead(item.id);
-                              if (onOpen && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
-                                event.preventDefault();
-                                onOpen(item.url);
-                              }
-                            }}>
-                              <strong>{item.title}</strong><ArrowUpRight size={15} aria-hidden="true" />
-                            </a>
-                            {item.body && <p>{item.body}</p>}
-                            <time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString(ru ? "ru-RU" : "en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
-                          </div>
-                          {!item.read && (
-                            <button type="button" className={styles.readButton} title={ru ? "Прочитано" : "Mark read"}
-                              aria-label={`${ru ? "Отметить прочитанным" : "Mark read"}: ${item.title}`}
-                              disabled={m.busy} onClick={() => void m.markRead(item.id)}>
-                              <Check size={17} aria-hidden="true" />
-                            </button>
-                          )}
-                        </li>
-                      ))}
-                    </ol>
-                  )}
-                  {m.next && <button type="button" className={styles.more} disabled={m.busy} onClick={() => void m.more()}>{ru ? "Показать ещё" : "Show more"}</button>}
                 </div>
               </section>
             </>

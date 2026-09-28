@@ -64,10 +64,26 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
     } else model.openDefect(row.id);
   }
-  if (!companyViewAvailable(model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session?.kind === "managed" ? <WorkspaceProfile />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
+  if (model.view === "config" || model.view === "notifications") {
+    return (
+      <ConfigView key={model.data.workspace.id}
+        notifications={<WorkspaceNotifications workspaceId={model.data.workspace.id} />}
+        environments={model.projectEnvironments}
+        project={model.project}
+        onCreate={model.openNewEnvironment}
+        onEditEnvironment={model.openEditEnvironment}
+        onToggleEnvironment={model.toggleEnvironment}
+        onEditProject={model.openEditProject}
+        onToggleProject={model.toggleProject}
+        exchangeEnabled={model.connection === "connected"}
+        onImport={() => model.setView("imports")}
+      />
+    );
+  }
   if (model.connection === "loading" || model.connection === "error") {
     return (
       <WorkspaceLoadState
@@ -79,7 +95,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
-  if (model.view === "notifications") return <WorkspaceNotifications key={model.data.workspace.id} workspaceId={model.data.workspace.id}/>;
   if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
   if (model.view === "cases" && model.repositoryScope.aggregate) return <WorkspaceCasesStage model={model} />;
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
@@ -147,21 +162,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
           model.setSelectedFolder(testCase.folderPath);
           model.setView("cases");
         }}
-      />
-    );
-  }
-  if (model.view === "config") {
-    return (
-      <ConfigView key={model.project.id}
-        environments={model.projectEnvironments}
-        project={model.project}
-        onCreate={model.openNewEnvironment}
-        onEditEnvironment={model.openEditEnvironment}
-        onToggleEnvironment={model.toggleEnvironment}
-        onEditProject={model.openEditProject}
-        onToggleProject={model.toggleProject}
-        exchangeEnabled={model.connection === "connected"}
-        onImport={() => model.setView("imports")}
       />
     );
   }

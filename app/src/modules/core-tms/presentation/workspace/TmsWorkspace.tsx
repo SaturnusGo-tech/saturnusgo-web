@@ -72,6 +72,7 @@ function LocalizedWorkspace() {
         view={model.view}
         onChange={changeView}
         disabled={!model.project}
+        connected={model.connection === "connected"}
         collapsed={sidebarCollapsed}
         onToggleCollapsed={toggleSidebar}
         workspaceId={model.data.workspace.id}

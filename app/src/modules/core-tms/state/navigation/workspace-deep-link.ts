@@ -2,6 +2,7 @@ import { preserveRepositoryScope } from "../../repository-scope/navigation/repos
 import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { isProvider } from "../../connectors/model/connector-types";
 import { workspaceViews, type View } from "../types/workspace";
+import { settingsSections } from "../../presentation/config/navigation/settings-sections";
 import { preserveGuideChatRoute } from "../../documentation/chat/navigation/chat-link";
 
 export function readWorkspaceDeepLink(href: string): { view: View | null; runId: string | null; runItemId?: string } {
@@ -12,6 +13,7 @@ export function readWorkspaceDeepLink(href: string): { view: View | null; runId:
   const item = query.get("runItemId");
   const runSelection = { view: "runs" as const, runId,
     ...(runId && item && /^[A-Za-z0-9._:-]{1,128}$/.test(item) ? { runItemId: item } : {}) };
+  if (view === "notifications") return { view: "config", runId: null };
   if (view === "integrations") return { view: "cases", runId: null };
   if (view === "runs") return runSelection;
   if (view && workspaceViews.includes(view as View)) return { view: view as View, runId: null };
@@ -37,6 +39,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const importFile = url.searchParams.get("importFile");
   const folderId = url.searchParams.get("folderId");
   const suiteId = url.searchParams.get("suiteId");
+  const settings = url.searchParams.get("view") === "notifications" ? "notifications" : url.searchParams.get("settings");
   const article = url.searchParams.get("article"); const section = url.hash;
   const commentId = url.searchParams.get("commentId");
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
@@ -47,7 +50,12 @@ export function buildWorkspaceDeepLink(href: string, input: {
   });
   url.search = ""; url.hash = "";
   url.searchParams.set("workspaceId", input.workspaceId); url.searchParams.set("projectId", input.projectId);
-  url.searchParams.set("view", input.view);
+  const targetView = input.view === "notifications" ? "config" : input.view;
+  url.searchParams.set("view", targetView);
+  if (targetView === "config") {
+    const section = input.view === "notifications" ? "notifications" : settings;
+    if (settingsSections.includes(section as typeof settingsSections[number])) url.searchParams.set("settings", section!);
+  }
   if (input.view === "portfolios" && sameWorkspace) {
     if (organizationCreate === "portfolio" || organizationCreate === "project") url.searchParams.set("organizationCreate", organizationCreate);
     if (sameScope && projectTab && /^[a-z-]{1,30}$/.test(projectTab)) url.searchParams.set("projectTab", projectTab);
