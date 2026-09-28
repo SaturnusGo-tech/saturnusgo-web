@@ -1,4 +1,5 @@
 "use client";
+import { useDocumentationCopy } from "../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../access/useDocumentationCatalog";
 
 import { BookOpen, Menu, Moon, Sun, X } from "lucide-react";
@@ -11,7 +12,8 @@ import { SearchResults } from "./search/SearchResults";
 import styles from "./documentation.module.css";
 
 export function DocumentationView() {
-  const { articleById } = useDocumentationCatalog();
+  const copy = useDocumentationCopy();
+  const { articleById, locale } = useDocumentationCatalog();
   const navigation = useDocumentationNavigation();
   const { isLight, toggleAnimated } = useColorMode();
   const [query, setQuery] = useState("");
@@ -58,15 +60,15 @@ export function DocumentationView() {
     };
     update(); root.addEventListener("scroll", update, { passive: true });
     return () => root.removeEventListener("scroll", update);
-  }, [navigation.articleId, searching]);
+  }, [navigation.articleId, searching, article]);
 
   function select() { setQuery(""); setTreeOpen(false); }
-  return <section className={styles.root} data-documentation-workspace lang="en" aria-label="Falcon documentation">
+  return <section className={styles.root} data-documentation-workspace lang={locale} aria-label={copy.workspace}>
     <header className={styles.header}>
-      <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? "Hide article tree" : "Show article tree"}
+      <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? copy.hideTree : copy.showTree}
         aria-expanded={treeOpen} aria-controls="documentation-sidebar" onClick={() => setTreeOpen((current) => !current)}>{treeOpen ? <X size={18} /> : <Menu size={18} />}</button>
-      <BookOpen size={17} aria-hidden="true" /><span>Documentation</span><span className={styles.headerDivider}>/</span><strong>{searching ? "Search" : article?.title ?? "Article not found"}</strong>
-      <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? "Switch to dark theme" : "Switch to light theme"}
+      <BookOpen size={17} aria-hidden="true" /><span>{copy.documentation}</span><span className={styles.headerDivider}>/</span><strong>{searching ? copy.search : article?.title ?? copy.notFound}</strong>
+      <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? copy.darkTheme : copy.lightTheme}
         onClick={(event) => toggleAnimated({ x: event.clientX, y: event.clientY })}>{isLight ? <Moon size={16} /> : <Sun size={16} />}</button>
     </header>
     <div className={styles.frame}>
@@ -76,14 +78,14 @@ export function DocumentationView() {
       <div className={styles.readingArea}>
         <div ref={scrollRef} className={styles.scroll}>
           {searching ? <SearchResults query={query.trim()} navigation={navigation} onSelect={select} /> : article
-            ? <DocumentationArticle key={article.id} article={article} navigation={navigation} />
-            : <section className={styles.searchResults}><span className={styles.eyebrow}>Falcon guide</span><h1>Article not found</h1>
-              <p>This link may be outdated. Select an article in the tree or use search.</p>
-              <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>Open the guide</a></section>}
+            ? <DocumentationArticle key={`${locale}:${article.id}`} article={article} navigation={navigation} />
+            : <section className={styles.searchResults}><span className={styles.eyebrow}>{copy.guide}</span><h1>{copy.notFound}</h1>
+              <p>{copy.outdatedLink}</p>
+              <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>{copy.openGuide}</a></section>}
         </div>
-        {!searching && article && <nav className={styles.toc} aria-label="On this page"><strong>On this page</strong>
+        {!searching && article && <nav className={styles.toc} aria-label={copy.onThisPage}><strong>{copy.onThisPage}</strong>
           {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)} aria-current={activeSection === s.id ? "location" : undefined}>{s.title}</a>)}
-          <div className={styles.tocNote}>This is the guide.<br />Make changes in the Falcon workspace.</div>
+          <div className={styles.tocNote}>{copy.guideNote}<br />{copy.workspaceNote}</div>
         </nav>}
       </div>
     </div>

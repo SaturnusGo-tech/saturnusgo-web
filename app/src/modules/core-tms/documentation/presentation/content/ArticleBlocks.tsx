@@ -1,4 +1,5 @@
 "use client";
+import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
 import { ArrowUpRight, CheckCircle2, Info, TriangleAlert } from "lucide-react";
 import type { DocBlock } from "../../model/article";
@@ -13,6 +14,7 @@ export function ArticleBlocks({ blocks, navigation }: { blocks: DocBlock[]; navi
   return <>{blocks.map((block, index) => <Block key={index} block={block} navigation={navigation} />)}</>;
 }
 function Block({ block, navigation }: { block: DocBlock; navigation: Navigation }) {
+  const copy = useDocumentationCopy();
   const { articleById } = useDocumentationCatalog();
   switch (block.kind) {
     case "walkthrough": return <ArticleWalkthrough block={block} />;
@@ -32,7 +34,7 @@ function Block({ block, navigation }: { block: DocBlock; navigation: Navigation 
       </aside>;
     }
     case "code": return <figure className={styles.codeBlock}>
-      <figcaption><span>{block.caption}</span><CopyButton value={block.text} label="Copy example" /></figcaption>
+      <figcaption><span>{block.caption}</span><CopyButton value={block.text} label={copy.copyExample} /></figcaption>
       <pre tabIndex={0} aria-label={block.caption}><code>{block.text}</code></pre><span className={styles.codeLanguage}>{block.language}</span>
     </figure>;
     case "table": return <div className={styles.tableScroll} role="region" aria-label={block.columns.join(" · ")} tabIndex={0}>

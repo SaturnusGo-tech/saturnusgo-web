@@ -25,7 +25,9 @@ scope and remove selectors belonging to other screens.
 ## Checking changes
 
 Run `npm run typecheck`, `npm run architecture:tms`, and
-`npm run test:tms-adapters`. Check the Help entry, article links, search, light
+`npm run test:tms-adapters`. Also run
+`npx tsx --test app/src/modules/core-tms/documentation/tests/localization/*.test.ts`
+for locale parity, access filtering, search and the Russian screenshot inventory. Check the Help entry, article links, search, light
 and dark themes, and narrow-screen navigation in the running application.
 The production static export must pass the normal repository workflow.
 
@@ -42,16 +44,19 @@ or a disposable guide workspace for workspace-level features.
 Do not generate or retouch interface controls, expose credentials, or capture
 customer records. Clearly label hypothetical defects and unsaved setup forms.
 
-Store JPEG captures under `public/falcon/docs/<edition>/`. The English edition
-contains 96 captures made on 28 September 2026 at 1440×900, using neutral
-Payments demo data. Every published image has an `-en-20260928.jpg` suffix;
-all previous Russian screenshots have been removed. The article catalog,
-walkthrough text and guide controls are English, independently of the application
-language preference. Keep visible labels consistent with Falcon’s English UI.
-Company administration remains fully documented in text; authenticated English
-administrator screenshots are pending. Swagger illustrations cover configuration
-previews only. The AI walkthrough explicitly shows an unavailable demo service,
-while the article also explains the successful generation flow.
+The guide follows Falcon's interface locale through `useDocumentationCatalog`.
+English articles live in `content/`; Russian articles live in `content-ru/`.
+Update both editions when behavior changes and retain stable article/section IDs.
+`localization/catalog/locale-catalog.ts` selects an edition before access filtering,
+lookup, navigation and search. `localization/ui-copy.ts` contains UI labels.
+Do not force a guide language independently of the user's interface preference.
+
+Store JPEG captures under `public/falcon/docs/<edition>/`. English captures use
+`2026-09/`; Russian captures use `2026-09-ru/`. Each edition has its own walkthrough
+references and inventory. Preserve both editions when updating screenshots.
+Company administration is documented in text without screenshots containing
+personal administrator information. Swagger illustrations show configuration
+previews; the AI guide distinguishes unavailable demo service from successful flow.
 `media/screenshots.json` records actual intrinsic dimensions for every image;
 `screenshotStep` restricts references to this inventory.
 When replacing captures, update dimensions and provenance together. The visual

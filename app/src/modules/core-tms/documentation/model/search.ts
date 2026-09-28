@@ -12,16 +12,16 @@ export function blockText(block: DocBlock): string {
     case "articles": return "";
   }
 }
-const normalize = (text: string) => text.toLocaleLowerCase("en").replace(/[**`]/g, "");
+const normalize = (text: string, locale: "en" | "ru" = "en") => text.toLocaleLowerCase(locale).replace(/[**`]/g, "");
 export const articleText = (article: DocArticle) => article.sections.map((s) => `${s.title} ${s.blocks.map(blockText).join(" ")}`).join(" ");
 export const readingMinutes = (article: DocArticle) => Math.max(1, Math.ceil(articleText(article).split(/\s+/).length / 180));
 
-export function searchArticles(articles: readonly DocArticle[], query: string) {
-  const terms = normalize(query.trim()).split(/\s+/).filter(Boolean);
+export function searchArticles(articles: readonly DocArticle[], query: string, locale: "en" | "ru" = "en") {
+  const terms = normalize(query.trim(), locale).split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
   return articles.map((article) => {
-    const title = normalize(article.title), keywords = normalize(article.keywords.join(" "));
-    const body = normalize(`${article.description} ${articleText(article)}`);
+    const title = normalize(article.title, locale), keywords = normalize(article.keywords.join(" "), locale);
+    const body = normalize(`${article.description} ${articleText(article)}`, locale);
     const score = terms.reduce((total, term) => total + (title.includes(term) ? 10 : keywords.includes(term) ? 6 : body.includes(term) ? 1 : 0), 0);
     const matches = terms.every((term) => title.includes(term) || keywords.includes(term) || body.includes(term));
     const index = body.indexOf(terms[0]);
