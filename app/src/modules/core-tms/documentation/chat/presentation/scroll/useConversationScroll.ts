@@ -14,7 +14,7 @@ export function useConversationScroll(revision: unknown, contentKey: unknown, co
     scroll.current.scrollTop += target.getBoundingClientRect().top - scroll.current.getBoundingClientRect().top - 16;
     target.focus({ preventScroll: true }); following.current = false; focused.current = `${conversationId}:${targetId}`;
   }, [targetId, contentKey, conversationId]);
-  useEffect(follow, [revision]);
+  useLayoutEffect(follow, [revision]);
   useEffect(() => {
     const element = scroll.current;
     if (!element?.firstElementChild || typeof ResizeObserver === "undefined") return;

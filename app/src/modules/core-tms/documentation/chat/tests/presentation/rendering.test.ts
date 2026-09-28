@@ -10,8 +10,8 @@ import { visibleCitations } from "../../model/citations";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
 
-test("plain suggestions fill the composer without making AI requests; reset and retry are explicit", () => {
-  const h = componentHarness(); let draft = "", resets = 0, retries = 0;
+test("suggestions submit immediately and are disabled during a response; reset and retry remain explicit", () => {
+  const h = componentHarness(), sent: string[] = []; let draft = "", resets = 0, retries = 0;
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
     if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
@@ -19,11 +19,14 @@ test("plain suggestions fill the composer without making AI requests; reset and 
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [], enabled: true, busy: false, error: "", draft: "",
-    setDraft: (value: string) => draft = value, newChat: () => resets++, retry: () => retries++ } as unknown as Parameters<typeof render>[0]["chat"];
+    setDraft: (value: string) => draft = value, send: async (value: string) => { sent.push(value); }, newChat: () => resets++, retry: () => retries++ } as unknown as Parameters<typeof render>[0]["chat"];
   const all = () => nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {} })));
   const suggestion = all().find(node => node.type === "button" && nodes(node).some(child => child.props.children === guideChatCopy.en.suggestions[0]))!;
-  invoke(suggestion, "onClick"); assert.equal(draft, guideChatCopy.en.suggestions[0]);
-  chat.draft = draft; chat.error = "unavailable";
+  invoke(suggestion, "onClick"); assert.deepEqual(sent, [guideChatCopy.en.suggestions[0]]); assert.equal(draft, "");
+  chat.busy = true;
+  const busySuggestion = all().find(node => node.type === "button" && nodes(node).some(child => child.props.children === guideChatCopy.en.suggestions[0]))!;
+  assert.equal(busySuggestion.props.disabled, true);
+  chat.busy = false; chat.draft = "Retry question"; chat.error = "unavailable";
   invoke(all().find(node => node.props["aria-label"] === "New chat")!, "onClick"); assert.equal(resets, 1);
   const retry = all().find(node => node.type === "button" && nodes(node).some(child => Array.isArray(child.props.children) && child.props.children.includes("Try again")))!;
   invoke(retry, "onClick"); assert.equal(retries, 1);

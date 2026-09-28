@@ -25,7 +25,7 @@ export function useInboxPopup() {
       }
       const anchor = button.getBoundingClientRect();
       const sidebar = button.closest('nav')?.getBoundingClientRect();
-      const edge = 10, width = Math.max(0, Math.min(456, innerWidth - edge * 2)), height = Math.max(0, Math.min(680, innerHeight - edge * 2));
+      const edge = 10, width = Math.max(0, Math.min(360, innerWidth - edge * 2)), height = Math.max(0, Math.min(430, innerHeight - edge * 2));
       const left = innerWidth > 760 ? Math.min((sidebar?.right ?? anchor.right) + 10, innerWidth - width - edge) : edge;
       element.style.width = `${width}px`; element.style.height = `${height}px`;
       element.style.left = `${Math.max(edge, left)}px`;

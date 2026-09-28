@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { act } from "react-test-renderer";
-import { chatHarness } from "../state/harness";
+import { chatHarness, flush } from "../state/harness";
 
 async function delta(h: ReturnType<typeof chatHarness>, value: string) {
   await act(async () => { h.backend.event(0, { type: "text_delta", delta: value }); await new Promise(resolve => setTimeout(resolve, 22)); });
@@ -11,6 +11,21 @@ test("real text renders provisionally and only persisted completion commits the 
   assert.equal(h.get().partialText, "Actual "); assert.equal(h.get().messages.length, 1);
   await delta(h, "answer"); assert.equal(h.get().partialText, "Actual answer");
   await h.reply(0, "Actual answer"); assert.equal(h.get().messages[1].content, "Actual answer"); assert.equal(h.get().partialText, ""); h.unmount();
+});
+test("persisted completion shows the full answer immediately and cancels a queued reveal", async t => {
+  const h = chatHarness(), answer = "Received answer. ".repeat(100).trimEnd(); t.after(h.unmount); h.draft("Question"); await h.send();
+  await act(async () => { h.backend.event(0, { type: "text_delta", delta: answer }); h.backend.complete(0, answer); await flush(); });
+  assert.equal(h.get().messages[1].content, answer); assert.equal(h.get().partialText, ""); assert.equal(h.get().busy, false);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  assert.equal(h.get().partialText, ""); assert.equal(h.get().messages.length, 2);
+});
+test("a suggested question submits once on rapid repeated clicks and later freeform typing still submits normally", async t => {
+  const h = chatHarness(), suggestion = "How do I edit a run?"; t.after(h.unmount);
+  await h.run(() => { void h.get().send(suggestion); void h.get().send(suggestion); });
+  assert.equal(h.requests.length, 1); assert.equal(h.requests[0].body.content, suggestion);
+  assert.equal(h.get().messages[0].content, suggestion); await h.reply(0);
+  h.draft("My own follow-up"); await h.send();
+  assert.equal(h.requests.length, 2); assert.equal(h.requests[1].body.content, "My own follow-up"); await h.reply(1);
 });
 test("provider failure removes provisional text while keeping the saved question retryable", async () => {
   const h = chatHarness(); h.draft("Keep my question"); await h.send(); await delta(h, "Unverified");

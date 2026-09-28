@@ -29,7 +29,7 @@ export function DocumentationChat({ chat, navigation, onSource }: {
         : !chat.messages.length ? <div className={css.empty}>
         <h1>{copy.heading}</h1><p>{copy.introduction}</p>
         <div className={css.suggestions}>{copy.suggestions.map(question => <button key={question} type="button"
-          disabled={!chat.enabled || chat.busy} onClick={() => chat.setDraft(question)}><span>{question}</span><ArrowUpRight size={15} aria-hidden="true" /></button>)}</div>
+          disabled={!chat.enabled || chat.busy} onClick={() => void chat.send(question)}><span>{question}</span><ArrowUpRight size={15} aria-hidden="true" /></button>)}</div>
       </div> : <div className={css.conversation} role="log" aria-label={copy.conversation} aria-live="polite" aria-relevant="additions">
         {chat.cursor && <button type="button" className={css.loadEarlier} onClick={chat.loadEarlier} disabled={chat.loading}>{historyCopy.earlier}</button>}
         {chat.messages.map((message, index) => <GuideMessage key={message.id ?? `${chat.conversationId}:${index}`} message={message} navigation={navigation} onSource={onSource}

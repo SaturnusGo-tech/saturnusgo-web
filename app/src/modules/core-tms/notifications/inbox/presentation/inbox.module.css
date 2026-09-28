@@ -3,8 +3,8 @@
 .panel[popover]:popover-open { display: flex; flex-direction: column; animation: appear 160ms cubic-bezier(.2,.8,.2,1); }
 .panel:not([popover]) { display: flex; flex-direction: column; }
 :global(.dark) .panel { background: #171719; border-color: #ffffff1c; box-shadow: 0 22px 70px #0008; }
-.header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 18px 15px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
-.header h2 { margin: 0; font-size: 18px; line-height: 1.4; font-weight: 630; letter-spacing: -.025em; outline: none; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.header h2 { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 630; letter-spacing: -.025em; outline: none; }
 .actions { display: flex; align-items: center; gap: 2px; }
 .actions button { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: none; cursor: pointer; }
 .actions button:hover { color: var(--ink); background: var(--glass-hover, #8881); }
@@ -15,9 +15,9 @@
 .row[data-read="false"] { background: color-mix(in srgb, #3975e8 10%, transparent); }
 .row:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .row[data-read="false"]:hover { background: color-mix(in srgb, #3975e8 15%, transparent); }
-.event { position: relative; display: flex; align-items: flex-start; gap: 13px; padding: 16px 15px; text-decoration: none; color: inherit; border-radius: inherit; }
+.event { position: relative; display: flex; align-items: flex-start; gap: 11px; padding: 12px; text-decoration: none; color: inherit; border-radius: inherit; }
 .panel .feed .row .event, .panel .feed .row .event:visited { color: var(--ink); }
-.eventIcon { flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.eventIcon { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .eventIcon[data-kind="defects"] { color: #d96a62; background: #d96a6214; }
 .eventIcon[data-kind="runs"] { color: #398878; background: #39887816; }
 .eventIcon[data-kind="access"] { color: #b88432; background: #b8843215; }
@@ -27,7 +27,7 @@
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 2px; }
 .unreadDot { flex: 0 0 5px; width: 5px; height: 5px; margin-top: 7px; border-radius: 50%; background: #4a82e7; }
 .badge { position: absolute; top: 0; right: -2px; width: 5px; height: 5px; background: #e45861; border-radius: 50%; }
-.empty { min-height: 300px; height: 100%; padding: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--muted); }
+.empty { min-height: 230px; height: 100%; padding: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--muted); }
 .empty h3 { font-size: 14px; color: var(--ink); margin: 15px 0 6px; font-weight: 550; }
 .empty p { font-size: 12px; line-height: 1.65; max-width: 260px; margin: 0; }
 .error { padding: 12px; display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); }
