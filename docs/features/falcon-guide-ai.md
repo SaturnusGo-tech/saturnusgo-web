@@ -58,8 +58,10 @@ screenshots are involved.
 The model selects relevant authorized articles from the catalog and answers from
 their content. Returned source identifiers must match selected article sections;
 the server supplies source titles and the frontend constructs internal links.
-The model selects illustration IDs from cited sections, never image URLs or
-captions. The backend resolves those IDs against its authorized corpus. The
+The model selects illustration IDs from authorized sections, never image URLs or
+captions. The backend resolves those IDs against its authorized corpus and adds
+their canonical section citations when the model omits them. The combined source
+list remains limited to eight sections. The
 frontend verifies each returned item against the visible local article catalog
 and uses that catalog's text and image metadata. Unknown, hidden or mismatched
 illustrations are not rendered. Citations and illustrations become available only
