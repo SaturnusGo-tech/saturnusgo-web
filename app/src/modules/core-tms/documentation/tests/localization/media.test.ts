@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import test from "node:test";
 import { documentationCatalog } from "../../localization/catalog/locale-catalog";
 import screenshots from "../../content-ru/walkthroughs/media/screenshots.json";
+import { historicalGuideMedia } from "../../model/visual/compatibility/historical-media";
 
 test("Russian guide uses its own complete screenshot inventory with valid dimensions", () => {
   const used = new Map(documentationCatalog("ru", true).docArticles.flatMap(a => a.sections.flatMap(s =>
@@ -24,6 +25,8 @@ test("Russian guide uses its own complete screenshot inventory with valid dimens
     assert.deepEqual(dimensions, { width: image.width, height: image.height }, src);
   }
   const assets = readdirSync("public/falcon/docs/2026-09-ru").filter(f => f.endsWith(".jpg")).sort();
-  assert.deepEqual(assets, [...used.keys()].map(src => src.split("/").pop()).sort());
-  assert.deepEqual(assets, Object.keys(screenshots).map(key => `${key}.jpg`).sort());
+  const current = [...used.keys()].map(src => src.split("/").pop()).sort();
+  const retained = historicalGuideMedia.filter(item => item.locale === "ru").map(item => item.src.split("/").pop()!);
+  assert.deepEqual(current, Object.keys(screenshots).map(key => `${key}.jpg`).sort());
+  assert.deepEqual(assets, [...current, ...retained].sort(), "only the explicit historical compatibility assets may remain outside the current guide");
 });

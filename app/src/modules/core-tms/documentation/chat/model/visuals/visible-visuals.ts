@@ -1,5 +1,6 @@
 import type { DocArticle } from "../../../model/article";
 import { documentationSectionMedia } from "../../../model/visual/guide-media";
+import { matchesHistoricalGuideMedia } from "../../../model/visual/compatibility/historical-media";
 import type { ScreenshotStep } from "../../../model/visual/walkthrough";
 import type { GuideVisual } from "../conversation";
 
@@ -15,10 +16,11 @@ export function visibleGuideVisuals(visuals: readonly GuideVisual[] | undefined,
     if (!article || !section || seen.has(key)) return [];
     const sourceSteps = section.blocks.flatMap(block => block.kind === "walkthrough" ? block.steps : []);
     const media = documentationSectionMedia(section);
-    const selected = new Map(visual.items.map(item => [item.id, item]));
     const steps = media.flatMap(item => {
-      const supplied = selected.get(item.id), source = sourceSteps.find(step => step.image.src === item.src);
-      if (!source || supplied?.src !== item.src) return [];
+      const source = sourceSteps.find(step => step.image.src === item.src);
+      const selected = visual.items.some(supplied => (supplied.id === item.id && supplied.src === item.src)
+        || matchesHistoricalGuideMedia(article.id, section.id, supplied, item));
+      if (!source || !selected) return [];
       return [{ id: item.id, title: item.title, instruction: item.instruction, result: item.result,
         image: { src: item.src, alt: item.alt, width: source.image.width, height: source.image.height } }];
     });

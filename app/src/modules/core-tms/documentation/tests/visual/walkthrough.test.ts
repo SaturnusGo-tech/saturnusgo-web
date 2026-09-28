@@ -5,6 +5,7 @@ import test from "node:test";
 import { docArticles, articleById } from "../../content/catalog";
 import { searchArticles } from "../../model/search";
 import screenshots from "../../content/walkthroughs/media/screenshots.json";
+import { historicalGuideMedia } from "../../model/visual/compatibility/historical-media";
 
 const flows = docArticles.flatMap((article) => article.sections.flatMap((section) =>
   section.blocks.flatMap((block) => block.kind === "walkthrough" ? [{ article, block }] : [])));
@@ -54,8 +55,10 @@ test("every published screenshot has accurate dimensions and fits the asset budg
   }
   assert.ok(total < 8_000_000, "guide screenshot budget");
   const assets = readdirSync("public/falcon/docs/2026-09").filter((file) => file.endsWith(".jpg")).sort();
-  assert.deepEqual(assets, [...used.keys()].map((src) => src.split("/").pop()).sort());
-  assert.deepEqual(assets, Object.keys(screenshots).map((key) => `${key}.jpg`).sort());
+  const current = [...used.keys()].map(src => src.split("/").pop()).sort();
+  const retained = historicalGuideMedia.filter(item => item.locale === "en").map(item => item.src.split("/").pop()!);
+  assert.deepEqual(current, Object.keys(screenshots).map(key => `${key}.jpg`).sort());
+  assert.deepEqual(assets, [...current, ...retained].sort(), "only the explicit historical compatibility assets may remain outside the current guide");
 });
 
 test("instructions, outcomes and image descriptions participate in documentation search", () => {
