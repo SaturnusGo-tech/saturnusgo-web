@@ -14,7 +14,7 @@
 .thumbnail:focus-visible { outline: 2px solid var(--docs-ink); outline-offset: 3px; }
 .expand { display: flex; position: absolute; right: 6px; bottom: 6px; padding: 5px; border-radius: 50%; background: var(--docs-bg); color: var(--docs-copy); box-shadow: 0 1px 3px #0002; }
 .galleryScroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--docs-line) transparent; padding-bottom: 9px; }
-.gallery { display: flex; align-items: start; gap: 16px; width: max-content; }
+.gallery { display: flex; align-items: flex-start; gap: 16px; width: max-content; }
 .gallery > li { width: 270px; flex: 0 0 270px; display: flex; flex-direction: column; gap: 10px; }
 .gallery .thumbnail { order: -1; }
 .gallery .thumbnail img { height: 157px; aspect-ratio: auto; }
