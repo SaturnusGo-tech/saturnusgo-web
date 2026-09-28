@@ -12,7 +12,7 @@ export const importFoldersWalkthrough = walkthrough("Import and export test case
     "Open the **Folder** field. Choose **Project root** or find a folder. The arrows beside Payments, Security and Transfers expand their nested levels.",
     "The structure from the file is added inside the selected destination. Importing does not merge several projects into one repository.",
     "Expanded import folder picker with Project root selected and Payments, Security and Transfers available below."),
-  shot("settings-03-exchange-20260928-en-20260928",
+  shot("settings-03-exchange-20260928-rows-en-20260928",
     "Use the shared import and export settings",
     "In **Settings → Import and export**, select **Export JSON** to download cases or **Import cases** to open the import page.",
     "Check that Payments is selected. JSON transfers case content and folders; it is not a complete backup and does not transfer custom field definitions, assignments, attachments or run history.",

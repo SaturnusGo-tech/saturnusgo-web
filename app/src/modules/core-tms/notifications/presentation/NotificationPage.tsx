@@ -57,7 +57,7 @@ export function NotificationPage({ model: m, ru, onOpen }: {
           {settings && (
             <>
               <NotificationChannels model={m} ru={ru} />
-              <section className={styles.card} aria-labelledby={`${id}-preferences-title`}>
+              <section className={styles.section} aria-labelledby={`${id}-preferences-title`}>
                 <h2>
                   <button type="button" className={styles.accordionTrigger} id={`${id}-preferences-title`}
                     aria-expanded={preferencesExpanded} aria-controls={`${id}-preferences`}
@@ -70,7 +70,7 @@ export function NotificationPage({ model: m, ru, onOpen }: {
                     <ChevronDown className={styles.chevron} size={20} aria-hidden="true" />
                   </button>
                 </h2>
-                <div className={styles.cardBody} id={`${id}-preferences`} hidden={!preferencesExpanded}>
+                <div className={styles.sectionBody} id={`${id}-preferences`} hidden={!preferencesExpanded}>
                   <div className={styles.categoryGroups}>
                     {categoryGroups.map((group) => (
                       <fieldset className={styles.categoryGroup} key={group.id}>
@@ -96,7 +96,7 @@ export function NotificationPage({ model: m, ru, onOpen }: {
                   <p className={styles.helpNote}>{ru ? "Применяется к Telegram и подключённым браузерам." : "Applies to Telegram and connected browsers."}</p>
                 </div>
               </section>
-              <section className={styles.card} aria-labelledby={`${id}-activity-title`}>
+              <section className={styles.section} aria-labelledby={`${id}-activity-title`}>
                 <h2>
                   <button type="button" className={styles.accordionTrigger} id={`${id}-activity-title`}
                     aria-expanded={activityExpanded} aria-controls={`${id}-activity`}
@@ -108,7 +108,7 @@ export function NotificationPage({ model: m, ru, onOpen }: {
                     <ChevronDown className={styles.chevron} size={20} aria-hidden="true" />
                   </button>
                 </h2>
-                <div className={styles.cardBody} id={`${id}-activity`} hidden={!activityExpanded}>
+                <div className={styles.sectionBody} id={`${id}-activity`} hidden={!activityExpanded}>
                   <div className={styles.feedHeader}>
                     <span>{ru ? "Входящие" : "Inbox"}</span>
                     <button type="button" onClick={() => void m.retry()} disabled={m.busy}>{ru ? "Обновить" : "Refresh"}</button>

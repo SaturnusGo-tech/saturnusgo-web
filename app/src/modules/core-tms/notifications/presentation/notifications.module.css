@@ -49,32 +49,34 @@
 .page button:disabled, .page input:disabled { opacity: .45; cursor: not-allowed; }
 .page.page :is(button, a, input):focus-visible { outline: 2px solid var(--notification-focus); outline-offset: 4px; box-shadow: none; }
 .page [hidden] { display: none; }
-.channels { display: grid; gap: 16px; list-style: none; padding: 0; margin-block: 0 16px; }
-.card { min-width: 0; border: 1px solid var(--notification-line); border-radius: 24px; background: var(--notification-surface); }
-.page > .card { margin-bottom: 16px; }
-.accordionTrigger { display: flex; align-items: center; gap: 20px; width: 100%; min-height: 98px; padding: 22px 24px; border: 0; border-radius: 23px; background: transparent; color: var(--notification-ink); text-align: left; }
-.accordionTrigger:hover { background: var(--notification-hover); }
+/* One continuous settings surface: dividers separate rows, not nested cards. */
+.channels { display: grid; list-style: none; padding: 0; margin-block: 0; }
+.section { min-width: 0; border: 0; border-bottom: 1px solid var(--notification-line); background: transparent; }
+.page > .section:last-child { border-bottom: 0; }
+.accordionTrigger { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 76px; padding: 18px 0; border: 0; border-radius: 0; background: transparent; color: var(--notification-ink); text-align: left; }
+.accordionTrigger:hover .sectionTitle { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--notification-muted); }
 .sectionCopy { display: grid; flex: 1; min-width: 0; gap: 4px; }
-.sectionTitle { font-size: 17px; line-height: 1.4; font-weight: 550; letter-spacing: -.025em; }
-.sectionDescription { color: var(--notification-muted); font-size: 14px; line-height: 1.5; font-weight: 400; letter-spacing: -.015em; }
-.chevron { color: var(--notification-muted); flex: 0 0 20px; transition: transform 160ms ease; }
+.sectionTitle { font-size: 14px; line-height: 1.4; font-weight: 550; letter-spacing: -.015em; }
+.sectionDescription { color: var(--notification-muted); font-size: 13px; line-height: 1.5; font-weight: 400; }
+.chevron { color: var(--notification-muted); flex: 0 0 16px; transition: transform 160ms ease; }
 .accordionTrigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
-.enabledCount { flex-shrink: 0; color: var(--notification-muted); font-size: 14px; font-weight: 400; }
-.channelHeader { position: relative; }
-.channelTrigger .sectionCopy { padding-right: 165px; }
-.channelActions { position: absolute; top: 50%; right: 66px; display: flex; align-items: center; gap: 16px; transform: translateY(-50%); }
-.channelIcon { box-sizing: content-box !important; flex: 0 0 23px; padding-right: 17px; border-right: 1px solid var(--notification-line); color: var(--notification-muted); }
-.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 38px; padding: 7px 16px; border: 1px solid var(--notification-line); border-radius: 14px; color: var(--notification-ink); background: transparent; font-size: 14px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
+.enabledCount { flex-shrink: 0; color: var(--notification-muted); font-size: 12px; font-weight: 400; }
+.channelHeader { display: flex; align-items: center; gap: 24px; }
+.channelHeader h2 { flex: 1; min-width: 0; }
+.channelTrigger { gap: 12px; }
+.channelActions { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; min-width: 96px; }
+.channelIcon { flex: 0 0 18px; color: var(--notification-muted); }
+.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 34px; padding: 6px 12px; border: 1px solid var(--notification-line); border-radius: 999px; color: var(--notification-ink); background: transparent; font-size: 13px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
 .connectionButton:hover:not(:disabled) { background: var(--notification-hover); border-color: var(--notification-muted); }
-.channelNotice { margin: -4px 24px 20px; color: var(--notification-muted); font-size: 13px; line-height: 1.5; }
-.cardBody { margin: 0 24px; padding: 21px 0 22px; border-top: 1px solid var(--notification-line); }
+.channelNotice { margin: -6px 0 16px 30px; color: var(--notification-muted); font-size: 12px; line-height: 1.5; }
+.sectionBody { margin: 0; padding: 0 0 20px; }
 .connectionStatus { margin: 0; color: var(--notification-ink); }
 .categoryGroups { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
 .categoryGroup { min-width: 0; margin: 0; padding: 0; border: 0; }
-.categoryGroup legend { margin-bottom: 10px; padding: 0; color: var(--notification-muted); font-size: 12px; line-height: 1.5; font-weight: 500; text-transform: uppercase; }
-.categories { display: grid; gap: 10px; }
-.category { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-width: 0; min-height: 44px; padding: 8px 14px; border: 1px solid var(--notification-line); border-radius: 11px; color: var(--notification-muted); font-size: 14px; cursor: pointer; transition: background-color 160ms ease; }
-.category:hover { background: var(--notification-hover); }
+.categoryGroup legend { margin-bottom: 10px; padding: 0; color: var(--notification-muted); font-size: 12px; line-height: 1.5; font-weight: 500; letter-spacing: .01em; }
+.categories { display: grid; }
+.category { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-width: 0; min-height: 44px; padding: 8px 0; border: 0; color: var(--notification-ink); font-size: 13px; cursor: pointer; }
+.category:hover { color: var(--notification-muted); }
 .category:has(input:disabled) { cursor: not-allowed; }
 :global(.dark) .category { color: var(--notification-ink); }
 .switchControl { position: relative; display: inline-flex; flex: 0 0 44px; width: 44px; height: 26px; cursor: pointer; }
@@ -86,7 +88,7 @@
 .switchInput:focus-visible + .switchTrack { outline: 2px solid var(--notification-focus); outline-offset: 4px; }
 .switchInput:disabled + .switchTrack { opacity: .45; }
 .switchControl:has(input:disabled) { cursor: not-allowed; }
-.helpNote { margin: 20px 0 0; color: var(--notification-muted); font-size: 13px; line-height: 1.6; }
+.helpNote { margin: 12px 0 0; color: var(--notification-muted); font-size: 13px; line-height: 1.6; }
 .feedHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; color: var(--notification-muted); font-size: 13px; }
 .feedHeader button, .error button, .more { min-height: 34px; padding: 6px 12px; border: 1px solid var(--notification-line); border-radius: 11px; color: var(--notification-ink); background: transparent; font-size: 13px; }
 .feedHeader button:hover:not(:disabled), .error button:hover:not(:disabled), .more:hover:not(:disabled), .readButton:hover:not(:disabled) { background: var(--notification-hover); }
@@ -104,44 +106,30 @@
 .feed p { grid-column: 1; grid-row: 2; margin: 3px 0 0; color: var(--notification-muted); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .feed time { grid-column: 2; grid-row: 1; color: var(--notification-muted); font-size: 12px; white-space: nowrap; }
 .readButton { display: grid; place-items: center; flex-shrink: 0; width: 32px; height: 32px; margin-top: -3px; padding: 6px; border: 0; border-radius: 9px; color: var(--notification-muted); background: transparent; }
-.empty { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 28px 0 18px; color: var(--notification-muted); }
+.empty { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 20px 0; color: var(--notification-muted); }
 .empty h3 { margin: 0; font-size: 14px; font-weight: 400; }
-.error { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; padding: 16px 20px; border: 1px solid var(--notification-line); border-radius: 16px; color: var(--notification-ink); background: var(--notification-surface); font-size: 14px; }
+.error { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; padding: 12px 0; border-bottom: 1px solid var(--notification-line); color: var(--notification-ink); font-size: 13px; }
 .linkFlow, .pending { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px; font-size: 14px; }
 .linkFlow p { flex-basis: 100%; margin: 0; color: var(--notification-muted); }
 .pending { justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--notification-line); }
 .pending strong { font-weight: 550; }
 .more { display: block; margin: 12px auto 0; }
 .skeleton { display: grid; gap: 16px; }
-.skeleton i { display: block; width: 100%; height: 98px; border: 1px solid var(--notification-line); border-radius: 24px; background: var(--notification-surface); animation: pulse 1.6s ease-in-out infinite; }
+.skeleton i { display: block; width: 100%; height: 76px; border-bottom: 1px solid var(--notification-line); background: var(--notification-surface); animation: pulse 1.6s ease-in-out infinite; }
 .skeleton i:nth-child(3) { height: 320px; }
 @keyframes pulse { 50% { opacity: .45; } }
 @media (max-width: 900px) {
-  .channelTrigger .sectionCopy { padding-right: 145px; }
-  .channelActions { gap: 12px; }
-  .channelIcon { padding-right: 12px; }
-  .categoryGroups { gap: 20px; }
+  .categoryGroups { gap: 24px; }
   .eventContent { grid-template-columns: minmax(0, 1fr); }
   .feed time { grid-column: 1; grid-row: 3; margin-top: 5px; }
 }
 @media (max-width: 700px) {
   .page { padding: 24px 18px 36px; }
-  .header h1 { font-size: 26px; }
-  .header p { font-size: 14px; }
-  .accordionTrigger { gap: 12px; padding: 20px; }
-  .channelTrigger { align-items: flex-start; padding-bottom: 66px; }
-  .channelTrigger .sectionCopy { padding-right: 0; }
-  .channelTrigger .chevron { margin-top: 3px; }
-  .channelActions { top: auto; bottom: 18px; right: auto; left: 20px; transform: none; }
-  .channelIcon { width: 20px; height: 20px; }
-  .connectionButton { min-height: 34px; padding: 5px 13px; font-size: 13px; }
-  .channelNotice { margin: 0 20px 18px; }
-  .cardBody { margin-inline: 20px; }
+  .header h1 { font-size: 25px; }
+  .channelHeader { gap: 12px; }
+  .channelActions { min-width: 0; }
+  .channelTrigger .sectionDescription { font-size: 12px; }
   .categoryGroups { grid-template-columns: minmax(0, 1fr); gap: 22px; }
-  .category { min-height: 46px; }
-  .enabledCount { font-size: 12px; }
-  .sectionTitle { font-size: 16px; }
-  .sectionDescription { font-size: 13px; }
   .error { align-items: flex-start; }
 }
 @media (forced-colors: active) {

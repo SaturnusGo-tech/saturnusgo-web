@@ -1,7 +1,7 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 export const settingsWalkthrough = walkthrough("Settings by task", [
-  shot("settings-01-general-20260928-en-20260928", "Check the project",
+  shot("settings-01-general-20260928-rows-en-20260928", "Check the project",
     "Open **Settings** in the global sidebar. Under **General**, check the project name, key and status. Select **Edit** to open its properties.",
     "The screenshot shows Payments with key PAY and Active status. Other settings sections are available on the left.",
     "Payments general settings with its description, PAY key, Active status and archive action."),
@@ -13,7 +13,7 @@ export const settingsWalkthrough = walkthrough("Settings by task", [
     "Open **Appearance and language** on the left. Select the light or dark theme card, then English or Russian. Changes apply immediately without a separate save action.",
     "Theme and language preferences are saved for this browser and applied to Falcon's workspace screens.",
     "Appearance and language settings with the light theme and English selected and the dark theme and Russian available."),
-  shot("settings-03-exchange-20260928-en-20260928", "Transfer your test repository",
+  shot("settings-03-exchange-20260928-rows-en-20260928", "Transfer your test repository",
     "Open **Import and export** in the project group. **Export JSON** downloads a file. **Import cases** opens a separate page for choosing a file, project and folder.",
     "The import page includes source file history, the current operation's result and partial-import continuation. JSON does not transfer all project data; review the limits in the import and export article.",
     "Payments Import and export settings with separate Export JSON and Import cases actions."),

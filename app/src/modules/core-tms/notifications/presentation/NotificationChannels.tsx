@@ -21,12 +21,13 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
         : null;
   return (
     <ul className={styles.channels} aria-label={ru ? "Каналы уведомлений" : "Notification channels"}>
-      <li className={styles.card}>
+      <li className={styles.section}>
         <div className={styles.channelHeader}>
           <h2>
             <button type="button" className={`${styles.accordionTrigger} ${styles.channelTrigger}`}
               id={`${id}-browser-title`} aria-expanded={browserExpanded} aria-controls={`${id}-browser`}
               onClick={() => setBrowserExpanded((value) => !value)}>
+              <AppWindow className={styles.channelIcon} size={18} strokeWidth={1.7} aria-hidden="true" />
               <span className={styles.sectionCopy}>
                 <span className={styles.sectionTitle}>{ru ? "Уведомления в браузере" : "Browser notifications"}</span>
                 <span className={styles.sectionDescription}>{ru ? "Получайте уведомления в этом браузере." : "Receive notifications in this browser."}</span>
@@ -35,7 +36,6 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
             </button>
           </h2>
           <div className={styles.channelActions}>
-            <AppWindow className={styles.channelIcon} size={23} strokeWidth={1.7} aria-hidden="true" />
             <label className={styles.switchControl}>
               <input type="checkbox" role="switch" className={styles.switchInput}
                 aria-label={ru ? "Уведомления в браузере" : "Browser notifications"}
@@ -48,19 +48,20 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
           </div>
         </div>
         {browserNotice && <p className={styles.channelNotice} id={`${id}-browser-notice`}>{browserNotice}</p>}
-        <div className={styles.cardBody} id={`${id}-browser`} hidden={!browserExpanded}>
+        <div className={styles.sectionBody} id={`${id}-browser`} hidden={!browserExpanded}>
           <p className={styles.connectionStatus}>{m.connected
             ? ru ? "Уведомления включены в этом браузере." : "Notifications are enabled in this browser."
             : ru ? "Уведомления выключены в этом браузере." : "Notifications are off in this browser."}</p>
           {!m.connected && !browserNotice && <p className={styles.helpNote}>{ru ? "Включите уведомления и разрешите их в браузере." : "Turn on notifications and allow them when your browser asks."}</p>}
         </div>
       </li>
-      <li className={styles.card}>
+      <li className={styles.section}>
         <div className={styles.channelHeader}>
           <h2>
             <button type="button" className={`${styles.accordionTrigger} ${styles.channelTrigger}`}
               id={`${id}-telegram-title`} aria-expanded={telegramExpanded} aria-controls={`${id}-telegram`}
               onClick={() => setTelegramExpanded((value) => !value)}>
+              <Send className={styles.channelIcon} size={18} strokeWidth={1.7} aria-hidden="true" />
               <span className={styles.sectionCopy}>
                 <span className={styles.sectionTitle}>Telegram</span>
                 <span className={styles.sectionDescription}>{ru ? "Получайте уведомления Falcon в Telegram." : "Receive Falcon notifications in Telegram."}</span>
@@ -69,7 +70,6 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
             </button>
           </h2>
           <div className={styles.channelActions}>
-            <Send className={styles.channelIcon} size={23} strokeWidth={1.7} aria-hidden="true" />
             {(!s?.pendingTelegram || s?.telegramConnected) && (
               <button type="button" className={styles.connectionButton} disabled={m.busy || !s?.telegramUsername}
                 aria-describedby={!s?.telegramUsername ? `${id}-telegram-notice` : undefined}
@@ -85,7 +85,7 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
           </div>
         </div>
         {!s?.telegramUsername && <p className={styles.channelNotice} id={`${id}-telegram-notice`}>{ru ? "Бот ещё не подключён." : "The bot has not been connected yet."}</p>}
-        <div className={styles.cardBody} id={`${id}-telegram`} hidden={!telegramExpanded}>
+        <div className={styles.sectionBody} id={`${id}-telegram`} hidden={!telegramExpanded}>
           <p className={styles.connectionStatus}>{s?.telegramConnected
             ? ru ? "Telegram подключён." : "Telegram is connected."
             : ru ? "Telegram не подключён." : "Telegram is not connected."}</p>

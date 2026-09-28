@@ -38,7 +38,7 @@ export function ConfigView(props: ConfigViewProps) {
       </nav>
     </aside>
     <div className={css.content}>
-      {settingsSections.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel}>
+      {settingsSections.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
         <header className={css.header}>
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>
         {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
