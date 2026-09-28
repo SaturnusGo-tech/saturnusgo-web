@@ -9,12 +9,17 @@ import { useDocumentationNavigation } from "../navigation/useDocumentationNaviga
 import { DocumentationTree } from "./navigation/DocumentationTree";
 import { DocumentationArticle } from "./article/DocumentationArticle";
 import { SearchResults } from "./search/SearchResults";
+import { documentationChatId } from "../navigation/documentation-link";
+import { useDocumentationChat } from "../chat/state/useDocumentationChat";
+import { DocumentationChat } from "../chat/presentation/DocumentationChat";
+import { guideChatCopy } from "../chat/localization/copy";
 import styles from "./documentation.module.css";
 
 export function DocumentationView() {
   const copy = useDocumentationCopy();
   const { articleById, locale } = useDocumentationCatalog();
   const navigation = useDocumentationNavigation();
+  const chat = useDocumentationChat();
   const { isLight, toggleAnimated } = useColorMode();
   const [query, setQuery] = useState("");
   const [treeOpen, setTreeOpen] = useState(false);
@@ -23,6 +28,7 @@ export function DocumentationView() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const article = articleById.get(navigation.articleId);
   const searching = Boolean(query.trim());
+  const chatting = !searching && navigation.articleId === documentationChatId;
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -67,7 +73,7 @@ export function DocumentationView() {
     <header className={styles.header}>
       <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? copy.hideTree : copy.showTree}
         aria-expanded={treeOpen} aria-controls="documentation-sidebar" onClick={() => setTreeOpen((current) => !current)}>{treeOpen ? <X size={18} /> : <Menu size={18} />}</button>
-      <BookOpen size={17} aria-hidden="true" /><span>{copy.documentation}</span><span className={styles.headerDivider}>/</span><strong>{searching ? copy.search : article?.title ?? copy.notFound}</strong>
+      <BookOpen size={17} aria-hidden="true" /><span>{copy.documentation}</span><span className={styles.headerDivider}>/</span><strong>{searching ? copy.search : chatting ? guideChatCopy[locale].title : article?.title ?? copy.notFound}</strong>
       <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? copy.darkTheme : copy.lightTheme}
         onClick={(event) => toggleAnimated({ x: event.clientX, y: event.clientY })}>{isLight ? <Moon size={16} /> : <Sun size={16} />}</button>
     </header>
@@ -76,13 +82,13 @@ export function DocumentationView() {
         <DocumentationTree navigation={navigation} query={query} onQuery={setQuery} searchRef={searchRef} onNavigate={select} onSearch={() => setTreeOpen(false)} />
       </aside>
       <div className={styles.readingArea}>
-        <div ref={scrollRef} className={styles.scroll}>
+        {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} /> : <div ref={scrollRef} className={styles.scroll}>
           {searching ? <SearchResults query={query.trim()} navigation={navigation} onSelect={select} /> : article
             ? <DocumentationArticle key={`${locale}:${article.id}`} article={article} navigation={navigation} />
             : <section className={styles.searchResults}><span className={styles.eyebrow}>{copy.guide}</span><h1>{copy.notFound}</h1>
               <p>{copy.outdatedLink}</p>
               <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>{copy.openGuide}</a></section>}
-        </div>
+        </div>}
         {!searching && article && <nav className={styles.toc} aria-label={copy.onThisPage}><strong>{copy.onThisPage}</strong>
           {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)} aria-current={activeSection === s.id ? "location" : undefined}>{s.title}</a>)}
           <div className={styles.tocNote}>{copy.guideNote}<br />{copy.workspaceNote}</div>

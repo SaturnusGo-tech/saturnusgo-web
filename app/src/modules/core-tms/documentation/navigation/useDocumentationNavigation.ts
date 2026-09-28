@@ -12,11 +12,11 @@ export function useDocumentationNavigation() {
     return () => { window.removeEventListener("popstate", read); window.removeEventListener("hashchange", read); };
   }, []);
   const link = (id: string, section?: string) => href ? documentationLink(href, id, section) : `?view=help&article=${id}`;
-  const navigate = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+  const navigate = (event: MouseEvent<HTMLAnchorElement>, id: string, section?: string) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     transitionContent(() => {
-    const next = documentationLink(window.location.href, id);
+    const next = documentationLink(window.location.href, id, section);
     if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== next) navigateWorkspace(next);
     setHref(window.location.href); setArticleId(id);
     });

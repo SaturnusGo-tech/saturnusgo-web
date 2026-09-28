@@ -73,8 +73,8 @@ test("company host parsing leaves the legacy origin alone until migration and re
   assert.equal(companyHost("tms.saturnusgo.com", { ...env, FALCON_LEGACY_HOST_MANAGED: "true" }), "tenant");
 });
 
-test("only dictation accepts the bounded five-minute PCM payload, and caller cancellation reaches the API", async () => {
-  const endpoint = `/api/v1/workspaces/workspace-a/ai/dictation`;
+for (const purpose of ["dictation", "documentation-dictation"]) test(`${purpose} accepts bounded PCM and forwards cancellation`, async () => {
+  const endpoint = `/api/v1/workspaces/workspace-a/ai/${purpose}`;
   const controller = new AbortController();
   const request = (path, size, method = "POST", declared) => new Request(`https://${host}${path}`, {
     method, body: "x".repeat(size), signal: controller.signal,

@@ -33,6 +33,7 @@ export function ManagedWorkspaceGate({ children, session, logout }: {
   }, [session.workspaceId, session.audience]);
   if (!ready) return <TmsAuthState kind="loading" />;
   return <TmsSessionProvider value={{ kind: "managed", subject: session.identity.id, label: profile.name,
+    workspaceId: session.workspaceId, workspaceRole: session.identity.role,
     companyCapabilities: session.capabilities, profilePath: "/testcases/umbrella-home/work/?view=profile", hasAvatar: profile.hasAvatar, avatarVersion: profile.version, updateProfile, avatarLoader,
     administrationPath: session.identity.role === "workspace_admin" ? "/admin/" : undefined, signOut: logout }}>
     <TmsHttpClientProvider client={http}><AttachmentClientProvider client={attachments}>{children}</AttachmentClientProvider></TmsHttpClientProvider>

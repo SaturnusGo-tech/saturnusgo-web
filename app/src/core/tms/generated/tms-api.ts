@@ -4344,6 +4344,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/ai/documentation-chat": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer a Falcon question from the authorized guide
+         * @description Active workspace members including viewers can ask about Falcon. workspace:read authorization is required. Trusted release guide corpus only; administrator articles require workspace_admin in this workspace. Locale selects both knowledge and answer language. Bounded conversation is never treated as documentation. Server selects up to 4 articles, generates a grounded response and validates exact section citations. At most 2 provider calls under one 38-second deadline. No tools, mutations, persisted chats or provider storage. Durable atomic member, workspace and global request quotas apply. Body limit 160000 bytes. No automatic retries. AI_GUIDE_RATE_LIMITED is 429, AI_GUIDE_UNAVAILABLE is 503 and AI_GUIDE_OUTPUT_INVALID is 422. Disconnect cancels the request.
+         */
+        post: operations["answerDocumentationQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspaceId}/ai/documentation-dictation": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transcribe a draft question for the Falcon guide
+         * @description Active workspace members including viewers may transcribe a question using workspace:read authorization. Identical bounded PCM WAV, language auto-detection, cancellation, provider and durable member/global time and request budgets as editor dictation. Returns draft text only; it never sends a chat message, saves audio or invokes the guide model. Editor dictation continues to require defect:manage. All validation, body limits, DICTATION_* errors and retries match the existing dictation contract.
+         */
+        post: operations["transcribeDocumentationQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8334,6 +8384,31 @@ export interface components {
         CustomFieldValueListEnvelope: {
             data: components["schemas"]["CustomFieldValue"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        DocumentationChatMessage: {
+            /** @enum {string} */
+            role: "user" | "assistant";
+            content: string;
+        };
+        /** @description 1–12 messages with at most 24000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge. */
+        DocumentationChatRequest: {
+            /** @enum {string} */
+            locale: "ru" | "en";
+            messages: components["schemas"]["DocumentationChatMessage"][];
+        };
+        DocumentationChatCitation: {
+            articleId: string;
+            sectionId: string;
+            title: string;
+        };
+        /** @description Supported answers include validated links to authorized guide sections. Unsupported or unrelated questions receive a localized explanation with no citations. The corpus version identifies the release knowledge used. */
+        DocumentationChatResult: {
+            answer: string;
+            citations: components["schemas"]["DocumentationChatCitation"][];
+            knowledgeVersion: string;
+        };
+        DocumentationChatResponse: {
+            data: components["schemas"]["DocumentationChatResult"];
         };
     };
     responses: {
@@ -18015,6 +18090,140 @@ export interface operations {
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["ReleaseWritePaused"];
+        };
+    };
+    answerDocumentationQuestion: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentationChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Answer with guide citations and release knowledge version */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentationChatResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            413: components["responses"]["PayloadTooLarge"];
+            /** @description AI_GUIDE_OUTPUT_INVALID; unsupported citations or incomplete model output are never returned as a grounded answer */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description AI_GUIDE_RATE_LIMITED; minimum retry delay is 60 seconds. Daily quotas reset at the next UTC day. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    /** @description 60 seconds (minimum suggested retry delay) */
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            /** @description AI_GUIDE_UNAVAILABLE; no workspace content changes */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    transcribeDocumentationQuestion: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DictationRequest"];
+            };
+        };
+        responses: {
+            /** @description Recognized instruction; no user content has been changed */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DictationResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            413: components["responses"]["PayloadTooLarge"];
+            /** @description DICTATION_INVALID_AUDIO for invalid format/duration or DICTATION_EMPTY for no detected speech */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description DICTATION_RATE_LIMITED; request or duration budget exhausted, or provider rate limit. Monthly quotas reset at the next UTC calendar month. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    /** @description 60 seconds (minimum suggested retry delay) */
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            /** @description DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
 }

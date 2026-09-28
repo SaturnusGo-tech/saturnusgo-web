@@ -8,6 +8,9 @@ export interface TmsSessionIdentity {
   readonly kind: "admin" | "cloud" | "managed";
   readonly label: string;
   readonly subject: string | null;
+  /** Membership returned by the authenticated session, scoped to this workspace. */
+  readonly workspaceId?: string | null;
+  readonly workspaceRole?: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer" | null;
   readonly profilePath?: string;
   readonly administrationPath?: string;
   readonly hasAvatar?: boolean;

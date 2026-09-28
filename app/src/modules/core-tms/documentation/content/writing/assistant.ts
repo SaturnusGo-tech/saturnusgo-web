@@ -7,6 +7,7 @@ export const writingAssistantArticle: DocArticle = {
   keywords: ["Falcon AI", "dictation", "microphone", "move window", "drag and drop", "hold", "fix errors", "improve text", "Markdown", "selection", "orb", "highlight", "writing", "improve", "H1", "H2", "H3", "headings"],
   related: ["colored-marker", "create-test-case", "edit-test-case", "portfolios"],
   sections: [
+    section("guide-chat", "Questions about Falcon", paragraph("For instructions about Falcon itself, open Help → Falcon AI chat. That chat explains procedures from this guide and links to the relevant articles. The editor assistant described below works on the text you select; it does not open the guide chat.")),
     section("walkthrough", "Walkthrough", assistantWalkthrough),
     section("open", "Select text and open Falcon AI", paragraph("Start editing a description, preconditions, action, or expected result. The same tools are available in project and portfolio descriptions and test plans. The blue **Ask Falcon AI** orb is first on the Markdown toolbar, to the left of Undo."),
       paragraph("Select a letter, word, sentence, paragraph, or all text, including lists and special characters. The selection stays highlighted while you type, dictate, or move the window. Without a selection, Falcon AI highlights and processes the entire current field. The window identifies the scope as **Selected text** or **Entire field**. Highlighting disappears when you close the window or apply a response and is not saved in the document.")),

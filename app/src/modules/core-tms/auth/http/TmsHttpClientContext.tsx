@@ -21,7 +21,11 @@ export function TmsHttpClientProvider({
 }
 
 export function useTmsHttpClient(): TmsHttpClient {
-  const client = useContext(TmsHttpClientContext);
+  const client = useOptionalTmsHttpClient();
   if (!client) throw new Error("TMS HTTP client is outside its authentication provider.");
   return client;
+}
+
+export function useOptionalTmsHttpClient(): TmsHttpClient | null {
+  return useContext(TmsHttpClientContext);
 }

@@ -86,6 +86,9 @@
     },
     {
       "name": "Support"
+    },
+    {
+      "name": "Documentation assistant"
     }
   ],
   "paths": {
@@ -3395,7 +3398,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5158,7 +5161,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -17538,6 +17541,242 @@
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
         "description": "Exact normalized duplicates always conflict. Similar strings require explicit confirmedSimilarValueIds from a prior SIMILAR_VALUES_EXIST conflict; the server rechecks matches under the project lock. New product values require a valid product-group parent. Archiving an in-use value is rejected; snapshots remain immutable."
+      }
+    },
+    "/workspaces/{workspaceId}/ai/documentation-chat": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "answerDocumentationQuestion",
+        "tags": [
+          "Documentation assistant"
+        ],
+        "summary": "Answer a Falcon question from the authorized guide",
+        "description": "Active workspace members including viewers can ask about Falcon. workspace:read authorization is required. Trusted release guide corpus only; administrator articles require workspace_admin in this workspace. Locale selects both knowledge and answer language. Bounded conversation is never treated as documentation. Server selects up to 4 articles, generates a grounded response and validates exact section citations. At most 2 provider calls under one 38-second deadline. No tools, mutations, persisted chats or provider storage. Durable atomic member, workspace and global request quotas apply. Body limit 160000 bytes. No automatic retries. AI_GUIDE_RATE_LIMITED is 429, AI_GUIDE_UNAVAILABLE is 503 and AI_GUIDE_OUTPUT_INVALID is 422. Disconnect cancels the request.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentationChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Answer with guide citations and release knowledge version",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "description": "AI_GUIDE_OUTPUT_INVALID; unsupported citations or incomplete model output are never returned as a grounded answer",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI_GUIDE_RATE_LIMITED; minimum retry delay is 60 seconds. Daily quotas reset at the next UTC day.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "60 seconds (minimum suggested retry delay)"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI_GUIDE_UNAVAILABLE; no workspace content changes",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/ai/documentation-dictation": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "transcribeDocumentationQuestion",
+        "tags": [
+          "Documentation assistant"
+        ],
+        "summary": "Transcribe a draft question for the Falcon guide",
+        "description": "Active workspace members including viewers may transcribe a question using workspace:read authorization. Identical bounded PCM WAV, language auto-detection, cancellation, provider and durable member/global time and request budgets as editor dictation. Returns draft text only; it never sends a chat message, saves audio or invokes the guide model. Editor dictation continues to require defect:manage. All validation, body limits, DICTATION_* errors and retries match the existing dictation contract.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recognized instruction; no user content has been changed",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "description": "DICTATION_INVALID_AUDIO for invalid format/duration or DICTATION_EMPTY for no detected speech",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "DICTATION_RATE_LIMITED; request or duration budget exhausted, or provider rate limit. Monthly quotas reset at the next UTC calendar month.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "60 seconds (minimum suggested retry delay)"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
       }
     }
   },
@@ -34438,7 +34677,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -35061,7 +35300,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -35162,7 +35401,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -38821,6 +39060,121 @@
           "data",
           "meta"
         ]
+      },
+      "DocumentationChatMessage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "content"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          }
+        }
+      },
+      "DocumentationChatRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "locale",
+          "messages"
+        ],
+        "description": "1–12 messages with at most 24000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ru",
+              "en"
+            ]
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/components/schemas/DocumentationChatMessage"
+            }
+          }
+        }
+      },
+      "DocumentationChatCitation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "articleId",
+          "sectionId",
+          "title"
+        ],
+        "properties": {
+          "articleId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "sectionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1100
+          }
+        }
+      },
+      "DocumentationChatResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answer",
+          "citations",
+          "knowledgeVersion"
+        ],
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16000
+          },
+          "citations": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/DocumentationChatCitation"
+            }
+          },
+          "knowledgeVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        },
+        "description": "Supported answers include validated links to authorized guide sections. Unsupported or unrelated questions receive a localized explanation with no citations. The corpus version identifies the release knowledge used."
+      },
+      "DocumentationChatResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DocumentationChatResult"
+          }
+        }
       }
     }
   }

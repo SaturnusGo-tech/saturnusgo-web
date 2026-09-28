@@ -1,9 +1,11 @@
 "use client";
 import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../../access/useDocumentationCatalog";
-import { BookOpen, ChevronDown, FileText, Search, X } from "lucide-react";
+import { BookOpen, ChevronDown, FileText, Search, Sparkles, X } from "lucide-react";
 import { useEffect, useState, type RefObject } from "react";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
+import { documentationChatId } from "../../navigation/documentation-link";
+import { guideChatCopy } from "../../chat/localization/copy";
 import styles from "../documentation.module.css";
 
 export function DocumentationTree({ navigation, query, onQuery, searchRef, onNavigate, onSearch }: {
@@ -23,6 +25,11 @@ export function DocumentationTree({ navigation, query, onQuery, searchRef, onNav
       {query ? <button type="button" aria-label={copy.clearSearch} onClick={() => { onQuery(""); searchRef.current?.focus(); }}><X size={14} /></button> : <kbd>/</kbd>}
     </form>
     <nav className={styles.tree} aria-label={copy.guideArticles}>
+      <a className={styles.chatLink} href={navigation.link(documentationChatId)}
+        aria-current={!query && navigation.articleId === documentationChatId ? "page" : undefined}
+        onClick={event => { navigation.navigate(event, documentationChatId); if (event.defaultPrevented) onNavigate(); }}>
+        <Sparkles size={15} aria-hidden="true" /><span>{guideChatCopy[locale].title}</span>
+      </a>
       {docGroups.map((item) => <section key={item.id} className={styles.treeGroup}>
         <button type="button" className={styles.groupToggle} aria-expanded={!closed.includes(item.id)} aria-controls={`docs-group-${item.id}`}
           onClick={() => setClosed((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}>

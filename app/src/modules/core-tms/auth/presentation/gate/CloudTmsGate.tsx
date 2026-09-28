@@ -30,13 +30,15 @@ export function CloudTmsGate({
   const sessionIdentity = useMemo(() => ({
     kind: "cloud" as const,
     subject: `cloud:${session.identity.id}`,
+    workspaceId: session.workspace.id,
+    workspaceRole: session.membership.role,
     label: `${session.identity.givenName} ${session.identity.familyName}`.trim()
       || session.identity.email,
     signOut: async () => {
       await logoutCloudSession();
       window.location.replace("/");
     },
-  }), [session.identity]);
+  }), [session.identity, session.workspace.id, session.membership.role]);
 
   return (
     <TmsSessionProvider value={sessionIdentity}>

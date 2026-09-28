@@ -1,6 +1,8 @@
 # Falcon user documentation
 
-The global Help button opens `view=help`. An article is addressable with
+The global Help button opens `view=help` with Falcon AI chat selected. The first
+navigation item below guide search returns to the chat; articles remain in the
+tree. An article is addressable with
 `article=<id>` and an optional section hash. Links retain workspace/project
 scope and remove selectors belonging to other screens.
 
@@ -33,7 +35,43 @@ The production static export must pass the normal repository workflow.
 
 The module is loaded through `DocumentationEntry` only when Help is opened.
 It uses the existing Falcon color-mode hook and shared dark surface tokens.
-No additional service, CMS, credentials or package dependencies are required.
+Articles and screenshots remain available without an AI response. Chat uses the
+authenticated documentation-assistant API and its configured server-side model.
+No provider credentials belong in frontend code or the documentation corpus.
+
+## Falcon AI chat and server knowledge
+
+The guide chat explains documented Falcon procedures and links to source articles
+and sections. It has no tools that create or change projects, cases, runs, builds,
+or settings. Conversation context stays in frontend memory for the current tab;
+it is not a stored chat history. Opening guide articles or guide search preserves
+the conversation. New chat, leaving Help, changing the interface language,
+workspace, or authenticated account clears it. Dictation inserts editable text into the composer.
+The user must send the request explicitly after reviewing it.
+
+Both typed article catalogs are the authoritative knowledge source. The server
+ships a generated, versioned JSON corpus rather than accepting guide content or
+article permissions from a chat request. It applies locale and authenticated
+workspace-administrator visibility before retrieval and generation. A content
+export preserves `adminOnly` and `planned` flags; it never turns planned features
+into available capabilities. Every section retains its stable source ID.
+
+After editing either edition, export the corpus to the backend checkout:
+
+```bash
+npx tsx scripts/documentation-ai/export.ts --output ../.tms-run-builds-backend/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json
+npx tsx scripts/documentation-ai/export.ts --check ../.tms-run-builds-backend/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json
+npx tsx --test scripts/documentation-ai/tests/*.test.ts
+```
+
+The path is explicit so a release checkout can target its corresponding backend.
+`--check` fails on missing or stale content without rewriting it. The version is
+the SHA-256 of canonical article JSON; ordering and output do not depend on the
+clock or filesystem enumeration. Export includes every paragraph, list, step,
+callout, table, code example, article reference and walkthrough instruction,
+expected result and screenshot alt text. It does not copy image files or extract
+screenshots with OCR. Never put credentials or customer data in article examples.
+Regenerate and verify the server corpus in the same release as guide changes.
 
 ## Illustrated workflows
 
