@@ -6,18 +6,22 @@ import { documentationCatalog } from "../../../localization/catalog/locale-catal
 import { guideChatCopy } from "../../localization/copy";
 import { shouldSendQuestion } from "../../presentation/composer/keyboard";
 
-test("request history retains complete recent exchanges within server limits", () => {
+test("request history preserves the original migration goal and recent exchanges within server limits", () => {
   const messages: GuideMessage[] = Array.from({ length: 20 }, (_, index) => ({ role: index % 2 ? "assistant" : "user", content: `${index}` }));
+  messages[0].content = "Migrate our TestRail project to Falcon";
+  messages[1].content = "Export the project and prepare a JSON import.";
   const recent = conversationContext(messages, "new question");
-  assert.equal(recent.length, 11); assert.equal(recent[0].content, "10");
+  assert.equal(recent.length, 19); assert.equal(recent[0].content, messages[0].content);
+  assert.equal(recent[1].content, messages[1].content); assert.equal(recent[2].content, "4");
   assert.deepEqual(recent[recent.length - 1], { role: "user", content: "new question" });
   const large = conversationContext([
-    { role: "user", content: "older" }, { role: "assistant", content: "answer" },
+    { role: "user", content: "g".repeat(4000) }, { role: "assistant", content: "a".repeat(4000) },
+    { role: "user", content: "Older exchange" }, { role: "assistant", content: "Older answer" },
     { role: "user", content: "u".repeat(8000) }, { role: "assistant", content: "a".repeat(16000) },
   ], "q".repeat(8000));
-  assert.equal(large.length, 3);
+  assert.equal(large.length, 5);
   assert.ok(large.every(message => message.content.length <= 8000));
-  assert.equal(large.reduce((sum, message) => sum + message.content.length, 0), 24000);
+  assert.equal(large.reduce((sum, message) => sum + message.content.length, 0), 32000);
 });
 
 test("citations cannot expose hidden articles or invent section links and use local guide titles", () => {

@@ -16,7 +16,7 @@ const blocks: DocBlock[] = [
   { kind: "articles", ids: ["example"] },
   { kind: "walkthrough", title: "Recorded workflow", steps: [{ title: "Open run",
     instruction: "Select a run", result: "The run opens", image: {
-      src: "/falcon/docs/private-example.jpg", alt: "Run status and owner", width: 1200, height: 800,
+      src: "/falcon/docs/2026-09/example.jpg", alt: "Run status and owner", width: 1200, height: 800,
     } }] },
 ];
 const example: DocArticle = {
@@ -24,9 +24,11 @@ const example: DocArticle = {
   keywords: ["example"], related: [], adminOnly: true, status: "planned",
   sections: [{ id: "procedure", title: "Procedure", blocks }],
 };
+const russian = (article: DocArticle): DocArticle => JSON.parse(JSON.stringify(article).replaceAll("/2026-09/", "/2026-09-ru/"));
+const editions = (articles: DocArticle[]) => ({ en: articles, ru: articles.map(russian) });
 
-test("export retains instructions from every block and excludes image paths", () => {
-  const corpus = buildGuideCorpus({ en: [example], ru: [example] });
+test("export retains instructions from every block and keeps image metadata separate from text", () => {
+  const corpus = buildGuideCorpus(editions([example]));
   const article = corpus.articles.find(entry => entry.locale === "en")!;
   assert.equal(article.adminOnly, true);
   assert.equal(article.status, "planned");
@@ -36,17 +38,18 @@ test("export retains instructions from every block and excludes image paths", ()
     "Recorded workflow", "Open run", "Select a run", "The run opens", "Run status and owner"]) {
     assert.ok(article.sections[0].text.includes(expected), expected);
   }
-  assert.ok(!JSON.stringify(corpus).includes("private-example.jpg"));
+  assert.ok(!article.sections[0].text.includes("example.jpg"));
+  assert.equal(article.sections[0].media?.[0].src, "/falcon/docs/2026-09/example.jpg");
 });
 
 test("canonical version is repeatable, ignores catalog ordering and changes with instructions", () => {
   const second = { ...example, id: "second", adminOnly: false, status: undefined };
-  const first = buildGuideCorpus({ en: [example, second], ru: [example, second] });
-  const reordered = buildGuideCorpus({ ru: [second, example], en: [second, example] });
+  const first = buildGuideCorpus(editions([example, second]));
+  const reordered = buildGuideCorpus(editions([second, example]));
   assert.deepEqual(first, reordered);
   assert.equal(first.version, createHash("sha256").update(JSON.stringify(first.articles)).digest("hex"));
   const changed = { ...second, description: "Changed procedure" };
-  assert.notEqual(buildGuideCorpus({ en: [example, changed], ru: [example, second] }).version, first.version);
+  assert.notEqual(buildGuideCorpus({ en: [example, changed], ru: [russian(example), russian(second)] }).version, first.version);
   assert.equal(first.articles.find(article => article.id === "second")?.status, "available");
 });
 

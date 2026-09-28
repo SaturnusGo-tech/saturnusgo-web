@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { DocArticle, DocBlock } from "../../app/src/modules/core-tms/documentation/model/article";
+import { documentationMediaLocale, documentationSectionMedia, type DocumentationMedia } from "../../app/src/modules/core-tms/documentation/model/visual/guide-media";
 
 type Locale = "en" | "ru";
 type CorpusArticle = {
@@ -10,7 +11,7 @@ type CorpusArticle = {
   keywords: string[];
   adminOnly: boolean;
   status: "available" | "planned";
-  sections: { id: string; title: string; text: string }[];
+  sections: { id: string; title: string; text: string; media?: DocumentationMedia[] }[];
 };
 
 function blockText(block: DocBlock, articles: ReadonlyMap<string, DocArticle>): string {
@@ -48,10 +49,14 @@ export function buildGuideCorpus(catalogs: Record<Locale, readonly DocArticle[]>
       articles.push({
         id: article.id, locale, title: article.title, description: article.description,
         keywords: [...article.keywords], adminOnly: article.adminOnly === true, status: article.status ?? "available",
-        sections: article.sections.map(section => ({
-          id: section.id, title: section.title,
-          text: section.blocks.map(block => blockText(block, byId)).join("\n\n"),
-        })),
+        sections: article.sections.map(section => {
+          const media = documentationSectionMedia(section);
+          if (media.some(image => documentationMediaLocale(image.src) !== locale)) throw new Error(`Screenshot locale mismatch: ${locale}:${article.id}:${section.id}`);
+          return { id: section.id, title: section.title,
+            text: section.blocks.map(block => blockText(block, byId)).join("\n\n"),
+            ...(media.length ? { media } : {}),
+          };
+        }),
       });
     }
   }

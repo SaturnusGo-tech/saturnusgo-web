@@ -17778,6 +17778,128 @@
           }
         }
       }
+    },
+    "/workspaces/{workspaceId}/ai/documentation-chat/stream": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,160}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "streamDocumentationChat",
+        "tags": [
+          "Documentation assistant"
+        ],
+        "summary": "Stream a grounded Falcon guide answer",
+        "description": "Streams real generated answer text as SSE data JSON events. Text deltas are provisional. Exactly one complete event carries the validated answer, citations and optional guide images; on error discard partial content. Authorization, validation and quota errors before streaming use ordinary JSON HTTP error responses. Client cancellation aborts provider work. Uses the same single durable budget reservation as the JSON endpoint.",
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentationChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server-sent data frames containing DocumentationChatStreamEvent JSON. Complete or error terminates the stream.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Each data line is JSON conforming to DocumentationChatStreamEvent."
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store, no-transform"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "422": {
+            "description": "AI_GUIDE_OUTPUT_INVALID; unsupported citations or incomplete model output are never returned as a grounded answer",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI_GUIDE_RATE_LIMITED; minimum retry delay is 60 seconds. Daily quotas reset at the next UTC day.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "60 seconds (minimum suggested retry delay)"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI_GUIDE_UNAVAILABLE; no workspace content changes",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -39090,7 +39212,7 @@
           "locale",
           "messages"
         ],
-        "description": "1–12 messages with at most 24000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -39102,7 +39224,7 @@
           "messages": {
             "type": "array",
             "minItems": 1,
-            "maxItems": 12,
+            "maxItems": 20,
             "items": {
               "$ref": "#/components/schemas/DocumentationChatMessage"
             }
@@ -39160,6 +39282,14 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 160
+          },
+          "visuals": {
+            "type": "array",
+            "maxItems": 8,
+            "description": "Optional server-resolved images from cited authorized guide sections. At most eight images in total across groups.",
+            "items": {
+              "$ref": "#/components/schemas/DocumentationChatVisual"
+            }
           }
         },
         "description": "Supported answers include validated links to authorized guide sections. Unsupported or unrelated questions receive a localized explanation with no citations. The corpus version identifies the release knowledge used."
@@ -39175,6 +39305,163 @@
             "$ref": "#/components/schemas/DocumentationChatResult"
           }
         }
+      },
+      "DocumentationChatMedia": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "instruction",
+          "result",
+          "src",
+          "alt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "instruction": {
+            "type": "string",
+            "maxLength": 8000
+          },
+          "result": {
+            "type": "string",
+            "maxLength": 8000
+          },
+          "src": {
+            "type": "string",
+            "pattern": "^/falcon/docs/2026-09(-ru)?/[a-z0-9-]+\\.jpg$",
+            "maxLength": 300
+          },
+          "alt": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "DocumentationChatVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "articleId",
+          "sectionId",
+          "layout",
+          "items"
+        ],
+        "properties": {
+          "articleId": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "sectionId": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "layout": {
+            "type": "string",
+            "enum": [
+              "steps",
+              "gallery"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/DocumentationChatMedia"
+            }
+          }
+        }
+      },
+      "DocumentationChatStreamEvent": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "delta"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text_delta"
+                ]
+              },
+              "delta": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "data"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "complete"
+                ]
+              },
+              "data": {
+                "$ref": "#/components/schemas/DocumentationChatResult"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "error"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              },
+              "error": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message",
+                  "requestId"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "AI_GUIDE_UNAVAILABLE",
+                      "AI_GUIDE_RATE_LIMITED",
+                      "AI_GUIDE_OUTPUT_INVALID"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "requestId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     }
   }

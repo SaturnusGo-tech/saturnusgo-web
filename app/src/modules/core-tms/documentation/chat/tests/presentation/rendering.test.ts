@@ -6,12 +6,14 @@ import type { GuideMessage } from "../../presentation/messages/GuideMessage";
 import type { GuideMarkdown } from "../../presentation/messages/GuideMarkdown";
 import { guideChatCopy } from "../../localization/copy";
 import { visibleCitations } from "../../model/citations";
+import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
 
 test("plain suggestions fill the composer without making AI requests; reset and retry are explicit", () => {
   const h = componentHarness(); let draft = "", resets = 0, retries = 0;
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [], enabled: true, busy: false, error: "", draft: "",
     setDraft: (value: string) => draft = value, newChat: () => resets++, retry: () => retries++ } as unknown as Parameters<typeof render>[0]["chat"];
@@ -30,6 +32,7 @@ test("assistant sources open only verified internal article and section links", 
     if (name.endsWith("useDocumentationCatalog")) return { useDocumentationCatalog: () => catalog };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
     if (name.endsWith("citations")) return { visibleCitations };
+    if (name.endsWith("visible-visuals")) return { visibleGuideVisuals };
   });
   const article = catalog.articleById.get("create-run")!, section = article.sections[0];
   const opened: string[][] = []; let selected = 0;
@@ -53,4 +56,18 @@ test("Markdown disables raw HTML, remote media and generated links; citations ar
   assert.ok((markdown.props.disallowedElements as string[]).includes("img"));
   assert.equal((markdown.props.urlTransform as (value: string) => string)("https://external.example"), "");
   assert.equal((markdown.props.urlTransform as (value: string) => string)("javascript:alert(1)"), "");
+});
+
+test("streaming text replaces the checking indicator before the validated answer is committed", () => {
+  const h = componentHarness();
+  const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
+    if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
+  });
+  const chat = { locale: "en", messages: [{ role: "user", content: "Question" }], partialText: "Actual streamed words", busy: true,
+    enabled: true, draft: "", error: "", conversationId: 1 } as unknown as Parameters<typeof render>[0]["chat"];
+  const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {} })));
+  assert.equal(all.some(node => Array.isArray(node.props.children) && node.props.children.includes(guideChatCopy.en.preparing)), false);
+  const partial = all.find(node => node.type === "GuideMessage" && node.props.streaming)!;
+  assert.equal((partial.props.message as { content: string }).content, "Actual streamed words");
 });

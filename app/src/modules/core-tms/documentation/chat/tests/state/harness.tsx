@@ -5,10 +5,10 @@ import type { GuideAnswer } from "../../model/conversation";
 import { useGuideConversation } from "../../state/useGuideConversation";
 
 Object.assign(globalThis, { React });
-export function chatHarness() {
+export function chatHarness(customHttp?: TmsHttpClient) {
   const requests: { path: string; body: { locale: string; messages: { role: string; content: string }[] }; signal?: AbortSignal;
     resolve: (value: GuideAnswer) => void; reject: (error: Error) => void }[] = [];
-  const http = { mutate: (path: string, _method: string, body: unknown, signal?: AbortSignal) => new Promise((resolve, reject) => {
+  const http = customHttp ?? { mutate: (path: string, _method: string, body: unknown, signal?: AbortSignal) => new Promise((resolve, reject) => {
     requests.push({ path, body: body as typeof requests[number]["body"], signal, resolve: resolve as (value: GuideAnswer) => void, reject });
   }) } as TmsHttpClient;
   type Scope = Parameters<typeof useGuideConversation>[0];

@@ -11,6 +11,32 @@ const env = { FALCON_MANAGED_AUTH_ENABLED: "true", FALCON_COMPANY_DOMAIN_SUFFIX:
 const host = "acme-falcon.example.test";
 const cookie = `__Host-falcon_tenant_session=${"a".repeat(43)}`;
 
+test("guide SSE passes through without buffering and preserves cancellation", async () => {
+  const abort = new AbortController();
+  let source;
+  let upstream;
+  let cancelled = false;
+  const body = new ReadableStream({ start(controller) { source = controller; }, cancel() { cancelled = true; } });
+  const incoming = new Request(`https://${host}/api/v1/workspaces/a/ai/documentation-chat/stream`, {
+    method: "POST", body: JSON.stringify({ locale: "en" }), signal: abort.signal,
+    headers: { origin: `https://${host}`, cookie, accept: "text/event-stream", "content-type": "application/json" },
+  });
+  const response = await proxyCompanyApi(incoming, env, "tenant", async request => {
+    upstream = request;
+    return new Response(body, { headers: { "content-type": "text/event-stream; charset=utf-8" } });
+  });
+  assert.equal(upstream.headers.get("accept"), "text/event-stream");
+  assert.match(response.headers.get("content-type"), /^text\/event-stream/);
+  assert.equal(response.headers.get("cache-control"), "private, no-store, no-transform");
+  const reader = response.body.getReader();
+  source.enqueue(new TextEncoder().encode('data: {"type":"text_delta","delta":"First"}\n\n'));
+  assert.match(new TextDecoder().decode((await reader.read()).value), /First/);
+  abort.abort();
+  assert.equal(upstream.signal.aborted, true);
+  await reader.cancel();
+  assert.equal(cancelled, true);
+});
+
 test("gateway signs the exact tenant, body, method, path, source address and host-only session", async () => {
   const body = JSON.stringify({ name: "Анна", phone: "" });
   const incoming = new Request(`https://${host}/api/v1/profile?test=one%20two`, { method: "PATCH", body, headers: {

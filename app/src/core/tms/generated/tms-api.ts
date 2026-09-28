@@ -4394,6 +4394,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/ai/documentation-chat/stream": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stream a grounded Falcon guide answer
+         * @description Streams real generated answer text as SSE data JSON events. Text deltas are provisional. Exactly one complete event carries the validated answer, citations and optional guide images; on error discard partial content. Authorization, validation and quota errors before streaming use ordinary JSON HTTP error responses. Client cancellation aborts provider work. Uses the same single durable budget reservation as the JSON endpoint.
+         */
+        post: operations["streamDocumentationChat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -8390,7 +8415,7 @@ export interface components {
             role: "user" | "assistant";
             content: string;
         };
-        /** @description 1–12 messages with at most 24000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge. */
+        /** @description 1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge. */
         DocumentationChatRequest: {
             /** @enum {string} */
             locale: "ru" | "en";
@@ -8406,9 +8431,44 @@ export interface components {
             answer: string;
             citations: components["schemas"]["DocumentationChatCitation"][];
             knowledgeVersion: string;
+            /** @description Optional server-resolved images from cited authorized guide sections. At most eight images in total across groups. */
+            visuals?: components["schemas"]["DocumentationChatVisual"][];
         };
         DocumentationChatResponse: {
             data: components["schemas"]["DocumentationChatResult"];
+        };
+        DocumentationChatMedia: {
+            id: string;
+            title: string;
+            instruction: string;
+            result: string;
+            src: string;
+            alt: string;
+        };
+        DocumentationChatVisual: {
+            articleId: string;
+            sectionId: string;
+            /** @enum {string} */
+            layout: "steps" | "gallery";
+            items: components["schemas"]["DocumentationChatMedia"][];
+        };
+        DocumentationChatStreamEvent: {
+            /** @enum {string} */
+            type: "text_delta";
+            delta: string;
+        } | {
+            /** @enum {string} */
+            type: "complete";
+            data: components["schemas"]["DocumentationChatResult"];
+        } | {
+            /** @enum {string} */
+            type: "error";
+            error: {
+                /** @enum {string} */
+                code: "AI_GUIDE_UNAVAILABLE" | "AI_GUIDE_RATE_LIMITED" | "AI_GUIDE_OUTPUT_INVALID";
+                message: string;
+                requestId: string;
+            };
         };
     };
     responses: {
@@ -18215,6 +18275,74 @@ export interface operations {
             };
             500: components["responses"]["InternalError"];
             /** @description DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    streamDocumentationChat: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentationChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Server-sent data frames containing DocumentationChatStreamEvent JSON. Complete or error terminates the stream. */
+            200: {
+                headers: {
+                    /** @description no-store, no-transform */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            413: components["responses"]["PayloadTooLarge"];
+            /** @description AI_GUIDE_OUTPUT_INVALID; unsupported citations or incomplete model output are never returned as a grounded answer */
+            422: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description AI_GUIDE_RATE_LIMITED; minimum retry delay is 60 seconds. Daily quotas reset at the next UTC day. */
+            429: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    /** @description 60 seconds (minimum suggested retry delay) */
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            /** @description AI_GUIDE_UNAVAILABLE; no workspace content changes */
             503: {
                 headers: {
                     "X-Request-Id": components["headers"]["XRequestId"];

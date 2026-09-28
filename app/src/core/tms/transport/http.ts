@@ -19,6 +19,7 @@ export type TmsMutationOptions = {
 };
 
 export interface TmsHttpClient {
+  stream?(path: string, body: unknown, signal?: AbortSignal): Promise<Response>;
   get<T>(path: string, signal?: AbortSignal): Promise<T>;
   getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>>;
   mutate<T>(path: string, method: MutationMethod, body?: unknown, signal?: AbortSignal): Promise<T>;
@@ -141,6 +142,13 @@ export function createTmsHttpClient(
   }
 
   return Object.freeze({
+    async stream(path: string, body: unknown, signal?: AbortSignal): Promise<Response> {
+      return request(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+        body: JSON.stringify(body),
+      }, signal);
+    },
     async get<T>(path: string, signal?: AbortSignal): Promise<T> {
       return await payload<T>(await request(path, { method: "GET" }, signal));
     },
