@@ -8,7 +8,6 @@ import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import type { GuideMessage } from "../../presentation/messages/GuideMessage";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
 import { documentationSectionMedia } from "../../../model/visual/guide-media";
-import { historyContent } from "../../model/context/history-content";
 import type { GuideVisual } from "../../model/conversation";
 
 test("gallery is a keyboard reachable scroll region and opens the existing guide image viewer", () => {
@@ -25,7 +24,7 @@ test("gallery is a keyboard reachable scroll region and opens the existing guide
   assert.equal(images[0].props.width, 1440); assert.equal(images[0].props.height, 900);
   assert.equal((images[0].props.style as { aspectRatio: string }).aspectRatio, "1440 / 900");
   const buttons = all().filter(node => node.props["aria-haspopup"] === "dialog");
-  assert.equal(buttons[1].props["aria-label"], "Enlarge screenshot 2: Step 2"); invoke(buttons[1], "onClick");
+  assert.equal(buttons[1].props["aria-label"], "Enlarge screenshot 2: Step 2"); invoke(buttons[1], "onClick", { currentTarget: null });
   let viewer = all().find(node => node.type === "ScreenshotDialog")!;
   assert.equal(viewer.props.selected, 1); assert.equal((viewer.props.steps as unknown[]).length, 6);
   invoke(viewer, "onSelect", null); viewer = all().find(node => node.type === "ScreenshotDialog")!; assert.equal(viewer.props.selected, null);
@@ -34,7 +33,7 @@ test("gallery is a keyboard reachable scroll region and opens the existing guide
   assert.equal(all().some(node => node.props["aria-expanded"] !== undefined), false);
 });
 
-test("all seven images across 5+2 sections match follow-up positions and the shared image viewer", () => {
+test("all seven images across 5+2 sections use continuous positions in the shared image viewer", () => {
   const catalog = documentationCatalog("en", false), h = componentHarness();
   const group = (articleId: string, count: number): GuideVisual => {
     const article = catalog.articleById.get(articleId)!;
@@ -45,6 +44,7 @@ test("all seven images across 5+2 sections match follow-up positions and the sha
   const { GuideMessage: renderMessage } = h.load<{ GuideMessage: typeof GuideMessage }>(new URL("../../presentation/messages/GuideMessage.tsx", import.meta.url), name => {
     if (name.endsWith("useDocumentationCatalog")) return { useDocumentationCatalog: () => catalog };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("citations")) return { visibleCitations: () => [] };
     if (name.endsWith("visible-visuals")) return { visibleGuideVisuals };
   });
@@ -62,13 +62,9 @@ test("all seven images across 5+2 sections match follow-up positions and the sha
   assert.equal(images.length, 7);
   assert.deepEqual(rendered.map(group => group.all().find(node => node.type === "ol")!.props.start), [1, 6]);
   assert.deepEqual(buttons.map(node => Number(String(node.props["aria-label"]).match(/screenshot (\d+):/)?.[1])), [1, 2, 3, 4, 5, 6, 7]);
-  const history = historyContent(message, 8000, catalog.articleById), marker = "[Displayed guide images: context only]\n";
-  const metadata = JSON.parse(history.slice(history.indexOf(marker) + marker.length, history.lastIndexOf("\n[/Displayed guide images]"))) as { position: number; mediaId: string }[];
   const expected = visibleGuideVisuals(message.visuals, catalog.articleById).flatMap(group => group.steps);
   assert.deepEqual(images.map(node => node.props.src), expected.map(step => step.image.src));
-  assert.deepEqual(metadata.map(item => item.position), [1, 2, 3, 4, 5, 6, 7]);
-  assert.deepEqual(metadata.map(item => item.mediaId), expected.map(step => step.id));
-  invoke(buttons[5], "onClick");
+  invoke(buttons[5], "onClick", { currentTarget: null });
   let viewer = rendered[1].all().find(node => node.type === "ScreenshotDialog")!;
   assert.equal(viewer.props.selected, 5); assert.equal((viewer.props.steps as unknown[]).length, 7);
   invoke(viewer, "onSelect", 4); viewer = rendered[1].all().find(node => node.type === "ScreenshotDialog")!;

@@ -1,24 +1,22 @@
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
-import type { TmsHttpClient } from "../../../../../../core/tms/transport/http";
-import type { GuideAnswer } from "../../model/conversation";
 import { useGuideConversation } from "../../state/useGuideConversation";
+import { guideBackend } from "../history/support/backend";
 
 Object.assign(globalThis, { React });
-export function chatHarness(customHttp?: TmsHttpClient) {
-  const requests: { path: string; body: { locale: string; messages: { role: string; content: string }[] }; signal?: AbortSignal;
-    resolve: (value: GuideAnswer) => void; reject: (error: Error) => void }[] = [];
-  const http = customHttp ?? { mutate: (path: string, _method: string, body: unknown, signal?: AbortSignal) => new Promise((resolve, reject) => {
-    requests.push({ path, body: body as typeof requests[number]["body"], signal, resolve: resolve as (value: GuideAnswer) => void, reject });
-  }) } as TmsHttpClient;
+export const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+export function chatHarness(backend = guideBackend()) {
   type Scope = Parameters<typeof useGuideConversation>[0];
-  let scope: Scope = { http, workspaceId: "workspace-a", subject: "member-a", locale: "ru", enabled: true };
+  let scope: Scope = { http: backend.api, workspaceId: "workspace-a", subject: "member-a", locale: "ru", enabled: true };
   let state!: ReturnType<typeof useGuideConversation>, tree!: ReactTestRenderer;
   function Hook() { state = useGuideConversation(scope); return null; }
   act(() => { tree = create(<Hook />); });
-  return { requests, get: () => state, update: (patch: Partial<Scope>) => act(() => { scope = { ...scope, ...patch }; tree.update(<Hook />); }),
-    draft: (text: string) => act(() => state.setDraft(text)), send: () => act(() => { void state.send(); }),
-    reply: (index: number, answer = "Answer") => act(async () => requests[index].resolve({ answer, citations: [], knowledgeVersion: "fixture" })),
-    fail: (index: number, error: Error) => act(async () => requests[index].reject(error)),
+  return { backend, requests: backend.requests, get: () => state,
+    update: async (patch: Partial<Scope>) => act(async () => { scope = { ...scope, ...patch }; tree.update(<Hook />); await flush(); }),
+    draft: (text: string) => act(() => state.setDraft(text)),
+    send: () => act(async () => { void state.send(); await flush(); }),
+    reply: (index: number, answer = "Answer") => act(async () => { backend.complete(index, answer); await flush(); }),
+    fail: (index: number, code = "AI_GUIDE_UNAVAILABLE") => act(async () => { backend.fail(index, code); await flush(); }),
+    run: (action: () => void | Promise<void>) => act(async () => { await action(); await flush(); }),
     unmount: () => act(() => tree.unmount()) };
 }

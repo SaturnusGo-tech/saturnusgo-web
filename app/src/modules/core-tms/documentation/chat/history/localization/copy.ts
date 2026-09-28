@@ -1,0 +1,33 @@
+export const guideHistoryCopy = {
+  en: {
+    actions: "Chat options", rename: "Rename", archive: "Archive", save: "Save", cancel: "Cancel", title: "Chat name",
+    archiveConfirm: "Archive this chat? It will leave your history and its shared links will stop working.",
+    manageFailure: "Could not update this chat. Try again.", manageConflict: "This chat changed. Review your edit and try again.",
+    history: "Chat history", search: "Find a chat", empty: "Your conversations will appear here.", noResults: "No matching chats.",
+    loading: "Loading conversations…", loadMore: "Load more", earlier: "Earlier messages", retry: "Try again", close: "Close history",
+    unavailable: "Could not load this conversation.", missing: "This conversation is unavailable.", conflict: "This chat changed. Refresh it before sending again.",
+    pending: "A response is still being prepared. Refresh the conversation to check it.", cancelled: "Response stopped. Your question is ready to send again.",
+    refresh: "Refresh conversation", untitled: "New chat", share: "Share answer", copyLink: "Copy link", copied: "Link copied",
+    shareScope: "Anyone in this workspace with this link can read this question and answer. Your other messages stay private.",
+    revoke: "Revoke link", revoked: "Link revoked", shareFailure: "Could not update the shared link. Try again.",
+    shared: "Shared answer", sharedMissing: "This link is unavailable or has been revoked.", startOwn: "Start my own chat",
+    ownHint: "This is a shared answer. Start your own chat to ask a follow-up.", closeShare: "Close sharing options",
+    linking: "Preparing link…", copyFailed: "The link was saved, but could not be copied. Try again.",
+  },
+  ru: {
+    actions: "Действия с чатом", rename: "Переименовать", archive: "В архив", save: "Сохранить", cancel: "Отмена", title: "Название чата",
+    archiveConfirm: "Архивировать чат? Он исчезнет из истории, а ссылки на его ответы перестанут работать.",
+    manageFailure: "Не удалось изменить чат. Попробуйте ещё раз.", manageConflict: "Чат изменился. Проверьте правку и повторите попытку.",
+    history: "История чатов", search: "Найти чат", empty: "Здесь появятся ваши разговоры.", noResults: "Чаты не найдены.",
+    loading: "Загружаем разговоры…", loadMore: "Загрузить ещё", earlier: "Предыдущие сообщения", retry: "Повторить", close: "Закрыть историю",
+    unavailable: "Не удалось загрузить разговор.", missing: "Этот разговор недоступен.", conflict: "Чат изменился. Обновите его перед отправкой.",
+    pending: "Ответ ещё готовится. Обновите разговор, чтобы проверить результат.", cancelled: "Ответ остановлен. Вопрос готов к повторной отправке.",
+    refresh: "Обновить разговор", untitled: "Новый чат", share: "Поделиться ответом", copyLink: "Скопировать ссылку", copied: "Ссылка скопирована",
+    shareScope: "Участники этого рабочего пространства смогут открыть по ссылке только этот вопрос и ответ. Остальная переписка останется личной.",
+    revoke: "Отозвать ссылку", revoked: "Ссылка отозвана", shareFailure: "Не удалось обновить ссылку. Попробуйте ещё раз.",
+    shared: "Ответ по ссылке", sharedMissing: "Ссылка недоступна или была отозвана.", startOwn: "Начать свой чат",
+    ownHint: "Это ответ по ссылке. Чтобы задать следующий вопрос, начните свой чат.", closeShare: "Закрыть настройки ссылки",
+    linking: "Создаём ссылку…", copyFailed: "Ссылка сохранена, но её не удалось скопировать. Попробуйте ещё раз.",
+  },
+} as const;
+export type GuideHistoryCopy = typeof guideHistoryCopy["en"] | typeof guideHistoryCopy["ru"];

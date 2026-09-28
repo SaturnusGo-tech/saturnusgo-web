@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Expand } from "lucide-react";
 import { ScreenshotDialog } from "../../../presentation/walkthrough/ScreenshotDialog";
 import { InlineText } from "../../../presentation/content/InlineText";
@@ -11,6 +11,7 @@ export function GuideVisuals({ visual, copy, startIndex = 0, screenshots = visua
   visual: VisibleGuideVisual; copy: GuideChatCopy; startIndex?: number; screenshots?: VisibleGuideVisual["steps"];
 }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const origin = useRef<HTMLButtonElement>(null);
   const docsCopy = useDocumentationCopy(), gallery = visual.layout === "gallery";
   return <section className={css.visuals} data-layout={visual.layout} aria-label={`${copy.visuals}: ${visual.title}`}>
     <h3>{visual.title}</h3>
@@ -22,7 +23,8 @@ export function GuideVisuals({ visual, copy, startIndex = 0, screenshots = visua
             <p><InlineText text={step.instruction} /></p>
             {!gallery && <p className={css.result}><InlineText text={step.result} /></p>}
           </div>
-          <button type="button" className={css.thumbnail} onClick={() => setSelected(startIndex + index)} aria-haspopup="dialog"
+          <button type="button" className={css.thumbnail} data-guide-image-index={startIndex + index}
+            onClick={event => { origin.current = event.currentTarget; setSelected(startIndex + index); }} aria-haspopup="dialog"
             aria-label={`${docsCopy.enlargeScreenshot} ${startIndex + index + 1}: ${step.title}`}>
             <img src={step.image.src} alt={step.image.alt} width={step.image.width} height={step.image.height}
               loading="lazy" decoding="async" style={{ aspectRatio: `${step.image.width} / ${step.image.height}` }} />
@@ -31,6 +33,6 @@ export function GuideVisuals({ visual, copy, startIndex = 0, screenshots = visua
         </li>)}
       </ol>
     </div>
-    <ScreenshotDialog steps={screenshots} selected={selected} onSelect={setSelected} />
+    <ScreenshotDialog steps={screenshots} selected={selected} onSelect={setSelected} originRef={origin} />
   </section>;
 }

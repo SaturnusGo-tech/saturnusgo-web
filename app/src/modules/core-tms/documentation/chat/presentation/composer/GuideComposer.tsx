@@ -15,14 +15,14 @@ export function GuideComposer({ chat }: { chat: ReturnType<typeof useGuideConver
     enabled: chat.enabled && !chat.busy, purpose: "documentation", maximumCharacters: maximumQuestionCharacters,
     contextKey: `${chat.scopeKey}:${chat.conversationId}` });
   const tooLong = chat.draft.length > maximumQuestionCharacters;
-  const canSend = chat.enabled && Boolean(chat.draft.trim()) && !tooLong && !chat.busy && !dictation.active;
+  const canSend = chat.enabled && Boolean(chat.draft.trim()) && !tooLong && !chat.busy && !chat.loading && !chat.loadError && !dictation.active;
   const microphoneLabel = dictation.state === "starting" || dictation.state === "transcribing" ? copy.cancelDictation
     : dictation.active ? copy.stopDictation : copy.dictate;
   useEffect(() => {
     const element = input.current; if (!element) return;
     element.style.height = "auto"; element.style.height = `${Math.min(element.scrollHeight, 160)}px`;
   }, [chat.draft]);
-  useEffect(() => { input.current?.focus({ preventScroll: true }); }, [chat.scopeKey, chat.conversationId]);
+  useEffect(() => { if (!chat.targetTurnId) input.current?.focus({ preventScroll: true }); }, [chat.scopeKey, chat.conversationId, chat.targetTurnId]);
   function send() { if (canSend) { void chat.send(); input.current?.focus({ preventScroll: true }); } }
   return <div className={css.composerArea}>
     <div className={css.composer} data-input-shell data-disabled={!chat.enabled || undefined}>

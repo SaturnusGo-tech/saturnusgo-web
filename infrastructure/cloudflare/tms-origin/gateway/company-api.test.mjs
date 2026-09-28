@@ -11,13 +11,14 @@ const env = { FALCON_MANAGED_AUTH_ENABLED: "true", FALCON_COMPANY_DOMAIN_SUFFIX:
 const host = "acme-falcon.example.test";
 const cookie = `__Host-falcon_tenant_session=${"a".repeat(43)}`;
 
-test("guide SSE passes through without buffering and preserves cancellation", async () => {
+for (const path of ["documentation-chat/stream", "documentation-chats/01931df5-d039-47f3-a2d2-4309f36667b3/turns/stream"]) {
+test(`guide SSE ${path} passes through without buffering and preserves cancellation`, async () => {
   const abort = new AbortController();
   let source;
   let upstream;
   let cancelled = false;
   const body = new ReadableStream({ start(controller) { source = controller; }, cancel() { cancelled = true; } });
-  const incoming = new Request(`https://${host}/api/v1/workspaces/a/ai/documentation-chat/stream`, {
+  const incoming = new Request(`https://${host}/api/v1/workspaces/a/ai/${path}`, {
     method: "POST", body: JSON.stringify({ locale: "en" }), signal: abort.signal,
     headers: { origin: `https://${host}`, cookie, accept: "text/event-stream", "content-type": "application/json" },
   });
@@ -36,6 +37,7 @@ test("guide SSE passes through without buffering and preserves cancellation", as
   await reader.cancel();
   assert.equal(cancelled, true);
 });
+}
 
 test("gateway signs the exact tenant, body, method, path, source address and host-only session", async () => {
   const body = JSON.stringify({ name: "Анна", phone: "" });
@@ -106,9 +108,11 @@ for (const purpose of ["dictation", "documentation-dictation"]) test(`${purpose}
     method, body: "x".repeat(size), signal: controller.signal,
     headers: { origin: `https://${host}`, ...(declared ? { "content-length": String(declared) } : {}) },
   });
-  const forwarded = await signedApiRequest(request(endpoint, 12_800_100), env, "tenant");
+  const incoming = request(endpoint, 12_800_100);
+  const forwarded = await signedApiRequest(incoming, env, "tenant");
   assert.equal((await forwarded.arrayBuffer()).byteLength, 12_800_100);
   controller.abort();
+  assert.equal(incoming.signal.aborted, true);
   assert.equal(forwarded.signal.aborted, true);
   let calls = 0;
   const send = () => { calls++; throw new Error("must not send"); };

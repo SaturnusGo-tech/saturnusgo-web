@@ -10,9 +10,11 @@
 .expand { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 6px; padding: 7px 10px; color: #fff; background: rgb(15 15 18 / 88%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 5px; font-size: 11px; opacity: 0; transition: opacity 150ms ease; }
 .screenshot:hover .expand, .screenshot:focus-visible .expand { opacity: 1; }
 .step figcaption { margin-top: 10px; color: var(--docs-muted); font-size: 12px; line-height: 1.7; }
-.dialog { width: min(1440px, calc(100vw - 40px)); max-width: none; max-height: calc(100dvh - 40px); padding: 0; margin: auto; color: var(--docs-ink); background: var(--docs-bg); border: 1px solid var(--docs-line); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 80px rgb(0 0 0 / 28%); }
+.dialog { width: min(1440px, calc(100vw - 40px)); max-width: none; max-height: calc(100dvh - 40px); padding: 0; margin: auto; color: var(--docs-ink); background: transparent; border: 0; border-radius: 10px; overflow: visible; }
 .dialog::backdrop { background: rgb(10 10 12 / 78%); }
-.viewer { display: flex; flex-direction: column; max-height: calc(100dvh - 42px); }
+.dialog[data-image-motion="open"]::backdrop { animation: screenshot-backdrop-in 260ms ease both; }
+.dialog[data-image-motion="close"]::backdrop { animation: screenshot-backdrop-out 200ms ease both; }
+.viewer { display: flex; flex-direction: column; max-height: calc(100dvh - 42px); background: var(--docs-bg); border: 1px solid var(--docs-line); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 80px rgb(0 0 0 / 28%); }
 .viewer > header, .viewer > footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; flex-shrink: 0; }
 .viewer > header { border-bottom: 1px solid var(--docs-line); }
 .viewer > header span { display: block; margin-bottom: 4px; color: var(--docs-muted); font-size: 11px; }
@@ -28,4 +30,6 @@
 .viewer nav { display: flex; gap: 8px; }
 @media (hover: none) { .expand { opacity: 1; } }
 @media (max-width: 600px) { .dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); } .viewer { max-height: calc(100dvh - 18px); } .viewer > header, .viewer > footer { padding: 12px; } .viewer > footer { align-items: flex-start; } .panHint { display: block; padding: 8px 12px; color: var(--docs-muted); font-size: 11px; } }
-@media (prefers-reduced-motion: reduce) { .expand { transition: none; } }
+@keyframes screenshot-backdrop-in { from { background: transparent; } to { background: rgb(10 10 12 / 78%); } }
+@keyframes screenshot-backdrop-out { from { background: rgb(10 10 12 / 78%); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .expand { transition: none; } .dialog::backdrop { animation: none !important; } }

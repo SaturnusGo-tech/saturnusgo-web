@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
 import { documentationSectionMedia } from "../../../model/visual/guide-media";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
-import { conversationContext, type GuideVisual } from "../../model/conversation";
+import type { GuideVisual } from "../../model/conversation";
 import { validateGuideAnswer } from "../../data/validate-answer";
 
 function fixture(locale: "ru" | "en" = "en") {
@@ -28,24 +28,6 @@ test("visuals accept only visible local guide images, use canonical copy, and pr
     assert.deepEqual(visibleGuideVisuals([unsafe], catalog.articleById), []);
   }
   assert.deepEqual(visibleGuideVisuals([visual], fixture("ru").catalog.articleById), []);
-});
-
-test("follow-up about the second image retains ordered canonical captions without sending image URLs", () => {
-  const { catalog, visual, items } = fixture();
-  const context = conversationContext([
-    { role: "user", content: "Show me how to create a run" },
-    { role: "assistant", content: "Follow these steps.", visuals: [{ ...visual, items: [...items].reverse() }] },
-  ], "What do I click in the second screenshot?", catalog.articleById);
-  const history = context[1].content;
-  const marker = "[Displayed guide images: context only]\n";
-  const start = history.indexOf(marker) + marker.length, end = history.lastIndexOf("\n[/Displayed guide images]");
-  const metadata = JSON.parse(history.slice(start, end)) as { position: number; mediaId: string; title: string; instruction: string }[];
-  assert.equal(metadata[1].position, 2); assert.equal(metadata[1].mediaId, items[1].id);
-  assert.equal(metadata[1].title, items[1].title.slice(0, 120)); assert.ok(metadata[1].instruction);
-  assert.doesNotMatch(history, /https?:\/\/|\/falcon\/docs\//); assert.ok(history.length <= 8000);
-  assert.equal(context[2].content, "What do I click in the second screenshot?");
-  const long = conversationContext([{ role: "user", content: "Question" }, { role: "assistant", content: "a".repeat(16000), visuals: [visual] }], "Next?", catalog.articleById);
-  assert.ok(long[1].content.length <= 8000); assert.match(long[1].content, /Displayed guide images/);
 });
 
 test("answer validation matches the server's 16k answer and eight-image total limits", () => {

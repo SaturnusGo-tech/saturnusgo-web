@@ -1,0 +1,15 @@
+.root { display: inline-flex; position: relative; }
+.trigger { width: 28px; height: 28px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--docs-muted); }
+.trigger:hover { background: var(--docs-control); color: var(--docs-ink); }
+.panel { position: fixed; inset: auto; margin: 0; padding: 15px; overflow: auto; color: var(--docs-ink); background: var(--docs-panel); border: 1px solid var(--docs-line); border-radius: 16px; box-shadow: 0 12px 36px #0002; }
+.panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.panel h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.panel header button { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; background: transparent; color: var(--docs-muted); }
+.panel p { margin: 10px 0 14px; font-size: 12px; line-height: 1.7; color: var(--docs-copy); }
+.actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.actions button { display: inline-flex; align-items: center; gap: 6px; background: transparent; color: var(--docs-ink); border: 0; padding: 6px 0; font-size: 12px; }
+.actions button:disabled { opacity: .45; }
+.actions button + button { color: var(--docs-muted); font-size: 11px; }
+.link { width: 100%; padding: 7px 0; background: transparent; color: var(--docs-muted); border: 0; font-size: 11px; }
+.panel .status { margin-bottom: 0; color: var(--docs-muted); font-size: 11px; }
+.panel :is(button,input):focus-visible, .trigger:focus-visible { outline: 2px solid var(--docs-ink); outline-offset: 2px; }

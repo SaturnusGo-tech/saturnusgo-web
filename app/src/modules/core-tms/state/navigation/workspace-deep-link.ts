@@ -2,6 +2,7 @@ import { preserveRepositoryScope } from "../../repository-scope/navigation/repos
 import { isProjectCaseContext } from "../../test-cases/navigation/project/project-case-context";
 import { isProvider } from "../../connectors/model/connector-types";
 import { workspaceViews, type View } from "../types/workspace";
+import { preserveGuideChatRoute } from "../../documentation/chat/navigation/chat-link";
 
 export function readWorkspaceDeepLink(href: string): { view: View | null; runId: string | null; runItemId?: string } {
   const query = new URL(href).searchParams;
@@ -63,6 +64,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
   if (input.view === "help") {
     if (article && /^[a-z][a-z0-9-]{0,63}$/.test(article)) url.searchParams.set("article", article);
     if (/^#[a-z][a-z0-9-]{0,63}$/.test(section)) url.hash = section;
+    if (sameWorkspace) preserveGuideChatRoute(href, url);
   }
   if (input.view === "runs" && input.runId) url.searchParams.set("runId", input.runId);
   if (input.view === "runs" && input.runId && input.runItemId) url.searchParams.set("runItemId", input.runItemId);

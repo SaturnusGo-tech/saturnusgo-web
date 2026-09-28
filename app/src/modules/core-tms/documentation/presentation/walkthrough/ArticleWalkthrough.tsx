@@ -1,5 +1,5 @@
 import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Expand } from "lucide-react";
 import type { WalkthroughBlock } from "../../model/visual/walkthrough";
 import { InlineText } from "../content/InlineText";
@@ -9,14 +9,16 @@ import styles from "./walkthrough.module.css";
 export function ArticleWalkthrough({ block }: { block: WalkthroughBlock }) {
   const copy = useDocumentationCopy();
   const [selected, setSelected] = useState<number | null>(null);
-  return <div className={styles.root}>
+  const origin = useRef<HTMLButtonElement>(null);
+  return <div className={styles.root} data-guide-image-scope>
     <p className={styles.intro}>{copy.walkthroughIntro}</p>
     <ol className={styles.sequence} aria-label={block.title}>
       {block.steps.map((step, index) => <li key={step.image.src} className={styles.step}>
         <div className={styles.heading}><span aria-hidden="true">{index + 1}</span><h3>{step.title}</h3></div>
         <p><InlineText text={step.instruction} /></p>
         <figure>
-          <button type="button" className={styles.screenshot} onClick={() => setSelected(index)}
+          <button type="button" className={styles.screenshot} data-guide-image-index={index}
+            onClick={event => { origin.current = event.currentTarget; setSelected(index); }}
             aria-label={`${copy.enlargeScreenshot} ${index + 1}: ${step.title}`} aria-haspopup="dialog">
             <img src={step.image.src} alt={step.image.alt} width={step.image.width} height={step.image.height}
               loading="lazy" decoding="async" />
@@ -26,6 +28,6 @@ export function ArticleWalkthrough({ block }: { block: WalkthroughBlock }) {
         </figure>
       </li>)}
     </ol>
-    <ScreenshotDialog steps={block.steps} selected={selected} onSelect={setSelected} />
+    <ScreenshotDialog steps={block.steps} selected={selected} onSelect={setSelected} originRef={origin} />
   </div>;
 }

@@ -28,13 +28,29 @@ All selected steps are visible without an additional expansion action. Image
 numbers continue across sections and match follow-up context; the enlarged
 viewer uses the same complete, ordered set of up to eight screenshots.
 
-Opening a source keeps the conversation
-available when the user returns to chat. The in-memory conversation resets on
-account, workspace or language changes and is not persisted in browser storage.
-Requests retain the opening exchange and the most recent complete exchanges
+Opening a source keeps the conversation available when the user returns to chat.
+Chats are saved on the server for the current account and workspace. History
+beside New chat opens a searchable, paginated list. New chat creates a blank draft;
+its first question creates a new saved conversation without deleting old ones.
+Changing UI language does not erase history: saved text and illustrations retain
+the conversation's original locale. The server retains the opening exchange and
+the most recent complete exchanges
 within 20 messages and 32,000 characters. Prior illustrated answers include
 bounded, ordered image references in conversation context so questions about
 "the second screenshot" can be resolved against the authorized guide again.
+
+Share answer beside Copy creates an authenticated, revocable link to one completed
+question/answer pair, including sources and illustrations. It does not disclose
+the rest of the private conversation. Current workspace members can view the
+snapshot subject to the answer's source permissions; administration-only content
+remains restricted. Recipients can start their own conversation. Private chat and
+message links use stable server IDs; browser Back/Forward preserves them.
+
+Screenshot viewing animates the image from its actual thumbnail to the native
+dialog and back. The current image returns to its matching visible thumbnail,
+including after arrow navigation. Missing or off-screen targets fade safely;
+reduced-motion preferences disable spatial movement. The dialog retains keyboard
+navigation, focus management and Escape behavior.
 
 ## Knowledge and trust
 
@@ -63,6 +79,7 @@ captions. The backend resolves those IDs against its authorized corpus and adds
 their canonical section citations when the model omits them. The combined source
 list remains limited to eight sections. The
 frontend verifies each returned item against the visible local article catalog
+for the saved conversation locale
 and uses that catalog's text and image metadata. Unknown, hidden or mismatched
 illustrations are not rendered. Citations and illustrations become available only
 with the validated final response. At most eight screenshots accompany one answer.
@@ -76,16 +93,40 @@ configuration is reused; credentials are never sent to the frontend. Provider
 requests use `store: false`, bounded input/output, cancellation and timeouts.
 Durable member, workspace and global budgets cap provider usage.
 
+Private chat and turn tables enforce both workspace and owner RLS. Shared answer
+snapshots have separate policies permitting only the owner or a specifically
+requested share ID. Application authorization is repeated against current
+membership and source access. All selected source IDs are retained, not only
+citations, with a sticky administration requirement inherited from context.
+Completed turns and share content are immutable; shares can be revoked.
+
+Turns use client-generated stable UUIDs, request digests, version checks and
+database leases. Provider calls do not hold an open SQL transaction. Complete and
+cancel operations compare the claim token; the final stream event follows commit.
+A retry of a completed turn replays its saved answer without another generation.
+Partial/failed responses are never persisted as completed answers.
+
 ## Contract and integration
 
 - `POST /workspaces/{workspaceId}/ai/documentation-chat`: locale and bounded
   user/assistant message history; returns answer, validated citations and corpus
   version inside the standard data envelope, with optional validated `visuals`.
-- `POST /workspaces/{workspaceId}/ai/documentation-chat/stream`: the chat client
-  uses this SSE endpoint. JSON data frames carry `text_delta` with `delta`,
+- `POST /workspaces/{workspaceId}/ai/documentation-chat/stream`: backward-compatible
+  stateless SSE endpoint. JSON data frames carry `text_delta` with `delta`,
   `complete` with the validated `data`, or `error` with the usual safe error object.
   Only text from the provider's answer field is streamed. Source and image
   identifiers remain subject to final validation; an incomplete stream is an error.
+- `/workspaces/{workspaceId}/ai/documentation-chats`: owner-scoped creation,
+  searchable/paginated history, metadata and turn pages. The persistent chat client
+  sends new questions to `/{chatId}/turns/stream`, not browser-supplied history.
+  The stream emits `accepted` with durable IDs, `text_delta`, then committed
+  `complete` with answer, chat and turn metadata. Stable turn lookup supports
+  direct message links. Cancellation is an explicit turn command.
+- `/{chatId}/turns/{turnId}/share` creates an idempotent share snapshot;
+  `/{chatId}/shares` lists owner metadata and `/{chatId}/shares/{shareId}` revokes
+  it. `/workspaces/{workspaceId}/ai/documentation-shares/{shareId}` reads just the
+  shared pair after current membership/source authorization. See OpenAPI for all
+  bounded DTOs, cursor rules and errors.
 - `POST /workspaces/{workspaceId}/ai/documentation-dictation`: existing canonical
   WAV/transcription contract with read-member authorization. The writing endpoint
   retains its editing permission requirements.
@@ -114,11 +155,11 @@ yet contain screenshots of those states. Do not substitute unrelated images or
 claim a complete illustrated migration walkthrough until those states are
 captured from the actual product with neutral data.
 
-Deploy the reviewed backend artifact to primary and managed API services with
-schema 0066 and existing configuration unchanged. Publish the frontend export.
-The existing Worker passes SSE bodies through without buffering; its audio route
-allowance is already deployed. No Worker runtime change is required for this
-extension. The notification worker needs no update.
-Verify exact deployment/source identities, public assets, actual grounded answers
-and source navigation. Recovery uses the preceding API/frontend/Worker artifacts;
-this feature has no schema migration or product-data rewrite.
+History requires additive schema migration 0067. Before migrating, deploy a schema
+0066..0067 compatibility bridge to primary API, managed API and notifications.
+Back up the database and rehearse restore. Then apply migration 0067, deploy the
+reviewed API artifact and publish the frontend. The existing Worker forwards SSE
+without buffering. Verify deployment/source identities, schema readiness, public
+assets, saved history, shared-answer revocation and source navigation. Recovery
+retains schema 0067 and uses the compatible bridge; binaries pinned to exactly
+0066 are not a valid post-migration rollback. No existing case/run data is rewritten.

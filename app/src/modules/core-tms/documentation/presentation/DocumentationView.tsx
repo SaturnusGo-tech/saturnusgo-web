@@ -18,8 +18,8 @@ import styles from "./documentation.module.css";
 export function DocumentationView() {
   const copy = useDocumentationCopy();
   const { articleById, locale } = useDocumentationCatalog();
-  const navigation = useDocumentationNavigation();
   const chat = useDocumentationChat();
+  const navigation = useDocumentationNavigation(chat.owner);
   const { isLight, toggleAnimated } = useColorMode();
   const [query, setQuery] = useState("");
   const [treeOpen, setTreeOpen] = useState(false);

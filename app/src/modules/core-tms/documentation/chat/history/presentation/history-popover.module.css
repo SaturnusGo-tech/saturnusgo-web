@@ -1,0 +1,33 @@
+.root { position: relative; }
+.trigger { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--docs-muted); }
+.trigger:hover { background: var(--docs-control); color: var(--docs-ink); }
+.panel { display: flex; flex-direction: column; position: fixed; inset: auto; margin: 0; padding: 10px; overflow: hidden; color: var(--docs-ink); background: var(--docs-panel); border: 1px solid var(--docs-line); border-radius: 16px; box-shadow: 0 12px 36px #0002; }
+.panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 4px 9px; flex-shrink: 0; }
+.panel h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.panel header button { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; background: transparent; color: var(--docs-muted); }
+.search { display: flex; align-items: center; gap: 7px; padding: 8px 9px; margin-bottom: 6px; flex-shrink: 0; border-bottom: 1px solid var(--docs-line); color: var(--docs-muted); }
+.search input { width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; box-shadow: none; border-radius: 0; color: var(--docs-ink); font: 12px/1.5 inherit; outline: none; }
+.list { overflow-y: auto; min-height: 0; scrollbar-width: thin; overscroll-behavior: contain; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 50px; padding: 8px 10px; border: 0; border-radius: 10px; text-align: left; background: transparent; color: var(--docs-copy); }
+.row > span { min-width: 0; }
+.row strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 1.6; font-weight: 500; }
+.row time { display: block; font-size: 10px; line-height: 1.5; color: var(--docs-muted); }
+.row svg { flex-shrink: 0; }
+.row:hover, .row[aria-current="page"] { background: var(--docs-control); }
+.status { margin: 9px; color: var(--docs-muted); font-size: 12px; line-height: 1.7; }
+.more { display: block; margin: 5px auto; padding: 7px; color: var(--docs-copy); background: transparent; border: 0; font-size: 11px; }
+.more:disabled { opacity: .5; }
+.panel :is(button,input):focus-visible, .trigger:focus-visible { outline: 2px solid var(--docs-ink); outline-offset: 2px; }
+
+.item { border-radius: 10px; }
+.itemHeader { display: flex; align-items: center; gap: 2px; }
+.itemHeader .row { min-width: 0; flex: 1; }
+.itemMore { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--docs-muted); }
+.itemMore:hover, .itemMore[aria-expanded="true"] { background: var(--docs-control); color: var(--docs-ink); }
+.itemControls { padding: 2px 9px 10px; }
+.itemControls p { margin: 5px 0 8px; font-size: 11px; line-height: 1.55; color: var(--docs-muted); }
+.itemControls input { box-sizing: border-box; width: 100%; min-height: 32px; padding: 6px 8px; border: 1px solid var(--docs-line); border-radius: 7px; background: var(--docs-control); color: var(--docs-ink); font: inherit; font-size: 12px; }
+.itemButtons { display: flex; align-items: center; gap: 9px; margin-top: 4px; }
+.itemButtons button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 0; border: 0; background: transparent; color: var(--docs-copy); font-size: 11px; }
+.itemButtons button:hover { color: var(--docs-ink); }
+.itemButtons button:disabled, .itemMore:disabled { opacity: .45; }

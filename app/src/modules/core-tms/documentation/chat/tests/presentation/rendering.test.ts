@@ -5,6 +5,7 @@ import type { DocumentationChat } from "../../presentation/DocumentationChat";
 import type { GuideMessage } from "../../presentation/messages/GuideMessage";
 import type { GuideMarkdown } from "../../presentation/messages/GuideMarkdown";
 import { guideChatCopy } from "../../localization/copy";
+import { guideHistoryCopy } from "../../history/localization/copy";
 import { visibleCitations } from "../../model/citations";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
@@ -12,7 +13,9 @@ import { documentationCatalog } from "../../../localization/catalog/locale-catal
 test("plain suggestions fill the composer without making AI requests; reset and retry are explicit", () => {
   const h = componentHarness(); let draft = "", resets = 0, retries = 0;
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
+    if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [], enabled: true, busy: false, error: "", draft: "",
@@ -30,7 +33,9 @@ test("assistant sources open only verified internal article and section links", 
   const h = componentHarness(), catalog = documentationCatalog("en", false);
   const { GuideMessage: render } = h.load<{ GuideMessage: typeof GuideMessage }>(new URL("../../presentation/messages/GuideMessage.tsx", import.meta.url), name => {
     if (name.endsWith("useDocumentationCatalog")) return { useDocumentationCatalog: () => catalog };
+    if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("citations")) return { visibleCitations };
     if (name.endsWith("visible-visuals")) return { visibleGuideVisuals };
   });
@@ -61,7 +66,9 @@ test("Markdown disables raw HTML, remote media and generated links; citations ar
 test("streaming text replaces the checking indicator before the validated answer is committed", () => {
   const h = componentHarness();
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
+    if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [{ role: "user", content: "Question" }], partialText: "Actual streamed words", busy: true,
