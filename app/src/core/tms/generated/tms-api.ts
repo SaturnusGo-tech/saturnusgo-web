@@ -4360,7 +4360,7 @@ export interface paths {
         put?: never;
         /**
          * Answer a Falcon question from the authorized guide
-         * @description Active workspace members including viewers can ask about Falcon. workspace:read authorization is required. Trusted release guide corpus only; administrator articles require workspace_admin in this workspace. Locale selects both knowledge and answer language. Bounded conversation is never treated as documentation. Server selects up to 4 articles, generates a grounded response and validates exact section citations. At most 2 provider calls under one 38-second deadline. No tools, mutations, persisted chats or provider storage. Durable atomic member, workspace and global request quotas apply. Body limit 160000 bytes. No automatic retries. AI_GUIDE_RATE_LIMITED is 429, AI_GUIDE_UNAVAILABLE is 503 and AI_GUIDE_OUTPUT_INVALID is 422. Disconnect cancels the request.
+         * @description Active workspace members including viewers can ask about Falcon. workspace:read authorization is required. Trusted release guide corpus only; administrator articles require workspace_admin in this workspace. Locale selects both knowledge and answer language. Bounded conversation is never treated as documentation. Server selects up to 4 articles, generates a grounded response and validates exact section citations. At most 2 provider calls under one 38-second deadline. No tools, mutations, persisted chats or provider storage. Durable atomic member, workspace and global request quotas apply. Body limit 200000 bytes. No automatic retries. AI_GUIDE_RATE_LIMITED is 429, AI_GUIDE_UNAVAILABLE is 503 and AI_GUIDE_OUTPUT_INVALID is 422. Disconnect cancels the request.
          */
         post: operations["answerDocumentationQuestion"];
         delete?: never;
@@ -18309,6 +18309,7 @@ export interface operations {
                 headers: {
                     /** @description no-store, no-transform */
                     "Cache-Control"?: string;
+                    "X-Request-Id": components["headers"]["XRequestId"];
                     [name: string]: unknown;
                 };
                 content: {
