@@ -35,7 +35,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
   const disclosure = useRef<HTMLButtonElement>(null);
   const selectedCount = node.selectableCaseIds.filter((id) => props.selected.has(id)).length;
   const drop = useDroppable({ id: `folder:${folder.id}`, data: { folderId: folder.id }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
-  const drag = useDraggable({ id: `drag-folder:${folder.id}`, data: { kind: "folder", folderId: folder.id, name: folder.name }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
+  const drag = useDraggable({ id: `drag-folder:${folder.id}`, data: { kind: "folder", folderId: folder.id, name: folder.name, caseIds: node.selectableCaseIds }, disabled: props.locked || !props.canManage || Boolean(folder.archivedAt) });
   const suppress = useContext(DragClickContext);
   const moving = useContext(RepositoryDragSelectionContext);
   useFolderDropReveal(drop.isOver && moving.active, open, folder.id, props.onReveal);

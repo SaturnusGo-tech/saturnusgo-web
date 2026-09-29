@@ -11,7 +11,12 @@ export function repositoryDrag(data: Record<string, unknown> | undefined, select
   }
   if (data?.kind !== "folder") return null;
   const folder = folders.find(item => item.id === data.folderId && !item.archivedAt);
-  return folder ? { kind: "folder", folderId: folder.id, label: folder.name } : null;
+  if (!folder) return null;
+  // Folder checkboxes select their cases; dragging such a folder carries the whole selection.
+  if (Array.isArray(data.caseIds) && data.caseIds.some(id => typeof id === "string" && selected.has(id))) {
+    return { kind: "case", ids: [...selected], label: "" };
+  }
+  return { kind: "folder", folderId: folder.id, label: folder.name };
 }
 
 export function canDropRepositoryDrag(drag: RepositoryDrag | null, target: unknown, folders: readonly RepositoryFolder[]): target is string | null {

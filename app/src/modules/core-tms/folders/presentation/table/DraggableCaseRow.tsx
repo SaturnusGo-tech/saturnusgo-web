@@ -7,6 +7,6 @@ export function DraggableCaseRow({ caseId, dragEnabled, ...props }: ComponentPro
   const suppress = useContext(DragClickContext);
   const moving = useContext(RepositoryDragSelectionContext);
   return <tr {...drag.listeners} {...props} ref={drag.setNodeRef}
-    style={{ ...props.style, opacity: moving.caseIds.has(caseId) ? .35 : undefined }}
+    style={{ ...props.style, userSelect: dragEnabled ? "none" : undefined, WebkitUserSelect: dragEnabled ? "none" : undefined, opacity: moving.caseIds.has(caseId) ? .35 : undefined }}
     onClick={(event) => { if (Date.now() > suppress.current) props.onClick?.(event); }} />;
 }

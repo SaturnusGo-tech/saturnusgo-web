@@ -50,3 +50,6 @@
 @media (prefers-reduced-motion: reduce) {
   .system :is(.wordmark, .collapse, .collapse svg, .label, .heading, .item) { transition: none; }
 }
+
+.footer > .collapse { margin-inline: var(--nav-inset); width: calc(100% - 2 * var(--nav-inset)); }
+@media (max-width: 760px) { .footer > .collapse { margin: 0; width: 44px; } }

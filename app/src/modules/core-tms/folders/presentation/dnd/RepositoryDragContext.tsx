@@ -10,7 +10,7 @@ const emptySelection = { active: false, caseIds: new Set<string>(), folderId: nu
 export function RepositoryDragContext({ children, resource, selected, ru, locked }: {
   children: ReactNode; resource: FolderResource; selected: ReadonlySet<string>; ru: boolean; locked: boolean;
 }) {
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 260, tolerance: 6 } }));
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const [drag, setDrag] = useState<RepositoryDrag | null>(null);
   const [selection, setSelection] = useState<{ active: boolean; caseIds: ReadonlySet<string>; folderId: string | null }>(emptySelection);
   const [error, setError] = useState("");
@@ -55,7 +55,7 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
     : count > 1 ? (ru ? "Выбранные тест-кейсы" : "Selected test cases") : (ru ? "Тест-кейс" : "Test case");
   return <DragClickContext.Provider value={suppressUntil}><RepositoryDragSelectionContext.Provider value={selection}>
     <DndContext sensors={sensors} collisionDetection={collisionDetection}
-      accessibility={{ screenReaderInstructions: { draggable: ru ? "Удерживайте строку и перетащите в папку. Escape отменяет перенос." : "Hold a row and drag it to a folder. Escape cancels the move." } }}
+      accessibility={{ screenReaderInstructions: { draggable: ru ? "Перетащите строку в папку. Escape отменяет перенос." : "Drag a row to a folder. Escape cancels the move." } }}
       onDragStart={({ active }) => {
         if (disabled || pending.current) return;
         const moving = repositoryDrag(active.data.current, selected, resource.items);

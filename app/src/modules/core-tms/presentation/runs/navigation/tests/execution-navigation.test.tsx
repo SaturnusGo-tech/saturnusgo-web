@@ -21,6 +21,7 @@ async function harness() {
     const [project, setProject] = useState(selected.project); selected = {id,run,project};
     const model = { data:{workspace:{id:"w"}},selectedRunId:run,selectedRunItemId:id,
       selectedRunItem: {id:stale?"old-detail":id}, setSelectedRunItemId:setId, setSelectedRunId:setRun, setProjectId:setProject,
+      unblockItem:async(onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},
       setItemStatus:async(_status:unknown, onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},setStepStatus:async()=>{writes++;return write();} } as unknown as WorkspaceModel;
     nav = useRunExecutionNavigation(model, { entries:values,rememberItem:(item:{id:string})=>committed.push(item.id),browser:{ready,loading:false,error:"",batch:{id:scope}} } as unknown as RunRepositoryModel,dirty);
     return null;
@@ -86,4 +87,14 @@ test("loading does not reconcile an old list, archived rows are skipped by auto-
     await h.update({ready:true,entries:[a,{...b,item:{...b.item,archivedAt:"2026-01-01"}},c]});
     await act(async()=>{await h.nav.mark("passed");});assert.equal(h.selected.id,"c");
   }finally{await h.close();}
+});
+
+test("unblocking updates the selected row without auto-advancing and respects draft guards", async () => {
+  const h = await harness(); try {
+    await act(async () => { assert.equal(await h.nav.unblock(), true); });
+    assert.equal(h.selected.id, "a"); assert.deepEqual(h.committed, ["a"]);
+    await h.update({ dirty: true });
+    await act(async () => { assert.equal(await h.nav.unblock(), false); });
+    assert.equal(h.writes, 1);
+  } finally { await h.close(); }
 });

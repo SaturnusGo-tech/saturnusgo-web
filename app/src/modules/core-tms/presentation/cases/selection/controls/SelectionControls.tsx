@@ -1,3 +1,4 @@
+import { QlDisclosure } from "../../../common/disclosure/QlDisclosure";
 import { caseFieldOptions, fieldFilterCount } from "../../model/fields/case-field-filters";
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { useMemberDirectory } from "../../../../workspace/members/state/directory/useMemberDirectory";
@@ -60,7 +61,7 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
       </span>
       {tools}
     </div>}
-    {ql && <div className={css.ql} ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
-      folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} /></div>}
+    <QlDisclosure open={ql}><div className={css.ql} ref={qlPanel} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setQl(false); qlButton.current?.focus(); } }}><CaseQlAutocomplete locale={ru ? "ru" : "en"} query={state.qlQuery} onQuery={state.setQlQuery}
+      folders={state.options.folders} components={state.options.components} members={state.directory.items} tags={state.options.tags} /></div></QlDisclosure>
   </div>;
 }

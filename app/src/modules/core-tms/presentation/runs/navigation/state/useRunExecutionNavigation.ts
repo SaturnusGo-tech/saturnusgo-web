@@ -57,6 +57,7 @@ export function useRunExecutionNavigation(model: WorkspaceModel, repository: Run
   }
   return { entries, pending, ready, selected,
     selectedItem: detailReady ? model.selectedRunItem : null,
+    unblock: () => mutate(() => model.unblockItem(repository.rememberItem), false),
     select, step, mark: (status: ExecutionStatus) => mutate(() => model.setItemStatus(status, repository.rememberItem), status !== "failed"),
   };
 }

@@ -176,3 +176,13 @@ test("closed folders expand after deliberate hover; leaving, opening and unmount
   act(() => view.unmount());
   act(() => context.mock.timers.tick(1000)); assert.equal(calls.length, 2);
 });
+
+ test("dragging a folder selected through its cases moves the full cross-folder selection", async () => {
+  const h = dragHarness(new Set(["case-a", "case-b", "other-folder-case"]));
+  const active = folderDrag("source");
+  Object.assign(active.data.current, { caseIds: ["case-a", "case-b"] });
+  h.start(active); h.drop(active, "target");
+  assert.deepEqual(h.moves[0].ids, ["case-a", "case-b", "other-folder-case"]);
+  assert.equal(h.updates.length, 0);
+  h.moves[0].resolve({ ok: true });
+});

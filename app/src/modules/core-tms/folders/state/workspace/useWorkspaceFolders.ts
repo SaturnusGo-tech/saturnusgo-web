@@ -1,3 +1,4 @@
+import { createMoveReceipt, restoreMove, type MoveReceipt } from "../../model/move/move-undo";
 import { useEffect, useRef, useState } from "react";
 import { TmsApiError } from "../../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
@@ -17,6 +18,8 @@ export function useWorkspaceFolders(state: ReturnType<typeof useWorkspaceState>,
   const canManage = connected && state.data.meta.authorization.capabilities.includes("test_case:manage");
   const query = useFolderQuery(http, scope, connected && Boolean(scope.projectId));
   const [busy, setBusy] = useState(false);
+  const [lastMove, setLastMove] = useState<MoveReceipt | null>(null);
+  const moveReceipt = useRef<MoveReceipt | null>(null);
   const active = useRef(false);
   const pending = useRef<{ signature: string; key: string } | null>(null);
   const scopeKey = JSON.stringify([scope.workspaceId, scope.projectId, state.view, connected]);
@@ -25,7 +28,7 @@ export function useWorkspaceFolders(state: ReturnType<typeof useWorkspaceState>,
   const mounted = useRef(false);
   const [mutationError, setMutationError] = useState("");
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  useEffect(() => { setMutationError(""); }, [scopeKey]);
+  useEffect(() => { setMutationError(""); moveReceipt.current = null; setLastMove(null); }, [scopeKey]);
 
   function captureCurrent() {
     const navigationCurrent = state.captureProjectNavigationGuard();
@@ -86,18 +89,44 @@ export function useWorkspaceFolders(state: ReturnType<typeof useWorkspaceState>,
   async function bulk(ids: readonly string[], targetFolderId?: string | null) {
     try {
       const items = targets(ids);
+      const before = derived.projectCases.filter(item => ids.includes(item.id)).map(item => ({ id: item.id, folderId: item.folderId }));
       const request = { items, ...(targetFolderId === undefined ? {} : { targetFolderId }) };
       const result = await command(JSON.stringify(request), (key) => targetFolderId === undefined
         ? archiveFolderCases(http, scope, { items }, key)
         : moveFolderCases(http, scope, { items, targetFolderId }, key));
+      if (result && latest.current === scopeKey && targetFolderId !== undefined) {
+        const receipt = createMoveReceipt(before, result.data);
+        moveReceipt.current = receipt; setLastMove(receipt);
+      }
       return result ? { ok: true as const } : { ok: false as const, message: ru ? "Изменения не подтверждены. Обновите список и повторите." : "Changes were not confirmed. Refresh and retry." };
     } catch (failure) { return { ok: false as const, message: failure instanceof Error ? failure.message : "Invalid selection." }; }
+  }
+  function dismissMove(id: string) {
+    if (moveReceipt.current?.id === id) { moveReceipt.current = null; setLastMove(null); }
+  }
+  async function undoMove(id: string) {
+    const receipt = moveReceipt.current;
+    if (!receipt || receipt.id !== id || Date.now() > receipt.expiresAt || active.current) {
+      return { ok: false as const, message: ru ? "Время отмены истекло." : "The undo window has expired." };
+    }
+    const isCurrent = captureCurrent();
+    const result = await command(`undo:${id}`, async () => {
+      await restoreMove(receipt, group => {
+        if (!isCurrent()) throw new Error("Repository changed.");
+        return moveFolderCases(http, scope, { items: group.items, targetFolderId: group.targetFolderId }, group.key);
+      });
+      return true;
+    });
+    if (result) { dismissMove(id); return { ok: true as const }; }
+    // Some groups may have succeeded before a conflict; reconcile those without replaying them.
+    await refresh(isCurrent);
+    return { ok: false as const, message: ru ? "Не всё удалось вернуть. Кейсы могли измениться — обновите список." : "Could not restore every case. Some may have changed — refresh the list." };
   }
   async function transition(folder: RepositoryFolder, operation: "archive" | "restore") {
     return Boolean(await command(`${operation}:${folder.id}:${folder.etag}`, (key) => transitionFolder(http, scope, folder, operation, key)));
   }
   return {
-    ...query, reload, error: mutationError || query.error, busy, canManage,
+    ...query, reload, lastMove, undoMove, dismissMove, error: mutationError || query.error, busy, canManage,
     async create(name, parentId) {
       const result = await command(`create:${parentId}:${name}`, (key) => createFolder(http, scope, { name, parentId }, key));
       return result?.data ?? null;

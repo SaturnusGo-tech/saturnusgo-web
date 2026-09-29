@@ -55,7 +55,7 @@ test("repository control placement preserves run-creation and suite selection ac
     const h = componentHarness(); let selected = 0;
     const { SelectionControls: render } = h.load<{ SelectionControls: typeof SelectionControls }>(new URL("../../../cases/selection/controls/SelectionControls.tsx", import.meta.url), name =>
       name.endsWith("case-field-filters") ? { fieldFilterCount: () => 0 } : undefined);
-    const props = { repository, ru: false, onSelectAll: () => selected++, state: { query: "", qlQuery: "", facets: { folders: [], components: [] }, filters: { type: "all", priority: "all", lifecycle: "all" } } } as unknown as Parameters<typeof SelectionControls>[0];
+    const props = { repository, ru: false, onSelectAll: () => selected++, state: { query: "", qlQuery: "", options: { folders: [], components: [], tags: [] }, directory: { items: [] }, facets: { folders: [], components: [] }, filters: { type: "all", priority: "all", lifecycle: "all" } } } as unknown as Parameters<typeof SelectionControls>[0];
     const all = nodes(h.render(() => render(props)));
     const search = all.find(node => node.props["data-input-shell"] === true)!;
     assert.equal(nodes(search).some(node => node.props["aria-label"] === "QL query"), repository);

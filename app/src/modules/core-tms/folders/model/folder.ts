@@ -1,9 +1,13 @@
+import type { MoveReceipt } from "./move/move-undo";
 import type { components } from "../../../../core/tms/generated/tms-api";
 
 export type RepositoryFolder = components["schemas"]["RepositoryFolder"];
 export type FolderScope = Readonly<{ workspaceId: string; projectId: string }>;
 export type FolderMutationResult = { ok: true } | { ok: false; message: string };
 export type FolderResource = {
+  lastMove?: MoveReceipt | null;
+  undoMove?: (id: string) => Promise<FolderMutationResult>;
+  dismissMove?: (id: string) => void;
   items: readonly RepositoryFolder[];
   loading: boolean;
   error: string;

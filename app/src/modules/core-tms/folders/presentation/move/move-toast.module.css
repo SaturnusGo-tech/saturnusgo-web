@@ -1,0 +1,11 @@
+.toast { position:fixed; z-index:1300; right:20px; bottom:20px; display:flex; align-items:center; gap:10px; max-width:min(460px,calc(100vw - 32px)); padding:12px 14px; border:1px solid #94baf0; border-radius:14px; background:#edf5ff; color:#163d75; box-shadow:0 8px 30px rgb(0 0 0 / 14%); font-family:inherit; font-size:13px; font-weight:500; line-height:1.45; }
+.toast > svg { flex-shrink:0; }
+.toast span { min-width:0; overflow-wrap:anywhere; font-size:13px; }
+.toast button { flex-shrink:0; border:0; background:transparent; color:inherit; font-family:inherit; font-size:13px; font-weight:600; line-height:1.4; cursor:pointer; padding:5px; border-radius:6px; }
+.toast button:hover { background:rgb(36 97 186 / 12%); }
+.toast button:disabled { opacity:.55; cursor:wait; }
+.toast button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.toast .close { display:grid; place-items:center; padding:3px; }
+:global(.dark) .toast { background:#14243b; color:#d9eaff; border-color:#31527a; }
+
+.toast[data-raised] { bottom: 82px; }

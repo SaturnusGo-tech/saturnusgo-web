@@ -12,7 +12,7 @@ import { executableSteps } from "../../helpers/cases/caseRevision";
 import { statusLabel } from "../../helpers/status/statusLabel";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { getRun, getRunItem, mutateRunWithEtagRecovery, transitionRun,
-  updateRunItem } from "../../runs/data/run-api";
+  retestRunItem, updateRunItem } from "../../runs/data/run-api";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
 import { createRunItemMutationQueue } from "./run-item-mutation-queue";
@@ -22,8 +22,7 @@ export async function refreshRunAfterSuccessfulMutation(
   try { await refresh(); } catch { invalidateEtag(); }
 }
 export function useRunActions(
-  state: ReturnType<typeof useWorkspaceState>, derived: ReturnType<typeof useWorkspaceDerived>,
-  notify: (message: string) => void,
+  state: ReturnType<typeof useWorkspaceState>, derived: ReturnType<typeof useWorkspaceDerived>, notify: (message: string) => void,
 ) {
   const http = useTmsHttpClient();
   const { locale, t } = useTmsLocale();
@@ -38,9 +37,7 @@ export function useRunActions(
   if (derived.selectedRunItem && state.selectedRunItemEtag) {
     itemMutations.sync({ data: derived.selectedRunItem, etag: state.selectedRunItemEtag });
   }
-  const statusVariables = (key: string, status: ExecutionStatus) => ({
-    key, status: statusLabel(locale, status),
-  });
+  const statusVariables = (key: string, status: ExecutionStatus) => ({ key, status: statusLabel(locale, status) });
   function openRunDialog(options?: { suiteId?: string; caseIds?: string[] }) {
     if (options?.suiteId) state.setSelectedSuiteId(options.suiteId);
     state.setRunPresetSuiteId(options?.suiteId ?? "");
@@ -57,22 +54,17 @@ export function useRunActions(
   }
   function commitRun(run: TestRunSummary, etag: string | null) {
     if (currentOwner.current !== owner) return;
-    state.setData((current) => ({ ...current,
-      runs: current.runs.map((item) => item.id === run.id ? run : item) }));
+    state.setData((current) => ({ ...current, runs: current.runs.map((item) => item.id === run.id ? run : item) }));
     state.setSelectedRunEtag(etag);
   }
-  async function refreshRun(runId: string) {
-    const run = await getRun(http, runId);
-    commitRun(run.data, run.etag);
-  }
+  async function refreshRun(runId: string) { const run = await getRun(http, runId); commitRun(run.data, run.etag); }
   async function recoverStaleItem(runId: string, itemId: string, error: unknown) {
     if (!(error instanceof TmsApiError) || error.status !== 412) return;
     try { const current = await getRunItem(http, runId, itemId);
       commitItem(current.data, current.etag); } catch {}
   }
   async function setStepStatus(stepId: string, status: ExecutionStatus, actualResult?: string) {
-    const run = derived.selectedRun;
-    const item = derived.selectedRunItem;
+    const run = derived.selectedRun, item = derived.selectedRunItem;
     if (!run || !item || !canEditRunAttempt(run, item) || !state.data.meta.authorization.capabilities.includes("run:execute") || !state.selectedRunItemEtag || state.connection !== "connected") return false;
     try {
       await itemMutations.run(item.id, async (current) => {
@@ -112,8 +104,7 @@ export function useRunActions(
     state.setSelectedRunItemDetail(next);
   }
   async function setItemStatus(status: ExecutionStatus, onCommitted?: (item: RunItemSummary) => void) {
-    const run = derived.selectedRun;
-    const item = derived.selectedRunItem;
+    const run = derived.selectedRun, item = derived.selectedRunItem;
     if (!run || !item || !state.selectedRunItemEtag || state.connection !== "connected") return false;
     const key = crypto.randomUUID();
     let policyBlocked = false;
@@ -121,8 +112,7 @@ export function useRunActions(
       await itemMutations.run(item.id, async (current) => {
         if (!current.etag) throw new Error("Run item ETag is required.");
         const currentItem = current.data;
-        const attempt = currentItem.attempts.find((entry) =>
-          entry.attemptNo === currentItem.activeAttemptNo) ?? currentItem.attempts[0];
+        const attempt = currentItem.attempts.find((entry) => entry.attemptNo === currentItem.activeAttemptNo) ?? currentItem.attempts[0];
         const required = executableSteps(currentItem.snapshot).filter((step) => step.required);
         if (status === "passed" && !required.every((step) => attempt.stepResults.find(
           (entry) => entry.stepId === step.id)?.status === "passed")) {
@@ -160,6 +150,28 @@ export function useRunActions(
     notify(t("actions.itemMarked", statusVariables(item.caseKey, status)));
     return true;
   }
+  async function unblockItem(onCommitted?: (item: RunItemSummary) => void) {
+    const run = derived.selectedRun, item = derived.selectedRunItem;
+    if (!run || run.status !== "active" || run.archivedAt || !item || item.status !== "blocked" || item.archivedAt
+      || !state.data.meta.authorization.capabilities.includes("run:execute") || !state.selectedRunItemEtag || state.connection !== "connected") return false;
+    const key = crypto.randomUUID();
+    try {
+      await itemMutations.run(item.id, async current => {
+        if (currentOwner.current !== owner || !current.etag || current.data.status !== "blocked") throw new Error("Run selection changed.");
+        try {
+          const refreshed = await retestRunItem(http, run.id, item.id, current.etag, key);
+          commitItem(refreshed.data, refreshed.etag);
+          if (currentOwner.current === owner) { const { snapshot, attempts, ...summary } = refreshed.data; onCommitted?.(summary); }
+          await refreshRunAfterSuccessfulMutation(() => refreshRun(run.id), () => { if (currentOwner.current === owner) state.setSelectedRunEtag(null); });
+          return refreshed;
+        } catch (error) { await recoverStaleItem(run.id, item.id, error); throw error; }
+      });
+      return currentOwner.current === owner;
+    } catch (error) {
+      notify(formatTmsMutationFailure(toTmsMutationFailure(error), locale === "ru" ? "Не удалось разблокировать кейс." : "Could not unblock the case."));
+      return false;
+    }
+  }
   async function completeRun() {
     const run = derived.selectedRun;
     if (!run || state.connection !== "connected") return;
@@ -184,5 +196,5 @@ export function useRunActions(
     }
     notify(t("actions.runCompleted", { key: run.key }));
   }
-  return { openRunDialog, setStepStatus, updateStepActualResult, setItemStatus, completeRun };
+  return { openRunDialog, setStepStatus, updateStepActualResult, setItemStatus, unblockItem, completeRun };
 }

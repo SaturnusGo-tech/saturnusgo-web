@@ -14,7 +14,7 @@ export const folderWalkthrough = walkthrough("Folders, cases and moves step by s
     "The bottom bar shows the total and actions for Move, Create test run, Status, Priority, Unfile and Archive. The close icon clears the selection while keeping the case details open.",
     "PAY-TC-34 Open Falcon help is selected with its details open; the bottom bar shows one selected case."),
   shot("organization-folder-04-move-20260928-en-20260928", "Check the shared destination",
-    "Select **Move**, expand the destination tree or search for a folder, and check the number of selected cases. To move without a dialog, hold a case and drag it onto a folder; dragging a selected case moves the entire selection.",
+    "Select **Move**, expand the destination tree or search for a folder, and check the number of selected cases. To move without a dialog, drag a case onto a folder without holding or pressing harder; dragging a selected case moves the entire selection.",
     "The screenshot has **Unfiled** selected for one case; the move is not confirmed yet. Choose the intended destination and select **Move**. **Cancel** preserves the existing location.",
     "Move test cases dialog with one selected case, Unfiled as the destination, the folder tree and a confirmation button."),
 ]);

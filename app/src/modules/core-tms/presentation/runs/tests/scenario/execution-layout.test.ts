@@ -83,3 +83,25 @@ test("required-step, pending and unsaved-actual-result guards survive the new la
   assert.equal(all().find(n => n.props["data-testid"] === "pass-case")?.props.disabled, true);
   assert.equal(all().find(n => n.props["aria-label"] === "runs.passStep 1")?.props.disabled, true);
 });
+
+test("grid closes properties and does not restore them when leaving focus mode", () => {
+  const { all } = setup();
+  invoke(all().find(n => n.type === "RunExecutionHeader")!, "onToggleProperties");
+  invoke(all().find(n => n.type === "ScenarioLayoutToggle")!, "onChange", "grid");
+  assert.equal(all().find(n => n.type === "RunExecutionHeader")?.props.propertiesOpen, false);
+  invoke(all().find(n => n.props["data-run-panel-handle"] !== undefined)!, "onClick");
+  invoke(all().find(n => n.props["data-run-panel-handle"] !== undefined)!, "onClick");
+  assert.equal(all().find(n => n.type === "RunExecutionHeader")?.props.propertiesOpen, false);
+});
+test("only a writable blocked case offers unblock and guards pending execution", () => {
+  const { all, props } = setup(); let calls = 0;
+  props.onUnblock = () => { calls++; };
+  assert.equal(all().some(n => n.props["data-testid"] === "unblock-case"), false);
+  props.selectedItem!.status = "blocked";
+  invoke(all().find(n => n.props["data-testid"] === "unblock-case")!, "onClick");
+  assert.equal(calls, 1);
+  props.executionPending = true;
+  assert.equal(all().find(n => n.props["data-testid"] === "unblock-case")?.props.disabled, true);
+  props.canExecute = false;
+  assert.equal(all().some(n => n.props["data-testid"] === "unblock-case"), false);
+});

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { hookHarness } from "../../../../state/navigation/browser/tests/project/hook-harness";
 import type { useDisclosureMotion } from "../../../common/disclosure/useDisclosureMotion";
-function setup(reduced = false) {
+function setup(reduced = false, slide = false) {
   const h = hookHarness("https://falcon.test/");
   Object.assign(h.react, { useLayoutEffect: h.react.useEffect });
   Object.assign(h.window, { matchMedia: () => ({ matches: reduced }) });
@@ -17,7 +17,7 @@ function setup(reduced = false) {
       return { finished, cancel() { entry.cancelled = true; } };
     },
   } as unknown as HTMLDivElement;
-  const render = () => h.settle(() => { const result = hook(open); result.ref.current = element; return result; });
+  const render = () => h.settle(() => { const result = hook(open, slide); result.ref.current = element; return result; });
   return { h, render, animations, set(value: boolean) { open = value; return render(); } };
 }
 test("closing a folder retains descendants until the measured collapse completes", async () => {
@@ -34,4 +34,13 @@ test("reversing a collapsing folder cancels its old animation without hiding the
 test("reduced motion collapses immediately and never starts a height animation", () => {
   const app = setup(true); app.render(); assert.equal(app.set(false).present, false);
   assert.equal(app.set(true).present, true); assert.equal(app.animations.length, 0); app.h.dispose();
+});
+
+test("QL expands downward and retreats upward, retaining the closing input until completion", async () => {
+  const app = setup(false, true); app.render();
+  assert.equal(app.set(false).present, true);
+  assert.equal(app.animations[0].frames[1].transform, "translateY(-6px)");
+  app.animations[0].finish(); await Promise.resolve(); assert.equal(app.render().present, false);
+  app.set(true); assert.equal(app.animations[1].frames[0].transform, "translateY(-6px)");
+  assert.equal(app.animations[1].frames[1].transform, "none"); app.h.dispose();
 });

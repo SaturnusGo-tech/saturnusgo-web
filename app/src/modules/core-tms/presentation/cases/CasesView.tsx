@@ -1,3 +1,4 @@
+import { MoveToast } from "../../folders/presentation/move/MoveToast";
 import { useCaseBrowserFocus } from "./browser/layout/useCaseBrowserFocus";
 import { CasesSelectionActions } from "./browser/selection/CasesSelectionActions";
 import { CaseBrowserEmpty } from "./browser/layout/CaseBrowserEmpty";
@@ -130,5 +131,5 @@ export function CasesView(props: CasesViewProps) {
     </div>
     <CasesSelectionActions props={props} view={view} locale={locale} />
   </div>;
-  return props.folders ? <RepositoryDragContext resource={props.folders} selected={view.bulkSelection.selected} ru={locale === "ru"} locked={Boolean(props.editor) || props.folders.busy}>{content}</RepositoryDragContext> : content;
+  return props.folders ? <RepositoryDragContext resource={props.folders} selected={view.bulkSelection.selected} ru={locale === "ru"} locked={Boolean(props.editor) || props.folders.busy}>{content}<MoveToast resource={props.folders} ru={locale === "ru"} raised={view.bulkSelection.selectedIds.length > 0} /></RepositoryDragContext> : content;
 }

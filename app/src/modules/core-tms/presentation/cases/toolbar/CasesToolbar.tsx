@@ -1,3 +1,4 @@
+import { QlDisclosure } from "../../common/disclosure/QlDisclosure";
 import { fieldFilterCount } from "../model/fields/case-field-filters";
 import { useEffect, useId, useRef, useState } from "react";
 import { PiCheck as Check, PiCaretDown as ChevronDown, PiFilePlusLight as FilePlus2, PiFunnelSimple as Filter,
@@ -127,11 +128,11 @@ export function CasesToolbar(props: Props) {
           </div>}
         </div>
       </div>
-      {(!props.repositoryMode || qlExpanded) && <div ref={qlPanelRef} id={qlPanelId} className={`${styles.qlLine} ${props.repositoryMode ? repositoryStyles.qlLine : ""}`}
+      <QlDisclosure open={(!props.repositoryMode || qlExpanded)}><div ref={qlPanelRef} id={qlPanelId} className={`${styles.qlLine} ${props.repositoryMode ? repositoryStyles.qlLine : ""}`}
         onKeyDown={(event) => { if (props.repositoryMode && event.key === "Escape" && !event.defaultPrevented) { event.preventDefault(); event.stopPropagation(); closeQl(); } }}>
         <CaseQlAutocomplete locale={props.locale} query={qlQuery} folders={facetOptions.folders} components={facetOptions.components} onQuery={updateQl} />
         {props.repositoryMode && <button type="button" className={styles.iconButton} aria-label={ru ? "Свернуть QL-запрос" : "Collapse QL query"} onClick={closeQl}><X size={14} /></button>}
-      </div>}
+      </div></QlDisclosure>
       {!props.repositoryMode && <div className={styles.groupLine} data-case-popover-root>
         <strong>{text.group}</strong><button type="button" className={styles.groupButton} onClick={() => { if (props.filterOpen) props.onFilterOpen(); setActionOpen(false); setGroupOpen((value) => !value); }} aria-haspopup="menu" aria-expanded={groupOpen} aria-controls="case-group-menu"><span>{groupLabels[groupBy]}</span><ChevronDown size={13} /></button>
         {groupOpen && <div className={`${styles.popover} ${styles.groupPopover}`} id="case-group-menu" role="menu">{groups.map((value) => <button type="button" role="menuitemradio" aria-checked={groupBy === value} key={value} className={groupBy === value ? styles.optionActive : ""} onClick={() => chooseGroup(value)}>{groupLabels[value]}{groupBy === value && <Check size={13} />}</button>)}</div>}

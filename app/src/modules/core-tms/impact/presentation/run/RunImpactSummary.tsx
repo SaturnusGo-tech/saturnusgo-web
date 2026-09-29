@@ -9,7 +9,7 @@ export function RunImpactSummary({ state, scope, ru }: {
   if (state.error) return <div className={css.root}><div className={css.error} role="alert">
     {ru ? "Не удалось проверить предложение для этого прогона." : "Could not check the proposal for this run."}
     <button type="button" onClick={() => void state.refresh()}>{ru ? "Повторить" : "Retry"}</button></div></div>;
-  if (!state.ready) return <p role="status" className={css.muted}>{ru ? "Проверяем состав прогона…" : "Checking run proposal…"}</p>;
+  if (!state.ready) return null;
   return <div className={css.root}><div className={css.notice}>
     {state.items.map((analysis) => <div className={css.rowHeading} key={analysis.id}>
       <span><strong>Impact Analysis</strong> · {analysis.change.repository} · {analysis.approved

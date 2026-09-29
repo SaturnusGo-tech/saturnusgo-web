@@ -1,15 +1,13 @@
-import { ChevronsLeft, CircleHelp, SlidersHorizontal } from "lucide-react";
+import { CircleHelp, SlidersHorizontal } from "lucide-react";
 import { NotificationBell } from "../../notifications/inbox/composition/NotificationBell";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { SupportContact } from "../../support/composition/SupportContact";
 import css from "./styles/sidebar-system.module.css";
-export function NavigationUtilityMenu({workspaceId,connected,subject,settingsActive,helpActive,onOpenSettings,onOpenHelp,collapsed,onToggleCollapsed}:{
+export function NavigationUtilityMenu({workspaceId,connected,subject,settingsActive,helpActive,onOpenSettings,onOpenHelp}:{
  workspaceId:string;connected:boolean;subject:string;settingsActive:boolean;helpActive:boolean;
  onOpenSettings:()=>void;onOpenHelp:()=>void;
- collapsed:boolean;onToggleCollapsed:()=>void;
 }) {
  const {t}=useTmsLocale();
- const toggleLabel=t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar");
  return <div className={css.utilities}>
    <button type="button" className={css.item} data-active={settingsActive} onClick={onOpenSettings}
      aria-current={settingsActive ? "page" : undefined} aria-label={t("nav.config")} data-nav-label={t("nav.config")} data-testid="nav-config">
@@ -22,9 +20,6 @@ export function NavigationUtilityMenu({workspaceId,connected,subject,settingsAct
    <SupportContact workspaceId={workspaceId} navigationClasses={{button:css.item,icon:css.icon,label:css.label}}/>
    <NotificationBell key={`${workspaceId}:${subject}`} workspaceId={workspaceId} connected={connected}
      navigationClasses={{button:css.item,icon:css.icon,label:css.label}}/>
-   <button type="button" className={`${css.item} ${css.collapse}`} onClick={onToggleCollapsed}
-     aria-label={toggleLabel} aria-expanded={!collapsed} aria-controls="tms-navigation" data-nav-label={toggleLabel}>
-     <span className={css.icon} aria-hidden="true"><ChevronsLeft size={20}/></span><span className={css.label}>{toggleLabel}</span>
-   </button>
+
  </div>;
 }

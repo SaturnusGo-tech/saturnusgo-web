@@ -21,3 +21,5 @@
 .qlLine > button { flex-shrink: 0; border-radius: 7px; }
 @container (max-width: 680px) { .selectionLabel { display: none; } }
 @container (max-width: 480px) { .repository .controls { padding: 13px 12px; } .meta { margin-left: 0; } .context { align-items: flex-start; flex-direction: column; } .searchLine > label { flex-basis: 100%; } }
+
+.repository .controls > [data-ql-disclosure] { margin-top: -12px; }

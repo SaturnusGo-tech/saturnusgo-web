@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
 /** Keep closing content present only until its measured height has collapsed. */
-export function useDisclosureMotion(open: boolean) {
+export function useDisclosureMotion(open: boolean, slide = false) {
   const [present, setPresent] = useState(open);
   const ref = useRef<HTMLDivElement>(null);
   const previous = useRef(open);
@@ -17,9 +17,9 @@ export function useDisclosureMotion(open: boolean) {
     const from = interruptedHeight.current ?? (open ? 0 : element.getBoundingClientRect().height);
     interruptedHeight.current = null;
     element.style.overflow = "hidden";
-    const animation = element.animate([{ height: `${from}px`, opacity: open ? .4 : 1 },
-      { height: `${open ? element.scrollHeight : 0}px`, opacity: open ? 1 : 0 }],
-    { duration: 180, easing: "cubic-bezier(.22,.68,.25,1)", fill: "both" });
+    const animation = element.animate([{ height: `${from}px`, opacity: open ? .4 : 1, transform: slide && open ? "translateY(-6px)" : "none" },
+      { height: `${open ? element.scrollHeight : 0}px`, opacity: open ? 1 : 0, transform: slide && !open ? "translateY(-6px)" : "none" }],
+    { duration: slide ? 220 : 180, easing: "cubic-bezier(.22,.68,.25,1)", fill: "both" });
     let finished = false;
     let cancelled = false;
     void animation.finished.then(() => {
@@ -33,6 +33,6 @@ export function useDisclosureMotion(open: boolean) {
       if (!finished) interruptedHeight.current = element.getBoundingClientRect().height;
       animation.cancel(); element.style.overflow = "";
     };
-  }, [open]);
+  }, [open, slide]);
   return { ref, present: open || present };
 }

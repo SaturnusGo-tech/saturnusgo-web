@@ -1,3 +1,4 @@
+import { ChevronsLeft } from "lucide-react";
 import { useRef } from "react";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -55,10 +56,15 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled}/>
       <NavigationUtilityMenu settingsActive={view === "config"} helpActive={view === "help"} connected={connected} subject={session?.subject ?? ''}
-        collapsed={collapsed} onToggleCollapsed={onToggleCollapsed}
         workspaceId={workspaceId}
         onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
       <NavigationProfile collapsed={collapsed}/>
+      <button type="button" className={`${css.item} ${css.collapse}`} onClick={onToggleCollapsed}
+        aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")} aria-expanded={!collapsed}
+        aria-controls="tms-navigation" data-nav-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}>
+        <span className={css.icon} aria-hidden="true"><ChevronsLeft size={20}/></span>
+        <span className={css.label}>{t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}</span>
+      </button>
     </div>
     <NavigationTooltip collapsed={collapsed} root={root}/>
   </nav>;

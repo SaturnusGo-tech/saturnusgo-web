@@ -43,3 +43,7 @@
 .progress progress::-webkit-progress-value { background: #3478f6; transition: width .15s; }
 @media(max-width:600px) { .panel { padding: 20px 16px !important; max-height: calc(100dvh - 24px); width: calc(100vw - 20px) !important; } .row { grid-template-columns: 1fr; gap: 6px; } .kinds button { font-size: 12px; gap: 5px; } .editorFooter > small { display: none; } }
 @media(prefers-reduced-motion:reduce) { .overlay, .overlay * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Neutral scrim: preserve the current surface rather than tinting it blue. */
+.overlay > [role="presentation"] { background: rgb(0 0 0 / 28%); backdrop-filter: blur(6px); }
+:global(.dark) .overlay > [role="presentation"] { background: rgb(0 0 0 / 52%); }

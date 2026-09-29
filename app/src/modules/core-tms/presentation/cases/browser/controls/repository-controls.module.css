@@ -56,3 +56,5 @@
 
 /* Reserve the selection toggle width so changing its label never resizes the search. */
 .controls[data-repository-controls] .select { flex: 0 0 78px; padding-inline: 7px; }
+
+.controls:has(> [data-ql-disclosure]) { row-gap: 0; }

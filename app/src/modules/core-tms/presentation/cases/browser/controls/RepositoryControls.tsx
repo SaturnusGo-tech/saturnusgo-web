@@ -1,3 +1,4 @@
+import { QlDisclosure } from "../../../common/disclosure/QlDisclosure";
 import { fieldFilterCount } from "../../model/fields/case-field-filters";
 import { useId, useRef, useState } from "react";
 import { PiFunnelSimple, PiMagnifyingGlass, PiX } from "react-icons/pi";
@@ -43,8 +44,8 @@ export function RepositoryControls({ props, view, locale }: {
     </div>
     {view.directory.loading && Boolean(props.query || view.qlQuery) && <span role="status" className={css.queryHint}>{ru ? "Загружаем ответственных…" : "Loading assignees…"}</span>}
     {view.directory.error && <button type="button" className={css.tool} onClick={view.directory.retry}>{ru ? "Не удалось загрузить ответственных. Повторить" : "Could not load assignees. Retry"}</button>}
-    {qlOpen && <div ref={qlRef} id={qlId} className={css.ql} onKeyDown={(event) => { if (event.key === "Escape" && !event.defaultPrevented) {
+    <QlDisclosure open={qlOpen}><div ref={qlRef} id={qlId} className={css.ql} onKeyDown={(event) => { if (event.key === "Escape" && !event.defaultPrevented) {
       event.preventDefault(); event.stopPropagation(); setQlOpen(false); qlButton.current?.focus();
-    } }}><CaseQlAutocomplete locale={locale} query={view.qlQuery} folders={view.facetOptions.folders} components={view.facetOptions.components} members={view.directory.items} tags={[...new Set(props.testCases.flatMap(item => item.tags))]} onQuery={view.setQlQuery} /></div>}
+    } }}><CaseQlAutocomplete locale={locale} query={view.qlQuery} folders={view.facetOptions.folders} components={view.facetOptions.components} members={view.directory.items} tags={[...new Set(props.testCases.flatMap(item => item.tags))]} onQuery={view.setQlQuery} /></div></QlDisclosure>
   </div>;
 }

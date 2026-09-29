@@ -131,3 +131,5 @@
 .repository[data-selection] .archiveToggle { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 180ms ease, visibility 0s 180ms; }
 @media (prefers-reduced-motion: reduce) { .archiveToggle, .repository[data-selection] .archiveToggle { transition: none; } }
 .treeHeading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.folderName, .caseButton { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
