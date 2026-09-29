@@ -1,6 +1,6 @@
-.properties { display: flex; flex-direction: column; gap: 15px; min-width: 0; align-self: start; }
-.row { display: grid; grid-template-columns: minmax(110px, .95fr) minmax(0, 1.05fr); align-items: center; gap: 4px 8px; min-height: 32px; }
-.row > span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.properties { display: flex; flex-direction: column; gap: 8px; min-width: 0; width: min(100%, 480px); align-self: start; }
+.row { display: grid; grid-template-columns: minmax(110px, 150px) minmax(0, 1fr); align-items: center; gap: 4px 8px; min-height: 32px; }
+.row > span, .row > label { color: var(--muted); font-size: 12px; line-height: 1.4; }
 .label { display: flex; align-items: center; gap: 2px; }
 .value.value { width: max-content; max-width: 100%; min-width: 0; }
 .value.value > button { width: max-content; max-width: 100%; min-height: 32px; padding: 5px 6px; gap: 7px; border: 0; border-radius: 10px; box-shadow: none; background: transparent; color: var(--ink); font-size: 12px; }
@@ -27,3 +27,7 @@
 .component.component, .routing.routing { width: 100%; }
 .component.component > button, .routing.routing > button { width: 100%; }
 .value.value [role="option"] + [role="option"] { margin-top: 3px; }
+
+.linkInput { width: 100%; min-width: 0; height: 32px; box-sizing: border-box; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--ink); font: inherit; font-size: 12px; }
+.linkInput::placeholder { color: var(--muted); }
+.linkInput:focus-visible { outline: 1px solid #79a5ed; outline-offset: 1px; }

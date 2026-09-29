@@ -67,13 +67,9 @@ export function DefectForm(props: Props) {
             <NarrativeField label={copy.expected} value={value.expectedResult} framed
               onChange={expectedResult => onChange({ expectedResult })} disabled={submitting} />
             <DefectEvidence files={props.files} onChange={props.onFilesChange} disabled={submitting} />
-            <div className={css.linkField}><label htmlFor={`${id}-link`}>{copy.deepLink}</label>
-              <input id={`${id}-link`} type="text" value={value.link} placeholder={copy.linkPlaceholder}
-                onChange={event => onChange({ link: event.target.value })} />
-            </div>
+            <DefectProperties workspaceId={props.workspaceId} offline={props.offline} disabled={submitting}
+              value={value} onChange={onChange} components={props.components} routing={routing} showRoutingError={attempted} />
           </div>
-          <DefectProperties workspaceId={props.workspaceId} offline={props.offline} disabled={submitting}
-            value={value} onChange={onChange} components={props.components} routing={routing} showRoutingError={attempted} />
         </div>
         {props.error && <FormError message={props.error} />}
       </div>

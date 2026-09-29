@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { AnimatedSelect } from "../../../common/select/AnimatedSelect";
 import { ResponsiblePicker } from "../../../../workspace/members/presentation/ResponsiblePicker";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
@@ -12,6 +13,7 @@ type Props = {
   components: { value: string; label: string }[]; routing: DefectRouting; showRoutingError: boolean;
 };
 export function DefectProperties({ workspaceId, offline, disabled, value, onChange, components, routing, showRoutingError }: Props) {
+  const linkId = useId();
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
   const copy = getDefectDialogCopy(locale);
@@ -38,6 +40,11 @@ export function DefectProperties({ workspaceId, offline, disabled, value, onChan
       <AnimatedSelect menuMinWidth={440} scrollLabels className={`${css.value} ${css.routing}`} label={copy.routingLabel} value={routing.value} options={routing.options}
         onChange={value => routing.onChange(value as DefectRouting["value"])} disabled={disabled || routing.disabled} />
       {showRoutingError && !routing.resolved && <small className={css.error} role="alert">{routing.message}</small>}
+    </div>
+    <div className={css.row}><label htmlFor={linkId}>{copy.deepLink}</label>
+      <input id={linkId} className={css.linkInput} type="text" value={value.link}
+        placeholder={copy.linkPlaceholder} disabled={disabled}
+        onChange={event => onChange({ link: event.target.value })} />
     </div>
   </aside>;
 }
