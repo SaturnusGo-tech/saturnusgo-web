@@ -16,6 +16,8 @@ import { CommentShareItem } from "../../cases/collaboration/sharing/CommentShare
 import { buildCaseDeepLink } from "../../../test-cases/navigation/case-deep-link";
 import { buildDefectDeepLink } from "../../../defects/navigation/defect-deep-link";
 import type { DefectRetest } from "../../../runs/verification/state/defect/useDefectRetest";
+import { DefectRetestPanel } from "./retest/DefectRetestPanel";
+import { DefectRetestMetadata } from "./context/DefectRetestMetadata";
 import { DefectRetestAction } from "./retest/DefectRetestAction";
 import surface from "../reports.module.css";
 import detail from "./defect-detail.module.css";
@@ -50,7 +52,7 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
             const url = new URL(window.location.href); if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
             return buildDefectDeepLink(url.href, { projectId: defect.projectId, defectId: defect.id });
           }} />
-          {retest && <DefectRetestAction retest={retest} defectKey={defect.key} />}
+          {retest && <DefectRetestAction retest={retest} />}
           <button className={surface.mobileBack} type="button" onClick={onBack} aria-label={t("reports.backToList")}><ArrowLeft size={17} /></button>
           <button className={surface.closeButton} type="button" onClick={onBack} aria-label={t("reports.backToList")}><X size={18} /></button>
         </div>
@@ -63,8 +65,10 @@ export function DefectReportDetail({ workspaceId, defect, run, links, tab, onTab
             {localizedLabel(locale, defect.status)}
           </span>
           <span>{t("reports.created")} <time dateTime={defect.createdAt}>{createdAt}</time></span>
+          {retest && <DefectRetestMetadata retest={retest} />}
         </p>
       </div>
+      {retest && <DefectRetestPanel key={defect.id} retest={retest} />}
       <nav className={surface.tabs} aria-label={locale === "ru" ? "Разделы баг-репорта" : "Bug report sections"}>
         <button type="button" data-active={tab === "overview" || undefined} onClick={() => onTabChange("overview")}>{t("reports.overview")}</button>
         <button type="button" data-active={tab === "attachments" || undefined} onClick={() => onTabChange("attachments")}>{t("reports.attachments")} {evidenceCount > 0 && <span>{evidenceCount}</span>}</button>

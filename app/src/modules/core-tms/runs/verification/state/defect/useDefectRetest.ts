@@ -1,3 +1,4 @@
+import { useDefectRetestContext } from "./useDefectRetestContext";
 import { useEffect, useRef, useState } from "react";
 import type { Defect } from "../../../../../../core/tms/contracts/legacy-contract";
 import { TmsApiError } from "../../../../../../core/tms/transport/http";
@@ -32,9 +33,12 @@ export function useDefectRetest(state: ReturnType<typeof useWorkspaceState>,
     ?? environments.find((item) => item.isDefault)?.id ?? environments[0]?.id ?? "";
   const current = form.scope === scope;
   const pending = current && form.pending;
+  const context = useDefectRetestContext(state.data.workspace.id, projectId, defect?.id, derived.projectRuns,
+    state.connection === "connected" && capabilities.includes("run:read") && capabilities.includes("defect:read"), current && form.open);
   const unresolved = starter.current.pending(projectId, defect?.id);
   function open() {
     if (!enabled) return;
+    if (current && !unresolved) { setForm(value => ({ ...value, open: true })); return; }
     setForm({ scope, open: true, pending: false, error: "",
       environmentId: unresolved?.environmentId ?? defaultEnvironment, build: unresolved?.build ?? "" });
   }
@@ -86,7 +90,7 @@ export function useDefectRetest(state: ReturnType<typeof useWorkspaceState>,
       setForm((value) => ({ ...value, pending: false, error }));
     } finally { if (controller.current === request) controller.current = null; }
   }
-  return { enabled: Boolean(enabled), canStart: Boolean(canStart), open, close, start,
+  return { ...context, openLatest: () => { if (context.latest) openRun(context.latest.id, null); }, enabled: Boolean(enabled), canStart: Boolean(canStart), open, close, start,
     isOpen: current && form.open, pending, error: current ? form.error : "", environments,
     environmentId: current ? form.environmentId : "", build: current ? form.build : "", unresolved: Boolean(unresolved),
     setEnvironmentId: (environmentId: string) => setForm((value) => ({ ...value, environmentId, error: "" })),

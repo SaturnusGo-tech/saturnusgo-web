@@ -131,3 +131,11 @@ test("unavailable cases and deleted steps explain why retest cannot start withou
     f.h.dispose();
   }
 });
+
+test("collapsing the inline form preserves its build and environment draft", () => {
+  const f = retestHarness(); const form = f.prepare("2.4.1 (148)");
+  form.setEnvironmentId("env-default"); f.render().close();
+  assert.equal(f.render().isOpen, false); f.render().open();
+  assert.equal(f.render().build, "2.4.1 (148)"); assert.equal(f.render().environmentId, "env-default");
+  f.h.dispose();
+});

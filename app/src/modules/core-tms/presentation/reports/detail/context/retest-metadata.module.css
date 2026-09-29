@@ -1,0 +1,7 @@
+.metadata { display:inline-flex; align-items:center; flex-wrap:wrap; gap:8px 12px; min-width:0; }
+.metadata > span, .metadata button { display:inline-flex; align-items:center; gap:5px; min-width:0; overflow-wrap:anywhere; }
+.metadata svg { flex:none; }
+.metadata button { padding:0; border:0; background:none; color:var(--report-primary); font:inherit; text-align:left; cursor:pointer; }
+.metadata button:hover { text-decoration:underline; }
+.metadata button:focus-visible { outline:2px solid var(--report-primary); outline-offset:3px; border-radius:3px; }
+.unavailable { color:var(--report-muted); }

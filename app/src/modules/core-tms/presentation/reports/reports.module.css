@@ -76,7 +76,7 @@
 .closeButton, .mobileBack { width: 30px; height: 30px; display: inline-grid; place-items: center; padding: 0; color: var(--report-muted); background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
 .closeButton:hover, .mobileBack:hover { color: var(--report-strong); background: var(--report-hover); border-color: var(--report-border); }
 .mobileBack { display: none; }
-.detailTitle { min-height: 104px; padding: 14px 24px 17px; }
+.detailTitle { min-height: 0; padding: 14px 24px 17px; }
 .detailTitle h1 { margin: 0; color: var(--report-strong); font-size: clamp(20px, 3.1cqi, 27px); font-weight: 650; line-height: 1.25; letter-spacing: -.025em; }
 .detailTitle h1 span { margin-left: 8px; color: var(--report-muted); font-size: .72em; font-weight: 450; letter-spacing: 0; white-space: nowrap; }
 .detailTitle p { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 10px 0 0; color: var(--report-muted); font-size: 12px; }

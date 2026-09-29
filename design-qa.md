@@ -418,3 +418,15 @@ Verification: architecture1280 files; full adapter chain841 tests passed,0 skipp
 Limits: actual account/avatar is absent in this development session, so its placement relies on the retained production component and scoped footer CSS rather than a fabricated profile screenshot. No separate Safari/Windows session was available; responsive checks use browser CSS viewport dimensions, not physical screen inches. Static captures do not quantify frame rate; transition geometry and code paths were checked. Shared dependency directory became empty during the final build pass; this worktree now has its own lockfile-based dependency install, avoiding that shared link.
 
 final result: passed
+
+## Inline defect retest · 30 September 2026
+
+- Source visual: `/var/folders/m4/ss0ghsrd5dl5chxys5v0rgqm0000gn/T/TemporaryItems/NSIRD_screencaptureui_r9JOEH/Screenshot 2026-09-30 at 12.48.31 AM.png` (user attachment, 580×734).
+- Implementation: in-app browser tab 42, local demo Payments / PAY-BUG-003. Light and dark browser screenshots are embedded in the task's tool results; no screenshot file was exported.
+- Viewport: 1280×720 CSS pixels, screenshot 1280×720. Compared the app-owned detail region, not the surrounding navigation: implementation detail width677px; source cropped detail approximately545px. Intentional content differences: real demo defect and persisted latest-retest metadata.
+- Form: located below status/creation metadata and above Overview/Attachments; two columns, 36px fields, 16px outer radius, blue Create run action. Existing Falcon font and neutral theme tokens retained. No new raster assets; existing Lucide icons.
+- Focused comparison: caption/field/footer spacing and button alignment checked against the attachment. Removed the old header minimum-height that left excess space before the panel. Final dark screenshot confirms compact spacing and rounded border; form disclosure185px tall, no modal/overlay.
+- Interaction: expand/collapse moves tabs/body in normal flow; drafts survive collapse; keyboard focus returns to trigger; reduced-motion uses the shared disclosure behavior. Created PAY-TR-13 with one linked case, build2.4.1(148), Staging. Returned to defect and reloaded: persisted association/name/build/environment restored. Original defect status remains Ready for retest.
+- Light and dark render checked; local theme restored to light. Browser console errors: none.1021 adapter tests passed; typecheck and architecture1452 files passed.
+- No actionable P0/P1/P2 findings. Narrow-container rules stack fields below380px; physical mobile/Safari testing not performed.
+- final result: passed

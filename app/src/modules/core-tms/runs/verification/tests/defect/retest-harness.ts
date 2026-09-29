@@ -26,6 +26,7 @@ export function retestHarness(handler?: (request: RequestLog, index: number) => 
       return handler ? handler(request, requests.length) : response(request.method === "GET" ? queue : { data: run });
     }) as typeof fetch });
   const loaded = h.load<{ useDefectRetest: typeof useDefectRetest }>(new URL("../../state/defect/useDefectRetest.ts", import.meta.url), name => {
+    if (name.endsWith("useDefectRetestContext")) return { useDefectRetestContext: () => ({ latest: null, linkedCases: null, contextError: false, countError: false }) };
     if (name.endsWith("useTmsHttpClient") || name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => http };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru" }) };
     if (name.endsWith("verification-run-starter")) return { createVerificationRunStarter };
