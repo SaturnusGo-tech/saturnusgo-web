@@ -81,7 +81,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
   const panelLabel = focused ? (locale === "ru" ? "Показать список кейсов" : "Show case list") : (locale === "ru" ? "Скрыть список кейсов" : "Hide case list");
   const panelHandle = selectedRun && <button type="button" className={focusStyles.panelHandle} onClick={toggleFocus}
     aria-expanded={!focused} aria-controls={navigationId} aria-label={panelLabel} title={panelLabel} data-run-panel-handle>
-    <ChevronLeft size={12} aria-hidden="true" />
+    <ChevronLeft size={10} aria-hidden="true" />
   </button>;
   if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
   if (selectedRun && !selectedItem) return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;

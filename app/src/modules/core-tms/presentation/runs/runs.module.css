@@ -230,7 +230,6 @@
 .shell { position: relative; }
 .shell:has([data-run-bulk]) .footer { visibility: hidden; }
 
-.overviewLayout[data-properties-open="false"] { grid-template-columns: minmax(0, 1fr); }
 .sideRail[hidden] { display: none; }
 .propertiesToggle { display: inline-flex; align-items: center; gap: 5px; padding: 3px 6px; border: 0; border-radius: 8px; background: transparent; color: var(--runs-muted); font-size: 12px; }
 .propertiesToggle:hover, .propertiesToggle[aria-expanded="true"] { color: var(--runs-strong); background: var(--runs-hover); }
