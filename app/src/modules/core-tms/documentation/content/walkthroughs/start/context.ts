@@ -19,7 +19,7 @@ export const workspaceWalkthrough = walkthrough("Project, environment and run co
     "Payments environment settings with Staging marked Default and controls to edit it or create a New environment."),
   shot("workspace-v2-02-environment-20260913-en-20260928",
     "Add an environment",
-    "In Payments, select **New environment** and enter a name, key and base URL. This example uses **Guide environment**, **GUIDE** and **https://staging.example.com**. Replace these with your own details before choosing **Create environment**.",
+    "In Payments, select **New environment** and enter a name, key and base URL. This example uses **Guide environment**, **GUIDE** and **https://staging.example.com**. Replace these with your own details before choosing **Save**.",
     "This is an unsaved form in Payments; no Guide environment was created for the capture. Saving valid details adds an environment to the selected project's list.",
     "Unsaved Payments environment form with Guide environment, key GUIDE and https://staging.example.com."),
   shot("run-03-target-20260928-en-20260928",

@@ -1,57 +1,50 @@
-import { Archive, ArchiveRestore, Check, Copy, Pencil, Plus, Server } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { Environment } from "../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import styles from "../../../tms.module.css";
-import css from "../config.module.css";
+import { EnvironmentEditor } from "../environments/editor/EnvironmentEditor";
+import { EnvironmentExpansion } from "../environments/motion/EnvironmentExpansion";
+import { EnvironmentRow } from "../environments/row/EnvironmentRow";
+import { transitionEnvironmentLayout } from "../environments/motion/layout-transition";
+import { ENVIRONMENT_SETTINGS_OPEN } from "../navigation/settings-section-route";
+import css from "../environments/environments.module.css";
 
-export function EnvironmentSettings({ environments, onCreate, onEdit, onToggle }: {
-  environments: Environment[]; onCreate: () => void; onEdit: (id: string) => void; onToggle: (id: string) => void;
+export function EnvironmentSettings({ environments, projectId, projectName, offline, onSaved, onToggle }: {
+  environments: Environment[]; projectId: string; projectName: string; offline: boolean;
+  onSaved(environment: Environment): void; onToggle(id: string): void;
 }) {
-  const { t, locale } = useTmsLocale();
-  const [copied, setCopied] = useState("");
-  const [error, setError] = useState("");
+  const { t, locale } = useTmsLocale(); const ru = locale === "ru";
+  const [copied, setCopied] = useState(""); const [error, setError] = useState("");
+  const [query, setQuery] = useState(""); const [editing, setEditing] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const reset = () => { if (!busy) setEditing(null); };
+    window.addEventListener(ENVIRONMENT_SETTINGS_OPEN, reset);
+    return () => window.removeEventListener(ENVIRONMENT_SETTINGS_OPEN, reset);
+  }, [busy]);
+  const select = (id: string | null) => { if (!busy) transitionEnvironmentLayout(() => setEditing(id)); };
   async function copy(environment: Environment) {
     try { await navigator.clipboard.writeText(environment.baseUrl); setCopied(environment.id); setError(""); }
-    catch { setError(locale === "ru" ? "Не удалось скопировать адрес. Выделите его и скопируйте вручную." : "Could not copy the URL. Select and copy it manually."); }
+    catch { setError(ru ? "Не удалось скопировать адрес. Выделите его и скопируйте вручную." : "Could not copy the URL. Select and copy it manually."); }
   }
-  return <div className={css.settingsStack}>
-    <div className={css.sectionLabel}><span>{t("config.environmentsCount", { count: environments.length })}</span>
-      <button type="button" className={styles.primaryButton} onClick={onCreate} data-testid="new-environment">
-        <Plus size={15} aria-hidden="true" />{t("config.newEnvironment")}
-      </button>
-    </div>
-    {error && <p role="alert" className={css.exchangeError}>{error}</p>}
-    {environments.length === 0 ? <div className={css.empty}><Server size={24} aria-hidden="true" />
-      <strong>{t("config.emptyEnvironments")}</strong><span>{t("config.emptyEnvironmentsHint")}</span>
-    </div> : <ul className={css.environments}>{environments.map((environment) => {
-      const archived = environment.status === "archived";
-      const baseUrl = environment.baseUrl?.trim();
-      return <li key={environment.id}>
-        <div className={css.environmentHeading}>
-          <h3 className={css.settingTitle}>{environment.name} <span className={css.state} data-archived={archived}>
-            {t(archived ? "common.archived" : environment.isDefault ? "common.default" : "common.active")}
-          </span></h3>
-          <div className={css.rowActions}>
-            <button type="button" className={css.iconAction} onClick={() => onEdit(environment.id)}
-              title={t("common.edit")} aria-label={`${t("common.edit")}: ${environment.name}`}><Pencil size={17} aria-hidden="true" /></button>
-            <button type="button" className={css.iconAction} onClick={() => onToggle(environment.id)}
-              title={t(archived ? "common.restore" : "common.archive")}
-              aria-label={`${t(archived ? "common.restore" : "common.archive")}: ${environment.name}`}>
-              {archived ? <ArchiveRestore size={17} aria-hidden="true" /> : <Archive size={17} aria-hidden="true" />}
-            </button>
-          </div>
-        </div>
-        <div className={css.settingCopy}>
-          {environment.description && <p className={css.settingDescription}>{environment.description}</p>}
-          <p className={css.environmentKey}>{t("config.environmentKey")}: <code>{environment.key}</code></p>
-          {baseUrl && <div className={css.url}><code>{baseUrl}</code>
-            <button type="button" title={t("config.copyBaseUrl")} aria-label={`${t("config.copyBaseUrl")}: ${environment.name}`}
-              onClick={() => void copy(environment)}>{copied === environment.id ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}</button>
-            {copied === environment.id && <span className={css.visuallyHidden} role="status">{locale === "ru" ? "Адрес скопирован" : "URL copied"}</span>}
-          </div>}
-        </div>
-      </li>;
-    })}</ul>}
+  const editor = (environment?: Environment) => <EnvironmentEditor key={environment?.id ?? "new"} projectId={projectId} environment={environment} offline={offline}
+    onClose={() => select(null)} onBusy={setBusy} onSaved={saved => transitionEnvironmentLayout(() => { onSaved(saved); setEditing(null); })} />;
+  const matching = environments.filter(item => item.id === editing || `${item.name} ${item.key} ${item.baseUrl}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  return <div className={css.environments}>
+    <header className={css.header}><div><h2 id="settings-environments-title">{ru ? "Окружения" : "Environments"} <span>{environments.length}</span></h2>
+      <p>{ru ? `Стенды для проверок в ${projectName}.` : `Test environments in ${projectName}.`}</p></div>
+      <button className={css.create} type="button" onClick={() => select("new")} disabled={busy || editing === "new"} data-testid="new-environment"><Plus size={14}/>{t("config.newEnvironment")}</button></header>
+    <label className={css.search}><Search size={14}/><input type="search" aria-label={ru ? "Найти окружение" : "Find an environment"}
+      placeholder={ru ? "Найти окружение" : "Find an environment"} value={query} disabled={busy} onChange={event => setQuery(event.target.value)} /></label>
+    {error && <p role="alert" className={css.error}>{error}</p>}
+    <div className={`${css.row} ${css.columns}`} aria-hidden="true"><span>{ru ? "Окружение" : "Environment"}</span><span>{ru ? "Ключ" : "Key"}</span><span>{ru ? "Адрес стенда" : "Base URL"}</span><span/></div>
+    <div style={{ viewTransitionName: "environment-create" }}><EnvironmentExpansion>{editing === "new" && editor()}</EnvironmentExpansion></div>
+    <ul className={css.list}>{matching.map(environment => <EnvironmentRow key={environment.id} environment={environment}
+      editor={editing === environment.id ? editor(environment) : undefined} disabled={busy}
+      copied={copied === environment.id} onCopy={() => void copy(environment)} onEdit={() => select(editing === environment.id ? null : environment.id)} onToggle={() => { select(null); onToggle(environment.id); }} />)}</ul>
+    {!matching.length && editing !== "new" && <div className={css.empty}>
+      {!environments.length && <img src="/falcon/ui/environment-server.webp" width="72" height="48" alt="" />}
+      <p>{environments.length ? (ru ? "Окружения не найдены" : "No environments found") : t("config.emptyEnvironments")}</p></div>}
+    <span className={css.srOnly} role="status">{copied ? (ru ? "Адрес скопирован" : "URL copied") : ""}</span>
   </div>;
 }

@@ -19,3 +19,12 @@ html:not([data-falcon-transition])::view-transition-new(root) { animation: disso
   @view-transition { navigation: none; }
   html::view-transition-old(root), html::view-transition-new(root) { animation: none !important; }
 }
+
+/* Inline environment rows retain identity as their editor expands. */
+html[data-environment-transition]::view-transition-group(*) { animation-duration:240ms; animation-timing-function:cubic-bezier(.22,.68,.25,1); }
+html[data-environment-transition]::view-transition-old(root), html[data-environment-transition]::view-transition-old(falcon-content) { display:none; }
+html[data-environment-transition]::view-transition-new(root), html[data-environment-transition]::view-transition-new(falcon-content) { animation:none; }
+html[data-environment-transition]::view-transition-old(*), html[data-environment-transition]::view-transition-new(*) { height:100%; object-fit:none; object-position:top left; overflow:clip; }
+@media(prefers-reduced-motion:reduce) { html[data-environment-transition]::view-transition-group(*) { animation-duration:0s; } }
+
+html[data-environment-transition]::view-transition { pointer-events:none; }

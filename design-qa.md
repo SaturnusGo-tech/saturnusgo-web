@@ -433,3 +433,15 @@ final result: passed
 
 ### Retest panel visual correction — 2026-09-30
 User requested a lighter neutral surface and slightly squarer corners. Scoped to the inline retest panel: light #fcfcfc, dark #202020; outer radius 10px (was 16), field radius 7px (was 9). Verified actual computed styles and screenshots in both themes. Existing layout, disclosure motion and run creation are unchanged. CSS-only follow-up; git diff whitespace check passed.
+
+## Inline environment settings — 2026-09-30
+
+- Reference: user screenshot, compact environment list with an editor expanding beneath the row. Retained Falcon's neutral light/dark colors and existing typography; removed card layout and environment modal entry points from settings/header.
+- Rows show name, default/archive badge, key, URL/copy and edit/more actions. Three compact inputs and description/actions expand inline. Native View Transitions preserve row identity; measured disclosure fallback supports browsers without that API, with reduced-motion handling.
+- Local browser QA: created Motion QA, edited it to Motion QA updated, reopened it and verified persisted fields, then archived the test record. Header returned to the list without an editor from both another settings section and an open editor.
+- Screenshots checked in light/dark at 1280×720 and dark at 820×720; captures are inline in tool results. No exported screenshot artifact. Menu stacking corrected so following row actions cannot paint over the menu. No browser console errors in the fresh verification tab. Original light theme and default viewport restored.
+- New photorealistic server asset: generated transparent image, optimized to 144×95 WebP (6,222 bytes); header uses 27×18 CSS pixels. No 3D illustration or new branding.
+- English and Russian guide instructions updated for inline create/edit and the header-to-list flow.
+- Verification: TypeScript and architecture (1,458 files) passed; full adapter test chain passed 1,023 tests; five focused editor/routing tests passed. Editor coverage checks fresh ETag usage, failed-load save guard, draft retention and stable retry operation key.
+- Limits: no physical Safari/Windows device validation; production UI requires the user's Auth0 login. Static captures do not measure frame rate.
+- final result: passed

@@ -19,11 +19,11 @@ export const settingsArticle: DocArticle = {
       ["Click Edit", "You can change the name and description, choose a portfolio, and assign a project owner. The portfolio and owner are optional."],
       ["Save your changes", "An existing project's key is locked: renaming the project does not change it. Save changes applies your edits; Cancel closes the form without saving."]),
       note("Project archive", "The bottom of the section offers Archive or Restore, depending on the project's status. Archiving preserves data and history. Coordinate with your team to finish ongoing work first.")),
-    section("environments", "Create or edit an environment", steps(
-      ["Click New environment", "Enter a name, unique key, and full environment URL, such as https://staging.example.com. The description is optional. The URL must use HTTP(S) and must not contain a username or password."],
-      ["Save the environment", "The saved environment appears in the project's list. Its row shows the name, status, description, key, and URL where provided."],
-      ["Edit as needed", "The pencil opens the edit form. The icon next to the address copies the environment URL. If copying is unavailable, select and copy the address manually."],
-      ["Retire an unused environment", "The archive icon archives the environment; archived environments can be restored. Saved runs retain their context."]),
+    section("environments", "Create or edit an environment", paragraph("Click the environment in the top bar to open **Settings → Environments**. This opens the list, without starting creation. Search by name, key or URL."), steps(
+      ["Click New environment", "The inline form expands at the top of the list. Enter a name, unique key, and full environment URL, such as https://staging.example.com. The description is optional. The URL must use HTTP(S) and must not contain a username or password."],
+      ["Save the environment", "The saved environment appears in the project's list. Its row shows the name, default or archived badge, key, and URL. Choose Save to apply the form."],
+      ["Edit as needed", "The pencil expands an inline edit form below that row. Cancel collapses it without saving. The icon next to the address copies the environment URL. If copying is unavailable, select and copy the address manually."],
+      ["Retire an unused environment", "Choose Archive from the row’s more-actions menu; archived environments can be restored. Saved runs retain their context."]),
       note("Default environment", "The Default badge identifies the environment already set as the default. This form has no control for assigning a default. When creating a run, Falcon uses the project's active default environment if configured; existing runs keep their original settings.")),
     section("exchange", "Transfer test cases", paragraph("In **Import and export**, click **Export JSON** to download the selected project's test cases as JSON. The action is disabled while the export is prepared. Falcon then reports how many cases were exported."),
       paragraph("**Import cases** opens a separate screen where you choose a file and destination folder, review its contents, and view import history. You do not need to return to Settings for each file. A server connection and permission for the action are required."),

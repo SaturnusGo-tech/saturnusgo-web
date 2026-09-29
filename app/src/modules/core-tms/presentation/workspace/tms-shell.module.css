@@ -937,3 +937,5 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   .shell[data-appearance="glass"] :is(.navigation, .brandArea, .navigationItems, .navigationUtilities, .navigationItem, .navigationUtilityButton, .navigationToggle, .navigationLabel, .tessiqWordmark),
   .shell[data-appearance="glass"] .navigationToggle .navigationIcon > svg { transition: none; }
 }
+
+.environmentImage { flex:none; object-fit:contain; width:27px; height:18px; }

@@ -3,7 +3,6 @@ import { RepositoryScopeSelector } from "../../repository-scope/presentation/sel
 import {
   GitBranch,
   Menu,
-  Server,
 } from "lucide-react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -12,6 +11,8 @@ import { ProjectSelector } from "./project-selector/ProjectSelector";
 import { transitionContent } from "./motion/transition/content-transition";
 import { RunClock } from "../runs/clock/RunClock";
 import { RunHeaderBuilds } from "../../runs/builds/presentation/header/RunHeaderBuilds";
+import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
+import { ENVIRONMENT_SETTINGS_OPEN, settingsSectionLink } from "../config/navigation/settings-section-route";
 import shellStyles from "./tms-shell.module.css";
 
 export function WorkspaceHeader({
@@ -35,8 +36,12 @@ export function WorkspaceHeader({
   const activeBuild = !build || /^local[- ]current$/i.test(build) ? "—" : build;
   const activeRun = model.view === "runs" ? model.selectedRun : null;
   function editEnvironment() {
-    if (environment) void model.openEditEnvironment(environment.id);
-    else model.openNewEnvironment();
+    transitionContent(() => {
+      model.closeResourceEditors(); model.setDialog(null);
+      navigateWorkspace(settingsSectionLink(window.location.href, "environments"));
+      model.setView("config");
+      window.dispatchEvent(new Event(ENVIRONMENT_SETTINGS_OPEN));
+    });
   }
   function openBuild() {
     transitionContent(() => {
@@ -80,8 +85,8 @@ export function WorkspaceHeader({
       {model.view !== "custom-fields" && model.view !== "api" && model.view !== "portfolios" && model.view !== "profile" && model.view !== "notifications" && !model.repositoryScope.aggregate && model.project && <div className={shellStyles.headerMeta}>
         {model.view === "runs" && model.selectedRun && <div className={shellStyles.runTime}><RunClock run={model.selectedRun} /></div>}
         <button type="button" className={`${shellStyles.headerMetaItem} ${activeRun ? shellStyles.runEnvironment : ""}`} onClick={editEnvironment} disabled={!workspaceReady}
-          title={t("header.editEnvironment")} aria-label={`${t("header.editEnvironment")}: ${activeEnvironment}`}>
-          <Server size={15} aria-hidden="true" />
+          title={t("header.environment")} aria-label={`${t("header.environment")}: ${activeEnvironment}`}>
+          <img src="/falcon/ui/environment-server.webp" width="27" height="18" alt="" className={shellStyles.environmentImage} />
           <span>
             {!activeRun && <small>{t("header.environment")}</small>}
             <strong>{activeEnvironment}</strong>

@@ -74,8 +74,11 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         notifications={<WorkspaceNotifications workspaceId={model.data.workspace.id} />}
         environments={model.projectEnvironments}
         project={model.project}
-        onCreate={model.openNewEnvironment}
-        onEditEnvironment={model.openEditEnvironment}
+        offline={model.connection === "demo"}
+        onEnvironmentSaved={environment => model.setData(current => ({ ...current, environments:
+          current.environments.some(item => item.id === environment.id)
+            ? current.environments.map(item => item.id === environment.id ? environment : item)
+            : [...current.environments, environment] }))}
         onToggleEnvironment={model.toggleEnvironment}
         onEditProject={model.openEditProject}
         onToggleProject={model.toggleProject}

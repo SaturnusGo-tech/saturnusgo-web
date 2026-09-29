@@ -14,7 +14,7 @@ import css from "./config.module.css";
 
 type ConfigViewProps = {
   environments: Environment[]; project?: Project; notifications?: ReactNode;
-  onCreate: () => void; onEditEnvironment: (id: string) => void;
+  offline: boolean; onEnvironmentSaved: (environment: Environment) => void;
   onToggleEnvironment: (id: string) => void; onEditProject: () => void;
   onToggleProject: () => void; exchangeEnabled: boolean; onImport: () => void;
 };
@@ -41,10 +41,10 @@ export function ConfigView(props: ConfigViewProps) {
     </aside>
     <div className={css.content}>
       {available.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
-        <header className={css.header}>
-          <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>
+        {id !== "environments" && <header className={css.header}>
+          <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>}
         {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
-        {id === "environments" && <EnvironmentSettings environments={props.environments} onCreate={props.onCreate} onEdit={props.onEditEnvironment} onToggle={props.onToggleEnvironment} />}
+        {id === "environments" && section === id && props.project && <EnvironmentSettings key={props.project.id} environments={props.environments} projectId={props.project.id} projectName={props.project.name} offline={props.offline} onSaved={props.onEnvironmentSaved} onToggle={props.onToggleEnvironment} />}
         {id === "exchange" && props.project && <ProjectCaseExchange enabled={props.exchangeEnabled} project={props.project} onImport={props.onImport} />}
         {id === "appearance" && <AppearanceSettings />}
         {id === "notifications" && section === id && props.notifications}

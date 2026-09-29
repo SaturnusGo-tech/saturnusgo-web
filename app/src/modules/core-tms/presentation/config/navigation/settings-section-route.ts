@@ -14,3 +14,5 @@ export function settingsSectionLink(href: string, section: SettingsSection) {
   url.searchParams.set("view", "config"); url.searchParams.set("settings", section); url.hash = "";
   return `${url.pathname}${url.search}`;
 }
+
+export const ENVIRONMENT_SETTINGS_OPEN = "falcon:environment-settings-open";

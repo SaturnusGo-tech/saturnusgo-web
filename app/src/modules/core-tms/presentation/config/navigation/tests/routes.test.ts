@@ -13,8 +13,8 @@ test("legacy notifications open personal Settings and canonicalize without losin
   assert.equal(new URL(buildWorkspaceDeepLink(origin, { ...scope, view: "notifications" })).searchParams.get("settings"), "notifications");
 });
 
-test("notification and account deep links work without a project and clear unrelated screen selections", () => {
-  for (const section of ["notifications", "account"] as const) {
+test("notification, account and environment deep links work without a project and clear unrelated screen selections", () => {
+  for (const section of ["notifications", "account", "environments"] as const) {
     const href = new URL(settingsSectionLink(`${origin}&runId=old&caseId=old#section`, section), origin).href;
     assert.equal(readSettingsSection(href), section);
     const query = new URL(href).searchParams;
