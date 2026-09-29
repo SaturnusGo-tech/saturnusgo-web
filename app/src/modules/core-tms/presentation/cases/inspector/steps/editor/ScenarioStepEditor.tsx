@@ -45,7 +45,7 @@ export function ScenarioStepEditor(props: Props) {
     stepId: props.step.id,
   });
 
-  return <article className={css.stepGroup}>
+  return <article className={css.stepGroup} data-scenario-motion-group>
     <div className={css.stepMenu}><StepActionMenu ru={props.ru}
       sharedSteps={props.sharedSteps} canRemove={props.canRemove}
       allowSharedSteps={props.allowSharedSteps}

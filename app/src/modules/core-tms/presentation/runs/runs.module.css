@@ -236,7 +236,7 @@
 .propertiesToggle:hover, .propertiesToggle[aria-expanded="true"] { color: var(--runs-strong); background: var(--runs-hover); }
 .propertiesToggle svg { transition: transform 160ms ease; }
 .propertiesToggle[aria-expanded="true"] svg { transform: rotate(180deg); }
-.steps { container: scenario-content / inline-size; }
+.steps { container: scenario-content / inline-size; align-content: start; }
 @container scenario-content (min-width: 520px) {
   .steps[data-scenario-layout="grid"] .step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 24px; row-gap: 8px; padding: 16px 0; }
   .steps[data-scenario-layout="grid"] .step + .step { border-top: 1px solid var(--runs-row-border); }

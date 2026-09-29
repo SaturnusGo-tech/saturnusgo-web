@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TmsApiError } from "../../../../../core/tms/transport/http";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
+import { subscribeDefectsChanged } from "../../../defects/application/defect-resource-events";
 import { getVerificationQueue } from "../data/verification-api";
 import type { VerificationQueue } from "../model/verification";
 
@@ -29,7 +30,7 @@ export function useVerificationQueue(projectId: string, enabled: boolean, ru: bo
         : error instanceof TmsApiError && error.status === 409
         ? (ru ? "Очередь изменилась во время загрузки. Обновите её." : "The queue changed while loading. Refresh it.")
         : (ru ? "Не удалось загрузить исправления. Обновите страницу, чтобы повторить." : "Could not load the fixes. Refresh the page to retry.");
-      setResource((old) => ({ ...old, scope, pending: false, error: message }));
+      setResource({ scope, data: null, pending: false, error: message });
       return null;
     }
   }, [enabled, http, projectId, ru, scope]);
@@ -38,9 +39,14 @@ export function useVerificationQueue(projectId: string, enabled: boolean, ru: bo
     void load();
     const refresh = () => { if (document.visibilityState === "visible") void load(); };
     const timer = window.setInterval(refresh, 60_000);
+    const unsubscribe = subscribeDefectsChanged((changedProject) => { if (changedProject === projectId) refresh(); });
     window.addEventListener("focus", refresh);
-    return () => { request.current?.abort(); window.clearInterval(timer); window.removeEventListener("focus", refresh); };
-  }, [enabled, load]);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      request.current?.abort(); window.clearInterval(timer); unsubscribe();
+      window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [enabled, load, projectId]);
   const visible = resource.scope === scope ? resource : null;
   return { data: visible?.data ?? null,
     pending: enabled && (visible?.pending ?? true), error: visible?.error ?? "",

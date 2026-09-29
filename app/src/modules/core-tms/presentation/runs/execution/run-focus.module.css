@@ -1,0 +1,65 @@
+.shell.shell {
+  --run-panel-duration: 280ms;
+  --run-panel-ease: cubic-bezier(.22, .68, .22, 1);
+  grid-template-columns: minmax(0, clamp(320px, 44%, 620px)) minmax(0, 1fr);
+  transition: grid-template-columns var(--run-panel-duration) var(--run-panel-ease);
+}
+.shell.shell[data-run-focused="true"] { grid-template-columns: minmax(0, 0px) minmax(0, 1fr); }
+.navigator { min-width: 0; overflow: hidden; }
+.navigationContent {
+  display: flex; flex-direction: column; width: clamp(320px, 44cqi, 620px); height: 100%; min-height: 0;
+  transition: transform var(--run-panel-duration) var(--run-panel-ease), opacity var(--run-panel-duration) ease, visibility 0s;
+}
+.navigationContent > aside { flex: 1; min-height: 0; }
+[data-run-focused="true"] .navigationContent { transform: translateX(-100%); opacity: 0; visibility: hidden; transition-delay: 0s, 0s, var(--run-panel-duration); }
+.detail { container: run-detail / inline-size; }
+.overview.overview {
+  --run-rail-width: clamp(180px, 26cqi, 250px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0px); gap: 0;
+  transition: grid-template-columns var(--run-panel-duration) var(--run-panel-ease);
+}
+.overview.overview[data-properties-open="true"] { grid-template-columns: minmax(0, 1fr) minmax(0, var(--run-rail-width)); }
+.railSlot { min-width: 0; overflow: hidden; align-self: stretch; }
+.rail.rail { width: var(--run-rail-width); padding-left: 24px; padding-top: 0; border: 0; grid-template-columns: minmax(0, 1fr); transition: transform var(--run-panel-duration) var(--run-panel-ease), opacity var(--run-panel-duration) ease, visibility 0s; }
+[data-properties-open="false"] .rail { transform: translateX(100%); opacity: 0; visibility: hidden; transition-delay: 0s, 0s, var(--run-panel-duration); }
+.primary { width: 100%; max-width: 1120px; min-width: 0; justify-self: center; }
+.primary > section > :not(header) { overflow-wrap: anywhere; }
+.primary > section:not([data-run-scenario]) { max-width: 78ch; }
+[data-run-focused="true"] .detail > header > :last-child { max-width: 1168px; margin-inline: auto; }
+.panelHandle {
+  position: absolute; z-index: 4; left: calc(clamp(320px, 44%, 620px) - 12px); top: 50%;
+  display: flex; align-items: center; justify-content: center; width: 24px; height: 64px;
+  padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--runs-muted);
+  transform: translateY(-50%); cursor: pointer; touch-action: manipulation;
+  transition: left var(--run-panel-duration) var(--run-panel-ease), top var(--run-panel-duration) var(--run-panel-ease), color 140ms ease;
+}
+.panelHandle::before {
+  content: ""; position: absolute; inset: 10px 5px; z-index: -1; border: 1px solid var(--runs-border);
+  border-radius: 8px; background: var(--runs-bg); transition: background-color 140ms ease, border-color 140ms ease;
+}
+.panelHandle:hover, .panelHandle:focus-visible { color: var(--runs-strong); }
+.panelHandle:hover::before { background: var(--runs-hover); border-color: var(--runs-muted); }
+.panelHandle:focus-visible { outline: 2px solid var(--runs-primary); outline-offset: -3px; border-radius: 10px; }
+.panelHandle > svg { transition: transform var(--run-panel-duration) var(--run-panel-ease); }
+[data-run-focused="true"] > .panelHandle { left: -4px; }
+[data-run-focused="true"] > .panelHandle > svg { transform: rotate(180deg); }
+.shell[data-focus-ready="false"], .shell[data-focus-ready="false"] .navigationContent, .shell[data-focus-ready="false"] .panelHandle { transition: none; }
+/* Shell width stays stable while the case expands, so the rail never changes
+   direction halfway through a synchronized panel transition. */
+@container runs-shell (max-width: 1180px) {
+  .overview.overview { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 0fr); transition: grid-template-rows var(--run-panel-duration) var(--run-panel-ease); }
+  .overview.overview[data-properties-open="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .rail.rail { width: 100%; padding: 22px 0 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-properties-open="false"] .rail { transform: translateX(24px); }
+}
+@media (max-width: 720px) {
+  .shell.shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 38dvh) minmax(0, 1fr) auto; transition: grid-template-rows var(--run-panel-duration) var(--run-panel-ease); }
+  .shell.shell[data-run-focused="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 0dvh) minmax(0, 1fr) auto; }
+  .navigationContent { width: 100%; height: 38dvh; }
+  .panelHandle { left: 50%; top: 38dvh; transform: translate(-50%, -50%) rotate(-90deg); }
+  [data-run-focused="true"] > .panelHandle { left: 50%; top: 6px; }
+}
+@media (max-width: 480px) { .rail.rail { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) {
+  .shell.shell, .overview.overview, .navigationContent, .rail.rail, .panelHandle, .panelHandle > svg { transition: none; }
+}

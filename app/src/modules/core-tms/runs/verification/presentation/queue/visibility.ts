@@ -1,10 +1,14 @@
-/** Keep interrupted run creation recoverable even after its defects leave the queue. */
+/** Show a confirmed action, or progress for an action that is already underway. */
 export function showVerificationControl(state: {
-  enabled: boolean; data: { totalCases: number } | null;
-  unresolved: boolean; pendingStart: boolean; error: string;
+  enabled: boolean; canStart: boolean; data: { totalCases: number } | null;
+  pending: boolean; pendingStart: boolean; unresolved: boolean; error: string; disabledReason: string;
 }): boolean {
-  if (!state.enabled) return false;
-  if (state.unresolved || state.pendingStart) return true;
-  // A failed request is not evidence that there are fixes to verify.
-  return (state.data?.totalCases ?? 0) > 0;
+  if (!state.enabled || !state.canStart) return false;
+  if (state.pendingStart) return true;
+  if (state.disabledReason) return false;
+  // Recovery repeats a real operation, even if its successful server response was lost.
+  if (state.unresolved) return true;
+  if (state.pending || state.error) return false;
+  const count = state.data?.totalCases ?? 0;
+  return Number.isSafeInteger(count) && count > 0;
 }

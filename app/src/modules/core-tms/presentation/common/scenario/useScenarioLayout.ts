@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { transitionScenarioLayout } from "./motion/transitionScenarioLayout";
 export type ScenarioLayout = "list" | "grid";
 const key = "falcon.scenario.layout.v1";
 const event = "falcon-scenario-layout";
@@ -16,8 +17,11 @@ export function useScenarioLayout() {
     return () => { window.removeEventListener("storage", restore); window.removeEventListener(event, restore); };
   }, []);
   function choose(next: ScenarioLayout) {
-    setLayout(next);
-    try { window.localStorage.setItem(key, next); window.dispatchEvent(new Event(event)); } catch { /* Keep the choice for this view. */ }
+    if (next === layout) return;
+    transitionScenarioLayout(() => {
+      setLayout(next);
+      try { window.localStorage.setItem(key, next); window.dispatchEvent(new Event(event)); } catch { /* Keep the choice for this view. */ }
+    });
   }
   return [layout, choose] as const;
 }

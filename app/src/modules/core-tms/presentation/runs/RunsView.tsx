@@ -20,6 +20,8 @@ import { RunScopeEmpty } from "./empty/RunScopeEmpty";
 import { runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
+import { useRunFocus } from "./execution/useRunFocus";
+import focusStyles from "./execution/run-focus.module.css";
 import { EstimateBadge, PriorityBadge, TypeBadge } from "../cases/list/CaseBadges";
 import styles from "../../tms.module.css";
 import runStyles from "./runs.module.css";
@@ -46,11 +48,20 @@ type RunsViewProps = {
   onArchive: (run: TestRunSummary) => void;
   onDefectCreated: (defect: Defect) => void;
 };
-export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, canArchive, archivePending, onArchive, onDefectCreated }: RunsViewProps) {
+export function RunsView({ executionPending = false, emptyFiltered = false, navigation, verificationContext, onCreate, onDirtyChange, workspaceId, offline, cases, selectedRun, items, scopeLoading, selectedItem, onSelectItem, onStepStatus, onStepActual, onSaveStepActual, onItemStatus, canExecute, startPending, startError, onStart, archivePending, onDefectCreated }: RunsViewProps) {
   const { locale, t } = useTmsLocale();
   const [reporting, setReporting] = useState(false);
   const [layout, setLayout] = useScenarioLayout();
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const focus = useRunFocus(workspaceId);
+  const focused = Boolean(selectedRun && focus.focused);
+  const restoreProperties = useRef(false);
+  const navigationId = useId();
+  const toggleFocus = () => {
+    if (!focused) { restoreProperties.current = propertiesOpen; setPropertiesOpen(false); }
+    else setPropertiesOpen(restoreProperties.current);
+    focus.toggle();
+  };
   const propertiesId = useId();
   const [dirtySteps, setDirtySteps] = useState<string[]>([]);
   useEffect(() => { onDirtyChange?.(dirtySteps.length > 0); return () => onDirtyChange?.(false); }, [dirtySteps.length, onDirtyChange]);
@@ -65,10 +76,16 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     items, selectedItem, selectedRun, runWritable: attemptWritable && !executionPending && dirtySteps.length === 0, navigationBlocked: executionPending || dirtySteps.length > 0, onItemStatus, onSelectItem,
     setReporting,
   });
-  const runNavigator = <div className={runStyles.navigator}>{navigation}</div>;
-  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
-  if (selectedRun && !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
-  if (!selectedRun || !selectedItem) return <div className={runStyles.shell} data-testid="runs-view">{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;
+  const runNavigator = <div id={navigationId} className={`${runStyles.navigator} ${focusStyles.navigator}`} aria-hidden={focused} ref={element => { if (element) element.inert = focused; }}><div className={focusStyles.navigationContent}>{navigation}</div></div>;
+  const shellProps = { className: `${runStyles.shell} ${focusStyles.shell}`, "data-testid": "runs-view", "data-run-focused": focused, "data-focus-ready": focus.ready };
+  const panelLabel = focused ? (locale === "ru" ? "Показать список кейсов" : "Show case list") : (locale === "ru" ? "Скрыть список кейсов" : "Hide case list");
+  const panelHandle = selectedRun && <button type="button" className={focusStyles.panelHandle} onClick={toggleFocus}
+    aria-expanded={!focused} aria-controls={navigationId} aria-label={panelLabel} title={panelLabel} data-run-panel-handle>
+    <ChevronLeft size={12} aria-hidden="true" />
+  </button>;
+  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
+  if (selectedRun && !selectedItem) return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
+  if (!selectedRun || !selectedItem) return <div {...shellProps}>{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);
   const failed = selectedItem.status === "failed" || attempt.stepResults.some((result) => result.status === "failed");
@@ -79,14 +96,15 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     ...attempt.stepResults.flatMap((result) => result.attachmentIds),
   ]));
   const currentIndex = items.findIndex((item) => item.id === selectedItem.id);
-  return <div className={runStyles.shell} data-testid="runs-view">
+  return <div {...shellProps}>
     {runNavigator}
-    <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
-      <RunExecutionHeader propertiesOpen={propertiesOpen} propertiesId={propertiesId} onToggleProperties={() => setPropertiesOpen(open => !open)} run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} canArchive={canArchive && !selectedRun.batchId} archivePending={archivePending} onArchive={onArchive} canStart={false} startPending={startPending} onStart={onStart} />
+    {panelHandle}
+    <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${focusStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
+      <RunExecutionHeader propertiesOpen={propertiesOpen} propertiesId={propertiesId} onToggleProperties={() => setPropertiesOpen(open => !open)} run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} archivePending={archivePending} canStart={false} startPending={startPending} onStart={onStart} />
       {startError && <FormError message={startError} />}
       <div className={runStyles.detailContent}>
-        <div className={runStyles.overviewLayout} data-properties-open={propertiesOpen}>
-          <div className={runStyles.primaryColumn}>
+        <div className={`${runStyles.overviewLayout} ${focusStyles.overview}`} data-properties-open={propertiesOpen}>
+          <div className={`${runStyles.primaryColumn} ${focusStyles.primary}`}>
             {verificationContext}
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
@@ -96,13 +114,13 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
               <header><h2>{t("runs.preconditions")}</h2></header>
               <MarkdownField value={selectedItem.snapshot.preconditions ?? ""} label={t("runs.preconditions")} emptyLabel={locale === "ru" ? "Предусловия не указаны." : "No preconditions."} allowAttachments={false} />
             </section>
-            <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`}>
+            <section className={`${runStyles.contentSection} ${runStyles.scenarioSection}`} data-run-scenario>
               <header><h2>{locale === "ru" ? "Сценарий" : "Scenario"}</h2><span>{executionEntries.length}</span><ScenarioLayoutToggle value={layout} onChange={setLayout} ru={locale === "ru"} /></header>
-              <div className={runStyles.steps} data-scenario-layout={layout} role="table" aria-label={selectedItem.snapshot.title}>
+              <div className={runStyles.steps} data-scenario-layout={layout} data-scenario-motion role="table" aria-label={selectedItem.snapshot.title}>
                 {executionEntries.map((step, index) => {
                   const result = attempt.stepResults.find((item) => item.stepId === step.id);
                   const status = result?.status ?? "not_run";
-                  return <article className={`${runStyles.step} ${runStyles[`step_${status}`]}`} key={step.id} role="row" aria-rowindex={index + 1}>
+                  return <article className={`${runStyles.step} ${runStyles[`step_${status}`]}`} key={step.id} role="row" aria-rowindex={index + 1} data-scenario-motion-group>
                     <div className={runStyles.stepTop}>
                       <span className={runStyles.stepNumber} role="cell">{step.order}</span>
                       <div className={runStyles.stepAction} role="cell"><ScenarioMarkdown value={step.action} label={locale === "ru" ? "Действие" : "Action"} /></div>
@@ -116,7 +134,8 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
               </div>
             </section>
           </div>
-          <aside id={propertiesId} hidden={!propertiesOpen} className={runStyles.sideRail} aria-label={locale === "ru" ? "Свойства тест-кейса" : "Test case properties"}>
+          <div className={focusStyles.railSlot} aria-hidden={!propertiesOpen} ref={element => { if (element) element.inert = !propertiesOpen; }}>
+          <aside id={propertiesId} className={`${runStyles.sideRail} ${focusStyles.rail}`} aria-label={locale === "ru" ? "Свойства тест-кейса" : "Test case properties"}>
             <section className={runStyles.railSection}>
               <header><h2>{locale === "ru" ? "Свойства" : "Properties"}</h2></header>
               <div className={runStyles.propertyList}>
@@ -131,6 +150,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
               <CaseCustomFields projectId={selectedRun.projectId} revision={selectedItem.snapshot} editing={false} ru={locale === "ru"} onPatch={() => {}} />
             </section>
           </aside>
+          </div>
         </div>
         {attachmentIds.length > 0 && <section className={runStyles.evidence}><strong>{t("runs.evidence")}</strong><div className={`${styles.attachmentGrid} ${runStyles.evidenceGrid}`}>{attachmentIds.map((id) => <AttachmentLink key={id} attachmentId={id} />)}</div></section>}
         {runWritable && reporting && failed && failedStep && <InlineDefectComposer key={`${selectedRun.id}-${selectedItem.id}-${failedStep.id}`} workspaceId={workspaceId} projectId={selectedRun.projectId} run={selectedRun} item={selectedItem} step={failedStep} components={cases.map((testCase) => testCase.component)} offline={offline} onClose={() => setReporting(false)} onCreated={onDefectCreated} />}

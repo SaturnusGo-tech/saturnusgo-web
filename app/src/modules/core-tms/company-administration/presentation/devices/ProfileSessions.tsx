@@ -10,19 +10,21 @@ import { administrationCopy } from "../copy/administration-copy";
 import { administrationError } from "../copy/administration-errors";
 import { ResourceState } from "../common/ResourceState";
 import styles from "../layout/administration.module.css";
+import deviceStyles from "./profile-sessions.module.css";
 
-export function ProfileSessions({ client, version }: { readonly client: AdministrationPort; readonly version: number }) {
+export function ProfileSessions({ client, version, showHeading = true }: { readonly client: AdministrationPort; readonly version: number; readonly showHeading?: boolean }) {
   const { locale, languageTag } = useTmsLocale();
   const copy = administrationCopy(locale);
   const list = useAdministrationList(useCallback((_: string, cursor: string | null, signal: AbortSignal) => client.sessions(cursor, signal), [client]));
   const command = useAdministrationCommand();
   useEffect(() => { if (version) list.refresh(); }, [version, list.refresh]);
-  return <section className={styles.section}><h2>{copy.sessions}</h2>
-    {list.loading ? <ResourceState loading error={null} retry={list.refresh} /> : <div className={styles.list}>
-      {list.items.map((device) => <div className={styles.row} key={device.id} style={{ cursor: "default" }}>
-        <span className={styles.rowTitle}><Monitor size={20} strokeWidth={1.3} /><span><strong>{device.current ? copy.currentSession : device.userAgent || "Falcon"}</strong>
+  return <section className={styles.section} aria-label={copy.sessions}>{showHeading && <h2>{copy.sessions}</h2>}
+    {list.loading ? <ResourceState loading error={null} retry={list.refresh} /> : <div className={deviceStyles.list}>
+      {!list.items.length && !list.error && <p className={deviceStyles.empty}>{locale === "ru" ? "Нет активных сессий." : "No active sessions."}</p>}
+      {list.items.map((device) => <div className={deviceStyles.row} key={device.id}>
+        <span className={deviceStyles.device}><Monitor size={20} strokeWidth={1.5} aria-hidden="true" /><span><strong>{device.current ? copy.currentSession : device.userAgent || "Falcon"}</strong>
           <small>{new Date(device.createdAt).toLocaleString(languageTag)}</small></span></span>
-        {!device.current && <button className={styles.button} disabled={command.pending} onClick={() => {
+        {!device.current && <button type="button" className={deviceStyles.revoke} disabled={command.pending} onClick={() => {
           void command.execute(device.id, async (_, signal) => { await client.revokeSession(device.id, signal); return true; }).then((done) => { if (done) list.refresh(); });
         }}>{copy.endSession}</button>}
       </div>)}

@@ -393,7 +393,7 @@
 
 .stepGroup .expectedBlock[data-input-shell] { border-color: #278c7b !important; border-radius: 0; }
 
-.scenarioView, .editor { container: scenario-content / inline-size; }
+.scenarioView, .editor { container: scenario-content / inline-size; align-content: start; }
 @container scenario-content (min-width: 360px) {
   :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start; padding: 14px 0; }
   :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) + :is(.viewGroup, .stepGroup) { border-top: 1px solid var(--cases-row-border); }

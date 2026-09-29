@@ -2,12 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 import type { RunsView } from "../../RunsView";
+import { runScopeState } from "../../state/run-view-state";
 
 function setup() {
-  const h = componentHarness(); let layout = "list"; const statuses: string[] = [];
+  const h = componentHarness(); let layout = "list"; let focused = false; const statuses: string[] = [];
   const { RunsView: render } = h.load<{ RunsView: typeof RunsView }>(new URL("../../RunsView.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("useScenarioLayout")) return { useScenarioLayout: () => [layout, (value: string) => { layout = value; }] };
+    if (name.endsWith("useRunFocus")) return { useRunFocus: () => ({ focused, ready: true, toggle: () => { focused = !focused; } }) };
+    if (name.endsWith("run-view-state")) return { runScopeState };
     if (name.endsWith("attempt-editing")) return { canEditRunAttempt: () => true };
     if (name.endsWith("caseRevision")) return { executableSteps: (snapshot: { steps: unknown[] }) => snapshot.steps };
     if (name.endsWith("labels")) return { localizedLabel: (_locale: string, value: string) => value };
@@ -27,13 +30,35 @@ function setup() {
 
 test("run properties start collapsed and can be restored without changing execution data", () => {
   const { all, props } = setup(); const before = JSON.stringify(props.selectedItem);
-  assert.equal(all().some(n => n.type === "aside" && !n.props.hidden), false);
+  const rail = { inert: false }; invoke(all().find(n => n.props.className === "railSlot")!, "ref", rail); assert.equal(rail.inert, true);
   const header = all().find(n => n.type === "RunExecutionHeader")!;
   assert.equal(header.props.propertiesOpen, false);
   invoke(header, "onToggleProperties");
   assert.equal(all().find(n => n.type === "RunExecutionHeader")?.props.propertiesOpen, true);
-  assert.equal(all().some(n => n.type === "aside" && !n.props.hidden), true);
+  invoke(all().find(n => n.props.className === "railSlot")!, "ref", rail); assert.equal(rail.inert, false);
   assert.equal(JSON.stringify(props.selectedItem), before);
+});
+
+test("focus hides both panels together, keeps execution mounted and restores the prior properties choice", () => {
+  const { all, props, statuses } = setup(); const before = JSON.stringify(props.selectedItem);
+  invoke(all().find(n => n.type === "RunExecutionHeader")!, "onToggleProperties");
+  invoke(all().find(n => n.props["data-run-panel-handle"] !== undefined)!, "onClick");
+  assert.equal(all().find(n => n.props["data-testid"] === "runs-view")?.props["data-run-focused"], true);
+  assert.equal(all().find(n => n.type === "RunExecutionHeader")?.props.propertiesOpen, false);
+  const navigation = { inert: false }; invoke(all().find(n => n.props.className === "navigator navigator")!, "ref", navigation); assert.equal(navigation.inert, true);
+  assert.ok(all().find(n => n.props["data-testid"] === "pass-case"));
+  invoke(all().find(n => n.props["data-run-panel-handle"] !== undefined)!, "onClick");
+  assert.equal(all().find(n => n.type === "RunExecutionHeader")?.props.propertiesOpen, true);
+  assert.equal(JSON.stringify(props.selectedItem), before); assert.deepEqual(statuses, []);
+});
+
+test("a focused run with no visible case still offers a way back to its repository", () => {
+  const { all, props } = setup();
+  invoke(all().find(n => n.props["data-run-panel-handle"] !== undefined)!, "onClick");
+  props.selectedItem = null; props.items = []; props.scopeLoading = false;
+  const restore = all().find(n => n.type === "button" && n.props["aria-label"] === "Show case list");
+  assert.ok(restore); invoke(restore, "onClick");
+  assert.equal(all().find(n => n.props["data-testid"] === "runs-view")?.props["data-run-focused"], false);
 });
 
 test("layout switching preserves step identity and does not execute or modify the snapshot", () => {

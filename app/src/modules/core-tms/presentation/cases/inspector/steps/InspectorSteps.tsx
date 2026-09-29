@@ -85,7 +85,7 @@ export function InspectorSteps({
         </li>)}
       </ol>;
     }
-    return <div className={css.scenarioView} data-scenario-layout={layout}>
+    return <div className={css.scenarioView} data-scenario-layout={layout} data-scenario-motion>
       {revision.steps.map((step, index) => step.sharedStep
         ? <SharedStepBlock layout={layout} key={step.id} snapshot={step.sharedStep} order={index + 1}
           editing={false} ru={ru} sharedSteps={sharedSteps}
@@ -95,7 +95,7 @@ export function InspectorSteps({
     </div>;
   }
 
-  return <div className={css.editor} data-scenario-layout={layout}>
+  return <div className={css.editor} data-scenario-layout={layout} data-scenario-motion>
     {revision.type === "checklist"
       ? revision.checklist.map((item, index) => <ChecklistRow
           key={item.id}
@@ -131,7 +131,7 @@ export function InspectorSteps({
     {revision.type === "checklist"
       ? <button type="button" className={css.addStepButton} onClick={addStep}><Plus size={15} />
           {ru ? "Добавить пункт" : "Add item"}</button>
-      : <div className={css.addStepMenu}><StepActionMenu trigger="add" ru={ru}
+      : <div className={css.addStepMenu} data-scenario-motion-part><StepActionMenu trigger="add" ru={ru}
           sharedSteps={sharedSteps} onAdd={(withExpected) => addAfter(revision.steps.length - 1, withExpected)}
           onInsertShared={(id) => void insertSharedAfter(revision.steps.length - 1, id)} /></div>}
   </div>;

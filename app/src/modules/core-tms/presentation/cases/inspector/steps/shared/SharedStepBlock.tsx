@@ -27,7 +27,7 @@ export function SharedStepBlock({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   return <article className={css.block} data-scenario-layout={layout}>
-    <header className={css.header}>
+    <header className={css.header} data-scenario-motion-part>
       <button type="button" className={css.collapse}
         aria-expanded={!collapsed}
         aria-label={collapsed
@@ -44,7 +44,7 @@ export function SharedStepBlock({
         onDuplicate={onDuplicate} onRemove={onRemove} />}
     </header>
     {!collapsed && <div className={css.items}>
-      {snapshot.items.map((item, itemIndex) => <div className={css.item} key={item.id}>
+      {snapshot.items.map((item, itemIndex) => <div className={css.item} key={item.id} data-scenario-motion-group>
         <div className={css.line}>
           <span>{order}.{itemIndex + 1}</span>
           <ScenarioMarkdown value={item.action || (ru ? "Действие не указано" : "No action")} label={ru ? "Действие" : "Action"} />

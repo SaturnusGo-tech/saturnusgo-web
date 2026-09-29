@@ -18,7 +18,7 @@ export function ScenarioStepView({ step, order, ru, layout = "list" }: {
     ? (ru ? `Развернуть шаг ${order}` : `Expand step ${order}`)
     : (ru ? `Свернуть шаг ${order}` : `Collapse step ${order}`);
 
-  return <article className={css.viewGroup} data-collapsed={collapsed || undefined}>
+  return <article className={css.viewGroup} data-collapsed={collapsed || undefined} data-scenario-motion-group>
     <div className={css.viewLines}>
       <div className={`${css.viewLine} ${css.primaryLine}`}>
         <button type="button" className={css.collapseButton}

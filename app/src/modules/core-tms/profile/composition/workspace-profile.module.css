@@ -1,4 +1,10 @@
 .profile.profile {
+  /* Keep workspace tokens inherited instead of cycling through admin aliases. */
+  --paper: inherit;
+  --ink: inherit;
+  --muted: inherit;
+  --line: inherit;
+  --control-hover: inherit;
   --admin-bg: var(--paper);
   --admin-surface: var(--paper);
   --admin-text: var(--ink);
@@ -10,9 +16,9 @@
   height: 100%;
   min-height: 0;
   overflow: auto;
-  padding: 32px clamp(20px, 4vw, 56px) 48px;
+  padding: 24px clamp(20px, 2.5vw, 36px) 36px;
   color: var(--ink);
   background: var(--paper);
 }
-.content { width: min(100%, 880px); margin-inline: auto; }
+.content { width: 100%; min-width: 0; }
 .profile :global(#security) { scroll-margin-top: 24px; }

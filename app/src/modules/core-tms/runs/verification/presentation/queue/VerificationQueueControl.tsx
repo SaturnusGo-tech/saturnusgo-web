@@ -1,4 +1,4 @@
-import { ChevronLeft, Loader2, Play, X } from "lucide-react";
+import { ChevronLeft, Loader2, Play, RotateCcw, X } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import type { WorkspaceVerification } from "../../state/workspace/useWorkspaceVerification";
@@ -19,7 +19,12 @@ export function VerificationQueueControl({ state, workspaceId }: { state: Worksp
   }, [collapsed]);
   if (!ready || !showVerificationControl(state)) return null;
   const ru = locale === "ru";
-  const label = ru ? "Проверить исправления" : "Verify fixes";
+  const label = state.pendingStart ? (ru ? "Запуск проверки…" : "Starting verification…")
+    : state.unresolved ? (ru ? "Повторить запуск проверки" : "Retry verification start")
+    : (ru ? "Проверить исправления" : "Verify fixes");
+  const startTitle = state.unresolved
+    ? (ru ? "Повторить неподтверждённый запуск без дублирования прогона" : "Retry the unconfirmed start without creating a duplicate run")
+    : (ru ? "Открыть прогон по всем связанным кейсам на проверку" : "Open a run with all linked cases waiting for QA");
   const hideLabel = ru ? "Скрыть проверку исправлений" : "Hide verify fixes";
   const restoreLabel = ru ? "Показать проверку исправлений" : "Show verify fixes";
   function toggle(next: boolean) { focusAfterToggle.current = true; setCollapsed(next); }
@@ -30,10 +35,11 @@ export function VerificationQueueControl({ state, workspaceId }: { state: Worksp
         <X size={13} strokeWidth={1.7} aria-hidden="true" />
       </button>
       <button type="button" className={css.start} tabIndex={collapsed ? -1 : 0}
-        disabled={Boolean(state.disabledReason) || state.pendingStart || state.pending}
-        title={state.disabledReason || (ru ? "Открыть прогон по всем связанным кейсам на проверку" : "Open a run with all linked cases waiting for QA")}
+        disabled={Boolean(state.disabledReason) || state.pendingStart || (state.pending && !state.unresolved)}
+        title={state.disabledReason || startTitle}
         aria-busy={state.pendingStart || undefined} onClick={() => { void state.start(); }}>
-        {state.pendingStart ? <Loader2 size={14} className={css.spinner} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
+        {state.pendingStart ? <Loader2 size={14} className={css.spinner} aria-hidden="true" />
+          : state.unresolved ? <RotateCcw size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
         <span>{label}</span>
       </button>
     </div>
