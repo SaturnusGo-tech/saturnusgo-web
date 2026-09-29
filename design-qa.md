@@ -430,3 +430,6 @@ final result: passed
 - Light and dark render checked; local theme restored to light. Browser console errors: none.1021 adapter tests passed; typecheck and architecture1452 files passed.
 - No actionable P0/P1/P2 findings. Narrow-container rules stack fields below380px; physical mobile/Safari testing not performed.
 - final result: passed
+
+### Retest panel visual correction — 2026-09-30
+User requested a lighter neutral surface and slightly squarer corners. Scoped to the inline retest panel: light #fcfcfc, dark #202020; outer radius 10px (was 16), field radius 7px (was 9). Verified actual computed styles and screenshots in both themes. Existing layout, disclosure motion and run creation are unchanged. CSS-only follow-up; git diff whitespace check passed.

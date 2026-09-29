@@ -3,7 +3,8 @@
 .start:hover { filter:brightness(1.08); }
 .start:disabled, .collapse:disabled { opacity:.55; cursor:default; }
 .start:focus-visible, .collapse:focus-visible { outline:2px solid var(--report-primary); outline-offset:3px; }
-.panel { margin:0 24px 16px; border:1px solid var(--report-border); border-radius:16px; background:var(--report-raised); overflow:hidden; }
+.panel { margin:0 24px 16px; border:1px solid var(--report-border); border-radius:10px; background:#fcfcfc; overflow:hidden; }
+:global(.dark) .panel { background:#202020; }
 .panel > header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 14px; border-bottom:1px solid var(--report-row-border); }
 .panel h2 { margin:0; font-size:14px; font-weight:600; line-height:1.4; }
 .collapse { display:inline-flex; align-items:center; gap:3px; border:0; padding:3px 0; background:transparent; color:var(--report-primary); font:inherit; font-size:12px; cursor:pointer; }
@@ -11,7 +12,7 @@
 .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .form p { margin:0; font-size:12px; line-height:1.5; color:var(--report-muted); }
 .form label { display:grid; gap:6px; font-size:12px; font-weight:500; }
-.form input, .form select { box-sizing:border-box; width:100%; min-width:0; height:36px; border:1px solid var(--report-control-border); border-radius:9px; background:var(--report-bg); color:var(--report-text); padding:0 10px; font:inherit; font-size:13px; font-weight:400; }
+.form input, .form select { box-sizing:border-box; width:100%; min-width:0; height:36px; border:1px solid var(--report-control-border); border-radius:7px; background:var(--report-bg); color:var(--report-text); padding:0 10px; font:inherit; font-size:13px; font-weight:400; }
 .form select option { color:var(--report-text); background:var(--report-bg); }
 .form input:focus, .form select:focus { outline:2px solid var(--report-primary); outline-offset:1px; }
 .form footer { display:flex; justify-content:space-between; align-items:center; gap:12px; }
