@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LockKeyhole, LoaderCircle } from "lucide-react";
 import type { AccessCopy } from "../copy/access-copy";
 import { AccessField } from "../fields/AccessField";
 import styles from "../screen/access.module.css";
@@ -16,14 +17,17 @@ export function FirstPasswordForm({ copy, pending, onSubmit }: {
     if (password !== confirmation) { setMismatch(true); return; }
     setMismatch(false); void onSubmit(password).then(() => { setPassword(""); setConfirmation(""); });
   }}>
-    <AccessField label={copy.newPassword} type="password" autoComplete="new-password" name="new-password" autoFocus
+    <AccessField label={copy.newPassword} type="password" autoComplete="new-password" name="new-password"
+      icon={<LockKeyhole size={19} strokeWidth={1.6} />} placeholder="••••••••"
       revealLabel={copy.showPassword} required minLength={12} maxLength={128} disabled={pending}
-      value={password} onChange={(event) => setPassword(event.target.value)} />
+      value={password} onChange={(event) => { setPassword(event.target.value); setMismatch(false); }} />
     <AccessField label={copy.confirmPassword} type="password" autoComplete="new-password" name="confirm-password"
+      icon={<LockKeyhole size={19} strokeWidth={1.6} />} placeholder="••••••••"
       revealLabel={copy.showPassword} required minLength={12} maxLength={128} disabled={pending}
       value={confirmation} onChange={(event) => { setConfirmation(event.target.value); setMismatch(false); }} />
     {mismatch && <p className={styles.error} role="alert">{copy.passwordMismatch}</p>}
-    <span className={styles.company}>{copy.passwordHint}</span>
-    <button type="submit" className={styles.primary} disabled={pending}>{copy.savePassword}</button>
+    <span className={styles.passwordHint}>{copy.passwordHint}</span>
+    <button type="submit" className={styles.primary} disabled={pending}>{copy.savePassword}
+      {pending && <LoaderCircle size={17} className={styles.spinner} />}</button>
   </form>;
 }

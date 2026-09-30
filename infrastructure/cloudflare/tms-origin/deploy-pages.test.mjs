@@ -107,6 +107,7 @@ write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
+write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
 if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }

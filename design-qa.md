@@ -1,3 +1,61 @@
+# Falcon managed authentication — 2026-10-01
+
+final result: passed
+
+## Visual truth
+
+- Sign-in: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-6f46a2d2-6cc1-4015-add6-52de07142502.png` (displayed option 2).
+- Password form: `/Users/mercuryrucks/.codex/generated_images/01a07862-f88a-7701-bf0e-179ddf13e9b1/exec-5db13e54-4768-4a04-937f-43c63691b78e.png` (displayed option 3).
+- Final user correction: use the SAME wing artwork from option 2 on both screens. The falcon hero in the original third mock is deliberately replaced.
+- Implementation: actual managed `/admin/` screen through local-only fixture proxy `http://localhost:4550/admin/`. Production auth hooks and API contracts are unchanged. Fixture server is outside the frontend repository and cannot ship in the frontend build.
+
+## Evidence
+
+- Source images: 1536×1024. Browser desktop captures: 1536×1024 CSS/pixels, normalized 1:1; no device frame.
+- Final sign-in: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/signin-en-desktop-final.jpg`.
+- Final password: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/password-en-desktop-final.jpg`.
+- Full-view combined comparisons: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/signin-comparison.jpg` and `password-comparison.jpg` (source on left, implementation on right).
+- Focused form comparisons: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/signin-focus-comparison.jpg` and `password-focus-comparison.jpg`.
+- Laptop: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/password-ru-1280.jpg` (1280×800).
+- Mobile: `/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-auth-design-20261001/signin-en-mobile-final.jpg` and `password-ru-mobile-final.jpg` (390×844, no horizontal/vertical overflow).
+
+## Fidelity review
+
+- Typography: existing self-hosted Geist Sans; straight sans, matching hierarchy. Form heading 44px at reference width, body/labels 14–16px, hero title 41px. Actual supplied Falcon mark retained rather than the generated approximation.
+- Spacing: left 410px form and large rounded right panel match reference proportions. Company name and language controls are retained functional context. Input height 54px including border, action height 55px. Form origin is stable when errors/help appear.
+- Colors: neutral #f4f4f4 form, white inputs, near-black action and black illustration. Secondary text darkened to #707070 for readability. The authentication composition stays neutral light/black even when the product's inherited theme is dark.
+- Image: one optimized 62.5KB WebP shared by every managed-auth stage. Text-free generated wing/diagonal light/inset; localized text is real HTML. No CSS/SVG approximation of artwork.
+- Copy: EN/RU supported. Username/email, actual 12–128 password limit and admin-assisted recovery are retained. No unsupported social login or cosmetic remember-me checkbox; existing session persistence is unchanged.
+
+## Comparison history / resolved findings
+
+1. P2: secondary text contrast below 4.5:1. Changed #777 to #707070 and placeholders #999 to #737373; rechecked final desktop/mobile captures.
+2. P2: stage transition lost focus after sign-in control unmounted. New non-anonymous stage focuses its heading without scrolling/opening keyboard. Browser test confirmed focused H1 'Change password'.
+3. P2: at 901×768 Russian hero sections touched. Shifted single-column breakpoint to 1100px. At1280×800 sections retain a clear gap; narrow layout has full-width form and no decorative hero.
+4. Form recentering on help/error expansion removed by anchoring content vertically, including mobile.
+
+No remaining actionable P0/P1/P2 differences. Minor differences from source: supplied logo silhouette instead of generated interpretation, persistent company/language context, API-supported fields/copy. These are intentional production requirements.
+
+## Verification
+
+- TypeScript typecheck: passed.
+- Managed access suite: 31 passed, 0 failed.
+- Authentication suite: 58 passed, 0 failed.
+- TMS architecture: passed, 1466 files.
+- Browser: login error, password reveal, administrator-help expansion, first-password mismatch, first-password→MFA-enrollment, back-to-sign-in, language switching, keyboard stage focus, desktop/laptop/mobile layout.
+- Final browser console: no warnings/errors.
+- Browser uses local simulated auth responses; no real passwords/accounts changed and no production deployment performed in this iteration.
+
+## Implementation checklist
+
+- [x] Shared wing image on both screens.
+- [x] Responsive selected layout and localized forms.
+- [x] Existing auth/MFA/recovery logic preserved.
+- [x] Browser comparison and form interactions verified.
+- [x] Local preview left running.
+
+---
+
 ## Minimal shell insets · 26 September 2026
 
 User approved production publication including the preceding dark-surface and sidebar-motion refinement.
