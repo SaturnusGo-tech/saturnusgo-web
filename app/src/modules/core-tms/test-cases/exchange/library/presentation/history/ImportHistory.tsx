@@ -1,4 +1,4 @@
-import { FileJson, LoaderCircle, Search } from "lucide-react";
+import { FileJson, Inbox, LoaderCircle, Search } from "lucide-react";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { MemberAvatar } from "../../../../../workspace/members/avatar/MemberAvatar";
 import { useMemberDirectory } from "../../../../../workspace/members/state/directory/useMemberDirectory";
@@ -43,7 +43,9 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
       </section>)}
     </div>
     {(history.loading || history.searching) && <p className={css.message} role="status"><LoaderCircle size={18} className={css.spin} />{ru ? "Загружаем файлы…" : "Loading files…"}</p>}
-    {!history.loading && !history.searching && !history.error && !history.items.length && <p className={css.empty}>{history.query ? (ru ? "Файлы не найдены" : "No matching files") : (ru ? "Здесь появятся исходные файлы новых импортов." : "Original files from new imports will appear here.")}</p>}
+    {!history.loading && !history.searching && !history.error && !history.items.length && <div className={css.empty}><Inbox size={48} strokeWidth={1.2} aria-hidden="true" />
+      <h3>{history.query ? (ru ? "Файлы не найдены" : "No matching files") : (ru ? "Пока нет импортов" : "No imports yet")}</h3>
+      <p>{history.query ? (ru ? "Попробуйте изменить поисковый запрос." : "Try a different search.") : (ru ? "Здесь появятся исходные файлы новых импортов." : "Original files from new imports will appear here.")}</p></div>}
     {history.cursor && <button type="button" className={css.more} disabled={history.loading} onClick={history.loadMore}>{ru ? "Загрузить ещё" : "Load more"}</button>}
     <ImportFileDialogs actions={actions} ru={ru} />
   </section>;

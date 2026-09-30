@@ -7,7 +7,9 @@ import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessio
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
 import { WorkspacePortfoliosStage } from "./portfolios/WorkspacePortfoliosStage";
-import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
+import { transitionContent } from "../workspace/motion/transition/content-transition";
+import { settingsSectionLink } from "../config/navigation/settings-section-route";
+import { navigateWorkspace, visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { DocumentationEntry } from "../../documentation/presentation/DocumentationEntry";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
@@ -64,6 +66,13 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       model.setQuery(""); model.setSelectedCaseId(row.id); model.setView("cases");
     } else model.openDefect(row.id);
   }
+  const exchange = model.project && (companyViewAvailable("imports", session?.companyCapabilities) ? <ImportCasesPage key={model.data.workspace.id} project={model.project}
+    workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}
+    exportEnabled={model.connection === "connected"}
+    initialFolderId={model.selectedFolderId} onProjectChange={id => void model.chooseProject(id)}
+    onBack={() => transitionContent(() => { navigateWorkspace(settingsSectionLink(window.location.href, "general")); model.setView("config"); })}
+    onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />
+    : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
   if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session?.kind === "managed" ? <WorkspaceProfile />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
@@ -82,8 +91,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
         onToggleEnvironment={model.toggleEnvironment}
         onEditProject={model.openEditProject}
         onToggleProject={model.toggleProject}
-        exchangeEnabled={model.connection === "connected"}
-        onImport={() => model.setView("imports")}
+        exchange={exchange}
       />
     );
   }
@@ -114,10 +122,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     workspaceId={model.data.workspace.id} projectId={model.project.id} connected={model.connection === "connected"}
     canManageFields={model.data.meta.authorization.capabilities.includes("project:manage")}
     canManageValues={model.data.meta.authorization.capabilities.includes("test_case:manage")} />;
-  if (model.view === "imports") return <ImportCasesPage key={model.data.workspace.id} project={model.project}
-    workspaceId={model.data.workspace.id} canManage={model.data.meta.authorization.capabilities.includes("test_case:manage") && model.data.meta.authorization.capabilities.includes("attachment:manage")}
-    initialFolderId={model.selectedFolderId} onProjectChange={id => void model.chooseProject(id)}
-    onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />;
+  if (model.view === "imports") return exchange;
   if (model.view === "dashboard") {
     return (
       <DashboardView

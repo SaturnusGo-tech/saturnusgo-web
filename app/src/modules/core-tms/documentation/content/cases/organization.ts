@@ -99,7 +99,7 @@ export const caseOrganization: DocArticle[] = [
       section("walkthrough", "Walkthrough: project and folder", importFoldersWalkthrough),
       section("export", "Export a project", steps(
         ["Select the project", "Open **Settings → Import and export**."],
-        ["Export the data", "Download JSON containing current case revisions, their paths, and the active folder structure, including empty folders. See Transfer scope below for what is included."],
+        ["Export the data", "Click **Export test cases** at the top right to download JSON containing current case revisions, their paths, and the active folder structure, including empty folders. See Transfer scope below for what is included."],
         ["Check the file", "Verify the case count and project before using the file to transfer data."])),
       section("import", "Import cases", steps(
         ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import test cases** page opens. Check the selected **Project**."],

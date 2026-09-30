@@ -1,4 +1,4 @@
-import { FileUp, LoaderCircle } from "lucide-react";
+import { FileUp, Folder, LoaderCircle } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { AnimatedSelect } from "../../../../../presentation/common/select/AnimatedSelect";
@@ -25,20 +25,23 @@ export function ImportComposer({ state, projects, projectId, onProjectChange, ru
     }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
       onDrop={event => { event.preventDefault(); setDragging(false); if (!disabled) void state.selectFile(event.dataTransfer.files[0]); }}>
       <FileUp className={css.uploadIcon} size={64} strokeWidth={1.25} aria-hidden="true" />
-      <div className={css.uploadText}><strong title={state.fileName}>{state.fileName || (ru ? "Добавить JSON" : "Add JSON")}</strong>
-        <span>{state.fileName ? copy.format : (ru ? "Перетащите файл или выберите на компьютере" : "Drop a file or choose one from your computer")}</span>
+      <div className={css.uploadText}><strong title={state.fileName}>{state.fileName || (ru ? "Перетащите JSON-файл сюда" : "Drop a JSON file here")}</strong>
+        <span>{state.fileName ? copy.format : (ru ? "или выберите файл на компьютере" : "or choose a file from your computer")}</span>
         <input ref={input} className={css.hidden} type="file" accept="application/json,.json" aria-label={copy.choose} disabled={disabled}
           onChange={event => { void state.selectFile(event.target.files?.[0]); event.target.value = ""; }} />
-        <button type="button" className={css.primary} disabled={disabled} onClick={() => input.current?.click()}>{state.fileName ? copy.replace : (ru ? "Выбрать файл" : "Choose file")}</button>
       </div>
+      <button type="button" className={css.primary} disabled={disabled} onClick={() => input.current?.click()}>{state.fileName ? copy.replace : (ru ? "Выбрать файл" : "Choose file")}</button>
     </div>
     <div className={css.destination}>
+      <h2>{ru ? "Место назначения" : "Destination"}</h2>
+      <div className={css.destinationFields}>
       <div className={css.field}><span>{ru ? "Проект" : "Project"}</span><AnimatedSelect label={ru ? "Проект для импорта" : "Import project"} value={projectId}
-        options={projects.map(project => ({ value: project.id, label: project.name }))} disabled={disabled} onChange={onProjectChange} /></div>
+        options={projects.map(project => ({ value: project.id, label: project.name, icon: <Folder size={18} aria-hidden="true" /> }))} disabled={disabled} onChange={onProjectChange} /></div>
       <fieldset className={css.field} disabled={disabled}><legend className={css.hidden}>{copy.destination}</legend><span aria-hidden="true">{ru ? "Папка" : "Folder"}</span>
         <ParentFolderPicker value={state.destination} options={[{ value: "/", label: copy.root }, ...(state.context?.folders ?? [])
           .filter(folder => !folder.archivedAt).map(folder => ({ value: folder.path, label: folder.path }))]}
           label={copy.destination} searchLabel={copy.search} emptyLabel={copy.noFolder} onChange={state.setDestination} /></fieldset>
+      </div>
       {showImportAction && <div className={css.importAction}>{state.busy && <button type="button" className={css.link} onClick={state.stop}>{copy.stop}</button>}
         <button type="button" className={css.primary} disabled={!canStart} onClick={() => void state.start()}>
           {state.busy && <LoaderCircle size={16} className={css.spin} />}{state.locked && !state.busy ? copy.retry : copy.start}</button></div>}

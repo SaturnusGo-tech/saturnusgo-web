@@ -1,13 +1,15 @@
-import { LoaderCircle } from "lucide-react";
+import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import type { Project } from "../../../../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { useImportProjects } from "../../../state/project/useImportProjects";
+import { ExportCasesAction } from "../export/ExportCasesAction";
 import { ImportSession } from "./ImportSession";
 import css from "./import-page.module.css";
 
 export type ImportCasesPageProps = Readonly<{
-  project: Project; workspaceId: string; canManage: boolean; initialFolderId?: string | null;
+  project: Project; workspaceId: string; canManage: boolean; exportEnabled: boolean; initialFolderId?: string | null;
+  onBack: () => void;
   onProjectChange: (id: string) => void; onImported: () => Promise<unknown>;
 }>;
 export function ImportCasesPage(props: ImportCasesPageProps) {
@@ -16,7 +18,11 @@ export function ImportCasesPage(props: ImportCasesPageProps) {
   const [session, setSession] = useState(0);
   return <main className={css.page} data-import-page>
     <div className={css.content}>
-      <h1>{ru ? "Импорт тест-кейсов" : "Import test cases"}</h1>
+      <button className={css.back} type="button" onClick={props.onBack}><ChevronLeft size={16} aria-hidden="true" />{ru ? "Настройки" : "Settings"}</button>
+      <header className={css.pageHeader}><div><h1>{ru ? "Импорт тест-кейсов" : "Import test cases"}</h1>
+        <p>{ru ? "Добавьте JSON-файл и выберите, куда перенести кейсы." : "Add a JSON file and choose where to import your test cases."}</p></div>
+        {catalog.project && <ExportCasesAction key={catalog.project.id} project={catalog.project} enabled={props.exportEnabled} />}
+      </header>
       {!catalog.catalog ? catalog.error ? <p className={css.error} role="alert">{ru ? "Не удалось загрузить проекты." : "Could not load projects."} <button type="button" onClick={catalog.retry}>{ru ? "Повторить" : "Retry"}</button></p>
         : <p className={css.message} role="status"><LoaderCircle size={18} className={css.spin} />{ru ? "Загружаем проекты…" : "Loading projects…"}</p>
         : !catalog.project ? <p className={css.empty}>{ru ? "Нет доступных проектов для импорта." : "No projects available for import."}</p>

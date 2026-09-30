@@ -5,7 +5,6 @@ import type { Environment, Project } from "../../../../core/tms/contracts/legacy
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { AppearanceSettings } from "./settings/AppearanceSettings";
 import { AccountSettings } from "./settings/AccountSettings";
-import { ProjectCaseExchange } from "./ProjectCaseExchange";
 import { ProjectSettings } from "./sections/ProjectSettings";
 import { EnvironmentSettings } from "./sections/EnvironmentSettings";
 import { settingsCopy, settingsSections } from "./navigation/settings-sections";
@@ -16,7 +15,7 @@ type ConfigViewProps = {
   environments: Environment[]; project?: Project; notifications?: ReactNode;
   offline: boolean; onEnvironmentSaved: (environment: Environment) => void;
   onToggleEnvironment: (id: string) => void; onEditProject: () => void;
-  onToggleProject: () => void; exchangeEnabled: boolean; onImport: () => void;
+  onToggleProject: () => void; exchange: ReactNode;
 };
 const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, notifications: Bell, account: UserRound };
 export function ConfigView(props: ConfigViewProps) {
@@ -24,6 +23,7 @@ export function ConfigView(props: ConfigViewProps) {
   const copy = settingsCopy[locale];
   const { section, select } = useSettingsSection(Boolean(props.project));
   const available = props.project ? settingsSections : settingsSections.filter(id => ["appearance", "notifications", "account"].includes(id));
+  if (section === "exchange" && props.project) return <>{props.exchange}</>;
   return <div className={css.page} data-testid="config-view">
     <aside className={css.sidebar}>
       <h1>{copy.title}</h1>
@@ -45,7 +45,6 @@ export function ConfigView(props: ConfigViewProps) {
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>}
         {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
         {id === "environments" && section === id && props.project && <EnvironmentSettings key={props.project.id} environments={props.environments} projectId={props.project.id} projectName={props.project.name} offline={props.offline} onSaved={props.onEnvironmentSaved} onToggle={props.onToggleEnvironment} />}
-        {id === "exchange" && props.project && <ProjectCaseExchange enabled={props.exchangeEnabled} project={props.project} onImport={props.onImport} />}
         {id === "appearance" && <AppearanceSettings />}
         {id === "notifications" && section === id && props.notifications}
         {id === "account" && <AccountSettings />}
