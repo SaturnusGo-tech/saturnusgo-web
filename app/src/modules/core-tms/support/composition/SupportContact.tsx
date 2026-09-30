@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MessageCircleMore } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useSupportDialogMotion } from "../presentation/motion/useSupportDialogMotion";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { Modal } from "../../presentation/common/modal/Modal";
@@ -19,6 +19,7 @@ function cleanPageUrl() {
 export function SupportContact({workspaceId,navigationClasses}:{workspaceId:string;navigationClasses?:{button:string;icon:string;label:string}}) {
   const {locale}=useTmsLocale();const ru=locale==='ru';const http=useTmsHttpClient();
   const model=useSupportForm(http,workspaceId,ru);const [open,setOpen]=useState(false);
+  const dialogMotion=useSupportDialogMotion(open);
   const [accepted,setAccepted]=useState<string|null>(null);
   const dismissToast=useCallback(()=>setAccepted(null),[]);
   useEffect(()=>{if(model.receipt){setOpen(false);setAccepted(model.receipt.id);}},[model.receipt]);
@@ -45,9 +46,8 @@ export function SupportContact({workspaceId,navigationClasses}:{workspaceId:stri
   const close=()=>{if(!model.busy&&!capturing)setOpen(false);};
   return <><button type="button" className={navigationClasses?.button ?? nav.navigationUtilityButton} onClick={show} aria-label={ru?'Связаться с нами':'Contact us'} data-nav-label={ru?'Связаться с нами':'Contact us'} data-testid="nav-support-utility">
     <span className={navigationClasses?.icon ?? nav.navigationIcon} aria-hidden="true"><MessageCircleMore size={20}/></span><span className={navigationClasses?.label ?? nav.navigationLabel}>{ru?'Связаться с нами':'Contact us'}</span>
-  </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/><AnimatePresence>{open&&<motion.div data-support-overlay className={css.overlay}
-    initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.18}}>
+  </button>{typeof document!=='undefined'&&createPortal(<><SupportToast receiptId={accepted} ru={ru} onDismiss={dismissToast}/>{dialogMotion.present&&<div ref={dialogMotion.ref} data-support-overlay className={css.overlay}>
     <Modal title={ru?'Новое обращение':'Contact Falcon'} onClose={close} panelClassName={css.panel} wide>
       <SupportForm model={model} ru={ru} pageUrl={pageUrl} onPageUrlChange={setPageUrl} capture={()=>void capture()} capturing={capturing} screenshot={screenshot} onClose={close}/>
-    </Modal></motion.div>}</AnimatePresence></>,document.body)}</>;
+    </Modal></div>}</>,document.body)}</>;
 }

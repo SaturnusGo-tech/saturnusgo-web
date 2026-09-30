@@ -1,4 +1,4 @@
-.overlay { position: fixed; inset: 0; z-index: 1200; color: var(--cases-strong, #202126); }
+.overlay { opacity: 0; position: fixed; inset: 0; z-index: 1200; color: var(--cases-strong, #202126); }
 .panel { --support-surface: var(--background, #fff); width: min(850px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 22px !important; border: 1px solid #8883 !important; padding: 26px 30px !important; overflow: auto; background: var(--support-surface) !important; color: var(--foreground, #202126); box-shadow: 0 12px 42px #0002 !important; }
 :global(.dark) .panel { --support-surface: #141416; color: #eeeef0; }
 .panel > header { margin-bottom: 22px; }
@@ -18,6 +18,8 @@
 .subject { font-size: 15px; height: 42px; }
 .row input:focus-visible, .subject:focus-visible { border-color: #3979ed88; }
 .editor { min-height: 200px; min-width: 0; background: transparent; padding: 10px 12px 6px; border: 1px solid #8883; border-radius: 12px; box-shadow: none; }
+/* Reserve the toolbar and empty text area while the lazy editor initializes. */
+.editor [data-markdown-transition] { min-height: 180px; }
 .editor :global(.mdxeditor-root-contenteditable) { min-height: 140px !important; max-height: 260px !important; }
 .editor :global(.mdxeditor-toolbar) { flex-wrap: wrap; }
 .editorFooter { display: flex; gap: 12px; align-items: center; min-height: 34px; margin-top: 8px; }
@@ -47,3 +49,6 @@
 /* Neutral scrim: preserve the current surface rather than tinting it blue. */
 .overlay > [role="presentation"] { background: rgb(0 0 0 / 28%); backdrop-filter: blur(6px); }
 :global(.dark) .overlay > [role="presentation"] { background: rgb(0 0 0 / 52%); }
+
+/* The support presence hook owns the fade; nested modal animations would compete. */
+.overlay > [role="presentation"], .overlay .panel { animation: none !important; }
