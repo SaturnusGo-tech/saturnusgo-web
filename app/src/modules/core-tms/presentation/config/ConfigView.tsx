@@ -14,7 +14,8 @@ import css from "./config.module.css";
 type ConfigViewProps = {
   environments: Environment[]; project?: Project; notifications?: ReactNode;
   offline: boolean; onEnvironmentSaved: (environment: Environment) => void;
-  onToggleEnvironment: (id: string) => void; onEditProject: () => void;
+  onToggleEnvironment: (id: string) => void; workspaceId: string; canManageProject: boolean;
+  onProjectUpdated: (project: Project, etag: string | null) => void;
   onToggleProject: () => void; exchange: ReactNode;
 };
 const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, notifications: Bell, account: UserRound };
@@ -43,7 +44,9 @@ export function ConfigView(props: ConfigViewProps) {
       {available.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={`settings-${id}-title`} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
         {id !== "environments" && <header className={css.header}>
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>}
-        {id === "general" && props.project && <ProjectSettings project={props.project} onEdit={props.onEditProject} onToggle={props.onToggleProject} />}
+        {id === "general" && section === id && props.project && <ProjectSettings key={props.project.id} project={props.project}
+          workspaceId={props.workspaceId} offline={props.offline} canManage={props.canManageProject}
+          onUpdated={props.onProjectUpdated} onToggle={props.onToggleProject} />}
         {id === "environments" && section === id && props.project && <EnvironmentSettings key={props.project.id} environments={props.environments} projectId={props.project.id} projectName={props.project.name} offline={props.offline} onSaved={props.onEnvironmentSaved} onToggle={props.onToggleEnvironment} />}
         {id === "appearance" && <AppearanceSettings />}
         {id === "notifications" && section === id && props.notifications}

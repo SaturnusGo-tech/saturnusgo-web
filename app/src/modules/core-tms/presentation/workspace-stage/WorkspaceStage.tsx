@@ -89,7 +89,9 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
             ? current.environments.map(item => item.id === environment.id ? environment : item)
             : [...current.environments, environment] }))}
         onToggleEnvironment={model.toggleEnvironment}
-        onEditProject={model.openEditProject}
+        workspaceId={model.data.workspace.id}
+        canManageProject={model.data.meta?.authorization?.capabilities?.includes("project:manage") ?? false}
+        onProjectUpdated={model.acceptProjectUpdate}
         onToggleProject={model.toggleProject}
         exchange={exchange}
       />
