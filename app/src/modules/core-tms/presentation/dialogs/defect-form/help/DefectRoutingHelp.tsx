@@ -21,6 +21,14 @@ export function DefectRoutingHelp() {
     setHref(documentationLink(window.location.href, "create-defect", "routing"));
     return () => clearTimeout(timer.current);
   }, []);
+  useEffect(() => {
+    if (!open) return;
+    const dismissOnScroll = (event: Event) => {
+      if (!popover.current?.contains(event.target as Node)) close();
+    };
+    window.addEventListener("scroll", dismissOnScroll, true);
+    return () => window.removeEventListener("scroll", dismissOnScroll, true);
+  }, [open, close]);
   return <div className={css.root} ref={root}
     onMouseEnter={() => { clearTimeout(timer.current); setOpen(true); }}
     onMouseLeave={() => { timer.current = setTimeout(() => {
