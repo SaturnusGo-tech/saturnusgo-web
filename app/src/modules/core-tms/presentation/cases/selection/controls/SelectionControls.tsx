@@ -36,7 +36,7 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
 }) {
   const qlButton = useRef<HTMLButtonElement>(null); const qlPanel = useRef<HTMLDivElement>(null);
   const [ql, setQl] = useState(false); const [filter, setFilter] = useState(false);
-  useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus(); }, [ql]);
+  useEffect(() => { if (ql) qlPanel.current?.querySelector("input")?.focus({ preventScroll: true }); }, [ql]);
   useEffect(() => { if (disabled) { setQl(false); setFilter(false); } }, [disabled]);
   const queryTools = <>
       <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-label={ru ? "QL-запрос" : "QL query"} data-active={Boolean(state.qlQuery) || undefined} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>

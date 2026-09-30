@@ -133,7 +133,12 @@
 }
 
 .noOptions { min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 8px; color: var(--cases-faint); font-size: 10px; text-align: center; }
-.qlSuggestions { top: 34px; left: 0; width: min(360px, calc(100% - 2px)); max-height: 224px; overflow: auto; transform-origin: top left; }
+.qlSuggestions {
+  top: 34px; left: 0; width: min(360px, calc(100% - 2px)); max-height: 224px; overflow: auto;
+  animation: none; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-5px);
+  transition: opacity 180ms ease, transform 220ms cubic-bezier(.22,.68,.25,1), visibility 0s 220ms;
+}
+.qlSuggestions[data-open] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); transition-delay: 0s; }
 .qlSyntax { display: flex; gap: 12px; padding: 4px 7px 6px; color: var(--cases-faint); border-bottom: 1px solid var(--cases-row-border); font-size: 9px; }
 .qlSyntax span { display: inline-flex; align-items: center; gap: 4px; }
 .qlSyntax kbd { min-width: 16px; padding: 1px 3px; color: var(--cases-secondary-text); background: var(--cases-control); border: 1px solid var(--cases-control-border); border-radius: 3px; font-family: inherit; text-align: center; }
@@ -236,7 +241,8 @@
   .selectionMode :is(.selectionCell, th:first-child, .groupHeading) input[type="checkbox"],
   .selectionMode th:first-child button { animation: none; }
   .selectionColumn,
-  .selectionCell { transition: none; }
+  .selectionCell,
+  .qlSuggestions { transition: none; }
 }
 
 @container cases-workspace (max-width: 820px) {

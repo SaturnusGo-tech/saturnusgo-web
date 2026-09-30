@@ -67,7 +67,7 @@ export function CasesToolbar(props: Props) {
   function updateQl(value: string) { props.onQlQuery ? props.onQlQuery(value) : setLocalQl(value); }
   function toggleQl() {
     setQlExpanded(!qlExpanded);
-    if (!qlExpanded) requestAnimationFrame(() => qlPanelRef.current?.querySelector<HTMLInputElement>("input")?.focus());
+    if (!qlExpanded) requestAnimationFrame(() => qlPanelRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true }));
   }
   function closeQl() { setQlExpanded(false); qlButtonRef.current?.focus(); }
   function chooseViewMode(value: CaseListViewMode) {

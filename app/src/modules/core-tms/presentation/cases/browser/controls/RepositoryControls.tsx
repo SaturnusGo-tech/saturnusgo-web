@@ -29,7 +29,7 @@ export function RepositoryControls({ props, view, locale }: {
         aria-label={ru ? "Поиск по ID, названию, ответственному, папке, компоненту или тегу" : "Search by ID, title, assignee, folder, component, or tag"} />
       {props.query && <button type="button" onClick={() => props.onQuery("")} aria-label={ru ? "Очистить поиск" : "Clear search"}><PiX size={14} /></button>}
       <button ref={qlButton} type="button" className={css.tool} aria-label={ru ? "QL-запрос" : "QL query"} aria-expanded={qlOpen} aria-controls={qlId} data-active={Boolean(view.qlQuery) || undefined}
-        onClick={() => { setQlOpen(!qlOpen); if (!qlOpen) requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus()); }}>QL</button>
+        onClick={() => { setQlOpen(!qlOpen); if (!qlOpen) requestAnimationFrame(() => qlRef.current?.querySelector("input")?.focus({ preventScroll: true })); }}>QL</button>
       <div className={css.filter}>
         <button ref={filterButton} type="button" className={css.tool} onClick={() => view.setFilterOpen(!view.filterOpen)} aria-expanded={view.filterOpen} aria-haspopup="dialog" aria-controls="case-filter-panel"
           aria-label={active ? (ru ? `Фильтры, активно: ${active}` : `Filters, active: ${active}`) : (ru ? "Фильтры" : "Filters")}

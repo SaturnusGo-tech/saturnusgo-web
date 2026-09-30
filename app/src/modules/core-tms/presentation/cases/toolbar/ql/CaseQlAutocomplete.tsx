@@ -22,7 +22,7 @@ export function CaseQlAutocomplete(props: Props) {
  }, []);
  function apply(item: QuerySuggestion) {
   const next = insertQuerySuggestion(props.query, result, item); props.onQuery(next.query); setCaret(next.caret); setOpen(item.field);
-  requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(next.caret, next.caret); });
+  requestAnimationFrame(() => { input.current?.focus({ preventScroll: true }); input.current?.setSelectionRange(next.caret, next.caret); });
  }
  return <div ref={root} className={styles.qlRoot} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>
   <label className={styles.inputShell} data-input-shell><input ref={input} role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls={`${id}-list`}
@@ -34,13 +34,14 @@ export function CaseQlAutocomplete(props: Props) {
     if (["ArrowDown", "ArrowUp"].includes(event.key) && result.suggestions.length) { event.preventDefault(); setOpen(true); setActive(value => (value + (event.key === "ArrowDown" ? 1 : -1) + result.suggestions.length) % result.suggestions.length); }
     if (event.key === "Enter" && open && result.suggestions[active]) { event.preventDefault(); apply(result.suggestions[active]); }
    }} placeholder={ru ? "Например: статус: готов И приоритет: высокий" : "Example: status: ready AND priority: high"} aria-label={ru ? "QL-запрос" : "QL query"} />
-   {props.query && <button type="button" className={styles.clearButton} onClick={() => { props.onQuery(""); setCaret(0); input.current?.focus(); }} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
+   {props.query && <button type="button" className={styles.clearButton} onClick={() => { props.onQuery(""); setCaret(0); input.current?.focus({ preventScroll: true }); }} aria-label={ru ? "Очистить QL" : "Clear QL"}><X size={12} /></button>}</label>
   <div id={`${id}-help`} className={styles.qlHelp} role="status" data-error={Boolean(error) || undefined}>{error ? errors[error] ?? (ru ? "Проверьте запрос." : "Check the query.") : ru ? 'И / ИЛИ · НЕ · несколько значений: приоритет: (высокий, критический)' : 'AND / OR · NOT · multiple values: priority: (high, critical)'}</div>
-  {open && <div className={`${styles.popover} ${styles.qlSuggestions}`} id={`${id}-list`} role="listbox" aria-label={ru ? "Подсказки запроса" : "Query suggestions"}>
+  <div className={`${styles.popover} ${styles.qlSuggestions}`} data-open={open || undefined} aria-hidden={!open || undefined}
+   ref={element => { if (element) element.inert = !open; }} id={`${id}-list`} role="listbox" aria-label={ru ? "Подсказки запроса" : "Query suggestions"}>
    {result.suggestions.map((item, index) => <button type="button" role="option" aria-selected={active === index} id={`${id}-${index}`} key={`${item.value}-${index}`}
     className={active === index ? styles.optionActive : ""} onMouseDown={event => event.preventDefault()} onClick={() => apply(item)}>
     <span>{item.label}</span><code>{item.field ? `${item.value}:` : item.detail ?? ""}</code></button>)}
    {!result.suggestions.length && <span className={styles.noOptions}>{ru ? "Введите значение; фразы заключайте в кавычки." : "Enter a value; enclose phrases in quotes."}</span>}
-  </div>}
+  </div>
  </div>;
 }
