@@ -2807,7 +2807,10 @@ export interface paths {
         /** List companies managed by the operator */
         get: operations["listManagedCompanies"];
         put?: never;
-        /** Create a company, primary administrator and domain job atomically */
+        /**
+         * Create a company, primary administrator and domain job atomically
+         * @description A newly created account queues an encrypted access email atomically. Delivery waits for an active company domain and is retried asynchronously; a successful response confirms creation, not inbox delivery. Idempotent replays do not enqueue another email. The primary Accept-Language selects Russian (ru) or English (default).
+         */
         post: operations["createManagedCompany"];
         delete?: never;
         options?: never;
@@ -2827,13 +2830,13 @@ export interface paths {
         };
         /**
          * List employees of the current company
-         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.
+         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit. Returns current company employees (pending, active, or blocked). Revoked identities remain in audit history and are omitted from this directory.
          */
         get: operations["listCompanyMembers"];
         put?: never;
         /**
          * Reserve a seat and create an employee with an expiring initial password
-         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.
+         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit. A newly created account queues an encrypted access email atomically. Delivery waits for an active company domain and is retried asynchronously; a successful response confirms creation, not inbox delivery. Idempotent replays do not enqueue another email. The primary Accept-Language selects Russian (ru) or English (default). Creates a new employee identity and queues an access email atomically. A revoked tenant employee does not reserve their email or login; inviting that address again creates new credentials and does not restore old sessions or permissions.
          */
         post: operations["createCompanyMember"];
         delete?: never;

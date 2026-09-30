@@ -46,6 +46,7 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
     if (!result) return false;
     onSaved();
     setConfirmation(null);
+    if (value.kind === "status" && value.status === "revoked") { onBack(); return true; }
     if (value.kind === "ownership") { setOwnershipTransferred(true); return true; }
     if (result.temporaryPassword) setHandoff(result); else resource.refresh();
     return true;
