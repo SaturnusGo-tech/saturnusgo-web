@@ -5,3 +5,4 @@
 .workflowReturn button:last-child{background:transparent;color:#f1f0ea}
 
 @media(prefers-reduced-motion:no-preference){@supports not (view-transition-name:falcon-public-page){.surface:not([hidden]){animation:falcon-direction-in .35s ease-out}}}
+@keyframes falcon-direction-in{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:none}}
