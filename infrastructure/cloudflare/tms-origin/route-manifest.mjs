@@ -23,7 +23,7 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
-  ...["hero", "repository", "run", "ai"].map((id) => `/falcon/landing/2026-10/${id}-stage.png`),
+  ...["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"].map((id) => `/falcon/landing/2026-10/${id}.png`),
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
   "/falcon/auth/silver-wing.webp",
