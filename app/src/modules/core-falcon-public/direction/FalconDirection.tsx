@@ -27,7 +27,7 @@ export function FalconDirection({ onWorkflow, onAI, onDemo }: { onWorkflow: () =
           <div className={styles.heroActions}><a href="#repository" className={styles.primary}>{c.explore} <ArrowRight size={14} /></a><button className={styles.ghost} onClick={onWorkflow}>{c.workflow}</button></div>
         </div>
         <div className={styles.heroStage}>
-          <img className={styles.heroPreview} src={`${art}hero-preview.png`} width={2512} height={1660} alt={c.heroAlt} fetchPriority="high" />
+          <img className={styles.heroPreview} src={`${art}hero-preview.png?v=9a4c27dd`} width={2512} height={1660} alt={c.heroAlt} fetchPriority="high" />
         </div>
       </section>
       <DirectionMarquee title={c.tools} pause={c.pause} resume={c.resume} />
