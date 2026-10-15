@@ -13,7 +13,7 @@
 .consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 12px; line-height: 1.7; color: #b8b8b1; }
 .consent input { flex-shrink: 0; margin: 2px 0 0; width: 18px; height: 18px; accent-color: #f1f0ea; cursor: pointer; }
 .consent label { cursor: pointer; }
-.consent a, .error a { color: #f1f0ea; text-decoration: underline; text-underline-offset: 3px; }
+.section .consent a, .section .error a { color: #f1f0ea; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
 .note { margin: 14px 0 0 28px; color: #999992; font-size: 11px; line-height: 1.7; }
 .status, .error { font-size: 14px; line-height: 1.6; margin: 16px 0 0; }
 .status:empty { display: none; }

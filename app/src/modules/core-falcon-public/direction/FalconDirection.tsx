@@ -27,7 +27,7 @@ export function FalconDirection({ onWorkflow, onAI, onDemo }: { onWorkflow: () =
           <div className={styles.heroActions}><a href="#repository" className={styles.primary}>{c.explore} <ArrowRight size={14} /></a><button className={styles.ghost} onClick={onWorkflow}>{c.workflow}</button></div>
         </div>
         <div className={styles.heroStage}>
-          <img className={styles.heroPreview} src={`${art}hero-preview.png`} width={2512} height={1416} alt={c.heroAlt} fetchPriority="high" />
+          <img className={styles.heroPreview} src={`${art}hero-preview.png`} width={2512} height={1660} alt={c.heroAlt} fetchPriority="high" />
         </div>
       </section>
       <DirectionMarquee title={c.tools} pause={c.pause} resume={c.resume} />
@@ -56,7 +56,7 @@ export function FalconDirection({ onWorkflow, onAI, onDemo }: { onWorkflow: () =
         <nav aria-label={c.product}><strong>{c.product}</strong><a href="#repository">{c.cases}</a><a href="#execution">{c.runs}</a><a href="#falcon-ai">Falcon AI</a></nav>
         <nav aria-label={c.resources}><strong>{c.resources}</strong><button onClick={onWorkflow}>{c.guide}</button><button onClick={onDemo}>{c.contact}</button><a href={`/privacy/?lang=${locale}`}>{c.privacy}</a></nav>
       </div>
-      <div className={styles.footerMeta}><small>© 2026 Falcon · SaturnusGo. All rights reserved.</small><LanguageSelector /><a href="#top">{c.back} ↑</a></div>
+      <div className={styles.footerMeta}><small>© 2026 Falcon · SaturnusGo. All rights reserved.</small><a href="#top">{c.back} ↑</a></div>
       <div className={styles.wordmark} aria-hidden="true">FALCON</div>
     </footer>
   </div>;
