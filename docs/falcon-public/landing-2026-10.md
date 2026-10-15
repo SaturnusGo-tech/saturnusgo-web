@@ -13,7 +13,7 @@ Product illustration panels are unchanged PNG exports of those exact Figma nodes
 
 ## Navigation and intake
 
-The main page is `/`; `?view=workflow` opens the preserved video landing. See the workflow / Get back use viewport View Transitions with a reduced-motion fallback. Book a demo returns to `/#book-demo`; the main page stays mounted so form drafts survive switching views. Two integration tracks loop in opposite directions and can be paused; reduced motion disables them.
+The main page is `/`; `?view=workflow` opens the preserved video landing. See the workflow / Get back use viewport View Transitions with a reduced-motion fallback. Book a demo returns to `/#book-demo`; the main page stays mounted so form drafts survive switching views. Two integration tracks split the complete canonical catalog into balanced, non-overlapping rows (currently six and five services), loop in opposite directions and can be paused; reduced motion disables them. The closing release CTA repeats See the workflow next to Book a demo. Meet Falcon AI switches to the video landing, then smoothly scrolls to `?view=workflow#cases-video`; direct links and browser history restore that destination. Both public headers expose the language selector and omit company login actions; the workflow footer also omits company entry. Section eyebrows have no numeric prefixes.
 
 `/privacy/?lang=ru|en|es|pt` contains the Falcon-specific policy. Only Russian uses Меркурий Рукс; other versions use Mercury Rucks.
 

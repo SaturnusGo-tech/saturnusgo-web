@@ -1,7 +1,6 @@
 "use client";
 import { useLandingLocale } from "./localization/context/LandingLocaleProvider";
 import { LanguageSelector } from "./localization/presentation/LanguageSelector";
-import Link from "next/link";
 import styles from "./landing.module.css";
 
 export function FalconHeader({ onDemo, onBack }: { onDemo: () => void; onBack: () => void }) {
@@ -16,9 +15,6 @@ export function FalconHeader({ onDemo, onBack }: { onDemo: () => void; onBack: (
           <a href="#contact">{copy.contacts}</a>
         </nav>
         <div className={styles.headerActions}>
-          <Link className={styles.loginButton} href="/cloud-login/">
-            {copy.login}
-          </Link>
           <button className={styles.primaryButton} onClick={onDemo}>{locale === "ru" ? "Запросить демо" : "Book a demo"}</button>
           <LanguageSelector />
         </div>

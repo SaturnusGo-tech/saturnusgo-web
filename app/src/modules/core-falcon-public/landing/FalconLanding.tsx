@@ -1,6 +1,4 @@
 "use client";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { SiTelegram } from "react-icons/si";
 import { FalconBrand } from "../shared/FalconBrand";
 import { FalconHeader } from "./FalconHeader";
@@ -29,7 +27,7 @@ function LandingContent() {
   return (
     <>
     <div className={transition.surface} hidden={navigation.view !== 'home'}>
-      <FalconDirection onWorkflow={navigation.openWorkflow} onDemo={navigation.openDemo} />
+      <FalconDirection onWorkflow={navigation.openWorkflow} onAI={navigation.openAI} onDemo={navigation.openDemo} />
     </div>
     {navigation.view === 'workflow' && <div className={`${styles.page} ${transition.surface}`} data-landing-locale={locale} lang={locale}>
       <a className={styles.skipLink} href="#product">
@@ -64,9 +62,11 @@ function LandingContent() {
             aria-labelledby={`${item.id}-title`}
           >
             <ProductStory story={item} headingId={`${item.id}-title`} />
-            <Reveal className={styles.videoReveal} variant="media">
-              <ProductVideo key={locale} demo={demos[item.id]} />
-            </Reveal>
+            <div id={`${item.id}-video`}>
+              <Reveal className={styles.videoReveal} variant="media">
+                <ProductVideo key={locale} demo={demos[item.id]} />
+              </Reveal>
+            </div>
           </section>
         ))}
         <section className={styles.workflowSection} id="results" aria-labelledby="results-title">
@@ -106,9 +106,6 @@ function LandingContent() {
         <div className={styles.footerMeta}>
           <FalconBrand inverse label={copy.home} />
           <span>{copy.category}</span>
-          <Link href="/cloud-login/">
-            {copy.companyLogin} <ArrowRight size={14} aria-hidden="true" />
-          </Link>
           <small>© {new Date().getFullYear()} Falcon</small>
         </div>
       </footer>

@@ -21,10 +21,10 @@ test("Falcon landing owns its language independently from company entry", () => 
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon landing has one company login action and accessible chapter navigation", () => {
+test("Falcon landing keeps company entry private and exposes accessible chapter navigation", () => {
   const header = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconHeader.tsx"), "utf8");
   const landing = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconLanding.tsx"), "utf8");
-  assert.match(header, /href="\/cloud-login\/"/);
+  assert.doesNotMatch(header + landing, /href="\/cloud-login\/"/);
   assert.doesNotMatch(header + landing, /href="\/signup\/"|Создать аккаунт/);
   assert.match(header, /aria-label=\{copy.navigation\}/);
   assert.match(landing, /href="#product">\s*\{copy.skip\}/);

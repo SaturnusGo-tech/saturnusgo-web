@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, Play } from 'lucide-react';
 import { useLandingLocale } from '../landing/localization/context/LandingLocaleProvider';
 import { LanguageSelector } from '../landing/localization/presentation/LanguageSelector';
 import { FalconDemoForm } from '../demo/FalconDemoForm';
@@ -7,7 +7,7 @@ import { DirectionMarquee } from './DirectionMarquee';
 import { directionCopy } from './content/copy';
 import styles from './direction.module.css';
 
-export function FalconDirection({ onWorkflow, onDemo }: { onWorkflow: () => void; onDemo: () => void }) {
+export function FalconDirection({ onWorkflow, onAI, onDemo }: { onWorkflow: () => void; onAI: () => void; onDemo: () => void }) {
   const { locale } = useLandingLocale();
   const c = directionCopy[locale];
   const art = '/falcon/landing/2026-10/';
@@ -16,7 +16,7 @@ export function FalconDirection({ onWorkflow, onDemo }: { onWorkflow: () => void
     <header className={styles.navigation}>
       <a className={styles.brand} href="#top" aria-label="Falcon"><img src="/falcon/falcon-mark-light.png" width={30} height={30} alt="" /><span>FALCON</span></a>
       <nav aria-label={c.resources}><a href="#repository">{c.product}</a><a href="#connected-tools">{c.integrations}</a><a href="#resources">{c.resources}</a></nav>
-      <div className={styles.navActions}><a href="/cloud-login/">{c.login}</a><button className={styles.primary} onClick={onDemo}>{c.demo}</button></div>
+      <div className={styles.navActions}><button className={styles.primary} onClick={onDemo}>{c.demo}</button><LanguageSelector /></div>
     </header>
     <main id="top">
       <section className={styles.hero} aria-labelledby="direction-title">
@@ -42,10 +42,10 @@ export function FalconDirection({ onWorkflow, onDemo }: { onWorkflow: () => void
         <p className={styles.caption}>{c.executionCaption}</p>
       </section>
       <section id="falcon-ai" className={styles.ai} aria-labelledby="ai-title">
-        <div className={styles.aiIntro}><p className={styles.eyebrow}>{c.aiLabel}</p><h2 id="ai-title">{c.aiTitle[0]}<br />{c.aiTitle[1]}</h2><p className={styles.body}>{c.aiBody}</p><p className={styles.aiSource}><BookOpen size={17} />{c.aiSource}</p><button className={styles.secondary} onClick={onWorkflow}>{c.aiAction} <ArrowRight size={14} /></button></div>
+        <div className={styles.aiIntro}><p className={styles.eyebrow}>{c.aiLabel}</p><h2 id="ai-title">{c.aiTitle[0]}<br />{c.aiTitle[1]}</h2><p className={styles.body}>{c.aiBody}</p><p className={styles.aiSource}><BookOpen size={17} />{c.aiSource}</p><button className={styles.secondary} onClick={onAI}>{c.aiAction} <ArrowRight size={14} /></button></div>
         <img src={`${art}ai-stage.png`} width={820} height={630} alt={c.aiAlt} loading="lazy" />
       </section>
-      <section className={styles.closing}><p className={styles.eyebrow}>{c.closeLabel}</p><h2>{c.closeTitle[0]}<br />{c.closeTitle[1]}</h2><button className={styles.primary} onClick={onDemo}>{c.demo} <ArrowRight size={14} /></button></section>
+      <section className={styles.closing}><p className={styles.eyebrow}>{c.closeLabel}</p><h2>{c.closeTitle[0]}<br />{c.closeTitle[1]}</h2><div className={styles.closingActions}><button className={styles.primary} onClick={onDemo}>{c.demo} <ArrowRight size={14} /></button><button className={styles.secondary} onClick={onWorkflow}><Play size={14} aria-hidden="true" />{c.workflow}</button></div></section>
       <section id="book-demo" className={styles.demoSection} aria-label={c.demo}><FalconDemoForm locale={locale} /></section>
     </main>
     <footer className={styles.footer} id="resources">
