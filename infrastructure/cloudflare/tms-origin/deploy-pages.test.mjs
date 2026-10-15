@@ -93,7 +93,7 @@ if (process.argv.slice(2).join(" ") === "run clean") {
   process.exit(0);
 }
 if (process.argv.slice(2).join(" ") !== "run build") process.exit(2);
-for (const name of ["sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
+for (const name of ["privacy", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
 write("out/index.html", "FALCON LANDING\\n");
 write("out/index.txt", "FALCON LANDING DATA\\n");
 if (process.env.OMIT_SIGNUP !== "1") {
@@ -106,6 +106,7 @@ write("out/testcases/umbrella-home/work/index.html", "CURRENT TMS\\n");
 write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
+for (const id of ["hero", "repository", "run", "ai"]) write("out/falcon/landing/2026-10/" + id + "-stage.png", "Figma asset");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
 if (process.env.OMIT_CINEMATIC_ASSET !== "1") {

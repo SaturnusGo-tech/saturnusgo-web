@@ -324,3 +324,13 @@ test("rejects unapproved hosts, paths, namespace access and unsafe methods", asy
   }
   assert.equal(fetches, 0);
 });
+
+test('demo intake is available only on the public TMS host and fails closed without server secrets', async (context) => {
+  mockFetch(context, async () => { throw new Error('must not forward'); });
+  const options = { method: 'POST', headers: { Origin: 'https://tms.saturnusgo.com', 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.1' }, body: '{}' };
+  const response = await worker.fetch(new Request('https://tms.saturnusgo.com/api/falcon-demo/request', options), {});
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  const unknown = await worker.fetch(new Request('https://unknown.example/api/falcon-demo/request', options), {});
+  assert.equal(unknown.status, 404);
+});

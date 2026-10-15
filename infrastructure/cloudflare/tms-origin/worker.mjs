@@ -1,3 +1,4 @@
+import { proxyDemo } from "./demo/proxy.mjs";
 import {
   APP_PATH,
   ORIGIN_NAMESPACE,
@@ -236,6 +237,9 @@ export default {
     // public surface canonical so an allowed prefix cannot be turned into an origin traversal.
     if (incoming.pathname.includes("%") || incoming.pathname.includes("\\")) {
       return notFoundResponse();
+    }
+    if (incoming.pathname === "/api/falcon-demo/request") {
+      return incoming.hostname === TMS_HOST ? secureResponse(await proxyDemo(request, env)) : notFoundResponse();
     }
     if (incoming.pathname.startsWith("/api/v1/")) {
       return audience ? secureResponse(await proxyCompanyApi(request, env, audience), true) : notFoundResponse();

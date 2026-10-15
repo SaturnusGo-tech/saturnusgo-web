@@ -1,0 +1,7 @@
+.surface{min-width:0}
+.surface[hidden]{display:none}
+.workflowReturn{display:flex;justify-content:center;gap:20px;align-items:center;padding:48px 24px 24px}
+.workflowReturn button{font:500 14px/1.4 var(--font-geist-sans),sans-serif;border:1px solid #414141;border-radius:8px;padding:12px 18px;background:#f1f0ea;color:#101010;cursor:pointer}
+.workflowReturn button:last-child{background:transparent;color:#f1f0ea}
+
+@media(prefers-reduced-motion:no-preference){@supports not (view-transition-name:falcon-public-page){.surface:not([hidden]){animation:falcon-direction-in .35s ease-out}}}

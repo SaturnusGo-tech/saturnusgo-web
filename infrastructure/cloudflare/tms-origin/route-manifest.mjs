@@ -5,6 +5,7 @@ export const RELEASE_EVIDENCE_PATH = `${ORIGIN_NAMESPACE}/release.json`;
 export const APP_PATH = "/testcases/umbrella-home/work/";
 
 export const publicRoutes = Object.freeze([
+  Object.freeze({ publicPath: "/privacy/", artifactPath: "privacy/index.html", required: true }),
   ...["sandbox", "admin", "profile"].map((name) => Object.freeze({ publicPath: `/${name}/`, artifactPath: `${name}/index.html`, required: true })),
   Object.freeze({ publicPath: "/", artifactPath: "index.html", required: true }),
   Object.freeze({ publicPath: "/signup/", artifactPath: "signup/index.html", required: true }),
@@ -22,6 +23,7 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  ...["hero", "repository", "run", "ai"].map((id) => `/falcon/landing/2026-10/${id}-stage.png`),
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
   "/falcon/auth/silver-wing.webp",

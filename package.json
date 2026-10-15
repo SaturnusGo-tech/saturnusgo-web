@@ -19,7 +19,7 @@
     "prepare:pages": "bash scripts/deploy_pages.sh --prepare",
     "deploy:tms-worker": "bash scripts/deploy_tms_worker.sh --publish",
     "prepare:tms-worker": "bash scripts/deploy_tms_worker.sh --prepare",
-    "test:tms-worker": "node --test infrastructure/cloudflare/tms-origin/worker.test.mjs infrastructure/cloudflare/tms-origin/pages-origin-readiness.test.mjs infrastructure/cloudflare/tms-origin/deploy-pages.test.mjs infrastructure/cloudflare/tms-origin/deploy-worker.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-api.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-document.test.mjs infrastructure/cloudflare/tms-origin/deployment/tests/*.test.mjs",
+    "test:tms-worker": "node --test infrastructure/cloudflare/tms-origin/demo/proxy.test.mjs infrastructure/cloudflare/tms-origin/worker.test.mjs infrastructure/cloudflare/tms-origin/pages-origin-readiness.test.mjs infrastructure/cloudflare/tms-origin/deploy-pages.test.mjs infrastructure/cloudflare/tms-origin/deploy-worker.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-api.test.mjs infrastructure/cloudflare/tms-origin/gateway/company-document.test.mjs infrastructure/cloudflare/tms-origin/deployment/tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
     "architecture:tms": "node scripts/check-tms-architecture.mjs",
     "test:tms-comment-links": "tsx --test app/src/modules/core-tms/test-cases/navigation/comments/tests/*.test.ts app/src/modules/core-tms/state/comment-changes/tests/*.test.ts",

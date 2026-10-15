@@ -688,3 +688,5 @@
 @keyframes languageRevealRu { from { opacity: .7; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .page[data-landing-locale] main, .page[data-landing-locale] .footer { animation: none; } }
 @media (max-width: 600px) { .headerActions { gap: 8px; } .headerInner { gap: 10px; padding-right: 14px; } }
+
+.homeButton{display:inline-flex;align-items:center;gap:12px;background:none;border:0;padding:8px 0;color:inherit;font-family:inherit;font-size:16px;line-height:1.4;font-weight:500;cursor:pointer;white-space:nowrap}

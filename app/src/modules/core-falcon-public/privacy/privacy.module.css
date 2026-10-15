@@ -1,0 +1,20 @@
+html:has(.page),body:has(.page){height:auto;min-height:100%;overflow-x:clip;overflow-y:visible}
+.page { min-height: 100vh; background: #101010; color: #f1f0ea; font-family: var(--font-geist-sans), "Geist", sans-serif; -webkit-font-smoothing: antialiased; }
+.header { max-width: 1360px; margin: auto; padding: 34px 56px; display: flex; justify-content: space-between; align-items: center; gap: 24px; border-bottom: 1px solid #303030; }
+.brand { display: flex; gap: 14px; align-items: center; font-size: 24px; font-weight: 600; letter-spacing: -.055em; text-decoration: none; }
+.brand span { font-weight: 400; font-size: 21px; }
+.languages { display: flex; flex-wrap: wrap; gap: 20px; font-size: 12px; }
+.languages a { color: #aaa9a2; text-decoration: none; }
+.languages a[aria-current="page"] { color: #f1f0ea; text-decoration: underline; text-underline-offset: 6px; }
+.content { width: min(760px, calc(100% - 48px)); margin: 0 auto; padding: 80px 0 64px; }
+.updated { color: #a7a7a1; font-size: 12px; }
+.content h1 { margin: 20px 0 28px; font-size: clamp(38px, 5.5vw, 64px); line-height: 1.05; letter-spacing: -.045em; font-weight: 500; }
+.intro { font-size: 19px; line-height: 1.6; color: #c3c2bb; }
+.contact { display: inline-block; margin: 12px 0 32px; font-size: 14px; overflow-wrap: anywhere; }
+.content section { padding-top: 28px; }
+.content h2 { font-size: 21px; font-weight: 500; line-height: 1.35; letter-spacing: -.02em; }
+.content section p { font-size: 15px; line-height: 1.8; color: #b8b8b1; overflow-wrap: anywhere; }
+.page a { color: inherit; text-underline-offset: 4px; }
+.page a:focus-visible { outline: 2px solid #f1f0ea; outline-offset: 6px; }
+.content footer { border-top: 1px solid #343434; margin-top: 52px; padding-top: 28px; font-size: 14px; }
+@media (max-width: 640px) { .header { padding: 24px; align-items: flex-start; flex-direction: column; } .languages { gap: 16px; } .content { padding-top: 48px; } }

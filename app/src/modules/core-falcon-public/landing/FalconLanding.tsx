@@ -14,19 +14,28 @@ import { PilotSection } from "./pilot/PilotSection";
 import { Reveal } from "./motion/Reveal";
 import { ProductStory } from "./ProductStory";
 import styles from "./landing.module.css";
+import { FalconDirection } from "../direction/FalconDirection";
+import { useLandingView } from "../direction/navigation/useLandingView";
+import "../direction/navigation/view-transition.css";
+import transition from "../direction/navigation/transition.module.css";
 
 export function FalconLanding() {
   return <LandingLocaleProvider><LandingContent /></LandingLocaleProvider>;
 }
 function LandingContent() {
   const { locale, copy } = useLandingLocale();
+  const navigation = useLandingView();
   const { demos, workflow, projectStory, resultsStory } = locale === "ru" ? russian : english;
   return (
-    <div className={styles.page} data-landing-locale={locale} lang={locale}>
+    <>
+    <div className={transition.surface} hidden={navigation.view !== 'home'}>
+      <FalconDirection onWorkflow={navigation.openWorkflow} onDemo={navigation.openDemo} />
+    </div>
+    {navigation.view === 'workflow' && <div className={`${styles.page} ${transition.surface}`} data-landing-locale={locale} lang={locale}>
       <a className={styles.skipLink} href="#product">
         {copy.skip}
       </a>
-      <FalconHeader />
+      <FalconHeader onDemo={navigation.openDemo} onBack={navigation.openHome} />
       <main>
         <FalconHeroCinema />
         <section
@@ -75,6 +84,7 @@ function LandingContent() {
           </details>)}</div>
         </section>
       </main>
+      <div className={transition.workflowReturn}><button onClick={navigation.openDemo}>{locale === 'ru' ? 'Запросить демо' : 'Book a demo'}</button><button onClick={navigation.openHome}>{locale === 'ru' ? 'Вернуться в начало' : 'Get back'} ↑</button></div>
       <footer className={styles.footer} id="contact">
         <img
           className={styles.footerWing}
@@ -102,6 +112,7 @@ function LandingContent() {
           <small>© {new Date().getFullYear()} Falcon</small>
         </div>
       </footer>
-    </div>
+    </div>}
+    </>
   );
 }

@@ -1,0 +1,25 @@
+.section { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; width: 100%; margin: 0 auto; padding: 112px 0; color: #f1f0ea; border-top: 1px solid #343434; font-family: var(--font-geist-sans), "Geist", sans-serif; scroll-margin-top: 100px; }
+.eyebrow { margin: 0 0 20px; color: #a7a7a1; font-size: 11px; letter-spacing: .16em; }
+.intro h2 { margin: 0 0 22px; font-size: clamp(34px, 4vw, 60px); line-height: 1.06; letter-spacing: -.045em; font-weight: 500; }
+.lead { max-width: 420px; margin: 0; color: #b8b8b1; font-size: 17px; line-height: 1.6; }
+.form { align-self: center; min-width: 0; }
+.emailLabel { display: block; margin-bottom: 10px; font-size: 13px; }
+.row { display: flex; gap: 10px; }
+.row input { min-width: 0; flex: 1; width: 100%; border: 1px solid #555550; border-radius: 6px; padding: 15px 16px; font: inherit; font-size: 15px; color: #f1f0ea; background: #181818; }
+.row input::placeholder { color: #92928c; }
+.row button { display: inline-flex; align-items: center; justify-content: center; gap: 18px; flex-shrink: 0; padding: 15px 18px; border: 1px solid #f1f0ea; border-radius: 6px; background: #f1f0ea; color: #101010; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.row button:hover { background: #fff; }
+.row button:disabled { opacity: .6; cursor: wait; }
+.consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 12px; line-height: 1.7; color: #b8b8b1; }
+.consent input { flex-shrink: 0; margin: 2px 0 0; width: 18px; height: 18px; accent-color: #f1f0ea; cursor: pointer; }
+.consent label { cursor: pointer; }
+.consent a, .error a { color: #f1f0ea; text-decoration: underline; text-underline-offset: 3px; }
+.note { margin: 14px 0 0 28px; color: #999992; font-size: 11px; line-height: 1.7; }
+.status, .error { font-size: 14px; line-height: 1.6; margin: 16px 0 0; }
+.status:empty { display: none; }
+.error { color: #ffb6aa; }
+.honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.section :is(input, button, a):focus-visible, .status:focus, .error:focus { outline: 2px solid #f1f0ea; outline-offset: 4px; }
+.row input[aria-invalid="true"] { border-color: #ffb6aa; }
+@media (max-width: 1000px) { .section { gap: 40px; width: 100%; } .row { flex-direction: column; } .row button { align-self: flex-start; } }
+@media (max-width: 680px) { .section { grid-template-columns: 1fr; gap: 32px; width: 100%; padding: 72px 0; } .row button { width: 100%; } .lead { font-size: 16px; } }

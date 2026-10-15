@@ -2,15 +2,14 @@
 import { useLandingLocale } from "./localization/context/LandingLocaleProvider";
 import { LanguageSelector } from "./localization/presentation/LanguageSelector";
 import Link from "next/link";
-import { FalconBrand } from "../shared/FalconBrand";
 import styles from "./landing.module.css";
 
-export function FalconHeader() {
-  const { copy } = useLandingLocale();
+export function FalconHeader({ onDemo, onBack }: { onDemo: () => void; onBack: () => void }) {
+  const { copy, locale } = useLandingLocale();
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
-        <FalconBrand inverse label={copy.home} />
+        <button className={styles.homeButton} onClick={onBack} aria-label={copy.home}>← Falcon</button>
         <nav className={styles.headerNav} aria-label={copy.navigation}>
           <a href="#product">{copy.product}</a>
           <a href="#integrations">{copy.integrations}</a>
@@ -20,7 +19,7 @@ export function FalconHeader() {
           <Link className={styles.loginButton} href="/cloud-login/">
             {copy.login}
           </Link>
-          <a className={styles.primaryButton} href="#contact">{copy.contact}</a>
+          <button className={styles.primaryButton} onClick={onDemo}>{locale === "ru" ? "Запросить демо" : "Book a demo"}</button>
           <LanguageSelector />
         </div>
       </div>

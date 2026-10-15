@@ -1,0 +1,5 @@
+::view-transition-old(root){animation:falcon-direction-out .32s cubic-bezier(.4,0,.2,1) both}
+::view-transition-new(root){animation:falcon-direction-in .44s cubic-bezier(.2,.7,.2,1) both}
+@keyframes falcon-direction-out{to{opacity:0;transform:translateY(-20px) scale(.985)}}
+@keyframes falcon-direction-in{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
