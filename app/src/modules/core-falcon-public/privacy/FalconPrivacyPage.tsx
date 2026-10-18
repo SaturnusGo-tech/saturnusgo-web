@@ -35,7 +35,7 @@ export function FalconPrivacyPage() {
       <p className={styles.updated}>{copy.updated}</p>
       <h1>{copy.title}</h1>
       <p className={styles.intro}>{copy.intro}</p>
-      <a className={styles.contact} href="mailto:mercury143143@yahoo.com">mercury143143@yahoo.com ↗</a>
+      <a className={styles.contact} href="mailto:falcon@saturnusgo.com">falcon@saturnusgo.com ↗</a>
       {copy.sections.map(([heading, ...paragraphs], index) => <section key={index} aria-labelledby={`privacy-${index}`}>
         <h2 id={`privacy-${index}`}>{heading}</h2>
         {paragraphs.map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}

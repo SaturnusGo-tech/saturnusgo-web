@@ -81,7 +81,7 @@ export function FalconDemoForm({ locale }: { locale: DemoLocale }) {
         <p className={styles.note}>{copy.note}</p>
       </>}
       <p ref={statusRef} id={`${id}-status`} className={failed ? styles.error : styles.status} role={failed ? "alert" : "status"} tabIndex={-1}>
-        {state === "success" ? copy.success : failed ? <>{copy[state]}{" "}<a href="mailto:mercury143143@yahoo.com">{copy.contact}</a></> : ""}
+        {state === "success" ? copy.success : failed ? <>{copy[state]}{" "}<a href="mailto:falcon@saturnusgo.com">{copy.contact}</a></> : ""}
       </p>
     </form>
   </section>;

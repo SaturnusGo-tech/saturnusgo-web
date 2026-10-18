@@ -23,3 +23,10 @@ The form POSTs to `/api/falcon-demo/request`. The TMS Worker restricts the origi
 ## Release
 
 Run typecheck, test:tms-auth, test:tms-worker, architecture:tms and demo component/transport tests. Deploy reviewed source via scripts/deploy_pages.sh, then scripts/deploy_tms_worker.sh so company-domain bindings are retained. Verify privacy route, four product images, old videos and live demo intake on production.
+
+
+## Contact mailbox — 18 October 2026
+
+`falcon@saturnusgo.com` is active in the owner's existing Proton mailbox. All four public policy translations, the privacy-page contact action and the demo form's failure contact link use this address. The policy date is 18 October 2026. Proton Mail (Proton AG, Switzerland) handles direct correspondence; the provider's identity was checked against its [official privacy policy](https://proton.me/mail/privacy-policy).
+
+Automatic demo notifications still use the existing backend configuration: Resend sends from `mercury@saturnusgo.com` to the owner's Yahoo address. Yahoo therefore remains listed for those notifications. Neither that delivery configuration nor the demo's purpose, retention or versioned consent is changed by this update.
