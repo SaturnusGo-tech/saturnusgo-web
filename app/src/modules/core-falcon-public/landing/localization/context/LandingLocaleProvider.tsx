@@ -14,14 +14,16 @@ export function LandingLocaleProvider({ children, initialLocale = 'en' }: { chil
     const read = () => {
       let saved: string | null = null;
       try { saved = localStorage.getItem(LANDING_LOCALE_KEY); } catch { /* Browsing without storage remains supported. */ }
-      setPreference(isLandingLocale(saved) ? saved : null);
-      setResolved(resolveLandingLocale(saved, navigator.language, requestedLandingLocale(location.pathname, location.search)));
+      const requested = requestedLandingLocale(location.pathname, location.search);
+      setPreference(requested ?? (isLandingLocale(saved) ? saved : null));
+      setResolved(resolveLandingLocale(saved, navigator.language, requested));
       setReady(true);
     };
     read();
     const onStorage = (event: StorageEvent) => { if (event.key === LANDING_LOCALE_KEY || event.key === null) read(); };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener('popstate', read);
+    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener('popstate', read); };
   }, []);
   useEffect(() => {
     const sync = () => { if (!preference) setResolved(resolveLandingLocale(null, navigator.language)); };

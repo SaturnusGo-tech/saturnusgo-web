@@ -16,7 +16,14 @@ test('language navigation retains workflow, attribution and the requested sectio
   assert.equal(url.hash,'#cases-video');
   assert.equal(landingLanguageURL(url.href,'en').pathname,'/');
   assert.equal(requestedLandingLocale('/ru/',''),'ru');
+  assert.equal(requestedLandingLocale('/',''),'en');
   assert.equal(requestedLandingLocale('/','?lang=ru'),'ru');
+});
+test('the English canonical stays English with a saved Russian preference', () => {
+  const html={dataset:{},lang:''};
+  runInNewContext(landingLocaleBootstrap,{document:{documentElement:html},navigator:{language:'ru-RU'},
+    localStorage:{getItem:()=> 'ru'},location:{pathname:'/',search:''},URLSearchParams});
+  assert.equal(html.lang,'en');
 });
 test('the prepaint language respects a shared URL even with an opposite saved preference', () => {
   const html={dataset:{},lang:''};
