@@ -94,6 +94,7 @@ if (process.argv.slice(2).join(" ") === "run clean") {
 }
 if (process.argv.slice(2).join(" ") !== "run build") process.exit(2);
 for (const name of ["privacy", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
+write("out/ru/index.html", "FALCON RUSSIAN LANDING");
 write("out/index.html", "FALCON LANDING\\n");
 write("out/index.txt", "FALCON LANDING DATA\\n");
 if (process.env.OMIT_SIGNUP !== "1") {

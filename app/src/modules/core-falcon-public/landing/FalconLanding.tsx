@@ -16,9 +16,10 @@ import { FalconDirection } from "../direction/FalconDirection";
 import { useLandingView } from "../direction/navigation/useLandingView";
 import "../direction/navigation/view-transition.css";
 import transition from "../direction/navigation/transition.module.css";
+import type { LandingLocale } from './localization/model/locale';
 
-export function FalconLanding() {
-  return <LandingLocaleProvider><LandingContent /></LandingLocaleProvider>;
+export function FalconLanding({ initialLocale = 'en' }: { initialLocale?: LandingLocale }) {
+  return <LandingLocaleProvider initialLocale={initialLocale}><LandingContent /></LandingLocaleProvider>;
 }
 function LandingContent() {
   const { locale, copy } = useLandingLocale();

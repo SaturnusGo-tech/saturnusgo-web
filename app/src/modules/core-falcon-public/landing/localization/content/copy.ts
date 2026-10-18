@@ -15,7 +15,7 @@ export const englishCopy = {
   footerTitle: ["Let's talk", "about Falcon."], footerLead: "Message us on Telegram with questions about the product, integrations or getting started.", companyLogin: "Company login",
   catalog: "Falcon integrations", resumeMarquee: "Resume integration carousel", pauseMarquee: "Pause integration carousel",
   player: { cover: "FALCON / IN ACTION", failed: "The video could not load", retry: "Try again", cancel: "Cancel playback", play: "Play video", pause: "Pause", watch: "Watch", controls: "Video controls", position: "Video position", silent: "No audio", captions: "English captions", track: "English", fullscreen: "Full screen", transcript: "In this video", of: "of" },
-  title: "Falcon: test management for your team", description: "Plan testing, run checks and track fixes in Falcon. See the product in action and talk to us about getting started.",
+  title: "Falcon TMS — Test Management for QA Teams", description: "Falcon TMS is a test management system for QA teams. Organize test cases, execute test runs, track defects and review release readiness in one workspace.",
 };
 export type LandingCopy = typeof englishCopy;
 export const russianCopy: LandingCopy = {
@@ -35,5 +35,5 @@ export const russianCopy: LandingCopy = {
   footerTitle: ["Обсудим", "подключение Falcon."], footerLead: "Напишите нам в Telegram. Ответим на вопросы о продукте, интеграциях и условиях подключения.", companyLogin: "Войти в компанию",
   catalog: "Каталог интеграций Falcon", resumeMarquee: "Запустить строку интеграций", pauseMarquee: "Остановить строку интеграций",
   player: { cover: "FALCON / В РАБОТЕ", failed: "Видео не загрузилось", retry: "Повторить", cancel: "Отменить запуск", play: "Воспроизвести видео", pause: "Пауза", watch: "Смотреть", controls: "Управление видео", position: "Позиция видео", silent: "Без звука", captions: "Русские подписи", track: "Русский", fullscreen: "На весь экран", transcript: "Что в видео", of: "из" },
-  title: "Falcon: управление тестированием и качеством продукта", description: "Планируйте тестирование, запускайте проверки и следите за исправлениями в Falcon. Посмотрите продукт в работе и свяжитесь с нами для подключения.",
+  title: "Falcon TMS — система управления тестированием", description: "Falcon TMS — система управления тестированием для QA-команд. Тест-кейсы, тест-раны, баг-репорты и готовность релизов в едином рабочем пространстве.",
 };

@@ -1,13 +1,13 @@
 "use client";
 import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { englishCopy, russianCopy } from "../content/copy";
-import { isLandingLocale, LANDING_LOCALE_KEY, resolveLandingLocale, type LandingLocale } from "../model/locale";
+import { isLandingLocale, LANDING_LOCALE_KEY, resolveLandingLocale, requestedLandingLocale, landingLanguageURL, type LandingLocale } from "../model/locale";
 
 const Context = createContext({ locale: "en" as LandingLocale, preference: null as LandingLocale | null,
   copy: englishCopy, setLocale: (_locale: LandingLocale | null) => {} });
 const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
-export function LandingLocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setResolved] = useState<LandingLocale>("en");
+export function LandingLocaleProvider({ children, initialLocale = 'en' }: { children: ReactNode; initialLocale?: LandingLocale }) {
+  const [locale, setResolved] = useState<LandingLocale>(initialLocale);
   const [preference, setPreference] = useState<LandingLocale | null>(null);
   const [ready, setReady] = useState(false);
   useClientLayoutEffect(() => {
@@ -15,7 +15,7 @@ export function LandingLocaleProvider({ children }: { children: ReactNode }) {
       let saved: string | null = null;
       try { saved = localStorage.getItem(LANDING_LOCALE_KEY); } catch { /* Browsing without storage remains supported. */ }
       setPreference(isLandingLocale(saved) ? saved : null);
-      setResolved(resolveLandingLocale(saved, navigator.language));
+      setResolved(resolveLandingLocale(saved, navigator.language, requestedLandingLocale(location.pathname, location.search)));
       setReady(true);
     };
     read();
@@ -39,6 +39,11 @@ export function LandingLocaleProvider({ children }: { children: ReactNode }) {
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]'])
       document.querySelector(selector)?.setAttribute("content", copy.title);
     document.querySelector('meta[property="og:locale"]')?.setAttribute("content", locale === "ru" ? "ru_RU" : "en_US");
+    const next = landingLanguageURL(location.href, locale);
+    if (next.href !== location.href) history.replaceState(history.state, '', next);
+    const canonical = locale === 'ru' ? 'https://tms.saturnusgo.com/ru/' : 'https://tms.saturnusgo.com/';
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', canonical);
   }, [locale, ready, copy]);
   const setLocale = (next: LandingLocale | null) => {
     setPreference(next);

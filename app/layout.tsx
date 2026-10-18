@@ -129,9 +129,9 @@ export default function RootLayout({
                   } else {
                     root.removeAttribute('data-tms');
                   }
-                  if (path === '/' || /^\\/(signup|cloud-login)(?:\\/|$)/i.test(path)) {
+                  if (path === '/' || path === '/ru/' || /^\\/(signup|cloud-login)(?:\\/|$)/i.test(path)) {
                     root.setAttribute('data-falcon-public', '1');
-                    root.lang = 'ru';
+                    if (path !== '/' && path !== '/ru/') root.lang = 'ru';
                   } else {
                     root.removeAttribute('data-falcon-public');
                   }

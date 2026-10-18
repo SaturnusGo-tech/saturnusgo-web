@@ -1,4 +1,5 @@
 import { proxyDemo } from "./demo/proxy.mjs";
+import { discoveryResponse } from './seo.mjs';
 import {
   APP_PATH,
   ORIGIN_NAMESPACE,
@@ -186,6 +187,8 @@ async function proxyToPublicSite(request, incoming, originPath, managed = false)
     redirect: "manual",
   }));
   const responseHeaders = new Headers(upstreamResponse.headers);
+  if ((incoming.pathname === APP_PATH || routeForRequestPath(incoming.pathname)) &&
+      !['/', '/ru/', '/privacy/'].includes(incoming.pathname)) responseHeaders.set('x-robots-tag','noindex, nofollow');
   responseHeaders.delete("set-cookie");
   const location = responseHeaders.get("location");
 
@@ -250,6 +253,8 @@ export default {
     if (!["GET", "HEAD"].includes(request.method)) {
       return notFoundResponse();
     }
+    const discovery = discoveryResponse(request, Boolean(audience));
+    if (discovery) return secureResponse(discovery, Boolean(audience));
     const documentRequest = incoming.pathname === "/" || incoming.pathname === APP_PATH || incoming.pathname === APP_PATH_NO_SLASH
       || incoming.pathname === `${APP_PATH}index.txt` || routeForRequestPath(incoming.pathname) || canonicalPublicPath(incoming.pathname);
     if (audience && documentRequest) {

@@ -8,6 +8,7 @@ export const publicRoutes = Object.freeze([
   Object.freeze({ publicPath: "/privacy/", artifactPath: "privacy/index.html", required: true }),
   ...["sandbox", "admin", "profile"].map((name) => Object.freeze({ publicPath: `/${name}/`, artifactPath: `${name}/index.html`, required: true })),
   Object.freeze({ publicPath: "/", artifactPath: "index.html", required: true }),
+  Object.freeze({ publicPath: "/ru/", artifactPath: "ru/index.html", required: true }),
   Object.freeze({ publicPath: "/signup/", artifactPath: "signup/index.html", required: true }),
   Object.freeze({
     publicPath: "/cloud-login/",

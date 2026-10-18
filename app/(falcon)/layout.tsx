@@ -4,6 +4,7 @@ import type React from "react";
 export const metadata: Metadata = {
   metadataBase: new URL("https://tms.saturnusgo.com"),
   applicationName: "Falcon",
+  robots: { index: false, follow: false },
   title: {
     default: "Falcon — управление качеством продукта",
     template: "%s | Falcon",
