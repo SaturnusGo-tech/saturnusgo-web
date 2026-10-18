@@ -28,6 +28,9 @@ export const githubArticle: DocArticle = {
       note("These are prefixes, not glob patterns", "Specify the start of a repository path. Do not use **/*.test.ts instead of a directory prefix.")),
     section("result", "Send the result back to GitHub", paragraph("Execute the created run in Falcon. With completion and stop events enabled, the connector publishes the result as a commit status. Check the exact SHA for which the run was created."),
       warning("Falcon does not configure branch protection", "If QA must block merging, a GitHub administrator configures a required status check in repository rules separately. A manual Falcon result does not rerun a failed Actions workflow.")),
+    section("impact-review", "Review Impact Analysis", paragraph("In Hooks → GitHub → Impact Analysis, review the code changes, test scope and coverage gaps. Lists show ten entries per page and have search. File evidence is collapsed until you open it; filtering never removes tests from the stored scope."),
+      note("AI is optional", "When the server pauses AI, a banner explains its availability. Existing analyses, code-evidence recommendations and manual review remain available. AI draft actions are hidden while paused; manual drafts still work. An unavailable AI result is not a complete AI assessment."),
+      paragraph("If another update changes the analysis during your decision, Falcon loads its current version and asks you to review again. Approval is never retried automatically. When AI is enabled, exhausted request budgets defer work until the applicable limit resets.")),
     section("verify", "Test the connection", paragraph("Open an agreed test PR matching the rule. Check webhook delivery in GitHub, Falcon's log, and the created run's contents. Execute it and check commit status. Configure Slack separately for release and failure messages.")),
   ],
 };

@@ -109,6 +109,7 @@ if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.pn
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
+if (process.env.OMIT_IMPACT_BANNER !== "1") write("out/falcon/impact/ai-paused-20261018.webp", "ai paused asset");
 if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
   write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
 }

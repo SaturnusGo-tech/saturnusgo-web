@@ -7,6 +7,8 @@ import { buildWorkspaceDeepLink } from "../../../state/navigation/workspace-deep
 import { ScopeReview } from "../scope/ScopeReview";
 import { CoverageGaps } from "../gaps/CoverageGaps";
 import { AnalysisHistory } from "../history/AnalysisHistory";
+import { AnalysisAvailability } from "../availability/AnalysisAvailability";
+import { ImpactAiBanner } from "../banner/ImpactAiBanner";
 import css from "../styles/impact.module.css";
 export function AnalysisDetail({ scope, id, ru, permissions, onBack }: {
   scope: ImpactScope; id: string; ru: boolean; permissions: ImpactPermissions; onBack: () => void;
@@ -19,6 +21,7 @@ export function AnalysisDetail({ scope, id, ru, permissions, onBack }: {
   return <div className={css.root}>
     <div className={css.heading}><button type="button" onClick={onBack}><ArrowLeft size={14} />{ru ? "Все анализы" : "All analyses"}</button>
       <button type="button" disabled={state.pending || state.loading} onClick={() => void state.refresh()}><RefreshCw size={14} />{ru ? "Обновить" : "Refresh"}</button></div>
+    {data?.aiEnabled === false && <ImpactAiBanner ru={ru} />}
     {state.error && <p className={css.error} role="alert">{state.error}</p>}
     {!state.identityReady && <p className={css.notice}>{ru ? "Для сохранения решений войдите в аккаунт повторно." : "Sign in again to save review decisions."}</p>}
     {data && !state.etag && <p className={css.notice}>{ru ? "Не удалось проверить актуальность анализа. Обновите данные перед сохранением." : "The analysis version could not be verified. Reload before saving decisions."}</p>}
@@ -33,15 +36,16 @@ export function AnalysisDetail({ scope, id, ru, permissions, onBack }: {
         <div className={css.actions} style={{ marginTop: 12 }}>{source && <a href={source} target="_blank" rel="noreferrer">GitHub <ExternalLink size={12} /></a>}
           {build && <a href={build} target="_blank" rel="noreferrer">GitHub Actions <ExternalLink size={12} /></a>}
           {runHref && <a href={runHref} className={css.button}>{ru ? "Открыть тест-ран" : "Open test run"}</a>}</div>
-        {data.errorCode && <p className={css.error} role="alert">{ru ? "Анализ не завершён:" : "Analysis incomplete:"} {data.errorCode}</p>}
+        {data.aiEnabled !== false && data.errorCode && <AnalysisAvailability code={data.errorCode} ru={ru} />}
         {data.change.truncated && <p className={css.notice}>{ru ? "Список изменений неполный. Проверьте исходный diff перед подтверждением." : "The change list is incomplete. Review the source diff before approval."}</p>}
-        {(data.status === "failed" || data.result?.ai.status === "failed" || data.result?.ai.status === "unavailable") && permissions.configure && <button type="button" disabled={busy} onClick={() => void state.command({ action: "retry", body: {} })}>{ru ? "Повторить анализ" : "Retry analysis"}</button>}
+        {(data.status === "failed" || data.result?.ai.status === "failed" || data.result?.ai.status === "unavailable") && permissions.configure && <button type="button" disabled={busy} onClick={() => void state.command({ action: "retry", body: {} })}>{data.aiEnabled === false ? (ru ? "Пересчитать рекомендации" : "Recalculate recommendations") : (ru ? "Повторить анализ" : "Retry analysis")}</button>}
         {data.result && <><p style={{ lineHeight: 1.65 }}>{data.result.summary}</p><span className={css.badge} data-warning={data.result.riskLevel === "high" || data.result.riskLevel === "critical" || undefined}>{ru ? "Риск" : "Risk"}: {impactLabel(data.result.riskLevel, ru)}</span>
-          <ul className={css.list} style={{ marginTop: 14 }}>{data.result.impactedAreas.map((area, index) => <li key={index} className={css.row}>
+          <details className={css.evidence}><summary>{ru ? "Затронутые области" : "Affected areas"} · {data.result.impactedAreas.length}</summary>
+          <ul className={css.list}>{data.result.impactedAreas.map((area, index) => <li key={index} className={css.row}>
             <strong>{area.area} <span className={css.badge}>{area.platform}</span></strong><ul className={css.files}>{area.reasons.map((reason, i) => <li key={i}>{reason}</li>)}</ul>
-            <details><summary>{ru ? "Связанные файлы" : "Related files"}</summary><ul className={css.files}>{area.changedFiles.map((file) => <li key={file}>{file}</li>)}</ul></details></li>)}</ul>
+            <details><summary>{ru ? "Связанные файлы" : "Related files"}</summary><ul className={css.files}>{area.changedFiles.map((file) => <li key={file}>{file}</li>)}</ul></details></li>)}</ul></details>
           {data.result.notes.length > 0 && <ul className={css.files}>{data.result.notes.map((note, index) => <li key={index}>{note}</li>)}</ul>}
-          <p className={css.muted} style={{ marginTop: 12 }}>{ru ? "AI-анализ" : "AI analysis"}: {impactLabel(data.result.ai.status, ru)} · {data.result.ai.model || data.result.ai.provider || "—"}
+          <p className={css.muted} style={{ marginTop: 12 }}>{ru ? "Последний AI-анализ" : "Last AI analysis"}: {impactLabel(data.result.ai.status, ru)} · {data.result.ai.model || data.result.ai.provider || "—"}
             {data.result.ai.errorCode && ` · ${data.result.ai.errorCode}`}</p></>}
         <details style={{ marginTop: 12 }}><summary>{ru ? "Сборки и изменённые файлы" : "Builds and changed files"}</summary>
           <ul className={css.files}>{data.builds.map((item, index) => <li key={index}>{item.name} · {impactLabel(item.status, ru)} · {ru ? "попытка" : "attempt"} {item.attempt}</li>)}</ul>

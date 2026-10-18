@@ -34,15 +34,43 @@ test("a late response after owner change cannot update the next project and pres
   assert.equal(applied, false); assert.equal(reads, 0); assert.equal(journal.pending()?.key, "owner-key"); journal.complete("owner-key");
 });
 test("412 before acceptance requires a new review, without silently submitting a new scope", async () => {
-  let calls = 0;
-  const api = impactApi(createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async () => {
-    calls++; return new Response(JSON.stringify({ error: { code: "PRECONDITION_FAILED", message: "changed" } }), { status: 412 });
+  const methods: string[] = []; const accepted: number[] = [];
+  const api = impactApi(createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async (_, init) => {
+    methods.push(init!.method!);
+    return init?.method === "POST"
+      ? new Response(JSON.stringify({ error: { code: "PRECONDITION_FAILED", message: "changed", requestId: "conflict-request" } }), { status: 412 })
+      : new Response(JSON.stringify({ data: analysis({ rowVersion: 9 }) }), { headers: { etag: "v9" } });
   } }));
   const journal = new ImpactOperations("stale-scope", storageFixture(), () => "stale-key");
   const operation = journal.begin({ action: "scope", body: { caseIds: ["case_old"] } }, "v7");
   await assert.rejects(executeImpactOperation({ scope, id: "analysis_qa", operation, signal: new AbortController().signal, owns: () => true },
-    { api, journal, accept: () => { throw new Error("must not apply"); } }));
-  assert.equal(calls, 1); assert.equal(journal.pending(), null);
+    { api, journal, accept: (value) => { accepted.push(value.data.rowVersion); } }), { status: 412, requestId: "conflict-request", refreshed: true });
+  assert.deepEqual(methods, ["POST", "GET"]); assert.deepEqual(accepted, [9]); assert.equal(journal.pending(), null);
+});
+test("412 recovery never replays approval, and preserves the original conflict when refreshing fails", async () => {
+  const methods: string[] = [];
+  const api = impactApi(createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async (_, init) => {
+    methods.push(init!.method!);
+    if (init?.method === "GET") throw new Error("connection lost during recovery");
+    return new Response(JSON.stringify({ error: { code: "PRECONDITION_FAILED", message: "changed" } }), { status: 412 });
+  } }));
+  const journal = new ImpactOperations("stale-approval", storageFixture(), () => "approval-key");
+  const operation = journal.begin({ action: "approve", body: {} }, "v7");
+  await assert.rejects(executeImpactOperation({ scope, id: "analysis_qa", operation, signal: new AbortController().signal, owns: () => true },
+    { api, journal, accept: () => { throw new Error("must not apply"); } }), { status: 412, refreshed: false });
+  assert.deepEqual(methods, ["POST", "GET"]); assert.equal(journal.pending(), null);
+});
+test("412 reconciliation cannot apply a response after its owner is cancelled", async () => {
+  const controller = new AbortController(); let applied = false; let reads = 0;
+  const api = impactApi(createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async (_, init) => {
+    if (init?.method === "POST") return new Response(JSON.stringify({ error: { code: "PRECONDITION_FAILED", message: "changed" } }), { status: 412 });
+    reads++; controller.abort(); return new Response(JSON.stringify({ data: analysis({ rowVersion: 9 }) }));
+  } }));
+  const journal = new ImpactOperations("cancelled-conflict", storageFixture(), () => "cancel-key");
+  const operation = journal.begin({ action: "scope", body: { caseIds: ["case_old"] } }, "v7");
+  await assert.rejects(executeImpactOperation({ scope, id: "analysis_qa", operation, signal: controller.signal, owns: () => true },
+    { api, journal, accept: () => { applied = true; } }), { name: "AbortError" });
+  assert.equal(reads, 1); assert.equal(applied, false); assert.equal(journal.pending(), null);
 });
 test("definitive 422 and 403 rejection unlock a corrected command while retryable responses retain identity", async () => {
   for (const [status, code, retained] of [[422, "VALIDATION_ERROR", false], [403, "FORBIDDEN", false], [409, "BUILD_NOT_SUCCESSFUL", false],

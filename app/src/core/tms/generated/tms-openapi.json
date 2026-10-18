@@ -25208,6 +25208,7 @@
           "AI_ANALYSIS_RETRY",
           "AI_AUTHENTICATION_FAILED",
           "AI_CONTEXT_BUDGET_EXCEEDED",
+          "AI_DISABLED",
           "AI_DUPLICATE_CASE_ID",
           "AI_INVALID_JSON",
           "AI_NOT_CONFIGURED",
@@ -35333,6 +35334,10 @@
               "type": "string"
             },
             "maxItems": 10
+          },
+          "aiEnabled": {
+            "type": "boolean",
+            "description": "Current server configuration for optional AI assistance. Historical AI results do not override this flag."
           }
         },
         "required": [
@@ -35355,7 +35360,8 @@
           "createdAt",
           "updatedAt",
           "canEditScope",
-          "approvalBlockedReasons"
+          "approvalBlockedReasons",
+          "aiEnabled"
         ]
       },
       "ImpactScopeRequest": {
@@ -35436,11 +35442,16 @@
                 "type": "null"
               }
             ]
+          },
+          "aiEnabled": {
+            "type": "boolean",
+            "description": "Current server configuration for optional AI assistance, also present when the list is empty."
           }
         },
         "required": [
           "data",
-          "nextCursor"
+          "nextCursor",
+          "aiEnabled"
         ]
       },
       "ImpactRepositoryListEnvelope": {

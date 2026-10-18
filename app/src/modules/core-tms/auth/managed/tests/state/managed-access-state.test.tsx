@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useManagedAccess } from "../../application/useManagedAccess";
 import type { ManagedAccessPort } from "../../application/managed-access-port";
 import { CompanyAccessError, type CompanyEntrypoint, type CompanySession } from "../../domain/managed-access";
+import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
 
 let current: ReturnType<typeof useManagedAccess>;
 function Probe({ client }: { client: ManagedAccessPort }) { current = useManagedAccess(client); return null; }
@@ -80,4 +82,64 @@ void test("an expired MFA challenge clears its secret and returns to company log
   assert.equal(current.state.enrollment, null);
   assert.deepEqual(current.state.recoveryCodes, []);
   await act(async () => renderer.unmount());
+});
+
+void test("managed session restoration shows only the shared loader until the session is verified", async (t) => {
+  const require = createRequire(import.meta.url);
+  const previousCss = require.extensions[".css"];
+  require.extensions[".css"] = module => { module.exports = {}; };
+  const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
+  Object.assign(globalThis, { React });
+  const previousFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = previousFetch;
+    if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
+    if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React");
+  });
+  const { ManagedAccessBoundary } = await import("../../composition/ManagedAccessBoundary");
+  const entrypoint = deferred<Response>();
+  const session = deferred<Response>();
+  const paths: string[] = [];
+  globalThis.fetch = async (path) => {
+    paths.push(String(path));
+    return path === "/api/v1/auth/entrypoint" ? entrypoint.promise : session.promise;
+  };
+  const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "Loading session" };
+  const signedIn: CompanySession = { authenticated: true, stage: "authenticated", audience: "tenant",
+    workspaceId: "alpha", capabilities: [], expiresAt: new Date(Date.now() + 60000).toISOString(),
+    identity: { id: "qa", name: "QA", login: "qa", email: "qa@example.test", emailVerified: true,
+      phone: "", role: "tester", owner: false, hasAvatar: false, version: 1 } };
+  let renderer!: ReactTestRenderer;
+  t.after(() => act(() => renderer.unmount()));
+  await act(async () => { renderer = create(<TmsLocaleContext.Provider value={locale}>
+    <ManagedAccessBoundary>{() => <div data-testid="protected-workspace" />}</ManagedAccessBoundary>
+  </TmsLocaleContext.Provider>); });
+  const assertRestoring = () => {
+    assert.equal(renderer.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 1);
+    assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 0);
+    assert.equal(renderer.root.findAllByType("form").length, 0);
+    assert.equal(renderer.root.findAllByType("aside").length, 0, "authorization artwork must stay hidden during restoration");
+  };
+  assertRestoring();
+  await act(async () => { entrypoint.resolve(Response.json({ data: entry })); });
+  assert.deepEqual(paths, ["/api/v1/auth/entrypoint", "/api/v1/auth/session"]);
+  assertRestoring();
+  await act(async () => { session.resolve(Response.json({ data: signedIn })); });
+  assert.equal(renderer.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 0);
+  assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 1);
+  assert.equal(renderer.root.findAllByType("aside").length, 0);
+
+  const restrictedSessions: CompanySession[] = [anonymous,
+    { authenticated: false, stage: "password_change", expiresAt: signedIn.expiresAt },
+    { authenticated: false, stage: "mfa_challenge", expiresAt: signedIn.expiresAt }];
+  for (const restricted of restrictedSessions) {
+    await act(async () => renderer.unmount());
+    globalThis.fetch = async path => Response.json({ data: path === "/api/v1/auth/entrypoint" ? entry : restricted });
+    await act(async () => { renderer = create(<TmsLocaleContext.Provider value={locale}>
+      <ManagedAccessBoundary>{() => <div data-testid="protected-workspace" />}</ManagedAccessBoundary>
+    </TmsLocaleContext.Provider>); });
+    assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 0);
+    assert.equal(renderer.root.findAllByType("form").length, 1, `${restricted.stage} must still require authorization`);
+    assert.equal(renderer.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 0);
+  }
 });

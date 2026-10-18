@@ -27,6 +27,7 @@ export const requiredPublicAssets = Object.freeze([
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",
   "/falcon/auth/silver-wing.webp",
+  "/falcon/impact/ai-paused-20261018.webp",
   "/falcon/landing/2026-09/falcon-wing.webp",
   "/falcon/landing/2026-09/atmosphere.webp",
   ...["projects-20260913", "cases", "runs-20260917", "suites-20260917", "defects", "dashboard", "youtrack-20260913"].flatMap((id) =>

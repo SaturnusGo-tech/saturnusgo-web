@@ -2,6 +2,7 @@ import { TmsApiError } from "../../../../../core/tms/transport/http";
 import type { impactApi } from "../../data/impact-api";
 import type { ImpactScope } from "../../model/impact-types";
 import type { ImpactOperation, ImpactOperations } from "./impact-operation";
+import { ImpactReviewConflict } from "../shared/impact-error";
 type Api = ReturnType<typeof impactApi>;
 export async function executeImpactOperation(input: {
   scope: ImpactScope; id: string; operation: ImpactOperation; signal: AbortSignal; owns: () => boolean;
@@ -18,8 +19,17 @@ export async function executeImpactOperation(input: {
     check(); ports.accept(refreshed); ports.journal.complete(input.operation.key);
   } catch (cause) {
     if (!accepted && cause instanceof TmsApiError && cause.status >= 400 && cause.status < 500
-      && ![408, 425, 429].includes(cause.status) && !/(?:IN_PROGRESS|OUTCOME_UNKNOWN|BUSY)/.test(cause.code))
+      && ![408, 425, 429].includes(cause.status) && !/(?:IN_PROGRESS|OUTCOME_UNKNOWN|BUSY)/.test(cause.code)) {
       ports.journal.complete(input.operation.key);
+      if (cause.status === 412) {
+        let refreshed = false;
+        try {
+          check(); const result = await ports.api.detail(input.scope, input.id, input.signal);
+          check(); ports.accept(result); refreshed = true;
+        } catch { check(); }
+        throw new ImpactReviewConflict(cause, refreshed);
+      }
+    }
     throw cause;
   }
 }

@@ -31,15 +31,16 @@ export function useImpactAnalysis(scope: ImpactScope, id: string, permissions: I
     return result;
   }, [id, scope.workspaceId, scope.projectId, owner]);
   const load = useCallback(async () => {
-    read.current?.abort(); if (!permissions.read) return;
+    if (current.current !== owner || write.current || !permissions.read) return;
+    read.current?.abort();
     const controller = new AbortController(); read.current = controller; setLoading(true); setError(null);
     try { const result = await api.detail(scope, id, controller.signal);
       if (!controller.signal.aborted && current.current === owner) accept(result);
     } catch (cause) { if (!controller.signal.aborted && current.current === owner) setError(impactError(cause, ru)); }
-    finally { if (!controller.signal.aborted && current.current === owner) setLoading(false); }
+    finally { if (read.current === controller) { read.current = null; if (current.current === owner) setLoading(false); } }
   }, [api, accept, owner, id, scope.workspaceId, scope.projectId, permissions.read, ru]);
-  useEffect(() => { setResource(null); setResolvedOwner(""); setPending(false); void load();
-    return () => { read.current?.abort(); write.current?.abort(); }; }, [load]);
+  useEffect(() => { setResource(null); setResolvedOwner(""); setPending(false); setLoading(false); void load();
+    return () => { read.current?.abort(); read.current = null; write.current?.abort(); write.current = null; }; }, [load]);
   const data = resolvedOwner === owner ? resource?.data ?? null : null;
   useEffect(() => {
     if (!data || pending || loading || error || !shouldRefreshImpact(data)) return;
@@ -48,20 +49,20 @@ export function useImpactAnalysis(scope: ImpactScope, id: string, permissions: I
     return () => { clearTimeout(timer); document.removeEventListener("visibilitychange", visible); };
   }, [data, pending, loading, error, load]);
   const command = async (input: ImpactCommand) => {
-    if (write.current || !resource?.etag || !data || !session.subject) return;
+    if (current.current !== owner || write.current || !resource?.etag || !data || !session.subject) return;
     if (!impactCommandAllowed(input, permissions)) return;
     let operation: ReturnType<ImpactOperations["begin"]>;
     try { operation = journal.begin(input, resource.etag); }
     catch (cause) { setError(impactError(cause, ru)); return; }
     const controller = new AbortController();
-    write.current = controller; read.current?.abort(); setPending(true); setError(null);
+    write.current = controller; read.current?.abort(); read.current = null; setLoading(false); setPending(true); setError(null);
     try {
       await executeImpactOperation({ scope, id, operation, signal: controller.signal, owns: () => current.current === owner },
         { api, journal, accept });
     } catch (cause) {
       if (!controller.signal.aborted && current.current === owner) setError(impactError(cause, ru));
-    } finally { if (write.current === controller) write.current = null;
-      if (current.current === owner) { setPending(false); setJournalVersion((value) => value + 1); } }
+    } finally { if (write.current === controller) { write.current = null;
+      if (current.current === owner) { setPending(false); setJournalVersion((value) => value + 1); } } }
   };
   void journalVersion;
   const unresolved = journal.pending();

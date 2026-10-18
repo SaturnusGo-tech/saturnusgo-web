@@ -1,7 +1,7 @@
 import type { ImpactAnalysis, RepositoryInput } from "../../model/impact-types";
 export const scope = { workspaceId: "workspace_qa", projectId: "project_qa" };
 export function analysis(patch: Partial<ImpactAnalysis> = {}): ImpactAnalysis {
-  return { ...scope, id: "analysis_qa", repositoryId: "repository_qa", change: {
+  return { ...scope, aiEnabled: true, id: "analysis_qa", repositoryId: "repository_qa", change: {
     repository: "qa/backend", platform: "backend", sha: "a".repeat(40), baseSha: "b".repeat(40), branch: "main",
     prNumber: 12, author: "QA", sourceUrl: "https://github.com/qa/backend/pull/12", workflowId: "build", workflowName: "Verify",
     workflowRunId: "900", workflowAttempt: 1, buildStatus: "success", buildUrl: "https://github.com/qa/backend/actions/runs/900", files: [], truncated: false,

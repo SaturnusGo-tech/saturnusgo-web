@@ -10,6 +10,7 @@ export function useImpactList(scope: ImpactScope, enabled: boolean, ru: boolean,
   const owner = JSON.stringify([session.subject, scope.workspaceId, scope.projectId, enabled, runId]);
   const current = useRef(owner); current.current = owner;
   const request = useRef<AbortController | null>(null);
+  const [aiEnabled, setAiEnabled] = useState<boolean | null>(null);
   const [items, setItems] = useState<ImpactAnalysis[]>([]); const [next, setNext] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); const [error, setError] = useState<string | null>(null);
   const [resolvedOwner, setResolvedOwner] = useState("");
@@ -22,11 +23,11 @@ export function useImpactList(scope: ImpactScope, enabled: boolean, ru: boolean,
       if (result.data.some((item) => item.workspaceId !== scope.workspaceId || item.projectId !== scope.projectId
         || (runId && item.runId !== runId))) throw new Error("IMPACT_SCOPE_MISMATCH");
       setItems((old) => before ? [...old, ...result.data.filter((item) => !old.some((row) => row.id === item.id))] : result.data);
-      setNext(result.nextCursor); setResolvedOwner(owner);
+      setNext(result.nextCursor); setAiEnabled(result.aiEnabled ?? null); setResolvedOwner(owner);
     } catch (cause) { if (!controller.signal.aborted && current.current === owner) setError(impactError(cause, ru)); }
     finally { if (!controller.signal.aborted && current.current === owner) setLoading(false); }
   }, [api, owner, enabled, ru, scope.workspaceId, scope.projectId, runId]);
-  useEffect(() => { setItems([]); setNext(null); setResolvedOwner(""); void load(); return () => request.current?.abort(); }, [load]);
+  useEffect(() => { setItems([]); setNext(null); setAiEnabled(null); setResolvedOwner(""); void load(); return () => request.current?.abort(); }, [load]);
   return { items: resolvedOwner === owner ? items : [], loading, error, next,
-    ready: resolvedOwner === owner, refresh: () => load(), more: () => next ? load(next) : Promise.resolve() };
+    aiEnabled: resolvedOwner === owner ? aiEnabled : null, ready: resolvedOwner === owner, refresh: () => load(), more: () => next ? load(next) : Promise.resolve() };
 }
