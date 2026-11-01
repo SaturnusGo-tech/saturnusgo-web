@@ -47,3 +47,20 @@ test("company directory row exposes agent-specific lifecycle in an inline disclo
   assert.match(html,/Disable for company/);assert.match(html,/10 \/ 10/);
   assert.doesNotMatch(html,/password|invitation|mailto:/i);
 });
+
+test("directory preserves loading/error/retry before any employee exists without inventing an agent row",async()=>{
+  let retries=0;
+  const pending={...state,employee:null,loading:true,refresh:()=>{retries++;}};
+  let loading="";
+  assert.doesNotThrow(()=>{loading=renderToStaticMarkup(<CodexEmployeeRow employee={pending.employee} locale="en" management={<CodexEmployeeManagement state={pending} locale="en"/>}/>);});
+  assert.match(loading,/Loading Codex/);assert.doesNotMatch(loading,/data-codex-employee-row|Disable for company|Activate Codex/);
+  const failed={...pending,loading:false,error:"SERVICE_UNAVAILABLE"};
+  const html=renderToStaticMarkup(<CodexEmployeeRow employee={failed.employee} locale="en" management={<CodexEmployeeManagement state={failed} locale="en"/>}/>);
+  assert.match(html,/Codex could not be loaded/);assert.match(html,/Retry/);assert.doesNotMatch(html,/data-codex-employee-row/);
+  const {act,create}=await import("react-test-renderer");
+  const mounted:{view?:ReturnType<typeof create>}={};
+  await act(async()=>{mounted.view=create(<CodexEmployeeRow employee={failed.employee} locale="en" management={<CodexEmployeeManagement state={failed} locale="en"/>}/>);});
+  const view=mounted.view;assert.ok(view);
+  await act(async()=>view.root.findByType("button").props.onClick());assert.equal(retries,1);
+  await act(async()=>view.unmount());
+});
