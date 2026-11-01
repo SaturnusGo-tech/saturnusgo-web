@@ -9219,6 +9219,10 @@ export interface components {
                     page?: number;
                     nodeId?: string;
                 }[];
+                sharedSteps?: {
+                    sharedStepId: string;
+                    revision: number;
+                }[];
             }[];
         };
         QaWorkflow: {
@@ -9238,6 +9242,14 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            executionBinding: {
+                runId: string;
+                environmentId: string;
+                snapshotDigest: string;
+                /** Format: date-time */
+                boundAt: string;
+            } | null;
+            transitionReason: string | null;
         };
         QaWorkflowEnvelope: {
             data: components["schemas"]["QaWorkflow"];

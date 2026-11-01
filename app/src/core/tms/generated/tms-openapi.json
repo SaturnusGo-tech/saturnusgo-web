@@ -42762,6 +42762,29 @@
                     ],
                     "additionalProperties": false
                   }
+                },
+                "sharedSteps": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "sharedStepId",
+                      "revision"
+                    ],
+                    "properties": {
+                      "sharedStepId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                      },
+                      "revision": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1000000
+                      }
+                    }
+                  }
                 }
               },
               "required": [
@@ -42797,7 +42820,9 @@
           "planDigest",
           "plan",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "executionBinding",
+          "transitionReason"
         ],
         "properties": {
           "id": {
@@ -42860,6 +42885,44 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "executionBinding": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "runId",
+              "environmentId",
+              "snapshotDigest",
+              "boundAt"
+            ],
+            "properties": {
+              "runId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              "environmentId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              "snapshotDigest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "boundAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "transitionReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
           }
         }
       },
