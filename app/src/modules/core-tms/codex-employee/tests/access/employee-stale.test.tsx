@@ -7,6 +7,7 @@ import { useCodexEmployee } from "../../application/state/useCodexEmployee";
 import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 import { status } from "../support/employee-fixture";
 let current: ReturnType<typeof useCodexEmployee>;
+const snapshot = () => current;
 function Probe({ api }: {
     api: ReturnType<typeof createCodexEmployeeApi>;
 }) { current = useCodexEmployee(api); return null; }
@@ -25,6 +26,6 @@ test("company changes cancel pending status/connections and cannot render anothe
     await act(async () => { pending[0].resolve({ data: status, etag: '"3"' }); pending[1].resolve({ data: [] }); });
     assert.equal(current.employee, null);
     await act(async () => { pending[2].resolve({ data: { ...status, identityId: "new-agent" }, etag: '"3"' }); pending[3].resolve({ data: [] }); });
-    assert.equal(current.employee?.identityId, "new-agent");
+    assert.equal(snapshot().employee?.identityId, "new-agent");
     await act(async () => view.unmount());
 });

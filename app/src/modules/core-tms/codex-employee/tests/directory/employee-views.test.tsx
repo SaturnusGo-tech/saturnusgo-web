@@ -40,3 +40,10 @@ test("official light/dark asset bytes match verified signed-source provenance", 
         assert.equal(createHash("sha256").update(readFileSync(`public/assets/integrations/codex/${name}`)).digest("hex"), hash);
     }
 });
+
+test("company directory row exposes agent-specific lifecycle in an inline disclosure at every width",()=>{
+  const html=renderToStaticMarkup(<CodexEmployeeRow employee={state.employee} locale="en" management={<CodexEmployeeManagement state={state} locale="en"/>}/>);
+  assert.match(html,/^<details/);assert.match(html,/<summary[^>]*aria-label="Company Codex"/);
+  assert.match(html,/Disable for company/);assert.match(html,/10 \/ 10/);
+  assert.doesNotMatch(html,/password|invitation|mailto:/i);
+});

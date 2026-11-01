@@ -12,8 +12,8 @@ import { CreateMember } from "../members/CreateMember";
 import { MemberDetail } from "../member-detail/MemberDetail";
 import styles from "./directory.module.css";
 
-export function MemberWorkspace({ client, session, id, creating, onBack, onOpen, onCreate, employeeRow, employeeManagement }: {
-  readonly employeeRow?: ReactNode; readonly employeeManagement?: ReactNode;
+export function MemberWorkspace({ client, session, id, creating, onBack, onOpen, onCreate, employeeRow }: {
+  readonly employeeRow?: ReactNode;
   readonly client: AdministrationPort; readonly session: SignedInCompanySession; readonly id: string | null;
   readonly creating: boolean; readonly onBack: () => void; readonly onOpen: (id: string) => void; readonly onCreate: () => void;
 }) {
@@ -29,7 +29,6 @@ export function MemberWorkspace({ client, session, id, creating, onBack, onOpen,
       {!open && <div className={styles.placeholder}>
         <img src="/falcon/illustrations/employee-directory.png" width={288} height={192} alt="" />
         <p>{locale === "ru" ? "Выберите сотрудника" : "Select a person"}</p>
-        {employeeManagement && <div className={styles.employeeManagement}>{employeeManagement}</div>}
       </div>}
       <AnimatePresence mode="wait" initial={false}>
         {open && <AdministrationPanel key={creating ? "create" : id} busy={busy} onClose={onBack}
