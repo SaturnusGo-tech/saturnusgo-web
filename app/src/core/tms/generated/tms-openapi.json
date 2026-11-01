@@ -19690,6 +19690,298 @@
           }
         }
       }
+    },
+    "/company/agents/codex": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getCodexEmployee",
+        "summary": "Read company Codex status and personal connection eligibility",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The configured connectUrl is validated; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CodexEmployeeStatus"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/company/agents/codex/deactivate": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "deactivateCodexEmployee",
+        "summary": "Disable Codex and revoke company connections",
+        "tags": [
+          "Company administration"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current integration:manage and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CodexEmployeeDeactivation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/qa-workflows": {
+      "get": {
+        "tags": [
+          "QA workflows"
+        ],
+        "summary": "List QA workflows",
+        "description": "Managed-auth read projection. Agent manifest mutations are available only through checked delegated MCP commands. HTTP never accepts MCP bearer credentials.",
+        "operationId": "listQaWorkflows",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-tms-pagination": "cursor",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/QaWorkflowListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/qa-workflows/{workflowId}": {
+      "get": {
+        "tags": [
+          "QA workflows"
+        ],
+        "summary": "Get QA workflow",
+        "description": "Managed-auth read projection. Agent manifest mutations are available only through checked delegated MCP commands. HTTP never accepts MCP bearer credentials.",
+        "operationId": "getQaWorkflow",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ProjectIdQueryRequired"
+          },
+          {
+            "name": "workflowId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/QaWorkflowResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -22170,6 +22462,42 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "QaWorkflowResponse": {
+        "description": "Project-scoped workflow manifest and current progress.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "ETag": {
+            "$ref": "#/components/headers/ETag"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QaWorkflowEnvelope"
+            }
+          }
+        }
+      },
+      "QaWorkflowListResponse": {
+        "description": "A bounded page of shared workflow manifests, ordered by stable ID descending.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/XRequestId"
+          },
+          "X-Next-Cursor": {
+            "$ref": "#/components/headers/XNextCursor"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QaWorkflowListEnvelope"
             }
           }
         }
@@ -41913,6 +42241,495 @@
               "null"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "CodexEmployeeStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "const": "codex"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "not_activated"
+            ]
+          },
+          "identityId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rowVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "securityVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "description": "Authorization epoch; advances on disable, independent of the rowVersion concurrency token."
+          },
+          "capacity": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "occupied": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "occupied",
+              "limit"
+            ]
+          },
+          "canActivate": {
+            "type": "boolean"
+          },
+          "canDeactivate": {
+            "type": "boolean"
+          },
+          "canConnect": {
+            "type": "boolean"
+          },
+          "connectUrl": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://chatgpt\\.com/plugins/[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "identityId",
+          "rowVersion",
+          "securityVersion",
+          "capacity",
+          "canActivate",
+          "canDeactivate",
+          "canConnect",
+          "connectUrl"
+        ]
+      },
+      "CodexEmployeeDeactivation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "const": "codex"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "identityId": {
+            "type": "string"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "securityVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Authorization epoch; advances on disable, independent of the rowVersion concurrency token."
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "identityId",
+          "rowVersion",
+          "securityVersion"
+        ]
+      },
+      "QaWorkflowPlan": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "pdf"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "attachmentId": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "pages": {
+                      "minItems": 1,
+                      "maxItems": 500,
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1000000
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "attachmentId",
+                    "digest",
+                    "pages"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "figma"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "fileId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256
+                    },
+                    "nodeIds": {
+                      "minItems": 1,
+                      "maxItems": 500,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      }
+                    },
+                    "sourceUrl": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    },
+                    "version": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "capturedAt": {
+                      "type": "string",
+                      "maxLength": 32
+                    },
+                    "snapshotDigest": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "assumptions": {
+                      "maxItems": 50,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "fileId",
+                    "nodeIds",
+                    "sourceUrl",
+                    "version",
+                    "capturedAt",
+                    "snapshotDigest",
+                    "assumptions"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "target": {
+            "type": "object",
+            "properties": {
+              "allowedOrigins": {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "buildLabel": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "deployment": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "verified",
+                      "declared"
+                    ]
+                  },
+                  "marker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": [
+                  "kind",
+                  "marker"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "allowedOrigins",
+              "buildLabel",
+              "deployment"
+            ],
+            "additionalProperties": false
+          },
+          "confirmedCases": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "caseId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000000
+                },
+                "anchors": {
+                  "minItems": 1,
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sourceId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                      },
+                      "page": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1000000
+                      },
+                      "nodeId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      }
+                    },
+                    "required": [
+                      "sourceId"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "caseId",
+                "revision",
+                "anchors"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "sources",
+          "target",
+          "confirmedCases"
+        ],
+        "additionalProperties": false,
+        "description": "Immutable source manifest. PDF pages and Figma nodes anchor exact case revisions. Figma snapshots are host captures, not certified retrieval. URLs cannot expand allowed target origins; browser credentials and transient session state are excluded."
+      },
+      "QaWorkflow": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "workspaceId",
+          "projectId",
+          "state",
+          "rowVersion",
+          "planVersion",
+          "actorIdentityId",
+          "initiatedByIdentityId",
+          "assignedIdentityId",
+          "planDigest",
+          "plan",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "projectId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready",
+              "preparing",
+              "executing",
+              "needs_input",
+              "paused",
+              "failed",
+              "completed",
+              "cancelled"
+            ]
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "planVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "actorIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "initiatedByIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "assignedIdentityId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "planDigest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/QaWorkflowPlan"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QaWorkflowEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QaWorkflow"
+          }
+        }
+      },
+      "QaWorkflowListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/QaWorkflow"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "limit",
+              "hasMore",
+              "nextCursor"
+            ],
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "hasMore": {
+                "type": "boolean"
+              },
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 1024
+              }
+            }
           }
         }
       }

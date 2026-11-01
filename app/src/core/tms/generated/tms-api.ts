@@ -4806,6 +4806,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/company/agents/codex": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read company Codex status and personal connection eligibility
+         * @description Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The configured connectUrl is validated; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.
+         */
+        get: operations["getCodexEmployee"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/company/agents/codex/deactivate": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Disable Codex and revoke company connections
+         * @description Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current integration:manage and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.
+         */
+        post: operations["deactivateCodexEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/qa-workflows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List QA workflows
+         * @description Managed-auth read projection. Agent manifest mutations are available only through checked delegated MCP commands. HTTP never accepts MCP bearer credentials.
+         */
+        get: operations["listQaWorkflows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/qa-workflows/{workflowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get QA workflow
+         * @description Managed-auth read projection. Agent manifest mutations are available only through checked delegated MCP commands. HTTP never accepts MCP bearer credentials.
+         */
+        get: operations["getQaWorkflow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -9002,6 +9088,104 @@ export interface components {
             /** Format: date-time */
             revokedAt: string | null;
         };
+        CodexEmployeeStatus: {
+            /** @constant */
+            provider: "codex";
+            /** @enum {string} */
+            status: "active" | "inactive" | "not_activated";
+            identityId: string | null;
+            rowVersion: number | null;
+            /** @description Authorization epoch; advances on disable, independent of the rowVersion concurrency token. */
+            securityVersion: number | null;
+            capacity: {
+                occupied: number;
+                limit: number;
+            };
+            canActivate: boolean;
+            canDeactivate: boolean;
+            canConnect: boolean;
+            /** Format: uri */
+            connectUrl: string;
+        };
+        CodexEmployeeDeactivation: {
+            /** @constant */
+            provider: "codex";
+            /** @enum {string} */
+            status: "active" | "inactive";
+            identityId: string;
+            rowVersion: number;
+            /** @description Authorization epoch; advances on disable, independent of the rowVersion concurrency token. */
+            securityVersion: number;
+        };
+        /** @description Immutable source manifest. PDF pages and Figma nodes anchor exact case revisions. Figma snapshots are host captures, not certified retrieval. URLs cannot expand allowed target origins; browser credentials and transient session state are excluded. */
+        QaWorkflowPlan: {
+            sources: ({
+                /** @constant */
+                kind: "pdf";
+                id: string;
+                attachmentId: string;
+                digest: string;
+                pages: number[];
+            } | {
+                /** @constant */
+                kind: "figma";
+                id: string;
+                fileId: string;
+                nodeIds: string[];
+                sourceUrl: string;
+                version: string | null;
+                capturedAt: string;
+                snapshotDigest: string;
+                assumptions: string[];
+            })[];
+            target: {
+                allowedOrigins: string[];
+                buildLabel: string;
+                deployment: {
+                    /** @enum {string} */
+                    kind: "verified" | "declared";
+                    marker: string;
+                };
+            };
+            confirmedCases: {
+                caseId: string;
+                revision: number;
+                anchors: {
+                    sourceId: string;
+                    page?: number;
+                    nodeId?: string;
+                }[];
+            }[];
+        };
+        QaWorkflow: {
+            id: string;
+            workspaceId: string;
+            projectId: string;
+            /** @enum {string} */
+            state: "draft" | "ready" | "preparing" | "executing" | "needs_input" | "paused" | "failed" | "completed" | "cancelled";
+            rowVersion: number;
+            planVersion: number;
+            actorIdentityId: string;
+            initiatedByIdentityId: string;
+            assignedIdentityId: string;
+            planDigest: string;
+            plan: components["schemas"]["QaWorkflowPlan"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        QaWorkflowEnvelope: {
+            data: components["schemas"]["QaWorkflow"];
+        };
+        QaWorkflowListEnvelope: {
+            data: components["schemas"]["QaWorkflow"][];
+            meta: {
+                limit: number;
+                hasMore: boolean;
+                nextCursor: string | null;
+            };
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -10058,6 +10242,28 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description Project-scoped workflow manifest and current progress. */
+        QaWorkflowResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                ETag: components["headers"]["ETag"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["QaWorkflowEnvelope"];
+            };
+        };
+        /** @description A bounded page of shared workflow manifests, ordered by stable ID descending. */
+        QaWorkflowListResponse: {
+            headers: {
+                "X-Request-Id": components["headers"]["XRequestId"];
+                "X-Next-Cursor": components["headers"]["XNextCursor"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["QaWorkflowListEnvelope"];
             };
         };
     };
@@ -19751,6 +19957,139 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCodexEmployee: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CodexEmployeeStatus"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deactivateCodexEmployee: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CodexEmployeeDeactivation"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listQaWorkflows: {
+        parameters: {
+            query: {
+                workspaceId: string;
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+                /** @description Opaque continuation token returned as meta.nextCursor or X-Next-Cursor. It is bound to the original filters and ordering. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["QaWorkflowListResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getQaWorkflow: {
+        parameters: {
+            query: {
+                workspaceId: string;
+                /** @description Required project scope; cross-project reads are never performed and filtered afterward. */
+                projectId: components["parameters"]["ProjectIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workflowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["QaWorkflowResponse"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
