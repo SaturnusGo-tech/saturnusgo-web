@@ -3398,7 +3398,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5161,7 +5161,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -19452,7 +19452,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member’s already-read inbox entries",
+        "summary": "Archive only this member\u2019s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -19662,7 +19662,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -19781,7 +19781,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current integration:manage and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current integration:manage and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -20075,6 +20075,126 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/execution-history": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Activity"
+        ],
+        "operationId": "listExecutionHistory",
+        "summary": "Read exact execution event history with run:read",
+        "description": "Requires run:read; verifies exact workspace/project/run/item and optional attempt/step through Runs. Only result, step result and retest-start events. Retest is not execution. Empty history never proves an executor. No current-result author inference. Cursor binds every filter. Ordinary REST rejects MCP bearer credentials. Generic audit policy is unchanged.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "runId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "attemptNo",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999999
+            }
+          },
+          {
+            "name": "stepId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded execution history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionHistoryEnvelope"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -37090,7 +37210,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -37713,7 +37833,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -37814,7 +37934,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -41548,7 +41668,7 @@
           "locale",
           "messages"
         ],
-        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -43102,6 +43222,106 @@
           }
         },
         "description": "Authenticated human initiator from verified audit attribution, resolved within the event workspace. No grant, token, command or security-version metadata."
+      },
+      "ExecutionHistoryEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "workspaceId",
+          "projectId",
+          "runId",
+          "itemId",
+          "attemptNo",
+          "kind",
+          "status",
+          "actor",
+          "actorIdentityId",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "itemId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "stepId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "attemptNo": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999999
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "result_recorded",
+              "step_result_recorded",
+              "retest_started"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/ActorRef"
+          },
+          "actorIdentityId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "actorKind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "actorProvider": {
+            "type": "string",
+            "const": "codex"
+          },
+          "initiatedBy": {
+            "$ref": "#/components/schemas/ActivityInitiatedBy"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "ExecutionHistoryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ExecutionHistoryEvent"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
       }
     }
   }

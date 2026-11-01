@@ -4917,6 +4917,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/execution-history": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read exact execution event history with run:read
+         * @description Requires run:read; verifies exact workspace/project/run/item and optional attempt/step through Runs. Only result, step result and retest-start events. Retest is not execution. Empty history never proves an executor. No current-result author inference. Cursor binds every filter. Ordinary REST rejects MCP bearer credentials. Generic audit policy is unchanged.
+         */
+        get: operations["listExecutionHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -9295,6 +9318,30 @@ export interface components {
         ActivityInitiatedBy: {
             identityId: components["schemas"]["Identifier"];
             name: string;
+        };
+        ExecutionHistoryEvent: {
+            id: components["schemas"]["Identifier"];
+            workspaceId: components["schemas"]["Identifier"];
+            projectId: components["schemas"]["Identifier"];
+            runId: components["schemas"]["Identifier"];
+            itemId: components["schemas"]["Identifier"];
+            stepId?: components["schemas"]["Identifier"];
+            attemptNo: number;
+            /** @enum {string} */
+            kind: "result_recorded" | "step_result_recorded" | "retest_started";
+            status: components["schemas"]["ExecutionStatus"];
+            actor: components["schemas"]["ActorRef"];
+            actorIdentityId: string | null;
+            /** @enum {string} */
+            actorKind?: "human" | "agent";
+            /** @constant */
+            actorProvider?: "codex";
+            initiatedBy?: components["schemas"]["ActivityInitiatedBy"];
+            createdAt: components["schemas"]["Timestamp"];
+        };
+        ExecutionHistoryEnvelope: {
+            data: components["schemas"]["ExecutionHistoryEvent"][];
+            meta: components["schemas"]["PageMeta"];
         };
     };
     responses: {
@@ -20240,6 +20287,45 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listExecutionHistory: {
+        parameters: {
+            query: {
+                workspaceId: components["schemas"]["Identifier"];
+                projectId: components["schemas"]["Identifier"];
+                runId: components["schemas"]["Identifier"];
+                itemId: components["schemas"]["Identifier"];
+                attemptNo?: number;
+                stepId?: components["schemas"]["Identifier"];
+                limit?: number;
+                cursor?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded execution history */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExecutionHistoryEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
