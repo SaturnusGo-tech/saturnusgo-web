@@ -6338,6 +6338,7 @@ export interface components {
             comment: components["schemas"]["LongText"];
             attachmentIds: components["schemas"]["Identifier"][];
             updatedAt: components["schemas"]["Timestamp"];
+            rowVersion: number;
         };
         RunAttemptSummary: {
             attemptNo: number;
@@ -6352,6 +6353,7 @@ export interface components {
             completedAt: string | null;
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
+            rowVersion: number;
         };
         RunAttempt: components["schemas"]["RunAttemptSummary"] & {
             stepResults: components["schemas"]["StepResult"][];
@@ -6371,6 +6373,7 @@ export interface components {
             rowVersion?: number;
             /** Format: date-time */
             archivedAt?: string | null;
+            etag: string;
         };
         RunItem: components["schemas"]["RunItemSummary"] & {
             snapshot: components["schemas"]["TestCaseRevision"];

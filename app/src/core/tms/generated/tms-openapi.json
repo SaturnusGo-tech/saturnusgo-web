@@ -29533,7 +29533,8 @@
           "actualResult",
           "comment",
           "attachmentIds",
-          "updatedAt"
+          "updatedAt",
+          "rowVersion"
         ],
         "properties": {
           "stepId": {
@@ -29558,6 +29559,10 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
           }
         }
       },
@@ -29574,7 +29579,8 @@
           "startedAt",
           "completedAt",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "rowVersion"
         ],
         "properties": {
           "attemptNo": {
@@ -29620,6 +29626,10 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/Timestamp"
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
           }
         }
       },
@@ -29659,7 +29669,8 @@
           "attemptCount",
           "activeAttemptNo",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "etag"
         ],
         "properties": {
           "id": {
@@ -29715,6 +29726,9 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "etag": {
+            "type": "string"
           }
         }
       },
