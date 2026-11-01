@@ -19982,6 +19982,102 @@
           }
         }
       }
+    },
+    "/workspaces/{workspaceId}/actors": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "operationId": "listWorkspaceActors",
+        "summary": "List typed workspace actors or resolve a historical author",
+        "description": "Requires workspace:read and current active membership. Bounded discriminated human/agent catalog, ordered by name and identityId. Collections include active identities and memberships only; Codex additionally requires the active company employee record. Exact identityId lookup resolves inactive historical actors within this workspace unless eligible=true. Foreign references return an empty page. eligible is catalog eligibility only; owning assignment commands retain their authorization and lifecycle policy. Search matches name or human email. Cursors bind workspace, search, identityId and eligible; no service credentials, login, MFA or security metadata are exposed. Ordinary REST authentication rejects MCP bearer credentials.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "identityId",
+            "in": "query",
+            "description": "Resolve a workspace actor, including inactive historical records. Use eligible=true to require active selection eligibility.",
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120,
+              "default": ""
+            }
+          },
+          {
+            "name": "eligible",
+            "in": "query",
+            "description": "Require active identity, membership and (for Codex) employee, including for an exact identity lookup. Collections always apply this filter.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded typed actor page.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Next-Cursor": {
+                "$ref": "#/components/headers/XNextCursor"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActorCatalogEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -33786,6 +33882,22 @@
               "null"
             ],
             "description": "Stable identity of the event author; null for system or legacy events."
+          },
+          "actorKind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ],
+            "description": "Derived from the actual workspace identity, independently of actor label. Absent for legacy label-only events."
+          },
+          "actorProvider": {
+            "type": "string",
+            "const": "codex",
+            "description": "Present only for a verified Codex service identity."
+          },
+          "initiatedBy": {
+            "$ref": "#/components/schemas/ActivityInitiatedBy"
           }
         }
       },
@@ -38097,6 +38209,33 @@
               "string",
               "null"
             ]
+          },
+          "actorIdentityId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tenant journal actor resolved within the event workspace. Absent for platform audit events."
+          },
+          "actorKind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ],
+            "description": "Derived from the actual workspace identity, independently of actor label. Absent for legacy label-only events."
+          },
+          "actorProvider": {
+            "type": "string",
+            "const": "codex",
+            "description": "Present only for a verified Codex service identity."
+          },
+          "initiatedBy": {
+            "$ref": "#/components/schemas/ActivityInitiatedBy"
           }
         },
         "required": [
@@ -38107,7 +38246,8 @@
           "occurredAt",
           "requestId",
           "status"
-        ]
+        ],
+        "description": "Safe administration journal entry. Optional business-actor metadata and verified scoped human initiatedBy are available for tenant audit events. Platform audit events do not synthesize delegated attribution. Existing label-only history remains untyped."
       },
       "ManagedReauthentication": {
         "type": "object",
@@ -42732,6 +42872,128 @@
             }
           }
         }
+      },
+      "HumanCatalogActor": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "kind",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "identityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "kind": {
+            "type": "string",
+            "const": "human"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 320
+          }
+        }
+      },
+      "AgentCatalogActor": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "kind",
+          "provider",
+          "name",
+          "status"
+        ],
+        "properties": {
+          "identityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "kind": {
+            "type": "string",
+            "const": "agent"
+          },
+          "provider": {
+            "type": "string",
+            "const": "codex"
+          },
+          "name": {
+            "type": "string",
+            "const": "Codex"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          }
+        }
+      },
+      "CatalogActor": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/HumanCatalogActor"
+          },
+          {
+            "$ref": "#/components/schemas/AgentCatalogActor"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "human": "#/components/schemas/HumanCatalogActor",
+            "agent": "#/components/schemas/AgentCatalogActor"
+          }
+        }
+      },
+      "ActorCatalogEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CatalogActor"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
+      },
+      "ActivityInitiatedBy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "identityId",
+          "name"
+        ],
+        "properties": {
+          "identityId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "description": "Authenticated human initiator from verified audit attribution, resolved within the event workspace. No grant, token, command or security-version metadata."
       }
     }
   }

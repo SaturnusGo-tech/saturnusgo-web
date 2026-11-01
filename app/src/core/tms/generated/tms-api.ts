@@ -4892,6 +4892,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/actors": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List typed workspace actors or resolve a historical author
+         * @description Requires workspace:read and current active membership. Bounded discriminated human/agent catalog, ordered by name and identityId. Collections include active identities and memberships only; Codex additionally requires the active company employee record. Exact identityId lookup resolves inactive historical actors within this workspace unless eligible=true. Foreign references return an empty page. eligible is catalog eligibility only; owning assignment commands retain their authorization and lifecycle policy. Search matches name or human email. Cursors bind workspace, search, identityId and eligible; no service credentials, login, MFA or security metadata are exposed. Ordinary REST authentication rejects MCP bearer credentials.
+         */
+        get: operations["listWorkspaceActors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -7266,6 +7291,17 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             /** @description Stable identity of the event author; null for system or legacy events. */
             actorIdentityId?: string | null;
+            /**
+             * @description Derived from the actual workspace identity, independently of actor label. Absent for legacy label-only events.
+             * @enum {string}
+             */
+            actorKind?: "human" | "agent";
+            /**
+             * @description Present only for a verified Codex service identity.
+             * @constant
+             */
+            actorProvider?: "codex";
+            initiatedBy?: components["schemas"]["ActivityInitiatedBy"];
         };
         ActivityListEnvelope: {
             data: components["schemas"]["ActivityEvent"][];
@@ -8192,6 +8228,7 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
         } | null;
+        /** @description Safe administration journal entry. Optional business-actor metadata and verified scoped human initiatedBy are available for tenant audit events. Platform audit events do not synthesize delegated attribution. Existing label-only history remains untyped. */
         AdministrationEvent: {
             id: string;
             action: string;
@@ -8201,6 +8238,19 @@ export interface components {
             occurredAt: string;
             requestId: string;
             status: string | null;
+            /** @description Tenant journal actor resolved within the event workspace. Absent for platform audit events. */
+            actorIdentityId?: components["schemas"]["Identifier"] | null;
+            /**
+             * @description Derived from the actual workspace identity, independently of actor label. Absent for legacy label-only events.
+             * @enum {string}
+             */
+            actorKind?: "human" | "agent";
+            /**
+             * @description Present only for a verified Codex service identity.
+             * @constant
+             */
+            actorProvider?: "codex";
+            initiatedBy?: components["schemas"]["ActivityInitiatedBy"];
         };
         ManagedReauthentication: {
             currentPassword: string;
@@ -9185,6 +9235,40 @@ export interface components {
                 hasMore: boolean;
                 nextCursor: string | null;
             };
+        };
+        HumanCatalogActor: {
+            identityId: components["schemas"]["Identifier"];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "human";
+            name: string;
+            email: string | null;
+        };
+        AgentCatalogActor: {
+            identityId: components["schemas"]["Identifier"];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "agent";
+            /** @constant */
+            provider: "codex";
+            /** @constant */
+            name: "Codex";
+            /** @enum {string} */
+            status: "active" | "inactive";
+        };
+        CatalogActor: components["schemas"]["HumanCatalogActor"] | components["schemas"]["AgentCatalogActor"];
+        ActorCatalogEnvelope: {
+            data: components["schemas"]["CatalogActor"][];
+            meta: components["schemas"]["PageMeta"];
+        };
+        /** @description Authenticated human initiator from verified audit attribution, resolved within the event workspace. No grant, token, command or security-version metadata. */
+        ActivityInitiatedBy: {
+            identityId: components["schemas"]["Identifier"];
+            name: string;
         };
     };
     responses: {
@@ -20090,6 +20174,46 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listWorkspaceActors: {
+        parameters: {
+            query?: {
+                /** @description Resolve a workspace actor, including inactive historical records. Use eligible=true to require active selection eligibility. */
+                identityId?: components["schemas"]["Identifier"];
+                search?: string;
+                /** @description Require active identity, membership and (for Codex) employee, including for an exact identity lookup. Collections always apply this filter. */
+                eligible?: boolean;
+                cursor?: string;
+                /** @description Requested page size. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Bounded typed actor page. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Next-Cursor": components["headers"]["XNextCursor"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActorCatalogEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };
