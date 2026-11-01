@@ -6274,6 +6274,8 @@ export interface components {
             ownerIdentityId: components["schemas"]["Identifier"] | null;
             /** @description Tags of the linked run iteration; empty for standalone runs. */
             readonly tags: string[];
+            rowVersion: number;
+            etag: string;
         };
         RunCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -6295,6 +6297,14 @@ export interface components {
             platformBuilds?: components["schemas"]["RunPlatformBuildInput"][];
             /** @description Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors. */
             ownerIdentityId?: components["schemas"]["Identifier"] | null;
+            /** @description Optional exact reviewed revision map; validated under snapshot transaction locks. */
+            expectedCaseRevisions?: {
+                [key: string]: number;
+            };
+            /** @description Optional exact reviewed revision map; validated under snapshot transaction locks. */
+            expectedSharedStepRevisions?: {
+                [key: string]: number;
+            };
         } & (unknown | unknown);
         RunPatchRequest: {
             name?: string;

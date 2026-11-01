@@ -29083,7 +29083,9 @@
           "activeSince",
           "measuredAt",
           "ownerIdentityId",
-          "tags"
+          "tags",
+          "rowVersion",
+          "etag"
         ],
         "properties": {
           "id": {
@@ -29275,6 +29277,13 @@
             "maxItems": 20,
             "readOnly": true,
             "description": "Tags of the linked run iteration; empty for standalone runs."
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "etag": {
+            "type": "string"
           }
         }
       },
@@ -29362,6 +29371,24 @@
               }
             ],
             "description": "Responsible person for the run. Must be an active workspace member. Does not assign or reassign any run item. Omitted or null means no run owner; historical owners are never inferred from case executors."
+          },
+          "expectedCaseRevisions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxProperties": 10000,
+            "description": "Optional exact reviewed revision map; validated under snapshot transaction locks."
+          },
+          "expectedSharedStepRevisions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxProperties": 10000,
+            "description": "Optional exact reviewed revision map; validated under snapshot transaction locks."
           }
         },
         "oneOf": [
