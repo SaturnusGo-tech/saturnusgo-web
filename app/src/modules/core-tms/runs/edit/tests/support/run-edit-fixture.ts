@@ -4,7 +4,7 @@ import type { RunEditResource, RunEditPort, RunMetadataPatch } from "../../model
 import { createRunEditStore } from "../../application/run-edit-store";
 import { buildClient } from "../../../builds/tests/support/build-fixture";
 const time = "2026-09-27T00:00:00Z";
-export const runDto: components["schemas"]["Run"] = { id: "run-a", projectId: "project-a", key: "QA-TR-1", name: "Release run",
+export const runDto: components["schemas"]["Run"] = { rowVersion: 3, etag: '"run:run-a:3"', id: "run-a", projectId: "project-a", key: "QA-TR-1", name: "Release run",
   description: "Original notes", tags: ["mobile"], ownerIdentityId: "person-a", type: "smoke", status: "active",
   environment: { id: null, key: "", name: "", baseUrl: "", variableKeys: [] }, suiteId: null, suiteResolutionId: null,
   build: "", platformBuilds: [{ platform: "android", attachmentId: "existing-build", fileName: "release.apk", byteSize: 3, version: "1.0" },

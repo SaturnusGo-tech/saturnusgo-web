@@ -6,7 +6,7 @@ export const time = "2026-09-07T00:00:00Z";
 export const run: TestRunSummary = { ...input.run, status: "active", startedAt: time };
 export function item(): RunItem {
   const value = mapRunItem({
-    id: "item-1", caseId: "case-1", caseKey: "QA-TC-1", revision: 1,
+    etag: '"item-1:1"', id: "item-1", caseId: "case-1", caseKey: "QA-TC-1", revision: 1,
     assigneeIdentityId: null, status: "in_progress", attemptCount: 2, activeAttemptNo: 2,
     createdAt: time, updatedAt: time,
     snapshot: { customFields: [], productGroupId: null, productId: null, regression: false, revision: 1, title: "Verify immutable source", description: "", preconditions: "",
@@ -14,9 +14,9 @@ export function item(): RunItem {
       ownerIdentityId: null, tags: [], estimatedMinutes: null, testData: "",
       steps: [{ id: "step-1", order: 1, action: "Inspect source", expectedResult: "SHA matches", required: true, attachmentIds: [], sharedStepId: null, sharedStep: null }],
       checklist: [], attachmentIds: [], changeNote: "Created", createdBy: "identity-1", createdAt: time },
-    activeAttempt: { attemptNo: 2, status: "in_progress", actualResult: "", comment: "",
+    activeAttempt: { rowVersion: 1, attemptNo: 2, status: "in_progress", actualResult: "", comment: "",
       blockedReason: "", attachmentIds: [], startedAt: time, completedAt: null,
-      createdAt: time, updatedAt: time, stepResults: [{ stepId: "step-1", status: "passed",
+      createdAt: time, updatedAt: time, stepResults: [{ rowVersion: 1, stepId: "step-1", status: "passed",
         actualResult: "", comment: "", attachmentIds: [], updatedAt: time }] },
   });
   value.attempts.push({ ...structuredClone(value.attempts[0]!), attemptNo: 1,

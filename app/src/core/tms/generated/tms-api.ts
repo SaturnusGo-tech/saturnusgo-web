@@ -8580,6 +8580,7 @@ export interface components {
             ownerIdentityId: components["schemas"]["Identifier"] | null;
             /** @description Tags of the linked run iteration; empty for standalone runs. */
             readonly tags: string[];
+            etag: string;
         };
         RunBatch: {
             id: components["schemas"]["Identifier"];

@@ -39532,7 +39532,8 @@
           "measuredAt",
           "rowVersion",
           "ownerIdentityId",
-          "tags"
+          "tags",
+          "etag"
         ],
         "properties": {
           "id": {
@@ -39728,6 +39729,9 @@
             "maxItems": 20,
             "readOnly": true,
             "description": "Tags of the linked run iteration; empty for standalone runs."
+          },
+          "etag": {
+            "type": "string"
           }
         }
       },

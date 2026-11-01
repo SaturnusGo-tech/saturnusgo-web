@@ -11,12 +11,12 @@ import { mapRunItem } from "../data/run-mapper";
 type Api = components["schemas"];
 const time = "2026-08-28T00:00:00.000Z";
 const attempt: Api["RunAttempt"] = {
-  attemptNo: 2, status: "not_run", actualResult: "", comment: "", blockedReason: "",
+  rowVersion: 1, attemptNo: 2, status: "not_run", actualResult: "", comment: "", blockedReason: "",
   attachmentIds: [], startedAt: null, completedAt: null, createdAt: time, updatedAt: time,
   stepResults: [],
 };
 const item: Api["RunItem"] = {
-  id: "item-1", caseId: "case-1", caseKey: "TMS-TC-1", revision: 2,
+  etag: '"item-1:1"', id: "item-1", caseId: "case-1", caseKey: "TMS-TC-1", revision: 2,
   assigneeIdentityId: null, status: "not_run", attemptCount: 2, activeAttemptNo: 2,
   createdAt: time, updatedAt: time,
   snapshot: { customFields: [], productGroupId: null, productId: null, regression: false,
@@ -28,7 +28,7 @@ const item: Api["RunItem"] = {
   activeAttempt: attempt,
 };
 const run: Api["Run"] = {
-  ownerIdentityId: null, tags: [], id: "run-1", projectId: "project-1", key: "TMS-TR-1", name: "Smoke", description: "",
+  rowVersion: 1, etag: '"run-1:1"', ownerIdentityId: null, tags: [], id: "run-1", projectId: "project-1", key: "TMS-TR-1", name: "Smoke", description: "",
   type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
   environment: { id: "env-1", key: "LOCAL", name: "Local", baseUrl: "https://example.test", variableKeys: [] },
   suiteId: null, suiteResolutionId: null, build: "42", configuration: {}, itemCount: 1,
@@ -189,7 +189,7 @@ test("chains step PATCH mutations with the returned ETag and distinct keys", asy
         attemptNo: 2, result } }), { status: 200, headers: { etag: `"item-1:${version}"` } });
     }) as typeof fetch });
   const current = mapRunItem({ ...item, activeAttempt: { ...attempt, stepResults: [
-    { stepId: "step-1", status: "not_run", actualResult: "", comment: "", attachmentIds: [], updatedAt: time },
+    { rowVersion: 1, stepId: "step-1", status: "not_run", actualResult: "", comment: "", attachmentIds: [], updatedAt: time },
   ] } });
   const passed = await updateRunStep(http, "run-1", "item-1", "step-1", { status: "passed" }, current, '"item-1:1"', "step-pass-key");
   const failed = await updateRunStep(http, "run-1", "item-1", "step-1", { status: "failed", actualResult: "Mismatch" }, passed.data, passed.etag!, "step-fail-key");

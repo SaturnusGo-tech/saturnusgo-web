@@ -9,12 +9,12 @@ import { archiveRun, mutateRunWithEtagRecovery, transitionRun, updateRunItem } f
 type Api = components["schemas"];
 const time = "2026-08-29T00:00:00.000Z";
 const attempt: Api["RunAttempt"] = {
-  attemptNo: 1, status: "not_run", actualResult: "", comment: "", blockedReason: "",
+  rowVersion: 1, attemptNo: 1, status: "not_run", actualResult: "", comment: "", blockedReason: "",
   attachmentIds: [], startedAt: null, completedAt: null, createdAt: time, updatedAt: time,
   stepResults: [],
 };
 const item: Api["RunItem"] = {
-  id: "item-1", caseId: "case-1", caseKey: "TMS-TC-1", revision: 1,
+  etag: '"item-1:1"', id: "item-1", caseId: "case-1", caseKey: "TMS-TC-1", revision: 1,
   assigneeIdentityId: null, status: "not_run", attemptCount: 1, activeAttemptNo: 1,
   createdAt: time, updatedAt: time,
   snapshot: { customFields: [], productGroupId: null, productId: null, regression: false, revision: 1, title: "Checkout", description: "", preconditions: "",
@@ -25,7 +25,7 @@ const item: Api["RunItem"] = {
   activeAttempt: attempt,
 };
 const run: Api["Run"] = {
-  ownerIdentityId: null, tags: [],
+  rowVersion: 1, etag: '"run-1:1"', ownerIdentityId: null, tags: [],
   id: "run-1", projectId: "project-1", key: "TMS-TR-1", name: "Smoke", description: "",
   type: "smoke", status: "active", elapsedMilliseconds: 0, activeSince: "2026-09-11T00:00:00.000Z", measuredAt: "2026-09-11T00:00:00.000Z",
   environment: { id: "env-1", key: "QA", name: "QA", baseUrl: "https://qa.test", variableKeys: [] },
