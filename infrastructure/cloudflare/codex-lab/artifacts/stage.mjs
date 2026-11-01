@@ -36,6 +36,10 @@ export async function stageAssets(sourceDirectory, releaseDirectory, sourceSha) 
       if (!path.startsWith("falcon/landing/")) mapping.set(path, path);
     }
   }
+  for (const theme of ["light", "dark"]) {
+    const path = `assets/integrations/codex/codex-${theme}.png`;
+    mapping.set(path, path);
+  }
   mapping.set("favicon.ico", "favicon.ico");
   const entries = [];
   for (const [source, target] of mapping) {

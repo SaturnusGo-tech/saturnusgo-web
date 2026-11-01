@@ -20,6 +20,7 @@ export const publicRoutes = Object.freeze([
 
 export const publicAssetPrefixes = Object.freeze([
   "/_next/",
+  "/assets/integrations/codex/",
   "/falcon/",
 ]);
 

@@ -30,3 +30,20 @@ test("an isolated asset miss stays local instead of falling back to production",
   assert.equal(response.status, 404);
   assert.equal(await response.text(), "Not found");
 });
+
+test("Codex marks are allowed without exposing unrelated assets", async () => {
+  const served = [];
+  const env = { FALCON_MANAGED_AUTH_ENABLED: "true", FALCON_COMPANY_DOMAIN_SUFFIX: "saturnusgo.com",
+    FALCON_PLATFORM_HOSTNAME: "codex-lab-admin.saturnusgo.com", FALCON_STATIC_ASSETS: { fetch: async (request) => {
+    served.push(new URL(request.url).pathname);
+    return new Response("png", { headers: { "content-type": "image/png" } });
+  } } };
+  for (const theme of ["light", "dark"]) {
+    const path = `/assets/integrations/codex/codex-${theme}.png`;
+    assert.equal((await worker.fetch(new Request(`https://codex-lab-falcon.saturnusgo.com${path}`), env)).status, 200);
+  }
+  for (const path of ["/assets/private.png", "/assets/integrations/other/logo.png", "/tms-origin/assets/integrations/codex/codex-light.png"]) {
+    assert.equal((await worker.fetch(new Request(`https://codex-lab-falcon.saturnusgo.com${path}`), env)).status, 404);
+  }
+  assert.deepEqual(served, ["/assets/integrations/codex/codex-light.png", "/assets/integrations/codex/codex-dark.png"]);
+});
