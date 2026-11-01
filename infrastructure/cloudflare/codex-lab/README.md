@@ -25,6 +25,8 @@ The shared Worker optionally accepts `FALCON_STATIC_ASSETS`. The production conf
 bind it and keeps using its current static origin. The lab binds it with `run_worker_first=true`,
 `html_handling=none` and `not_found_handling=none`; this preserves the existing explicit route map
 and prevents static hosting from bypassing document authentication or returning an SPA fallback.
+The lab maps the canonical TMS work directory to its explicit `index.html` object before fetching
+the exact-file asset binding; the production Pages origin retains its existing directory request.
 
 ## Prepare and publish
 

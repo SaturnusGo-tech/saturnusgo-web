@@ -177,6 +177,7 @@ function publicPathForOrigin(pathname) {
 
 async function proxyToPublicSite(request, incoming, originPath, managed = false, env) {
   const upstream = new URL(originPath + incoming.search, SOURCE_ORIGIN);
+  if (env?.FALCON_STATIC_ASSETS && upstream.pathname === APP_PATH) upstream.pathname += "index.html";
   if (incoming.pathname.startsWith(APP_PATH)) {
     for (const parameter of AUTH_CALLBACK_PARAMETERS) upstream.searchParams.delete(parameter);
   }
