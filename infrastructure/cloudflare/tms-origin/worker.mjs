@@ -13,6 +13,7 @@ import { serveDocsAudio } from "./audio/response.mjs";
 import { companyHost } from "./gateway/company-host.mjs";
 import { proxyCompanyApi } from "./gateway/proxy-company-api.mjs";
 import { verifyCompanyDocument, unavailableCompanyDocument } from "./gateway/company-document.mjs";
+import { readConsentPolicy } from "./gateway/protocol/security/read-consent-policy.mjs";
 
 const APP_PATH_NO_SLASH = APP_PATH.slice(0, -1);
 const FORWARDED_HEADERS = [
@@ -76,7 +77,7 @@ function redirectToCanonicalPath(url, pathname) {
   return secureResponse(Response.redirect(url.toString(), 302));
 }
 
-function secureResponse(response, managed = false) {
+function secureResponse(response, managed = false, consentPolicy = null) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
   if (managed) {
@@ -84,6 +85,10 @@ function secureResponse(response, managed = false) {
       "https://api.tms.saturnusgo.com https://dev-4v1srvqwzp1m7cdl.us.auth0.com ", ""));
     headers.set("referrer-policy", "same-origin");
     headers.set("x-robots-tag", "noindex, nofollow");
+  }
+  if (consentPolicy) {
+    headers.set("content-security-policy", consentPolicy);
+    headers.set("referrer-policy", "no-referrer");
   }
   return new Response(response.body, {
     status: response.status,
@@ -241,11 +246,21 @@ export default {
     if (incoming.pathname.includes("%") || incoming.pathname.includes("\\")) {
       return notFoundResponse();
     }
+    const metadataPath = incoming.pathname === "/.well-known/oauth-authorization-server/api/v1/falcon-oauth"
+      ? "/api/v1/falcon-oauth/.well-known/openid-configuration"
+      : incoming.pathname === "/.well-known/oauth-protected-resource/api/v1/mcp" ? "/api/v1/mcp/resource-metadata" : null;
+    if (metadataPath) {
+      if (audience !== "tenant" || !["GET", "HEAD"].includes(request.method)) return notFoundResponse();
+      const target = new URL(request.url); target.pathname = metadataPath;
+      return secureResponse(await proxyCompanyApi(new Request(target, request), env, audience), true);
+    }
     if (incoming.pathname === "/api/falcon-demo/request") {
       return incoming.hostname === TMS_HOST ? secureResponse(await proxyDemo(request, env)) : notFoundResponse();
     }
     if (incoming.pathname.startsWith("/api/v1/")) {
-      return audience ? secureResponse(await proxyCompanyApi(request, env, audience), true) : notFoundResponse();
+      if (!audience) return notFoundResponse();
+      const response = await proxyCompanyApi(request, env, audience);
+      return secureResponse(response, true, readConsentPolicy(request, response, audience));
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
       return secureResponse(await serveDocsAudio(request, env?.DOCS_AUDIO));

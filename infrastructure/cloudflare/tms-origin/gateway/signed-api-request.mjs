@@ -1,3 +1,5 @@
+import { protocolRoutePolicy } from "./protocol/route-policy.mjs";
+
 const MAXIMUM_BODY_BYTES = 2 * 1024 * 1024;
 const HEX_KEY = /^[a-f0-9]{64}$/;
 const encoder = new TextEncoder();
@@ -33,6 +35,7 @@ async function readBody(request, maximumBytes) {
 
 export async function signedApiRequest(request, env, audience) {
   const incoming = new URL(request.url);
+  const protocol = protocolRoutePolicy(incoming.pathname, audience);
   const dictation = request.method === "POST" &&
     /^\/api\/v1\/workspaces\/[A-Za-z0-9_-]{1,160}\/ai\/(?:dictation|documentation-dictation)$/.test(incoming.pathname);
   if (!HEX_KEY.test(env.FALCON_MANAGED_GATEWAY_KEY ?? "")) throw new GatewayRequestError(503, "GATEWAY_UNAVAILABLE");
@@ -43,14 +46,19 @@ export async function signedApiRequest(request, env, audience) {
     throw new GatewayRequestError(405, "METHOD_NOT_ALLOWED");
   }
   const origin = request.headers.get("origin") ?? "";
-  if (!["GET", "HEAD"].includes(request.method) && origin !== incoming.origin) {
+  if (!["GET", "HEAD"].includes(request.method) && origin !== incoming.origin &&
+    !(origin === "" && request.method === "POST" && protocol?.allowServerPost)) {
     throw new GatewayRequestError(403, "ORIGIN_DENIED");
   }
   const cookieName = audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
   const cookie = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim())
-    .filter((part) => part.startsWith(`${cookieName}=`)).join("; ");
+    .filter((part) => part.startsWith(`${cookieName}=`) ||
+      protocol?.cookieNames.includes(part.slice(0, part.indexOf("=")))).join("; ");
   const headers = new Headers();
   for (const name of ["accept", "content-type", "user-agent", "if-match", "idempotency-key", "range"]) {
+    const value = request.headers.get(name); if (value) headers.set(name, value);
+  }
+  if (protocol?.kind === "mcp") for (const name of ["authorization", "mcp-protocol-version", "mcp-session-id", "last-event-id"]) {
     const value = request.headers.get(name); if (value) headers.set(name, value);
   }
   const requestId = request.headers.get("x-request-id") ?? "";
@@ -61,11 +69,14 @@ export async function signedApiRequest(request, env, audience) {
   const timestamp = String(Date.now());
   const clientIp = request.headers.get("cf-connecting-ip") ?? "";
   const body = await readBody(request, dictation ? 12_810_000 : MAXIMUM_BODY_BYTES);
-  const canonical = JSON.stringify(["falcon-gateway-v1", request.method, incoming.pathname + incoming.search,
-    incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)]);
+  const fields = [protocol?.kind === "mcp" ? "falcon-gateway-v2" : "falcon-gateway-v1", request.method,
+    incoming.pathname + incoming.search, incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)];
+  if (protocol?.kind === "mcp") fields.push(await digest(headers.get("authorization") ?? ""));
+  const canonical = JSON.stringify(fields);
   const key = await crypto.subtle.importKey("raw", Uint8Array.from(env.FALCON_MANAGED_GATEWAY_KEY.match(/../g),
     (pair) => parseInt(pair, 16)), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  headers.set("x-falcon-signature", hex(await crypto.subtle.sign("HMAC", key, encoder.encode(canonical))));
+  const signature = hex(await crypto.subtle.sign("HMAC", key, encoder.encode(canonical)));
+  headers.set("x-falcon-signature", protocol?.kind === "mcp" ? `v2:${signature}` : signature);
   headers.set("x-falcon-time", timestamp);
   headers.set("x-falcon-host", incoming.hostname);
   headers.set("x-falcon-client-ip", clientIp);

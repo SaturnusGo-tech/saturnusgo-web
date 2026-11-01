@@ -19513,6 +19513,183 @@
           "$ref": "#/components/parameters/XRequestId"
         }
       ]
+    },
+    "/profile/mcp-connections": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listOwnFalconMcpConnections",
+        "summary": "List own Codex connections",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "description": "Uses the existing fully authenticated managed company session and verified company gateway. Lists only grants belonging to the current identity and company, including revoked and expired grants. No caller identity or workspace selector is accepted. Grant IDs are connection identifiers, not bearer credentials; session IDs, identity IDs, security versions, tokens and encrypted provider state are never returned.",
+        "x-tms-pagination": "cursor",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Own connection page",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Next-Cursor": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Present only when a further page exists."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/FalconMcpConnection"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "nextCursor"
+                      ],
+                      "properties": {
+                        "nextCursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 256
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/profile/mcp-connections/{grantId}/revoke": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "grantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        },
+        {
+          "name": "Origin",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Must exactly equal the verified company HTTPS origin; absent and foreign origins are rejected."
+        }
+      ],
+      "post": {
+        "operationId": "revokeOwnFalconMcpConnection",
+        "summary": "Revoke an own Codex connection",
+        "tags": [
+          "Managed profile"
+        ],
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "x-tms-idempotency": "not-applicable",
+        "responses": {
+          "204": {
+            "description": "Connection revoked or already unavailable to this identity",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -41682,6 +41859,62 @@
             }
           }
         ]
+      },
+      "FalconMcpConnection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectIds",
+          "scopes",
+          "createdAt",
+          "expiresAt",
+          "revokedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "projectIds": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "scopes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "string",
+              "enum": [
+                "falcon:read",
+                "falcon:cases:create",
+                "falcon:runs:create"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "revokedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
       }
     }
   }

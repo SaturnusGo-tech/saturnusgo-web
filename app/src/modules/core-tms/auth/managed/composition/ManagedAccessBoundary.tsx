@@ -7,6 +7,7 @@ import { useManagedAccess } from "../application/useManagedAccess";
 import { ManagedAccessScreen } from "../presentation/screen/ManagedAccessScreen";
 import type { SignedInCompanySession } from "../domain/managed-access";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
+import { ManagedOAuthResume } from "../oauth/ManagedOAuthResume";
 
 export function ManagedAccessBoundary({ children }: {
   readonly children: (session: SignedInCompanySession, logout: () => Promise<void>) => ReactNode;
@@ -17,5 +18,6 @@ export function ManagedAccessBoundary({ children }: {
   if (!access.state.session?.authenticated || access.state.recoveryCodes.length > 0) {
     return <ManagedAccessScreen access={access} />;
   }
-  return children(access.state.session, access.logout);
+  const content = children(access.state.session, access.logout);
+  return access.state.session.audience === "tenant" ? <ManagedOAuthResume>{content}</ManagedOAuthResume> : content;
 }
