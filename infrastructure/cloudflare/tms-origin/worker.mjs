@@ -88,7 +88,7 @@ function secureResponse(response, managed = false, consentPolicy = null) {
   }
   if (consentPolicy) {
     headers.set("content-security-policy", consentPolicy);
-    headers.set("referrer-policy", "no-referrer");
+    headers.set("referrer-policy", "same-origin");
   }
   return new Response(response.body, {
     status: response.status,

@@ -17,7 +17,7 @@ test("company gateway and worker preserve the exact restrictive OAuth consent ca
   const result = await worker.fetch(new Request(`https://${host}/api/v1/falcon-oauth/interaction/validated-id`), env);
   assert.equal(result.status, 200);
   assert.equal(result.headers.get("content-security-policy"), strictPolicy);
-  assert.equal(result.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(result.headers.get("referrer-policy"), "same-origin");
   assert.equal(result.headers.get("x-frame-options"), "DENY");
 });
 
