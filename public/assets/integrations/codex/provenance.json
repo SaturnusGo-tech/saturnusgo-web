@@ -1,0 +1,30 @@
+{
+  "sourceKind": "official installed OpenAI application resources",
+  "bundleIdentifier": "com.openai.codex",
+  "bundleVersion": "22943",
+  "bundleShortVersion": "26.1027.30824",
+  "signingTeam": "2DC432GLL2",
+  "signingAuthority": "Developer ID Application: OpenAI OpCo, LLC",
+  "assets": [
+    {
+      "source": "/Applications/ChatGPT.app/Contents/Resources/icon-codex-light.png",
+      "file": "codex-light.png",
+      "sha256": "de7d43f3386105ab20952958c2c25beb0d903e2aeb6e1aef57c49a648c0d1c07",
+      "transformation": "none; exact original bytes"
+    },
+    {
+      "source": "/Applications/ChatGPT.app/Contents/Resources/icon-codex-dark-color.png",
+      "file": "codex-dark.png",
+      "sha256": "69fb4384e161be8a20dcb94a9ac34aea4fbfaeb67514110a71e7b0732eccb0fc",
+      "transformation": "none; exact original bytes"
+    }
+  ],
+  "usageContext": "Codex integration/service actor avatar; Falcon remains product brand",
+  "guidelines": "https://openai.com/brand/",
+  "reviewNote": "Original light/dark app icons visually inspected. Keep unchanged; source signature validation result recorded separately.",
+  "signatureVerification": {
+    "command": "codesign --verify --strict --verbose=1 /Applications/ChatGPT.app",
+    "exitCode": 0,
+    "result": "valid on disk; satisfies Designated Requirement"
+  }
+}

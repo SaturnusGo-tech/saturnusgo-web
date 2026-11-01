@@ -1,0 +1,3 @@
+import type { components } from "../../../../../core/tms/generated/tms-api";
+export const status: components["schemas"]["CodexEmployeeStatus"] = { provider: "codex", status: "active", identityId: "agent", rowVersion: 3, securityVersion: 7, capacity: { occupied: 10, limit: 10 }, canActivate: false, canDeactivate: true, canConnect: true, connectUrl: "https://chatgpt.com/plugins/plugins_6ae71c46213c8191a222c90ec7999ed3" };
+export const connection: components["schemas"]["FalconMcpConnection"] = { id: "grant-1", projectIds: ["project"], scopes: ["falcon:read"], createdAt: "2026-11-01T00:00:00Z", expiresAt: "2026-11-08T00:00:00Z", revokedAt: null };

@@ -16,6 +16,7 @@ function ActivityEntry({ event, locale, subjectName }: { event: AdministrationEv
       {event.actorName !== subjectName && <p className={styles.actor}>{event.actorName}</p>}
       <details className={styles.details}><summary aria-label={`${ru ? "Подробности" : "Details"}: ${view.title}`}><ChevronDown size={12} />{ru ? "Подробности" : "Details"}</summary>
         <dl><dt>{ru ? "Событие" : "Event"}</dt><dd>{event.action}</dd>
+          {event.initiatedBy && <><dt>{ru ? "Инициатор" : "Initiated by"}</dt><dd>{event.initiatedBy.name}</dd></>}
           <dt>{ru ? "Объект" : "Object"}</dt><dd>{event.targetName}</dd>
           <dt>{ru ? "Номер записи" : "Record ID"}</dt><dd>{event.id}</dd>
           <dt>{ru ? "Номер запроса" : "Request ID"}</dt><dd>{event.requestId}</dd>

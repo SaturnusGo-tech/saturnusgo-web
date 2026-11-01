@@ -41,3 +41,5 @@
 @media(max-width:1400px) { .workspace { grid-template-columns:300px minmax(0,1fr); } .avatar { width:40px; height:40px; } .heading { padding:24px 18px; } .search { margin:0 18px 18px; } .heading h1 { font-size:23px; } }
 @media(max-width:1050px) { .workspace { display:block; position:relative; } .directory { height:100%; border:0; } .detailHost { position:absolute; inset:0; pointer-events:none; background:transparent; } .placeholder { display:none; } .panel { pointer-events:auto; } }
 @media(prefers-reduced-motion:reduce) { .skeletons { animation:none; } }
+
+.employeeManagement { width:min(500px,90%); text-align:left; }

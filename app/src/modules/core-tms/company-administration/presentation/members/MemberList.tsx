@@ -3,7 +3,7 @@
 import type { SignedInCompanySession } from "../../../auth/managed/domain/managed-access";
 import type { MemberChange } from "../../domain/administration";
 import { Plus, Search, UserRoundPlus } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { useAdministrationList } from "../../application/list/useAdministrationList";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -12,8 +12,8 @@ import { ResourceState } from "../common/ResourceState";
 import { MemberDirectoryRow } from "../directory/MemberDirectoryRow";
 import styles from "../directory/directory.module.css";
 
-export function MemberList({ client, session, onAction, onOpen, onCreate, selectedId, creating, version, disabled }: {
-  readonly session: SignedInCompanySession; readonly onAction: (id: string, change: MemberChange | "edit") => void;
+export function MemberList({ client, session, onAction, onOpen, onCreate, selectedId, creating, version, disabled, employeeRow }: {
+  readonly employeeRow?: ReactNode; readonly session: SignedInCompanySession; readonly onAction: (id: string, change: MemberChange | "edit") => void;
   readonly client: AdministrationPort; readonly onOpen: (id: string) => void; readonly onCreate: () => void;
   readonly selectedId: string | null; readonly creating: boolean; readonly version: number; readonly disabled: boolean;
 }) {
@@ -36,6 +36,7 @@ export function MemberList({ client, session, onAction, onOpen, onCreate, select
     <label className={styles.search}><Search size={19} strokeWidth={1.6} /><input type="search" aria-label={copy.memberSearch}
       placeholder={copy.memberSearch} value={list.search} maxLength={200} onChange={(event) => list.setSearch(event.target.value)} /></label>
     <div className={styles.people} aria-busy={list.loading}>
+      {employeeRow}
       {list.loading ? <div className={styles.skeletons} aria-label={locale === "ru" ? "Загрузка сотрудников" : "Loading people"}>
         {[0, 1, 2].map((item) => <div className={styles.skeletonRow} key={item}><i /><span /><span /></div>)}
       </div> : list.items.map((member) => <MemberDirectoryRow key={member.identityId} member={member} client={client}

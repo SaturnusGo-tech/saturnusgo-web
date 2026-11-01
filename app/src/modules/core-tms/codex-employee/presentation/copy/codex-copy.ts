@@ -1,0 +1,21 @@
+export const codexCopy = (locale: "en" | "ru") => locale === "ru" ? {
+    title: "Codex", personal: "Моё подключение Codex", management: "Codex в компании", connect: "Подключить Codex", activate: "Активировать Codex",
+    disable: "Отключить для компании", revoke: "Отозвать подключение", refresh: "Обновить", loading: "Загрузка Codex…", retry: "Повторить",
+    active: "Активен", inactive: "Неактивен", not_activated: "Не активирован", seat: "1 место в компании", seats: "Занято мест",
+    explanation: "Один сотрудник Codex занимает одно оплачиваемое место во всей компании. Личные подключения не добавляют сотрудников или мест.",
+    full: "Лимит мест исчерпан. Администратор может освободить место или изменить квоту; покупка автоматически не выполняется.",
+    unavailable: "Подключение доступно, когда интеграция активна и у вас есть права QA. Обратитесь к администратору.",
+    empty: "Личных подключений пока нет.", own: "Подключения текущего аккаунта", expires: "Истекает", revoked: "Отозвано", projects: "Проектов", error: "Не удалось загрузить Codex. Повторите запрос.",
+    quota: "Лимит мест исчерпан. Обновите данные и обратитесь к администратору.", permissions: "Доступ изменился. Обновите данные или обратитесь к администратору.",
+    connectNote: "Откроется Falcon в ChatGPT. Подтвердите доступ своим аккаунтом компании. Только ваши текущие права; назначение Codex само по себе не запускает QA.",
+} : {
+    title: "Codex", personal: "My Codex connection", management: "Company Codex", connect: "Connect Codex", activate: "Activate Codex",
+    disable: "Disable for company", revoke: "Revoke connection", refresh: "Refresh", loading: "Loading Codex…", retry: "Retry",
+    active: "Active", inactive: "Inactive", not_activated: "Not activated", seat: "1 company seat", seats: "Occupied seats",
+    explanation: "One Codex employee occupies one billable seat across the company. Personal connections do not add employees or seats.",
+    full: "The seat quota is full. An administrator can free a seat or change the quota; no purchase happens automatically.",
+    unavailable: "Connect when the integration is active and you have QA access. Contact your administrator.",
+    empty: "No personal connections yet.", own: "Connections for this account", expires: "Expires", revoked: "Revoked", projects: "Projects", error: "Codex could not be loaded. Please retry.",
+    quota: "The seat quota is full. Refresh and contact your administrator.", permissions: "Access changed. Refresh or contact your administrator.",
+    connectNote: "Opens Falcon in ChatGPT. Confirm access with your company account. Your current rights apply; assigning Codex does not start QA.",
+};

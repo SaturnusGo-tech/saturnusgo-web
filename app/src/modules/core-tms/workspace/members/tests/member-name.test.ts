@@ -8,7 +8,7 @@ function deferredDirectory() {
   const http = { get: (path: string, signal: AbortSignal) => new Promise((resolve) => pending.push({ path, signal, resolve })) } as unknown as TmsHttpClient;
   return { http, pending };
 }
-const directory = { data: [{ identityId: "member-1", displayName: "Alex", email: null }], meta: { limit: 100, hasMore: false, nextCursor: null } };
+const directory = { data: [{ identityId: "member-1", kind: "human", name: "Alex", email: null }], meta: { limit: 100, hasMore: false, nextCursor: null } };
 
 test("repeated responsible labels share a request and one unmount cannot cancel another row", async () => {
   const { http, pending } = deferredDirectory();

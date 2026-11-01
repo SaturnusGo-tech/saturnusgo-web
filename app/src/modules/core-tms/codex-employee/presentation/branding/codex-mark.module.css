@@ -1,0 +1,5 @@
+.mark { display:inline-grid; width:32px; height:32px; flex-shrink:0; vertical-align:middle; }
+.mark img { grid-area:1 / 1; width:100%; height:100%; object-fit:contain; }
+.dark { display:none; }
+:global(.dark) .light { display:none; }
+:global(.dark) .dark { display:block; }

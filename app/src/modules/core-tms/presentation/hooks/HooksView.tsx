@@ -1,4 +1,5 @@
 "use client";
+import { CodexManagementFeature } from "./codex/CodexManagementFeature";
 
 import { ApiSourceManager } from "../../api-sources/presentation/ApiSourceManager";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
@@ -89,6 +90,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   }
   return (
     <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
+      {session?.kind === "managed" && <CodexManagementFeature />}
       <IntegrationCatalog
         russian={russian}
         copy={hooksCopy(russian)}

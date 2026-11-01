@@ -1,3 +1,4 @@
+import { ExecutionHistoryFeature } from "../../codex-employee/execution-history/composition/ExecutionHistoryFeature";
 import { ScenarioLayoutToggle } from "../common/scenario/ScenarioLayoutToggle";
 import { useScenarioLayout } from "../common/scenario/useScenarioLayout";
 import { CaseCustomFields } from "../cases/inspector/fields/CaseCustomFields";
@@ -107,6 +108,7 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
         <div className={`${runStyles.overviewLayout} ${focusStyles.overview}`} data-properties-open={propertiesOpen}>
           <div className={`${runStyles.primaryColumn} ${focusStyles.primary}`}>
             {verificationContext}
+            <ExecutionHistoryFeature key={`${selectedRun.id}:${selectedItem.id}`} scope={{workspaceId,projectId:selectedRun.projectId,runId:selectedRun.id,itemId:selectedItem.id}} attemptNo={attempt.attemptNo} version={selectedItem.rowVersion} steps={executionEntries} offline={offline} />
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
               <MarkdownField value={selectedItem.snapshot.description ?? ""} label={locale === "ru" ? "Описание" : "Description"} emptyLabel={locale === "ru" ? "Описание не указано." : "No description."} allowAttachments={false} />
