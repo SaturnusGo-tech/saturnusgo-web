@@ -175,7 +175,7 @@ function publicPathForOrigin(pathname) {
     : route.publicPath;
 }
 
-async function proxyToPublicSite(request, incoming, originPath, managed = false) {
+async function proxyToPublicSite(request, incoming, originPath, managed = false, env) {
   const upstream = new URL(originPath + incoming.search, SOURCE_ORIGIN);
   if (incoming.pathname.startsWith(APP_PATH)) {
     for (const parameter of AUTH_CALLBACK_PARAMETERS) upstream.searchParams.delete(parameter);
@@ -186,11 +186,14 @@ async function proxyToPublicSite(request, incoming, originPath, managed = false)
     if (value && !(managed && ["if-modified-since", "if-none-match"].includes(name))) headers.set(name, value);
   }
 
-  const upstreamResponse = await fetch(new Request(upstream.toString(), {
+  const upstreamRequest = new Request(upstream.toString(), {
     method: request.method,
     headers,
     redirect: "manual",
-  }));
+  });
+  const upstreamResponse = env?.FALCON_STATIC_ASSETS
+    ? await env.FALCON_STATIC_ASSETS.fetch(upstreamRequest)
+    : await fetch(upstreamRequest);
   const responseHeaders = new Headers(upstreamResponse.headers);
   if ((incoming.pathname === APP_PATH || routeForRequestPath(incoming.pathname)) &&
       !['/', '/ru/', '/privacy/'].includes(incoming.pathname)) responseHeaders.set('x-robots-tag','noindex, nofollow');
@@ -285,6 +288,6 @@ export default {
     if (canonicalPath) return redirectToCanonicalPath(incoming, canonicalPath);
     const originPath = originPathFor(incoming.pathname);
     if (!originPath) return notFoundResponse();
-    return proxyToPublicSite(request, incoming, originPath, Boolean(audience && documentRequest));
+    return proxyToPublicSite(request, incoming, originPath, Boolean(audience && documentRequest), env);
   },
 };

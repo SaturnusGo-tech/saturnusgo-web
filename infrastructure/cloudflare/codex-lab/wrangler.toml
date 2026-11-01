@@ -1,0 +1,27 @@
+name = "falcon-codex-lab"
+account_id = "4b485e3b82c9e0b429aa9aa753c250a7"
+main = "../tms-origin/worker.mjs"
+compatibility_date = "2026-08-28"
+workers_dev = false
+preview_urls = false
+
+routes = [
+  { pattern = "codex-lab-falcon.saturnusgo.com", custom_domain = true },
+  { pattern = "codex-lab-admin.saturnusgo.com", custom_domain = true },
+  { pattern = "codex-lab-foreign-falcon.saturnusgo.com", custom_domain = true }
+]
+
+[vars]
+FALCON_MANAGED_AUTH_ENABLED = "true"
+FALCON_COMPANY_DOMAIN_SUFFIX = "saturnusgo.com"
+FALCON_PLATFORM_HOSTNAME = "codex-lab-admin.saturnusgo.com"
+FALCON_LEGACY_HOST_MANAGED = "false"
+# The release command supplies the isolated API origin; this default cannot resolve.
+FALCON_API_ORIGIN = "https://codex-lab-backend.invalid"
+
+[assets]
+directory = "../../../dist/codex-lab/assets"
+binding = "FALCON_STATIC_ASSETS"
+run_worker_first = true
+html_handling = "none"
+not_found_handling = "none"

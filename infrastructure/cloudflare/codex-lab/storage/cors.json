@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://codex-lab-falcon.saturnusgo.com",
+          "https://codex-lab-admin.saturnusgo.com",
+          "https://codex-lab-foreign-falcon.saturnusgo.com"
+        ],
+        "methods": ["GET", "HEAD", "PUT"],
+        "headers": ["Content-Type", "Range", "x-amz-checksum-sha256"]
+      },
+      "exposeHeaders": ["ETag", "Content-Length", "Content-Range", "Accept-Ranges", "x-amz-checksum-sha256"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
