@@ -12,9 +12,9 @@ const chat = "94e3be6c-8fc9-48a9-b4c4-4d5e98e0c040";
 const turn = "b1e5a4d8-8ab8-4b52-9455-4899206a941f";
 const chatHref = `${help}&article=falcon-ai-chat&chat=${chat}&message=${turn}`;
 
-function header(href = help, locale: "en" | "ru" = "en") {
+function header(href = help, locale: "en" | "ru" = "en", historyOpen = false) {
   const h = componentHarness(href);
-  let navigated = 0;
+  let navigated = 0, toggles = 0;
   const { useDocumentationNavigation: useNavigation } = h.load<{ useDocumentationNavigation: typeof useDocumentationNavigation }>(new URL("../../navigation/useDocumentationNavigation.ts", import.meta.url), name => {
     if (name.endsWith("documentation-link")) return { defaultArticleId, documentationChatId, documentationLink, safeArticleId };
     if (name.endsWith("chat-link")) return { guideChatLink, readGuideChatRoute };
@@ -29,7 +29,7 @@ function header(href = help, locale: "en" | "ru" = "en") {
   const all = () => {
     const view = () => {
       const navigation = useNavigation("owner");
-      return render({ navigation, chatting: navigation.articleId === documentationChatId, treeOpen: true, onTreeToggle() {},
+      return render({ navigation, chatting: navigation.articleId === documentationChatId, treeOpen: true, historyOpen, onTreeToggle: () => toggles++,
         onNavigate: () => navigated++, onSearch() {}, isLight: true, onThemeChange() {} });
     };
     h.render(view);
@@ -37,7 +37,7 @@ function header(href = help, locale: "en" | "ru" = "en") {
   };
   return { all, tabs: () => nodes(all().find(node => node.type === "nav")).filter(node => node.type === "a"),
     visit(target: string) { h.navigate(target); h.emit("popstate"); }, href: () => h.window.location.href,
-    navigated: () => navigated, dispose: h.dispose };
+    navigated: () => navigated, toggles: () => toggles, dispose: h.dispose };
 }
 
 function mouse(modifiers = {}) {
@@ -93,4 +93,17 @@ test("modified and middle tab clicks retain browser link behavior and leave the 
       assert.equal(h.navigated(), 0);
     }
   } finally { h.dispose(); }
+});
+
+test("the AI header burger controls chat history with localized disclosure state", () => {
+  for (const locale of ["en", "ru"] as const) for (const open of [false, true]) {
+    const h = header(chatHref, locale, open);
+    try {
+      const burger = h.all().find(node => node.props["aria-controls"] === "falcon-ai-history")!;
+      assert.ok(burger);
+      assert.equal(burger.props["aria-expanded"], open);
+      assert.equal(burger.props["aria-label"], open ? documentationCopy[locale].hideChatHistory : documentationCopy[locale].showChatHistory);
+      invoke(burger, "onClick"); assert.equal(h.toggles(), 1);
+    } finally { h.dispose(); }
+  }
 });

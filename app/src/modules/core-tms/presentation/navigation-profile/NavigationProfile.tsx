@@ -23,7 +23,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const role = session?.workspaceRole ? roles[session.workspaceRole][ru ? 1 : 0]
     : session?.kind === "admin" ? (ru ? "Администратор" : "Administrator") : (ru ? "Аккаунт Falcon" : "Falcon account");
   const navigate = (action: () => void) => { popup.dismiss(); action(); };
-  return <div ref={popup.root} className={css.root} data-collapsed={collapsed} onPointerEnter={event => { if (event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
+  return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
     <button ref={popup.trigger} type="button" className={css.profile} data-collapsed={collapsed} data-active={popup.open}
       onClick={popup.toggle} onKeyDown={popup.triggerKeyDown} aria-label={`${t("auth.account")}: ${label}`}
       aria-haspopup="menu" aria-expanded={popup.open} aria-controls={popup.open ? id : undefined} data-testid="nav-account">

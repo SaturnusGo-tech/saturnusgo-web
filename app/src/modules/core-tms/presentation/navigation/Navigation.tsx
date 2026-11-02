@@ -1,4 +1,3 @@
-import { SidebarCollapseLeft } from "@openai/apps-sdk-ui/components/Icon";
 import { useRef } from "react";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -12,18 +11,20 @@ import { NavigationProfile } from "../navigation-profile/NavigationProfile";
 import { getSidebarNavigation, SIDEBAR_NAVIGATION_IDS } from "./model/sidebar-navigation";
 import { useSidebarPreferences } from "./state/useSidebarPreferences";
 import { NavigationGroups } from "./ui/NavigationGroups";
-import { NavigationTooltip } from "./tooltip/NavigationTooltip";
 import { SidebarSectionsMenu } from "./sections-menu/SidebarSectionsMenu";
 import { RareNavigationMenu } from "./overflow/RareNavigationMenu";
 import css from "./styles/sidebar-system.module.css";
+import { useSidebarReveal } from "./reveal/useSidebarReveal";
 
-export function Navigation({ view, onChange, disabled, connected, collapsed, onToggleCollapsed, workspaceId, activeRunCount, userCapabilities }: {
+export function Navigation({ view, onChange, disabled, connected, collapsed, onCollapsedChange, workspaceId, activeRunCount, userCapabilities }: {
   view: View; onChange: (view: View) => void; disabled: boolean; collapsed: boolean;
-  onToggleCollapsed: () => void; workspaceId: string; connected: boolean; activeRunCount: number; userCapabilities: readonly string[];
+  onCollapsedChange: (next: boolean) => void; workspaceId: string; connected: boolean; activeRunCount: number; userCapabilities: readonly string[];
 }) {
-  const { t } = useTmsLocale();
+  const { t, locale } = useTmsLocale();
   const session = useOptionalTmsSession();
   const root = useRef<HTMLElement>(null);
+  const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
+  const compact = collapsed && !reveal.revealed;
   const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, session?.kind === "managed") && workspaceViewAllowed(candidate, userCapabilities, session?.kind === "managed");
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
@@ -41,8 +42,8 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
     }
     onChange(next);
   };
-  return <nav ref={root} id="tms-navigation" data-sidebar-system data-collapsed={collapsed} tabIndex={-1}
-    className={`${shellStyles.navigation} ${collapsed ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
+  return <nav ref={root} id="tms-navigation" data-sidebar-system data-collapsed={compact} data-peek={reveal.revealed || undefined} tabIndex={-1}
+    className={`${shellStyles.navigation} ${compact ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
     <div className={css.header}>
       <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
         aria-label={t("header.dashboardAria")}>
@@ -58,14 +59,14 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={session?.kind === "managed"}/>
       <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>
-      <NavigationProfile collapsed={collapsed} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
-      <button type="button" className={`${css.item} ${css.collapse}`} onClick={onToggleCollapsed}
-        aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")} aria-expanded={!collapsed}
-        aria-controls="tms-navigation" data-nav-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}>
-        <span className={css.icon} aria-hidden="true"><SidebarCollapseLeft width={24} height={24}/></span>
-        <span className={css.label}>{t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}</span>
-      </button>
+      <NavigationProfile collapsed={compact} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
     </div>
-    <NavigationTooltip collapsed={collapsed} root={root}/>
+    <div className={css.resizeHandle} data-sidebar-resize role="separator" aria-orientation="vertical" tabIndex={0}
+      aria-label={locale === "ru" ? "Ширина навигации" : "Navigation width"} aria-valuemin={52} aria-valuemax={240} aria-valuenow={compact ? 52 : 240}
+      aria-valuetext={locale === "ru" ? (compact ? "Свёрнута" : "Развёрнута") : (compact ? "Collapsed" : "Expanded")}
+      onKeyDown={event => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault(); event.stopPropagation(); reveal.setCollapsed(event.key === "ArrowLeft" || event.key === "Home");
+      }}/>
   </nav>;
 }

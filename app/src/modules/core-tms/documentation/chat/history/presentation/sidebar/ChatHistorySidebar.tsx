@@ -8,13 +8,15 @@ import { HistoryItem } from "../HistoryItem";
 import { useSidebarVisibility } from "./useSidebarVisibility";
 import css from "./history-sidebar.module.css";
 
-export function ChatHistorySidebar({ chat }: { chat: ReturnType<typeof useGuideConversation> }) {
+export function ChatHistorySidebar({ chat, active = true, onNavigate }: {
+  chat: ReturnType<typeof useGuideConversation>; active?: boolean; onNavigate?: () => void;
+}) {
   const copy = guideHistoryCopy[chat.locale], chatCopy = guideChatCopy[chat.locale];
   const sidebar = useRef<HTMLElement>(null), visible = useSidebarVisibility(sidebar);
-  const history = useChatHistory(chat.api, chat.owner, chat.historyRevision, visible);
-  return <aside ref={sidebar} className={css.sidebar} aria-label={copy.history}>
+  const history = useChatHistory(chat.api, chat.owner, chat.historyRevision, active && visible);
+  return <aside id="falcon-ai-history" ref={sidebar} className={css.sidebar} aria-label={copy.history}>
     <div className={css.identity}>Falcon AI</div>
-    <button type="button" className={css.newChat} onClick={chat.newChat}>
+    <button type="button" className={css.newChat} onClick={() => { chat.newChat(); onNavigate?.(); }}>
       <ComposeEditSquare width={20} height={20} aria-hidden="true" /><span>{chatCopy.newChat}</span>
     </button>
     <label className={css.search}>
@@ -25,7 +27,7 @@ export function ChatHistorySidebar({ chat }: { chat: ReturnType<typeof useGuideC
     <h2 className={css.heading}>{copy.history}</h2>
     <div className={css.list} aria-busy={history.loading}>
       {chat.api && history.items.map(item => <HistoryItem key={item.id} item={item} api={chat.api!} locale={chat.locale}
-        selected={item.id === chat.chatId} onOpen={() => chat.selectChat(item.id)}
+        selected={item.id === chat.chatId} onOpen={() => { chat.selectChat(item.id); onNavigate?.(); }}
         onChanged={archived => {
           chat.refreshHistory();
           if (item.id === chat.chatId) { if (archived) chat.newChat(); else chat.refresh(); }

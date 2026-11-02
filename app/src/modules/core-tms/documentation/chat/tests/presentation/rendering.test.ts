@@ -10,17 +10,20 @@ import { visibleCitations } from "../../model/citations";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
 
+const history = { open: true, narrow: false, toggle() {}, close() {}, afterNavigate() {} };
+
 test("suggestions submit immediately and are disabled during a response; reset and retry remain explicit", () => {
   const h = componentHarness(), sent: string[] = []; let draft = "", resets = 0, retries = 0;
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
     if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("useHistorySwipe")) return { useHistorySwipe: () => ({}) };
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [], enabled: true, busy: false, error: "", draft: "",
     setDraft: (value: string) => draft = value, send: async (value: string) => { sent.push(value); }, newChat: () => resets++, retry: () => retries++ } as unknown as Parameters<typeof render>[0]["chat"];
-  const all = () => nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {} })));
+  const all = () => nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {}, history })));
   const suggestion = all().find(node => node.type === "button" && nodes(node).some(child => child.props.children === guideChatCopy.en.suggestions[0]))!;
   invoke(suggestion, "onClick"); assert.deepEqual(sent, [guideChatCopy.en.suggestions[0]]); assert.equal(draft, "");
   chat.busy = true;
@@ -73,12 +76,36 @@ test("streaming text replaces the checking indicator before the validated answer
     if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("useHistorySwipe")) return { useHistorySwipe: () => ({}) };
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { locale: "en", messages: [{ role: "user", content: "Question" }], partialText: "Actual streamed words", busy: true,
     enabled: true, draft: "", error: "", conversationId: 1 } as unknown as Parameters<typeof render>[0]["chat"];
-  const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {} })));
+  const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {}, history })));
   assert.equal(all.some(node => Array.isArray(node.props.children) && node.props.children.includes(guideChatCopy.en.preparing)), false);
   const partial = all.find(node => node.type === "GuideMessage" && node.props.streaming)!;
   assert.equal((partial.props.message as { content: string }).content, "Actual streamed words");
+});
+
+test("history disclosure assigns native inert state and restores chat interactivity after closing", () => {
+  const h = componentHarness(undefined, { requestAnimationFrame: () => 1, cancelAnimationFrame() {} });
+  const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
+    if (name.includes("history/localization/copy")) return { guideHistoryCopy };
+    if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useHistorySwipe")) return { useHistorySwipe: () => ({}) };
+    if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
+  });
+  const chat = { locale: "en", messages: [], enabled: true, draft: "" } as unknown as Parameters<typeof render>[0]["chat"];
+  const disclosure = { ...history, open: false, narrow: false }, panel = { inert: false }, main = { inert: false };
+  function check(open: boolean, narrow: boolean, expectedMain: boolean) {
+    disclosure.open = open; disclosure.narrow = narrow;
+    const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {}, history: disclosure })));
+    const panelNode = all.find(node => node.props["data-open"] === open && node.props.ref)!;
+    const mainNode = all.find(node => node.props.className === "chatMain")!;
+    assert.equal(panelNode.props.inert, undefined); assert.equal(mainNode.props.inert, undefined);
+    invoke(panelNode, "ref", panel); invoke(mainNode, "ref", main);
+    assert.equal(panel.inert, !open); assert.equal(main.inert, expectedMain);
+  }
+  check(false, false, false); check(true, false, false); check(true, true, true); check(false, true, false);
+  h.dispose();
 });

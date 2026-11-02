@@ -9,6 +9,7 @@
 .iconButton { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--docs-muted); }
 .iconButton:hover { background: var(--docs-control); color: var(--docs-ink); }
 .treeToggle { display: none; }
+.historyToggle { display: grid; }
 @container falcon-docs (max-width: 760px) {
   .header { grid-template-columns: minmax(0,1fr) auto; gap: 0 12px; min-height: 100px; padding: 0 20px; }
   .identity { min-height: 56px; }

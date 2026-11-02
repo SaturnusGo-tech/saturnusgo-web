@@ -29,20 +29,21 @@ function LocalizedWorkspace() {
   const pageRef = usePageAppearance([model.view, model.project?.id, model.selectedCaseId, model.selectedRunId, model.selectedRunItemId, model.selectedSuiteId, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("tms.sidebar.collapsed.v1");
-    if (saved !== null) setSidebarCollapsed(saved === "true");
+    try {
+      const saved = window.localStorage.getItem("tms.sidebar.collapsed.v1");
+      if (saved !== null) setSidebarCollapsed(saved === "true");
+    } catch { /* The rail remains usable when browser storage is unavailable. */ }
   }, []);
 
-  function toggleSidebar() {
-    setSidebarCollapsed((current) => {
-      const next = !current;
-      window.localStorage.setItem("tms.sidebar.collapsed.v1", String(next));
-      return next;
-    });
+  function changeSidebar(next: boolean) {
+    setSidebarCollapsed(next);
+    try { window.localStorage.setItem("tms.sidebar.collapsed.v1", String(next)); } catch { /* Session-only preference. */ }
   }
+
+  function toggleSidebar() { changeSidebar(!sidebarCollapsed); }
 
   function changeView(next: typeof model.view) { transitionContent(() => selectView(next)); }
 
@@ -74,7 +75,7 @@ function LocalizedWorkspace() {
         disabled={!model.project}
         connected={model.connection === "connected"}
         collapsed={sidebarCollapsed}
-        onToggleCollapsed={toggleSidebar}
+        onCollapsedChange={changeSidebar}
         workspaceId={model.data.workspace.id}
         activeRunCount={model.activeProjectRuns.length}
         userCapabilities={model.data.meta.authorization.capabilities}

@@ -14,11 +14,12 @@ test("shared answer renders only its two messages and starts an independent chat
   const { DocumentationChat: render } = h.load<{ DocumentationChat: typeof DocumentationChat }>(new URL("../../presentation/DocumentationChat.tsx", import.meta.url), name => {
     if (name.includes("history/localization/copy")) return { guideHistoryCopy };
     if (name.endsWith("localization/copy")) return { guideChatCopy };
+    if (name.endsWith("useHistorySwipe")) return { useHistorySwipe: () => ({}) };
     if (name.endsWith("useConversationScroll")) return { useConversationScroll: () => ({ scroll: { current: null }, onScroll() {} }) };
   });
   const chat = { readonly: true, locale: "en", conversationId: "share", messages: [{ role: "user", content: "Selected question" },
     { role: "assistant", content: "Selected answer" }], startOwn: () => started++ } as unknown as Parameters<typeof render>[0]["chat"];
-  const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {} })));
+  const all = nodes(h.render(() => render({ chat, navigation: {} as never, onSource() {}, history: { open: false, narrow: false, toggle() {}, close() {}, afterNavigate() {} } })));
   assert.equal(all.some(node => node.type === "GuideComposer"), false);
   const messages = all.filter(node => node.type === "GuideMessage"); assert.equal(messages.length, 2);
   assert.ok(messages.every(node => node.props.sharing === undefined));

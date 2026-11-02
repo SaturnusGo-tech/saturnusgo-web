@@ -12,6 +12,7 @@ import { documentationChatId } from "../navigation/documentation-link";
 import { useDocumentationChat } from "../chat/state/useDocumentationChat";
 import { DocumentationChat } from "../chat/presentation/DocumentationChat";
 import { DocumentationHeader } from "./header/DocumentationHeader";
+import { useHistoryDisclosure } from "../chat/history/state/sidebar/useHistoryDisclosure";
 import styles from "./documentation.module.css";
 
 export function DocumentationView() {
@@ -23,6 +24,8 @@ export function DocumentationView() {
   const [query, setQuery] = useState("");
   const [treeOpen, setTreeOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const rootRef = useRef<HTMLElement>(null);
+  const history = useHistoryDisclosure(rootRef);
   const searchRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const article = articleById.get(navigation.articleId);
@@ -40,11 +43,11 @@ export function DocumentationView() {
         && !target.closest("input,textarea,select,[contenteditable=true]")) {
         event.preventDefault(); openSearch();
       }
-      if (event.key === "Escape") setTreeOpen(false);
+      if (event.key === "Escape") { setTreeOpen(false); if (chatting && history.open) history.close(true); }
     };
     document.addEventListener("keydown", shortcut);
     return () => document.removeEventListener("keydown", shortcut);
-  }, [chatting]);
+  }, [chatting, history.open]);
 
   useEffect(() => {
     if (searching) { scrollRef.current?.scrollTo(0, 0); return; }
@@ -72,11 +75,11 @@ export function DocumentationView() {
   }, [navigation.articleId, searching, article]);
 
   function select() { setQuery(""); setTreeOpen(false); }
-  return <section className={styles.root} data-documentation-workspace lang={locale} aria-label={copy.workspace}>
-    <DocumentationHeader navigation={navigation} chatting={chatting} treeOpen={treeOpen}
-      onTreeToggle={() => setTreeOpen(current => !current)} onNavigate={select} onSearch={openSearch}
+  return <section ref={rootRef} className={styles.root} data-documentation-workspace lang={locale} aria-label={copy.workspace}>
+    <DocumentationHeader navigation={navigation} chatting={chatting} treeOpen={treeOpen} historyOpen={history.open}
+      onTreeToggle={chatting ? history.toggle : () => setTreeOpen(current => !current)} onNavigate={select} onSearch={openSearch}
       isLight={isLight} onThemeChange={toggleAnimated} />
-    {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} /> : <div className={styles.frame}>
+    {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} history={history} /> : <div className={styles.frame}>
       <aside id="documentation-sidebar" className={styles.sidebar} data-open={treeOpen}>
         <DocumentationTree navigation={navigation} query={query} onQuery={setQuery} searchRef={searchRef} onNavigate={select} onSearch={() => setTreeOpen(false)} />
       </aside>

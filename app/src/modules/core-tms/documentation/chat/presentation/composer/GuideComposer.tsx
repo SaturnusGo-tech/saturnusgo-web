@@ -31,7 +31,6 @@ export function GuideComposer({ chat }: { chat: ReturnType<typeof useGuideConver
         aria-describedby={statusId} onChange={event => chat.setDraft(event.target.value)}
         onKeyDown={event => { if (shouldSendQuestion(event)) { event.preventDefault(); send(); } }} />
       <div className={css.composerActions}>
-        <span className={css.composerHint}>{dictation.active ? copy.review : ""}</span>
         <button type="button" className={css.iconButton} aria-label={microphoneLabel} title={microphoneLabel}
           aria-pressed={dictation.active} disabled={!chat.enabled || chat.busy || tooLong}
           data-recording={dictation.state === "listening" || undefined} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
@@ -44,6 +43,7 @@ export function GuideComposer({ chat }: { chat: ReturnType<typeof useGuideConver
         </button>
       </div>
     </div>
+    {dictation.active && <p className={css.composerHint}>{copy.review}</p>}
     <div id={statusId} className={css.composerStatus} role={dictation.error || tooLong ? "alert" : "status"}>
       {!chat.enabled ? copy.offline : dictation.error || dictation.notice || (tooLong ? copy.limit
         : dictation.state === "starting" ? copy.recording : dictation.state === "transcribing" ? copy.transcribing

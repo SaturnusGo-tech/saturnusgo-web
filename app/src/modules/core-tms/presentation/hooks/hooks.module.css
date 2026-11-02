@@ -1,4 +1,5 @@
 .root {
+  container: integrations / inline-size;
   width: 100%;
   height: 100%;
   min-width: 0;

@@ -1,4 +1,5 @@
 import { ArrowUpRight, Plus, ArrowRotateCcw, CloseBold } from "@openai/apps-sdk-ui/components/Icon";
+import { useEffect, type KeyboardEvent } from "react";
 import type { useGuideConversation } from "../state/useGuideConversation";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import { guideChatCopy } from "../localization/copy";
@@ -6,21 +7,40 @@ import { GuideMessage } from "./messages/GuideMessage";
 import { GuideComposer } from "./composer/GuideComposer";
 import { useConversationScroll } from "./scroll/useConversationScroll";
 import css from "./guide-chat.module.css";
-import { ChatHistoryPopover } from "../history/presentation/ChatHistoryPopover";
 import { guideHistoryCopy } from "../history/localization/copy";
 import { ChatHistorySidebar } from "../history/presentation/sidebar/ChatHistorySidebar";
+import type { useHistoryDisclosure } from "../history/state/sidebar/useHistoryDisclosure";
+import { useHistorySwipe } from "../history/state/sidebar/useHistorySwipe";
 
-export function DocumentationChat({ chat, navigation, onSource }: {
+export function DocumentationChat({ chat, navigation, onSource, history }: {
   chat: ReturnType<typeof useGuideConversation>; navigation: ReturnType<typeof useDocumentationNavigation>; onSource: () => void;
+  history: ReturnType<typeof useHistoryDisclosure>;
 }) {
   const copy = guideChatCopy[chat.locale];
   const historyCopy = guideHistoryCopy[chat.locale];
+  const historySwipe = useHistorySwipe(history.close);
   const { scroll, onScroll } = useConversationScroll(`${chat.messages.length}:${chat.partialText}:${chat.busy}`, chat.messages.length, chat.conversationId, chat.targetTurnId);
+  useEffect(() => {
+    if (!history.open || !history.narrow) return;
+    const frame = requestAnimationFrame(() => document.querySelector<HTMLInputElement>('#falcon-ai-history input[type="search"]')?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [history.open, history.narrow]);
+  function containHistoryFocus(event: KeyboardEvent<HTMLDivElement>) {
+    if (!history.narrow || event.key !== "Tab") return;
+    const choices = [...event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),a[href]')];
+    const first = choices[0], last = choices[choices.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+  }
   return <section className={css.chat} aria-label={copy.title} data-documentation-chat>
-    <ChatHistorySidebar chat={chat} />
-    <div className={css.chatMain}>
+    <div ref={element => { if (element) element.inert = !history.open; }} className={css.historyPanel}
+      data-open={history.open} onKeyDown={containHistoryFocus} {...historySwipe}>
+      <ChatHistorySidebar chat={chat} active={history.open} onNavigate={history.afterNavigate} />
+    </div>
+    <button type="button" className={css.historyBackdrop} data-open={history.open} aria-label={historyCopy.close}
+      aria-hidden={!history.open || !history.narrow} tabIndex={-1} onClick={() => history.close(true)} />
+    <div ref={element => { if (element) element.inert = history.open && history.narrow; }} className={css.chatMain}>
     <div className={css.toolbar}>
-      <div className={css.mobileHistory}><ChatHistoryPopover chat={chat} /></div>
       <span className={css.conversationTitle}>{chat.readonly ? historyCopy.shared : chat.title || "Falcon AI"}</span>
       <button type="button" className={`${css.iconButton} ${css.mobileNewChat}`} aria-label={copy.newChat} title={copy.newChat}
         onClick={chat.newChat} disabled={!chat.chatId && !chat.readonly && !chat.messages.length && !chat.draft && !chat.error}><Plus width={20} height={20} /></button>

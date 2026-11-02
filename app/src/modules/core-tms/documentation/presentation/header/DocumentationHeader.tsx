@@ -5,8 +5,9 @@ import { documentationChatId } from "../../navigation/documentation-link";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import css from "./documentation-header.module.css";
 
-export function DocumentationHeader({ navigation, chatting, treeOpen, onTreeToggle, onNavigate, onSearch, isLight, onThemeChange }: {
+export function DocumentationHeader({ navigation, chatting, treeOpen, historyOpen = false, onTreeToggle, onNavigate, onSearch, isLight, onThemeChange }: {
   navigation: ReturnType<typeof useDocumentationNavigation>; chatting: boolean; treeOpen: boolean;
+  historyOpen?: boolean;
   onTreeToggle: () => void; onNavigate: () => void; onSearch: () => void; isLight: boolean;
   onThemeChange: (origin: { x: number; y: number }) => void;
 }) {
@@ -19,11 +20,12 @@ export function DocumentationHeader({ navigation, chatting, treeOpen, onTreeTogg
   }
   return <header className={css.header}>
     <div className={css.identity}>
-      {!chatting && <button type="button" className={`${css.iconButton} ${css.treeToggle}`}
-        aria-label={treeOpen ? copy.hideTree : copy.showTree} aria-expanded={treeOpen}
-        aria-controls="documentation-sidebar" onClick={onTreeToggle}>
-        {treeOpen ? <X width={18} height={18} /> : <Menu width={18} height={18} />}
-      </button>}
+      <button type="button" className={`${css.iconButton} ${chatting ? css.historyToggle : css.treeToggle}`}
+        aria-label={chatting ? (historyOpen ? copy.hideChatHistory : copy.showChatHistory) : (treeOpen ? copy.hideTree : copy.showTree)}
+        aria-expanded={chatting ? historyOpen : treeOpen} aria-controls={chatting ? "falcon-ai-history" : "documentation-sidebar"}
+        onClick={onTreeToggle}>
+        {!chatting && treeOpen ? <X width={18} height={18} /> : <Menu width={18} height={18} />}
+      </button>
       <a className={css.brand} href={navigation.link(docsId, section)} onClick={event => navigate(event, docsId, section)}>Falcon Docs</a>
     </div>
     <nav className={css.tabs} aria-label={copy.sectionsLabel}>
