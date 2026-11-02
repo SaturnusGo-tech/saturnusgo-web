@@ -3,6 +3,7 @@
 import { useLandingLocale } from "../localization/context/LandingLocaleProvider";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CodexMark } from "../../../core-tms/codex-employee/presentation/branding/CodexMark";
 import { INTEGRATIONS } from "../../../core-tms/presentation/hooks/catalog/integration-definitions";
 import styles from "../landing.module.css";
 
@@ -29,7 +30,7 @@ export function IntegrationMarquee() {
             >
               {INTEGRATIONS.map(({ id, name, icon: Icon }) => (
                 <li key={id} className={styles.marqueeBrand}>
-                  {Icon ? (
+                  {id === "codex" ? <CodexMark /> : Icon ? (
                     <Icon aria-hidden="true" />
                   ) : (
                     <img

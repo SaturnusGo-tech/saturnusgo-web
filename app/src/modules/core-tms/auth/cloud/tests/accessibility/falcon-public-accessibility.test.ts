@@ -53,7 +53,7 @@ test("landing shows the complete canonical integration catalog with accessible m
   const section = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconIntegrations.tsx"), "utf8");
   const marquee = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/motion/IntegrationMarquee.tsx"), "utf8");
   assert.deepEqual(INTEGRATIONS.map(({ name }) => name).sort(), [
-    "Confluence", "GitHub", "GitLab", "Jenkins", "Jira", "Linear", "Slack", "Swagger", "TeamCity", "Trello", "YouTrack",
+    "Codex", "Confluence", "GitHub", "GitLab", "Jenkins", "Jira", "Linear", "Slack", "Swagger", "TeamCity", "Trello", "YouTrack",
   ]);
   assert.match(section, /<IntegrationMarquee\s*\/>/);
   assert.match(marquee, /import\s*\{\s*INTEGRATIONS\s*\}\s*from[^;]*integration-definitions/);
@@ -90,4 +90,20 @@ test("company entry uses one rounded input surface with neutral outer focus", ()
   assert.match(styles, /\.field:focus-within/);
   assert.match(styles, /border-radius:13px/);
   assert.match(styles, /prefers-reduced-motion/);
+});
+
+test("landing marquee renders Codex branding and retains the YouTrack mark", async () => {
+  const { componentHarness, nodes } = await import("../../../../portfolios/tests/support/component-harness");
+  const document = { hidden: false, addEventListener() {}, removeEventListener() {} };
+  const h = componentHarness(undefined, { document });
+  const { IntegrationMarquee } = h.load<{ IntegrationMarquee: () => unknown }>(new URL("../../../../../core-falcon-public/landing/motion/IntegrationMarquee.tsx", import.meta.url), name => {
+    if (name.endsWith("LandingLocaleProvider")) return { useLandingLocale: () => ({ copy: {} }) };
+    if (name.endsWith("integration-definitions")) return { INTEGRATIONS };
+  });
+  const items = nodes(h.render(() => IntegrationMarquee())).filter(node => node.type === "li");
+  const codex = items.find(node => nodes(node).some(child => child.type === "span" && child.props.children === "Codex"))!;
+  const youtrack = items.find(node => nodes(node).some(child => child.type === "span" && child.props.children === "YouTrack"))!;
+  assert.ok(nodes(codex).some(node => node.type === "CodexMark"));
+  assert.equal(nodes(codex).some(node => node.props.src === "/falcon/integrations/youtrack.svg"), false);
+  assert.ok(nodes(youtrack).some(node => node.props.src === "/falcon/integrations/youtrack.svg"));
 });
