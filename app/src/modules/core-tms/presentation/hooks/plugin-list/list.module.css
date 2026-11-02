@@ -1,0 +1,24 @@
+.page { width: min(100%, 940px); margin-inline: auto; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 38px; }
+.header h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 36px; letter-spacing: -.025em; }
+.header p { margin: 6px 0 0; color: var(--plugin-muted); font-size: 14px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+.toolbar > span { border-radius: 12px; padding: 7px 12px; color: var(--plugin-text); background: var(--plugin-panel); }
+.toolbar small { margin-left: 6px; color: var(--plugin-muted); font-size: inherit; }
+.search { display: flex; align-items: center; gap: 8px; width: 290px; max-width: 100%; min-width: 0; padding: 7px 12px; border: 1px solid var(--plugin-line); border-radius: 12px; background: var(--plugin-panel); color: var(--plugin-muted); }
+.search input { width: 100%; min-width: 0; padding: 0; height: 26px; border: 0; background: transparent; color: var(--plugin-text); outline: none; box-shadow: none; }
+.search input::placeholder { color: var(--plugin-muted); }
+.search button { display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.open { display: flex; align-items: center; flex: 1; min-width: 0; gap: 16px; padding: 0; background: transparent; border: 0; color: var(--plugin-text); text-align: left; cursor: pointer; }
+.open strong { display: block; font-size: 15px; font-weight: 500; }
+.open small { margin-left: 6px; font-size: 13px; font-weight: 400; color: var(--plugin-muted); }
+.open strong + span { display: block; margin-top: 3px; color: var(--plugin-muted); font-size: 14px; line-height: 21px; }
+.chevron { display: grid; place-items: center; flex: none; width: 24px; height: 30px; padding: 0; background: transparent; border: 0; color: var(--plugin-muted); cursor: pointer; }
+.open:hover strong, .chevron:hover { color: var(--plugin-text); text-decoration: underline; text-underline-offset: 3px; }
+.empty { padding: 40px 0; color: var(--plugin-muted); }
+.empty h3 { color: var(--plugin-text); font-size: 17px; font-weight: 500; }
+@media(max-width: 600px) { .toolbar { flex-wrap: wrap; gap: 14px; } .search { width: 100%; } .header { margin-bottom: 24px; } .open { gap: 12px; } .open small { display: none; } }
+.brand > svg { width: 27px; height: 27px; }
+.hint { color: var(--plugin-muted); font-size: 12px; white-space: nowrap; }
+.error { color: #c85656; margin-bottom: 18px; }
+@media(max-width: 600px) { .hint { max-width: 80px; white-space: normal; text-align: right; } }

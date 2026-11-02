@@ -1,49 +1,40 @@
 "use client";
+import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
+import { pluginSettingsLink } from "../config/navigation/plugins/plugin-settings-route";
 import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
 import { CodexDetail } from "../../codex-employee/presentation/setup/CodexDetail";
 import { useWorkspaceCodex } from "../../codex-employee/composition/workspace/useWorkspaceCodex";
 
-import { ApiSourceManager } from "../../api-sources/presentation/ApiSourceManager";
-import { ApiTestingView } from "../api-testing/ApiTestingView";
-import { useApiSourceList } from "../../api-sources/state/useApiSourceList";
+import { IntegrationPluginDetail } from "./plugin-detail/IntegrationPluginDetail";
+import { usePluginCatalogState } from "./settings-state/usePluginCatalogState";
+import { catalogEntries } from "./catalog/model/catalog-model";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {
-  getYouTrackConfiguration,
-  getYouTrackIntegrationStatus,
-  type YouTrackIntegrationStatus,
-} from "../../application/integrations/getYouTrackIntegrationStatus";
-import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
-import { useTmsLocale } from "../../localization/context/useTmsLocale";
-import type { YouTrackConfiguration } from "../../youtrack/model/youtrack-settings";
-import { ConnectorSettings } from "../../connectors/presentation/ConnectorSettings";
-import { useWorkspaceConnectors } from "../../connectors/application/context/WorkspaceConnectorContext";
-import { isProvider } from "../../connectors/model/connector-types";
 import { integrationScreen, type IntegrationScreen } from "./hooks-navigation";
 import { IntegrationCatalog } from "./catalog/IntegrationCatalog";
 import surface from "./hooks.module.css";
+import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { hooksCopy } from "./shared/hooks-copy";
-import { YouTrackSettings } from "./youtrack/YouTrackSettings";
 
 export function HooksView({ workspaceId, projectId, canManage, capabilities, connected }: { workspaceId: string; projectId: string; canManage: boolean; capabilities: readonly string[]; connected: boolean }) {
-  const http = useTmsHttpClient();
-  const { locale, languageTag } = useTmsLocale();
+  const { locale } = useTmsLocale();
   const russian = locale === "ru";
   const [screen, setScreen] = useState<IntegrationScreen>(() => typeof window === "undefined" ? "catalog" : integrationScreen(window.location.search));
-  const [status, setStatus] = useState<YouTrackIntegrationStatus | null>(null);
-  const [configuration, setConfiguration] = useState<YouTrackConfiguration | null>(null);
-  const [statusFailed, setStatusFailed] = useState(false);
-  const [configurationFailed, setConfigurationFailed] = useState(false);
-  const [reload, setReload] = useState(0);
-  const connectors = useWorkspaceConnectors();
   const session = useOptionalTmsSession();
   const codex = useWorkspaceCodex(session?.kind === "managed");
   const connectorAccess = canManage && companyViewAvailable("hooks", session?.companyCapabilities);
-  const apiEnabled = companyViewAvailable("api", session?.companyCapabilities);
-  const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, connectorAccess && apiEnabled && screen === "catalog");
+  const apiEnabled = canManage && !!projectId && companyViewAvailable("api", session?.companyCapabilities);
+  const catalog = usePluginCatalogState(workspaceId, projectId, connectorAccess, apiEnabled);
+  const codexStatus = codex.loading ? "checking" : codex.error ? "attention" : "available";
+  const entries = catalogEntries({ ...catalog, showOthers: connectorAccess, showSwagger: apiEnabled, showCodex: session?.kind === "managed", codexStatus, codexCompanyStatus: codex.employee?.status, projectId });
+  const manage = (id: Exclude<IntegrationScreen, "catalog">) => {
+    const target = new URL(pluginSettingsLink(window.location.href, id, id === "github" && (new URL(window.location.href).searchParams.get("impact") === "1" || new URL(window.location.href).searchParams.has("analysisId"))), window.location.href);
+    if (id === "github") for (const key of ["impact", "analysisId"]) { const value = new URL(window.location.href).searchParams.get(key); if (value) target.searchParams.set(key, value); }
+    visitWorkspace(target.toString());
+  };
   const open = (target: IntegrationScreen) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
@@ -58,62 +49,28 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     window.addEventListener("popstate", restore);
     return () => window.removeEventListener("popstate", restore);
   }, []);
-  const refresh = useCallback(() => { setReload((value) => value + 1); connectors.refresh(); }, [connectors.refresh]);
-
   useEffect(() => {
-    const controller = new AbortController();
-    setStatus(null);
-    setConfiguration(null);
-    setStatusFailed(false);
-    setConfigurationFailed(false);
-    if (!connectorAccess) return () => controller.abort();
-    void getYouTrackIntegrationStatus(http, workspaceId, controller.signal)
-      .then(setStatus)
-      .catch((error: unknown) => {
-        if (!(error instanceof DOMException && error.name === "AbortError")) setStatusFailed(true);
-      });
-    void getYouTrackConfiguration(http, workspaceId, controller.signal)
-      .then((resource) => setConfiguration(resource.data))
-      .catch((error: unknown) => {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setConfigurationFailed(true);
-        }
-      });
-    return () => controller.abort();
-  }, [http, workspaceId, reload, connectorAccess]);
-
-  if (screen === "codex" && session?.kind === "managed") return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} />;
-  if (screen !== "catalog" && !connectorAccess) return <CompanyFeatureUnavailable onReturn={() => open("catalog")} />;
-  if (screen === "swagger") return canManage ? <ApiSourceManager key={workspaceId} workspaceId={workspaceId} projectId={projectId} onBack={() => open("catalog")} />
-    : <ApiTestingView scope={{ workspaceId, projectId }} canManage={false} />;
-  if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
-    workspaceId={workspaceId} projectId={projectId} provider={screen} ru={russian} canManage={canManage} capabilities={capabilities} connected={connected}
-    onBack={() => open("catalog")} onSaved={refresh} />;
-  if (screen === "youtrack") {
-    return <YouTrackSettings
-      workspaceId={workspaceId}
-      status={status}
-      languageTag={languageTag}
-      russian={russian}
-      canManage={canManage}
-      onBack={() => open("catalog")}
-      onStatusChange={refresh}
-    />;
-  }
+    if (screen === "github" && connectorAccess && (new URL(window.location.href).searchParams.get("impact") === "1" || new URL(window.location.href).searchParams.has("analysisId"))) manage("github");
+  }, [screen, connectorAccess]);
+  if (screen === "codex" && session?.kind === "managed") return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} accountKey={session.subject ?? workspaceId} onManage={() => manage("codex")} />;
+  if (screen !== "catalog" && (screen === "swagger" ? !apiEnabled : !connectorAccess)) return <CompanyFeatureUnavailable onReturn={() => open("catalog")} />;
+  if (screen !== "catalog") return <IntegrationPluginDetail key={`${workspaceId}:${projectId}:${screen}`} id={screen} ru={russian}
+    status={entries.find(entry => entry.integration.id === screen)?.status ?? "available"} accountKey={session?.subject ?? workspaceId}
+    scopeKey={JSON.stringify([workspaceId, projectId])} disabled={!connected} onBack={() => open("catalog")} onManage={() => manage(screen)} />;
   return (
     <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
       <IntegrationCatalog
-        showOthers={connectorAccess} russian={russian}
+        showOthers={connectorAccess} showSwagger={apiEnabled} russian={russian}
         showCodex={session?.kind === "managed"} onOpenCodex={() => open("codex")}
-        codexStatus={codex.loading ? "checking" : codex.error ? "attention" : "available"} codexCompanyStatus={codex.employee?.status}
+        codexStatus={codexStatus} codexCompanyStatus={codex.employee?.status}
         copy={hooksCopy(russian)}
-        configuration={configuration}
-        status={status}
-        statusFailed={statusFailed || configurationFailed}
-        swaggerStatus={!apiEnabled ? "available" : sources.loading ? "checking" : sources.error ? "attention" : sources.items.some(source => source.enabled) ? "connected" : "available"}
-        connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
+        configuration={catalog.configuration}
+        status={catalog.status}
+        statusFailed={catalog.statusFailed}
+        swaggerStatus={catalog.swaggerStatus}
+        connectorState={catalog.connectorState} connections={catalog.connections} projectId={projectId}
         onOpenConnector={open}
-        onRefresh={() => { if (connectorAccess) { refresh(); sources.refresh(); } codex.refresh(); }}
+        onRefresh={() => { if (connectorAccess || apiEnabled) catalog.refresh(); codex.refresh(); }}
         onOpenYouTrack={() => open("youtrack")}
       />
     </div>

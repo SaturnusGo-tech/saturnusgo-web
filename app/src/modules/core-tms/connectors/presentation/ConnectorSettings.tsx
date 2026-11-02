@@ -13,10 +13,10 @@ import { ActivityPanel } from "./activity/ActivityPanel";
 import styles from "./styles/connector.module.css";
 import { ImpactWorkspace } from "../../impact/presentation/ImpactWorkspace";
 import { impactPermissions } from "../../impact/model/impact-types";
-export function ConnectorSettings({ workspaceId, projectId, provider, ru, canManage, capabilities, connected, onBack, onSaved }: {
+export function ConnectorSettings({ workspaceId, projectId, provider, ru, canManage, capabilities, connected, onBack, onSaved, embedded = false }: {
   workspaceId: string; projectId: string; provider: Provider; ru: boolean; canManage: boolean;
   capabilities: readonly string[]; connected: boolean;
-  onBack: () => void; onSaved: () => void;
+  onBack: () => void; onSaved: () => void; embedded?: boolean;
 }) {
   const [tab, setTab] = useState<ConnectorTab>(() => provider === "github" && typeof window !== "undefined"
     && (new URLSearchParams(window.location.search).has("analysisId") || new URLSearchParams(window.location.search).get("impact") === "1") ? "impact" : "connection");
@@ -30,7 +30,7 @@ export function ConnectorSettings({ workspaceId, projectId, provider, ru, canMan
   const project = state.snapshot?.catalog.projects.find((p) => p.id === projectId)?.name ?? projectId;
   const snapshot = state.snapshot;
   return <ConnectorChrome provider={provider} ru={ru} project={project} tab={tab} onTab={selectTab} onBack={onBack}
-    enabled={Boolean(snapshot?.connection?.enabled)}>
+    enabled={Boolean(snapshot?.connection?.enabled)} embedded={embedded}>
     {state.error && <div className={styles.error} role="alert"><p>{state.error}</p>
       <button type="button" className={styles.secondary} onClick={() => void (tab === "activity" && snapshot && !state.configurationReloadRequired ? state.refreshActivity() : state.load())}
         disabled={Boolean(state.pending)}><RefreshCw size={14} />{ru ? "Загрузить заново" : "Reload"}</button></div>}

@@ -84,7 +84,7 @@
 .verified { display: flex; align-items: flex-start; gap: 10px; margin: 22px 0; color: var(--c-accent); }
 .verified p { margin: 5px 0; font-size: 12px; }
 .verified code { display: block; font-size: 10px; overflow-wrap: anywhere; color: var(--c-muted); }
-.callback { margin-top: 22px; padding: 12px; background: var(--c-soft); border: 1px solid var(--c-line); border-radius: var(--c-radius); }
+.callback { position: relative; margin-top: 22px; padding: 14px 48px 14px 14px; background: var(--c-soft); border: 1px solid var(--c-line); border-radius: 12px; }
 .callback > span { font-size: 10px; font-weight: 600; color: var(--c-muted); }
 .callback > code { display: block; overflow-wrap: anywhere; font-size: 10px; margin: 8px 0 12px; }
 .footer { position: sticky; bottom: 0; z-index: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 16px;
@@ -251,3 +251,21 @@
 
 .root[data-provider="swagger"] { --c-accent: #267d12; --c-highlight: #e9f5e5; --c-radius: 8px; }
 :global(.dark) .root[data-provider="swagger"] { --c-accent: #85c95d; --c-highlight: #233020; }
+
+.root.root[data-provider][data-embedded] :is(.setupGrid, .automationGrid, .activityGrid) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.root.root[data-provider][data-embedded] .setupGrid > * { grid-column: auto; grid-row: auto; }
+.root.root[data-provider][data-embedded] .panel { padding: 20px 0 0; border: 0; border-top: 1px solid var(--plugin-line); border-radius: 0; box-shadow: none; background: transparent; }
+.root.root[data-provider][data-embedded] .panel:first-child { border-top: 0; padding-top: 0; }
+.root.root[data-provider][data-embedded] .panel > header { margin: 0 0 16px; padding: 0; border: 0; background: transparent; border-radius: 0; }
+.root.root[data-provider][data-embedded] .step { display: none; }
+.root.root[data-provider][data-embedded] .panel h2 { font-size: 16px; font-weight: 500; line-height: 24px; }
+.root.root[data-provider][data-embedded] .setupGrid label { grid-template-columns: minmax(0, 1fr); max-width: 650px; }
+.root.root[data-provider][data-embedded] .primary { color: var(--plugin-on-action) !important; background: var(--plugin-action); border-color: transparent; border-radius: 10px; }
+.root.root[data-provider][data-embedded] .secondary { border-radius: 9px; }
+.root.root[data-provider][data-embedded] .footer { position: static; margin-top: 22px; padding: 18px 0 0; background: transparent; }
+.root.root[data-provider][data-embedded] .notice { color: var(--plugin-muted); background: transparent; border-color: var(--plugin-line); border-radius: 9px; }
+.root.root[data-provider][data-embedded] :is(input, select, button, a):focus-visible { outline-color: var(--plugin-muted); }
+@media(max-width: 600px) { .root.root[data-provider][data-embedded] .fields { grid-template-columns: minmax(0, 1fr); } }
+
+.copyCode { display: grid; place-items: center; position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--c-muted); cursor: pointer; }
+.copyCode:hover { background: var(--c-highlight); color: var(--c-ink); }

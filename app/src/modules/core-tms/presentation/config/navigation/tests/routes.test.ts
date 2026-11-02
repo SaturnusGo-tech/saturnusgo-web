@@ -43,7 +43,7 @@ function settingsHarness(locale: "en" | "ru" = "en", hasProject = true, initial 
     if (name.endsWith("useSettingsSection")) return { useSettingsSection: () => ({ section: selected, select: (next: string) => { selected = next; } }) };
   });
   const draw = () => nodes(h.render(() => render({ environments: [], project: hasProject ? { id: "p", name: "Falcon project" } : undefined,
-    exchange: { type: "ImportContent", props: {} } } as never)));
+    exchange: { type: "ImportContent", props: {} }, plugins: { type: "PluginsContent", props: {} } } as never)));
   return { draw, selected: () => selected };
 }
 
@@ -74,7 +74,19 @@ test("empty settings search can be cleared and personal settings never reveal pr
   assert.equal(all.filter(node => node.type === "button" && node.props["aria-controls"]).length, 0);
   invoke(all.find(node => node.type === "button" && node.props["aria-label"] === "Очистить поиск")!, "onClick");
   const targets = h.draw().filter(node => node.type === "button" && node.props["aria-controls"]).map(node => node.props["aria-controls"]);
-  assert.deepEqual(targets, ["settings-appearance", "settings-notifications", "settings-account"]);
+  assert.deepEqual(targets, ["settings-appearance", "settings-notifications", "settings-account", "settings-plugins"]);
+});
+
+test("Plugins is project-independent and owns a single content heading", () => {
+  const h = settingsHarness("en", false, "plugins");
+  const all = h.draw();
+  const active = all.filter(node => node.type === "section" && node.props.hidden === false);
+  assert.equal(active.length, 1); assert.equal(active[0].props.id, "settings-plugins");
+  assert.equal(active[0].props["aria-label"], "Plugins");
+  assert.ok(all.some(node => node.type === "PluginsContent"));
+  assert.equal(all.some(node => node.type === "h2" && node.props.id === "settings-plugins-title"), false);
+  const groups = all.filter(node => node.props.className === "navLabel");
+  assert.ok(groups.some(node => Array.isArray(node.props.children) && node.props.children[0] === "Integrations"));
 });
 
 test("import settings keep category navigation and a single selected content panel", () => {

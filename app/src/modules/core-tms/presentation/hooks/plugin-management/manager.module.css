@@ -1,0 +1,17 @@
+.brand :is(svg, img) { width: 48px; height: 48px; object-fit: contain; }
+.rowBrand :is(svg, img) { width: 26px; height: 26px; object-fit: contain; }
+.usesGroup { overflow: visible; }
+.rowButton { width: 100%; padding: 16px; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; font: inherit; }
+.rowButton > span > span, .rowLink > span > span { display: block; }
+.rowButton:hover { background: var(--plugin-hover); }
+.rowLink { padding-inline: 16px; text-decoration: none; border-top: 1px solid var(--plugin-line); border-radius: 12px; }
+.rowLink:hover { background: var(--plugin-hover); }
+.chevron { flex: none; transition: transform 180ms ease; }
+.chevron[data-open] { transform: rotate(90deg); }
+.expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 200ms ease, opacity 160ms ease; }
+.expansion[data-open] { grid-template-rows: 1fr; opacity: 1; }
+.clipped { min-height: 0; overflow: hidden; }
+.clipped[data-settled] { overflow: visible; }
+.configuration { min-width: 0; padding: 4px 0 24px 58px; --ink: var(--plugin-text); --muted: var(--plugin-muted); --paper: var(--plugin-bg); --line: var(--plugin-line); --action: var(--plugin-action); --action-foreground: var(--plugin-on-action); }
+@media(max-width: 760px) { .configuration { padding-left: 0; } }
+@media(prefers-reduced-motion: reduce) { .expansion, .chevron { transition: none; } }

@@ -4,7 +4,11 @@ import type { SettingsSection } from "../settings-sections";
 import { readSettingsSection, settingsSectionLink } from "../settings-section-route";
 
 export function useSettingsSection(hasProject: boolean) {
-  const [section, setSection] = useState<SettingsSection>(hasProject ? "general" : "appearance");
+  const [section, setSection] = useState<SettingsSection>(() => {
+    if (typeof window === "undefined") return hasProject ? "general" : "appearance";
+    const selected = readSettingsSection(window.location.href);
+    return !hasProject && ["general", "environments", "exchange"].includes(selected) ? "appearance" : selected;
+  });
   useEffect(() => {
     const read = () => {
       const current = window.location.href, query = new URL(current).searchParams;

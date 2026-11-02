@@ -1,4 +1,5 @@
-import { CheckCircle2, Copy, ExternalLink, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ExternalLink, ShieldCheck } from "lucide-react";
+import { Check, Copy } from "@openai/apps-sdk-ui/components/Icon";
 import { useState } from "react";
 import type { Provider, ConnectionInput, Discovery, Snapshot } from "../../model/connector-types";
 import { providerCopy } from "../../localization/connector-copy";
@@ -8,7 +9,8 @@ export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pend
   provider: Provider; ru: boolean; draft: ConnectionInput; snapshot: Snapshot;
   discovery: Discovery | null; pending: string | null; onChange: (value: ConnectionInput) => void; onDiscover: () => void;
 }) {
-  const copy = providerCopy(provider, ru); const [copied, setCopied] = useState(false);
+  const copy = providerCopy(provider, ru); const [copied, setCopied] = useState<{ url: string; success: boolean } | null>(null);
+  const done = copied?.url === snapshot.webhook.url && copied.success;
   const webhook = ["jira", "trello", "linear", "github"].includes(provider);
   const settings = draft.settings;
   return <div className={styles.setupGrid}>
@@ -55,8 +57,8 @@ export function ConnectionPanel({ provider, ru, draft, snapshot, discovery, pend
             onChange={(e) => { const secrets = { ...draft.secrets }; if (e.target.value) secrets.signingSecret = e.target.value;
               else delete secrets.signingSecret; onChange({ ...draft, secrets }); }} /></label>
         {snapshot.webhook.url ? <div className={styles.callback}><span>Webhook URL</span><code>{snapshot.webhook.url}</code>
-          <button type="button" className={styles.secondary} onClick={() => { void navigator.clipboard.writeText(snapshot.webhook.url!).then(() => setCopied(true), () => setCopied(false)); }}>
-            <Copy size={14} />{copied ? (ru ? "Скопировано" : "Copied") : (ru ? "Копировать" : "Copy")}</button></div> :
+          <button type="button" className={styles.copyCode} aria-label={ru ? "Копировать Webhook URL" : "Copy Webhook URL"} title={done ? (ru ? "Скопировано" : "Copied") : (ru ? "Копировать Webhook URL" : "Copy Webhook URL")} onClick={() => { const url = snapshot.webhook.url!; void navigator.clipboard.writeText(url).then(() => setCopied({ url, success: true }), () => setCopied({ url, success: false })); }}>
+            {done ? <Check width={16} height={16} /> : <Copy width={16} height={16} />}</button><span className={styles.srOnly} role="status">{copied?.url === snapshot.webhook.url ? done ? (ru ? "Скопировано" : "Copied") : (ru ? "Не удалось скопировать. Выделите текст вручную." : "Copy failed. Select the text manually.") : ""}</span></div> :
           <small>{ru ? "Для получения адреса сохраните подключение; секрет подписи можно добавить следующим шагом." :
             "Save the connection to get its URL; the signing secret can be added in the next step."}</small>}
         <a href={copy.docs} target="_blank" rel="noreferrer">{ru ? "Настроить вебхук в сервисе" : "Set up the service webhook"}<ExternalLink size={13} /></a>

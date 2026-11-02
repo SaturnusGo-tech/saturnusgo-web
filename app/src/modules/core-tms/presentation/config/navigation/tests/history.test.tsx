@@ -3,6 +3,8 @@ import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useSettingsSection } from "../state/useSettingsSection";
+import { pluginSettingsLink, readPluginSettingsRoute } from "../plugins/plugin-settings-route";
+import { navigateWorkspace } from "../../../../state/navigation/browser/workspace-history";
 
 Object.assign(globalThis, { React });
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -29,6 +31,18 @@ test("settings tabs restore on back/forward and the notifications legacy URL is 
     assert.equal(state.section, "notifications");
     await act(async () => { location.href = next; browser.dispatchEvent(new Event("popstate")); await flush(); });
     assert.equal(state.section, "account");
+    await act(async () => { state.select("plugins"); await flush(); });
+    const list = location.href;
+    assert.equal(state.section, "plugins"); assert.equal(readPluginSettingsRoute(list), null);
+    await act(async () => { navigateWorkspace(new URL(pluginSettingsLink(location.href, "codex"), location.href).href); await flush(); });
+    const manage = location.href;
+    assert.equal(state.section, "plugins"); assert.equal(readPluginSettingsRoute(manage), "codex");
+    await act(async () => { location.href = list; browser.dispatchEvent(new Event("popstate")); await flush(); });
+    assert.equal(state.section, "plugins"); assert.equal(readPluginSettingsRoute(location.href), null);
+    await act(async () => { location.href = manage; browser.dispatchEvent(new Event("popstate")); await flush(); });
+    assert.equal(readPluginSettingsRoute(location.href), "codex");
+    await act(async () => { state.select("plugins"); await flush(); });
+    assert.equal(readPluginSettingsRoute(location.href), null); assert.equal(state.section, "plugins");
   } finally {
     if (tree) act(() => tree.unmount());
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");

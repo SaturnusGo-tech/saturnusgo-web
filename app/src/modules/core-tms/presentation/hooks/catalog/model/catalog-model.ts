@@ -8,14 +8,14 @@ export type CatalogFilter = "all" | "connected" | "attention" | "planned";
 export type CatalogGroup = IntegrationGroup | "all";
 export type CatalogEntry = { integration: IntegrationDefinition; status: IntegrationUiStatus };
 export type CatalogSource = {
-  showOthers?: boolean; showCodex: boolean; codexStatus: IntegrationUiStatus;
+  showOthers?: boolean; showSwagger?: boolean; showCodex: boolean; codexStatus: IntegrationUiStatus;
   codexCompanyStatus?: "active" | "inactive" | "not_activated" | null; swaggerStatus: IntegrationUiStatus;
   configuration: YouTrackConfiguration | null; status: YouTrackIntegrationStatus | null; statusFailed: boolean;
   connectorState: "loading" | "ready" | "error"; connections: readonly Connection[]; projectId: string;
 };
 
 export function catalogEntries(source: CatalogSource): CatalogEntry[] {
-  return INTEGRATIONS.filter(integration => integration.id === "codex" ? source.showCodex : source.showOthers !== false)
+  return INTEGRATIONS.filter(integration => integration.id === "codex" ? source.showCodex : integration.id === "swagger" ? (source.showSwagger ?? source.showOthers !== false) : source.showOthers !== false)
     .map(integration => ({ integration, status: state(integration, source) }));
 }
 

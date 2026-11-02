@@ -1,3 +1,4 @@
+import { CodexPluginsSettings } from "../../codex-employee/composition/settings/CodexPluginsSettings";
 import { ImportCasesPage } from "../../test-cases/exchange/library/presentation/page/ImportCasesPage";
 import { CustomFieldsPage } from "../../custom-fields/presentation/catalog/CustomFieldsPage";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
@@ -81,6 +82,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     return (
       <ConfigView key={model.data.workspace.id}
         notifications={<WorkspaceNotifications workspaceId={model.data.workspace.id} />}
+        plugins={<CodexPluginsSettings workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} canManage={model.canManageIntegrations} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />}
         environments={model.projectEnvironments}
         project={model.project}
         offline={model.connection === "demo"}

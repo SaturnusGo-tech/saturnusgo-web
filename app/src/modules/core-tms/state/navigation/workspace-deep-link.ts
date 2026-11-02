@@ -20,7 +20,7 @@ export function readWorkspaceDeepLink(href: string): { view: View | null; runId:
   if (query.get("defectId") || query.get("defect")) return { view: "reports", runId: null };
   if (runId) return runSelection;
   const integration = query.get("integration");
-  if (integration && (isProvider(integration) || integration === "youtrack")) return { view: "hooks", runId: null };
+  if (integration && (isProvider(integration) || integration === "youtrack" || integration === "codex")) return { view: "hooks", runId: null };
   return { view: null, runId: null };
 }
 
@@ -41,6 +41,8 @@ export function buildWorkspaceDeepLink(href: string, input: {
   const suiteId = url.searchParams.get("suiteId");
   const suiteEdit = url.searchParams.get("suiteEdit");
   const settings = url.searchParams.get("view") === "notifications" ? "notifications" : url.searchParams.get("settings");
+  const plugin = url.searchParams.get("plugin");
+  const pluginSetup = url.searchParams.get("pluginSetup");
   const article = url.searchParams.get("article"); const section = url.hash;
   const commentId = url.searchParams.get("commentId");
   const defectId = url.searchParams.get("defectId") ?? url.searchParams.get("defect");
@@ -56,6 +58,14 @@ export function buildWorkspaceDeepLink(href: string, input: {
   if (targetView === "config") {
     const section = input.view === "notifications" ? "notifications" : settings;
     if (settingsSections.includes(section as typeof settingsSections[number])) url.searchParams.set("settings", section!);
+    if (section === "plugins" && sameScope && plugin && (plugin === "codex" || plugin === "youtrack" || isProvider(plugin))) {
+      url.searchParams.set("plugin", plugin);
+      if (pluginSetup === "connect") url.searchParams.set("pluginSetup", "connect");
+      if (plugin === "github" && (impact === "1" || analysisId)) {
+        url.searchParams.set("impact", "1");
+        if (analysisId && /^[A-Za-z0-9._:-]{1,128}$/.test(analysisId)) url.searchParams.set("analysisId", analysisId);
+      }
+    }
   }
   if (input.view === "portfolios" && sameWorkspace) {
     if (organizationCreate === "portfolio" || organizationCreate === "project") url.searchParams.set("organizationCreate", organizationCreate);
@@ -87,7 +97,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
     url.searchParams.set("defectId", defectId);
     if (commentId && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(commentId)) url.searchParams.set("commentId", commentId);
   }
-  if (input.view === "hooks" && integration && (isProvider(integration) || integration === "youtrack")) {
+  if (input.view === "hooks" && integration && (isProvider(integration) || integration === "youtrack" || integration === "codex")) {
     url.searchParams.set("integration", integration);
     if (sameScope && integration === "github" && (impact === "1" || analysisId)) {
       url.searchParams.set("impact", "1");

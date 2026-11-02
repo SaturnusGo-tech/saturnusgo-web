@@ -88,6 +88,16 @@ test("opening Config from an integration replaces the URL and reload restores Co
   }
 });
 
+test("plugin management is canonical only in scoped Plugins settings", () => {
+  const base = "https://tms.example/work/?workspaceId=w&projectId=p&view=config&settings=plugins&plugin=codex";
+  const scope = { workspaceId: "w", projectId: "p", view: "config" as const, runId: null };
+  assert.equal(new URL(buildWorkspaceDeepLink(base, scope)).searchParams.get("plugin"), "codex");
+  for (const next of [{ ...scope, workspaceId: "other" }, { ...scope, projectId: "other" }, { ...scope, view: "cases" as const }])
+    assert.equal(new URL(buildWorkspaceDeepLink(base, next)).searchParams.has("plugin"), false);
+  for (const href of [base.replace("settings=plugins", "settings=general"), base.replace("plugin=codex", "plugin=../../other")])
+    assert.equal(new URL(buildWorkspaceDeepLink(href, scope)).searchParams.has("plugin"), false);
+});
+
 test("reports preserve a scoped detail and closing it restores the report list after reload", () => {
   const previous = "https://tms.example/work/?workspaceId=w&projectId=p&view=reports&defectId=d";
   const reports = buildWorkspaceDeepLink(previous, { workspaceId: "w", projectId: "p", view: "reports", runId: "active" });
@@ -154,4 +164,17 @@ test("report comment canonicalization is stable and never carries across compani
   assert.equal(new URL(buildWorkspaceDeepLink(href,next)).searchParams.has("commentId"),false);
  assert.equal(new URL(buildDefectDeepLink(href,{projectId:"p",defectId:"other"})).searchParams.has("commentId"),false);
  assert.equal(new URL(buildDefectDeepLink(href,{projectId:"p",defectId:null})).searchParams.has("commentId"),false);
+});
+
+test("Codex detail and setup intent survive reload only in their scoped destination", () => {
+  const scope = { workspaceId: "w", projectId: "p", view: "config" as const, runId: null };
+  const href = "https://tms.example/work/?workspaceId=w&projectId=p&view=config&settings=plugins&plugin=codex&pluginSetup=connect";
+  const result = new URL(buildWorkspaceDeepLink(href, scope));
+  assert.equal(result.searchParams.get("pluginSetup"), "connect");
+  for (const next of [{ ...scope, projectId: "other" }, { ...scope, workspaceId: "other" }, { ...scope, view: "cases" as const }]) {
+    assert.equal(new URL(buildWorkspaceDeepLink(href, next)).searchParams.get("pluginSetup"), null);
+  }
+  assert.equal(new URL(buildWorkspaceDeepLink(href.replace("settings=plugins", "settings=appearance"), scope)).searchParams.get("pluginSetup"), null);
+  const detail = "https://tms.example/work/?workspaceId=w&projectId=p&view=hooks&integration=codex";
+  assert.equal(new URL(buildWorkspaceDeepLink(detail, { ...scope, view: "hooks" })).searchParams.get("integration"), "codex");
 });

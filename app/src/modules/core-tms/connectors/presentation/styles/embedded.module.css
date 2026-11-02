@@ -1,0 +1,10 @@
+.embedded.embedded[data-provider], :global(.dark) .embedded.embedded[data-provider] {
+  --c-bg: var(--plugin-bg); --c-panel: var(--plugin-bg); --c-soft: var(--plugin-panel); --c-ink: var(--plugin-text);
+  --c-muted: var(--plugin-muted); --c-line: var(--plugin-line); --c-accent: var(--plugin-text); --c-highlight: var(--plugin-hover); --c-radius: 9px;
+  --c-side: var(--plugin-panel); --c-side-ink: var(--plugin-text); color-scheme: inherit;
+  height: auto; overflow: visible; background: transparent; color: var(--plugin-text); font: inherit;
+}
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 18px; border-bottom: 1px solid var(--plugin-line); }
+.tabs button { min-height: 32px; padding: 5px 10px; color: var(--plugin-muted); border: 0; border-radius: 8px; background: transparent; }
+.tabs button:hover, .tabs button[aria-current="page"] { color: var(--plugin-text); background: var(--plugin-hover); }
+.content { min-width: 0; padding-top: 20px; }

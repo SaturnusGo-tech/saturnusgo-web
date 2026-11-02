@@ -1,0 +1,24 @@
+.expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 200ms ease, opacity 160ms ease; }
+.expansion[data-open] { grid-template-rows: 1fr; opacity: 1; }
+.clipped { min-height: 0; overflow: hidden; }
+.content { padding: 0 0 22px 58px; }
+.intro { margin: 0 0 20px; max-width: 72ch; color: var(--plugin-muted); }
+.field { display: grid; gap: 8px; max-width: 460px; }
+.field > span, .label { color: var(--plugin-text); font-weight: 500; }
+.field input { width: 100%; min-width: 0; height: 38px; padding: 8px 11px; border: 1px solid var(--plugin-line); border-radius: 8px; background: var(--plugin-bg); color: var(--plugin-text); caret-color: var(--plugin-text); }
+.field input[aria-invalid="true"] { border-color: #d85e5e; }
+.label { margin-top: 20px; }
+.codeBlock { position: relative; min-width: 0; min-height: 44px; margin-top: 8px; padding-right: 44px; border: 1px solid var(--plugin-line); border-radius: 10px; color: var(--plugin-text); background: var(--plugin-bg); }
+.singleValue { display: block; min-width: 0; padding: 12px 10px 12px 14px; overflow-wrap: anywhere; font: 12px/1.6 ui-monospace, monospace; }
+.copy { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; color: var(--plugin-muted); background: transparent; cursor: pointer; }
+.copy:hover:not(:disabled) { color: var(--plugin-text); background: var(--plugin-hover); }
+.steps { margin: 22px 0; padding-left: 22px; }
+.steps li { padding-left: 4px; margin-top: 10px; max-width: 76ch; }
+.advanced h3 { margin: 20px 0 8px; color: var(--plugin-muted); font-size: 13px; font-weight: 500; }
+.codeBlock pre { margin: 0; padding: 12px 10px 12px 14px; overflow-x: auto; font: 12px/1.6 ui-monospace, monospace; }
+.protocol { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 8px 14px; margin: 20px 0 0; font-size: 12px; }
+.protocol dt { color: var(--plugin-muted); }
+.protocol dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.feedback { min-height: 21px; margin: 12px 0 0; color: var(--plugin-muted); font-size: 13px; }
+@media(max-width: 760px) { .content { padding-left: 0; } }
+@media(prefers-reduced-motion: reduce) { .expansion { transition: none; } }

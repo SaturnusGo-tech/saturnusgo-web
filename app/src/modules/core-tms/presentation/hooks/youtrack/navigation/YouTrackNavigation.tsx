@@ -4,13 +4,16 @@ import { IntegrationGuideLink } from "../../shared/theme/IntegrationGuideLink";
 import styles from "../youtrack.module.css";
 
 export type YouTrackTab = "connection" | "projects" | "workflow" | "webhook";
-export function YouTrackNavigation({ tab, onTab, copy, canManage, russian }: {
-  tab: YouTrackTab; onTab: (tab: YouTrackTab) => void; copy: HooksCopy; canManage: boolean; russian: boolean;
+export function YouTrackNavigation({ tab, onTab, copy, canManage, russian, embedded = false }: {
+  tab: YouTrackTab; onTab: (tab: YouTrackTab) => void; copy: HooksCopy; canManage: boolean; russian: boolean; embedded?: boolean;
 }) {
   const items = [{ id: "connection" as const, title: copy.connection, Icon: Settings2 },
     { id: "projects" as const, title: russian ? "Проекты и правила" : "Projects & rules", Icon: FolderKanban },
     { id: "workflow" as const, title: copy.workflow, Icon: GitBranch },
     ...(canManage ? [{ id: "webhook" as const, title: "Webhook", Icon: Webhook }] : [])];
+  if (embedded) return <nav className={styles.embeddedTabs} aria-label={russian ? "Разделы YouTrack" : "YouTrack sections"}>
+    {items.map(({ id, title }) => <button key={id} type="button" aria-current={tab === id ? "page" : undefined} onClick={() => onTab(id)}>{title}</button>)}
+  </nav>;
   return <aside className={styles.sidebar}>
     <div className={styles.sideTitle}>{russian ? "НАСТРОЙКИ ИНТЕГРАЦИИ" : "INTEGRATION SETTINGS"}</div>
     <nav aria-label={russian ? "Разделы YouTrack" : "YouTrack sections"}>

@@ -23,3 +23,7 @@
 @keyframes pulse { to { opacity:.35; } }
 @media(prefers-reduced-motion:reduce) { .skeleton { animation:none; } }
 @media(max-width:720px) { .manager { padding:18px 16px; } .manager header { flex-wrap:wrap; gap:12px; } .manager h1 { font-size:18px; } .back { font-size:12px!important; } .projectNames { display:none; } .primary { padding:9px 13px; } }
+.manager[data-embedded] { height: auto; overflow: visible; padding: 0; background: transparent; font: inherit; }
+.manager[data-embedded] header h3 { margin: 0; font-size: 16px; font-weight: 500; }
+.manager[data-embedded] .primary { min-height: 36px; padding: 6px 12px; border-radius: 10px; background: var(--plugin-action); color: var(--plugin-on-action); font: inherit !important; }
+.manager[data-embedded] .state { min-height: 160px; }

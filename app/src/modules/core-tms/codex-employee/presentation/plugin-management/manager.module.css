@@ -1,0 +1,19 @@
+.rowButton { padding-inline: 16px; border-radius: 12px; width: 100%; border: 0; background: transparent; cursor: pointer; text-align: left; font: inherit; }
+.rowButton:hover, .rowLink:hover { color: var(--plugin-text); }
+.rowButton:hover .chevron, .rowLink:hover > svg { transform: translateX(2px); }
+.rowButton > span > span, .rowLink > span > span { display: block; }
+.chevron { transition: transform 180ms ease; }
+.chevron[data-open] { transform: rotate(90deg) !important; }
+.company { border-top: 1px solid var(--plugin-line); flex-wrap: wrap; }
+.status { display: inline-block; margin-left: 12px; color: var(--plugin-muted); font-size: 13px; font-weight: 400; }
+.rowLink { border-radius: 12px; text-decoration: none; border-top: 1px solid var(--plugin-line); }
+.rowLink > svg { transition: transform 180ms ease; }
+.resource:empty { display: none; }
+.resource { color: var(--plugin-muted); }
+.resource button, .refresh { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; border: 0; border-radius: 8px; padding: 5px 8px; background: transparent; color: var(--plugin-text); cursor: pointer; font: inherit; }
+.resource button:hover, .refresh:hover { background: var(--plugin-hover); }
+.empty { margin: 0; padding: 18px 0; color: var(--plugin-muted); }
+.connectionDetails { margin-top: 8px; color: var(--plugin-muted); font-size: 12px; }
+.connectionDetails summary { cursor: pointer; }
+.connectionDetails p { margin: 8px 0 0; overflow-wrap: anywhere; }
+@media(max-width: 600px) { .company > div { flex-basis: 100%; } }

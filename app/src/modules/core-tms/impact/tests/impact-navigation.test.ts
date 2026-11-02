@@ -23,6 +23,31 @@ test("switching project or leaving GitHub cannot retain a foreign analysis; list
   const list = impactHref(href, scope, null); assert.equal(new URL(list).searchParams.get("impact"), "1");
   assert.equal(readImpactSelection(list, scope), null);
 });
+test("canonical plugin-manager links open the actual selected analysis and retain their container on selection", () => {
+  const manager = new URL("https://tms.falcon.test/work/");
+  manager.search = new URLSearchParams({ ...scope, view: "config", settings: "plugins", plugin: "github", impact: "1", analysisId: "analysis_qa" }).toString();
+  assert.equal(readImpactSelection(manager.href, scope), "analysis_qa");
+  const next = impactHref(`${manager.href}&runId=old&defectId=old#old`, scope, "analysis_next");
+  assert.deepEqual(Object.fromEntries(new URL(next).searchParams), { ...scope, view: "config", settings: "plugins", plugin: "github", impact: "1", analysisId: "analysis_next" });
+  assert.equal(readImpactSelection(next, scope), "analysis_next");
+  const canonical = buildWorkspaceDeepLink(next, { ...scope, view: "config", runId: null });
+  assert.equal(readImpactSelection(canonical, scope), "analysis_next");
+  const list = impactHref(next, scope, null);
+  assert.equal(new URL(list).searchParams.get("plugin"), "github");
+  assert.equal(new URL(list).searchParams.get("analysisId"), null); assert.equal(readImpactSelection(list, scope), null);
+  for (const foreign of [{ ...scope, workspaceId: "other" }, { ...scope, projectId: "other" }]) assert.equal(readImpactSelection(next, foreign), null);
+  const moved = buildWorkspaceDeepLink(next, { ...scope, projectId: "other", view: "config", runId: null });
+  assert.equal(readImpactSelection(moved, { ...scope, projectId: "other" }), null);
+});
+test("unrelated settings and provider routes cannot expose a selected analysis or masquerade as its container", () => {
+  for (const query of ["view=config&settings=general&plugin=github", "view=config&settings=plugins&plugin=slack", "view=hooks&integration=slack", "view=runs&integration=github", "view=config&integration=github"]) {
+    const href = `https://tms.falcon.test/work/?${new URLSearchParams(scope)}&${query}&analysisId=analysis_qa`;
+    assert.equal(readImpactSelection(href, scope), null);
+    const target = new URL(impactHref(href, scope, "analysis_next"));
+    assert.equal(target.searchParams.get("view"), "hooks"); assert.equal(target.searchParams.get("integration"), "github");
+    assert.equal(target.searchParams.has("settings"), false); assert.equal(target.searchParams.has("plugin"), false);
+  }
+});
 test("malformed IDs and unsafe externally supplied hyperlinks do not become navigation targets", () => {
   assert.throws(() => impactHref("https://tms.falcon.test/work/", scope, "../foreign"));
   for (const value of ["javascript:alert(1)", "http://github.com/qa", "https://user:secret@github.com/qa", "/relative", ""]) assert.equal(safeImpactLink(value), undefined);

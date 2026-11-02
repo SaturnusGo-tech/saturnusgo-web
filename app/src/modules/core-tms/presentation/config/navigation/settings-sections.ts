@@ -1,8 +1,8 @@
-export const settingsSections = ["general", "environments", "exchange", "appearance", "notifications", "account"] as const;
+export const settingsSections = ["general", "environments", "exchange", "appearance", "notifications", "account", "plugins"] as const;
 export type SettingsSection = typeof settingsSections[number];
 export const settingsCopy = {
   ru: {
-    title: "Настройки", projectGroup: "Проект", personalGroup: "Личные настройки",
+    title: "Настройки", projectGroup: "Проект", personalGroup: "Личные настройки", integrationsGroup: "Интеграции",
     search: "Поиск настроек", clearSearch: "Очистить поиск", noResults: "Настройки не найдены",
     general: ["Общие", "Название, ключ и состояние выбранного проекта."],
     environments: ["Окружения", "Стенды, на которых команда выполняет проверки."],
@@ -10,13 +10,14 @@ export const settingsCopy = {
     appearance: ["Оформление и язык", "Настройте Falcon под привычный способ работы."],
     notifications: ["Уведомления", "Выберите события Falcon и каналы, в которых хотите их получать."],
     account: ["Аккаунт и сессия", "Ваш вход в рабочее пространство Falcon."],
+    plugins: ["Плагины", "Управляйте плагинами и MCP-подключениями Falcon."],
     themePreview: "Предпросмотр темы", archiveHint: "Архивный проект сохраняет историю. Его можно восстановить.",
     exportHint: "Скачайте тест-кейсы проекта в формате JSON.",
     importHint: "Выберите файл экспорта Falcon. Перед импортом вы увидите количество кейсов.",
     currentAccount: "Вы вошли как", sessionNote: "Оформление и язык сохраняются для вашего браузера. Выход завершает текущую сессию.",
   },
   en: {
-    title: "Settings", projectGroup: "Project", personalGroup: "Personal settings",
+    title: "Settings", projectGroup: "Project", personalGroup: "Personal settings", integrationsGroup: "Integrations",
     search: "Search settings", clearSearch: "Clear search", noResults: "No settings found",
     general: ["General", "Name, key and status of the selected project."],
     environments: ["Environments", "The environments your team uses to run tests."],
@@ -24,6 +25,7 @@ export const settingsCopy = {
     appearance: ["Appearance and language", "Make Falcon fit the way you work."],
     notifications: ["Notifications", "Choose which Falcon events to receive and where."],
     account: ["Account and session", "Your access to the Falcon workspace."],
+    plugins: ["Plugins", "Manage Falcon plugins and MCP connections."],
     themePreview: "Theme preview", archiveHint: "Archived projects retain their history and can be restored.",
     exportHint: "Download this project’s test cases as a JSON file.",
     importHint: "Select a Falcon export. Review the number of cases before importing.",

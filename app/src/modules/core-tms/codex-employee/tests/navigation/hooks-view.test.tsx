@@ -38,7 +38,7 @@ test("catalog, detail, browser back and refresh share one resource owner", async
   assert.ok(tile.findAllByType("span").some(span => span.children.includes("Company active")));
   act(() => tile.props.onClick());
   assert.equal(current.searchParams.get("integration"), "codex");
-  assert.match(JSON.stringify(view.toJSON()), /Set up the connection/);
+  assert.match(JSON.stringify(view.toJSON()), /Your QA workflow in Codex/);
   assert.equal(statusCalls, 1); assert.equal(grantCalls, 1);
   await act(async () => { current = new URL(stack[--index]); listeners.forEach(listener => listener()); });
   assert.match(JSON.stringify(view.toJSON()), /All services/);
@@ -50,7 +50,7 @@ test("catalog, detail, browser back and refresh share one resource owner", async
   act(() => tileAgain.props.onClick());
   await act(async () => view.unmount());
   await act(async () => { view = create(tree); });
-  assert.match(JSON.stringify(view.toJSON()), /Set up the connection/);
+  assert.match(JSON.stringify(view.toJSON()), /Your QA workflow in Codex/);
   assert.equal(statusCalls, 3); assert.equal(grantCalls, 3);
   await act(async () => view.unmount());
 });
@@ -71,7 +71,7 @@ test("tester restored connector links cannot start connector requests or expose 
     let view!: ReactTestRenderer;
     await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="p" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
     assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")), calls.join(", "));
-    assert.equal(JSON.stringify(view.toJSON()).includes("Set up the connection"), integration === "codex");
+    assert.equal(JSON.stringify(view.toJSON()).includes("Your QA workflow in Codex"), integration === "codex");
     await act(async () => view.unmount());
   }
 });
@@ -91,8 +91,8 @@ test("profile connect URL reaches setup and a core-only denial stays actionable"
     let view!: ReactTestRenderer;
     await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
     const rendered = JSON.stringify(view.toJSON());
-    if (entitled) assert.match(rendered, /Set up the connection/);
-    else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Set up the connection/); }
+    if (entitled) assert.match(rendered, /Your QA workflow in Codex/);
+    else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Company active/); }
     assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")));
     await act(async () => view.unmount());
   }

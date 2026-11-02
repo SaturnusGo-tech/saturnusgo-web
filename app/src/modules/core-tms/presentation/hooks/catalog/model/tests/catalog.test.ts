@@ -20,3 +20,8 @@ test("catalog permission filtering happens before query, group and status select
   assert.deepEqual(catalogEntries({ ...base, showOthers: false, showCodex: false }), []);
   assert.deepEqual(filterCatalog(catalogEntries(base), "api", "all", " openapi ").map(entry => entry.integration.id), ["swagger"]);
 });
+
+test("Swagger follows its own API entitlement without falling through to integrations", () => {
+  assert.equal(catalogEntries({ ...base, showSwagger: false }).some(entry => entry.integration.id === "swagger"), false);
+  assert.deepEqual(catalogEntries({ ...base, showOthers: false, showSwagger: true }).map(entry => entry.integration.id), ["codex", "swagger"]);
+});

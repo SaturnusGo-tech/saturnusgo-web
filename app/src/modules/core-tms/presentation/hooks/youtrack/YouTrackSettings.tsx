@@ -23,6 +23,7 @@ export function YouTrackSettings({
   canManage,
   onBack,
   onStatusChange,
+  embedded = false,
 }: {
   workspaceId: string;
   status: YouTrackIntegrationStatus | null;
@@ -31,11 +32,13 @@ export function YouTrackSettings({
   canManage: boolean;
   onBack: () => void;
   onStatusChange: () => void;
+  embedded?: boolean;
 }) {
   const copy = hooksCopy(russian);
   const state = useYouTrackSettings(workspaceId, copy, onStatusChange, canManage);
   const webhook = useYouTrackWebhookSetup(workspaceId, state.configuration, canManage);
   const [disconnectOpen, setDisconnectOpen] = useState(false);
+  const rootClass = `${embedded ? "" : surface.root} ${identity.root} ${embedded ? identity.embedded : ""}`;
   const uiStatus: IntegrationUiStatus = state.configuration?.connection.status === "connected" ||
     (state.configuration?.source === "runtime" && state.configuration.enabled &&
       state.configuration.tokenConfigured)
@@ -43,20 +46,20 @@ export function YouTrackSettings({
     : state.configuration?.connection.status === "failed" ? "attention" : "available";
 
   if (state.loading) {
-    return <div className={`${surface.root} ${identity.root}`} data-integration-workspace>
-      <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="checking" />
+    return <div className={rootClass} data-integration-workspace>
+      {!embedded && <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="checking" />}
       <YouTrackSettingsSkeleton copy={copy} />
     </div>;
   }
   if (state.loadFailed || !state.configuration || !state.draft) {
-    return <div className={`${surface.root} ${identity.root}`} data-integration-workspace>
-      <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="attention" />
+    return <div className={rootClass} data-integration-workspace>
+      {!embedded && <YouTrackSettingsHeader russian={russian} onBack={onBack} copy={copy} status="attention" />}
       <YouTrackSettingsFailure copy={copy} onRetry={state.retry} />
     </div>;
   }
   return (
-    <div className={`${surface.root} ${identity.root}`} data-integration-workspace data-testid="youtrack-settings">
-      <YouTrackSettingsHeader russian={russian}
+    <div className={rootClass} data-integration-workspace data-testid="youtrack-settings">
+      {!embedded && <YouTrackSettingsHeader russian={russian}
         onBack={onBack}
         copy={copy}
         status={uiStatus}
@@ -65,9 +68,10 @@ export function YouTrackSettings({
         baseUrl={state.configuration.baseUrl ?? ""}
         action={state.action}
         onSave={canManage ? () => void state.save() : undefined}
-      />
-      <YouTrackSettingsForm russian={russian} copy={copy} state={state} webhook={webhook} canManage={canManage}
+      />}
+      <YouTrackSettingsForm embedded={embedded} russian={russian} copy={copy} state={state} webhook={webhook} canManage={canManage}
         onChangeConnection={() => setDisconnectOpen(true)} />
+      {embedded && canManage && <footer className={identity.embeddedFooter}><button type="button" onClick={() => void state.save()} disabled={state.action !== "idle"}>{state.action === "saving" ? copy.saving : copy.save}</button></footer>}
       {canManage && disconnectOpen ? <DisconnectYouTrackDialog copy={copy} busy={state.action === "disconnecting"}
         onClose={() => setDisconnectOpen(false)} onConfirm={() => {
           void state.disconnect().then((done) => { if (done) setDisconnectOpen(false); });

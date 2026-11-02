@@ -10,20 +10,22 @@ import { WorkflowSection } from "../sections/workflow/WorkflowSection";
 import { WebhookSection } from "../sections/webhook/WebhookSection";
 import type { useYouTrackWebhookSetup } from "../state/webhook/use-youtrack-webhook-setup";
 
-export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChangeConnection, russian }: {
+export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChangeConnection, russian, embedded = false }: {
   russian: boolean;
   copy: HooksCopy;
   state: YouTrackSettingsState;
   webhook: ReturnType<typeof useYouTrackWebhookSetup>;
   canManage: boolean;
   onChangeConnection: () => void;
+  embedded?: boolean;
 }) {
   const [tab, setTab] = useState<YouTrackTab>("connection");
+  const Content = embedded ? "div" : "main";
   if (!state.configuration || !state.draft) return null;
   return (
     <div className={identity.layout}>
-      <YouTrackNavigation tab={tab} onTab={setTab} copy={copy} canManage={canManage} russian={russian} />
-      <main className={surface.settingsMain} key={tab}>
+      <YouTrackNavigation embedded={embedded} tab={tab} onTab={setTab} copy={copy} canManage={canManage} russian={russian} />
+      <Content className={surface.settingsMain} data-youtrack-body key={tab}>
       {state.notice ? (
         <div className={surface.settingsNotice} data-tone={state.notice.tone} role="status">
           {state.notice.text}
@@ -63,7 +65,7 @@ export function YouTrackSettingsForm({ copy, state, webhook, canManage, onChange
       />}
       {canManage && tab === "webhook" ? <WebhookSection copy={copy} setup={webhook.setup} status={webhook.status} /> : null}
       </fieldset>
-    </main>
+    </Content>
     </div>
   );
 }

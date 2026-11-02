@@ -4,10 +4,11 @@ import { IntegrationBrand } from "../../../presentation/hooks/shared/brand/Integ
 import type { Provider } from "../../model/connector-types";
 import { providerCopy } from "../../localization/connector-copy";
 import styles from "../styles/connector.module.css";
+import inline from "../styles/embedded.module.css";
 export type ConnectorTab = "connection" | "automation" | "activity" | "impact";
-export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, enabled, children }: {
+export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, enabled, children, embedded = false }: {
   provider: Provider; ru: boolean; tab: ConnectorTab; onTab: (tab: ConnectorTab) => void;
-  onBack: () => void; project: string; enabled: boolean; children: ReactNode;
+  onBack: () => void; project: string; enabled: boolean; children: ReactNode; embedded?: boolean;
 }) {
   const logo = <IntegrationBrand provider={provider} />; const copy = providerCopy(provider, ru);
   const tabs = [
@@ -16,6 +17,11 @@ export function ConnectorChrome({ provider, ru, tab, onTab, onBack, project, ena
     { id: "activity" as const, icon: Activity, label: ru ? "Журнал и связи" : "Activity & links" }]),
     ...(provider === "github" ? [{ id: "impact" as const, icon: GitBranch, label: "Impact Analysis" }] : []),
   ];
+  if (embedded) return <section className={`${styles.root} ${inline.embedded}`} data-provider={provider} data-embedded data-integration-workspace data-testid={`connector-${provider}`}>
+    <nav className={inline.tabs} aria-label={ru ? "Разделы интеграции" : "Integration sections"}>{tabs.map(item => <button type="button" key={item.id}
+      aria-current={tab === item.id ? "page" : undefined} onClick={() => onTab(item.id)}>{item.label}</button>)}</nav>
+    <div className={inline.content}>{children}</div>
+  </section>;
   return <main className={styles.root} data-provider={provider} data-integration-workspace data-testid={`connector-${provider}`}>
     <header className={styles.topbar}>
       <button type="button" className={styles.back} onClick={onBack}><ArrowLeft size={16} />{ru ? "Интеграции" : "Integrations"}</button>
