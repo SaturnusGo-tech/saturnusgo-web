@@ -4,26 +4,25 @@ import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/su
 import type { DocumentationTree } from "../../../presentation/navigation/DocumentationTree";
 import type { GuideComposer } from "../../presentation/composer/GuideComposer";
 import { guideChatCopy } from "../../localization/copy";
-import { documentationChatId } from "../../../navigation/documentation-link";
 import { shouldSendQuestion } from "../../presentation/composer/keyboard";
 
-test("Falcon AI is the first navigation item immediately after search, while article groups remain", () => {
+test("the article tree contains guide articles and leaves AI chat to its separate tab", () => {
   for (const locale of ["ru", "en"] as const) {
     const h = componentHarness(); let navigated = 0;
     const { DocumentationTree: render } = h.load<{ DocumentationTree: typeof DocumentationTree }>(new URL("../../../presentation/navigation/DocumentationTree.tsx", import.meta.url), name => {
       if (name.endsWith("useDocumentationCatalog")) return { useDocumentationCatalog: () => ({ locale, docGroups: [{ id: "start", title: "Start" }],
         docArticles: [{ id: "introduction", title: "Guide", group: "start" }] }) };
       if (name.endsWith("useDocumentationCopy")) return { useDocumentationCopy: () => ({ guideArticles: "Guide articles" }) };
-      if (name.endsWith("documentation-link")) return { documentationChatId };
       if (name.endsWith("localization/copy")) return { guideChatCopy };
     });
-    const navigation = { articleId: documentationChatId, link: (id: string) => `?article=${id}`, navigate: (event: { defaultPrevented: boolean }) => { event.defaultPrevented = true; } };
+    const navigation = { articleId: "introduction", documentationId: "introduction", documentationSection: undefined,
+      link: (id: string) => `?article=${id}`, navigate: (event: { defaultPrevented: boolean }) => { event.defaultPrevented = true; } };
     const all = nodes(h.render(() => render({ navigation, query: "", onQuery() {}, searchRef: { current: null }, onSearch() {}, onNavigate: () => navigated++ } as Parameters<typeof render>[0])));
     const links = all.filter(node => node.type === "a");
-    assert.equal(links[0].props.href, `?article=${documentationChatId}`); assert.equal(links[0].props["aria-current"], "page");
-    assert.equal(nodes(links[0]).find(node => node.type === "span")?.props.children, guideChatCopy[locale].title);
+    assert.equal(links.length, 1);
+    assert.equal(links[0].props.href, "?article=introduction"); assert.equal(links[0].props["aria-current"], "page");
+    assert.equal(nodes(links[0]).find(node => node.type === "span")?.props.children, "Guide");
     assert.ok(all.indexOf(all.find(node => node.props.role === "search")!) < all.indexOf(links[0]));
-    assert.equal(links[1].props.href, "?article=introduction");
     invoke(links[0], "onClick", { defaultPrevented: false }); assert.equal(navigated, 1);
   }
 });

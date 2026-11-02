@@ -20,7 +20,7 @@ export const gettingStarted: DocArticle[] = [
         ["Review ongoing work", "Dashboard"], ["Connect your team's services", "Hooks"],
         ["Change project details, environments, or appearance", "Settings"])),
       section("reading", "How to use this guide", bullets(
-        "Help opens Falcon AI chat. Ask a question there or open an article in the tree. The Falcon AI chat item is immediately below guide search.",
+        "Help opens the Falcon guide. Choose an article in the tree or use guide search. To ask a question about a procedure, open the Falcon AI tab at the top.",
         "Find an article in the tree on the left or search its title and contents. Search recognizes English terms and service names.",
         "In walkthroughs, read the action above each screenshot and the expected outcome below it. Click an image to enlarge it; use the arrow keys to browse and Escape to close.",
         "Screenshots use the training projects Falcon Guide, Payments, and Umbrella-Host; the instructions and screenshot header identify the project. Replace example addresses, names, and builds with your own. Screenshots contain no credentials.",
@@ -29,10 +29,10 @@ export const gettingStarted: DocArticle[] = [
         "The theme switch changes Falcon's overall appearance. Articles and new chats follow the interface language. Saved conversations retain their original text and screenshot language."),
         note("Documentation for the current version", "These articles describe available features. GitLab, Jenkins, and TeamCity cards are still marked Coming soon; their automation is not yet enabled in Falcon.")),
       section("guide-chat", "Ask Falcon AI about a procedure", steps(
-        ["Describe your task", "Open Falcon AI chat and ask, for example: “How do I replace an Android build in an existing run?” Use Send message to submit your question."],
+        ["Describe your task", "Open the Falcon AI tab at the top and ask, for example: “How do I replace an Android build in an existing run?” Use Send message to submit your question."],
         ["Review the answer and its sources", "Read the explanation and open the links under In the guide for the relevant articles and sections. You can return to the chat and ask a follow-up question without repeating the whole conversation."],
         ["Dictate if convenient", "Click Dictate a question and allow microphone access. Finish recording, review the transcribed text, correct it if needed, then use Send message. Recording a question does not send it automatically."],
-        ["Return to a conversation", "Use Chat history beside New chat to find and reopen an earlier conversation. Chats are saved for your account in the current workspace. New chat starts a separate conversation and keeps the earlier ones. A chat is created when you send its first question."],
+        ["Return to a conversation", "Use the history sidebar to find and reopen an earlier conversation. On a narrow screen, open Chat history in the chat header. Chats are saved for your account in the current workspace. New chat starts a separate conversation and keeps the earlier ones. A chat is created when you send its first question."],
         ["Share one answer", "Use Share answer beside Copy under a completed answer. Copy its link for a colleague in the same workspace. The link opens only that question and answer, including its sources and screenshots, after sign-in; it does not open your other messages. Revoke the link from the same control when access is no longer needed. Administration-only answers still require administrator access."],
         ["Inspect an illustration", "Click a screenshot to expand it from its thumbnail. Use the arrow keys to browse the answer's screenshots and Escape to return. If the thumbnail is still visible, the image shrinks back into it. Reduced motion is respected."]),
         note("What the chat can explain", "Falcon AI answers from the current guide and provides source links. If the guide does not cover a detail, it should say so. The chat does not inspect your test results or change cases, runs, builds, or settings. Follow the instructions in Falcon yourself; the text assistant in case editors is a separate tool.")),

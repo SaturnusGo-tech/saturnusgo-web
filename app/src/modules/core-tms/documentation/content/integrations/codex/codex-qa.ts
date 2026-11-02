@@ -8,7 +8,7 @@ export const codexQaArticle: DocArticle = {
   keywords: ["Codex", "QA", "virtual employee", "Figma", "PDF", "URL", "existing cases", "browser", "consent", "resume", "retest"],
   related: ["integration-overview", "falcon-ai-writing", "execute-run", "integration-troubleshooting"],
   sections: [
-    section("purpose", "Choose the right assistant", paragraph("Help → Falcon AI chat answers questions from this handbook. The editor's Falcon AI improves selected text. The connected Falcon plugin in Codex can perform authorized QA actions and save results in Falcon."),
+    section("purpose", "Choose the right assistant", paragraph("Help → Falcon AI answers questions from this handbook. The editor's Falcon AI improves selected text. The connected Falcon plugin in Codex can perform authorized QA actions and save results in Falcon."),
       note("Availability", "Your company features, role, connection permissions, and the supported browser in your Codex host determine what you can do.")),
     section("company", "One Codex employee for the company", bullets(
       "A company has one stable Codex employee and one occupied billable seat across projects, chats, clients, and personal connections.",

@@ -1,5 +1,5 @@
 export const documentationChatId = "falcon-ai-chat";
-export const defaultArticleId = documentationChatId;
+export const defaultArticleId = "introduction";
 export const safeArticleId = (value: string | null) => value && /^[a-z][a-z0-9-]{0,63}$/.test(value) ? value : defaultArticleId;
 
 export function documentationLink(href: string, articleId: string, sectionId?: string) {

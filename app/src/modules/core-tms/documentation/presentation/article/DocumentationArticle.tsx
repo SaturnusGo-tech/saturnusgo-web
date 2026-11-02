@@ -12,14 +12,13 @@ import styles from "../documentation.module.css";
 export function DocumentationArticle({ article, navigation }: {
   article: DocArticle; navigation: ReturnType<typeof useDocumentationNavigation>;
 }) {
-  const { docArticles, articleById, docGroups } = useDocumentationCatalog();
+  const { docArticles, articleById } = useDocumentationCatalog();
   const index = docArticles.indexOf(article);
   const copy = useDocumentationCopy();
   const adjacent = [{ label: copy.previousArticle, article: docArticles[index - 1], Icon: ArrowLeft },
     { label: copy.nextArticle, article: docArticles[index + 1], Icon: ArrowRight }];
   return <article className={styles.article} aria-labelledby="docs-article-title">
     <header className={styles.articleHeader}>
-      <span className={styles.eyebrow}>{docGroups.find((g) => g.id === article.group)?.title}</span>
       <h1 id="docs-article-title" tabIndex={-1}>{article.title}</h1><p className={styles.lead}>{article.description}</p>
       <div className={styles.articleMeta}><span><Clock3 size={13} aria-hidden="true" />{readingMinutes(article)} {copy.minRead}</span>
         {article.status === "planned" && <span className={styles.planned}>{copy.comingToFalcon}</span>}

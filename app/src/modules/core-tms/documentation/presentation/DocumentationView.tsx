@@ -2,7 +2,6 @@
 import { useDocumentationCopy } from "../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../access/useDocumentationCatalog";
 
-import { BookOpen, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useColorMode } from "../../../../shared/_hooks/useColorMode";
 import { useDocumentationNavigation } from "../navigation/useDocumentationNavigation";
@@ -12,7 +11,7 @@ import { SearchResults } from "./search/SearchResults";
 import { documentationChatId } from "../navigation/documentation-link";
 import { useDocumentationChat } from "../chat/state/useDocumentationChat";
 import { DocumentationChat } from "../chat/presentation/DocumentationChat";
-import { guideChatCopy } from "../chat/localization/copy";
+import { DocumentationHeader } from "./header/DocumentationHeader";
 import styles from "./documentation.module.css";
 
 export function DocumentationView() {
@@ -27,21 +26,25 @@ export function DocumentationView() {
   const searchRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const article = articleById.get(navigation.articleId);
-  const searching = Boolean(query.trim());
-  const chatting = !searching && navigation.articleId === documentationChatId;
+  const chatting = navigation.articleId === documentationChatId;
+  const searching = !chatting && Boolean(query.trim());
+
+  function openSearch() { setTreeOpen(true); requestAnimationFrame(() => searchRef.current?.focus()); }
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest("dialog[open]")) return;
-      if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey && !target.closest("input,textarea,select,[contenteditable=true]")) {
-        event.preventDefault(); setTreeOpen(true); requestAnimationFrame(() => searchRef.current?.focus());
+      if (!chatting && ((event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey)
+        || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k"))
+        && !target.closest("input,textarea,select,[contenteditable=true]")) {
+        event.preventDefault(); openSearch();
       }
       if (event.key === "Escape") setTreeOpen(false);
     };
     document.addEventListener("keydown", shortcut);
     return () => document.removeEventListener("keydown", shortcut);
-  }, []);
+  }, [chatting]);
 
   useEffect(() => {
     if (searching) { scrollRef.current?.scrollTo(0, 0); return; }
@@ -70,30 +73,26 @@ export function DocumentationView() {
 
   function select() { setQuery(""); setTreeOpen(false); }
   return <section className={styles.root} data-documentation-workspace lang={locale} aria-label={copy.workspace}>
-    <header className={styles.header}>
-      <button className={`${styles.quietButton} ${styles.treeToggle}`} type="button" aria-label={treeOpen ? copy.hideTree : copy.showTree}
-        aria-expanded={treeOpen} aria-controls="documentation-sidebar" onClick={() => setTreeOpen((current) => !current)}>{treeOpen ? <X size={18} /> : <Menu size={18} />}</button>
-      <BookOpen size={17} aria-hidden="true" /><span>{copy.documentation}</span><span className={styles.headerDivider}>/</span><strong>{searching ? copy.search : chatting ? guideChatCopy[locale].title : article?.title ?? copy.notFound}</strong>
-      <button className={`${styles.quietButton} ${styles.themeButton}`} type="button" aria-label={isLight ? copy.darkTheme : copy.lightTheme}
-        onClick={(event) => toggleAnimated({ x: event.clientX, y: event.clientY })}>{isLight ? <Moon size={16} /> : <Sun size={16} />}</button>
-    </header>
-    <div className={styles.frame}>
+    <DocumentationHeader navigation={navigation} chatting={chatting} treeOpen={treeOpen}
+      onTreeToggle={() => setTreeOpen(current => !current)} onNavigate={select} onSearch={openSearch}
+      isLight={isLight} onThemeChange={toggleAnimated} />
+    {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} /> : <div className={styles.frame}>
       <aside id="documentation-sidebar" className={styles.sidebar} data-open={treeOpen}>
         <DocumentationTree navigation={navigation} query={query} onQuery={setQuery} searchRef={searchRef} onNavigate={select} onSearch={() => setTreeOpen(false)} />
       </aside>
       <div className={styles.readingArea}>
-        {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} /> : <div ref={scrollRef} className={styles.scroll}>
+        <div ref={scrollRef} className={styles.scroll}>
           {searching ? <SearchResults query={query.trim()} navigation={navigation} onSelect={select} /> : article
             ? <DocumentationArticle key={`${locale}:${article.id}`} article={article} navigation={navigation} />
             : <section className={styles.searchResults}><span className={styles.eyebrow}>{copy.guide}</span><h1>{copy.notFound}</h1>
               <p>{copy.outdatedLink}</p>
               <a href={navigation.link("introduction")} onClick={(event) => navigation.navigate(event, "introduction")}>{copy.openGuide}</a></section>}
-        </div>}
+        </div>
         {!searching && article && <nav className={styles.toc} aria-label={copy.onThisPage}><strong>{copy.onThisPage}</strong>
           {article.sections.map((s) => <a key={s.id} href={navigation.link(article.id, s.id)} aria-current={activeSection === s.id ? "location" : undefined}>{s.title}</a>)}
           <div className={styles.tocNote}>{copy.guideNote}<br />{copy.workspaceNote}</div>
         </nav>}
       </div>
-    </div>
+    </div>}
   </section>;
 }

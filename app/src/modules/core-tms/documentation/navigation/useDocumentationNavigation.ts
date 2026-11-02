@@ -6,17 +6,22 @@ import { guideChatLink, readGuideChatRoute, type GuideChatRoute } from "../chat/
 
 export function useDocumentationNavigation(identity = "") {
   const [articleId, setArticleId] = useState(defaultArticleId);
+  const [documentation, setDocumentation] = useState<{ id: string; section?: string }>({ id: defaultArticleId });
   const [href, setHref] = useState("");
   const lastChat = useRef<Partial<GuideChatRoute>>({});
   const workspace = useRef<string | null>(null);
   useEffect(() => {
     lastChat.current = {};
+    setDocumentation({ id: defaultArticleId });
     const read = () => {
-      const current = window.location.href, id = safeArticleId(new URL(current).searchParams.get("article"));
-      const nextWorkspace = new URL(current).searchParams.get("workspaceId");
-      if (workspace.current !== nextWorkspace) { workspace.current = nextWorkspace; lastChat.current = {}; }
+      const current = window.location.href, url = new URL(current), id = safeArticleId(url.searchParams.get("article"));
+      const nextWorkspace = url.searchParams.get("workspaceId");
+      if (workspace.current !== nextWorkspace) {
+        workspace.current = nextWorkspace; lastChat.current = {}; setDocumentation({ id: defaultArticleId });
+      }
       setHref(current); setArticleId(id);
       if (id === documentationChatId) lastChat.current = readGuideChatRoute(current);
+      else setDocumentation({ id, section: url.hash.slice(1) || undefined });
     };
     read(); window.addEventListener("popstate", read); window.addEventListener("hashchange", read); window.addEventListener(HISTORY_CHANGE, read);
     return () => { window.removeEventListener("popstate", read); window.removeEventListener("hashchange", read); window.removeEventListener(HISTORY_CHANGE, read); };
@@ -32,5 +37,5 @@ export function useDocumentationNavigation(identity = "") {
     setHref(window.location.href); setArticleId(id);
     });
   };
-  return { articleId, link, navigate };
+  return { articleId, documentationId: documentation.id, documentationSection: documentation.section, link, navigate };
 }

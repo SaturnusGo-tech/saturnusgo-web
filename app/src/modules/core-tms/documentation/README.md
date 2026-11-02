@@ -1,8 +1,12 @@
 # Falcon user documentation
 
-The global Help button opens `view=help` with Falcon AI chat selected. The first
-navigation item below guide search returns to the chat; articles remain in the
-tree. An article is addressable with
+The global Help button opens `view=help` with the introduction selected.
+Documentation and Falcon AI are separate header links. The documentation view
+has an article tree, search, reading column and table of contents. The AI view
+has its own conversation history and composer; narrow screens expose history
+through the chat header. Switching views restores the last article/section or
+conversation/message/share route within the current identity and workspace.
+An article is addressable with
 `article=<id>` and an optional section hash. Links retain workspace/project
 scope and remove selectors belonging to other screens.
 
@@ -34,7 +38,10 @@ and dark themes, and narrow-screen navigation in the running application.
 The production static export must pass the normal repository workflow.
 
 The module is loaded through `DocumentationEntry` only when Help is opened.
-It uses the existing Falcon color-mode hook and shared dark surface tokens.
+It uses the existing Falcon color-mode hook and scoped neutral documentation
+tokens. Reference OpenAI Sans assets are self-hosted under
+`public/fonts/falcon-docs/`, with provenance in `SOURCES.md`; they do not replace
+the rest of Falcon's fonts. The main workspace stage clips its top corners to16px.
 Articles and screenshots remain available without an AI response. Chat uses the
 authenticated documentation-assistant API and its configured server-side model.
 No provider credentials belong in frontend code or the documentation corpus.

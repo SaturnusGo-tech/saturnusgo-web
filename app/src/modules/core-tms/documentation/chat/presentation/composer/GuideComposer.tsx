@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from "react";
-import { ArrowUp, LoaderCircle, Mic, Square } from "lucide-react";
+import { ArrowUp, ArrowRotateCw, Mic, Stop } from "@openai/apps-sdk-ui/components/Icon";
 import { useWritingDictation } from "../../../../writing-assistant/dictation/state/useWritingDictation";
 import { RecordingStatus } from "../../../../writing-assistant/dictation/presentation/RecordingStatus";
 import { maximumQuestionCharacters } from "../../model/conversation";
@@ -35,12 +35,12 @@ export function GuideComposer({ chat }: { chat: ReturnType<typeof useGuideConver
         <button type="button" className={css.iconButton} aria-label={microphoneLabel} title={microphoneLabel}
           aria-pressed={dictation.active} disabled={!chat.enabled || chat.busy || tooLong}
           data-recording={dictation.state === "listening" || undefined} onClick={() => dictation.active ? dictation.stop() : dictation.start()}>
-          {dictation.state === "starting" || dictation.state === "transcribing" ? <LoaderCircle size={17} className={css.spinner} />
-            : dictation.active ? <Square size={13} fill="currentColor" /> : <Mic size={18} />}
+          {dictation.state === "starting" || dictation.state === "transcribing" ? <ArrowRotateCw width={19} height={19} className={css.spinner} />
+            : dictation.active ? <Stop width={18} height={18} /> : <Mic width={21} height={21} />}
         </button>
         <button type="button" className={css.send} aria-label={chat.busy ? copy.stop : copy.send}
           disabled={!chat.busy && !canSend} onClick={chat.busy ? chat.cancel : send}>
-          {chat.busy ? <Square size={13} fill="currentColor" /> : <ArrowUp size={19} />}
+          {chat.busy ? <Stop width={19} height={19} /> : <ArrowUp width={23} height={23} />}
         </button>
       </div>
     </div>

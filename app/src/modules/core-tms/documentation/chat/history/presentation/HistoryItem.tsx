@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Archive, Check, MoreHorizontal, Pencil } from "lucide-react";
+import { Archive, Check, DotsHorizontalMoreMenu, Pencil } from "@openai/apps-sdk-ui/components/Icon";
 import type { GuideHistoryApi } from "../model/api";
 import type { GuideChatSummary } from "../model/history";
 import { guideHistoryCopy } from "../localization/copy";
@@ -24,17 +24,17 @@ export function HistoryItem({ item, api, locale, selected, onOpen, onChanged }: 
       <button type="button" data-chat-choice aria-current={selected ? "page" : undefined} className={css.row} onClick={onOpen}>
         <span><strong>{item.title || copy.untitled}</strong><time dateTime={item.updatedAt}>
           {new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(new Date(item.updatedAt))}</time></span>
-        {selected && <Check size={14} aria-hidden="true" />}
+        {selected && <Check width={16} height={16} aria-hidden="true" />}
       </button>
       <button ref={trigger} type="button" className={css.itemMore} aria-label={`${copy.actions}: ${item.title || copy.untitled}`}
         aria-expanded={Boolean(editor.mode)} disabled={editor.busy} onClick={() => editor.mode ? close() : editor.setMode("menu")}>
-        <MoreHorizontal size={16} aria-hidden="true" />
+        <DotsHorizontalMoreMenu width={19} height={19} aria-hidden="true" />
       </button>
     </div>
     {editor.mode && <div ref={controls} className={css.itemControls} data-history-controls>
       {editor.mode === "menu" ? <div className={css.itemButtons}>
-        <button type="button" onClick={() => editor.setMode("rename")}><Pencil size={13} />{copy.rename}</button>
-        <button type="button" onClick={() => editor.setMode("archive")}><Archive size={13} />{copy.archive}</button>
+        <button type="button" onClick={() => editor.setMode("rename")}><Pencil width={15} height={15} />{copy.rename}</button>
+        <button type="button" onClick={() => editor.setMode("archive")}><Archive width={15} height={15} />{copy.archive}</button>
       </div> : editor.mode === "rename" ? <form onSubmit={event => { event.preventDefault(); void editor.save(); }}>
         <input ref={input} aria-label={copy.title} maxLength={120} value={editor.title} disabled={editor.busy}
           onChange={event => editor.setTitle(event.target.value)} />

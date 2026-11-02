@@ -950,6 +950,9 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 .shell[data-appearance="glass"] .header { background: #f5f5f5; border-bottom: 0; gap: 10px; padding-inline: 14px; }
 :global(.dark) .shell[data-appearance="glass"] :is(.header, .navigation) { background: #242424; }
 .shell[data-appearance="glass"] .workspaceColumn { border-radius: 0; }
+.shell[data-appearance="glass"] .workspaceColumn { background: #f5f5f5; }
+:global(.dark) .shell[data-appearance="glass"] .workspaceColumn { background: #242424; }
+.shell[data-appearance="glass"] .stage.stage { border-radius: 16px 16px 0 0; overflow: hidden; background: var(--glass-panel); }
 .shell[data-appearance="glass"] .projectSelectorSlot > div > button:first-child { border-radius: 8px; }
 .projectEyebrow { display: none; }
 @media (max-width: 760px) {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { History, Search, X } from "lucide-react";
+import { SidebarMenuMobile, MagnifyingGlassSearch, CloseBold } from "@openai/apps-sdk-ui/components/Icon";
 import type { useGuideConversation } from "../../state/useGuideConversation";
 import { useAnchoredPopup } from "../../../../presentation/common/popup/useAnchoredPopup";
 import { useChatHistory } from "../state/useChatHistory";
@@ -29,11 +29,11 @@ export function ChatHistoryPopover({ chat }: { chat: ReturnType<typeof useGuideC
   }} onBlur={event => { if (event.relatedTarget && !root.current?.contains(event.relatedTarget as Node)) close(); }}>
     <button type="button" className={css.trigger} ref={trigger} onClick={() => setOpen(value => !value)}
       aria-label={copy.history} title={copy.history} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined}>
-      <History size={18} aria-hidden="true" />
+      <SidebarMenuMobile width={21} height={21} aria-hidden="true" />
     </button>
     {open && <div ref={panel} id={id} popover="manual" role="dialog" aria-labelledby={`${id}-title`} className={css.panel}>
-      <header><h2 id={`${id}-title`}>{copy.history}</h2><button type="button" onClick={dismiss} aria-label={copy.close}><X size={15} /></button></header>
-      <label className={css.search}><Search size={14} aria-hidden="true" /><input ref={input} value={history.query} maxLength={120}
+      <header><h2 id={`${id}-title`}>{copy.history}</h2><button type="button" onClick={dismiss} aria-label={copy.close}><CloseBold width={15} height={15} /></button></header>
+      <label className={css.search}><MagnifyingGlassSearch width={17} height={17} aria-hidden="true" /><input ref={input} value={history.query} maxLength={120}
         onChange={event => history.setQuery(event.target.value)} placeholder={copy.search} aria-label={copy.search} /></label>
       <div className={css.list} aria-busy={history.loading}>
         {api && history.items.map(item => <HistoryItem key={item.id} item={item} api={api} locale={chat.locale}

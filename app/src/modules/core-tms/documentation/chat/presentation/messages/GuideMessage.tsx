@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@openai/apps-sdk-ui/components/Icon";
 import { useDocumentationCatalog } from "../../../access/useDocumentationCatalog";
 import type { useDocumentationNavigation } from "../../../navigation/useDocumentationNavigation";
 import { CopyButton } from "../../../presentation/controls/CopyButton";
@@ -37,7 +37,7 @@ export function GuideMessage({ message, navigation, onSource, streaming = false,
         title={`${source.title} · ${source.sectionTitle}`} onClick={event => {
           navigation.navigate(event, source.articleId, source.sectionId);
           if (event.defaultPrevented) onSource();
-        }}><span>{source.sectionTitle}</span><ArrowUpRight size={13} aria-hidden="true" /></a>)}
+        }}><span>{source.sectionTitle}</span><ArrowUpRight width={14} height={14} aria-hidden="true" /></a>)}
     </nav>}
     {!streaming && <div className={css.answerActions}><CopyButton value={message.content} label={copy.copy} />
       {sharing && message.turnId && <ShareAnswer {...sharing} turnId={message.turnId} />}</div>}
