@@ -23,7 +23,7 @@ import { HooksView } from "../hooks/HooksView";
 import { ProjectOnboarding } from "../onboarding/ProjectOnboarding";
 import { ReportsView } from "../reports/ReportsView";
 import { WorkspaceRunsStage } from "./runs/WorkspaceRunsStage";
-import { SuitesView } from "../suites/SuitesView";
+import { WorkspaceSuitesStage } from "./suites/WorkspaceSuitesStage";
 import { SharedStepsView } from "../shared-steps/SharedStepsView";
 import { WorkspaceLoadState } from "../workspace-state/WorkspaceLoadState";
 import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
@@ -145,38 +145,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "shared-steps") {
     return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
   }
-  if (model.view === "suites") {
-    return (
-      <SuitesView
-        key={`${model.data.workspace.id}:${model.project.id}`}
-        workspaceId={model.data.workspace.id} projectId={model.project.id} projectName={model.project.name}
-        suites={model.projectSuites}
-        cases={model.projectCases}
-        folders={model.folders.items}
-        selectedDetail={model.selectedSuite}
-        detailError={model.selectedSuiteDetailError} onRetryDetail={model.retrySelectedSuiteDetail}
-        canManage={model.data.meta.authorization.capabilities.includes("suite:manage")}
-        canRun={model.data.meta.authorization.capabilities.includes("run:manage")}
-        onSelect={model.setSelectedSuiteId}
-        onCreate={() => {
-          model.setEditingSuiteId(null);
-          model.setDialog("suite");
-        }}
-        onConfigure={(suiteId) => {
-          model.setSelectedSuiteId(suiteId);
-          model.setEditingSuiteId(suiteId);
-          model.setDialog("suite");
-        }}
-        onRun={(suiteId) => model.openRunDialog({ suiteId })}
-        onOpenCase={(testCase) => {
-          model.setQuery("");
-          model.setSelectedCaseId(testCase.id);
-          model.setSelectedFolder(testCase.folderPath);
-          model.setView("cases");
-        }}
-      />
-    );
-  }
+  if (model.view === "suites") return <WorkspaceSuitesStage key={`${model.data.workspace.id}:${model.project.id}`} model={model} />;
   if (model.view === "runs") return <WorkspaceRunsStage model={model} />;
   return (
     <ReportsView connected={model.connection === "connected"} canComment={model.data.meta.authorization.capabilities.includes("defect:manage")} workspaceId={model.data.workspace.id} projectId={model.projectId} projectName={model.project.name}

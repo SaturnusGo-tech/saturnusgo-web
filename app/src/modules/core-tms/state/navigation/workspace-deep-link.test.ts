@@ -101,6 +101,29 @@ test("reports preserve a scoped detail and closing it restores the report list a
   }
 });
 
+test("suite editor survives scoped canonicalization and is removed outside its workspace, project or view", () => {
+  const base = "https://tms.example/work/?workspaceId=w&projectId=p&view=suites";
+  const scope = { workspaceId: "w", projectId: "p", view: "suites" as const, runId: null };
+  for (const [suffix, mode, id] of [["&suiteEdit=new", "new", null], ["&suiteId=suite-1&suiteEdit=edit", "edit", "suite-1"]] as const) {
+    const href = `${base}${suffix}`;
+    const canonical = buildWorkspaceDeepLink(href, scope);
+    assert.equal(new URL(canonical).searchParams.get("suiteEdit"), mode);
+    assert.equal(new URL(canonical).searchParams.get("suiteId"), id);
+    assert.equal(buildWorkspaceDeepLink(canonical, scope), canonical);
+    for (const next of [{ ...scope, workspaceId: "other" }, { ...scope, projectId: "other" }, { ...scope, view: "cases" as const }]) {
+      const moved = new URL(buildWorkspaceDeepLink(href, next));
+      assert.equal(moved.searchParams.has("suiteEdit"), false);
+      assert.equal(moved.searchParams.has("suiteId"), false);
+    }
+  }
+  const create = new URL(buildWorkspaceDeepLink(`${base}&suiteEdit=new&suiteId=old`, scope));
+  assert.equal(create.searchParams.get("suiteEdit"), "new");
+  assert.equal(create.searchParams.has("suiteId"), false);
+  for (const suffix of ["&suiteEdit=edit", "&suiteEdit=edit&suiteId=../../foreign", "&suiteEdit=unknown"]) {
+    assert.equal(new URL(buildWorkspaceDeepLink(`${base}${suffix}`, scope)).searchParams.has("suiteEdit"), false);
+  }
+});
+
 test("retired integration testing links open the repository without changing connector routes", () => {
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=integrations"), { view: "cases", runId: null });
   assert.deepEqual(readWorkspaceDeepLink("https://tms.example/work/?view=api"), { view: "api", runId: null });

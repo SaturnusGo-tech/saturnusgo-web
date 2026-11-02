@@ -65,20 +65,3 @@ test("Falcon production assets are square RGBA PNGs with transparency", () => {
     assert.equal(asset[25], 6);
   });
 });
-
-test("suite settings and detail reuse the repository and the shared Markdown editor", () => {
-  const dialog = source("app/src/modules/core-tms/presentation/dialogs/suite/SuiteDialog.tsx");
-  const fields = source("app/src/modules/core-tms/presentation/dialogs/suite/fields/SuiteEditableFields.tsx");
-  const detail = source("app/src/modules/core-tms/presentation/suites/detail/repository/SuiteRepository.tsx");
-  for (const screen of [dialog, detail]) { assert.match(screen, /<SelectionTree/); assert.match(screen, /<SelectionControls/); assert.doesNotMatch(screen, /<EmbeddedCaseList/); }
-  assert.match(fields, /<MarkdownField/); assert.match(fields, /onRequestEdit/); assert.doesNotMatch(fields, /<Pencil/);
-});
-
-test("suite primary actions keep white labels and visible keyboard focus", () => {
-  const styles = source("app/src/modules/core-tms/presentation/dialogs/suite/suite-dialog.module.css");
-  const suites = source("app/src/modules/core-tms/presentation/suites/suites.module.css");
-  assert.match(suites, /\.primary\.primary[\s\S]*color: #fff !important/);
-  assert.match(suites, /\.search input\s*\{[^}]*background: transparent; outline: none; box-shadow: none/s);
-  assert.match(suites, /button:focus-visible[^}]*outline: 2px solid #3574f0/);
-  assert.doesNotMatch(styles, /focus[^}]*border-color: var\(--action\)/s);
-});

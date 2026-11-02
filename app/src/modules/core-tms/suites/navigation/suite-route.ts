@@ -11,6 +11,20 @@ export function buildSuiteRoute(href: string, workspaceId: string, projectId: st
   url.searchParams.set("projectId", projectId);
   url.searchParams.set("view", "suites");
   url.searchParams.delete("suiteId");
+  url.searchParams.delete("suiteEdit");
   if (id && suiteIdPattern.test(id)) url.searchParams.set("suiteId", id);
+  return url.toString();
+}
+
+export function readSuiteEditorRoute(href: string, workspaceId: string, projectId: string) {
+  const query = new URL(href).searchParams;
+  if (query.get("view") !== "suites" || query.get("workspaceId") !== workspaceId || query.get("projectId") !== projectId) return null;
+  if (query.get("suiteEdit") === "new") return "new";
+  return query.get("suiteEdit") === "edit" && readSuiteRoute(href, workspaceId, projectId) ? "edit" : null;
+}
+
+export function buildSuiteEditorRoute(href: string, workspaceId: string, projectId: string, id: string | null) {
+  const url = new URL(buildSuiteRoute(href, workspaceId, projectId, id));
+  url.searchParams.set("suiteEdit", id ? "edit" : "new");
   return url.toString();
 }

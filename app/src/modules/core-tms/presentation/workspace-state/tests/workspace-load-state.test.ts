@@ -30,10 +30,6 @@ test("resource hydration uses the branded loader instead of a false empty state"
     new URL("../../cases/CasesView.tsx", import.meta.url),
     "utf8",
   );
-  const suitesSource = readFileSync(
-    new URL("../../suites/detail/SuiteDetail.tsx", import.meta.url),
-    "utf8",
-  );
   const runsSource = readFileSync(
     new URL("../../runs/RunsView.tsx", import.meta.url),
     "utf8",
@@ -44,16 +40,11 @@ test("resource hydration uses the branded loader instead of a false empty state"
   assert.match(casesSource, /props\.detailLoadError/);
   assert.match(casesSource, /data-testid="case-detail-error"/);
   assert.match(casesSource, /onClick=\{props\.onRetryDetail\}/);
-  assert.match(suitesSource, /!detail \|\| preview\.loading \? <div data-testid="suite-detail-loading"><RunCasesSkeleton/);
   assert.match(runsSource, /selectedRun && !selectedItem/);
   assert.match(runsSource, /testId="run-item-loading"/);
 });
 
-test("suite and run drawers share the production test-case list", () => {
-  const suiteDialogSource = readFileSync(
-    new URL("../../dialogs/suite/SuiteDialog.tsx", import.meta.url),
-    "utf8",
-  );
+test("run preparation preserves the production test-case list", () => {
   const runScopeSource = readFileSync(
     new URL("../../dialogs/run/RunDialog.tsx", import.meta.url),
     "utf8",
@@ -67,7 +58,6 @@ test("suite and run drawers share the production test-case list", () => {
     "utf8",
   );
 
-  assert.match(suiteDialogSource, /<SelectionTree/);
   assert.match(runScopeSource, /<SelectionTree/);
   assert.match(embeddedListSource, /<LifecycleBadge/);
   assert.match(embeddedListSource, /<PrioritySignal/);

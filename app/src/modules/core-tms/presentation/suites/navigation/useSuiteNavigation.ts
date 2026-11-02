@@ -1,4 +1,4 @@
-import { navigateWorkspace } from "../../../state/navigation/browser/workspace-history";
+import { HISTORY_CHANGE, navigateWorkspace } from "../../../state/navigation/browser/workspace-history";
 import { useCallback, useEffect, useState } from "react";
 import { buildSuiteRoute, readSuiteRoute } from "../../../suites/navigation/suite-route";
 
@@ -12,7 +12,8 @@ export function useSuiteNavigation(workspaceId: string, projectId: string, onSel
     };
     read();
     window.addEventListener("popstate", read);
-    return () => window.removeEventListener("popstate", read);
+    window.addEventListener(HISTORY_CHANGE, read);
+    return () => { window.removeEventListener("popstate", read); window.removeEventListener(HISTORY_CHANGE, read); };
   }, [workspaceId, projectId, onSelect]);
   const navigate = useCallback((next: string | null) => {
     const href = buildSuiteRoute(window.location.href, workspaceId, projectId, next);

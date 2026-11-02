@@ -2,7 +2,6 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { FolderDialog } from "../dialogs/folder/FolderDialog";
 import { ProjectDialog } from "../dialogs/project/ProjectDialog";
-import { SuiteDialog } from "../dialogs/suite/SuiteDialog";
 import { WorkspaceExecutionDialogs } from "./WorkspaceExecutionDialogs";
 
 export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
@@ -54,40 +53,6 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
           if (!result) return;
           model.selectFolder(result.path, result.id); model.setSelectedCaseId(""); close();
           model.notify(t("actions.folderCreated", { path: result.path }));
-        }}
-      />
-    );
-  }
-  if (model.dialog === "suite") {
-    return (
-      <SuiteDialog
-        projectId={model.project?.id ?? ""}
-        projectName={model.project?.name ?? ""}
-        folders={model.folders.items}
-        cases={model.projectCases}
-        suite={model.selectedSuiteDetail?.id === model.editingSuiteId
-          ? model.selectedSuiteDetail
-          : undefined}
-        suiteEtag={model.selectedSuiteEtag}
-        offline={model.connection === "demo"}
-        onClose={close}
-        onSaved={(suite, etag) => {
-          const existing = model.data.suites.some((item) => item.id === suite.id);
-          const { caseIds: _caseIds, filter: _filter, resolvedCaseCount: _resolved, ...summary } = suite;
-          model.setData((current) => ({
-            ...current,
-            suites: current.suites.some((item) => item.id === suite.id)
-              ? current.suites.map((item) =>
-                  item.id === suite.id ? summary : item,
-                )
-              : [...current.suites, summary],
-          }));
-          model.setSelectedSuiteId(suite.id);
-          model.setSelectedSuiteDetail(suite);
-          model.setSelectedSuiteEtag(etag);
-          model.setEditingSuiteId(null);
-          close();
-          model.notify(t(existing ? "actions.suiteUpdated" : "actions.suiteCreated"));
         }}
       />
     );
