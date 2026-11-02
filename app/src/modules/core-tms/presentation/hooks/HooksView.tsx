@@ -1,7 +1,6 @@
 "use client";
 import { CodexDetail } from "../../codex-employee/presentation/setup/CodexDetail";
-import { useCodexEmployee } from "../../codex-employee/application/state/useCodexEmployee";
-import { createCodexEmployeeApi } from "../../codex-employee/data/http/codex-employee-api";
+import { useWorkspaceCodex } from "../../codex-employee/composition/workspace/useWorkspaceCodex";
 
 import { ApiSourceManager } from "../../api-sources/presentation/ApiSourceManager";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
@@ -9,7 +8,7 @@ import { useApiSourceList } from "../../api-sources/state/useApiSourceList";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   getYouTrackConfiguration,
@@ -40,8 +39,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const [reload, setReload] = useState(0);
   const connectors = useWorkspaceConnectors();
   const session = useOptionalTmsSession();
-  const codexApi = useMemo(() => createCodexEmployeeApi(http), [http]);
-  const codex = useCodexEmployee(codexApi, session?.kind === "managed");
+  const codex = useWorkspaceCodex(session?.kind === "managed");
   const apiEnabled = companyViewAvailable("api", session?.companyCapabilities);
   const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, apiEnabled && screen === "catalog");
   const open = (target: IntegrationScreen) => transitionContent(() => {
