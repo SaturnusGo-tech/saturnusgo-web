@@ -40,6 +40,7 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.deepEqual(result.checkedRoutes, ["/privacy/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
+  for (const theme of ["light", "dark"]) assert.ok(result.checkedAssets.includes(`/assets/integrations/codex/codex-${theme}.png`));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.mp4"));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.vtt"));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/atmosphere.webp"));
@@ -89,4 +90,13 @@ test("fails closed for non-HTTPS origins and missing required assets", async () 
     }),
     /Required asset \/falcon\/falcon-mark-dark\.png returned 404/,
   );
+});
+
+for (const theme of ["light", "dark"]) test(`readiness rejects a missing Codex ${theme} mark`, async () => {
+  const path = `/assets/integrations/codex/codex-${theme}.png`;
+  await assert.rejects(verifyPagesOriginReadiness({
+    sourceOrigin: "https://origin.example", sourceSha,
+    fetchImpl: async (input, options) => new URL(input).pathname === path
+      ? new Response("missing", { status: 404 }) : successfulFetch([])(input, options),
+  }), new RegExp(`Required asset ${path.replaceAll(".", "\\.")} returned 404`));
 });

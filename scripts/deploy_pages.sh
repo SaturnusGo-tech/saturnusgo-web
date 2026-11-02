@@ -15,6 +15,8 @@ route_path="testcases/umbrella-home/work"
 manifest_file="$source_repo/infrastructure/cloudflare/tms-origin/route-manifest.mjs"
 origin_namespace="tms-origin"
 falcon_asset_path="falcon"
+codex_asset_path="assets/integrations/codex"
+codex_assets=("$codex_asset_path/codex-light.png" "$codex_asset_path/codex-dark.png")
 expected_pages_remote_https="https://github.com/SaturnusGo-tech/saturnusgo-web.github.io.git"
 expected_pages_remote_ssh="git@github.com:SaturnusGo-tech/saturnusgo-web.github.io.git"
 
@@ -218,6 +220,10 @@ rsync -ani "$out_dir/_next/" "$pages_repo/_next/"
 rsync -ani --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
 rsync -ani --delete "$origin_stage/" "$pages_repo/$origin_namespace/"
 rsync -ani --delete "$out_dir/$falcon_asset_path/" "$pages_repo/$falcon_asset_path/"
+for asset in "${codex_assets[@]}"; do
+  if [[ -d "$pages_repo/$codex_asset_path" ]]; then rsync -ani "$out_dir/$asset" "$pages_repo/$asset"
+  else printf 'new public asset: %s\n' "$asset"; fi
+done
 
 if [[ "$mode" == "--prepare" ]]; then
   echo "Prepared only; Pages checkout was not modified."
@@ -232,17 +238,20 @@ mkdir -p \
   "$pages_repo/_next" \
   "$pages_repo/$route_path" \
   "$pages_repo/$origin_namespace" \
-  "$pages_repo/$falcon_asset_path"
+  "$pages_repo/$falcon_asset_path" \
+  "$pages_repo/$codex_asset_path"
 rsync -a "$out_dir/_next/" "$pages_repo/_next/"
 rsync -a --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
 rsync -a --delete "$origin_stage/" "$pages_repo/$origin_namespace/"
 rsync -a --delete "$out_dir/$falcon_asset_path/" "$pages_repo/$falcon_asset_path/"
+for asset in "${codex_assets[@]}"; do rsync -a "$out_dir/$asset" "$pages_repo/$asset"; done
 touch "$pages_repo/.nojekyll"
 git -C "$pages_repo" add \
   _next \
   "$route_path" \
   "$origin_namespace" \
   "$falcon_asset_path" \
+  "${codex_assets[@]}" \
   .nojekyll
 git -C "$pages_repo" commit -m "deploy: TMS ${actual_sha:0:8}"
 git -C "$pages_repo" push origin main

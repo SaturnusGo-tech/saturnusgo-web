@@ -25,6 +25,8 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  "/assets/integrations/codex/codex-light.png",
+  "/assets/integrations/codex/codex-dark.png",
   ...["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"].map((id) => `/falcon/landing/2026-10/${id}.png`),
   "/falcon/falcon-mark-dark.png",
   "/falcon/falcon-mark-light.png",

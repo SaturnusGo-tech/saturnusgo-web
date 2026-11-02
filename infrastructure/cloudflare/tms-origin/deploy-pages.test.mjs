@@ -106,6 +106,9 @@ if (process.env.INCLUDE_LOGIN === "1") write("out/login/index.html", "FALCON LOG
 write("out/testcases/umbrella-home/work/index.html", "CURRENT TMS\\n");
 write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
+for (const theme of ["light", "dark"]) if (process.env.OMIT_CODEX_ASSET !== theme) write("out/assets/integrations/codex/codex-" + theme + ".png", "reviewed " + theme);
+write("out/assets/integrations/codex/private.json", "private fixture");
+write("out/assets/private.txt", "private fixture");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
@@ -205,6 +208,13 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
     "CURRENT TMS\n",
   );
+  for (const theme of ["light", "dark"]) {
+    const path = `assets/integrations/codex/codex-${theme}.png`;
+    assert.equal(readFileSync(join(fixture.pages, path), "utf8"), `reviewed ${theme}`);
+    assert.equal(git(fixture.pages, "show", `HEAD:${path}`).stdout, `reviewed ${theme}`);
+  }
+  assert.equal(existsSync(join(fixture.pages, "assets/integrations/codex/private.json")), false);
+  assert.equal(existsSync(join(fixture.pages, "assets/private.txt")), false);
   assert.match(git(fixture.pages, "log", "-1", "--pretty=%s").stdout, /^deploy: TMS /);
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
 });
@@ -316,5 +326,12 @@ test("fails closed when an English caption track is missing", (context) => {
   const result = deploy(fixture, "--publish", { OMIT_ENGLISH_CAPTIONS: "1" });
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*2026-09-english-final\/cases\.vtt/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+for (const theme of ["light", "dark"]) test(`fails closed when Codex ${theme} asset is absent`, (context) => {
+  const fixture = createFixture(context); const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_CODEX_ASSET: theme });
+  assert.equal(result.status, 15); assert.match(result.stderr, new RegExp(`Required public asset is missing.*codex-${theme}\\.png`));
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
