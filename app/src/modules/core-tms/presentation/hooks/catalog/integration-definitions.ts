@@ -11,10 +11,10 @@ import {
 import { SiLinear, SiTeamcity, SiSwagger } from "react-icons/si";
 
 export type IntegrationId =
-  | "youtrack" | "jira" | "linear" | "trello" | "github"
+  | "codex" | "youtrack" | "jira" | "linear" | "trello" | "github"
   | "gitlab" | "jenkins" | "teamcity" | "slack" | "confluence" | "swagger";
 
-export type IntegrationGroup = "tracker" | "delivery" | "communication" | "api";
+export type IntegrationGroup = "tracker" | "delivery" | "communication" | "api" | "ai";
 
 export type IntegrationDefinition = Readonly<{
   id: IntegrationId;
@@ -24,9 +24,10 @@ export type IntegrationDefinition = Readonly<{
   icon?: IconType;
 }>;
 
-export const INTEGRATION_GROUPS = ["tracker", "delivery", "communication", "api"] as const;
+export const INTEGRATION_GROUPS = ["ai", "tracker", "delivery", "communication", "api"] as const;
 
 export const INTEGRATIONS: readonly IntegrationDefinition[] = [
+  item("codex", "Codex", "ai", "Подключите Codex к Falcon для работы с тестированием.", "Connect Codex to Falcon for testing workflows."),
   item("swagger", "Swagger", "api", "Спецификация OpenAPI и проверка запросов к API вашего проекта.",
     "Connect your project’s OpenAPI specification and test API requests.", SiSwagger),
   item("youtrack", "YouTrack", "tracker",

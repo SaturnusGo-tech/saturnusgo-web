@@ -4,9 +4,10 @@ import { CodexMark } from "../branding/CodexMark";
 import { codexCopy } from "../copy/codex-copy";
 import { CodexResourceState } from "../shared/CodexResourceState";
 import styles from "../shared/employee.module.css";
-export function PersonalCodexConnection({ state, locale }: {
+export function PersonalCodexConnection({ state, locale, setupHere = false }: {
     state: ReturnType<typeof useCodexEmployee>;
     locale: "en" | "ru";
+    setupHere?: boolean;
 }) {
     const copy = codexCopy(locale);
     const employee = state.employee;
@@ -14,7 +15,7 @@ export function PersonalCodexConnection({ state, locale }: {
     <header className={styles.header}><CodexMark /><h2>{copy.personal}</h2>{employee && <small>{copy[employee.status]}</small>}</header>
     <p>{copy.explanation}</p>
     <CodexResourceState loading={state.loading} error={state.error} locale={locale} retry={state.refresh}/>
-    {employee && (employee.canConnect ? <><div className={styles.actions}><a href={employee.connectUrl} target="_blank" rel="noopener noreferrer">{copy.connect}</a></div><p className={styles.notice}>{copy.connectNote}</p></> : <p>{copy.unavailable}</p>)}
+    {employee && (employee.canConnect ? <><div className={styles.actions}><a href={setupHere ? "#codex-setup" : employee.connectUrl}>{copy.connect}</a></div><p className={styles.notice}>{copy.connectNote}</p></> : <p>{copy.unavailable}</p>)}
     <details><summary>{copy.own} ({state.connections.length})</summary>
       <CodexResourceState loading={false} error={state.connectionsError} locale={locale} retry={state.refresh}/>
       {!state.loading && !state.connectionsError && !state.connections.length && <p>{copy.empty}</p>}

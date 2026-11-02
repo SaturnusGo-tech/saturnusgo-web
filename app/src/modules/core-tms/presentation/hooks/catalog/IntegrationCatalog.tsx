@@ -14,7 +14,8 @@ import styles from "./catalog.module.css";
 
 type Filter = "all" | "connected" | "attention" | "planned";
 export function IntegrationCatalog({ russian, copy, configuration, status, statusFailed, onRefresh,
-  onOpenYouTrack, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
+  onOpenYouTrack, onOpenCodex, codexStatus, showCodex, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
+  onOpenCodex: () => void; codexStatus: IntegrationUiStatus; showCodex: boolean;
   swaggerStatus: IntegrationUiStatus; russian: boolean; connections: readonly Connection[]; connectorState: "loading" | "ready" | "error";
   projectId: string; onOpenConnector: (provider: Provider) => void; copy: HooksCopy;
   configuration: YouTrackConfiguration | null; status: YouTrackIntegrationStatus | null;
@@ -23,7 +24,7 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<IntegrationGroup | "all">("all");
   const [filter, setFilter] = useState<Filter>("all");
-  const entries = INTEGRATIONS.map((integration) => ({ integration, status: integration.id === "youtrack"
+  const entries = INTEGRATIONS.filter(integration => showCodex || integration.id !== "codex").map((integration) => ({ integration, status: integration.id === "codex" ? codexStatus : integration.id === "youtrack"
     ? catalogIntegrationStatus(configuration, status, statusFailed)
     : integration.id === "swagger" ? swaggerStatus : isProvider(integration.id) ? connectorState === "loading" ? "checking" : connectorState === "error" ? "attention"
       : connections.some((c) => c.provider === integration.id && c.projectId === projectId && c.enabled) ? "connected" : "available" : "planned" }));
@@ -63,7 +64,7 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
     {visible.length ? <div className={styles.grid}>
       {visible.map(({ integration, status: state }) => <IntegrationCard key={integration.id} integration={integration}
         russian={russian} copy={copy} status={state as IntegrationUiStatus}
-        onOpen={integration.id === "youtrack" ? onOpenYouTrack : isProvider(integration.id) ? () => onOpenConnector(integration.id as Provider) : undefined} />)}
+        onOpen={integration.id === "codex" ? onOpenCodex : integration.id === "youtrack" ? onOpenYouTrack : isProvider(integration.id) ? () => onOpenConnector(integration.id as Provider) : undefined} />)}
     </div> : <div className={styles.empty}><Search size={24} /><h2>{russian ? "Здесь пока нет сервисов" : "No services here"}</h2>
       <p>{russian ? "Измените запрос или фильтры, чтобы найти нужное подключение." : "Change your search or filters to find a connection."}</p>
       <button type="button" onClick={() => { setQuery(""); setFilter("all"); setGroup("all"); }}>{russian ? "Сбросить фильтры" : "Reset filters"}</button></div>}

@@ -19708,7 +19708,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The configured connectUrl is validated; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The connectUrl and setup derive from the verified company entrypoint; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.",
         "responses": {
           "200": {
             "description": "Success",
@@ -42616,7 +42616,65 @@
           "connectUrl": {
             "type": "string",
             "format": "uri",
-            "pattern": "^https://chatgpt\\.com/plugins/[A-Za-z0-9_-]+$"
+            "description": "Same-company Falcon Hooks/Codex setup URL."
+          },
+          "setup": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "type": "string",
+                "const": "1"
+              },
+              "mcpUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "resource": {
+                "type": "string",
+                "format": "uri"
+              },
+              "oauthIssuer": {
+                "type": "string",
+                "format": "uri"
+              },
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "falcon:read",
+                    "falcon:cases:create",
+                    "falcon:runs:create",
+                    "falcon:cases:write",
+                    "falcon:repository:write",
+                    "falcon:suites:write",
+                    "falcon:environments:write",
+                    "falcon:runs:manage",
+                    "falcon:execution:write",
+                    "falcon:defects:write",
+                    "falcon:attachments:write",
+                    "falcon:workflows:write",
+                    "offline_access"
+                  ]
+                },
+                "minItems": 13,
+                "maxItems": 13,
+                "uniqueItems": true
+              },
+              "authentication": {
+                "type": "string",
+                "const": "oauth"
+              }
+            },
+            "required": [
+              "version",
+              "mcpUrl",
+              "resource",
+              "oauthIssuer",
+              "scopes",
+              "authentication"
+            ]
           }
         },
         "required": [
@@ -42629,7 +42687,8 @@
           "canActivate",
           "canDeactivate",
           "canConnect",
-          "connectUrl"
+          "connectUrl",
+          "setup"
         ]
       },
       "CodexEmployeeDeactivation": {

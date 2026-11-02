@@ -34,9 +34,9 @@ test("the built-in article catalog and walkthroughs contain English copy", () =>
 });
 test("all catalog services are documented with accurate implementation availability", () => {
   for (const integration of INTEGRATIONS) {
-    const article = articleById.get(integration.id);
+    const article = articleById.get(integration.id === "codex" ? "codex-web-qa" : integration.id);
     assert.ok(article, integration.id);
-    const available = integration.id === "youtrack" || providers.some((provider) => provider === integration.id);
+    const available = integration.id === "codex" || integration.id === "youtrack" || providers.some((provider) => provider === integration.id);
     assert.equal(article.status === "planned", !available, integration.id);
   }
 });

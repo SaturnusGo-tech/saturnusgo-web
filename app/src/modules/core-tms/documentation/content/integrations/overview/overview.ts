@@ -23,6 +23,6 @@ export const integrationOverview: DocArticle = {
       ["Verify the full cycle", "Perform an agreed test action. Check delivery, the external record, and the incoming status update where supported."])),
     section("lifecycle", "Credentials and resource changes", note("An empty secret preserves the existing value", "Falcon does not reveal a saved credential again. Enter a new one to replace it. Leaving the field empty on save preserves the existing credential."),
       paragraph("A saved connection's address and primary resource are fixed. To change the external project, use **Disconnect**, then configure a new connection. Existing external records and links are preserved; pending events are canceled. This does not revoke the credential in the external service.")),
-    section("guides", "Service instructions", articles("swagger", "youtrack", "jira", "linear", "trello", "github", "slack", "confluence", "gitlab", "teamcity", "jenkins")),
+    section("guides", "Service instructions", articles("codex-web-qa", "swagger", "youtrack", "jira", "linear", "trello", "github", "slack", "confluence", "gitlab", "teamcity", "jenkins")),
   ],
 };

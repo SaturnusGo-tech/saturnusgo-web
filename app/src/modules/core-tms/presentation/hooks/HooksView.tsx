@@ -1,5 +1,7 @@
 "use client";
-import { CodexManagementFeature } from "./codex/CodexManagementFeature";
+import { CodexDetail } from "../../codex-employee/presentation/setup/CodexDetail";
+import { useCodexEmployee } from "../../codex-employee/application/state/useCodexEmployee";
+import { createCodexEmployeeApi } from "../../codex-employee/data/http/codex-employee-api";
 
 import { ApiSourceManager } from "../../api-sources/presentation/ApiSourceManager";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
@@ -7,7 +9,7 @@ import { useApiSourceList } from "../../api-sources/state/useApiSourceList";
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   getYouTrackConfiguration,
@@ -19,7 +21,8 @@ import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { YouTrackConfiguration } from "../../youtrack/model/youtrack-settings";
 import { ConnectorSettings } from "../../connectors/presentation/ConnectorSettings";
 import { useWorkspaceConnectors } from "../../connectors/application/context/WorkspaceConnectorContext";
-import { isProvider, type Provider } from "../../connectors/model/connector-types";
+import { isProvider } from "../../connectors/model/connector-types";
+import { integrationScreen, type IntegrationScreen } from "./hooks-navigation";
 import { IntegrationCatalog } from "./catalog/IntegrationCatalog";
 import surface from "./hooks.module.css";
 import { hooksCopy } from "./shared/hooks-copy";
@@ -29,10 +32,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const http = useTmsHttpClient();
   const { locale, languageTag } = useTmsLocale();
   const russian = locale === "ru";
-  const [screen, setScreen] = useState<"catalog" | "youtrack" | Provider>(() => {
-    const selected = typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("integration");
-    return selected && (isProvider(selected) || selected === "youtrack") ? selected : "catalog";
-  });
+  const [screen, setScreen] = useState<IntegrationScreen>(() => typeof window === "undefined" ? "catalog" : integrationScreen(window.location.search));
   const [status, setStatus] = useState<YouTrackIntegrationStatus | null>(null);
   const [configuration, setConfiguration] = useState<YouTrackConfiguration | null>(null);
   const [statusFailed, setStatusFailed] = useState(false);
@@ -40,15 +40,24 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const [reload, setReload] = useState(0);
   const connectors = useWorkspaceConnectors();
   const session = useOptionalTmsSession();
+  const codexApi = useMemo(() => createCodexEmployeeApi(http), [http]);
+  const codex = useCodexEmployee(codexApi, session?.kind === "managed");
   const apiEnabled = companyViewAvailable("api", session?.companyCapabilities);
   const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, apiEnabled && screen === "catalog");
-  const open = (target: "catalog" | "youtrack" | Provider) => transitionContent(() => {
+  const open = (target: IntegrationScreen) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
     url.searchParams.delete("analysisId"); url.searchParams.delete("impact");
     if (target === "catalog") url.searchParams.delete("integration"); else url.searchParams.set("integration", target);
-    window.history.replaceState(window.history.state, "", url);
+    window.history.pushState(window.history.state, "", url);
   });
+  useEffect(() => {
+    const restore = () => {
+      setScreen(integrationScreen(window.location.search));
+    };
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
   const refresh = useCallback(() => { setReload((value) => value + 1); connectors.refresh(); }, [connectors.refresh]);
 
   useEffect(() => {
@@ -72,6 +81,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     return () => controller.abort();
   }, [http, workspaceId, reload]);
 
+  if (screen === "codex" && session?.kind === "managed") return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} />;
   if (screen === "swagger") return canManage ? <ApiSourceManager key={workspaceId} workspaceId={workspaceId} projectId={projectId} onBack={() => open("catalog")} />
     : <ApiTestingView scope={{ workspaceId, projectId }} canManage={false} />;
   if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
@@ -90,9 +100,10 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   }
   return (
     <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
-      {session?.kind === "managed" && <CodexManagementFeature />}
       <IntegrationCatalog
         russian={russian}
+        showCodex={session?.kind === "managed"} onOpenCodex={() => open("codex")}
+        codexStatus={codex.loading ? "checking" : codex.error ? "attention" : codex.employee?.status === "active" ? "connected" : "available"}
         copy={hooksCopy(russian)}
         configuration={configuration}
         status={status}
@@ -100,7 +111,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
         swaggerStatus={!apiEnabled ? "available" : sources.loading ? "checking" : sources.error ? "attention" : sources.items.some(source => source.enabled) ? "connected" : "available"}
         connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
         onOpenConnector={open}
-        onRefresh={() => { refresh(); sources.refresh(); }}
+        onRefresh={() => { refresh(); sources.refresh(); codex.refresh(); }}
         onOpenYouTrack={() => open("youtrack")}
       />
     </div>

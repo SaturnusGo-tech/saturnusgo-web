@@ -1,0 +1,42 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import React from "react";
+import { act, create } from "react-test-renderer";
+import { status } from "../support/employee-fixture";
+import type { useCodexEmployee } from "../../application/state/useCodexEmployee";
+(globalThis as typeof globalThis & { React: typeof React }).React = React;
+Object.defineProperty(globalThis, "window", { value: { location: { href: "https://company.test/?view=hooks" } }, configurable: true });
+const previous = require.extensions[".css"];
+require.extensions[".css"] = module => { module.exports = {}; };
+const { CodexDetail } = require("../../presentation/setup/CodexDetail") as typeof import("../../presentation/setup/CodexDetail");
+if (previous) require.extensions[".css"] = previous; else delete require.extensions[".css"];
+const state = { employee: { ...status, etag: '"3"' }, connections: [], loading: false, pending: false, error: null, connectionsError: null, refresh: () => {}, deactivate: async () => {}, revoke: async () => {} } satisfies ReturnType<typeof useCodexEmployee>;
+test("setup uses tenant URL, explicit scopes and in-page links", () => {
+  const view = create(<CodexDetail state={state} locale="en" onBack={() => {}} />);
+  const text = JSON.stringify(view.toJSON());
+  assert.match(text, /https:\/\/company.test\/api\/v1\/mcp/);
+  assert.match(text, /codex mcp login falcon-company --scopes falcon:read,offline_access/);
+  assert.match(text, /#codex-setup/);
+  assert.doesNotMatch(text, /chatgpt.com\/plugins/);
+});
+test("copy feedback reports clipboard success and failure", async () => {
+  Object.defineProperty(globalThis, "navigator", { value: { clipboard: { writeText: async () => {} } }, configurable: true });
+  const view = create(<CodexDetail state={state} locale="en" onBack={() => {}} />);
+  const button = view.root.findAllByType("button").find(node => node.children.includes("Copy"))!;
+  await act(async () => { button.props.onClick(); });
+  assert.match(JSON.stringify(view.toJSON()), /Copied\./);
+  Object.defineProperty(globalThis, "navigator", { value: { clipboard: { writeText: async () => { throw new Error("denied"); } } }, configurable: true });
+  await act(async () => { button.props.onClick(); });
+  assert.match(JSON.stringify(view.toJSON()), /Copy failed/);
+  delete (globalThis as { navigator?: unknown }).navigator;
+});
+test("unavailable, quota and loading states remain honest", () => {
+  const full = { ...state, employee: { ...state.employee, status: "not_activated" as const, canConnect: false, canActivate: false, canDeactivate: false } };
+  const view = create(<CodexDetail state={full} locale="en" onBack={() => {}} />);
+  const text = JSON.stringify(view.toJSON());
+  assert.match(text, /quota is full/);
+  assert.match(text, /QA rights are required/);
+  assert.doesNotMatch(text, /Disable for company/);
+  const loading = create(<CodexDetail state={{ ...state, employee: null, loading: true }} locale="ru" onBack={() => {}} />);
+  assert.match(JSON.stringify(loading.toJSON()), /Загрузка Codex/);
+});

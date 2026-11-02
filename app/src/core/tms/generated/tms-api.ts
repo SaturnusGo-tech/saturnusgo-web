@@ -4818,7 +4818,7 @@ export interface paths {
         };
         /**
          * Read company Codex status and personal connection eligibility
-         * @description Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The configured connectUrl is validated; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.
+         * @description Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Returns current seat capacity and server-owned activation, deactivation and personal connection flags. Testers can connect only to an active employee; managers/admins can first activate through OAuth consent. Viewer/reporter cannot create employee connections. The connectUrl and setup derive from the verified company entrypoint; GET never provisions an employee. ETag is omitted before first activation. Existing own connection list/revoke remains available after disable or feature loss.
          */
         get: operations["getCodexEmployee"];
         put?: never;
@@ -9191,8 +9191,24 @@ export interface components {
             canActivate: boolean;
             canDeactivate: boolean;
             canConnect: boolean;
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description Same-company Falcon Hooks/Codex setup URL.
+             */
             connectUrl: string;
+            setup: {
+                /** @constant */
+                version: "1";
+                /** Format: uri */
+                mcpUrl: string;
+                /** Format: uri */
+                resource: string;
+                /** Format: uri */
+                oauthIssuer: string;
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "offline_access")[];
+                /** @constant */
+                authentication: "oauth";
+            };
         };
         CodexEmployeeDeactivation: {
             /** @constant */
