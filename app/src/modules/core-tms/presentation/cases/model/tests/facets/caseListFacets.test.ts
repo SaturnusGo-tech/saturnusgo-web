@@ -120,7 +120,7 @@ test("toolbar keeps subtle focus and editor-locked create actions", () => {
   const css = readFileSync(new URL("../../../listing/caseListing.module.css", import.meta.url), "utf8");
   const bulkCss = readFileSync(new URL("../../../bulk/styles/caseBulk.module.css", import.meta.url), "utf8");
   const inputFocus = css.match(/\.inputShell:focus-within \{([^}]*)\}/)?.[1] ?? "";
-  assert.match(inputFocus, /border-color: var\(--tms-focus-border\)/); assert.match(inputFocus, /var\(--tms-focus-ring\)/);
+  assert.match(inputFocus, /border-color: var\(--falcon-focus\)/); assert.match(inputFocus, /color-mix\(in srgb, var\(--falcon-focus\) 16%, transparent\)/);
   assert.match(toolbar, /aria-disabled=\{props\.interactionLocked \|\| undefined\}/); assert.match(toolbar, /guardCreateInteraction/);
   assert.match(toolbar, /role="menuitem"/); assert.match(toolbar, /Выбрать тест-кейсы|Select test cases/);
   assert.match(toolbar, /aria-pressed=\{props\.selectionMode\}/); assert.match(table, /props\.selectionMode \? <CaseSelectionHeader/); assert.match(table, /props\.selectionMode && <CaseSelectionCheckbox/);

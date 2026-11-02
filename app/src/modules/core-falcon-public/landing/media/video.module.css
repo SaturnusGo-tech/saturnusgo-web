@@ -7,16 +7,16 @@
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-  background: #111114;
-  border: 1px solid #2e2f33;
-  box-shadow: 0 24px 90px #0005;
+  background: var(--falcon-panel);
+  border: 1px solid var(--falcon-border);
+  box-shadow: var(--falcon-shadow);
 }
 .video {
   display: block;
   width: 100%;
   aspect-ratio: 1728/1118;
   object-fit: contain;
-  background: #111114;
+  background: var(--falcon-media-surface);
 }
 .controls {
   height: var(--controls-height);
@@ -24,9 +24,9 @@
   align-items: center;
   gap: 15px;
   padding: 0 16px;
-  border-top: 1px solid #292a2e;
-  background: #121315;
-  color: #f4f4f5;
+  border-top: 1px solid var(--falcon-border);
+  background: var(--falcon-panel);
+  color: var(--falcon-text);
 }
 .controls button,
 .error button {
@@ -43,7 +43,7 @@
   border-radius: 7px;
 }
 .controls button:hover {
-  background: #27282b;
+  background: var(--falcon-hover);
 }
 .controls button:disabled {
   opacity: 0.4;
@@ -55,19 +55,19 @@
   white-space: nowrap;
 }
 .duration {
-  color: #9c9da3;
+  color: var(--falcon-text-muted);
 }
 .controls input {
   flex: 1;
   min-width: 30px;
   height: 4px;
-  accent-color: #c6cad4;
+  accent-color: var(--falcon-action);
   cursor: pointer;
   opacity: 0.85;
 }
 .silent {
   font-size: 11px;
-  color: #9c9da3;
+  color: var(--falcon-text-muted);
   white-space: nowrap;
 }
 .caption {
@@ -77,12 +77,12 @@
   gap: 24px;
   padding: 20px 3px 0;
   font-size: 13px;
-  color: #96989e;
+  color: var(--falcon-text-muted);
 }
 .caption strong {
   font-size: 14px;
   font-weight: 500;
-  color: #dfdfe2;
+  color: var(--falcon-text-muted);
 }
 .caption p {
   line-height: 1.6;
@@ -95,7 +95,7 @@
 }
 .transcript summary {
   cursor: pointer;
-  color: #b5b6bc;
+  color: var(--falcon-text);
 }
 .transcript p {
   text-align: left;
@@ -108,11 +108,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #0c0d10ee;
-  color: #eee;
+  background: var(--falcon-danger-bg);
+  color: var(--falcon-danger);
 }
 .error button {
-  border: 1px solid #444;
+  border: 1px solid var(--falcon-danger-border);
   padding: 4px 15px;
   border-radius: 100px;
 }
@@ -122,7 +122,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #0b0c0e;
+  background: var(--falcon-media-surface);
 }
 .frame:fullscreen .video {
   max-height: calc(100vh - var(--controls-height));
@@ -162,7 +162,7 @@
   display: grid;
   place-items: center;
   pointer-events: none;
-  background: #07080a18;
+  background: color-mix(in srgb, var(--falcon-scrim) 15%, transparent);
 }
 .playButton {
   display: grid;
@@ -170,10 +170,10 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  border: 1px solid #ffffff45;
-  color: #fff;
-  background: #202126e6;
-  box-shadow: 0 6px 24px #0005;
+  border: 1px solid var(--falcon-action);
+  color: var(--falcon-on-action);
+  background: var(--falcon-action);
+  box-shadow: var(--falcon-shadow);
   backdrop-filter: blur(12px);
   cursor: pointer;
   pointer-events: auto;
@@ -182,8 +182,8 @@
     border-color 160ms;
 }
 .playButton:hover {
-  background: #34363cf2;
-  border-color: #ffffff80;
+  background: var(--falcon-action-hover);
+  border-color: var(--falcon-border-strong);
 }
 .playButton > svg:not(.spinner) {
   margin-left: 3px;
@@ -192,7 +192,7 @@
 .controls button:focus-visible,
 .controls input:focus-visible,
 .error button:focus-visible {
-  outline: 2px solid #e2e3e7;
+  outline: 2px solid var(--falcon-danger-border);
   outline-offset: 4px;
 }
 .spinner {
@@ -226,13 +226,13 @@
   justify-content: space-between;
   padding: 6%;
   pointer-events: none;
-  background: linear-gradient(90deg, #0c1018 0%, #0c1018ee 28%, #0c10188c 55%, #0c101829 100%);
-  color: #f4f5f8;
+  background: linear-gradient(90deg, var(--falcon-surface) 0%, color-mix(in srgb, var(--falcon-surface) 93%, transparent) 28%, color-mix(in srgb, var(--falcon-surface) 55%, transparent) 55%, color-mix(in srgb, var(--falcon-surface) 10%, transparent) 100%);
+  color: var(--falcon-text);
 }
-.cover > span { font-size: 10px; letter-spacing: .18em; color: #a4b3cd; }
+.cover > span { font-size: 10px; letter-spacing: .18em; color: var(--falcon-text); }
 .cover > div { max-width: 55%; }
 .cover strong { display: block; font-size: clamp(23px, 3.1vw, 42px); line-height: 1.1; letter-spacing: -.035em; font-weight: 550; }
-.cover p { margin: 15px 0 0; font-size: clamp(11px, 1.15vw, 15px); color: #aeb7c8; line-height: 1.5; }
+.cover p { margin: 15px 0 0; font-size: clamp(11px, 1.15vw, 15px); color: var(--falcon-text-secondary); line-height: 1.5; }
 .frame[data-cover="true"] .playOverlay { display: flex; justify-content: flex-end; align-items: center; padding-right: 15%; background: none; }
 @media (max-width: 600px) {
   .cover { padding: 6%; }

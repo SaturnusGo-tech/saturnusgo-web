@@ -2,45 +2,44 @@
 @font-face { font-family: "Falcon Suites Sans"; src: url("/fonts/falcon-docs/OpenAISans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 @font-face { font-family: "Falcon Suites Sans"; src: url("/fonts/falcon-docs/OpenAISans-Semibold.woff2") format("woff2"); font-weight: 600 900; font-display: swap; }
 .workspace {
-  --suite-bg: #fff; --suite-panel: #f8f8f8; --suite-text: #242424; --suite-muted: #676767;
-  --suite-line: #e8e8eb; --suite-hover: #f4f4f6; --suite-control: #eeeef1;
-  --suite-folder: #5579b8; --suite-case: #6b7fa6; --suite-accent: #315fba; --suite-accent-bg: #eaf0fa; --suite-good: #13824a; --suite-warning: #93611d; --suite-warning-bg: #f8f0e0; --yt-link: var(--suite-text);
-  --cases-bg: var(--suite-bg); --cases-text: var(--suite-text); --cases-strong: var(--suite-text); --cases-muted: var(--suite-muted);
-  --cases-secondary-text: var(--suite-muted); --cases-hover: var(--suite-hover); --cases-control-border: var(--suite-muted);
-  --cases-row-border: var(--suite-line); --cases-raised: var(--suite-panel); --cases-link: var(--suite-accent);
-  --cases-border: var(--suite-line); --cases-deep: var(--suite-panel); --cases-faint: var(--suite-muted);
-  --cases-primary: #3574f0; --cases-on-primary: #fff; --cases-control: transparent;
+  --suite-bg: var(--falcon-surface); --suite-panel: var(--falcon-panel); --suite-text: var(--falcon-text); --suite-muted: var(--falcon-text-muted);
+  --suite-line: var(--falcon-border-subtle); --suite-hover: var(--falcon-hover); --suite-control: var(--falcon-control);
+  --suite-folder: var(--falcon-folder); --suite-case: var(--falcon-case-icon); --suite-accent: var(--falcon-info); --suite-accent-bg: var(--falcon-info-bg); --suite-good: var(--falcon-success); --suite-warning: var(--falcon-warning); --suite-warning-bg: var(--falcon-warning-bg); --yt-link: var(--falcon-link);
+  --cases-bg: var(--falcon-surface); --cases-text: var(--falcon-text); --cases-strong: var(--falcon-text); --cases-muted: var(--falcon-text-muted);
+  --cases-secondary-text: var(--falcon-text-secondary); --cases-hover: var(--falcon-hover); --cases-control-border: var(--falcon-border-strong);
+  --cases-row-border: var(--falcon-border-subtle); --cases-raised: var(--falcon-panel); --cases-link: var(--falcon-link);
+  --cases-border: var(--falcon-border); --cases-deep: var(--falcon-elevated); --cases-faint: var(--falcon-text-disabled);
+  --cases-primary: var(--falcon-action); --cases-on-primary: var(--falcon-on-action); --cases-control: transparent;
   width: 100%; flex: 1; height: 100%; min-height: 0; min-width: 0; overflow: auto; padding: 26px 30px 56px;
-  color: var(--suite-text); background: var(--suite-bg); scrollbar-color: var(--suite-line) transparent;
+  color: var(--falcon-text); background: var(--falcon-surface); scrollbar-color: var(--falcon-border-subtle) transparent;
   font: 400 14px/1.45 "Falcon Suites Sans", system-ui, sans-serif; container: suites / inline-size;
 }
-:global(.dark) .workspace { --suite-bg: var(--tms-bg-canvas, #111113); --suite-panel: var(--tms-bg-panel, #1c1c1f); --suite-text: var(--tms-text, #ededf0); --suite-muted: var(--tms-text-muted, #a1a1aa); --suite-line: #ffffff0e; --suite-hover: var(--tms-bg-hover, #ffffff06); --suite-control: #ffffff09; --suite-folder: #7b96d0; --suite-case: #8e9ebf; --suite-accent: #9abaff; --suite-accent-bg: #7299ec16; --suite-good: #6fbd91; --suite-warning: #d6ad68; --suite-warning-bg: #d6ad6813; }
 .workspace *, .workspace *::before, .workspace *::after { box-sizing: border-box; }
 .workspace :is(button, input, select, textarea) { font-family: inherit; }
-.workspace ::selection { color: var(--suite-bg); background: var(--suite-text); }
+.workspace ::selection { color: var(--falcon-surface); background: var(--falcon-text); }
 .page { width: min(100%, 1050px); margin-inline: auto; }
 .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
-.header h1 { margin: 0; font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -.025em; color: var(--suite-text); }
-.header h1 > span { margin-left: 9px; color: var(--suite-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
-.subtitle { margin: 6px 0 0; color: var(--suite-muted); font-size: 14px; line-height: 22px; }
-.primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 14px; border: 0; border-radius: 10px; background: var(--suite-text); color: var(--suite-bg); cursor: pointer; font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; }
+.header h1 { margin: 0; font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -.025em; color: var(--falcon-text); }
+.header h1 > span { margin-left: 9px; color: var(--falcon-text-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
+.subtitle { margin: 6px 0 0; color: var(--falcon-text-muted); font-size: 14px; line-height: 22px; }
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 14px; border: 0; border-radius: 10px; background: var(--falcon-action); color: var(--falcon-on-action); cursor: pointer; font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; }
 .primary.primary :is(span, svg) { color: inherit; }
 .primary:hover { opacity: .85; }
 .primary:disabled { opacity: .4; cursor: default; }
-.quiet { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--suite-muted); font-size: 14px; line-height: 20px; cursor: pointer; white-space: nowrap; }
-.quiet:hover { background: var(--suite-hover); color: var(--suite-text); }
+.quiet { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-muted); font-size: 14px; line-height: 20px; cursor: pointer; white-space: nowrap; }
+.quiet:hover { background: var(--falcon-hover); color: var(--falcon-text); }
 .quiet:disabled { opacity: .4; cursor: default; }
 .play { composes: quiet; }
-.workspace :is(button, input, a):focus-visible { outline: 2px solid var(--suite-muted); outline-offset: 3px; box-shadow: none; }
-.search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--suite-line); border-radius: 10px; background: transparent; color: var(--suite-muted); }
+.workspace :is(button, input, a):focus-visible { outline: 2px solid var(--falcon-text-muted); outline-offset: 3px; box-shadow: none; }
+.search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; background: transparent; color: var(--falcon-text-muted); }
 .workspace .search[data-input-shell] { border-radius: 10px; }
-.search:focus-within { border-color: var(--suite-muted); }
-.search input { width: 100%; min-width: 0; height: 32px; padding: 0; color: var(--suite-text); font-size: 14px; border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
-.search input::placeholder { color: var(--suite-muted); opacity: 1; }
+.search:focus-within { border-color: var(--falcon-text-muted); }
+.search input { width: 100%; min-width: 0; height: 32px; padding: 0; color: var(--falcon-text); font-size: 14px; border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
+.search input::placeholder { color: var(--falcon-text-muted); opacity: 1; }
 .search > svg { flex: none; }
-.search button { display: grid; place-items: center; border: 0; padding: 2px; background: transparent; color: var(--suite-muted); cursor: pointer; }
-.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 280px; padding: 42px 20px; text-align: center; color: var(--suite-muted); }
-.empty h2 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 500; color: var(--suite-text); }
+.search button { display: grid; place-items: center; border: 0; padding: 2px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 280px; padding: 42px 20px; text-align: center; color: var(--falcon-text-muted); }
+.empty h2 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 500; color: var(--falcon-text); }
 .empty p { margin: 0; max-width: 400px; font-size: 14px; line-height: 22px; }
 @container suites (max-width: 760px) { .header { flex-wrap: wrap; gap: 18px; margin-bottom: 24px; } }
 @media(max-width: 640px) { .workspace { padding: 24px 18px 56px; } }

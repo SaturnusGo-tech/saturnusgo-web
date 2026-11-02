@@ -32,17 +32,17 @@
 .panelHandle {
   position: absolute; z-index: 4; left: calc(clamp(320px, 44%, 620px) - 12px); top: 50%;
   display: flex; align-items: center; justify-content: center; width: 24px; height: 44px;
-  padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--runs-muted);
+  padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--falcon-text-muted);
   transform: translateY(-50%); cursor: pointer; touch-action: manipulation;
   transition: left var(--run-panel-duration) var(--run-panel-ease), top var(--run-panel-duration) var(--run-panel-ease), color 140ms ease;
 }
 .panelHandle::before {
-  content: ""; position: absolute; inset: 9px 7px; z-index: -1; border: 1px solid var(--runs-border);
-  border-radius: 8px; background: var(--runs-bg); transition: background-color 140ms ease, border-color 140ms ease;
+  content: ""; position: absolute; inset: 9px 7px; z-index: -1; border: 1px solid var(--falcon-border);
+  border-radius: 8px; background: var(--falcon-surface); transition: background-color 140ms ease, border-color 140ms ease;
 }
-.panelHandle:hover, .panelHandle:focus-visible { color: var(--runs-strong); }
-.panelHandle:hover::before { background: var(--runs-hover); border-color: var(--runs-muted); }
-.panelHandle:focus-visible { outline: 2px solid var(--runs-primary); outline-offset: -3px; border-radius: 10px; }
+.panelHandle:hover, .panelHandle:focus-visible { color: var(--falcon-text); }
+.panelHandle:hover::before { background: var(--falcon-hover); border-color: var(--falcon-text-muted); }
+.panelHandle:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: -3px; border-radius: 10px; }
 .panelHandle > svg { transition: transform var(--run-panel-duration) var(--run-panel-ease); }
 [data-run-focused="true"] > .panelHandle { left: -4px; }
 [data-run-focused="true"] > .panelHandle > svg { transform: rotate(180deg); }

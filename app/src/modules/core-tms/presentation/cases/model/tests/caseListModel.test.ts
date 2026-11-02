@@ -71,8 +71,8 @@ test("case listings keep priority as one sortable signal instead of a duplicate 
   assert.equal((table.match(/key: "priority"/g) ?? []).length, 1);
   assert.match(signal, /priority === "low" \? Diamond : Triangle/);
   assert.match(signal, /fill=\{filled \? "currentColor" : "none"\}/);
-  assert.match(styles, /\.signal\[data-priority="high"\] \{ color: #e58b18; \}/);
-  assert.match(styles, /\.signal\[data-priority="critical"\] \{ color: #e3404b; \}/);
+  assert.match(styles, /\.signal\[data-priority="high"\] \{ color: var\(--falcon-warning\); \}/);
+  assert.match(styles, /\.signal\[data-priority="critical"\] \{ color: var\(--falcon-danger\); \}/);
   assert.match(listingStyles, /\.flagColumn \{ width: 32px; padding-inline: 0 !important; \}/);
   assert.match(listingStyles, /\.typeColumn \{ width: 36px; padding-inline: 0 !important; \}/);
   assert.match(listingStyles, /\.keyColumn \{ width: 90px; \}/);

@@ -1,25 +1,25 @@
 .root { position: relative; min-width: 0; }
-.trigger { width: 100%; min-height: 36px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; text-align: left; transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
+.trigger { width: 100%; min-height: 36px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 12px; color: var(--falcon-text); background: var(--falcon-panel); border: 1px solid var(--falcon-border-strong); border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; text-align: left; transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
 .trigger:disabled { opacity: .5; cursor: default; }
-.trigger:hover:not(:disabled) { background: var(--control-hover); border-color: var(--tms-focus-border, var(--muted)); }
-.trigger:focus-visible, .trigger[aria-expanded="true"] { outline: 0 !important; border-color: var(--tms-focus-border, var(--muted)); box-shadow: 0 0 0 2px var(--tms-focus-ring, rgb(128 128 128 / 15%)); }
+.trigger:hover:not(:disabled) { background: var(--falcon-hover); border-color: var(--falcon-focus); }
+.trigger:focus-visible, .trigger[aria-expanded="true"] { outline: 0 !important; border-color: var(--falcon-focus); box-shadow: var(--falcon-shadow); }
 .trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.trigger > svg { color: var(--muted); transition: transform 160ms ease; }
+.trigger > svg { color: var(--falcon-text-muted); transition: transform 160ms ease; }
 .trigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
 .compactTrigger { min-height: 32px; padding-block: 5px; font-size: 12px; }
-.menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 80; width: 100%; max-height: min(280px, 42dvh); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; padding: 5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 20px rgb(0 0 0 / 10%); opacity: 0; pointer-events: none; transform: translateY(-4px); transform-origin: top; visibility: hidden; transition: opacity 140ms ease, transform 140ms ease, visibility 0s linear 140ms; }
+.menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 80; width: 100%; max-height: min(280px, 42dvh); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--falcon-border-strong) transparent; padding: 5px; color: var(--falcon-text); background: var(--falcon-elevated); border: 1px solid var(--falcon-border); border-radius: 12px; box-shadow: var(--falcon-shadow-popover); opacity: 0; pointer-events: none; transform: translateY(-4px); transform-origin: top; visibility: hidden; transition: opacity 140ms ease, transform 140ms ease, visibility 0s linear 140ms; }
 .menu[popover] { position: fixed; inset: auto; margin: 0; }
 .menu[data-open="true"] { opacity: 1; pointer-events: auto; transform: none; visibility: visible; transition-delay: 0s; }
 .menu > button { width: 100%; min-height: 34px; display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-items: center; gap: 8px; padding: 7px 9px; color: inherit; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; text-align: left; }
-.menu > button:hover, .menu:not(:has(> button:hover)) > button:focus-visible { outline: 0; background: var(--control-hover); }
-.menu:not(:has(> button:hover)) > button:focus-visible { box-shadow: inset 0 0 0 1px var(--tms-focus-border, var(--muted)); }
+.menu > button:hover, .menu:not(:has(> button:hover)) > button:focus-visible { outline: 0; background: var(--falcon-hover); }
+.menu:not(:has(> button:hover)) > button:focus-visible { box-shadow: var(--falcon-shadow-popover); }
 .menu > button[data-selected="true"] { font-weight: 550; }
 .menu > button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.menu > button > svg { color: var(--muted); }
-:global(.dark) .menu { background: var(--nav-raised, var(--control)); box-shadow: 0 10px 30px rgb(0 0 0 / 30%); }
+.menu > button > svg { color: var(--falcon-text-muted); }
+:global(.dark) .menu { background: var(--falcon-elevated); }
 @media (prefers-reduced-motion: reduce) { .trigger, .trigger > svg, .menu { transition: none; } }
 
-.textTrigger { background: transparent !important; border: 0 !important; border-bottom: 1px solid var(--tms-border, #d3d5da) !important; border-radius: 0 !important; box-shadow: none !important; padding: 6px 0 !important; }
+.textTrigger { background: transparent !important; border: 0 !important; border-bottom: 1px solid var(--falcon-border) !important; border-radius: 0 !important; box-shadow: none !important; padding: 6px 0 !important; }
 
 .optionLabel { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .optionLabel > :first-child { flex-shrink: 0; }

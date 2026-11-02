@@ -2,7 +2,7 @@
   min-width: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden;
   color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 15px;
 }
-.panel :is(button, [tabindex]):focus-visible { outline: 2px solid var(--dash-blue, #3671f6); outline-offset: -3px; border-radius: 6px; }
+.panel :is(button, [tabindex]):focus-visible { outline: 2px solid var(--dash-blue, var(--falcon-focus)); outline-offset: -3px; border-radius: 6px; }
 .heading { padding: 20px 20px 7px; }
 .heading h2 { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 620; letter-spacing: -.025em; }
 .heading p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
@@ -15,10 +15,10 @@
 .checks button { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 9px 0; color: var(--ink); background: transparent; border: 0; text-align: left; font: inherit; cursor: pointer; }
 .checks button:disabled { opacity: .5; cursor: default; }
 .icon { flex: 0 0 24px; display: grid; place-items: center; color: var(--muted); }
-.checks [data-kind="inProgressItems"] .icon { color: var(--dash-success, #39a653); }
-.checks [data-kind="activeRuns"] .icon { color: var(--dash-blue, #3671f6); }
-.checks [data-kind="blockedItems"] .icon { color: var(--dash-warning, #c48c24); }
-.checks [data-kind="openDefects"] .icon { color: var(--dash-danger, #d64c59); }
+.checks [data-kind="inProgressItems"] .icon { color: var(--dash-success, var(--falcon-icon)); }
+.checks [data-kind="activeRuns"] .icon { color: var(--dash-blue, var(--falcon-icon)); }
+.checks [data-kind="blockedItems"] .icon { color: var(--dash-warning, var(--falcon-warning)); }
+.checks [data-kind="openDefects"] .icon { color: var(--dash-danger, var(--falcon-icon)); }
 .label { min-width: 0; flex: 1; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
 .checks strong { font-size: 18px; font-weight: 590; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
 .drillArrow { flex-shrink: 0; margin-left: -6px; color: var(--muted); opacity: 0; transition: opacity 150ms; }
@@ -28,7 +28,7 @@
 .pageLabel { color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .progress { display: flex; flex: 1; gap: 4px; max-width: 76px; margin-right: auto; }
 .progress span { height: 3px; flex: 1; border-radius: 3px; background: var(--line-strong, var(--line)); transition: background 200ms; }
-.progress span[data-current="true"] { background: var(--dash-blue, #3671f6); }
+.progress span[data-current="true"] { background: var(--dash-blue, var(--falcon-selected)); }
 .arrows { display: flex; gap: 4px; }
 .arrows button { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; }
 .arrows button[aria-disabled="true"] { color: var(--muted); opacity: .4; cursor: default; }
@@ -36,6 +36,6 @@
 @media (max-width: 640px) { .heading { padding-inline: 16px; }.page { padding-inline: 16px; }.footer { padding-inline: 16px; } }
 @media (prefers-reduced-motion: reduce) { .track, .progress span, .drillArrow { transition: none; } }
 
-:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--falcon-shadow-popover); }
 :global([data-appearance="glass"]) .arrows button { border-radius: 50%; }
 :global([data-appearance="glass"]) .progress span[data-current="true"] { background: var(--ink); }

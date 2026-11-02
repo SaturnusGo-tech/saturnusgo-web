@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
+import { PiUsers } from "react-icons/pi";
 import { useState, type ReactNode } from "react";
 import type { MemberChange } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -27,7 +28,7 @@ export function MemberWorkspace({ client, session, id, creating, onBack, onOpen,
     <MemberList employeeRow={employeeRow} client={client} session={session} onAction={(identityId, change) => { setAction({ id: identityId, change }); onOpen(identityId); }} onOpen={onOpen} onCreate={onCreate} selectedId={id} creating={creating} version={version} disabled={busy} />
     <div className={styles.detailHost}>
       {!open && <div className={styles.placeholder}>
-        <img src="/falcon/illustrations/employee-directory.png" width={288} height={192} alt="" />
+        <PiUsers className={styles.emptyIcon} size={44} aria-hidden="true" />
         <p>{locale === "ru" ? "Выберите сотрудника" : "Select a person"}</p>
       </div>}
       <AnimatePresence mode="wait" initial={false}>

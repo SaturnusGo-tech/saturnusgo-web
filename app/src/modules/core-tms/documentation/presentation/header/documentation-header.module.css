@@ -1,9 +1,9 @@
 .header { display: grid; grid-template-columns: minmax(170px, 1fr) auto minmax(100px, 1fr); align-items: center; min-height: 64px; padding: 0 24px; gap: 24px; background: var(--docs-bg); border-bottom: 1px solid var(--docs-line); }
 .identity, .actions { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.brand { --yt-link: var(--docs-ink); color: var(--docs-ink); font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -.025em; white-space: nowrap; }
+.brand { --yt-link: var(--falcon-link); color: var(--docs-ink); font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -.025em; white-space: nowrap; }
 .tabs { display: flex; align-self: stretch; gap: 24px; }
-.tabs a { --yt-link: var(--docs-muted); display: flex; align-items: center; min-height: 64px; border-bottom: 2px solid transparent; color: var(--docs-muted); font-size: 14px; line-height: 21px; white-space: nowrap; transition: color 140ms ease; }
-.tabs a:hover, .tabs a[aria-current="page"] { --yt-link: var(--docs-ink); color: var(--docs-ink); }
+.tabs a { --yt-link: var(--falcon-link); display: flex; align-items: center; min-height: 64px; border-bottom: 2px solid transparent; color: var(--docs-muted); font-size: 14px; line-height: 21px; white-space: nowrap; transition: color 140ms ease; }
+.tabs a:hover, .tabs a[aria-current="page"] { --yt-link: var(--falcon-link); color: var(--docs-ink); }
 .tabs a[aria-current="page"] { border-bottom-color: var(--docs-ink); }
 .actions { justify-content: flex-end; }
 .iconButton { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--docs-muted); }

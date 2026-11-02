@@ -12,8 +12,7 @@ export function highlightRanges(root: HTMLElement, ranges: Range[], valid: () =>
   if (!registry || !api.Highlight) return rangeOverlay(root, () => ranges.flatMap((range) => Array.from(range.getClientRects())), valid);
   const name = `falcon-ai-source-${++sequence}`;
   const style = document.createElement("style");
-  style.textContent = `::highlight(${name}) { background-color: rgb(70 147 245 / 30%); color: inherit; }
-    .dark ::highlight(${name}) { background-color: rgb(112 184 255 / 36%); color: inherit; }`;
+  style.textContent = `::highlight(${name}) { background-color: color-mix(in srgb, var(--falcon-info) 30%, transparent); color: inherit; }`;
   document.head.append(style);
   registry.set(name, new api.Highlight(...ranges));
   const observer = new MutationObserver(() => { if (!valid()) cleanup(); });

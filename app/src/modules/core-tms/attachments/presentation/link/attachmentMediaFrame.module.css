@@ -41,7 +41,7 @@
 .actions button:hover,
 .disclosure:focus-visible,
 .actions button:focus-visible { color: var(--cases-strong); background: var(--cases-hover); outline: 0; }
-.actions button:last-child:hover { color: #c54851; }
+.actions button:last-child:hover { color: var(--falcon-danger); }
 .actions button:disabled { cursor: wait; opacity: .45; }
 .kindIcon { width: 22px; height: 24px; display: grid; place-items: center; color: var(--cases-faint); }
 
@@ -68,7 +68,7 @@
   max-height: var(--media-max-height, 460px);
   display: block;
   object-fit: contain;
-  background: var(--cases-deep, #fff);
+  background: var(--cases-deep, var(--falcon-surface));
   border: 0;
   border-radius: 9px;
 }
@@ -95,7 +95,7 @@
   background: color-mix(in srgb, var(--cases-control) 90%, transparent);
   border: 1px solid var(--cases-control-border);
   border-radius: 8px;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 14%);
+  box-shadow: var(--falcon-shadow);
   cursor: ew-resize;
   opacity: 0;
   transform: translateY(-50%) scale(.92);

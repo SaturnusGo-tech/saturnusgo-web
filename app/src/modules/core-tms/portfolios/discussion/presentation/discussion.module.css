@@ -2,7 +2,7 @@
 .discussion > header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .discussion h2 { margin: 0; font-size: 15px; font-weight: 570; }
 .composer { position: relative; overflow: visible; border: 1px solid var(--line); border-radius: 16px; transition: border-color 160ms ease; }
-.composer:focus-within { border-color: var(--tms-focus-border, #999); box-shadow: none; }
+.composer:focus-within { border-color: var(--tms-focus-border, var(--falcon-focus)); box-shadow: none; }
 .comments { margin: 22px 0 0; padding: 0; list-style: none; }
 .statusStrip { border-radius: 15px 15px 0 0; display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--muted); background: var(--control-hover); font-size: 12px; }
 .editor { position: relative; padding: 0; }
@@ -15,7 +15,7 @@
 .editor .send { position: absolute; bottom: 12px; left: 12px; min-height: 30px; padding: 5px 11px; font-size: 12px; border-radius: 9px; }
 .feedback { position: absolute; bottom: 0; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (prefers-reduced-motion: reduce) { .composer { transition: none; } }
-.limit { padding: 0 12px; color: var(--danger, #c74755); font-size: 12px; }
+.limit { padding: 0 12px; color: var(--danger, var(--falcon-text)); font-size: 12px; }
 
 .editor textarea { min-height: 112px; border: 0 !important; outline: none !important; box-shadow: none !important; background: transparent !important; }
 

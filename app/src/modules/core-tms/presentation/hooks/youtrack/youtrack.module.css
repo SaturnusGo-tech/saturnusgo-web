@@ -1,6 +1,6 @@
 /* YouTrack/Ring UI controls: https://github.com/JetBrains/ring-ui/blob/master/design-tokens.json */
-.root { --ink: #27282e; --muted: #6c707e; --paper: #fff; --control: #fff; --control-hover: #f7f8fa; --line: #e5e7eb; --line-strong: #b8bcc5; --action: #3369d6; --action-foreground: #fff; --teal: #3369d6; --yt-side: #f7f8fa; --yt-selection: #edf3ff; --yt-link: #315fbd; --green: #2b7b50; --green-soft: #e6f7e9; --red: #cc3645; --red-soft: #fff2f3; display: flex; flex-direction: column; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; color-scheme: light; }
-:global(.dark) .root { --ink: #e8e8e9; --muted: #9da0a8; --paper: #1e1f22; --control: #1e1f22; --control-hover: #2b2d30; --line: #36383d; --line-strong: #565a63; --action: #366acf; --action-foreground: #fff; --teal: #548af7; --yt-side: #242528; --yt-selection: #2e436e; --yt-link: #7ba7fa; --green: #83bb96; --green-soft: #233b2b; --red: #ef929a; --red-soft: #44292e; color-scheme: dark; }
+.root { --ink: var(--falcon-text); --muted: var(--falcon-text-muted); --paper: var(--falcon-panel); --control: var(--falcon-control); --control-hover: var(--falcon-hover); --line: var(--falcon-border); --line-strong: var(--falcon-border-strong); --action: var(--falcon-action); --action-foreground: var(--falcon-on-action); --teal: var(--falcon-info); --yt-side: var(--falcon-icon-muted); --yt-selection: var(--falcon-selected); --yt-link: var(--falcon-link); --green: var(--falcon-success); --green-soft: var(--falcon-success-bg); --red: var(--falcon-danger); --red-soft: var(--falcon-danger-bg); display: flex; flex-direction: column; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; color-scheme: light; }
+:global(.dark) .root { --ink: var(--falcon-text); --muted: var(--falcon-text-muted); --paper: var(--falcon-panel); --control: var(--falcon-control); --control-hover: var(--falcon-hover); --line: var(--falcon-border); --line-strong: var(--falcon-border-strong); --action: var(--falcon-action); --action-foreground: var(--falcon-on-action); --teal: var(--falcon-info); --yt-side: var(--falcon-icon-muted); --yt-selection: var(--falcon-selected); --yt-link: var(--falcon-link); --green: var(--falcon-success); --green-soft: var(--falcon-success-bg); --red: var(--falcon-danger); --red-soft: var(--falcon-danger-bg); color-scheme: dark; }
 .header { background: var(--paper); border-bottom: 1px solid var(--line); flex-shrink: 0; }
 .breadcrumb { display: flex; align-items: center; gap: 12px; padding: 12px 28px 8px; color: var(--muted); font-size: 12px; }
 .breadcrumb > button:first-child { display: flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--yt-link); cursor: pointer; }
@@ -46,9 +46,9 @@
 @media (max-width: 430px) { .actions { width: 100%; margin-top: 7px; } .actions button { margin-left: auto; } }
 
 .embedded.embedded, :global(.dark) .embedded.embedded {
-  --ink: var(--plugin-text); --muted: var(--plugin-muted); --paper: var(--plugin-bg); --control: var(--plugin-bg); --control-hover: var(--plugin-hover);
-  --line: var(--plugin-line); --line-strong: var(--plugin-line); --action: var(--plugin-action); --action-foreground: var(--plugin-on-action);
-  --teal: var(--plugin-text); --yt-side: var(--plugin-panel); --yt-selection: var(--plugin-hover); --yt-link: var(--plugin-text);
+  --ink: var(--falcon-text); --muted: var(--falcon-text-muted); --paper: var(--falcon-panel); --control: var(--falcon-control); --control-hover: var(--falcon-hover);
+  --line: var(--falcon-border); --line-strong: var(--falcon-border-strong); --action: var(--falcon-action); --action-foreground: var(--falcon-on-action);
+  --teal: var(--falcon-info); --yt-side: var(--plugin-panel); --yt-selection: var(--falcon-selected); --yt-link: var(--falcon-link);
   height: auto; min-height: 0; overflow: visible; font: inherit; color-scheme: inherit; background: transparent;
 }
 .embedded .layout { display: block; }

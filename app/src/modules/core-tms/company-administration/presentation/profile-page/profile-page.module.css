@@ -22,5 +22,5 @@
   .sessionsBody { padding: 6px 18px 18px; }
 }
 .back:hover, .security:hover { background: var(--admin-hover); }
-.back:focus-visible, .security:focus-visible { outline: 2px solid var(--admin-muted); outline-offset: 3px; }
+.back:focus-visible, .security:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .back, .security { transition: none; } }

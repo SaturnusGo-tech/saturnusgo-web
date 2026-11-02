@@ -59,7 +59,7 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
   assert.match(styles, /\.editorContent strong/);
   assert.match(styles, /\.editorContent em/);
   assert.match(styles, /font-weight: 600/);
-  assert.match(styles, /color: var\(--cases-strong\) !important/);
+  assert.match(styles, /color: var\(--falcon-text\) !important/);
 });
 
 test("case Markdown inputs attach or paste private files from the conventional lower-left position", () => {
@@ -85,7 +85,7 @@ test("Markdown link editing uses a themed modal layer with clear fields", () => 
   assert.match(translations, /dialogControls\.save[\s\S]*Сохранить/);
   assert.match(styles, /\.wysiwyg:has\(form\)/);
   assert.match(styles, /place-items: center/);
-  assert.match(styles, /\[role="dialog"\][\s\S]*background: var\(--cases-deep\)/);
+  assert.match(styles, /\[role="dialog"\][\s\S]*background: var\(--falcon-elevated\)/);
   assert.match(styles, /\[role="dialog"\] input[\s\S]*min-height: 38px/);
 });
 
@@ -107,8 +107,8 @@ test("case chrome is quiet until the user asks to edit", () => {
   assert.doesNotMatch(comments, /className=\{css\.commentPrompt\}/);
   assert.match(comments, /compact[\s\S]*autoFocus/);
   assert.doesNotMatch(comments, /comments\.items\.length\}/);
-  assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--cases-muted\) !important/);
-  assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--cases-on-primary\)/);
+  assert.match(listingStyles, /\.keyCell \{[\s\S]*color: var\(--falcon-text-muted\) !important/);
+  assert.match(listingStyles, /selectionModeButton\[aria-pressed="true"\][\s\S]*var\(--falcon-on-action\)/);
 });
 
 test("case content and editable custom fields retain the two-column hierarchy", () => {

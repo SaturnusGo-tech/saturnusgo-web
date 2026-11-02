@@ -10,11 +10,9 @@
 .projectKey, .headerActions { display: flex; align-items: center; gap: 10px; }
 .projectKey { justify-content: flex-end; }
 .projectKey code { font: inherit; }
-.state { --project-status-dot: #248348; display: inline-flex; align-items: center; gap: 6px; }
+.state { --project-status-dot: var(--falcon-success); display: inline-flex; align-items: center; gap: 6px; }
 .state::before { content: ""; flex: 0 0 6px; width: 6px; height: 6px; background: var(--project-status-dot); border-radius: 50%; }
-.state[data-archived="true"] { --project-status-dot: #b56a12; }
-:global(.dark) .state { --project-status-dot: #3fbd75; }
-:global(.dark) .state[data-archived="true"] { --project-status-dot: #e9a23b; }
+.state[data-archived="true"] { --project-status-dot: var(--falcon-warning); }
 .headerActions { flex-wrap: wrap; justify-content: flex-end; }
 .general .edit, .general .cancel, .general .save { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 5px 10px; border: 1px solid var(--settings-line); border-radius: 8px; color: var(--settings-ink); background: var(--settings-selected); font: 400 13px/1.5 var(--font-geist-sans), sans-serif; white-space: nowrap; }
 .general .edit:hover:not(:disabled), .general .cancel:hover:not(:disabled), .general .save:hover:not(:disabled) { background: var(--settings-hover); }

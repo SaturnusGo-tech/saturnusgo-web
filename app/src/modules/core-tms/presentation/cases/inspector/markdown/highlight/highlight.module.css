@@ -19,5 +19,4 @@
 }
 
 /* Native selection stays distinct without covering the marker with an opaque blue slab. */
-.surface::selection, .surface :global(::selection) { background: rgb(112 184 235 / 25%); color: inherit; }
-:global(.dark) .surface::selection, :global(.dark) .surface :global(::selection) { background: rgb(112 184 235 / 30%); color: inherit; }
+.surface::selection, .surface :global(::selection) { background: var(--falcon-selected); color: inherit; }

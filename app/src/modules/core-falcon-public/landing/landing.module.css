@@ -1,12 +1,12 @@
 .page {
-  --ink: #f1f1f3;
-  --muted: #aaaeb8;
-  --line: #ffffff19;
+  --ink: var(--falcon-text);
+  --muted: var(--falcon-text-muted);
+  --line: var(--falcon-border);
   position: relative;
   isolation: isolate;
   min-height: 100vh;
   color: var(--ink);
-  background: #05090c;
+  background: var(--falcon-surface);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
@@ -18,8 +18,7 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: url("/falcon/landing/2026-09/atmosphere.webp") center / cover
-    no-repeat;
+  background: var(--falcon-surface);
 }
 .page * {
   box-sizing: border-box;
@@ -29,7 +28,7 @@
   text-decoration: none;
 }
 .page :focus-visible {
-  outline: 2px solid #d1d3da;
+  outline: 2px solid var(--falcon-focus);
   outline-offset: 5px;
 }
 .page button {
@@ -40,8 +39,8 @@
   left: 20px;
   top: -80px;
   z-index: 100;
-  background: #fff;
-  color: #111 !important;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action) !important;
   padding: 12px 18px;
   border-radius: 8px;
 }
@@ -53,7 +52,7 @@
   inset: 0 0 auto;
   height: 80px;
   z-index: 10;
-  color: #f4f4f5;
+  color: var(--falcon-text);
 }
 .headerInner {
   width: 100%;
@@ -69,13 +68,13 @@
 .headerNav {
   display: flex;
   gap: 32px;
-  color: #c2c3c8;
+  color: var(--falcon-text);
   font-size: 13px;
   margin: 0 auto;
 }
 .headerNav a:hover,
 .loginButton:hover {
-  color: #fff;
+  color: var(--falcon-text);
 }
 .headerActions {
   display: flex;
@@ -84,27 +83,27 @@
 }
 .loginButton {
   font-size: 13px;
-  color: #c2c3c8 !important;
+  color: var(--falcon-text) !important;
 }
 .primaryButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border: 1px solid #f4f4f5;
+  border: 1px solid var(--falcon-action);
   border-radius: 999px;
   min-height: 43px;
   padding: 0 21px;
-  background: #f4f4f5;
-  color: #111214 !important;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action) !important;
   font-size: 13px;
   font-weight: 550;
   white-space: nowrap;
   transition: background 180ms ease;
 }
 .primaryButton:hover {
-  background: #dfe1e7;
-  border-color: #dfe1e7;
+  background: var(--falcon-action-hover);
+  border-color: var(--falcon-border-strong);
 }
 .hero {
   position: relative;
@@ -121,9 +120,10 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.9;
-  mask-image: linear-gradient(#000 62%, transparent);
+  opacity: 0.12;
+  mask-image: linear-gradient(var(--falcon-mask) 62%, transparent);
 }
+:global(.dark) .heroArt { opacity: 0.9; }
 .heroInner {
   max-width: 1380px;
   margin: auto;
@@ -134,7 +134,7 @@
   font-weight: 450;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: #acb0ba;
+  color: var(--falcon-text-muted);
   margin: 0 0 27px;
 }
 .hero h1 {
@@ -148,7 +148,7 @@
 .heroLead {
   font-size: clamp(17px, 1.55vw, 21px);
   line-height: 1.55;
-  color: #b8bdc8;
+  color: var(--falcon-text-secondary);
   margin: 30px 0 26px;
   max-width: 570px;
   letter-spacing: -0.018em;
@@ -165,12 +165,12 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid #8a909a;
+  border: 1px solid var(--falcon-border);
   border-radius: 50%;
   transition: background 180ms;
 }
 .watchLink:hover > span {
-  background: #ffffff1a;
+  background: var(--falcon-hover);
 }
 .scrollLink {
   position: absolute;
@@ -180,7 +180,7 @@
   height: 38px;
   display: grid;
   place-items: center;
-  color: #aaa !important;
+  color: var(--falcon-text-muted) !important;
 }
 .overview,
 .workflowSection,
@@ -200,7 +200,7 @@
 }
 .storyLabel {
   margin: 0 0 20px;
-  color: #aab2bf;
+  color: var(--falcon-text-muted);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -216,7 +216,7 @@
 }
 .storyBody {
   margin-top: 30px;
-  color: #c5c9d2;
+  color: var(--falcon-text-secondary);
   font-size: 17px;
   line-height: 1.78;
   letter-spacing: -0.009em;
@@ -243,10 +243,10 @@
 }
 .chapterNav a {
   font-size: 13px;
-  color: #c8ccd3;
+  color: var(--falcon-text);
 }
 .chapterNav a:hover {
-  color: white;
+  color: var(--falcon-text);
 }
 .workflowSection {
   padding: 112px 0 48px;
@@ -263,8 +263,8 @@
   mask-image: linear-gradient(
     to right,
     transparent,
-    #000 6%,
-    #000 94%,
+    var(--falcon-mask) 6%,
+    var(--falcon-mask) 94%,
     transparent
   );
 }
@@ -291,7 +291,7 @@
   align-items: center;
   gap: 12px;
   white-space: nowrap;
-  color: #e0e2e8;
+  color: var(--falcon-text);
   font-size: 22px;
   font-weight: 500;
   letter-spacing: -0.03em;
@@ -311,7 +311,7 @@
   margin-top: 1px;
   font-size: 9px;
   font-weight: 400;
-  color: #969da9;
+  color: var(--falcon-text-muted);
   letter-spacing: 0;
 }
 .marqueeToggle {
@@ -321,13 +321,13 @@
   height: 28px;
   border: 0;
   border-radius: 50%;
-  color: #b6bbc5;
+  color: var(--falcon-text);
   background: transparent;
   margin: 10px 0 0 auto;
   cursor: pointer;
 }
 .marqueeToggle:hover {
-  background: #ffffff14;
+  background: var(--falcon-hover);
 }
 @keyframes service-drift {
   to {
@@ -387,9 +387,9 @@
   opacity: 0.85;
   mask-image: linear-gradient(
     transparent,
-    #000 35%,
-    #000 60%,
-    #0003 78%,
+    var(--falcon-mask) 35%,
+    var(--falcon-mask) 60%,
+    color-mix(in srgb, var(--falcon-mask) 20%, transparent) 78%,
     transparent
   );
   pointer-events: none;
@@ -418,7 +418,7 @@
   gap: 28px;
   border-top: 1px solid var(--line);
   padding-top: 24px;
-  color: #a2a8b4;
+  color: var(--falcon-text-muted);
   font-size: 12px;
 }
 .footerMeta > a:nth-last-child(2) {
@@ -669,8 +669,8 @@
     display: none;
   }
 }
-.pilotLead { max-width: 410px; font-size: 16px; line-height: 1.7; color: #b9c3d2; margin: -8px 0 28px; }
-.telegramHandle { color: #9faebe; font-size: 12px; margin: 18px 0 0; }
+.pilotLead { max-width: 410px; font-size: 16px; line-height: 1.7; color: var(--falcon-text-secondary); margin: -8px 0 28px; }
+.telegramHandle { color: var(--falcon-text-muted); font-size: 12px; margin: 18px 0 0; }
 .footer { scroll-margin-top: 30px; }
 .hero h1 { font-size: clamp(54px, 5.05vw, 78px); }
 @media(max-width:700px) {

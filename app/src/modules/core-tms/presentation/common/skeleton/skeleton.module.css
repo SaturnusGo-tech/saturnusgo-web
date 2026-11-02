@@ -1,4 +1,4 @@
-.skeleton { width: 100%; min-width: 0; flex: 1; padding: clamp(18px, 3vw, 36px); color: var(--muted, #888); background: transparent; overflow: hidden; }
+.skeleton { width: 100%; min-width: 0; flex: 1; padding: clamp(18px, 3vw, 36px); color: var(--falcon-text-muted); background: transparent; overflow: hidden; }
 .skeleton > div { max-width: 1080px; margin-inline: auto; }
 .title, .subtitle, .row i, .row span, .row b { display: block; background: currentColor; opacity: .11; border-radius: 6px; }
 .title { height: 22px; width: 32%; max-width: 280px; margin-bottom: 14px; }

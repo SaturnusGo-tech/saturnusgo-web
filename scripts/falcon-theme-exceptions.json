@@ -1,0 +1,56 @@
+{
+  "app/src/modules/core-tms/presentation/cases/inspector/markdown/highlight/toolbar/highlightToolbar.module.css::.menu .swatch.swatch[data-color=\"yellow\"]::--swatch": {
+    "values": [
+      "#edce77"
+    ],
+    "reason": "Authored document highlighter ink: user-selectable content color, not interface chrome. Preserves existing saved Markdown highlight meaning."
+  },
+  "app/src/modules/core-tms/presentation/cases/inspector/markdown/highlight/toolbar/highlightToolbar.module.css::.menu .swatch.swatch[data-color=\"blue\"]::--swatch": {
+    "values": [
+      "#9cc9ee"
+    ],
+    "reason": "Authored document highlighter ink: user-selectable content color, not interface chrome. Preserves existing saved Markdown highlight meaning."
+  },
+  "app/src/modules/core-tms/presentation/cases/inspector/markdown/highlight/toolbar/highlightToolbar.module.css::.menu .swatch.swatch[data-color=\"green\"]::--swatch": {
+    "values": [
+      "#a9d4b3"
+    ],
+    "reason": "Authored document highlighter ink: user-selectable content color, not interface chrome. Preserves existing saved Markdown highlight meaning."
+  },
+  "app/src/modules/core-tms/presentation/cases/inspector/markdown/highlight/toolbar/highlightToolbar.module.css::.menu .swatch.swatch[data-color=\"pink\"]::--swatch": {
+    "values": [
+      "#e5b0c3"
+    ],
+    "reason": "Authored document highlighter ink: user-selectable content color, not interface chrome. Preserves existing saved Markdown highlight meaning."
+  },
+  "app/src/modules/core-tms/presentation/cases/inspector/markdown/highlight/toolbar/highlightToolbar.module.css::.menu .swatch.swatch[data-color=\"purple\"]::--swatch": {
+    "values": [
+      "#c2b2e6"
+    ],
+    "reason": "Authored document highlighter ink: user-selectable content color, not interface chrome. Preserves existing saved Markdown highlight meaning."
+  },
+  "app/src/modules/core-tms/presentation/hooks/catalog/catalog.module.css::.logo[data-provider=\"jira\"], .logo[data-provider=\"confluence\"]::color": {
+    "values": [
+      "#1868db"
+    ],
+    "reason": "Existing official integration brand mark paint; branding is content, not Falcon interface chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/catalog/catalog.module.css::.logo[data-provider=\"trello\"]::color": {
+    "values": [
+      "#0c66e4"
+    ],
+    "reason": "Existing official integration brand mark paint; branding is content, not Falcon interface chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/catalog/catalog.module.css::.logo[data-provider=\"gitlab\"]::color": {
+    "values": [
+      "#e96c30"
+    ],
+    "reason": "Existing official integration brand mark paint; branding is content, not Falcon interface chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/catalog/catalog.module.css::.logo[data-provider=\"jenkins\"]::color": {
+    "values": [
+      "#c64a42"
+    ],
+    "reason": "Existing official integration brand mark paint; branding is content, not Falcon interface chrome."
+  }
+}

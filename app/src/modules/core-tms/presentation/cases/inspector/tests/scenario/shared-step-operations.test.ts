@@ -66,9 +66,9 @@ test("shared-step editing stays dense and does not expose nested shared procedur
 });
 
 test("shared-step canvas and action menu use opaque integrated surfaces", () => {
-  assert.match(sharedCss, /--cases-bg: var\(--ss-bg\)/);
+  assert.match(sharedCss, /--cases-bg: var\(--falcon-surface\)/);
   assert.match(sharedCss, /\.paper \{[^}]*background: transparent;[^}]*border: 0;[^}]*box-shadow: none/s);
-  assert.match(menuCss, /background: var\(--cases-bg, #fff\)/);
+  assert.match(menuCss, /background: var\(--falcon-surface\)/);
   assert.match(menuCss, /\.menu\[data-trigger="add"\] \{ left: 8px; \}/);
 });
 

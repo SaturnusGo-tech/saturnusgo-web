@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type React from "react";
+import "../src/modules/core-tms/presentation/theme/falcon-theme.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tms.saturnusgo.com"),

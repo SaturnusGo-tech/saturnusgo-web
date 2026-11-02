@@ -22,7 +22,7 @@ export function rangeOverlay(root: HTMLElement, readRects: () => Box[], valid: (
       const right = Math.min(rect.right, clip.right), bottom = Math.min(rect.bottom, clip.bottom);
       if (right <= left || bottom <= top) return null;
       const box = document.createElement("span");
-      box.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px;background:rgb(70 147 245 / 30%);border-radius:2px;`;
+      box.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${right-left}px;height:${bottom-top}px;background:color-mix(in srgb, var(--falcon-info) 30%, transparent);border-radius:2px;`;
       return box;
     }).filter((box): box is HTMLSpanElement => Boolean(box));
     layer.replaceChildren(...boxes);

@@ -7,11 +7,11 @@
   max-width: min(260px, calc(100vw - 24px));
   margin: 0;
   padding: 8px 11px;
-  border: 1px solid var(--tooltip-border, var(--sidebar-menu-border, #dededd));
+  border: 1px solid var(--tooltip-border, var(--sidebar-menu-border, var(--falcon-border)));
   border-radius: 9px;
-  background: var(--tooltip-bg, var(--sidebar-menu-bg, #fafaf9));
-  color: var(--tooltip-text, var(--sidebar-menu-text, #20201f));
-  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  background: var(--tooltip-bg, var(--sidebar-menu-bg, var(--falcon-elevated)));
+  color: var(--tooltip-text, var(--sidebar-menu-text, var(--falcon-text)));
+  box-shadow: var(--falcon-shadow-popover);
   font-family: inherit;
   font-size: 12px;
   font-style: normal;

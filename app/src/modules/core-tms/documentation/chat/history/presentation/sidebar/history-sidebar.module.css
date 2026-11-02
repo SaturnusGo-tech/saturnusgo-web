@@ -1,4 +1,4 @@
-.sidebar { width: 240px; height: 100%; min-height: 0; display: flex; flex-direction: column; padding: 20px 10px 12px; background: var(--chat-history, #f8f8f8); color: var(--docs-ink); }
+.sidebar { width: 240px; height: 100%; min-height: 0; display: flex; flex-direction: column; padding: 20px 10px 12px; background: var(--chat-history, var(--falcon-surface)); color: var(--docs-ink); }
 .identity { padding: 2px 12px 24px; font-size: 16px; font-weight: 600; letter-spacing: -.025em; }
 .newChat { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 9px 11px; border: 0; border-radius: 8px; background: transparent; color: var(--docs-ink); text-align: left; font-size: 14px !important; }
 .newChat:hover { background: var(--docs-hover); }

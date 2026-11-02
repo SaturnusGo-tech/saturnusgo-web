@@ -8,10 +8,10 @@
 .hotspotHeader, .hotspotRow { min-width: 650px; display: grid; grid-template-columns: minmax(150px,1.5fr) minmax(65px,.55fr) minmax(125px,1fr) minmax(70px,.6fr) minmax(80px,.65fr) minmax(65px,.6fr); align-items: center; }
 .hotspotHeader { background: var(--control); color: var(--muted); font-size: 10px; line-height: 1.4; }
 .hotspotHeader span { min-width: 0; padding: 10px 12px; white-space: normal; }
-.hotspotRow { --risk-color: var(--dash-slate); border-top: 1px solid var(--line); }
-.hotspotRow[data-risk="failed"] { --risk-color: var(--dash-danger); }
-.hotspotRow[data-risk="blocked"] { --risk-color: var(--dash-warning); }
-.hotspotRow[data-risk="open"] { --risk-color: var(--dash-blue); }
+.hotspotRow { --risk-color: var(--falcon-warning); border-top: 1px solid var(--line); }
+.hotspotRow[data-risk="failed"] { --risk-color: var(--falcon-danger); }
+.hotspotRow[data-risk="blocked"] { --risk-color: var(--falcon-warning); }
+.hotspotRow[data-risk="open"] { --risk-color: var(--falcon-info); }
 .hotspotRow > div { min-width: 0; padding: 5px 12px; }
 .hotspotRow > div + div { border-left: 1px solid var(--line); }
 .portfolioPanel button { padding: 4px 0; color: var(--ink); border: 0; background: transparent; font-size: 12px; line-height: 1.5; cursor: pointer; font-variant-numeric: tabular-nums; }
@@ -40,7 +40,7 @@
 .dataNote svg { flex: 0 0 auto; margin-top: 2px; }
 @container dashboard-widget (max-width: 340px) { .panelHeading { padding-inline: 14px; }.hotspotTable { margin-inline: 14px; } }
 
-:global([data-appearance="glass"]) .operationsPanel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .operationsPanel { border-radius: 22px; box-shadow: var(--falcon-shadow); }
 :global([data-appearance="glass"]) .hotspotTable { border: 0; border-radius: 12px; }
 :global([data-appearance="glass"]) .hotspotHeader { background: var(--control); }
 :global([data-appearance="glass"]) .hotspotRow > div + div { border-left: 0; }

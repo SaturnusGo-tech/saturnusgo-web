@@ -1,19 +1,19 @@
 .brand > svg { width: 46px; height: 46px; }
 .rowBrand > svg { width: 27px; height: 27px; }
 .description { margin: 30px 0 0; font-size: 15px; line-height: 25px; }
-.preview { --glow: #74667c; position: relative; display: grid; place-items: center; min-height: 355px; padding: 40px 38px; overflow: hidden; border-radius: 20px; background: radial-gradient(ellipse at 80% 0%, var(--glow), transparent 67%), linear-gradient(125deg, #25343e, #30333d 75%); color: #f3f3f3; }
-.preview[data-brand="jira"], .preview[data-brand="trello"] { --glow: #456587; }
-.preview[data-brand="linear"], .preview[data-brand="youtrack"] { --glow: #71516e; }
-.preview[data-brand="swagger"] { --glow: #4e6b54; }
-.preview[data-brand="slack"] { --glow: #785b6e; }
-.preview[data-brand="confluence"] { --glow: #436477; }
-.preview[data-brand="github"] { --glow: #686877; }
+.preview { --glow: var(--falcon-elevated); position: relative; display: grid; place-items: center; min-height: 355px; padding: 40px 38px; overflow: hidden; border-radius: 20px; background: linear-gradient(135deg, var(--falcon-elevated), var(--falcon-panel)); color: var(--falcon-text); }
+.preview[data-brand="jira"], .preview[data-brand="trello"] { --glow: var(--falcon-elevated); }
+.preview[data-brand="linear"], .preview[data-brand="youtrack"] { --glow: var(--falcon-elevated); }
+.preview[data-brand="swagger"] { --glow: var(--falcon-elevated); }
+.preview[data-brand="slack"] { --glow: var(--falcon-elevated); }
+.preview[data-brand="confluence"] { --glow: var(--falcon-elevated); }
+.preview[data-brand="github"] { --glow: var(--falcon-elevated); }
 .workflows { display: grid; gap: 16px; width: min(100%, 650px); }
-.workflows > div { display: flex; align-items: center; gap: 15px; border: 1px solid #ffffff0c; border-radius: 20px; padding: 17px 18px; background: #191b22e8; font-size: 16px; line-height: 24px; }
+.workflows > div { display: flex; align-items: center; gap: 15px; border: 1px solid var(--falcon-border); border-radius: 20px; padding: 17px 18px; background: var(--falcon-surface); font-size: 16px; line-height: 24px; }
 .workflowLogo { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; }
 .workflowLogo > :is(svg, img, span) { width: 23px; height: 23px; }
 .workflows > div > :nth-child(2) { flex: 1; }
-.falcon { font-size: 11px; color: #b8b9c3; letter-spacing: .02em; }
+.falcon { font-size: 11px; color: var(--falcon-text); letter-spacing: .02em; }
 .connection { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 84px; padding: 16px; background: transparent; border: 0; border-block: 1px solid var(--plugin-line); border-radius: 12px; color: var(--plugin-text); text-align: left; cursor: pointer; }
 .connection:hover { background: var(--plugin-panel); }
 .connection strong { display: block; font-size: 15px; font-weight: 500; }

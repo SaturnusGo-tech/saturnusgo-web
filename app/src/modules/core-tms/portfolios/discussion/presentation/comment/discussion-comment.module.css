@@ -6,6 +6,6 @@
 .author button:hover { background: var(--control-hover); color: var(--text); }
 .comment footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 .comment footer button { border: 1px solid var(--line); border-radius: 10px; padding: 7px 13px; background: transparent; color: var(--text); cursor: pointer; }
-.comment footer button[type=submit] { background: var(--primary, #3976f6); border-color: transparent; color: white; }
+.comment footer button[type=submit] { background: var(--falcon-action); border-color: transparent; color: var(--falcon-on-action); }
 .comment button:disabled { opacity: .5; cursor: default; }
-.comment form > p[role=alert] { color: var(--danger, #c74755); font-size: 12px; }
+.comment form > p[role=alert] { color: var(--danger, var(--falcon-text)); font-size: 12px; }

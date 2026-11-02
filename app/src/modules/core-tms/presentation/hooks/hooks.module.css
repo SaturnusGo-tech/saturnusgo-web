@@ -151,10 +151,10 @@
   width: min(390px, calc(100vw - 48px));
   padding: 17px 18px;
   color: var(--ink);
-  background: var(--paper);
+  background: var(--falcon-elevated);
   border: 1px solid var(--line-strong);
   border-radius: 13px;
-  box-shadow: 0 18px 48px rgb(0 0 0 / 20%);
+  box-shadow: var(--falcon-shadow);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-5px) scale(.985);
@@ -266,7 +266,7 @@
   background: var(--paper);
   border: 1px solid var(--line-strong);
   border-radius: 10px;
-  box-shadow: 0 14px 36px rgb(0 0 0 / 18%);
+  box-shadow: var(--falcon-shadow);
 }
 .multiSelect > div > label { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
 .multiSelect > div > label:hover { background: var(--control-hover); }
@@ -354,7 +354,7 @@
 
 .root :is(button, a, input, select):focus-visible {
   outline: 0;
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px color-mix(in srgb, var(--ink) 72%, transparent);
+  box-shadow: var(--falcon-shadow);
 }
 
 @keyframes hooksSpin { to { transform: rotate(1turn); } }

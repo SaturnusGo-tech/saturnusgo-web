@@ -2,13 +2,12 @@
 @font-face { font-family: "Falcon Store Sans"; src: url("/fonts/falcon-docs/OpenAISans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 @font-face { font-family: "Falcon Store Sans"; src: url("/fonts/falcon-docs/OpenAISans-Semibold.woff2") format("woff2"); font-weight: 600 900; font-display: swap; }
 .catalog {
-  --catalog-bg: #fff; --catalog-sidebar: #f8f8f8; --catalog-hover: #f2f2f2; --catalog-control: #e9e9e9; --catalog-line: #dedede;
-  --catalog-ink: #242424; --catalog-muted: #676767; --catalog-placeholder: #737373; --yt-link: var(--catalog-ink);
+  --catalog-bg: var(--falcon-surface); --catalog-sidebar: var(--falcon-sidebar); --catalog-hover: var(--falcon-hover); --catalog-control: var(--falcon-control); --catalog-line: var(--falcon-border);
+  --catalog-ink: var(--falcon-text); --catalog-muted: var(--falcon-text-muted); --catalog-placeholder: var(--falcon-text-muted); --yt-link: var(--falcon-link);
   display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100%; width: 100%; color: var(--catalog-ink);
   background: var(--catalog-bg); font: 400 14px/1.45 "Falcon Store Sans", system-ui, sans-serif;
   container: integrations / inline-size;
 }
-:global(.dark) .catalog { --catalog-bg: #181818; --catalog-sidebar: #202020; --catalog-hover: #252525; --catalog-control: #303030; --catalog-line: #353535; --catalog-ink: #eee; --catalog-muted: #aaa; --catalog-placeholder: #999; }
 .catalog :is(button, input) { font-family: inherit; }
 .catalog ::selection { color: var(--catalog-bg); background: var(--catalog-ink); }
 .catalog :is(button, a, input):focus-visible { outline: 2px solid var(--catalog-muted); outline-offset: 2px; box-shadow: none; }
@@ -43,7 +42,7 @@
 .connectButton:disabled { cursor: default; opacity: .45; }
 .chevron { flex: none; width: 14px; height: 14px; }
 .menu { display: inline-flex; flex: none; }
-.menuPopover { position: fixed; inset: auto; margin: 0; z-index: 90; padding: 6px; overflow: auto; color: var(--catalog-ink); background: var(--catalog-sidebar); border: 1px solid var(--catalog-line); border-radius: 14px; box-shadow: 0 10px 28px rgb(0 0 0 / .18); font-size: 14px; }
+.menuPopover { position: fixed; inset: auto; margin: 0; z-index: 90; padding: 6px; overflow: auto; color: var(--catalog-ink); background: var(--catalog-sidebar); border: 1px solid var(--catalog-line); border-radius: 14px; box-shadow: var(--falcon-shadow-popover); font-size: 14px; }
 .menuHeading { margin: 10px 10px 5px; color: var(--catalog-muted); font-size: 12px; line-height: 18px; }
 .menuItem { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px; padding: 7px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--catalog-ink); text-align: left; text-decoration: none; font: inherit; cursor: pointer; }
 .menuItem:hover, .menuItem[aria-pressed="true"] { background: var(--catalog-hover); }

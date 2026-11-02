@@ -6,7 +6,7 @@
 .field { display: grid; gap: 8px; max-width: 460px; }
 .field > span, .label { color: var(--plugin-text); font-weight: 500; }
 .field input { width: 100%; min-width: 0; height: 38px; padding: 8px 11px; border: 1px solid var(--plugin-line); border-radius: 8px; background: var(--plugin-bg); color: var(--plugin-text); caret-color: var(--plugin-text); }
-.field input[aria-invalid="true"] { border-color: #d85e5e; }
+.field input[aria-invalid="true"] { border-color: var(--falcon-danger-border); }
 .label { margin-top: 20px; }
 .codeBlock { position: relative; min-width: 0; min-height: 44px; margin-top: 8px; padding-right: 44px; border: 1px solid var(--plugin-line); border-radius: 10px; color: var(--plugin-text); background: var(--plugin-bg); }
 .singleValue { display: block; min-width: 0; padding: 12px 10px 12px 14px; overflow-wrap: anywhere; font: 12px/1.6 ui-monospace, monospace; }

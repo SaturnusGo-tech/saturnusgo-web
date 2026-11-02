@@ -1,15 +1,15 @@
 .page {
-  --settings-canvas: #fafafa; --settings-nav: #f4f4f4; --settings-surface: #fff;
-  --settings-ink: #202020; --settings-muted: #666; --settings-line: #dedede;
-  --settings-hover: #ededed; --settings-selected: #e6e6e6; --settings-focus: #707070;
+  --settings-canvas: var(--falcon-surface); --settings-nav: var(--falcon-sidebar); --settings-surface: var(--falcon-panel);
+  --settings-ink: var(--falcon-text); --settings-muted: var(--falcon-text-muted); --settings-line: var(--falcon-border);
+  --settings-hover: var(--falcon-hover); --settings-selected: var(--falcon-selected); --settings-focus: var(--falcon-focus);
   display: flex; flex: 1; min-width: 0; min-height: 0; height: 100%; overflow: hidden;
   background: var(--settings-canvas); color: var(--settings-ink); color-scheme: light;
   font: 400 14px/1.5 var(--font-geist-sans), sans-serif;
 }
 :global(.dark) .page {
-  --settings-canvas: #181818; --settings-nav: #202020; --settings-surface: #232323;
-  --settings-ink: #f5f5f5; --settings-muted: #b5b5b5; --settings-line: #353535;
-  --settings-hover: #2b2b2b; --settings-selected: #303030; --settings-focus: #b5b5b5;
+  --settings-canvas: var(--falcon-surface); --settings-nav: var(--falcon-sidebar); --settings-surface: var(--falcon-panel);
+  --settings-ink: var(--falcon-text); --settings-muted: var(--falcon-text-muted); --settings-line: var(--falcon-border);
+  --settings-hover: var(--falcon-hover); --settings-selected: var(--falcon-selected); --settings-focus: var(--falcon-focus);
   color-scheme: dark;
 }
 .page *, .page *::before, .page *::after { box-sizing: border-box; }
@@ -55,7 +55,7 @@
 .panel :is(button[class*="primaryButton"], button[class*="secondaryButton"]) { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 6px 12px; border: 1px solid var(--settings-line); border-radius: 10px; background: var(--settings-selected); color: var(--settings-ink); font: 500 13px/1.5 var(--font-geist-sans), sans-serif; white-space: nowrap; box-shadow: none; }
 .panel :is(button[class*="primaryButton"], button[class*="secondaryButton"]):hover:not(:disabled) { background: var(--settings-hover); border-color: var(--settings-muted); color: var(--settings-ink); transform: none; box-shadow: none; }
 .exchange { min-width: 0; }
-.page .exchange :global([data-import-page]) { --exchange-canvas: var(--settings-canvas); --exchange-surface: var(--settings-surface); --exchange-ink: var(--settings-ink); --exchange-muted: var(--settings-muted); --exchange-line: var(--settings-line); --exchange-hover: var(--settings-hover); height: auto; overflow: visible; background: transparent; }
+.page .exchange :global([data-import-page]) { --exchange-canvas: var(--falcon-surface); --exchange-surface: var(--falcon-panel); --exchange-ink: var(--falcon-text); --exchange-muted: var(--falcon-text-muted); --exchange-line: var(--falcon-border); --exchange-hover: var(--falcon-hover); height: auto; overflow: visible; background: transparent; }
 .exchange :global([data-import-page]) > div { width: 100%; max-width: none; margin: 0; padding: 0; }
 .exchange :global([data-import-page]) > div > button:first-child { display: none; }
 .exchange :global([data-import-page]) > div > header { align-items: flex-start; margin-top: 0; margin-bottom: 22px; }

@@ -1,2 +1,2 @@
-.header { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; min-width: 0; padding: 20px 24px; border-bottom: 1px solid var(--runs-row-border); color: var(--runs-text); font-size: 13px; }
+.header { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; min-width: 0; padding: 20px 24px; border-bottom: 1px solid var(--falcon-border-subtle); color: var(--falcon-text); font-size: 13px; }
 .title { flex: 1 1 140px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 550; }

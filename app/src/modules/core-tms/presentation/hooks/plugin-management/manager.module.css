@@ -12,6 +12,6 @@
 .expansion[data-open] { grid-template-rows: 1fr; opacity: 1; }
 .clipped { min-height: 0; overflow: hidden; }
 .clipped[data-settled] { overflow: visible; }
-.configuration { min-width: 0; padding: 4px 0 24px 58px; --ink: var(--plugin-text); --muted: var(--plugin-muted); --paper: var(--plugin-bg); --line: var(--plugin-line); --action: var(--plugin-action); --action-foreground: var(--plugin-on-action); }
+.configuration { min-width: 0; padding: 4px 0 24px 58px; --ink: var(--falcon-text); --muted: var(--falcon-text-muted); --paper: var(--falcon-panel); --line: var(--falcon-border); --action: var(--falcon-action); --action-foreground: var(--falcon-on-action); }
 @media(max-width: 760px) { .configuration { padding-left: 0; } }
 @media(prefers-reduced-motion: reduce) { .expansion, .chevron { transition: none; } }

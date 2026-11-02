@@ -20,5 +20,5 @@
 @media(max-width: 600px) { .toolbar { flex-wrap: wrap; gap: 14px; } .search { width: 100%; } .header { margin-bottom: 24px; } .open { gap: 12px; } .open small { display: none; } }
 .brand > svg { width: 27px; height: 27px; }
 .hint { color: var(--plugin-muted); font-size: 12px; white-space: nowrap; }
-.error { color: #c85656; margin-bottom: 18px; }
+.error { color: var(--falcon-danger); margin-bottom: 18px; }
 @media(max-width: 600px) { .hint { max-width: 80px; white-space: normal; text-align: right; } }

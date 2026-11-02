@@ -3,7 +3,7 @@
   height: 15px;
   flex: 0 0 15px;
   margin: 0;
-  accent-color: var(--cases-primary);
+  accent-color: var(--falcon-action);
   cursor: pointer;
 }
 
@@ -22,11 +22,11 @@
   display: grid;
   place-items: center;
   padding: 0;
-  color: var(--cases-muted);
+  color: var(--falcon-text-muted);
   border-radius: 3px;
 }
 
-.selectionMenuButton:hover { color: var(--cases-strong); background: var(--cases-hover); }
+.selectionMenuButton:hover { color: var(--falcon-text); background: var(--falcon-hover); }
 
 .selectionMenu {
   position: absolute;
@@ -35,11 +35,11 @@
   left: 0;
   width: 220px;
   padding: 4px;
-  color: var(--cases-secondary-text);
-  background: var(--cases-raised);
-  border: 1px solid var(--cases-control-border);
+  color: var(--falcon-text-secondary);
+  background: var(--falcon-elevated);
+  border: 1px solid var(--falcon-border-strong);
   border-radius: 5px;
-  box-shadow: 0 9px 24px rgb(0 0 0 / 30%);
+  box-shadow: var(--falcon-shadow-popover);
 }
 
 .selectionMenu button {
@@ -58,10 +58,10 @@
 }
 
 .selectionMenu button:hover,
-.selectionMenu button:focus-visible { color: var(--cases-strong); background: var(--cases-hover-strong); }
+.selectionMenu button:focus-visible { color: var(--falcon-text); background: var(--falcon-selected); }
 .selectionMenu button:disabled { cursor: not-allowed; opacity: .45; }
 .selectionMenu button span { min-width: 0; flex: 1; }
-.selectionMenu button small { color: var(--cases-faint); font-size: 10px; }
+.selectionMenu button small { color: var(--falcon-text-disabled); font-size: 10px; }
 
 /* A real flex row below the scroll area keeps the last case and all actions reachable. */
 .bulkBar {
@@ -76,11 +76,11 @@
   margin: 8px auto;
   max-width: calc(100% - 16px);
   padding: 7px;
-  color: #fff;
-  background: #3464db;
+  color: var(--falcon-text);
+  background: var(--falcon-panel);
   border: 1px solid transparent;
   border-radius: 14px;
-  box-shadow: 0 3px 12px rgb(0 0 0 / 5%);
+  box-shadow: var(--falcon-shadow);
   animation: bulkBarReveal 160ms ease-out both;
 }
 .bulkCount {
@@ -103,7 +103,7 @@
   justify-content: center;
   gap: 6px;
   padding: 0 10px;
-  color: #fff;
+  color: var(--falcon-text);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 9px;
@@ -112,14 +112,14 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.bulkBar .bulkPrimary { color: #fff; background: rgb(255 255 255 / 14%); }
-.bulkBar .bulkPrimary:hover:not(:disabled) { color: #fff; background: rgb(255 255 255 / 22%); }
+.bulkBar .bulkPrimary { color: var(--falcon-on-action); background: var(--falcon-action); }
+.bulkBar .bulkPrimary:hover:not(:disabled) { color: var(--falcon-on-action); background: var(--falcon-action-hover); }
 .bulkBar .bulkAction:hover:not(:disabled),
 .bulkBar .bulkAction[aria-expanded="true"],
-.bulkBar .bulkClose:hover:not(:disabled) { background: rgb(255 255 255 / 14%); }
+.bulkBar .bulkClose:hover:not(:disabled) { background: var(--falcon-hover); }
 .bulkBar .bulkClose { width: 32px; padding: 0; }
 .bulkBar button:disabled { cursor: not-allowed; opacity: .5; }
-.bulkBar button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.bulkBar button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
 .bulkMenuRoot { position: relative; flex: 0 0 auto; }
 .bulkMenu {
   position: absolute;
@@ -130,11 +130,11 @@
   max-height: min(340px, 55dvh);
   overflow-y: auto;
   padding: 6px;
-  color: var(--cases-secondary-text);
-  background: var(--cases-raised);
-  border: 1px solid var(--cases-control-border);
+  color: var(--falcon-text-secondary);
+  background: var(--falcon-elevated);
+  border: 1px solid var(--falcon-border-strong);
   border-radius: 13px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 14%);
+  box-shadow: var(--falcon-shadow-popover);
 }
 .bulkMenu button {
   width: 100%;
@@ -157,13 +157,13 @@
 .bulkNext { margin-left: auto; }
 .bulkMenu button span { min-width: 0; overflow-wrap: anywhere; }
 .bulkMenu button:hover:not(:disabled),
-.bulkMenu button:focus-visible { color: var(--cases-strong); background: var(--cases-hover-strong); }
+.bulkMenu button:focus-visible { color: var(--falcon-text); background: var(--falcon-selected); }
 .bulkMenu .bulkBack { margin-bottom: 4px; font-weight: 550; }
-.bulkError { flex: 0 0 100%; min-width: 0; padding: 2px 4px; color: #fff; font-size: 12px; overflow-wrap: anywhere; }
-.critical { color: #ef4d55; }
-.high { color: #e9a23b; }
-.medium { color: #75a7ff; }
-.low { color: #69bd88; }
+.bulkError { flex: 0 0 100%; min-width: 0; padding: 2px 4px; color: var(--falcon-danger-on-solid); font-size: 12px; overflow-wrap: anywhere; }
+.critical { color: var(--falcon-danger); }
+.high { color: var(--falcon-text-muted); }
+.medium { color: var(--falcon-text-muted); }
+.low { color: var(--falcon-text-muted); }
 @media (max-width: 650px) {
   .bulkBar { gap: 3px; justify-content: flex-start; }
   .bulkCount { font-size: 11px; }

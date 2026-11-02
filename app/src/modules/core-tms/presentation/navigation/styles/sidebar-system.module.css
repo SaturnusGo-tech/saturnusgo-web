@@ -13,7 +13,7 @@
 .item[data-active="true"] { background: var(--glass-selected, var(--sidebar-active)); color: var(--sidebar-strong); font-weight: 500; }
 .icon { position: relative; display: grid; place-items: center; width: 24px; flex: 0 0 24px; height: 24px; }
 .label { position: absolute; left: 48px; right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 1; transition: opacity 120ms ease 80ms, transform 180ms ease; }
-.dot { position: absolute; top: 0; right: -1px; width: 5px; height: 5px; border: 0; border-radius: 50%; background: #d85c63; }
+.dot { position: absolute; top: 0; right: -1px; width: 5px; height: 5px; border: 0; border-radius: 50%; background: var(--falcon-danger); }
 .utilities { flex-shrink: 0; margin: 0 var(--nav-inset); padding: 0; }
 .footer { flex-shrink: 0; padding-bottom: 8px; }
 .item:disabled { opacity: .45; cursor: default; }
@@ -41,8 +41,8 @@
 
 /* Filled SDK geometry stays intact; a fine surface-colored inset lightens its weight. */
 .icon svg path { stroke: var(--sidebar-icon-surface, var(--sidebar-frame)); stroke-width: .28px; stroke-linejoin: round; paint-order: fill stroke; }
-.item:hover, .item:focus-visible { --sidebar-icon-surface: color-mix(in srgb, var(--sidebar-frame) 94%, var(--sidebar-strong) 6%); }
-.item[data-active="true"] { --sidebar-icon-surface: color-mix(in srgb, var(--sidebar-frame) 89%, var(--sidebar-strong) 11%); }
+.item:hover, .item:focus-visible { --sidebar-icon-surface: var(--falcon-hover); }
+.item[data-active="true"] { --sidebar-icon-surface: var(--falcon-selected); }
 @media (min-width: 761px) { .system.system { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; } }
 
 .resizeHandle { position: absolute; z-index: 2; inset: 0 0 0 auto; width: 8px; cursor: col-resize; touch-action: none; outline: none; }

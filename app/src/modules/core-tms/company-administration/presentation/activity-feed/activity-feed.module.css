@@ -5,8 +5,8 @@
 .entry { position:relative; display:flex; gap:13px; padding:0 0 22px; }
 .entry:not(:last-child)::before { content:""; position:absolute; left:14px; top:30px; bottom:0; width:1px; background:var(--admin-line); }
 .icon { position:relative; flex-shrink:0; width:29px; height:29px; border-radius:50%; display:grid; place-items:center; color:var(--admin-blue); background:color-mix(in srgb,var(--admin-blue) 9%,transparent); }
-.icon[data-tone="access"] { color:#9773de; background:rgb(151 115 222 / 10%); }
-.icon[data-tone="defect"] { color:#e67666; background:rgb(230 118 102 / 10%); }
+.icon[data-tone="access"] { color:var(--falcon-discovery); background:var(--falcon-discovery-bg); }
+.icon[data-tone="defect"] { color:var(--falcon-danger); background:var(--falcon-danger-bg); }
 .icon[data-tone="file"] { color:var(--admin-muted); background:var(--admin-hover); }
 .content { flex:1; min-width:0; padding-top:4px; }
 .line { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }

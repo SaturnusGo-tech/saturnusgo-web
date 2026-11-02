@@ -1,10 +1,10 @@
 .thread { position:relative; min-width: 0; }
 .replies { position: relative; margin-left: 25px; padding-left: 14px; }
 .rail { position: absolute; left: 26px; top: 46px; bottom: 12px; width: 12px; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: 8px; z-index: 1; }
-.rail::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px; border-radius: 3px; background: var(--cases-control-border); transition: background-color 160ms; }
-.rail:hover::before { background: var(--cases-muted); width: 2px; }
+.rail::before { content: ""; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px; border-radius: 3px; background: var(--falcon-border-strong); transition: background-color 160ms; }
+.rail:hover::before { background: var(--falcon-text-muted); width: 2px; }
 .actions { display: flex; align-items: center; gap: 8px; margin: 0 12px 2px 53px; flex-wrap: wrap; }
-.actions button { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; padding: 2px 7px; border: 0; border-radius: 9px; background: transparent; color: var(--cases-muted); font: inherit; font-size: 11px; cursor: pointer; }
-.actions button:hover { background: var(--cases-hover); color: var(--cases-text); }
+.actions button { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; padding: 2px 7px; border: 0; border-radius: 9px; background: transparent; color: var(--falcon-text-muted); font: inherit; font-size: 11px; cursor: pointer; }
+.actions button:hover { background: var(--falcon-hover); color: var(--falcon-text); }
 .replies[data-deep="true"] { margin-left: 0; padding-left: 0; }
 @media(max-width:600px) { .replies { margin-left: 15px; padding-left: 7px; } .rail { left: 21px; } }

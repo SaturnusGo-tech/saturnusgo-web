@@ -1,33 +1,33 @@
 .properties { display: flex; flex-direction: column; gap: 8px; min-width: 0; width: min(100%, 480px); align-self: start; }
 .row { display: grid; grid-template-columns: minmax(110px, 150px) minmax(0, 1fr); align-items: center; gap: 4px 8px; min-height: 32px; }
-.row > span, .row > label { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.row > span, .row > label { color: var(--falcon-text-muted); font-size: 12px; line-height: 1.4; }
 .label { display: flex; align-items: center; gap: 2px; }
 .value.value { width: max-content; max-width: 100%; min-width: 0; }
-.value.value > button { width: max-content; max-width: 100%; min-height: 32px; padding: 5px 6px; gap: 7px; border: 0; border-radius: 10px; box-shadow: none; background: transparent; color: var(--ink); font-size: 12px; }
+.value.value > button { width: max-content; max-width: 100%; min-height: 32px; padding: 5px 6px; gap: 7px; border: 0; border-radius: 10px; box-shadow: none; background: transparent; color: var(--falcon-text); font-size: 12px; }
 .value.value > button > span { flex: 0 1 auto; text-align: left; }
-.value.value > button:hover { background: var(--control-hover); }
-.value.value > button:focus-visible { outline: 1px solid #79a5ed; outline-offset: 1px; }
-.value.value > [role="listbox"] { min-width: 180px; width: max-content; max-width: calc(100vw - 24px); right: 0; left: auto; border: 1px solid var(--line); border-radius: 12px; box-shadow: none; background: var(--paper); color: var(--ink); color-scheme: inherit; }
+.value.value > button:hover { background: var(--falcon-hover); }
+.value.value > button:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }
+.value.value > [role="listbox"] { min-width: 180px; width: max-content; max-width: calc(100vw - 24px); right: 0; left: auto; border: 1px solid var(--falcon-border); border-radius: 12px; box-shadow: none; background: var(--falcon-panel); color: var(--falcon-text); color-scheme: inherit; }
 .value.value [role="option"] { white-space: nowrap; border-radius: 8px; font-size: 12px; }
 .value.value [role="option"] > span { white-space: nowrap; }
 .responsible { min-width: 0; }
 .responsible > div > button { width: max-content; max-width: 100%; min-height: 34px; padding: 4px 6px; gap: 6px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; font-size: 12px; }
 .responsible > div > button > span:first-child { width: 24px; height: 24px; font-size: 10px; }
-.responsible > div > button:hover { background: var(--control-hover); }
-.responsible.responsible > div > div { left: auto; right: 0; width: min(300px, calc(100vw - 80px)); border: 1px solid var(--line); border-radius: 13px; background: var(--paper); box-shadow: none; }
-.error { grid-column: 1 / -1; font-size: 12px; line-height: 1.5; color: var(--danger, #c96c70); }
+.responsible > div > button:hover { background: var(--falcon-hover); }
+.responsible.responsible > div > div { left: auto; right: 0; width: min(300px, calc(100vw - 80px)); border: 1px solid var(--falcon-border); border-radius: 13px; background: var(--falcon-panel); box-shadow: none; }
+.error { grid-column: 1 / -1; font-size: 12px; line-height: 1.5; color: var(--falcon-danger); }
 
 .component [role="listbox"] { min-width: min(340px, calc(100vw - 24px)); }
-.levelDot { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--green, #29955d); }
-.levelDot[data-level="medium"] { background: #3981e8; }
-.levelDot[data-level="high"] { background: #a276cd; }
-.levelDot[data-level="critical"] { background: var(--red, #d74b59); }
+.levelDot { display: inline-block; width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; background: var(--falcon-success); }
+.levelDot[data-level="medium"] { background: var(--falcon-info-solid); color: var(--falcon-info-on-solid); }
+.levelDot[data-level="high"] { background: var(--falcon-discovery-solid); color: var(--falcon-discovery-on-solid); }
+.levelDot[data-level="critical"] { background: var(--falcon-danger); }
 
 .routing [role="listbox"] { min-width: min(440px, calc(100vw - 24px)); }
 .component.component, .routing.routing { width: 100%; }
 .component.component > button, .routing.routing > button { width: 100%; }
 .value.value [role="option"] + [role="option"] { margin-top: 3px; }
 
-.linkInput { width: 100%; min-width: 0; height: 32px; box-sizing: border-box; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--ink); font: inherit; font-size: 12px; }
-.linkInput::placeholder { color: var(--muted); }
-.linkInput:focus-visible { outline: 1px solid #79a5ed; outline-offset: 1px; }
+.linkInput { width: 100%; min-width: 0; height: 32px; box-sizing: border-box; padding: 5px 8px; border: 1px solid var(--falcon-border); border-radius: 7px; background: transparent; color: var(--falcon-text); font: inherit; font-size: 12px; }
+.linkInput::placeholder { color: var(--falcon-text-muted); }
+.linkInput:focus-visible { outline: 1px solid var(--falcon-focus); outline-offset: 1px; }

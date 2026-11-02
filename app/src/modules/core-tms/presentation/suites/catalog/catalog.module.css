@@ -2,34 +2,34 @@
 .search { width: 225px; min-width: 120px; }
 .repository { min-width: 0; }
 .project, .row { display: grid; grid-template-columns: minmax(260px, 1fr) 112px 96px 72px 32px; align-items: center; column-gap: 16px; }
-.project { min-height: 36px; margin-bottom: 3px; border-bottom: 1px solid var(--suite-line); color: var(--suite-muted); font-size: 11px; }
-.projectName { display: flex; min-width: 0; gap: 10px; align-items: baseline; color: var(--suite-text); font-size: 12px; }
+.project { min-height: 36px; margin-bottom: 3px; border-bottom: 1px solid var(--falcon-border-subtle); color: var(--falcon-text-muted); font-size: 11px; }
+.projectName { display: flex; min-width: 0; gap: 10px; align-items: baseline; color: var(--falcon-text); font-size: 12px; }
 .projectName > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.projectName small { flex: none; color: var(--suite-muted); font-size: 11px; }
+.projectName small { flex: none; color: var(--falcon-text-muted); font-size: 11px; }
 .list { padding: 0; margin: 0; list-style: none; }
 .row { min-height: 56px; padding: 6px 8px; margin-inline: -8px; border: 0; border-radius: 8px; transition: background 120ms ease; }
-.row:hover, .row:focus-within { background: var(--suite-hover); }
-.name.name { display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 42px; padding: 0; border: 0; border-radius: 6px; background: transparent; text-align: left; color: var(--suite-text); cursor: pointer; }
-.key { flex: 0 0 82px; color: var(--suite-muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row:hover, .row:focus-within { background: var(--falcon-hover); }
+.name.name { display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 42px; padding: 0; border: 0; border-radius: 6px; background: transparent; text-align: left; color: var(--falcon-text); cursor: pointer; }
+.key { flex: 0 0 82px; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .copy { display: grid; min-width: 0; gap: 2px; }
 .name strong { font-size: 14px; line-height: 20px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.summary { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--suite-muted); font-size: 12px; line-height: 18px; }
+.summary { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--falcon-text-muted); font-size: 12px; line-height: 18px; }
 .mode { min-width: 0; }
-.count { min-width: 0; color: var(--suite-text); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.countLabel { display: none; color: var(--suite-muted); }
-.count [data-empty] { color: var(--suite-warning); }
-.resolve { display: inline-flex; align-items: center; gap: 3px; padding: 0; min-height: 28px; border: 0; border-radius: 5px; background: transparent; color: var(--suite-accent); font: inherit; font-size: 11px; cursor: pointer; }
+.count { min-width: 0; color: var(--falcon-text); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.countLabel { display: none; color: var(--falcon-text-muted); }
+.count [data-empty] { color: var(--falcon-warning); }
+.resolve { display: inline-flex; align-items: center; gap: 3px; padding: 0; min-height: 28px; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-info); font: inherit; font-size: 11px; cursor: pointer; }
 .resolve:hover { text-decoration: underline; text-underline-offset: 3px; }
-.date { color: var(--suite-muted); font-size: 11px; white-space: nowrap; }
-.run { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--suite-muted); cursor: pointer; }
-.run:hover { background: var(--suite-control); color: var(--suite-text); }
+.date { color: var(--falcon-text-muted); font-size: 11px; white-space: nowrap; }
+.run { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.run:hover { background: var(--falcon-control); color: var(--falcon-text); }
 .run:disabled { opacity: .3; cursor: default; }
-.row[data-archived] .name { color: var(--suite-muted); }
+.row[data-archived] .name { color: var(--falcon-text-muted); }
 .filter { position: relative; display: inline-flex; }
-.filterButton { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--suite-muted); cursor: pointer; }
-.filterButton:hover, .filterButton[aria-expanded=true], .filterButton[data-active] { background: var(--suite-control); color: var(--suite-text); }
-.filterMenu { position: fixed; inset: auto; z-index: 90; margin: 0; display: grid; gap: 8px; padding: 14px; overflow: auto; border: 1px solid var(--suite-line); border-radius: 14px; color: var(--suite-text); background: var(--suite-panel); box-shadow: 0 10px 28px #0003; font: 400 14px/1.45 "Falcon Suites Sans", system-ui, sans-serif; }
-.filterMenu > label { color: var(--suite-muted); font-size: 12px; }
+.filterButton { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.filterButton:hover, .filterButton[aria-expanded=true], .filterButton[data-active] { background: var(--falcon-control); color: var(--falcon-text); }
+.filterMenu { position: fixed; inset: auto; z-index: 90; margin: 0; display: grid; gap: 8px; padding: 14px; overflow: auto; border: 1px solid var(--falcon-border-subtle); border-radius: 14px; color: var(--falcon-text); background: var(--falcon-elevated); box-shadow: var(--falcon-shadow-popover); font: 400 14px/1.45 "Falcon Suites Sans", system-ui, sans-serif; }
+.filterMenu > label { color: var(--falcon-text-muted); font-size: 12px; }
 .filterMenu > label:not(:first-child) { margin-top: 6px; }
 .filterMenu :is(button, input) { font-family: inherit; }
 

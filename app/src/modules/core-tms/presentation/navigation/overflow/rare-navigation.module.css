@@ -1,15 +1,15 @@
 .root { flex-shrink: 0; margin-top: 4px; }
-.panel { position: fixed; z-index: 130; box-sizing: border-box; width: 228px; max-width: calc(100vw - 24px); padding: 6px; overflow: auto; overscroll-behavior: contain; border: 0; border-radius: 16px; background: var(--rail-menu-surface, #fff); color: var(--sidebar-menu-text, #202020); box-shadow: 0 8px 28px rgb(0 0 0 / 16%); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; scrollbar-width: thin; scrollbar-color: #777 transparent; }
-:global(.dark) .panel { --rail-menu-surface: #2b2b2b; color: #f1f1f1; }
+.panel { position: fixed; z-index: 130; box-sizing: border-box; width: 228px; max-width: calc(100vw - 24px); padding: 6px; overflow: auto; overscroll-behavior: contain; border: 0; border-radius: 16px; background: var(--falcon-elevated); color: var(--sidebar-menu-text, var(--falcon-text)); box-shadow: var(--falcon-shadow-popover); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; scrollbar-width: thin; scrollbar-color: var(--falcon-text) transparent; }
+:global(.dark) .panel { --rail-menu-surface: var(--falcon-elevated); color: var(--falcon-text); }
 .row { display: flex; align-items: center; min-width: 0; border-radius: 8px; }
-.row[data-active="true"] { background: rgb(127 127 127 / 14%); }
+.row[data-active="true"] { background: var(--falcon-selected); }
 .route, .pin { border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .route { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; height: 36px; padding: 8px 6px; text-align: left; }
 .route svg { flex: 0 0 20px; }
 .route span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pin { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 30px; padding: 0; color: var(--sidebar-menu-muted, #777); }
+.pin { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 30px; padding: 0; color: var(--sidebar-menu-muted, var(--falcon-text)); }
 .pin[aria-pressed="true"] { color: inherit; }
-.route:hover, .pin:hover { background: rgb(127 127 127 / 16%); }
+.route:hover, .pin:hover { background: var(--falcon-hover); }
 .panel button:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
 .panel button:disabled { opacity: .45; cursor: default; }
 @media (max-width: 760px) { .root { margin: 0; } }

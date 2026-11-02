@@ -1,23 +1,23 @@
-.browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 9px 12px; border-right: 1px solid var(--cases-row-border); background: var(--cases-bg); font-size: 12px; }
+.browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 9px 12px; border-right: 1px solid var(--falcon-border-subtle); background: var(--falcon-surface); font-size: 12px; }
 .browser button { cursor: pointer; font: inherit; }
 .scroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
-.empty { padding: 18px 8px; color: var(--cases-muted); }
-.status { display: inline-flex; color: var(--cases-muted); }
+.empty { padding: 18px 8px; color: var(--falcon-text-muted); }
+.status { display: inline-flex; color: var(--falcon-text-muted); }
 .status svg { width: 16px; height: 16px; }
-.status[data-status=passed] { color: #368667; }
-.status[data-status=failed] { color: #d66c79; }
-.status[data-status=blocked] { color: #c2924d; }
-.status[data-status=in_progress] { color: #3574f0; }
+.status[data-status=passed] { color: var(--falcon-success); }
+.status[data-status=failed] { color: var(--falcon-danger); }
+.status[data-status=blocked] { color: var(--falcon-warning); }
+.status[data-status=in_progress] { color: var(--falcon-info); }
 @media (max-width: 600px) { .browser { padding: 12px 8px; } }
 .status svg { color: inherit !important; }
 
-.assignee { margin-left: auto; max-width: 130px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.assignee { margin-left: auto; max-width: 130px; font-size: 11px; color: var(--falcon-text-muted); flex-shrink: 0; }
 .assignee > span { max-width: 100%; }
 .assignee > span > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 700px) { .assignee { max-width: 80px; } }
 
-.restore { border: 0; border-radius: 16px; padding: 8px 12px; background: var(--cases-hover); color: var(--cases-text); align-self: flex-start; }
+.restore { border: 0; border-radius: 16px; padding: 8px 12px; background: var(--falcon-hover); color: var(--falcon-text); align-self: flex-start; }
 
 .projectName { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .projectName > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.projectName > small { flex-shrink: 0; color: var(--cases-muted); font: inherit; font-weight: 400; }
+.projectName > small { flex-shrink: 0; color: var(--falcon-text-muted); font: inherit; font-weight: 400; }

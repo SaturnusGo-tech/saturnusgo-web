@@ -1,14 +1,14 @@
 .actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-.originLink { border: 0; padding: 0; background: transparent; color: var(--report-primary); text-align: left; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
+.originLink { border: 0; padding: 0; background: transparent; color: var(--falcon-action); text-align: left; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
 .originLink:hover { text-decoration: underline; }
 .overview .discussion {
   grid-column: 1 / -1; min-width: 0; padding-top: 8px;
-  border-top: 1px solid var(--report-row-border);
+  border-top: 1px solid var(--falcon-border-subtle);
   --comment-editor-height: 160px;
 }
 @container report-detail (max-width: 660px) {
   .overview { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .overview > aside { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; border-top: 1px solid var(--report-row-border); }
+  .overview > aside { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 20px; border-top: 1px solid var(--falcon-border-subtle); }
 }
 @container report-detail (max-width: 380px) {
   .actions { gap: 6px; }

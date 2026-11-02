@@ -8,7 +8,7 @@
 .toolTabs { min-height: 42px; display: flex; flex: 0 0 auto; align-items: stretch; gap: 22px; padding: 0 22px; border-bottom: 1px solid var(--line); }
 .toolTab, .toolTabActive { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 2px; color: var(--muted); background: transparent; border: 0; font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
 .toolTab:hover, .toolTabActive { color: var(--ink); }
-.toolTabActive::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; content: ""; background: #85b747; }
+.toolTabActive::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; content: ""; background: var(--falcon-action); }
 .meta { margin-left: auto; align-self: center; color: var(--muted); font-size: 11px; }
 .page button:focus-visible, .page a:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; }
 .webview { position: relative; min-width: 0; min-height: 0; flex: 1 1 auto; overflow: auto; }
@@ -17,7 +17,7 @@
 .state h2 { color: var(--ink); margin: 6px 0 0; font-size: 20px; font-weight: 550; }
 .state p { max-width: 510px; margin: 0; font-size: 13px; line-height: 1.7; }
 .state button { font: inherit; font-size: 13px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--paper); cursor: pointer; }
-.state .primary { background: var(--action); color: #fff; border-color: transparent; margin-top: 12px; }
+.state .primary { background: var(--action); color: var(--falcon-on-action); border-color: transparent; margin-top: 12px; }
 @media (max-width: 720px) { .header, .toolTabs { padding-inline: 14px; } .meta { display: none; } .hint { padding-inline: 16px; } .header h1 { font-size: 18px; } }
 .sourceSelector { width: min(360px, 40vw); min-width: 180px; }
 @media(max-width:720px) { .header { flex-wrap:wrap; gap:10px; } .sourceSelector { order:3; width:100%; } }

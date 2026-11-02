@@ -7,22 +7,22 @@
 }
 .action { display: flex; align-items: center; gap: 7px; min-height: var(--quick-add-height, 43px); width: 100%;
   padding: 5px 9px 5px 42px; border: 0; border-radius: 9px; background: transparent; text-align: left;
-  color: var(--cases-muted); font: inherit; font-size: 12px; cursor: pointer; }
-.action:hover:not(:disabled) { color: var(--cases-primary); background: color-mix(in srgb, var(--cases-primary) 7%, var(--cases-bg)); }
-.action svg { flex-shrink: 0; color: #7b96d0; }
+  color: var(--falcon-text-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.action:hover:not(:disabled) { color: var(--falcon-action); background: color-mix(in srgb, var(--falcon-action) 7%, var(--falcon-surface)); }
+.action svg { flex-shrink: 0; color: var(--falcon-icon-muted); }
 .form { margin: 0; padding: 3px 4px 5px 38px; min-width: 0; }
 .fields { display: flex; align-items: center; gap: 6px; min-height: 32px; }
 .fields input { display: block; flex: 1; min-width: 0; width: 100%; height: 30px; margin: 0; opacity: 1; padding: 4px 8px;
-  border: 1px solid var(--cases-control-border); border-radius: 8px; background: var(--cases-bg); color: var(--cases-text); font: inherit; font-size: 12px; }
-.fields input::placeholder { color: var(--cases-muted); }
-.fields input:focus { border-color: var(--cases-primary); outline: none; }
-.form .fields input:focus-visible { outline: none !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--cases-primary) 13%, transparent); }
+  border: 1px solid var(--falcon-border-strong); border-radius: 8px; background: var(--falcon-surface); color: var(--falcon-text); font: inherit; font-size: 12px; }
+.fields input::placeholder { color: var(--falcon-text-muted); }
+.fields input:focus { border-color: var(--falcon-action); outline: none; }
+.form .fields input:focus-visible { outline: none !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--falcon-action) 13%, transparent); }
 .fields .confirm, .fields .cancel { display: grid; place-items: center; flex: 0 0 27px; width: 27px; height: 27px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; }
-.fields .confirm { background: var(--cases-primary); color: #fff; }
-.fields .confirm:hover:not(:disabled) { background: #2868dd; }
-.fields .cancel { background: transparent; color: var(--cases-muted); }
-.fields .cancel:hover:not(:disabled) { background: var(--cases-hover); color: var(--cases-text); }
-.error { font-size: 11px; line-height: 1.45; color: var(--tms-danger, #d74c60); margin: 5px 0 0; overflow-wrap: anywhere; }
+.fields .confirm { background: var(--falcon-action); color: var(--falcon-on-action); }
+.fields .confirm:hover:not(:disabled) { background: var(--falcon-action-hover); }
+.fields .cancel { background: transparent; color: var(--falcon-text-muted); }
+.fields .cancel:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
+.error { font-size: 11px; line-height: 1.45; color: var(--falcon-danger); margin: 5px 0 0; overflow-wrap: anywhere; }
 .spin { animation: spin 700ms linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (hover: none) { .anchor > .reveal:not([data-disabled]) { grid-template-rows: 1fr; opacity: 1; visibility: visible; } }

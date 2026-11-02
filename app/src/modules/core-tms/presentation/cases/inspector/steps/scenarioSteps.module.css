@@ -59,7 +59,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  color: var(--cases-faint);
+  color: var(--falcon-text-disabled);
   background: transparent;
   border: 0;
   border-radius: 4px;
@@ -68,8 +68,8 @@
 
 .collapseButton:hover,
 .collapseButton:focus-visible {
-  color: var(--cases-strong);
-  background: var(--cases-hover);
+  color: var(--falcon-text);
+  background: var(--falcon-hover);
   outline: 0;
 }
 
@@ -80,7 +80,7 @@
   align-items: center;
   justify-content: flex-end;
   padding-right: 6px;
-  color: var(--cases-faint);
+  color: var(--falcon-text-disabled);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -100,7 +100,7 @@
   min-height: 26px;
   overflow: hidden;
   padding: 3px 6px 2px;
-  color: var(--cases-text);
+  color: var(--falcon-text);
   background: transparent;
   border: 0;
   border-bottom: 1px solid transparent;
@@ -116,7 +116,7 @@
 .lineInput::placeholder,
 .expectedInput::placeholder,
 .dataInput::placeholder {
-  color: var(--cases-faint);
+  color: var(--falcon-text-disabled);
   opacity: .76;
 }
 
@@ -125,7 +125,7 @@
 .expectedInput:focus,
 .dataInput:focus {
   background: transparent;
-  border-bottom-color: var(--cases-control-border);
+  border-bottom-color: var(--falcon-border-strong);
   box-shadow: none !important;
   outline: 0 !important;
 }
@@ -162,7 +162,7 @@
 }
 
 .attachmentError {
-  color: #b4494f;
+  color: var(--falcon-danger);
   font-size: 10px;
   line-height: 1.35;
 }
@@ -173,18 +173,14 @@
   gap: 1px;
   margin: 2px 0 0 43px;
   padding: 3px 0 3px 11px;
-  border-left: 2px solid #278c7b;
+  border-left: 2px solid var(--falcon-success);
 }
 
 .expectedLabel {
-  color: #237a6d;
+  color: var(--falcon-success);
   font-size: 11px;
   font-weight: 650;
   line-height: 1.35;
-}
-
-:global(.dark) .expectedLabel {
-  color: #69bdaf;
 }
 
 .expectedInput {
@@ -197,7 +193,7 @@
 }
 
 .dataInput {
-  color: var(--cases-secondary-text);
+  color: var(--falcon-text-secondary);
   font-size: 12px;
 }
 
@@ -205,7 +201,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--cases-muted);
+  color: var(--falcon-text-muted);
   cursor: pointer;
   font-size: 10px;
 }
@@ -224,7 +220,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  color: var(--cases-muted);
+  color: var(--falcon-text-muted);
   background: transparent;
   border: 0;
   border-radius: 4px;
@@ -232,8 +228,8 @@
 }
 
 .removeButton:hover:not(:disabled) {
-  color: #c3565d;
-  background: var(--cases-hover);
+  color: var(--falcon-text-disabled);
+  background: var(--falcon-hover);
 }
 
 .removeButton:disabled {
@@ -249,7 +245,7 @@
   gap: 6px;
   margin: 1px 0 0 37px;
   padding: 0 8px;
-  color: var(--cases-muted);
+  color: var(--falcon-text-muted);
   background: transparent;
   border: 0;
   border-radius: 4px;
@@ -265,8 +261,8 @@
 
 .addStepButton:hover,
 .addStepButton:focus-visible {
-  color: var(--cases-strong);
-  background: var(--cases-hover);
+  color: var(--falcon-text);
+  background: var(--falcon-hover);
 }
 
 .viewLine > p,
@@ -274,7 +270,7 @@
 .viewData p {
   margin: 0;
   overflow-wrap: anywhere;
-  color: var(--cases-secondary-text);
+  color: var(--falcon-text-secondary);
   font-size: 13px;
   line-height: 1.45;
   white-space: pre-wrap;
@@ -295,7 +291,7 @@
 }
 
 .viewData > span {
-  color: var(--cases-muted);
+  color: var(--falcon-text-muted);
   font-size: 10px;
 }
 
@@ -329,12 +325,12 @@
   align-items: start;
   gap: 5px;
   padding: 3px 0 9px;
-  border-bottom: 1px solid var(--cases-row-border);
+  border-bottom: 1px solid var(--falcon-border-subtle);
 }
 
 .checklistView li > span {
   padding-top: 6px;
-  color: var(--cases-faint);
+  color: var(--falcon-text-disabled);
   font-size: 12px;
   text-align: right;
 }
@@ -342,7 +338,7 @@
 .checklistView li > p {
   margin: 0;
   padding: 4px 7px;
-  color: var(--cases-secondary-text);
+  color: var(--falcon-text-secondary);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -386,17 +382,17 @@
   }
 }
 
-.collapsedCopy { margin: 0; padding: 3px 6px; color: var(--cases-secondary-text); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collapsedCopy { margin: 0; padding: 3px 6px; color: var(--falcon-text-secondary); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .actionLines > .primaryLine { padding-right: 28px; }
 
 .stepGroup :is(.actionLine, .expectedBlock, .optionalData)[data-input-shell]:is(:hover, :focus-within) { box-shadow: none !important; outline: none !important; }
 
-.stepGroup .expectedBlock[data-input-shell] { border-color: #278c7b !important; border-radius: 0; }
+.stepGroup .expectedBlock[data-input-shell] { border-color: var(--falcon-success-border) !important; border-radius: 0; }
 
 .scenarioView, .editor { container: scenario-content / inline-size; align-content: start; }
 @container scenario-content (min-width: 360px) {
   :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start; padding: 14px 0; }
-  :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) + :is(.viewGroup, .stepGroup) { border-top: 1px solid var(--cases-row-border); }
+  :is(.scenarioView, .editor)[data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) + :is(.viewGroup, .stepGroup) { border-top: 1px solid var(--falcon-border-subtle); }
   [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > :is(.viewLines, .actionLines) { grid-column: 1; grid-row: 1; }
   [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > .expectedBlock { grid-column: 2; grid-row: 1; margin: 0; }
   [data-scenario-layout="grid"] > :is(.viewGroup, .stepGroup) > :is(.optionalData, .viewData, .savedAttachments, .attachmentControls) { grid-column: 1 / -1; }

@@ -1,15 +1,15 @@
 .page {
-  --access-bg: #f4f4f4;
-  --access-text: #151515;
-  --access-muted: #707070;
-  --access-line: #e4e4e4;
-  --access-input: #ffffff;
+  --access-bg: var(--falcon-surface);
+  --access-text: var(--falcon-text);
+  --access-muted: var(--falcon-text-muted);
+  --access-line: var(--falcon-border);
+  --access-input: var(--falcon-control);
   min-height: 100dvh;
   width: 100%;
   padding: 40px 50px 36px;
   background: var(--access-bg);
   color: var(--access-text);
-  color-scheme: light;
+  color-scheme: inherit;
   font: 400 16px/1.5 var(--font-geist-sans), Arial, sans-serif;
   display: grid;
   grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
@@ -20,6 +20,8 @@
 .header { position: absolute; inset: 0 0 auto; display: flex; justify-content: flex-end; }
 .brand { display: flex; flex-direction: column; align-items: flex-start; width: fit-content; gap: 4px; margin-bottom: 26px; color: inherit; text-decoration: none; }
 .brand img { width: 88px; height: 88px; object-fit: contain; }
+.brand img { content: url("/falcon/falcon-mark-dark.png"); }
+:global(.dark) .brand img { content: url("/falcon/falcon-mark-light.png"); }
 .brand span { font-size: 20px; line-height: 28px; font-weight: 650; letter-spacing: 5px; }
 .language { display: flex; gap: 4px; }
 .language button, .linkButton { color: var(--access-muted); background: transparent; border: 0; border-radius: 8px; padding: 6px 8px; font: inherit; cursor: pointer; }
@@ -31,28 +33,28 @@
 .content h1 { font-size: clamp(30px, 2.85vw, 44px); line-height: 1.14; letter-spacing: -1.4px; font-weight: 650; margin: 0 0 14px; }
 .content h1.loginHeading { margin-bottom: 34px; }
 .lead { color: var(--access-muted); margin: 0 0 28px; line-height: 1.6; }
-.hero { position: relative; min-height: 680px; min-width: 0; overflow: hidden; border-radius: 42px; background: #080808; color: #f8f8f8; align-self: stretch; }
+.hero { position: relative; min-height: 680px; min-width: 0; overflow: hidden; border-radius: 42px; background: var(--falcon-media-surface); color: var(--falcon-media-text); align-self: stretch; }
 .heroArtwork { position: absolute; width: 100%; height: 100%; inset: 0; object-fit: cover; }
 .heroIntro { position: absolute; top: 54.5%; left: 11.7%; right: 8%; }
-.heroIntro p { color: #aeaeae; font-size: clamp(14px, 1.27vw, 20px); line-height: 1.55; margin: 0; }
-.heroIntro p.heroEyebrow { color: #f5f5f5; font-size: 14px; font-weight: 550; letter-spacing: 4px; margin-bottom: 14px; }
+.heroIntro p { color: var(--falcon-media-muted); font-size: clamp(14px, 1.27vw, 20px); line-height: 1.55; margin: 0; }
+.heroIntro p.heroEyebrow { color: var(--falcon-media-text); font-size: 14px; font-weight: 550; letter-spacing: 4px; margin-bottom: 14px; }
 .heroIntro h2 { font-size: clamp(25px, 2.65vw, 41px); font-weight: 630; line-height: 1.18; letter-spacing: -1.1px; margin: 0 0 10px; text-wrap: balance; }
 .heroStatement { position: absolute; top: 82%; left: 18.4%; right: 14%; }
 .heroStatement p { font-size: clamp(21px, 1.9vw, 29px); font-weight: 570; line-height: 1.23; letter-spacing: -.65px; white-space: pre-line; margin: 0 0 20px; }
-.heroStatement span { color: #b8b8b8; font-size: clamp(14px, 1.2vw, 19px); }
+.heroStatement span { color: var(--falcon-media-muted); font-size: clamp(14px, 1.2vw, 19px); }
 .form { display: grid; gap: 18px; }
 .field { display: grid; align-content: start; align-self: start; gap: 8px; color: var(--access-text); font-size: 13px; }
 .inputWrap { display: flex; align-items: center; gap: 8px; border: 1px solid var(--access-line); border-radius: 12px; padding: 0 13px; background: var(--access-input); transition: border-color 150ms ease, box-shadow 150ms ease; }
-.inputWrap:focus-within { border-color: var(--access-muted); box-shadow: 0 0 0 3px color-mix(in srgb, var(--access-muted) 12%, transparent); }
+.inputWrap:focus-within { border-color: var(--falcon-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--falcon-focus) 12%, transparent); }
 .inputWrap input { flex: 1; width: 100%; min-width: 0; height: 44px; color: inherit; padding: 0; font: inherit; font-size: 14px; border: 0 !important; outline: none !important; box-shadow: none !important; background: transparent !important; border-radius: 0; }
 .inputWrap button { display: grid; place-items: center; color: var(--access-muted); border: 0; background: none; padding: 5px; cursor: pointer; border-radius: 8px; }
-.page .primary { display: flex; justify-content: center; align-items: center; gap: 9px; width: 100%; min-height: 43px; padding: 10px 16px; background: #356fed; color: #fff; font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 12px; cursor: pointer; transition: background 150ms ease; }
-.page .primary:hover { background: #2d60d3; }
+.page .primary { display: flex; justify-content: center; align-items: center; gap: 9px; width: 100%; min-height: 43px; padding: 10px 16px; background: var(--falcon-action); color: var(--falcon-on-action); font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 12px; cursor: pointer; transition: background 150ms ease; }
+.page .primary:hover { background: var(--falcon-action-hover); }
 .page .primary:disabled { cursor: wait; opacity: .65; }
 .primary svg { color: inherit; }
 .footer { margin-top: 24px; display: grid; gap: 8px; color: var(--access-muted); font-size: 13px; }
 .footer a { color: inherit; text-underline-offset: 4px; overflow-wrap: anywhere; }
-.error { color: #b94b59; margin: 0 0 18px; font-size: 13px; }
+.error { color: var(--falcon-danger); margin: 0 0 18px; font-size: 13px; }
 
 .spinner { animation: spin 900ms linear infinite; }
 .loading { display: grid; place-items: center; min-height: 220px; color: var(--access-muted); }
@@ -63,7 +65,7 @@
 .codes code { font-size: 11px; overflow-wrap: anywhere; user-select: all; color: var(--access-text); }
 .check { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0 22px; color: var(--access-muted); }
 .check input { margin-top: 4px; }
-.page :is(button, a):focus-visible { outline: 2px solid var(--access-muted); outline-offset: 3px; }
+.page :is(button, a):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
@@ -76,12 +78,12 @@
 .page .field { gap: 8px; font-size: 16px; }
 .page .inputWrap { border-radius: 10px; padding: 0 16px; gap: 12px; }
 .page .inputWrap input { height: 52px; font-size: 15px; }
-.page .inputWrap input::placeholder { color: #737373; opacity: 1; }
+.page .inputWrap input::placeholder { color: var(--falcon-text-muted); opacity: 1; }
 .page .inputWrap input[type="password"]:placeholder-shown { letter-spacing: 3px; }
-.page .inputWrap button { color: #535353; }
+.page .inputWrap button { color: var(--falcon-icon-muted); }
 .fieldIcon { display: flex; flex: 0 0 auto; color: inherit; }
-.page .primary { min-height: 55px; background: #181818; color: #fff; border-radius: 10px; font-weight: 550; font-size: 17px; }
-.page .primary:hover { background: #303030; }
+.page .primary { min-height: 55px; background: var(--falcon-action); color: var(--falcon-on-action); border-radius: 10px; font-weight: 550; font-size: 17px; }
+.page .primary:hover { background: var(--falcon-action-hover); }
 .page .primary:disabled { opacity: .55; }
 .page .footer { margin-top: 24px; gap: 18px; font-size: 15px; }
 .page .linkButton { display: inline-flex; width: fit-content; align-items: center; gap: 12px; padding: 4px 0; color: var(--access-text); text-align: left; font-size: 16px; }
@@ -90,7 +92,7 @@
 .help summary { width: fit-content; list-style: none; color: var(--access-text); cursor: pointer; }
 .help summary::-webkit-details-marker { display: none; }
 .help summary:hover { text-decoration: underline; text-underline-offset: 4px; }
-.help summary:focus-visible { outline: 2px solid var(--access-muted); outline-offset: 4px; border-radius: 2px; }
+.help summary:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 4px; border-radius: 2px; }
 .help div { margin-top: 12px; font-size: 14px; line-height: 1.6; }
 .help p { margin: 0 0 6px; }
 @media (max-width: 1200px) {

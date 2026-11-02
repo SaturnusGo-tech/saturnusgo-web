@@ -19,10 +19,9 @@
 }
 
 .artwork {
-  width: clamp(190px, 24vw, 280px);
-  height: auto;
+  flex: none;
+  color: var(--falcon-icon-muted);
   margin-bottom: 18px;
-  object-fit: contain;
   user-select: none;
 }
 
@@ -53,8 +52,8 @@
   padding: 10px 16px;
   border: 0;
   border-radius: 12px;
-  background: var(--action, #3677ea);
-  color: #fff;
+  background: var(--action, var(--falcon-surface));
+  color: var(--falcon-on-action);
   font-size: 13px;
   font-weight: 550;
   line-height: 20px;
@@ -62,13 +61,13 @@
   transition: background-color 160ms ease, box-shadow 160ms ease;
 }
 
-.create:hover { background: color-mix(in srgb, var(--action, #3677ea) 90%, #fff); }
+.create:hover { background: color-mix(in srgb, var(--action, var(--falcon-hover)) 90%, var(--falcon-hover)); }
 .create:focus-visible { outline: 2px solid var(--muted); outline-offset: 4px; }
 .create svg { flex: 0 0 auto; color: inherit; }
 
 @media (max-height: 620px) {
   .empty { padding-block: 20px; }
-  .artwork { width: 190px; margin-bottom: 12px; }
+  .artwork { margin-bottom: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,7 +3,7 @@
 .trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trigger > svg { flex: 0 0 16px; color: var(--settings-muted); }
 .trigger:hover, .trigger[aria-expanded="true"] { background: var(--settings-hover); }
-.menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 80; width: 100%; max-height: 220px; margin: 0; padding: 4px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--settings-line) transparent; border: 1px solid var(--settings-line); border-radius: 10px; background: var(--settings-surface); color: var(--settings-ink); font: 400 13px/1.5 var(--font-geist-sans), sans-serif; opacity: 0; transform: translateY(-4px); visibility: hidden; pointer-events: none; transition: opacity 140ms ease-out, transform 140ms ease-out, visibility 0s linear 140ms; }
+.menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 80; width: 100%; max-height: 220px; margin: 0; padding: 4px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--settings-line) transparent; border: 1px solid var(--settings-line); border-radius: 10px; background: var(--falcon-elevated); color: var(--settings-ink); box-shadow: var(--falcon-shadow-popover); font: 400 13px/1.5 var(--font-geist-sans), sans-serif; opacity: 0; transform: translateY(-4px); visibility: hidden; pointer-events: none; transition: opacity 140ms ease-out, transform 140ms ease-out, visibility 0s linear 140ms; }
 .menu[popover] { position: fixed; inset: auto; }
 @supports (transition-behavior: allow-discrete) {
   .menu[popover] { transition: opacity 140ms ease-out, transform 140ms ease-out, visibility 0s linear 140ms, display 140ms allow-discrete, overlay 140ms allow-discrete; }

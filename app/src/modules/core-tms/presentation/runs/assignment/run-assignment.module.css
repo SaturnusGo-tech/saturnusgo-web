@@ -1,8 +1,8 @@
 .dock{position:absolute;left:0;right:0;bottom:12px;z-index:40;display:flex;justify-content:center;pointer-events:none;padding:0 12px}
 .bar{pointer-events:auto;margin:0;max-width:100%;width:max-content;gap:6px;flex-wrap:wrap}
-.picker{position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:270px;max-width:calc(100vw - 70px);background:var(--cases-bg);color:var(--cases-text);border:1px solid var(--cases-row-border);border-radius:12px;padding:6px;box-shadow:0 8px 24px #00000020}
-.createFolder{border:0;background:var(--cases-hover);color:var(--cases-primary);border-radius:8px;padding:8px;width:100%;text-align:left;overflow-wrap:anywhere}
-.skeleton{height:32px;margin:6px;border-radius:8px;background:var(--cases-hover);animation:pulse 1s ease-in-out infinite alternate}
+.picker{position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:270px;max-width:calc(100vw - 70px);background:var(--falcon-surface);color:var(--falcon-text);border:1px solid var(--falcon-border-subtle);border-radius:12px;padding:6px;box-shadow:var(--falcon-shadow)}
+.createFolder{border:0;background:var(--falcon-hover);color:var(--falcon-action);border-radius:8px;padding:8px;width:100%;text-align:left;overflow-wrap:anywhere}
+.skeleton{height:32px;margin:6px;border-radius:8px;background:var(--falcon-hover);animation:pulse 1s ease-in-out infinite alternate}
 @keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@keyframes pulse{to{opacity:.4}}
 @media(prefers-reduced-motion:reduce){.picker,.skeleton{animation:none}}
 

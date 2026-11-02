@@ -1,17 +1,17 @@
 .root {
-  --c-bg: #fff; --c-panel: #fff; --c-soft: #f6f8fa; --c-ink: #172b4d;
-  --c-muted: #626f86; --c-warning: #b35b24; --c-line: #dfe1e6; --c-accent: #0c66e4; --c-highlight: #e9f2ff;
-  --c-side: #f7f8f9; --c-side-ink: var(--c-ink); --c-radius: 5px;
+  --c-bg: var(--falcon-surface); --c-panel: var(--falcon-panel); --c-soft: var(--falcon-elevated); --c-ink: var(--falcon-text);
+  --c-muted: var(--falcon-text-muted); --c-warning: var(--falcon-warning); --c-line: var(--falcon-border); --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected);
+  --c-side: var(--falcon-sidebar); --c-side-ink: var(--falcon-text-secondary); --c-radius: 5px;
   min-width: 0; height: 100%; overflow: auto; color: var(--c-ink); background: var(--c-bg);
   font-size: 13px; line-height: 1.5; color-scheme: light;
 }
 :global(.dark) .root, :global(.dark) .root[data-provider] {
-  --c-bg: var(--tms-bg-canvas); --c-panel: var(--tms-bg-panel); --c-soft: var(--tms-bg-elevated);
-  --c-ink: var(--tms-text); --c-muted: var(--tms-text-muted); --c-line: var(--tms-border);
-  --c-accent: #579dff; --c-warning: #fdba74; --c-highlight: var(--tms-bg-selected);
-  --c-side: var(--tms-bg-sidebar); --c-side-ink: var(--tms-text-secondary);
-  --c-topbar-bg: var(--tms-bg-panel); --c-topbar-line: var(--tms-border); --c-topbar-ink: var(--tms-text);
-  --c-nav-hover: var(--tms-bg-hover); --c-nav-selected: var(--tms-bg-selected); --c-selected-ink: var(--tms-text);
+  --c-bg: var(--falcon-surface); --c-panel: var(--falcon-panel); --c-soft: var(--falcon-elevated);
+  --c-ink: var(--falcon-text); --c-muted: var(--falcon-text-muted); --c-line: var(--falcon-border);
+  --c-accent: var(--falcon-action); --c-warning: var(--falcon-warning); --c-highlight: var(--falcon-selected);
+  --c-side: var(--falcon-sidebar); --c-side-ink: var(--falcon-text-secondary);
+  --c-topbar-bg: var(--falcon-panel); --c-topbar-line: var(--falcon-border); --c-topbar-ink: var(--falcon-text);
+  --c-nav-hover: var(--falcon-hover); --c-nav-selected: var(--falcon-selected); --c-selected-ink: var(--falcon-text);
   color-scheme: dark;
 }
 .root * { box-sizing: border-box; }
@@ -30,8 +30,7 @@
 .scope { margin-left: auto; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 220px; color: var(--c-muted); }
 .badge { padding: 3px 9px; background: var(--c-soft); color: var(--c-muted); border-radius: 4px;
   white-space: nowrap; font-size: 11px; font-weight: 600; }
-.badge[data-active="true"] { color: #147347; background: #dcfce7; }
-:global(.dark) .badge[data-active="true"] { color: #88e2b0; background: #173c2f; }
+.badge[data-active="true"] { color: var(--falcon-success); background: var(--falcon-success-bg); }
 .layout { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: calc(100% - 57px); }
 .sidebar { background: var(--c-side); color: var(--c-side-ink); border-right: 1px solid var(--c-line); padding: 26px 14px; }
 .sideHeading { display: flex; gap: 9px; align-items: center; margin: 0 10px 28px; font-size: 14px; }
@@ -77,8 +76,7 @@
 .checkList .check:last-child { border-bottom: 0; }
 .root .primary, .root .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   min-height: 35px; padding: 7px 12px; border-radius: var(--c-radius); font-size: 12px; font-weight: 550; white-space: nowrap; }
-.root .primary { color: #fff !important; background: var(--c-accent); border: 1px solid transparent; }
-:global(.dark) .root .primary { color: #0d1724 !important; }
+.root .primary { color: var(--falcon-on-action) !important; background: var(--c-accent); border: 1px solid transparent; }
 .root .secondary { color: var(--c-ink); background: var(--c-soft); border: 1px solid var(--c-line); }
 .root .secondary:hover { filter: brightness(.97); }
 .verified { display: flex; align-items: flex-start; gap: 10px; margin: 22px 0; color: var(--c-accent); }
@@ -107,7 +105,7 @@
 .empty h3 { margin: 8px 0 0; color: var(--c-ink); }
 .empty p { margin: 0; max-width: 500px; }
 .slackMessage { display: flex; gap: 12px; padding: 20px 0; }
-.botAvatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: #4a154b; color: white; font-weight: 700; flex: 0 0 auto; }
+.botAvatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: var(--falcon-surface); color: var(--falcon-text); font-weight: 700; flex: 0 0 auto; }
 .slackMessage strong { font-size: 14px; }
 .slackMessage strong small { font-size: 9px; font-weight: 500; padding: 2px 4px; background: var(--c-soft); color: var(--c-muted); border-radius: 3px; }
 .slackMessage h3 { margin: 14px 0 6px; }
@@ -122,10 +120,8 @@
 .delivery > button { margin-top: 12px; }
 .deliveryError { display: block; margin: 8px 0; color: var(--c-warning); font-size: 10px; overflow-wrap: anywhere; }
 .deliveryBadge { border-radius: 4px; padding: 3px 6px; font-size: 10px; white-space: nowrap; color: var(--c-muted); background: var(--c-soft); }
-.deliveryBadge[data-status="delivered"] { color: #147347; background: #dcfce7; }
-.deliveryBadge[data-status="failed"], .deliveryBadge[data-status="uncertain"] { color: #9a3412; background: #ffedd5; }
-:global(.dark) .deliveryBadge[data-status="delivered"] { color: #88e2b0; background: #173c2f; }
-:global(.dark) .deliveryBadge[data-status="failed"], :global(.dark) .deliveryBadge[data-status="uncertain"] { color: #fdba74; background: #48280e; }
+.deliveryBadge[data-status="delivered"] { color: var(--falcon-success); background: var(--falcon-success-bg); }
+.deliveryBadge[data-status="failed"], .deliveryBadge[data-status="uncertain"] { color: var(--falcon-danger); background: var(--falcon-danger-bg); }
 .reconcile { margin-top: 14px; }
 .linkRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--c-line); }
 .linkRow div { display: grid; gap: 4px; min-width: 0; }
@@ -133,9 +129,8 @@
 .linkRow small { font-size: 10px; color: var(--c-muted); overflow-wrap: anywhere; }
 .linkRow span { font-size: 10px; color: var(--c-muted); }
 .error, .notice { margin: 0 0 20px; padding: 14px 18px; border: 1px solid var(--c-line); border-radius: var(--c-radius); font-size: 12px; }
-.error { background: #fff4ed; border-color: #fed7aa; color: #9a3412; }
+.error { background: var(--falcon-danger-bg); border-color: var(--falcon-danger-border); color: var(--falcon-danger); }
 .error p { margin: 0 0 10px; }
-:global(.dark) .error { background: #382419; border-color: #683c20; color: #fdba74; }
 .notice { background: var(--c-highlight); color: var(--c-accent); }
 .loading { display: flex; gap: 12px; align-items: center; padding: 50px 0; color: var(--c-muted); }
 .loading svg { animation: spin 1s linear infinite; }
@@ -146,8 +141,7 @@
 .root[data-provider="jira"] .sidebar nav button[aria-current="page"] { border-left: 3px solid var(--c-accent); padding-left: 9px; }
 .root[data-provider="jira"] .content { max-width: 1300px; }
 /* Linear keeps configuration in a quiet, compact workspace hierarchy. */
-.root[data-provider="linear"] { --c-ink: #222326; --c-muted: #6f7178; --c-line: #e8e8ec; --c-accent: #5e6ad2; --c-highlight: #f0effc; --c-side: #f8f8fa; --c-radius: 6px; }
-:global(.dark) .root[data-provider="linear"] { --c-accent: #989fff; }
+.root[data-provider="linear"] { --c-ink: var(--falcon-text); --c-muted: var(--falcon-text-muted); --c-line: var(--falcon-border); --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected); --c-side: var(--falcon-sidebar); --c-radius: 6px; }
 .root[data-provider="linear"] .topbar { min-height: 46px; padding-top: 6px; padding-bottom: 6px; }
 .root[data-provider="linear"] .brand { font-size: 15px; }
 .root[data-provider="linear"] .brand svg, .brand img { width: 18px; height: 18px; color: var(--c-ink); }
@@ -161,10 +155,9 @@
 .root[data-provider="linear"] .step { display: none; }
 .root[data-provider="linear"] .eyebrow { display: none; }
 /* Trello settings are grouped as three lists on a board, with a compact board toolbar. */
-.root[data-provider="trello"] { --c-bg: #e8f1fa; --c-panel: #fff; --c-soft: #f1f2f4; --c-accent: #0c66e4; --c-highlight: #dceafe; --c-side: #cce0f3; --c-radius: 10px; }
-:global(.dark) .root[data-provider="trello"] { --c-accent: #85b8ff; }
-.root[data-provider="trello"] .topbar { background: var(--c-topbar-bg, #074b83); border-color: var(--c-topbar-line, #286491); color: var(--c-topbar-ink, white); }
-.root[data-provider="trello"] .brand svg, .root[data-provider="trello"] .back, .root[data-provider="trello"] .scope { color: var(--c-topbar-ink, #fff) !important; }
+.root[data-provider="trello"] { --c-bg: var(--falcon-surface); --c-panel: var(--falcon-panel); --c-soft: var(--falcon-elevated); --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected); --c-side: var(--falcon-sidebar); --c-radius: 10px; }
+.root[data-provider="trello"] .topbar { background: var(--c-topbar-bg, var(--falcon-surface)); border-color: var(--c-topbar-line, var(--falcon-border)); color: var(--c-topbar-ink, var(--falcon-text)); }
+.root[data-provider="trello"] .brand svg, .root[data-provider="trello"] .back, .root[data-provider="trello"] .scope { color: var(--c-topbar-ink, var(--falcon-icon)) !important; }
 .root[data-provider="trello"] .layout { display: block; }
 .root[data-provider="trello"] .sidebar { padding: 10px 24px; border-right: 0; border-bottom: 1px solid var(--c-line); display: flex; align-items: center; gap: 24px; }
 .root[data-provider="trello"] .sideHeading { margin: 0; }
@@ -176,37 +169,34 @@
 .root[data-provider="trello"] .hero h1 { font-size: 26px; }
 .root[data-provider="trello"] .setupGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .root[data-provider="trello"] .setupGrid > * { grid-row: auto; grid-column: auto; }
-.root[data-provider="trello"] .setupGrid .panel { border: 0; padding: 18px; box-shadow: 0 2px 3px #091e4226; }
+.root[data-provider="trello"] .setupGrid .panel { border: 0; padding: 18px; box-shadow: var(--falcon-shadow-popover); }
 .root[data-provider="trello"] .setupGrid .panel > header { margin: -18px -18px 20px; padding: 15px 18px; background: var(--c-soft); border-radius: 10px 10px 0 0; }
 .root[data-provider="trello"] .step { border-radius: 20px; background: var(--c-line); color: var(--c-muted); }
 /* GitHub uses repository navigation, inset section headers and familiar settings groups. */
-.root[data-provider="github"] { --c-ink: #1f2328; --c-muted: #59636e; --c-line: #d1d9e0; --c-accent: #1f883d; --c-highlight: #dafbe1; --c-side: #f6f8fa; --c-radius: 6px; }
-:global(.dark) .root[data-provider="github"] { --c-accent: #3fb950; }
+.root[data-provider="github"] { --c-ink: var(--falcon-text); --c-muted: var(--falcon-text-muted); --c-line: var(--falcon-border); --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected); --c-side: var(--falcon-sidebar); --c-radius: 6px; }
 .root[data-provider="github"] .layout { display: block; }
 .root[data-provider="github"] .brand svg, .brand img { color: var(--c-ink); }
 .root[data-provider="github"] .sidebar { padding: 0 28px; border-right: 0; border-bottom: 1px solid var(--c-line); }
 .root[data-provider="github"] .sideHeading, .root[data-provider="github"] .sidebar > small, .root[data-provider="github"] .sidebar > a { display: none; }
 .root[data-provider="github"] .sidebar nav { display: flex; gap: 18px; }
 .root[data-provider="github"] .sidebar nav button { border-radius: 0; border-bottom: 2px solid transparent; padding: 13px 8px; }
-.root[data-provider="github"] .sidebar nav button[aria-current="page"] { color: var(--c-ink); background: transparent; border-bottom-color: #fd8c73; }
+.root[data-provider="github"] .sidebar nav button[aria-current="page"] { color: var(--c-ink); background: transparent; border-bottom-color: var(--falcon-border); }
 .root[data-provider="github"] .content { max-width: 1280px; margin: auto; }
 .root[data-provider="github"] .hero h1 { font-size: 26px; font-weight: 500; }
 .root[data-provider="github"] .panel > header { margin: -24px -24px 20px; padding: 14px 24px; background: var(--c-soft); border-bottom: 1px solid var(--c-line); border-radius: 6px 6px 0 0; }
 /* Slack's workspace rail and channel-like content make notification setup familiar. */
-.root[data-provider="slack"] { --c-ink: #1d1c1d; --c-muted: #616061; --c-line: #e2e2e2; --c-accent: #007a5a; --c-highlight: #e8f5ee; --c-side: #3f0e40; --c-side-ink: #f8e9f8; --c-radius: 8px; }
-:global(.dark) .root[data-provider="slack"] { --c-accent: #65c99d; }
-.root[data-provider="slack"] .topbar { background: var(--c-topbar-bg, #350d36); color: var(--c-topbar-ink, #fff); border-bottom-color: var(--c-topbar-line, #5c335c); }
-.root[data-provider="slack"] .topbar .back, .root[data-provider="slack"] .brand svg, .root[data-provider="slack"] .scope { color: var(--c-topbar-ink, #fff) !important; }
-.root[data-provider="slack"] .sidebar nav button:hover { background: var(--c-nav-hover, #ffffff14); }
-.root[data-provider="slack"] .sidebar nav button[aria-current="page"] { background: var(--c-nav-selected, #1164a3); color: var(--c-selected-ink, white); }
-.root[data-provider="slack"] .sidebar > a { color: #f8e9f8; opacity: 1; }
+.root[data-provider="slack"] { --c-ink: var(--falcon-text); --c-muted: var(--falcon-text-muted); --c-line: var(--falcon-border); --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected); --c-side: var(--falcon-sidebar); --c-side-ink: var(--falcon-text-secondary); --c-radius: 8px; }
+.root[data-provider="slack"] .topbar { background: var(--c-topbar-bg, var(--falcon-surface)); color: var(--c-topbar-ink, var(--falcon-text)); border-bottom-color: var(--c-topbar-line, var(--falcon-border)); }
+.root[data-provider="slack"] .topbar .back, .root[data-provider="slack"] .brand svg, .root[data-provider="slack"] .scope { color: var(--c-topbar-ink, var(--falcon-icon)) !important; }
+.root[data-provider="slack"] .sidebar nav button:hover { background: var(--c-nav-hover, var(--falcon-hover)); }
+.root[data-provider="slack"] .sidebar nav button[aria-current="page"] { background: var(--c-nav-selected, var(--falcon-selected)); color: var(--c-selected-ink, var(--falcon-text)); }
+.root[data-provider="slack"] .sidebar > a { color: var(--falcon-text); opacity: 1; }
 :global(.dark) .root[data-provider="slack"] .sidebar > a { color: var(--c-muted); opacity: .8; }
 .root[data-provider="slack"] .hero h1 { font-weight: 700; }
 .root[data-provider="slack"] .setupGrid { grid-template-columns: minmax(250px, 1fr) minmax(230px, 1fr); }
 .root[data-provider="slack"] .setupGrid > :last-child { border-style: dashed; }
 /* Confluence presents setup as a readable space page, with an outline and report sections. */
-.root[data-provider="confluence"] { --c-accent: #0c66e4; --c-side: #fff; --c-radius: 4px; }
-:global(.dark) .root[data-provider="confluence"] { --c-accent: #85b8ff; }
+.root[data-provider="confluence"] { --c-accent: var(--falcon-action); --c-side: var(--falcon-sidebar); --c-radius: 4px; }
 .root[data-provider="confluence"] .content { max-width: 1150px; margin: auto; padding: 36px 56px 0; }
 .root[data-provider="confluence"] .hero { border-bottom: 1px solid var(--c-line); padding-bottom: 28px; margin-bottom: 22px; }
 .root[data-provider="confluence"] .hero h1 { font-size: 32px; }
@@ -249,8 +239,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .loading svg { animation: none; } }
 
-.root[data-provider="swagger"] { --c-accent: #267d12; --c-highlight: #e9f5e5; --c-radius: 8px; }
-:global(.dark) .root[data-provider="swagger"] { --c-accent: #85c95d; --c-highlight: #233020; }
+.root[data-provider="swagger"] { --c-accent: var(--falcon-action); --c-highlight: var(--falcon-selected); --c-radius: 8px; }
 
 .root.root[data-provider][data-embedded] :is(.setupGrid, .automationGrid, .activityGrid) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 .root.root[data-provider][data-embedded] .setupGrid > * { grid-column: auto; grid-row: auto; }
@@ -269,3 +258,7 @@
 
 .copyCode { display: grid; place-items: center; position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--c-muted); cursor: pointer; }
 .copyCode:hover { background: var(--c-highlight); color: var(--c-ink); }
+:global(.dark) .badge[data-active="true"] {
+  color: var(--falcon-success);
+  background: var(--falcon-success-bg);
+}

@@ -1,6 +1,6 @@
 .skeleton { padding: 14px 8px; }
 .row { display: flex; align-items: center; gap: 12px; height: 40px; }
-.row span, .row i { display: block; background: var(--tms-bg-hover, #eceef2); border-radius: 5px; animation: pulse 1.4s ease-in-out infinite; }
+.row span, .row i { display: block; background: var(--falcon-hover); border-radius: 5px; animation: pulse 1.4s ease-in-out infinite; }
 .row span { width: 16px; height: 16px; }
 .row i { height: 12px; }
 @keyframes pulse { 50% { opacity: .4; } }

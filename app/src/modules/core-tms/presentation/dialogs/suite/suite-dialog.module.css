@@ -1,41 +1,41 @@
-.page { width: min(100%, 1050px); margin-inline: auto; color: var(--suite-text); font-size: 14px; }
-.back { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 4px 0; margin-bottom: 16px; background: transparent; color: var(--suite-muted); cursor: pointer; font: inherit; }
-.back:hover { color: var(--suite-text); }
+.page { width: min(100%, 1050px); margin-inline: auto; color: var(--falcon-text); font-size: 14px; }
+.back { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 4px 0; margin-bottom: 16px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; font: inherit; }
+.back:hover { color: var(--falcon-text); }
 .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 24px; }
 .header h1 { margin: 0; font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -.025em; }
 .header h1:focus { outline: 0; }
-.header p { margin: 6px 0 0; color: var(--suite-muted); line-height: 22px; }
+.header p { margin: 6px 0 0; color: var(--falcon-text-muted); line-height: 22px; }
 .actions { display: flex; align-items: center; gap: 8px; flex: none; }
-.cancel, .textButton, .descriptionEdit { display: inline-flex; justify-content: center; align-items: center; min-height: 34px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--suite-text); font: inherit; cursor: pointer; }
-.cancel:hover, .textButton:hover, .descriptionEdit:hover { background: var(--suite-hover); }
+.cancel, .textButton, .descriptionEdit { display: inline-flex; justify-content: center; align-items: center; min-height: 34px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text); font: inherit; cursor: pointer; }
+.cancel:hover, .textButton:hover, .descriptionEdit:hover { background: var(--falcon-hover); }
 .cancel:disabled, .back:disabled { opacity: .4; cursor: default; }
-.fields { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr); column-gap: 32px; row-gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--suite-line); }
+.fields { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr); column-gap: 32px; row-gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--falcon-border-subtle); }
 .nameField { display: grid; gap: 8px; grid-column: 1; font-weight: 500; }
-.nameField input, .tagsField input { width: 100%; height: 36px; min-width: 0; border: 1px solid var(--suite-line); border-radius: 10px; padding: 7px 11px; background: transparent; color: var(--suite-text); font: inherit; font-weight: 400; caret-color: var(--suite-text); }
-.nameField input::placeholder, .tagsField input::placeholder { color: var(--suite-muted); }
-.nameField input:focus, .tagsField input:focus { border-color: var(--suite-muted); outline: none; }
+.nameField input, .tagsField input { width: 100%; height: 36px; min-width: 0; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; padding: 7px 11px; background: transparent; color: var(--falcon-text); font: inherit; font-weight: 400; caret-color: var(--falcon-text); }
+.nameField input::placeholder, .tagsField input::placeholder { color: var(--falcon-text-muted); }
+.nameField input:focus, .tagsField input:focus { border-color: var(--falcon-text-muted); outline: none; }
 .description { grid-column: 1; min-width: 0; }
 .description > div:not(.fieldLabel) { font-size: 14px; }
 .description p { margin-block: 8px; }
-.descriptionShell { min-width: 0; border: 1px solid var(--suite-line); border-radius: 10px; padding: 8px 10px; background: transparent; }
-.descriptionShell:focus-within { border-color: var(--suite-accent, var(--suite-muted)); }
-.descriptionEdit { min-height: 28px; padding-inline: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; color: var(--suite-muted); }
-.descriptionEdit:hover { background: transparent; color: var(--suite-text); }
+.descriptionShell { min-width: 0; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; padding: 8px 10px; background: transparent; }
+.descriptionShell:focus-within { border-color: var(--falcon-info); }
+.descriptionEdit { min-height: 28px; padding-inline: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; color: var(--falcon-text-muted); }
+.descriptionEdit:hover { background: transparent; color: var(--falcon-text); }
 .fieldLabel { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; font-weight: 500; }
-.fieldLabel small { margin-left: 6px; color: var(--suite-muted); font-size: 12px; font-weight: 400; }
+.fieldLabel small { margin-left: 6px; color: var(--falcon-text-muted); font-size: 12px; font-weight: 400; }
 .textButton { min-height: 24px; padding: 0 6px; font-size: 13px; }
 .membership { grid-column: 2; grid-row: 1 / span 2; min-width: 0; }
 .modeGroup { display: inline-flex; flex-wrap: wrap; gap: 5px; }
-.modeGroup button { min-height: 32px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--suite-muted); font: inherit; font-size: 13px; cursor: pointer; }
-.modeGroup button:hover { background: var(--suite-hover); }
-.modeGroup button[aria-pressed="true"] { background: var(--suite-control); color: var(--suite-text); }
-.modeGroup button[data-mode="dynamic"][aria-pressed="true"] { background: color-mix(in srgb, var(--suite-accent, #3574f0) 12%, var(--suite-bg)); color: var(--suite-accent, #3574f0); }
-.hint { margin: 9px 0 0; color: var(--suite-muted); font-size: 13px; line-height: 20px; }
+.modeGroup button { min-height: 32px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-muted); font: inherit; font-size: 13px; cursor: pointer; }
+.modeGroup button:hover { background: var(--falcon-hover); }
+.modeGroup button[aria-pressed="true"] { background: var(--falcon-control); color: var(--falcon-text); }
+.modeGroup button[data-mode="dynamic"][aria-pressed="true"] { background: color-mix(in srgb, var(--falcon-info) 12%, var(--falcon-surface)); color: var(--falcon-info); }
+.hint { margin: 9px 0 0; color: var(--falcon-text-muted); font-size: 13px; line-height: 20px; }
 .tagsField { display: grid; gap: 8px; margin-top: 14px; }
-.tagsField small { color: var(--suite-muted); line-height: 19px; font-size: 12px; }
+.tagsField small { color: var(--falcon-text-muted); line-height: 19px; font-size: 12px; }
 .scopeSection { margin-top: 24px; }
 .scopeHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .scopeHeader h2 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; }
-.scopeHeader > span { color: var(--suite-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.scopeHeader > span { color: var(--falcon-text-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 @container suites (max-width: 760px) { .header { flex-wrap: wrap; gap: 18px; } .fields { grid-template-columns: 1fr; } .membership { grid-column: 1; grid-row: auto; } .actions { margin-left: auto; } }
 @media (prefers-reduced-motion: no-preference) { .page { animation: suite-page-in 160ms ease-out; } @keyframes suite-page-in { from { opacity: .5; transform: translateY(3px); } to { opacity: 1; transform: none; } } }

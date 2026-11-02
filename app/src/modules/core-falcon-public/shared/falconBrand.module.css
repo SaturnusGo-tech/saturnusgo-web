@@ -13,4 +13,6 @@
   width: 32px;
   height: 32px;
   object-fit: contain;
+  content: url("/falcon/falcon-mark-dark.png");
 }
+:global(.dark) .mark { content: url("/falcon/falcon-mark-light.png"); }

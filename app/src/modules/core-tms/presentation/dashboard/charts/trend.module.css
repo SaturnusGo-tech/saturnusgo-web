@@ -1,27 +1,17 @@
 .panel {
-  --trend-launched: #2563eb;
-  --trend-passed: #16a34a;
-  --trend-failed: #e53935;
-  --trend-blocked: #d97706;
-  --trend-incomplete: #64748b;
-  --trend-not_started: #858e9b;
-  --trend-aborted: #9333ea;
-  --trend-grid: color-mix(in srgb, var(--ink) 9%, transparent);
+  --trend-launched: var(--falcon-info);
+  --trend-passed: var(--falcon-success);
+  --trend-failed: var(--falcon-danger);
+  --trend-blocked: var(--falcon-warning);
+  --trend-incomplete: var(--falcon-text-muted);
+  --trend-not_started: var(--falcon-text-disabled);
+  --trend-aborted: var(--falcon-discovery);
+  --trend-grid: var(--falcon-border-subtle);
   min-width: 0;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 15px;
-}
-
-:global(.dark) .panel {
-  --trend-launched: #60a5fa;
-  --trend-passed: #22c55e;
-  --trend-failed: #fb5353;
-  --trend-blocked: #fbbf24;
-  --trend-incomplete: #9ca3af;
-  --trend-not_started: #737d8f;
-  --trend-aborted: #c084fc;
 }
 
 .heading {
@@ -91,7 +81,7 @@
 .footer { border-top: 0; padding-top: 0; }
 .chart { height: 240px; }
 
-:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--dashboard-shadow); }
+:global([data-appearance="glass"]) .panel { border-radius: 22px; box-shadow: var(--falcon-shadow-popover); }
 :global([data-appearance="glass"]) .modes { border-radius: 999px; background: var(--control); }
 :global([data-appearance="glass"]) .modes button { border-radius: 999px; }
 :global([data-appearance="glass"]) .modes button[aria-pressed="true"] { color: var(--dashboard-selection-ink); background: var(--dashboard-selection); }

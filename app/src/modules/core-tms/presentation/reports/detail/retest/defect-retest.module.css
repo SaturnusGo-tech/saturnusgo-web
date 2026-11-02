@@ -1,24 +1,24 @@
-.start { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:34px; padding:7px 12px; border:0; border-radius:10px; background:var(--report-primary,#3478f6); color:#fff; font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; }
+.start { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:34px; padding:7px 12px; border:0; border-radius:10px; background:var(--falcon-action); color:var(--falcon-on-action); font:inherit; font-size:13px; cursor:pointer; white-space:nowrap; }
 .start svg { flex:none; display:block; }
 .start:hover { filter:brightness(1.08); }
 .start:disabled, .collapse:disabled { opacity:.55; cursor:default; }
-.start:focus-visible, .collapse:focus-visible { outline:2px solid var(--report-primary); outline-offset:3px; }
-.panel { margin:0 24px 16px; border:1px solid var(--report-border); border-radius:10px; background:#fcfcfc; overflow:hidden; }
-:global(.dark) .panel { background:#202020; }
-.panel > header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 14px; border-bottom:1px solid var(--report-row-border); }
+.start:focus-visible, .collapse:focus-visible { outline:2px solid var(--falcon-action); outline-offset:3px; }
+.panel { margin:0 24px 16px; border:1px solid var(--falcon-border); border-radius:10px; background:var(--falcon-surface); overflow:hidden; }
+:global(.dark) .panel { background:var(--falcon-panel); }
+.panel > header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 14px; border-bottom:1px solid var(--falcon-border-subtle); }
 .panel h2 { margin:0; font-size:14px; font-weight:600; line-height:1.4; }
-.collapse { display:inline-flex; align-items:center; gap:3px; border:0; padding:3px 0; background:transparent; color:var(--report-primary); font:inherit; font-size:12px; cursor:pointer; }
+.collapse { display:inline-flex; align-items:center; gap:3px; border:0; padding:3px 0; background:transparent; color:var(--falcon-action); font:inherit; font-size:12px; cursor:pointer; }
 .form { display:grid; gap:12px; padding:12px 14px 14px; max-height:42dvh; overflow:auto; }
 .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-.form p { margin:0; font-size:12px; line-height:1.5; color:var(--report-muted); }
+.form p { margin:0; font-size:12px; line-height:1.5; color:var(--falcon-text-muted); }
 .form label { display:grid; gap:6px; font-size:12px; font-weight:500; }
-.form input, .form select { box-sizing:border-box; width:100%; min-width:0; height:36px; border:1px solid var(--report-control-border); border-radius:7px; background:var(--report-bg); color:var(--report-text); padding:0 10px; font:inherit; font-size:13px; font-weight:400; }
-.form select option { color:var(--report-text); background:var(--report-bg); }
-.form input:focus, .form select:focus { outline:2px solid var(--report-primary); outline-offset:1px; }
+.form input, .form select { box-sizing:border-box; width:100%; min-width:0; height:36px; border:1px solid var(--falcon-border-strong); border-radius:7px; background:var(--falcon-surface); color:var(--falcon-text); padding:0 10px; font:inherit; font-size:13px; font-weight:400; }
+.form select option { color:var(--falcon-text); background:var(--falcon-surface); }
+.form input:focus, .form select:focus { outline:2px solid var(--falcon-action); outline-offset:1px; }
 .form footer { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .scope { min-width:0; display:grid; gap:5px; }
-.scope > span { display:inline-flex; align-items:center; gap:6px; color:var(--report-primary); font-size:12px; }
-.form .error { color:#d14e59; }
+.scope > span { display:inline-flex; align-items:center; gap:6px; color:var(--falcon-action); font-size:12px; }
+.form .error { color:var(--falcon-danger); }
 .spinner { animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 @container report-detail (max-width:520px) { .start:not(.submit) > span { display:none; } .panel { margin-inline:18px; } }
