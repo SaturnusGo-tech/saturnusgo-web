@@ -34000,7 +34000,7 @@
           },
           "action": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$",
+            "pattern": "^[a-z][a-z0-9_-]*(?:\\.[a-z][a-z0-9_-]*)+$",
             "maxLength": 120
           },
           "entityType": {
