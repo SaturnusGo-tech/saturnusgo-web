@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <g stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3">
+    <path d="M28 12 73 56 88 83 105 99 117 103 121 110 117 121 113 113 102 113 82 105 62 89"/>
+    <path d="M10 10 29 46 67 72"/>
+    <path d="M18 34 39 65 79 88"/>
+    <path d="M31 59 48 79 89 102"/>
+    <path d="M22 77 48 99 78 105"/>
+    <path d="M39 92 58 106 89 111"/>
+    <path d="M88 80 91 68 80 38 95 53 106 77 102 91"/>
+    <path d="M92 59 99 77 97 86"/>
+    <path d="M100 103 108 110"/>
+  </g>
+  <path d="m109 104 4 3" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+</svg>

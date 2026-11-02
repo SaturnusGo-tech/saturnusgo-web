@@ -1,8 +1,7 @@
 .system { --nav-row: 44px; --nav-inset: 10px; color: var(--sidebar-strong); }
 .header { position: relative; display: flex; align-items: center; flex: 0 0 60px; padding: 0 16px; overflow: hidden; }
 .brand { display: flex; align-items: center; gap: 11px; width: 176px; height: 44px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
-.mark { flex: 0 0 32px; width: 32px; height: 32px; background: url("../../../assets/falcon/falcon-mark-on-light.png") center / contain no-repeat; }
-:global(.dark) .mark { background-image: url("../../../assets/falcon/falcon-mark-on-dark.png"); }
+.mark { flex: 0 0 32px; width: 32px; height: 32px; background-color: var(--falcon-text); -webkit-mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask: url("../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask-mode: alpha; }
 .wordmark { font-size: 17px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; opacity: 1; transition: opacity 120ms ease 80ms; }
 .scroll { flex: 1 1 auto; min-height: 0; overflow: hidden auto; padding: 4px var(--nav-inset) 8px; scrollbar-width: thin; scrollbar-color: var(--sidebar-border) transparent; }
 .group { margin: 0 0 8px; }
