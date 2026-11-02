@@ -52,7 +52,6 @@
 .settingDescription { max-width: 74ch; margin: 0; color: var(--settings-muted); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .settingControls { display: flex; align-items: center; flex-wrap: wrap; flex-shrink: 0; gap: 8px; }
 .settingValue { max-width: 55%; color: var(--settings-muted); font-size: 14px; text-align: right; overflow-wrap: anywhere; }
-.page .select { flex-shrink: 0; width: auto; min-width: 150px; max-width: 240px; height: 34px; margin: 0; padding: 5px 10px; border: 1px solid var(--settings-line); border-radius: 8px; background: var(--settings-selected); color: var(--settings-ink); font: 400 13px/1.5 var(--font-geist-sans), sans-serif; cursor: pointer; }
 .panel :is(button[class*="primaryButton"], button[class*="secondaryButton"]) { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 6px 12px; border: 1px solid var(--settings-line); border-radius: 10px; background: var(--settings-selected); color: var(--settings-ink); font: 500 13px/1.5 var(--font-geist-sans), sans-serif; white-space: nowrap; box-shadow: none; }
 .panel :is(button[class*="primaryButton"], button[class*="secondaryButton"]):hover:not(:disabled) { background: var(--settings-hover); border-color: var(--settings-muted); color: var(--settings-ink); transform: none; box-shadow: none; }
 .exchange { min-width: 0; }
@@ -83,6 +82,5 @@
 }
 @media (max-width: 560px) {
   .settingRow { align-items: flex-start; gap: 14px; }
-  .page .select { min-width: 120px; max-width: 45%; }
   .settingsStack { gap: 28px; }
 }

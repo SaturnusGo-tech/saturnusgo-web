@@ -86,24 +86,26 @@ test("import settings keep category navigation and a single selected content pan
   assert.equal(active[0].props.id, "settings-exchange");
 });
 
-test("native appearance controls keep animated theme changes and validate language selections", () => {
+test("appearance dropdowns keep animated theme changes and validate language selections", () => {
   const h = componentHarness();
   const toggles: unknown[] = [], languages: string[] = [];
   const { AppearanceSettings: render } = h.load<{ AppearanceSettings: typeof AppearanceSettings }>(new URL("../../settings/AppearanceSettings.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key, setLocale: (value: string) => languages.push(value) }) };
     if (name.endsWith("useColorMode")) return { useColorMode: () => ({ isLight: true, toggleAnimated: (position: unknown) => toggles.push(position) }) };
+    if (name.endsWith("AppearanceDropdown")) return { AppearanceDropdown: "AppearanceDropdown" };
   });
   const all = nodes(h.render(render));
-  const theme = all.find(node => node.type === "select" && node.props.value === "light");
-  const language = all.find(node => node.type === "select" && node.props.value === "en");
-  assert.ok(theme, "theme uses a compact native select"); assert.ok(language);
-  const currentTarget = { getBoundingClientRect: () => ({ left: 20, top: 10, width: 100, height: 30 }) };
-  invoke(theme, "onChange", { target: { value: "light" }, currentTarget });
+  const theme = all.find(node => node.type === "AppearanceDropdown" && node.props.value === "light");
+  const language = all.find(node => node.type === "AppearanceDropdown" && node.props.value === "en");
+  assert.ok(theme, "theme uses the shared appearance dropdown"); assert.ok(language);
+  const changeTheme = theme.props.onChange as (value: string, position: { x: number; y: number }) => void;
+  const changeLanguage = language.props.onChange as (value: string) => void;
+  changeTheme("light", { x: 70, y: 25 });
   assert.equal(toggles.length, 0);
-  invoke(theme, "onChange", { target: { value: "dark" }, currentTarget });
+  changeTheme("dark", { x: 70, y: 25 });
   assert.equal(toggles.length, 1);
   assert.equal((toggles[0] as { x: number }).x, 70); assert.equal((toggles[0] as { y: number }).y, 25);
-  invoke(language, "onChange", { target: { value: "ru" } });
-  invoke(language, "onChange", { target: { value: "unsupported" } });
+  changeLanguage("ru");
+  changeLanguage("unsupported");
   assert.deepEqual(languages, ["ru"]);
 });

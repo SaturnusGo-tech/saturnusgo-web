@@ -46,3 +46,12 @@
 ## Handoff after app restart
 
 Implementation is saved on `codex/falcon-chatgpt-shell-20261102`. Production deployment, push and merge have not been performed. Final captures are in `output/falcon-shell-20261102/screenshots/v2-*.jpg` in the parent workspace. The preview uses synthetic read-only data, so save/sign-out operations cannot be accepted as end-to-end production verification. Desktop 1440×900 and phone 390×844 were inspected; viewport override was reset afterward. This is visual consistency verification, not a claim of pixel-for-pixel identity or full production QA.
+
+## Local review follow-up
+
+- [x] Increase main navigation spacing, mute inactive controls, retain bright hover/focus/active states.
+- [x] Use green Active and amber Archived project-status dots while retaining text labels.
+- [x] Replace native Theme/Language selects with compact custom comboboxes, official icons, a 12px chevron inset, selected checks and reduced-motion-aware popup transitions.
+- [x] Verify TypeScript, architecture (1539 files) and 108 navigation/project-settings/notifications/dropdown tests. Browser checks confirm 8px collapsed-rail gaps and grey/bright states, green Active dot, custom list rendering, Escape cancellation and keyboard selection without focus loss.
+- [x] Confirm the custom menu on desktop and geometry at 390×844: menu stays within x=252–372, document has no horizontal overflow, outside dismissal works and the browser error log is empty. Reset emulation after checking. The mobile screenshot API produced an invalid scaled capture; do not use `v3-appearance-mobile.jpg` as visual evidence. The desktop dropdown capture is valid.
+- [x] Restart preview and synthetic API as detached processes after the app restart; confirm HTTP 200. No production publication.

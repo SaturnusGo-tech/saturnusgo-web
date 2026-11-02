@@ -851,7 +851,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 .shell[data-appearance="glass"] .navigation {
   --sidebar-border: var(--glass-border); --sidebar-divider: var(--glass-border);
   --sidebar-toggle-divider: var(--glass-border); --sidebar-text: var(--glass-text);
-  --sidebar-soft: var(--glass-text); --sidebar-strong: var(--glass-text);
+  --sidebar-soft: #6b6b6b; --sidebar-strong: var(--glass-text);
   --sidebar-muted: var(--glass-muted); --sidebar-brand-button: var(--glass-text);
   --sidebar-wordmark: var(--glass-text); --sidebar-toggle: var(--glass-muted);
   --sidebar-active: var(--glass-active); --sidebar-active-ink: var(--glass-active-ink);
@@ -865,6 +865,7 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
   background: var(--glass-panel); box-shadow: none;
   backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
 }
+:global(.dark) .shell[data-appearance="glass"] .navigation { --sidebar-soft: #949494; }
 .shell[data-appearance="glass"] .brandArea { border-bottom: 0; height: 72px; flex-basis: 72px; }
 .shell[data-appearance="glass"] .tessiqMark { background-image: url("../../assets/falcon/falcon-mark-on-light.png"); }
 :global(.dark) .shell[data-appearance="glass"] .tessiqMark { background-image: url("../../assets/falcon/falcon-mark-on-dark.png"); }
