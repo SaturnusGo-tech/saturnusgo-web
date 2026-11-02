@@ -1,0 +1,4 @@
+.badge { display: inline-flex; align-items: center; gap: 5px; flex: none; min-height: 23px; padding: 2px 7px; border-radius: 6px; background: var(--suite-control, #eeeeef); color: var(--suite-muted, #6a6c73); font-size: 11px; line-height: 18px; font-weight: 500; white-space: nowrap; }
+.badge svg { flex: none; }
+.badge[data-suite-kind="dynamic"] { color: var(--suite-accent, #5579b8); background: var(--suite-accent-bg, #eaf0fa); }
+.badge[data-suite-kind="archived"] { color: var(--suite-muted); background: transparent; }

@@ -8,6 +8,7 @@ import { MarkdownField } from "../../cases/inspector/markdown/MarkdownField";
 import { RunCasesSkeleton } from "../../runs/loading/RunCasesSkeleton";
 import { SuiteRepository } from "./repository/SuiteRepository";
 import { SuiteCriteria } from "./SuiteCriteria";
+import { SuiteKindBadge } from "../shared/kind/SuiteKindBadge";
 import shared from "../suites.module.css";
 import css from "./detail.module.css";
 
@@ -28,8 +29,7 @@ export function SuiteDetail(props: Props) {
     {!suite ? <div className={shared.empty}><Stack width={30} height={30} /><h2>{ru ? "Сьют недоступен" : "Suite unavailable"}</h2><p>{ru ? "Возможно, набор был удалён или относится к другому проекту." : "This suite may have been removed or belongs to another project."}</p></div> : <>
       <header className={css.header}>
         <div className={css.heading}><h1 ref={heading} tabIndex={-1}>{suite.name}</h1>
-          <div className={css.metadata}><span>{suite.key}</span><span>{suite.type === "dynamic" ? (ru ? "Динамический" : "Dynamic") : (ru ? "Вручную" : "Manual")}</span>
-            {suite.status === "archived" && <span>{ru ? "В архиве" : "Archived"}</span>}
+          <div className={css.metadata}><span>{suite.key}</span><SuiteKindBadge type={suite.type} archived={suite.status === "archived"} ru={ru} />
             <time dateTime={suite.updatedAt}>{ru ? "Обновлён" : "Updated"} {updated}</time>
           </div>
         </div>

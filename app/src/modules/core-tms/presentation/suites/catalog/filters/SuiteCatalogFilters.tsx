@@ -22,7 +22,7 @@ export function SuiteCatalogFilters(props: Props) {
     {open && <div ref={panel} id={id} popover="manual" role="dialog" aria-label={ru ? "Фильтры сьютов" : "Suite filters"} className={css.filterMenu}>
       <label>{ru ? "Состав" : "Membership"}</label>
       <AnimatedSelect label={ru ? "Состав" : "Membership"} value={props.filter} onChange={value => props.onFilter(value as SuiteCatalogFilter)}
-        options={[{ value: "all", label: ru ? "Все сьюты" : "All suites" }, { value: "static", label: ru ? "Вручную" : "Manual" }, { value: "dynamic", label: ru ? "Динамические" : "Dynamic" }]} />
+        options={[{ value: "all", label: ru ? "Все сьюты" : "All suites" }, { value: "static", label: ru ? "Вручную" : "Manual" }, { value: "dynamic", label: ru ? "По правилам" : "Automatic" }]} />
       <label>{ru ? "Сортировка" : "Sort"}</label>
       <AnimatedSelect label={ru ? "Сортировка" : "Sort"} value={props.sort} onChange={value => props.onSort(value as SuiteCatalogSort)}
         options={[{ value: "updated", label: ru ? "Обновлённые" : "Recently updated" }, { value: "name", label: ru ? "По названию" : "Name" }, { value: "created", label: ru ? "Недавно созданные" : "Recently created" }]} />

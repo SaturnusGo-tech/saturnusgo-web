@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { createRequire } from "node:module";
 import test from "node:test";
 import React from "react";
 import * as jsxRuntime from "react/jsx-runtime";
-import { act, create, type ReactTestRenderer } from "react-test-renderer";
+import { act, create, type ReactTestRenderer, type ReactTestInstance } from "react-test-renderer";
 import ts from "typescript";
 import type { SuiteCasePicker, SuiteCasePickerProps } from "../SuiteCasePicker";
 import * as model from "../model/picker-model";
@@ -22,6 +23,7 @@ function setup(readonly = false) {
         if (name === "react/jsx-runtime") return jsxRuntime;
         if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_object, key) => String(key) }) };
         if (name.endsWith("/Icon")) return new Proxy({}, { get: () => () => <svg /> });
+        if (name === "react-icons/pi" || name === "lucide-react") return createRequire(import.meta.url)(name);
         if (name.endsWith("picker-model")) return model;
         if (name.endsWith("useAnchoredPopup")) return { useAnchoredPopup() {} };
         const next = [".tsx", ".ts"].map(extension => new URL(`${name}${extension}`, url)).find(value => existsSync(value));
@@ -69,6 +71,22 @@ test("dynamic previews browse and filter the same cases without editable selecti
     assert.equal(h.root().findAllByProps({ type: "checkbox" }).length, 0);
     h.clickFolder("/Host/Calendar"); h.search("booking");
     assert.equal(h.root().findAllByProps({ className: "caseTitle" }).length, 1);
+    assert.deepEqual(h.scopes, []); assert.deepEqual(h.toggles, []);
+  } finally { h.dispose(); }
+});
+test("case and current-folder breadcrumbs keep full path tooltips and localize the unfiled root", () => {
+  const h = setup(true);
+  const text = (node: ReactTestInstance | string): string => typeof node === "string" ? node : node.children.map(text).join("");
+  try {
+    h.clickFolder("/Host/Calendar");
+    const current = h.root().findByProps({ className: "scopeName" });
+    assert.equal(current.props.title, "/Host/Calendar"); assert.equal(text(current), "HostCalendar");
+    const casePath = h.root().findByProps({ className: "caseFolder" });
+    assert.equal(casePath.props.title, "/Host/Calendar"); assert.equal(text(casePath), "HostCalendar");
+    h.clickFolder("/");
+    assert.equal(text(h.root().findByProps({ className: "scopeName" })), "Unfiled");
+    assert.equal(text(h.root().findByProps({ className: "caseFolder" })), "Unfiled");
+    assert.equal(h.root().findByProps({ className: "caseFolder" }).props.title, "/");
     assert.deepEqual(h.scopes, []); assert.deepEqual(h.toggles, []);
   } finally { h.dispose(); }
 });

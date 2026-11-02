@@ -1,23 +1,27 @@
-.topbar { display: flex; align-items: center; gap: 14px; margin: -4px 0 22px; }
+.topbar { display: flex; align-items: center; gap: 14px; margin: -4px 0 18px; }
 .topbar > button { margin-left: -10px; }
-.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
 .heading { min-width: 0; }
 .header h1 { margin: 0; color: var(--suite-text); font-size: 24px; line-height: 34px; font-weight: 500; letter-spacing: -.025em; overflow-wrap: anywhere; outline: none; }
 .actions { display: flex; align-items: center; gap: 7px; flex: none; }
 .metadata { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; color: var(--suite-muted); font-size: 12px; line-height: 20px; }
 .metadata > :first-child { font-variant-numeric: tabular-nums; }
-.description { margin: 0 0 24px; max-width: 780px; font-size: 14px; line-height: 22px; }
+.description { margin: 0 0 20px; max-width: 780px; font-size: 14px; line-height: 22px; }
 .description [data-editor-shell] { padding: 0; }
 .rule { color: var(--suite-muted); font-size: 13px; line-height: 20px; margin: 16px 0; }
-.membership { padding: 20px 0 24px; margin-top: 20px; border-top: 1px solid var(--suite-line); }
-.membership h2, .repositoryHeader h2 { margin: 0; color: var(--suite-text); font-size: 17px; line-height: 26px; font-weight: 500; }
-.membership p { margin: 6px 0 0; color: var(--suite-muted); font-size: 13px; line-height: 21px; }
-.criteria { display: flex; flex-wrap: wrap; gap: 14px 34px; margin: 16px 0 0; padding: 0; }
-.criteria > div { min-width: 90px; max-width: 100%; }
-.criteria dt { color: var(--suite-muted); font-size: 12px; line-height: 20px; }
-.criteria dd { margin: 3px 0 0; font-size: 13px; line-height: 21px; overflow-wrap: anywhere; color: var(--suite-text); }
+.membership { margin: 18px 0 24px; }
+.repositoryHeader h2 { margin: 0; color: var(--suite-text); font-size: 15px; line-height: 24px; font-weight: 500; }
+.membership p { margin: 0; color: var(--suite-muted); font-size: 12px; line-height: 20px; }
+.criteria { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.criterion, .folderRule { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; min-height: 26px; padding: 3px 8px; border-radius: 7px; background: var(--suite-hover); font-size: 12px; line-height: 20px; }
+.criterion > svg { flex: none; }
+.folderRule { flex-wrap: wrap; column-gap: 10px; }
+.folderRule small { color: var(--suite-muted); font-size: 11px; }
+.lifecycleRule { display: inline-flex; align-items: center; min-height: 26px; }
+.textRule { max-width: min(100%, 420px); }
+.textRule > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .repository { min-width: 0; }
-.repositoryHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--suite-line); }
+.repositoryHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 10px; margin-bottom: 6px; }
 .repositoryHeader h2 { padding-top: 4px; white-space: nowrap; }
 .repositoryHeader h2 > span { color: var(--suite-muted); margin-left: 10px; font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .repositoryTools { width: min(100%, 360px); min-width: 180px; }
@@ -26,17 +30,16 @@
 .repositoryTools [data-repository-controls] > div > [data-input-shell]:focus-within { box-shadow: none; border-color: var(--suite-muted); }
 .repositoryTools input { font-size: 13px; }
 .cases { list-style: none; padding: 0; margin: 0; }
-.case { display: flex; align-items: center; gap: 12px; width: calc(100% + 16px); margin-inline: -8px; min-height: 72px; padding: 12px 8px; border: 0; border-bottom: 1px solid var(--suite-line); border-radius: 0; background: transparent; color: var(--suite-text); text-align: left; cursor: pointer; }
-.cases > li:last-child .case { border-bottom: 0; }
-.case:hover, .case:focus-visible { background: var(--suite-hover); border-radius: 9px; }
-.case > svg { flex: none; color: var(--suite-muted); }
-.caseCopy { display: grid; gap: 5px; flex: 1; min-width: 0; }
-.caseCopy strong { font-size: 14px; line-height: 21px; font-weight: 400; overflow-wrap: anywhere; }
-.caseContext { display: flex; align-items: center; gap: 14px; min-width: 0; color: var(--suite-muted); font-size: 11px; line-height: 18px; }
+.case { display: flex; align-items: center; gap: 10px; width: calc(100% + 16px); margin-inline: -8px; min-height: 48px; padding: 4px 8px; border: 0; border-radius: 9px; background: transparent; color: var(--suite-text); text-align: left; cursor: pointer; transition: background-color 130ms ease; }
+.case:hover, .case:focus-visible { background: var(--suite-hover); }
+.case > svg { flex: none; }
+.case > svg:first-child { color: #8e9ebf; }
+.caseCopy { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.caseCopy strong { font-size: 13px; line-height: 18px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.caseContext { display: flex; align-items: center; gap: 12px; min-width: 0; color: var(--suite-muted); font-size: 11px; line-height: 16px; }
 .caseContext > span:first-child { flex: none; }
-.folder { display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.folder > svg { flex: none; }
-.folder > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lifecycle { flex: none; color: var(--suite-muted); font-size: 12px; }
+.lifecycle { flex: none; max-width: 110px; }
+.lifecycle > span { min-height: 21px; padding-block: 1px; font-weight: 500; }
 @container suites (max-width: 800px) { .header { flex-wrap: wrap; gap: 16px; } .actions { margin-left: -10px; } }
-@container suites (max-width: 580px) { .repositoryHeader { flex-wrap: wrap; gap: 12px; } .repositoryTools { width: 100%; } .case { gap: 9px; } .caseContext { flex-wrap: wrap; gap: 1px 10px; } .lifecycle { display: none; } .folder { max-width: 100%; } .criteria { gap: 14px 24px; } }
+@container suites (max-width: 580px) { .repositoryHeader { flex-wrap: wrap; gap: 12px; } .repositoryTools { width: 100%; } .case { gap: 9px; } .caseContext { gap: 8px; } .lifecycle { display: none; } .folderRule { flex-basis: 100%; } }
+@media (prefers-reduced-motion: reduce) { .case { transition: none; } }

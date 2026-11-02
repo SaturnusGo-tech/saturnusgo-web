@@ -1,8 +1,10 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { ChevronDown, Folder, Search, X } from "@openai/apps-sdk-ui/components/Icon";
+import { ChevronDown, Search, X } from "@openai/apps-sdk-ui/components/Icon";
+import { PiFolderSimpleDuotone } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "../../../../folders/model/folder";
-import { filterPickerCases, pickerFolders, pickerSelection, UNFILED, type PickerPriority } from "./model/picker-model";
+import { filterPickerCases, pickerFolders, pickerSelection, type PickerPriority } from "./model/picker-model";
+import { SuiteFolderPath } from "../../../suites/shared/folder-path/SuiteFolderPath";
 import { PickerFolders } from "./folders/PickerFolders";
 import { PickerRows } from "./rows/PickerRows";
 import { PriorityFilter } from "./controls/PriorityFilter";
@@ -25,8 +27,8 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
     selected: selectedOnly && !readOnly ? selected : undefined }), [active, entries, scope, query, priority, selectedOnly, readOnly, selected]);
   const selection = pickerSelection(visible, selected);
   useEffect(() => { if (checkbox.current) checkbox.current.indeterminate = selection.partial; }, [selection.partial]);
-  const folderName = currentFolder ? currentFolder.id === UNFILED ? (ru ? "Без папки" : "Unfiled") : currentFolder.path
-    : (ru ? "Все кейсы" : "All cases");
+  const folderName = currentFolder ? <SuiteFolderPath path={currentFolder.path} ru={ru} /> : (ru ? "Все кейсы" : "All cases");
+  const folderTitle = currentFolder?.path ?? (ru ? "Все кейсы" : "All cases");
   const chooseFolder = (id: string) => { setFolder(id); if (mobileFolders.current) mobileFolders.current.open = false; };
   const navigation = <PickerFolders folders={entries} count={active.length} current={scope} projectName={projectName} ru={ru} onChoose={chooseFolder} />;
   const filtered = Boolean(query || scope || priority !== "all" || (selectedOnly && !readOnly));
@@ -43,13 +45,13 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
         {ru ? "Выбрано" : "Selected"}<span>{selected.size}</span>
       </button>}
     </div>
-    <details ref={mobileFolders} className={styles.mobileFolders}><summary><Folder width={16} height={16} aria-hidden="true" />
+    <details ref={mobileFolders} className={styles.mobileFolders}><summary>{!currentFolder && <PiFolderSimpleDuotone size={18} aria-hidden="true" />}
       <span>{folderName}</span><ChevronDown width={14} height={14} aria-hidden="true" /></summary>{navigation}</details>
     <div className={styles.browser}>
       <aside className={styles.folders}>{navigation}</aside>
       <div className={styles.results}>
         <div className={styles.scopeBar}>
-          {readOnly ? <span className={styles.scopeName} title={folderName}>{folderName}</span>
+          {readOnly ? <span className={styles.scopeName} title={folderTitle}>{folderName}</span>
             : <label className={styles.selectVisible}><input ref={checkbox} type="checkbox" checked={selection.all} disabled={!visible.length}
               aria-label={ru ? "Выбрать видимые кейсы" : "Select visible cases"} onChange={() => onScope(selection.ids)} />
               <span>{ru ? "Выбрать видимые" : "Select visible"}</span></label>}

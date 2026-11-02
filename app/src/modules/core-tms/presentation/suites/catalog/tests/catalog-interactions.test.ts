@@ -38,6 +38,8 @@ test("read-only viewers can open suites without seeing create or execution actio
 test("dynamic counts remain unknown until matching detail resolves them; filtered empty state resets the controls", () => {
   const { h, props, render, events } = setup(); props.suites = [suite({ type: "dynamic", caseCount: 0 })];
   let all = render(); assert.equal(all.some(node => node.props.title === "Open this suite to resolve its current membership"), true);
+  invoke(all.find(node => node.props["aria-label"] === "View cases: Release smoke")!, "onClick");
+  assert.deepEqual(events, ["open:suite-a"]); events.length = 0;
   props.detail = { ...props.suites[0], caseIds: [], filter: { tags: ["smoke"] }, resolvedCaseCount: 7 };
   all = render(); assert.equal(all.some(node => node.props.title === "Open this suite to resolve its current membership"), false);
   props.query = "not present"; all = render();

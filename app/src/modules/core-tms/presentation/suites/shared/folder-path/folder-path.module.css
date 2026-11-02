@@ -1,0 +1,6 @@
+.path { display: inline-flex; align-items: center; gap: 5px; min-width: 0; max-width: 100%; color: var(--suite-muted); vertical-align: middle; }
+.path > svg { flex: none; color: var(--suite-folder, #7b96d0); }
+.segments { display: inline-flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+.segments > svg { flex: none; color: var(--suite-muted); opacity: .7; }
+.segments > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.path[data-unavailable] > svg { color: var(--suite-muted); }
