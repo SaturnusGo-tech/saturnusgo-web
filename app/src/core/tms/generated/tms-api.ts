@@ -9204,7 +9204,7 @@ export interface components {
             /** @description Authorization epoch; advances on disable, independent of the rowVersion concurrency token. */
             securityVersion: number;
         };
-        /** @description Immutable source manifest. PDF pages and Figma nodes anchor exact case revisions. Figma snapshots are host captures, not certified retrieval. URLs cannot expand allowed target origins; browser credentials and transient session state are excluded. */
+        /** @description Immutable reviewed source manifest. PDF page and Figma node anchors retain their original shape. Web and existing_case anchors contain only sourceId; existing_case anchors require the same confirmed case ID and immutable revision. Web sourceUrl is canonical HTTP(S), has no credentials and belongs to allowedOrigins. Web captures are private project-owned ready files (text/plain, application/json, image/png) with exact SHA256. Captures are host research baselines; ordinary navigation and volatile text are observations, not automatic source drift. Material scope/build/expectation changes require a new plan and review. No server fetching or certified retrieval; credentials and secrets are excluded. */
         QaWorkflowPlan: {
             sources: ({
                 /** @constant */
@@ -9224,6 +9224,23 @@ export interface components {
                 capturedAt: string;
                 snapshotDigest: string;
                 assumptions: string[];
+            } | {
+                /** @constant */
+                kind: "web";
+                id: string;
+                sourceUrl: string;
+                /** @description Requested website area covered by the immutable reviewed capture; not an OAuth scope. */
+                scope: string;
+                attachmentId: string;
+                digest: string;
+                capturedAt: string;
+                assumptions: string[];
+            } | {
+                /** @constant */
+                kind: "existing_case";
+                id: string;
+                caseId: string;
+                revision: number;
             })[];
             target: {
                 allowedOrigins: string[];

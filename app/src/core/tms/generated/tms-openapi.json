@@ -42788,6 +42788,91 @@
                     "assumptions"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "web"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "sourceUrl": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    },
+                    "scope": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000,
+                      "description": "Requested website area covered by the immutable reviewed capture; not an OAuth scope."
+                    },
+                    "attachmentId": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "capturedAt": {
+                      "type": "string",
+                      "maxLength": 32
+                    },
+                    "assumptions": {
+                      "maxItems": 50,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "sourceUrl",
+                    "scope",
+                    "attachmentId",
+                    "digest",
+                    "capturedAt",
+                    "assumptions"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "existing_case"
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "caseId": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1000000
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "caseId",
+                    "revision"
+                  ],
+                  "additionalProperties": false
                 }
               ]
             }
@@ -42922,7 +43007,7 @@
           "confirmedCases"
         ],
         "additionalProperties": false,
-        "description": "Immutable source manifest. PDF pages and Figma nodes anchor exact case revisions. Figma snapshots are host captures, not certified retrieval. URLs cannot expand allowed target origins; browser credentials and transient session state are excluded."
+        "description": "Immutable reviewed source manifest. PDF page and Figma node anchors retain their original shape. Web and existing_case anchors contain only sourceId; existing_case anchors require the same confirmed case ID and immutable revision. Web sourceUrl is canonical HTTP(S), has no credentials and belongs to allowedOrigins. Web captures are private project-owned ready files (text/plain, application/json, image/png) with exact SHA256. Captures are host research baselines; ordinary navigation and volatile text are observations, not automatic source drift. Material scope/build/expectation changes require a new plan and review. No server fetching or certified retrieval; credentials and secrets are excluded."
       },
       "QaWorkflow": {
         "type": "object",
