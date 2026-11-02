@@ -1,0 +1,67 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import type { NavigationProfile } from "../NavigationProfile";
+import type { TmsSessionIdentity } from "../../../auth/presentation/session/TmsSessionContext";
+import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
+
+function setup(session: Partial<TmsSessionIdentity> = {}) {
+  let dismissed = 0, closed = 0, settings = 0, help = 0;
+  const identity = { label: "Mercury", kind: "cloud", subject: "u", signOut: async () => {}, ...session };
+  const h = componentHarness(undefined, { document: { body: {} } });
+  const popup = { root: { current: null }, trigger: { current: null }, panel: { current: null }, open: true,
+    position: { left: 64, top: 80 }, openHover() {}, leave() {}, cancelClose() {}, toggle() {},
+    close() { closed++; }, dismiss() { dismissed++; }, triggerKeyDown() {}, panelKeyDown() {} };
+  const { NavigationProfile: render } = h.load<{ NavigationProfile: typeof NavigationProfile }>(new URL("../NavigationProfile.tsx", import.meta.url), name => {
+    if (name === "react-dom") return { createPortal: (value: unknown) => value };
+    if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => identity };
+    if (name.endsWith("useRailPopup")) return { useRailPopup: () => popup };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
+  });
+  const props = { collapsed: true, workspaceId: "w", onOpenSettings() { settings++; }, onOpenHelp() { help++; } };
+  const all = () => nodes(h.render(() => render(props)));
+  return { all, popup, dismissed: () => dismissed, closed: () => closed, settings: () => settings, help: () => help };
+}
+
+test("account settings, help and sign out remain reachable without a profile route", () => {
+  const h = setup();
+  const all = h.all();
+  const settings = all.find(node => node.props["data-testid"] === "nav-config");
+  const help = all.find(node => node.props["data-testid"] === "nav-help-utility");
+  assert.ok(settings); assert.ok(help);
+  invoke(settings, "onClick"); invoke(help, "onClick");
+  assert.equal(h.settings(), 1); assert.equal(h.help(), 1); assert.equal(h.dismissed(), 2);
+  assert.ok(all.some(node => node.props["data-testid"] === "account-logout"));
+});
+
+test("managed account preserves profile and administration destinations inside the popup", () => {
+  const h = setup({ kind: "managed", profilePath: "/profile/", administrationPath: "/company/", workspaceRole: "qa_manager" });
+  const all = h.all();
+  assert.ok(all.some(node => node.type === "ProfileLink" && node.props.role === "menuitem"));
+  assert.ok(all.some(node => node.type === "a" && node.props.href === "/company/" && node.props.role === "menuitem"));
+  assert.ok(all.some(node => node.props.children === "QA manager"));
+});
+
+test("logout prevents duplicate requests and reports a failure without dropping the menu", async () => {
+  let reject!: (reason: Error) => void, calls = 0;
+  const h = setup({ signOut: () => { calls++; return new Promise<void>((_, fail) => { reject = fail; }); } });
+  const button = () => h.all().find(node => node.props["data-testid"] === "account-logout")!;
+  invoke(button(), "onClick");
+  assert.equal(button().props.disabled, true); assert.equal(calls, 1);
+  reject(new Error("network")); await Promise.resolve(); await Promise.resolve();
+  assert.equal(button().props.disabled, false);
+  assert.ok(h.all().some(node => node.props.role === "alert" && node.props.children === "auth.logoutError"));
+  assert.equal(h.dismissed(), 0);
+});
+
+
+test("opening support dismisses the account popup while its dialog composition stays mounted", () => {
+  const h = setup();
+  const support = h.all().find(node => node.type === "SupportContact")!;
+  assert.equal(support.props.menuItem, true);
+  const wrapper = h.all().find(node => node.props.className === "support")!;
+  invoke(wrapper, "onClickCapture", { target: { closest: () => ({}) } });
+  assert.equal(h.closed(), 1); assert.equal(h.dismissed(), 0);
+  h.popup.open = false;
+  assert.ok(h.all().some(node => node.type === "SupportContact"));
+  assert.ok(h.all().some(node => node.props.role === "menu" && node.props.hidden === true));
+});

@@ -20,6 +20,7 @@ import { AttachmentLink } from "../../attachments/presentation/link/AttachmentLi
 import { RunScopeEmpty } from "./empty/RunScopeEmpty";
 import { runScopeState } from "./state/run-view-state";
 import { RunExecutionHeader } from "./header/RunExecutionHeader";
+import { RunSelectionContext } from "./header/RunSelectionContext";
 import { useRunKeyboardShortcuts } from "./execution/useRunKeyboardShortcuts";
 import { useRunFocus } from "./execution/useRunFocus";
 import focusStyles from "./execution/run-focus.module.css";
@@ -85,8 +86,8 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     aria-expanded={!focused} aria-controls={navigationId} aria-label={panelLabel} title={panelLabel} data-run-panel-handle>
     <ChevronLeft size={10} aria-hidden="true" />
   </button>;
-  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
-  if (selectedRun && !selectedItem) return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane}><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
+  if (selectedRun && !selectedItem && runScopeState(scopeLoading, items.length) === "empty") return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane} data-has-run><RunSelectionContext run={selectedRun} /><RunScopeEmpty filtered={emptyFiltered} /></div></div>;
+  if (selectedRun && !selectedItem) return <div {...shellProps}>{runNavigator}{panelHandle}<div className={runStyles.emptyPane} data-has-run><RunSelectionContext run={selectedRun} /><TessiqLoader pane label={t("common.loading")} testId="run-item-loading" /></div></div>;
   if (!selectedRun || !selectedItem) return <div {...shellProps}>{runNavigator}<div className={runStyles.emptyPane}><RunScopeEmpty noRun={!selectedRun} onCreate={onCreate} filtered={emptyFiltered} /></div></div>;
   const attempt = selectedItem.attempts.find((item) => item.attemptNo === selectedItem.activeAttemptNo) ?? selectedItem.attempts[0];
   const executionEntries = executableSteps(selectedItem.snapshot, locale);

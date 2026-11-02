@@ -1,4 +1,3 @@
-import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -11,20 +10,22 @@ export function AccountSettings() {
   const { t, locale } = useTmsLocale();
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
-  return <section className={css.settingSection}>
-    <div className={css.identityRow}>
+  return <div className={css.settingSurface}>
+    <div className={css.settingRow}>
+      <p className={css.settingTitle}>{settingsCopy[locale].currentAccount}</p>
+      <span className={css.settingValue}>{session.label || t("auth.account")}</span>
+    </div>
+    <div className={css.settingRow}>
       <div className={css.settingCopy}>
-        <p className={css.settingDescription}>{settingsCopy[locale].currentAccount}</p>
-        <h3 className={css.settingTitle}>{session.label || t("auth.account")}</h3>
+        <p className={css.settingTitle}>{t("auth.signOut")}</p>
+        <p className={css.settingDescription}>{locale === "ru" ? "Завершить текущую сессию в этом браузере." : "End your current session in this browser."}</p>
       </div>
-      <div className={css.settingControls}>
-        <button type="button" className={styles.secondaryButton} disabled={pending} aria-busy={pending}
-          onClick={() => {
-            setFailed(false); setPending(true);
-            void session.signOut().catch(() => { setFailed(true); setPending(false); });
-          }}><LogOut size={15} aria-hidden="true" />{t("auth.signOut")}</button>
-      </div>
+      <button type="button" className={styles.secondaryButton} disabled={pending} aria-busy={pending}
+        onClick={() => {
+          setFailed(false); setPending(true);
+          void session.signOut().catch(() => { setFailed(true); setPending(false); });
+        }}>{t("auth.signOut")}</button>
     </div>
     {failed && <p role="alert" className={css.exchangeError}>{t("auth.logoutError")}</p>}
-  </section>;
+  </div>;
 }

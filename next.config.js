@@ -6,6 +6,9 @@ const nextConfig = {
   images: { unoptimized: true },
   trailingSlash: true,
   transpilePackages: ['geist'],
+  experimental: {
+    optimizePackageImports: ['@openai/apps-sdk-ui/components/Icon'],
+  },
 
   // опционально: форсим уникальный buildId, чтобы дифы всегда отличались
   // generateBuildId: async () => String(Date.now()),

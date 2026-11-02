@@ -1,6 +1,6 @@
-import { Bell, Boxes, FileJson, FolderCog, Palette, UserRound } from "lucide-react";
+import { AvatarProfile, Bell, ColorTheme, Cube, Download, Search, Settings, X } from "@openai/apps-sdk-ui/components/Icon";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { AppearanceSettings } from "./settings/AppearanceSettings";
@@ -18,26 +18,36 @@ type ConfigViewProps = {
   onProjectUpdated: (project: Project, etag: string | null) => void;
   onToggleProject: () => void; exchange: ReactNode;
 };
-const icons = { general: FolderCog, environments: Boxes, exchange: FileJson, appearance: Palette, notifications: Bell, account: UserRound };
+const icons = { general: Settings, environments: Cube, exchange: Download, appearance: ColorTheme, notifications: Bell, account: AvatarProfile };
 export function ConfigView(props: ConfigViewProps) {
   const { locale } = useTmsLocale();
   const copy = settingsCopy[locale];
+  const [query, setQuery] = useState("");
   const { section, select } = useSettingsSection(Boolean(props.project));
   const available = props.project ? settingsSections : settingsSections.filter(id => ["appearance", "notifications", "account"].includes(id));
-  if (section === "exchange" && props.project) return <>{props.exchange}</>;
+  const matching = available.filter(id => copy[id].join(" ").toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const groups = [{ label: copy.projectGroup, ids: matching.filter(id => ["general", "environments", "exchange"].includes(id)) },
+    { label: copy.personalGroup, ids: matching.filter(id => ["appearance", "notifications", "account"].includes(id)) }];
   return <div className={css.page} data-testid="config-view">
     <aside className={css.sidebar}>
       <h1>{copy.title}</h1>
-      <nav aria-label={copy.title}>
-        {props.project && <div className={css.navLabel}>{copy.projectGroup}<span title={props.project.name}>{props.project.name}</span></div>}
-        {available.map((id) => {
-          const Icon = icons[id];
-          return <div key={id}>
-            {id === "appearance" && <div className={css.navLabel}>{copy.personalGroup}</div>}
-            <button type="button" aria-current={section === id ? "page" : undefined} aria-controls={`settings-${id}`}
-              onClick={() => transitionContent(() => select(id))}><Icon size={16} aria-hidden="true" />{copy[id][0]}</button>
-          </div>;
-        })}
+      <div className={css.search} data-input-shell>
+        <Search width={18} height={18} aria-hidden="true" />
+        <input type="search" aria-label={copy.search} placeholder={copy.search} value={query}
+          aria-controls="settings-navigation" onChange={event => setQuery(event.target.value)} />
+        {query && <button type="button" aria-label={copy.clearSearch} onClick={() => setQuery("")}><X width={15} height={15} aria-hidden="true" /></button>}
+      </div>
+      <nav id="settings-navigation" aria-label={copy.title}>
+        {groups.filter(group => group.ids.length).map(group => <div key={group.label} className={css.navGroup}>
+          <div className={css.navLabel}>{group.label}
+            {group.label === copy.projectGroup && <span title={props.project?.name}>{props.project?.name}</span>}</div>
+          {group.ids.map(id => {
+            const Icon = icons[id];
+            return <button key={id} type="button" aria-current={section === id ? "page" : undefined} aria-controls={`settings-${id}`}
+              onClick={() => transitionContent(() => select(id))}><Icon width={18} height={18} aria-hidden="true" />{copy[id][0]}</button>;
+          })}
+        </div>)}
+        {!matching.length && <p className={css.searchEmpty} role="status">{copy.noResults}</p>}
       </nav>
     </aside>
     <div className={css.content}>
@@ -48,6 +58,7 @@ export function ConfigView(props: ConfigViewProps) {
           workspaceId={props.workspaceId} offline={props.offline} canManage={props.canManageProject}
           onUpdated={props.onProjectUpdated} onToggle={props.onToggleProject} />}
         {id === "environments" && section === id && props.project && <EnvironmentSettings key={props.project.id} environments={props.environments} projectId={props.project.id} projectName={props.project.name} offline={props.offline} onSaved={props.onEnvironmentSaved} onToggle={props.onToggleEnvironment} />}
+        {id === "exchange" && section === id && props.project && <div className={css.exchange}>{props.exchange}</div>}
         {id === "appearance" && <AppearanceSettings />}
         {id === "notifications" && section === id && props.notifications}
         {id === "account" && <AccountSettings />}

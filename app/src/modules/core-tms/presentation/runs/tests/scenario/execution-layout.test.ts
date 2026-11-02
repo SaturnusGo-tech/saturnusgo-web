@@ -61,6 +61,14 @@ test("a focused run with no visible case still offers a way back to its reposito
   assert.equal(all().find(n => n.props["data-testid"] === "runs-view")?.props["data-run-focused"], false);
 });
 
+test("selected run keeps its clock and build details reachable when cases are filtered out or loading", () => {
+  const { all, props } = setup();
+  props.selectedItem = null; props.items = []; props.scopeLoading = false;
+  assert.equal(all().find(n => n.type === "RunSelectionContext")?.props.run, props.selectedRun);
+  props.scopeLoading = true;
+  assert.equal(all().find(n => n.type === "RunSelectionContext")?.props.run, props.selectedRun);
+});
+
 test("layout switching preserves step identity and does not execute or modify the snapshot", () => {
   const { all, props, statuses } = setup(); const before = JSON.stringify(props.selectedItem);
   const toggle = all().find(n => n.type === "ScenarioLayoutToggle")!;

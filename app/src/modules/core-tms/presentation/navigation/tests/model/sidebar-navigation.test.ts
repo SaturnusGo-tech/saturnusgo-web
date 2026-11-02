@@ -3,45 +3,42 @@ import { test } from "node:test";
 import { getSidebarNavigation, SIDEBAR_NAVIGATION_IDS } from "../../model/sidebar-navigation";
 import type { View } from "../../../../state/types/workspace";
 
-const full = { mode: "all", pinned: [] } as const;
-const contextual = { mode: "contextual", pinned: [] } as const;
-const navigation = (activeView: View, availableIds: readonly View[] = SIDEBAR_NAVIGATION_IDS, preferences = contextual) =>
-  getSidebarNavigation({ activeView, availableIds, preferences });
+const core = ["dashboard", "cases", "shared-steps", "runs", "suites", "reports"];
+const navigation = (view: View, pinned: readonly View[] = [], availableIds: readonly View[] = SIDEBAR_NAVIGATION_IDS, mode = "all" as "all" | "contextual") =>
+  getSidebarNavigation({ activeView: view, availableIds, preferences: { mode, pinned } });
 
-test("full mode preserves the four groups and canonical order despite caller order", () => {
-  const result = getSidebarNavigation({ activeView: "cases", availableIds: [...SIDEBAR_NAVIGATION_IDS].reverse(), preferences: full });
-  assert.deepEqual(result.visibleIds, SIDEBAR_NAVIGATION_IDS);
-  assert.deepEqual(result.groups.map(group => group.id), ["overview", "testing", "management", "insights"]);
-  assert.deepEqual(result.hiddenIds, []);
+test("legacy modes keep the six primary sections visible and rare services in overflow", () => {
+  for (const mode of ["all", "contextual"] as const) {
+    const result = navigation("cases", [], [...SIDEBAR_NAVIGATION_IDS].reverse(), mode);
+    assert.deepEqual(result.visibleIds, core);
+    assert.deepEqual(result.hiddenIds, ["portfolios", "custom-fields", "api", "hooks"]);
+    assert.deepEqual(result.groups.map(group => group.id), ["overview", "testing", "insights"]);
+  }
 });
 
-test("imports selects cases and keeps its entire testing group in contextual mode", () => {
-  const result = navigation("imports");
-  assert.equal(result.activeId, "cases");
-  assert.deepEqual(result.visibleIds, ["dashboard", "cases", "shared-steps", "runs", "suites", "reports"]);
-  assert.deepEqual(result.hiddenIds, ["portfolios", "custom-fields", "api", "hooks"]);
+test("imports highlights cases and active rare routes stay available in overflow", () => {
+  assert.equal(navigation("imports").activeId, "cases");
+  const result = navigation("api");
+  assert.equal(result.activeId, "api"); assert.deepEqual(result.visibleIds, core);
+  assert.ok(result.hiddenIds.includes("api"));
 });
 
-test("contextual management includes its context and the available core, never inferred grants", () => {
-  const result = navigation("custom-fields", ["custom-fields", "cases", "hooks", "help", "imports"]);
-  assert.deepEqual(result.visibleIds, ["cases", "custom-fields", "hooks"]);
-  assert.deepEqual(result.availableIds, ["cases", "custom-fields", "hooks"]);
-  assert.deepEqual(result.groups.map(group => group.id), ["testing", "management"]);
-});
-
-test("pins use canonical order and unavailable pinned or active views never become links", () => {
-  const preferences = { mode: "contextual", pinned: ["hooks", "api", "hooks", "portfolios"] } as const;
-  const result = getSidebarNavigation({ activeView: "api", availableIds: ["cases", "hooks", "portfolios"], preferences });
+test("only explicit available pins promote rare services into the rail", () => {
+  const result = navigation("custom-fields", ["hooks", "api", "hooks", "portfolios"], ["cases", "hooks", "portfolios", "custom-fields"]);
   assert.deepEqual(result.pinnedIds, ["portfolios", "hooks"]);
   assert.deepEqual(result.visibleIds, ["cases", "portfolios", "hooks"]);
-  assert.equal(result.activeId, null);
-  assert.deepEqual(preferences.pinned, ["hooks", "api", "hooks", "portfolios"]);
+  assert.deepEqual(result.hiddenIds, ["custom-fields"]);
+  assert.equal(result.activeId, "custom-fields");
 });
 
-test("utility routes leave the core visible and every other permitted section discoverable", () => {
-  const result = navigation("config");
-  assert.equal(result.activeId, null);
-  assert.deepEqual(result.visibleIds, ["dashboard", "cases", "runs", "reports"]);
-  assert.deepEqual(result.hiddenIds, ["shared-steps", "suites", "portfolios", "custom-fields", "api", "hooks"]);
-  assert.deepEqual(navigation("reports", []).groups, []);
+test("capability filtering never infers grants from active routes or pins", () => {
+  const result = navigation("api", ["api", "hooks"], ["cases", "hooks"]);
+  assert.deepEqual(result.availableIds, ["cases", "hooks"]);
+  assert.deepEqual(result.visibleIds, ["cases", "hooks"]); assert.equal(result.activeId, null);
+});
+
+test("utility routes retain primary navigation and an empty capability set has no links", () => {
+  assert.deepEqual(navigation("config").visibleIds, core);
+  assert.equal(navigation("config").activeId, null);
+  assert.deepEqual(navigation("reports", [], []).groups, []);
 });

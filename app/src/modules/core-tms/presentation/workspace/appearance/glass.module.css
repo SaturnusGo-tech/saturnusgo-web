@@ -1,9 +1,9 @@
-/* Shared geometry; themes change only the neutral surface palette. */
+/* Integrated workspace surfaces; reference geometry is shared across themes. */
 .glass.glass[data-appearance="glass"] {
   --glass-text: #20201f;
   --glass-muted: #686866;
-  --glass-panel: rgb(255 255 255 / 70%);
-  --glass-panel-strong: #fafaf9;
+  --glass-panel: #ffffff;
+  --glass-panel-strong: #ffffff;
   --glass-border: rgb(40 40 36 / 12%);
   --glass-hover: rgb(35 35 32 / 6%);
   --glass-selected: rgb(35 35 32 / 9%);
@@ -18,19 +18,19 @@
   --line: var(--glass-border);
   --line-strong: rgb(40 40 36 / 22%);
   --control-hover: var(--glass-hover);
-  padding: 2px;
-  gap: 4px;
-  background-color: #eae9e6;
-  background-image: var(--glass-wallpaper);
+  padding: 0;
+  gap: 0;
+  background-color: #f5f5f5;
+  background-image: none;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 }
 :global(.dark) .glass.glass[data-appearance="glass"] {
-  --glass-text: #f2f2f0;
-  --glass-muted: #a5a5a2;
-  --glass-panel: rgb(13 13 15 / 96%);
-  --glass-panel-strong: #111113;
+  --glass-text: #f5f5f5;
+  --glass-muted: #b5b5b5;
+  --glass-panel: #181818;
+  --glass-panel-strong: #181818;
   --glass-border: rgb(255 255 250 / 12%);
   --glass-hover: rgb(255 255 250 / 7%);
   --glass-selected: rgb(255 255 250 / 11%);
@@ -40,15 +40,15 @@
   --glass-shadow: 0 12px 38px rgb(0 0 0 / 20%), inset 0 1px 0 rgb(255 255 250 / 4%);
   --glass-wallpaper: radial-gradient(ellipse at 12% 0%, #242425 0%, transparent 58%), radial-gradient(ellipse at 95% 100%, #1c1c1d 0%, transparent 62%);
   --line-strong: rgb(255 255 250 / 22%);
-  --tms-bg-canvas: #111113;
-  --tms-bg-panel: #111113;
-  --tms-bg-elevated: #19191c;
-  --tms-bg-sidebar: #0d0d0f;
+  --tms-bg-canvas: #181818;
+  --tms-bg-panel: #181818;
+  --tms-bg-elevated: #232323;
+  --tms-bg-sidebar: #242424;
   --paper: var(--glass-panel-strong);
   --control: var(--tms-bg-elevated);
-  background-color: #161617;
+  background-color: #242424;
 }
 @media (max-width: 760px) {
-  .glass.glass[data-appearance="glass"] { padding: 2px 2px 64px; gap: 0; }
-  .glass.glass[data-appearance="glass"][data-sidebar="collapsed"] { padding-bottom: 2px; }
+  .glass.glass[data-appearance="glass"] { padding: 0 0 58px; gap: 0; }
+  .glass.glass[data-appearance="glass"][data-sidebar="collapsed"] { padding-bottom: 0; }
 }

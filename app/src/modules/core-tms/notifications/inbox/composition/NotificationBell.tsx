@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Bell } from 'lucide-react';
+import { Bell } from '@openai/apps-sdk-ui/components/Icon';
 import { useTmsHttpClient } from '../../../auth/http/TmsHttpClientContext';
 import { useTmsLocale } from '../../../localization/context/useTmsLocale';
 import { notificationInboxClient } from '../../data/inbox-client';
@@ -40,7 +40,7 @@ export function NotificationBell({ workspaceId, connected, navigationClasses }: 
     <button ref={popup.trigger} type="button" className={navigationClasses.button} data-active={popup.open} onClick={popup.toggle} disabled={!connected}
       aria-label={model.unreadCount ? `${label}, ${model.unreadCount} ${ru ? 'не прочитано' : 'unread'}` : label}
       data-nav-label={label} aria-haspopup="dialog" aria-expanded={popup.open} aria-controls={popup.open ? id : undefined} data-testid="nav-notifications">
-      <span className={navigationClasses.icon} aria-hidden="true"><Bell size={20}/>{model.unreadCount > 0 && <i className={css.badge}/>}</span>
+      <span className={navigationClasses.icon} aria-hidden="true"><Bell width={24} height={24}/>{model.unreadCount > 0 && <i className={css.badge}/>}</span>
       <span className={navigationClasses.label}>{label}</span>
     </button>
     {popup.portalHost && content ? createPortal(content, popup.portalHost) : content}

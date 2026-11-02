@@ -1,4 +1,5 @@
 import { RunDetailsPopover } from "../repository/details/RunDetailsPopover";
+import { RunClock } from "../clock/RunClock";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
 import { ChevronDown, Play } from "lucide-react";
@@ -29,9 +30,10 @@ export function RunExecutionHeader({ propertiesOpen, propertiesId, onTogglePrope
         <div className={runStyles.runContext}>
           <span>{locale === "ru" ? `Кейс ${itemIndex + 1} из ${itemCount}` : `Case ${itemIndex + 1} of ${itemCount}`}</span>
         </div>
-        {canStart && <div className={runStyles.headerActions}>
-          <button type="button" className={styles.primaryButton} disabled={startPending || archivePending} onClick={onStart} data-testid="start-existing-run"><Play size={16} />{startPending ? (locale === "ru" ? "Запускаем…" : "Starting…") : (locale === "ru" ? "Начать прогон" : "Start run")}</button>
-        </div>}
+        <div className={runStyles.headerActions}>
+          <RunClock run={run} />
+          {canStart && <button type="button" className={styles.primaryButton} disabled={startPending || archivePending} onClick={onStart} data-testid="start-existing-run"><Play size={16} />{startPending ? (locale === "ru" ? "Запускаем…" : "Starting…") : (locale === "ru" ? "Начать прогон" : "Start run")}</button>}
+        </div>
       </div>
       <div className={runStyles.titleBlock}>
         <h1>{item.snapshot.title}<span>#{item.caseKey}</span></h1>

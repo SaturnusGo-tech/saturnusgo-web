@@ -21,7 +21,7 @@ export function NavigationGroups({ groups, activeId, disabled, allowManagedHooks
         onClick={() => onNavigate(id)} disabled={unavailable} data-testid={`nav-${id}`}
         data-nav-label={label} aria-current={active ? "page" : undefined}
         aria-label={running ? `${label}, ${activeRunCount} ${locale === "ru" ? "активных" : "active"}` : label}>
-        <span className={css.icon} aria-hidden="true"><Icon size={20} strokeWidth={1.7}/>{running && <span className={css.dot}/>}</span>
+        <span className={css.icon} aria-hidden="true"><Icon width={24} height={24}/>{running && <span className={css.dot}/>}</span>
         <span className={css.label}>{label}</span>
       </button>;
     })}

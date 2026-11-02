@@ -10,7 +10,8 @@ export const SIDEBAR_GROUPS = [
 export type SidebarGroupId = typeof SIDEBAR_GROUPS[number]["id"];
 export type SidebarNavigationId = typeof SIDEBAR_GROUPS[number]["ids"][number];
 export const SIDEBAR_NAVIGATION_IDS: readonly SidebarNavigationId[] = SIDEBAR_GROUPS.flatMap(group => [...group.ids]);
-const CONTEXTUAL_CORE: readonly SidebarNavigationId[] = ["dashboard", "cases", "runs", "reports"];
+export const PRIMARY_SIDEBAR_IDS: readonly SidebarNavigationId[] = ["dashboard", "cases", "shared-steps", "runs", "suites", "reports"];
+export const RARE_SIDEBAR_IDS: readonly SidebarNavigationId[] = ["portfolios", "custom-fields", "api", "hooks"];
 
 export function canonicalSidebarView(view: unknown): SidebarNavigationId | null {
   const candidate = view === "imports" ? "cases" : view;
@@ -26,11 +27,8 @@ export function getSidebarNavigation({ availableIds, activeView, preferences }: 
   const activeId = candidate && available.includes(candidate) ? candidate : null;
   const pins = new Set(preferences.pinned.map(canonicalSidebarView));
   const pinnedIds = available.filter(id => pins.has(id));
-  const contextual = new Set<SidebarNavigationId>([...CONTEXTUAL_CORE, ...pinnedIds]);
-  const activeGroup = SIDEBAR_GROUPS.find(group => group.ids.some(id => id === activeId));
-  activeGroup?.ids.forEach(id => contextual.add(id));
-  if (activeId) contextual.add(activeId);
-  const visibleIds = available.filter(id => preferences.mode === "all" || contextual.has(id));
+  const railIds = new Set<SidebarNavigationId>([...PRIMARY_SIDEBAR_IDS, ...pinnedIds]);
+  const visibleIds = available.filter(id => railIds.has(id));
   const visible = new Set(visibleIds);
   return {
     groups: SIDEBAR_GROUPS.map(group => ({ id: group.id, ids: group.ids.filter(id => visible.has(id)) })).filter(group => group.ids.length),

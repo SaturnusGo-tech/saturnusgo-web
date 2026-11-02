@@ -15,3 +15,4 @@
 .description p { margin-block: 0 6px; font-size: 12px; line-height: 1.55; }
 .description p:last-child { margin-bottom: 0; }
 .description > div :is(h1, h2, h3, h4, h5, h6) { font-size: 13px; margin-block: 6px; }
+.buildReference { min-width: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }

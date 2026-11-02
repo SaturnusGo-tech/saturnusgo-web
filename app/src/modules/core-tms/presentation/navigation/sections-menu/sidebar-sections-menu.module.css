@@ -4,10 +4,6 @@
 .header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 8px 4px; }
 .header h2 { margin: 0; font: inherit; font-size: 13px; font-weight: 600; }
 .panel .close { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border-radius: 50%; color: var(--glass-muted, var(--sidebar-menu-muted)); }
-.modes { display: flex; gap: 8px; min-width: 0; margin: 0; padding: 0 4px; border: 0; }
-.modes legend { margin-bottom: 5px; padding: 0; color: var(--glass-muted, var(--sidebar-menu-muted)); font-size: 11px; }
-.modes label { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; cursor: pointer; }
-.modes input { width: 14px; height: 14px; margin: 0; accent-color: var(--glass-text, var(--sidebar-menu-text)); }
 .hint { margin: 5px 4px 9px; color: var(--glass-muted, var(--sidebar-menu-muted)); font-size: 11px; }
 .sections { display: grid; gap: 2px; margin: 0; padding: 7px 0 0; list-style: none; border-top: 1px solid var(--glass-border, var(--sidebar-menu-border)); }
 .sections > li { display: flex; align-items: center; min-width: 0; border-radius: 8px; }

@@ -1,4 +1,4 @@
-import { ChevronsLeft } from "lucide-react";
+import { SidebarCollapseLeft } from "@openai/apps-sdk-ui/components/Icon";
 import { useRef } from "react";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -14,6 +14,7 @@ import { useSidebarPreferences } from "./state/useSidebarPreferences";
 import { NavigationGroups } from "./ui/NavigationGroups";
 import { NavigationTooltip } from "./tooltip/NavigationTooltip";
 import { SidebarSectionsMenu } from "./sections-menu/SidebarSectionsMenu";
+import { RareNavigationMenu } from "./overflow/RareNavigationMenu";
 import css from "./styles/sidebar-system.module.css";
 
 export function Navigation({ view, onChange, disabled, connected, collapsed, onToggleCollapsed, workspaceId, activeRunCount, userCapabilities }: {
@@ -50,19 +51,18 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
     </div>
     <div className={css.scroll} data-sidebar-scroll>
       <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={session?.kind === "managed"} activeRunCount={activeRunCount} onNavigate={navigate}/>
-
+      <RareNavigationMenu availableIds={navigation.availableIds} activeId={navigation.activeId} pinnedIds={navigation.pinnedIds}
+        disabled={disabled} allowManagedHooks={session?.kind === "managed"} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
     </div>
     <div className={css.footer}>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
-        preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={session?.kind === "managed"}/>
-      <NavigationUtilityMenu settingsActive={view === "config"} helpActive={view === "help"} connected={connected} subject={session?.subject ?? ''}
-        workspaceId={workspaceId}
-        onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
-      <NavigationProfile collapsed={collapsed}/>
+        preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={session?.kind === "managed"}/>
+      <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>
+      <NavigationProfile collapsed={collapsed} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
       <button type="button" className={`${css.item} ${css.collapse}`} onClick={onToggleCollapsed}
         aria-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")} aria-expanded={!collapsed}
         aria-controls="tms-navigation" data-nav-label={t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}>
-        <span className={css.icon} aria-hidden="true"><ChevronsLeft size={20}/></span>
+        <span className={css.icon} aria-hidden="true"><SidebarCollapseLeft width={24} height={24}/></span>
         <span className={css.label}>{t(collapsed ? "nav.expandSidebar" : "nav.collapseSidebar")}</span>
       </button>
     </div>

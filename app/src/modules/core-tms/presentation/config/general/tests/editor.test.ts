@@ -9,6 +9,8 @@ import { componentHarness, invoke, nodes, type Node } from "../../../../portfoli
 import type { useProjectForm } from "../../../../projects/state/dialog/useProjectForm";
 import { getProjectDialogCopy } from "../../../dialogs/project/copy";
 import type { ProjectInlineEditor } from "../ProjectInlineEditor";
+import type { ProjectSettings } from "../../sections/ProjectSettings";
+import { settingsCopy } from "../../navigation/settings-sections";
 
 const project: Project = { id: "project", key: "PAY", name: "Payments", description: "Existing description", status: "active",
   portfolioId: "portfolio", responsibleIdentityId: "member", testingPlan: "Acceptance plan", workflowPhase: "new", checklist: [] };
@@ -40,6 +42,7 @@ function setup(t: TestContext, overrides: { etag?: string | null; offline?: bool
   const { ProjectInlineEditor: Editor } = h.load<{ ProjectInlineEditor: typeof ProjectInlineEditor }>(new URL("../ProjectInlineEditor.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("portfolios/model/copy")) return { portfolioCopy };
+    if (name.endsWith("settings-sections")) return { settingsCopy };
     if (name.endsWith("project/copy")) return { getProjectDialogCopy };
     if (name.endsWith("useProjectForm")) return form;
     if (name.endsWith("useProjectPortfolioOptions")) return { useProjectPortfolioOptions: () => ({ items: [] }) };
@@ -115,4 +118,20 @@ test("Escape dismisses an idle inline draft without saving", t => {
   const s = setup(t), tree = s.rename("Discard this draft");
   invoke(formNode(tree), "onKeyDown", { key: "Escape", preventDefault() {}, stopPropagation() {} });
   assert.equal(s.cancelled(), 1); assert.equal(s.requests.length, 0);
+});
+
+test("project settings expose horizontal property rows while management actions respect access", () => {
+  const h = componentHarness();
+  const { ProjectSettings: render } = h.load<{ ProjectSettings: typeof ProjectSettings }>(new URL("../../sections/ProjectSettings.tsx", import.meta.url), name => {
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
+    if (name.endsWith("portfolios/model/copy")) return { portfolioCopy };
+    if (name.endsWith("settings-sections")) return { settingsCopy };
+    if (name.endsWith("useProjectSettingsEditor")) return { useProjectSettingsEditor: () => ({ close() {}, loading: false }) };
+    if (name.endsWith("useDisclosureMotion")) return { useDisclosureMotion: () => ({ present: false, ref: {} }) };
+  });
+  const props = { project, workspaceId: "workspace", offline: false, canManage: false, onUpdated() {}, onToggle() {} };
+  const all = nodes(h.render(() => render(props)));
+  assert.deepEqual(all.filter(node => node.type === "dt").map(node => node.props.children), ["Name", "Key", "Description", "Responsible", "Portfolio", "Status"]);
+  assert.ok(all.some(node => node.type === "dd" && node.props.children === "Payments"));
+  assert.equal(all.some(node => node.type === "button" && node.props["aria-controls"]), false);
 });

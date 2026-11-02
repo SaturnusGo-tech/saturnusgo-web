@@ -51,7 +51,7 @@ export function useSidebarSectionsPopup(sidebar: RefObject<HTMLElement | null>) 
       element.style.top = `${Math.max(edge, Math.min(popup.y, innerHeight - element.getBoundingClientRect().height - edge))}px`;
     };
     position();
-    element.querySelector<HTMLElement>(popup.kind === "context" ? "[role=menuitem]" : "input:checked")?.focus({ preventScroll: true });
+    element.querySelector<HTMLElement>(popup.kind === "context" ? "[role=menuitem]" : "[data-sidebar-section]:not(:disabled)")?.focus({ preventScroll: true });
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) dismiss(); };
     const scroll = (event: Event) => { if (!root.current?.contains(event.target as Node)) dismiss(); };
     window.addEventListener("resize", position);

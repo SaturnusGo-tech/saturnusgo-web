@@ -254,3 +254,4 @@
 @container run-footer (max-width: 600px) { .shell .footer .outcomeAction { width: auto; padding-inline: 10px; } }
 @container run-footer (max-width: 420px) { .outcomeLabel { display: none; }.shell .footer .outcomeAction { width: 34px; padding-inline: 0; } }
 @media (prefers-reduced-motion: reduce) { .propertiesToggle svg, .shell .footer .outcomeAction { transition: none; } }
+.emptyPane[data-has-run] { grid-template-rows: auto minmax(0, 1fr); place-items: stretch; }

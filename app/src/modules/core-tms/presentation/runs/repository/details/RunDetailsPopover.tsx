@@ -4,6 +4,7 @@ import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy
 import { useWorkspacePeople } from "../../../../workspace/members/context/WorkspacePeopleContext";
 import { ResponsibleName } from "../../../../workspace/members/presentation/ResponsibleName";
 import { MarkdownField } from "../../../cases/inspector/markdown/MarkdownField";
+import { RunHeaderBuilds } from "../../../../runs/builds/presentation/header/RunHeaderBuilds";
 import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
 import css from "./runDetailsPopover.module.css";
 
@@ -31,6 +32,13 @@ export function RunDetailsPopover({ run, ru }: { run: TestRunSummary; ru: boolea
         <button type="button" ref={closeButton} onClick={close} className={css.close}
           aria-label={ru ? "Закрыть сведения о прогоне" : "Close run details"}><X size={16} aria-hidden="true" /></button>
       </header>
+      <div className={css.owner}><span>{ru ? "Окружение" : "Environment"}</span><strong>{run.environment.name}</strong></div>
+      {!!run.platformBuilds?.length && <div className={css.owner}>
+        <span>{ru ? "Сборки" : "Builds"}</span><RunHeaderBuilds builds={run.platformBuilds} disabled={offline} />
+      </div>}
+      {!run.platformBuilds?.length && run.build?.trim() && <div className={css.owner}>
+        <span>{ru ? "Сборка" : "Build"}</span><span className={css.buildReference}>{run.build}</span>
+      </div>}
       <div className={css.owner}><span>{ru ? "Ответственный за прогон" : "Run owner"}</span>
         <ResponsibleName workspaceId={workspaceId} identityId={run.ownerIdentityId ?? null} offline={offline} />
       </div>

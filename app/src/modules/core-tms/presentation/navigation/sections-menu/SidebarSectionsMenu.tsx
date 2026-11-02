@@ -1,6 +1,6 @@
 import { workspaceViewDisabledWithoutProject } from "../../../auth/managed/domain/features/workspace-view-access";
 import { useId, type RefObject } from "react";
-import { Grid2X2, Pin, X } from "lucide-react";
+import { Grid, Pin, X } from "@openai/apps-sdk-ui/components/Icon";
 import type { TmsMessageKey } from "../../../localization/catalog/messages";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useSidebarSectionsPopup } from "./useSidebarSectionsPopup";
@@ -14,7 +14,7 @@ const labels: Record<SidebarNavigationId, TmsMessageKey> = {
 };
 type Props = {
   sidebar: RefObject<HTMLElement | null>; availableIds: readonly SidebarNavigationId[]; activeId: SidebarNavigationId | null;
-  preferences: SidebarPreferences; onMode: (mode: SidebarPreferences["mode"]) => void;
+  preferences: SidebarPreferences;
   onTogglePinned: (id: SidebarNavigationId) => void; onNavigate: (id: SidebarNavigationId) => void; disabled: boolean; allowManagedHooks?: boolean;
 };
 
@@ -36,21 +36,14 @@ export function SidebarSectionsMenu(props: Props) {
         }
       }}>
       <button className={css.contextAction} type="button" role="menuitem" aria-haspopup="dialog"
-        data-testid="nav-all-sections" onClick={openSections}><Grid2X2 size={18} aria-hidden="true"/><span>{title}</span></button>
+        data-testid="nav-all-sections" onClick={openSections}><Grid width={20} height={20} aria-hidden="true"/><span>{title}</span></button>
     </div>}
     {popup?.kind === "sections" && <div className={css.panel} ref={panel} id={id} popover="manual" role="dialog"
       aria-labelledby={`${id}-title`} data-testid="sidebar-sections-menu">
       <header className={css.header}><h2 id={`${id}-title`}>{title}</h2>
-        <button type="button" className={css.close} onClick={close} aria-label={ru ? "Закрыть меню разделов" : "Close sections menu"}><X size={16} aria-hidden="true" /></button>
+        <button type="button" className={css.close} onClick={close} aria-label={ru ? "Закрыть меню разделов" : "Close sections menu"}><X width={16} height={16} aria-hidden="true" /></button>
       </header>
-      <fieldset className={css.modes}><legend>{ru ? "В боковом меню" : "Show in sidebar"}</legend>
-        {(["all", "contextual"] as const).map(mode => <label key={mode}>
-          <input type="radio" name={`${id}-mode`} value={mode} data-sidebar-mode={mode}
-            checked={props.preferences.mode === mode} onChange={() => props.onMode(mode)} />
-          <span>{mode === "all" ? (ru ? "Все разделы" : "All sections") : (ru ? "По контексту" : "Contextual")}</span>
-        </label>)}
-      </fieldset>
-      <p className={css.hint}>{ru ? "В контексте: основные разделы, текущая группа и закреплённое." : "Contextual: core sections, current group and pinned links."}</p>
+      <p className={css.hint}>{ru ? "Закрепите нужные разделы в боковом меню." : "Pin the sections you use in the sidebar."}</p>
       <ul className={css.sections}>{available.map(view => {
         const label = t(labels[view]); const pinned = props.preferences.pinned.includes(view);
         return <li key={view} data-active={view === props.activeId || undefined}>
@@ -59,7 +52,7 @@ export function SidebarSectionsMenu(props: Props) {
             onClick={() => { close(); props.onNavigate(view); }}>{label}</button>
           <button type="button" className={css.pin} data-sidebar-pin={view} aria-pressed={pinned}
             aria-label={`${pinned ? (ru ? "Открепить" : "Unpin") : (ru ? "Закрепить" : "Pin")} ${label}`}
-            onClick={() => props.onTogglePinned(view)}><Pin size={14} aria-hidden="true" /></button>
+            onClick={() => props.onTogglePinned(view)}><Pin width={16} height={16} aria-hidden="true" /></button>
         </li>;
       })}</ul>
     </div>}

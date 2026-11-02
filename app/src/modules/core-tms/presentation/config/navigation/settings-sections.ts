@@ -3,6 +3,7 @@ export type SettingsSection = typeof settingsSections[number];
 export const settingsCopy = {
   ru: {
     title: "Настройки", projectGroup: "Проект", personalGroup: "Личные настройки",
+    search: "Поиск настроек", clearSearch: "Очистить поиск", noResults: "Настройки не найдены",
     general: ["Общие", "Название, ключ и состояние выбранного проекта."],
     environments: ["Окружения", "Стенды, на которых команда выполняет проверки."],
     exchange: ["Импорт и экспорт", "Переносите тестовую базу между проектами Falcon."],
@@ -16,6 +17,7 @@ export const settingsCopy = {
   },
   en: {
     title: "Settings", projectGroup: "Project", personalGroup: "Personal settings",
+    search: "Search settings", clearSearch: "Clear search", noResults: "No settings found",
     general: ["General", "Name, key and status of the selected project."],
     environments: ["Environments", "The environments your team uses to run tests."],
     exchange: ["Import and export", "Move your test library between Falcon projects."],

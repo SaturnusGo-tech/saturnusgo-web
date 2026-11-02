@@ -37,7 +37,7 @@
   --notification-focus: #c1c1c5;
   color-scheme: dark;
 }
-.page > * { max-width: 1120px; margin-inline: auto; }
+.page > * { margin-inline: 0; }
 .page *, .page *::before, .page *::after { box-sizing: border-box; }
 .header { margin-bottom: 24px; }
 .header h1 { margin: 0; font-family: inherit; font-size: 28px; font-weight: 600; line-height: 1.25; letter-spacing: -.035em; }
@@ -53,10 +53,10 @@
 .channels { display: grid; list-style: none; padding: 0; margin-block: 0; }
 .section { min-width: 0; border: 0; border-bottom: 1px solid var(--notification-line); background: transparent; }
 .page > .section:last-child { border-bottom: 0; }
-.accordionTrigger { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 76px; padding: 18px 0; border: 0; border-radius: 0; background: transparent; color: var(--notification-ink); text-align: left; }
+.accordionTrigger { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 72px; padding: 16px 0; border: 0; border-radius: 0; background: transparent; color: var(--notification-ink); text-align: left; }
 .accordionTrigger:hover .sectionTitle { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--notification-muted); }
 .sectionCopy { display: grid; flex: 1; min-width: 0; gap: 4px; }
-.sectionTitle { font-size: 14px; line-height: 1.4; font-weight: 550; letter-spacing: -.015em; }
+.sectionTitle { font-size: 14px; line-height: 1.4; font-weight: 400; }
 .sectionDescription { color: var(--notification-muted); font-size: 13px; line-height: 1.5; font-weight: 400; }
 .chevron { color: var(--notification-muted); flex: 0 0 16px; transition: transform 160ms ease; }
 .accordionTrigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
@@ -64,27 +64,28 @@
 .channelHeader { display: flex; align-items: center; gap: 24px; }
 .channelHeader h2 { flex: 1; min-width: 0; }
 .channelTrigger { gap: 12px; }
-.channelActions { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; min-width: 96px; }
-.channelIcon { flex: 0 0 18px; color: var(--notification-muted); }
-.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 34px; padding: 6px 12px; border: 1px solid var(--notification-line); border-radius: 999px; color: var(--notification-ink); background: transparent; font-size: 13px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
+.channelActions { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.channelIcon { display: none; }
+.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 32px; padding: 5px 10px; border: 1px solid var(--notification-line); border-radius: 8px; color: var(--notification-ink); background: transparent; font-size: 13px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
 .connectionButton:hover:not(:disabled) { background: var(--notification-hover); border-color: var(--notification-muted); }
-.channelNotice { margin: -6px 0 16px 30px; color: var(--notification-muted); font-size: 12px; line-height: 1.5; }
+.channelNotice { margin: -8px 0 16px; color: var(--notification-muted); font-size: 12px; line-height: 1.5; }
 .sectionBody { margin: 0; padding: 0 0 20px; }
 .connectionStatus { margin: 0; color: var(--notification-ink); }
-.categoryGroups { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.categoryGroups { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
 .categoryGroup { min-width: 0; margin: 0; padding: 0; border: 0; }
 .categoryGroup legend { margin-bottom: 10px; padding: 0; color: var(--notification-muted); font-size: 12px; line-height: 1.5; font-weight: 500; letter-spacing: .01em; }
 .categories { display: grid; }
-.category { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-width: 0; min-height: 44px; padding: 8px 0; border: 0; color: var(--notification-ink); font-size: 13px; cursor: pointer; }
+.category { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-width: 0; min-height: 44px; padding: 10px 0; border: 0; border-bottom: 1px solid var(--notification-line); color: var(--notification-ink); font-size: 13px; cursor: pointer; }
+.category:last-child { border-bottom: 0; }
 .category:hover { color: var(--notification-muted); }
 .category:has(input:disabled) { cursor: not-allowed; }
 :global(.dark) .category { color: var(--notification-ink); }
-.switchControl { position: relative; display: inline-flex; flex: 0 0 44px; width: 44px; height: 26px; cursor: pointer; }
-.page .switchInput.switchInput { position: absolute; inset: 0; z-index: 1; width: 44px; height: 26px; margin: 0; padding: 0; opacity: 0; cursor: inherit; }
-.switchTrack { position: relative; display: block; width: 44px; height: 26px; border: 1px solid transparent; border-radius: 999px; background: var(--notification-switch-off); pointer-events: none; transition: background-color 160ms ease; }
-.switchTrack::before { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--notification-thumb-off); box-shadow: 0 1px 2px #00000012; transition: transform 160ms ease, background-color 160ms ease; }
+.switchControl { position: relative; display: inline-flex; flex: 0 0 34px; width: 34px; height: 20px; cursor: pointer; }
+.page .switchInput.switchInput { position: absolute; inset: 0; z-index: 1; width: 34px; height: 20px; margin: 0; padding: 0; opacity: 0; cursor: inherit; }
+.switchTrack { position: relative; display: block; width: 34px; height: 20px; border: 1px solid transparent; border-radius: 999px; background: var(--notification-switch-off); pointer-events: none; transition: background-color 160ms ease; }
+.switchTrack::before { content: ""; position: absolute; top: 1px; left: 1px; width: 16px; height: 16px; border-radius: 50%; background: var(--notification-thumb-off); transition: transform 160ms ease, background-color 160ms ease; }
 .switchInput:checked + .switchTrack { background: var(--notification-switch-on); }
-.switchInput:checked + .switchTrack::before { transform: translateX(18px); background: var(--notification-thumb); }
+.switchInput:checked + .switchTrack::before { transform: translateX(14px); background: var(--notification-thumb); }
 .switchInput:focus-visible + .switchTrack { outline: 2px solid var(--notification-focus); outline-offset: 4px; }
 .switchInput:disabled + .switchTrack { opacity: .45; }
 .switchControl:has(input:disabled) { cursor: not-allowed; }
@@ -144,3 +145,6 @@
 }
 
 .page[data-embedded="true"] { height: auto; overflow: visible; padding: 0; background: transparent; }
+.page[data-embedded="true"] { --notification-surface: var(--settings-surface); --notification-ink: var(--settings-ink); --notification-muted: var(--settings-muted); --notification-line: var(--settings-line); --notification-hover: var(--settings-hover); }
+.page[data-embedded="true"] .channels { margin-bottom: 24px; }
+.page[data-embedded="true"] .connectionButton { background: var(--settings-selected); }

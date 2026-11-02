@@ -14,7 +14,7 @@ async function setup(t: TestContext) {
   const sidebar = Object.assign(new EventTarget(), { closest: () => invoker, focus() { restored++; } });
   const item = { focus() { focused++; } };
   const panel = { style: {} as Record<string, string>, showPopover() { popover = true; }, hidePopover() { popover = false; },
-    matches: () => popover, getBoundingClientRect: () => ({ height: 90 }), querySelector: () => item };
+    matches: () => popover, getBoundingClientRect: () => ({ height: 90 }), querySelector: (selector: string) => selector === "[role=menuitem]" || selector === "[data-sidebar-section]:not(:disabled)" ? item : null };
   const popupRoot = { contains: (target: unknown) => target === item || target === panel };
   const sidebarRef = { current: sidebar as unknown as HTMLElement };
   let state!: ReturnType<typeof useSidebarSectionsPopup>; let renderer!: ReactTestRenderer;
