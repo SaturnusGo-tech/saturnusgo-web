@@ -54,3 +54,46 @@ test("catalog, detail, browser back and refresh share one resource owner", async
   assert.equal(statusCalls, 3); assert.equal(grantCalls, 3);
   await act(async () => view.unmount());
 });
+
+test("tester restored connector links cannot start connector requests or expose controls", async () => {
+  for (const integration of ["youtrack", "swagger", "jira", "codex"]) {
+    const current = new URL(`https://company.test/?view=hooks&integration=${integration}`);
+    Object.defineProperty(globalThis, "window", { value: { location: current, addEventListener() {}, removeEventListener() {} }, configurable: true });
+    const calls: string[] = [];
+    const client = createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
+      const path = new URL(String(input)).pathname; calls.push(path);
+      if (path.endsWith("/company/agents/codex")) return Response.json({ data: status }, { headers: { etag: '"3"' } });
+      if (path.endsWith("/profile/mcp-connections")) return Response.json({ data: [] });
+      return new Response("{}", { status: 403 });
+    } });
+    const session = { kind: "managed" as const, companyCapabilities: ["core", "integrations"], label: "Tester", subject: "user", signOut: async () => {} };
+    const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "" };
+    let view!: ReactTestRenderer;
+    await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="p" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
+    assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")), calls.join(", "));
+    assert.equal(JSON.stringify(view.toJSON()).includes("Set up the connection"), integration === "codex");
+    await act(async () => view.unmount());
+  }
+});
+
+test("profile connect URL reaches setup and a core-only denial stays actionable", async () => {
+  for (const entitled of [true, false]) {
+    Object.defineProperty(globalThis, "window", { value: { location: new URL(status.connectUrl), addEventListener() {}, removeEventListener() {} }, configurable: true });
+    const calls: string[] = [];
+    const client = createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
+      const path = new URL(String(input)).pathname; calls.push(path);
+      if (path.endsWith("/company/agents/codex")) return entitled ? Response.json({ data: status }, { headers: { etag: '"3"' } }) : Response.json({ error: { code: "FORBIDDEN" } }, { status: 403 });
+      if (path.endsWith("/profile/mcp-connections")) return Response.json({ data: [] });
+      return new Response("{}", { status: 403 });
+    } });
+    const session = { kind: "managed" as const, companyCapabilities: entitled ? ["core", "integrations"] : ["core"], label: "Tester", subject: "user", signOut: async () => {} };
+    const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "" };
+    let view!: ReactTestRenderer;
+    await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="p" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
+    const rendered = JSON.stringify(view.toJSON());
+    if (entitled) assert.match(rendered, /Set up the connection/);
+    else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Set up the connection/); }
+    assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")));
+    await act(async () => view.unmount());
+  }
+});

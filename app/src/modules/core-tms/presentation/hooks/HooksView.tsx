@@ -1,4 +1,5 @@
 "use client";
+import { CompanyFeatureUnavailable } from "../../auth/managed/presentation/permissions/CompanyFeatureUnavailable";
 import { CodexDetail } from "../../codex-employee/presentation/setup/CodexDetail";
 import { useWorkspaceCodex } from "../../codex-employee/composition/workspace/useWorkspaceCodex";
 
@@ -40,8 +41,9 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const connectors = useWorkspaceConnectors();
   const session = useOptionalTmsSession();
   const codex = useWorkspaceCodex(session?.kind === "managed");
+  const connectorAccess = canManage && companyViewAvailable("hooks", session?.companyCapabilities);
   const apiEnabled = companyViewAvailable("api", session?.companyCapabilities);
-  const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, apiEnabled && screen === "catalog");
+  const sources = useApiSourceList(workspaceId, { projectIds: [projectId] }, false, connectorAccess && apiEnabled && screen === "catalog");
   const open = (target: IntegrationScreen) => transitionContent(() => {
     setScreen(target);
     const url = new URL(window.location.href);
@@ -64,6 +66,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     setConfiguration(null);
     setStatusFailed(false);
     setConfigurationFailed(false);
+    if (!connectorAccess) return () => controller.abort();
     void getYouTrackIntegrationStatus(http, workspaceId, controller.signal)
       .then(setStatus)
       .catch((error: unknown) => {
@@ -77,9 +80,10 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
         }
       });
     return () => controller.abort();
-  }, [http, workspaceId, reload]);
+  }, [http, workspaceId, reload, connectorAccess]);
 
   if (screen === "codex" && session?.kind === "managed") return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} />;
+  if (screen !== "catalog" && !connectorAccess) return <CompanyFeatureUnavailable onReturn={() => open("catalog")} />;
   if (screen === "swagger") return canManage ? <ApiSourceManager key={workspaceId} workspaceId={workspaceId} projectId={projectId} onBack={() => open("catalog")} />
     : <ApiTestingView scope={{ workspaceId, projectId }} canManage={false} />;
   if (isProvider(screen)) return <ConnectorSettings key={`${workspaceId}:${projectId}:${screen}`}
@@ -99,7 +103,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   return (
     <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
       <IntegrationCatalog
-        russian={russian}
+        showOthers={connectorAccess} russian={russian}
         showCodex={session?.kind === "managed"} onOpenCodex={() => open("codex")}
         codexStatus={codex.loading ? "checking" : codex.error ? "attention" : "available"} codexCompanyStatus={codex.employee?.status}
         copy={hooksCopy(russian)}
@@ -109,7 +113,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
         swaggerStatus={!apiEnabled ? "available" : sources.loading ? "checking" : sources.error ? "attention" : sources.items.some(source => source.enabled) ? "connected" : "available"}
         connectorState={connectors.state} connections={connectors.connections} projectId={projectId}
         onOpenConnector={open}
-        onRefresh={() => { refresh(); sources.refresh(); codex.refresh(); }}
+        onRefresh={() => { if (connectorAccess) { refresh(); sources.refresh(); } codex.refresh(); }}
         onOpenYouTrack={() => open("youtrack")}
       />
     </div>

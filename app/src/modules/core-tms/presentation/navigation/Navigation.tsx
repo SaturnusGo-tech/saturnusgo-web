@@ -23,7 +23,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
   const { t } = useTmsLocale();
   const session = useOptionalTmsSession();
   const root = useRef<HTMLElement>(null);
-  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities) && workspaceViewAllowed(candidate, userCapabilities);
+  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, session?.kind === "managed") && workspaceViewAllowed(candidate, userCapabilities, session?.kind === "managed");
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
   const navigate = (next: View) => {

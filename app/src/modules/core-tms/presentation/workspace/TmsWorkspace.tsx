@@ -61,7 +61,7 @@ function LocalizedWorkspace() {
 
   return (
     <WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
-    <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected"}>
+    <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected" && model.canManageIntegrations}>
     <div
       className={`${styles.app} ${shellStyles.shell} ${glassEnabled ? appearance.glass : ""}`}
       data-appearance={glassEnabled ? "glass" : undefined}

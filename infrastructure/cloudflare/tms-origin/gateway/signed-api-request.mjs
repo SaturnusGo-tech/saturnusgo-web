@@ -61,6 +61,11 @@ export async function signedApiRequest(request, env, audience) {
   if (protocol?.kind === "mcp") for (const name of ["authorization", "mcp-protocol-version", "mcp-session-id", "last-event-id"]) {
     const value = request.headers.get(name); if (value) headers.set(name, value);
   }
+  const language = request.headers.get("accept-language") ?? "";
+  if (protocol?.kind === "oauth" && /^\/api\/v1\/falcon-oauth\/interaction\/[^/]+$/.test(incoming.pathname) &&
+    language.length <= 256 && /^(?:[A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)(?:\s*;\s*q=(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?))?(?:\s*,\s*(?:[A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)(?:\s*;\s*q=(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?))?)*$/.test(language)) {
+    headers.set("accept-language", language);
+  }
   const requestId = request.headers.get("x-request-id") ?? "";
   headers.set("x-request-id", /^[A-Za-z0-9._:-]{1,128}$/.test(requestId) ? requestId : crypto.randomUUID());
   headers.set("cache-control", "no-store");

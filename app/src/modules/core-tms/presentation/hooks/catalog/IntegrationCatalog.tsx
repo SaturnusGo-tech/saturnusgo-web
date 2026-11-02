@@ -14,8 +14,8 @@ import styles from "./catalog.module.css";
 
 type Filter = "all" | "connected" | "attention" | "planned";
 export function IntegrationCatalog({ russian, copy, configuration, status, statusFailed, onRefresh,
-  onOpenYouTrack, onOpenCodex, codexStatus, codexCompanyStatus, showCodex, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
-  onOpenCodex: () => void; codexStatus: IntegrationUiStatus; codexCompanyStatus?: "active" | "inactive" | "not_activated" | null; showCodex: boolean;
+  showOthers, onOpenYouTrack, onOpenCodex, codexStatus, codexCompanyStatus, showCodex, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
+  showOthers?: boolean; onOpenCodex: () => void; codexStatus: IntegrationUiStatus; codexCompanyStatus?: "active" | "inactive" | "not_activated" | null; showCodex: boolean;
   swaggerStatus: IntegrationUiStatus; russian: boolean; connections: readonly Connection[]; connectorState: "loading" | "ready" | "error";
   projectId: string; onOpenConnector: (provider: Provider) => void; copy: HooksCopy;
   configuration: YouTrackConfiguration | null; status: YouTrackIntegrationStatus | null;
@@ -24,7 +24,7 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<IntegrationGroup | "all">("all");
   const [filter, setFilter] = useState<Filter>("all");
-  const entries = INTEGRATIONS.filter(integration => showCodex || integration.id !== "codex").map((integration) => ({ integration, status: integration.id === "codex" ? codexStatus : integration.id === "youtrack"
+  const entries = INTEGRATIONS.filter(integration => integration.id === "codex" ? showCodex : showOthers !== false).map((integration) => ({ integration, status: integration.id === "codex" ? codexStatus : integration.id === "youtrack"
     ? catalogIntegrationStatus(configuration, status, statusFailed)
     : integration.id === "swagger" ? swaggerStatus : isProvider(integration.id) ? connectorState === "loading" ? "checking" : connectorState === "error" ? "attention"
       : connections.some((c) => c.provider === integration.id && c.projectId === projectId && c.enabled) ? "connected" : "available" : "planned" }));

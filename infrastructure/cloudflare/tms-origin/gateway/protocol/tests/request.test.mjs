@@ -86,3 +86,15 @@ test("OAuth issuer forwards only its named cookies together with its own tenant 
   assert.equal(forwarded.headers.get("cookie"), `${tenant}; ${cookies.join("; ")}`);
   assert.equal(forwarded.headers.has("authorization"), false);
 });
+
+test("only OAuth interactions forward a bounded valid presentation language", async () => {
+  for (const [path, language, expected] of [
+    [`${issuer}/interaction/id`, "ru-RU,ru;q=0.9,en;q=0.8", "ru-RU,ru;q=0.9,en;q=0.8"],
+    [`${issuer}/interaction/id`, "ru;bad=value", null],
+    [`${issuer}/interaction/id`, "a".repeat(257), null],
+    [`${issuer}/token`, "ru", null], ["/api/v1/mcp", "ru", null],
+  ]) {
+    const forwarded = await signedApiRequest(new Request(`https://${host}${path}`, { headers: { "accept-language": language } }), env, "tenant");
+    assert.equal(forwarded.headers.get("accept-language"), expected, path + language);
+  }
+});

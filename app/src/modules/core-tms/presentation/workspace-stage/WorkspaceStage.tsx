@@ -73,7 +73,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     onBack={() => transitionContent(() => { navigateWorkspace(settingsSectionLink(window.location.href, "general")); model.setView("config"); })}
     onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />
     : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
-  if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session?.kind === "managed" ? <WorkspaceProfile />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
@@ -107,11 +107,13 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
   if (model.view === "cases" && model.repositoryScope.aggregate) return <WorkspaceCasesStage model={model} />;
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
     scope={{ workspaceId: model.data.workspace.id, projectId: model.projectId }} canManage={model.canManageIntegrations} />;
+  if (model.view === "hooks" && (model.project || session?.kind === "managed")) return <HooksView workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""}
+    canManage={model.canManageIntegrations && !!model.project} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   if (!model.project) {
     return (
       <ProjectOnboarding
@@ -176,8 +178,6 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (model.view === "runs") return <WorkspaceRunsStage model={model} />;
-  if (model.view === "hooks") return <HooksView workspaceId={model.data.workspace.id} projectId={model.project.id}
-    canManage={model.canManageIntegrations} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   return (
     <ReportsView connected={model.connection === "connected"} canComment={model.data.meta.authorization.capabilities.includes("defect:manage")} workspaceId={model.data.workspace.id} projectId={model.projectId} projectName={model.project.name}
       defects={model.reportDefects}
