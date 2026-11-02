@@ -89,7 +89,7 @@ test("profile connect URL reaches setup and a core-only denial stays actionable"
     const session = { kind: "managed" as const, companyCapabilities: entitled ? ["core", "integrations"] : ["core"], label: "Tester", subject: "user", signOut: async () => {} };
     const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "" };
     let view!: ReactTestRenderer;
-    await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="p" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
+    await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
     const rendered = JSON.stringify(view.toJSON());
     if (entitled) assert.match(rendered, /Set up the connection/);
     else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Set up the connection/); }

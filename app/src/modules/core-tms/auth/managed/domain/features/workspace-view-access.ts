@@ -4,3 +4,8 @@ export function workspaceViewAllowed(view: View, userCapabilities: readonly stri
     : view === "api" ? userCapabilities.includes("integration:read")
     : view === "custom-fields" ? userCapabilities.includes("project:read") : true;
 }
+
+/** Project-independent navigation remains separate from view and company authorization. */
+export function workspaceViewDisabledWithoutProject(view: View, disabled: boolean, allowManagedHooks: boolean): boolean {
+  return disabled && view !== "portfolios" && view !== "api" && !(allowManagedHooks && view === "hooks");
+}

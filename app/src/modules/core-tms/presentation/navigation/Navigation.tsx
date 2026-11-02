@@ -49,12 +49,12 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onT
       </button>
     </div>
     <div className={css.scroll} data-sidebar-scroll>
-      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} activeRunCount={activeRunCount} onNavigate={navigate}/>
+      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={session?.kind === "managed"} activeRunCount={activeRunCount} onNavigate={navigate}/>
 
     </div>
     <div className={css.footer}>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
-        preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled}/>
+        preferences={state.preferences} onMode={state.setMode} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={session?.kind === "managed"}/>
       <NavigationUtilityMenu settingsActive={view === "config"} helpActive={view === "help"} connected={connected} subject={session?.subject ?? ''}
         workspaceId={workspaceId}
         onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>

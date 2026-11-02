@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { ComponentProps } from "react";
 import type { SidebarSectionsMenu } from "../SidebarSectionsMenu";
+import { workspaceViewDisabledWithoutProject } from "../../../../auth/managed/domain/features/workspace-view-access";
 import * as model from "../../model/sidebar-navigation";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 
@@ -11,6 +12,7 @@ function menu() {
   const dismiss = () => { popup = null; };
   const { SidebarSectionsMenu: renderMenu } = h.load<{ SidebarSectionsMenu: typeof SidebarSectionsMenu }>(
     new URL("../SidebarSectionsMenu.tsx", import.meta.url), name => {
+      if (name.endsWith("workspace-view-access")) return { workspaceViewDisabledWithoutProject };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
       if (name.endsWith("sidebar-navigation")) return model;
       if (name.endsWith("useSidebarSectionsPopup")) return { useSidebarSectionsPopup: () => ({ popup,
@@ -91,4 +93,13 @@ test("context action has menu semantics and opens the sections dialog", () => {
 test("sections launcher is absent from the resting sidebar", () => {
   const h = menu();
   assert.equal(h.render().some(node => node.props["data-testid"] === "nav-all-sections"), false);
+});
+
+test("managed company without a project can navigate Hooks from sections", () => {
+  const h = menu(); h.props.disabled = true; h.props.availableIds = ["cases", "hooks"];
+  Object.assign(h.props, { allowManagedHooks: true }); h.open();
+  const rows = h.render().filter(node => node.props["data-sidebar-section"]);
+  assert.equal(rows.find(node => node.props["data-sidebar-section"] === "cases")?.props.disabled, true);
+  const hooks = rows.find(node => node.props["data-sidebar-section"] === "hooks")!;
+  assert.equal(hooks.props.disabled, false); invoke(hooks, "onClick"); assert.deepEqual(h.navigated, ["hooks"]);
 });

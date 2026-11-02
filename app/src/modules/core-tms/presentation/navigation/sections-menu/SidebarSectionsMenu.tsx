@@ -1,3 +1,4 @@
+import { workspaceViewDisabledWithoutProject } from "../../../auth/managed/domain/features/workspace-view-access";
 import { useId, type RefObject } from "react";
 import { Grid2X2, Pin, X } from "lucide-react";
 import type { TmsMessageKey } from "../../../localization/catalog/messages";
@@ -14,7 +15,7 @@ const labels: Record<SidebarNavigationId, TmsMessageKey> = {
 type Props = {
   sidebar: RefObject<HTMLElement | null>; availableIds: readonly SidebarNavigationId[]; activeId: SidebarNavigationId | null;
   preferences: SidebarPreferences; onMode: (mode: SidebarPreferences["mode"]) => void;
-  onTogglePinned: (id: SidebarNavigationId) => void; onNavigate: (id: SidebarNavigationId) => void; disabled: boolean;
+  onTogglePinned: (id: SidebarNavigationId) => void; onNavigate: (id: SidebarNavigationId) => void; disabled: boolean; allowManagedHooks?: boolean;
 };
 
 export function SidebarSectionsMenu(props: Props) {
@@ -54,7 +55,7 @@ export function SidebarSectionsMenu(props: Props) {
         const label = t(labels[view]); const pinned = props.preferences.pinned.includes(view);
         return <li key={view} data-active={view === props.activeId || undefined}>
           <button type="button" className={css.navigate} data-sidebar-section={view} aria-current={view === props.activeId ? "page" : undefined}
-            disabled={props.disabled && view !== "portfolios" && view !== "api"}
+            disabled={workspaceViewDisabledWithoutProject(view, props.disabled, props.allowManagedHooks ?? false)}
             onClick={() => { close(); props.onNavigate(view); }}>{label}</button>
           <button type="button" className={css.pin} data-sidebar-pin={view} aria-pressed={pinned}
             aria-label={`${pinned ? (ru ? "Открепить" : "Unpin") : (ru ? "Закрепить" : "Pin")} ${label}`}

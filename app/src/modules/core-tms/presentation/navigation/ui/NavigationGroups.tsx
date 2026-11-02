@@ -1,11 +1,12 @@
+import { workspaceViewDisabledWithoutProject } from "../../../auth/managed/domain/features/workspace-view-access";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import type { SidebarGroupId, SidebarNavigationId } from "../model/sidebar-navigation";
 import { sidebarCatalog, sidebarGroupLabels } from "./sidebar-catalog";
 import css from "../styles/sidebar-system.module.css";
 
-export function NavigationGroups({ groups, activeId, disabled, activeRunCount, onNavigate }: {
+export function NavigationGroups({ groups, activeId, disabled, allowManagedHooks, activeRunCount, onNavigate }: {
   groups: readonly { id: SidebarGroupId; ids: readonly SidebarNavigationId[] }[];
-  activeId: SidebarNavigationId | null; disabled: boolean; activeRunCount: number;
+  activeId: SidebarNavigationId | null; disabled: boolean; allowManagedHooks: boolean; activeRunCount: number;
   onNavigate: (id: SidebarNavigationId) => void;
 }) {
   const { locale, t } = useTmsLocale();
@@ -13,7 +14,7 @@ export function NavigationGroups({ groups, activeId, disabled, activeRunCount, o
     <h2 id={`sidebar-${group.id}`} className={css.heading}>{sidebarGroupLabels[group.id][locale === "ru" ? "ru" : "en"]}</h2>
     {group.ids.map(id => {
       const item = sidebarCatalog[id]; const Icon = item.icon; const label = t(item.labelKey);
-      const unavailable = disabled && id !== "portfolios" && id !== "api";
+      const unavailable = workspaceViewDisabledWithoutProject(id, disabled, allowManagedHooks);
       const active = activeId === id && !unavailable;
       const running = id === "runs" && activeRunCount > 0;
       return <button key={id} type="button" className={css.item} data-active={active}
