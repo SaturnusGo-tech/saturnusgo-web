@@ -9,3 +9,7 @@
 .steps details { margin-top:20px; }.steps summary { cursor:pointer; }.steps code { overflow-wrap:anywhere; }
 @media(max-width:650px) { .page { padding:16px; }.summary { grid-template-columns:1fr; }.header a { margin-left:0; } }
 @media(prefers-reduced-motion:reduce) { .page * { transition:none !important; animation:none !important; } }
+
+.steps input { display:block; max-width:100%; width:100%; padding:8px; border:1px solid var(--line); border-radius:7px; color:var(--ink); background:var(--control); }
+.steps input:focus-visible { outline:2px solid var(--tms-focus-border); outline-offset:3px; }
+.page button:disabled { opacity:.55; cursor:default; }

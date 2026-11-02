@@ -101,7 +101,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
       <IntegrationCatalog
         russian={russian}
         showCodex={session?.kind === "managed"} onOpenCodex={() => open("codex")}
-        codexStatus={codex.loading ? "checking" : codex.error ? "attention" : codex.employee?.status === "active" ? "connected" : "available"}
+        codexStatus={codex.loading ? "checking" : codex.error ? "attention" : "available"} codexCompanyStatus={codex.employee?.status}
         copy={hooksCopy(russian)}
         configuration={configuration}
         status={status}

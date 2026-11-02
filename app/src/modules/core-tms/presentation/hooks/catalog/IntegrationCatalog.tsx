@@ -14,8 +14,8 @@ import styles from "./catalog.module.css";
 
 type Filter = "all" | "connected" | "attention" | "planned";
 export function IntegrationCatalog({ russian, copy, configuration, status, statusFailed, onRefresh,
-  onOpenYouTrack, onOpenCodex, codexStatus, showCodex, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
-  onOpenCodex: () => void; codexStatus: IntegrationUiStatus; showCodex: boolean;
+  onOpenYouTrack, onOpenCodex, codexStatus, codexCompanyStatus, showCodex, swaggerStatus, connections, connectorState, projectId, onOpenConnector }: {
+  onOpenCodex: () => void; codexStatus: IntegrationUiStatus; codexCompanyStatus?: "active" | "inactive" | "not_activated" | null; showCodex: boolean;
   swaggerStatus: IntegrationUiStatus; russian: boolean; connections: readonly Connection[]; connectorState: "loading" | "ready" | "error";
   projectId: string; onOpenConnector: (provider: Provider) => void; copy: HooksCopy;
   configuration: YouTrackConfiguration | null; status: YouTrackIntegrationStatus | null;
@@ -64,6 +64,7 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
     {visible.length ? <div className={styles.grid}>
       {visible.map(({ integration, status: state }) => <IntegrationCard key={integration.id} integration={integration}
         russian={russian} copy={copy} status={state as IntegrationUiStatus}
+        companyStatus={integration.id === "codex" && state !== "attention" && state !== "checking" ? codexCompanyStatus : null}
         onOpen={integration.id === "codex" ? onOpenCodex : integration.id === "youtrack" ? onOpenYouTrack : isProvider(integration.id) ? () => onOpenConnector(integration.id as Provider) : undefined} />)}
     </div> : <div className={styles.empty}><Search size={24} /><h2>{russian ? "Здесь пока нет сервисов" : "No services here"}</h2>
       <p>{russian ? "Измените запрос или фильтры, чтобы найти нужное подключение." : "Change your search or filters to find a connection."}</p>
@@ -73,8 +74,8 @@ export function IntegrationCatalog({ russian, copy, configuration, status, statu
   </section>;
 }
 
-function IntegrationCard({ integration, russian, status, onOpen, copy }: {
-  integration: IntegrationDefinition; russian: boolean; status: IntegrationUiStatus; onOpen?: () => void; copy: HooksCopy;
+function IntegrationCard({ integration, russian, status, onOpen, copy, companyStatus }: {
+  integration: IntegrationDefinition; russian: boolean; status: IntegrationUiStatus; onOpen?: () => void; copy: HooksCopy; companyStatus?: "active" | "inactive" | "not_activated" | null;
 }) {
   const content = <>
     <span className={styles.cardTop}><span className={styles.logo} data-provider={integration.id} aria-hidden="true">
@@ -82,7 +83,7 @@ function IntegrationCard({ integration, russian, status, onOpen, copy }: {
     </span><span className={styles.category}>{copy.groups[integration.group]}</span></span>
     <strong className={styles.name}>{integration.name}</strong>
     <span className={styles.description}>{russian ? integration.description.ru : integration.description.en}</span>
-    <span className={styles.cardFoot}><IntegrationStatusBadge status={status} copy={copy} />
+    <span className={styles.cardFoot}>{companyStatus ? <span>{companyStatus === "active" ? (russian ? "Активен в компании" : "Company active") : (russian ? "Не активен в компании" : "Company inactive")}</span> : <IntegrationStatusBadge status={status} copy={copy} />}
       {onOpen && <span className={styles.openLabel}>{russian ? status === "connected" ? "Управлять" : "Настроить" : status === "connected" ? "Manage" : "Set up"}<ArrowUpRight size={15} /></span>}
     </span>
   </>;
