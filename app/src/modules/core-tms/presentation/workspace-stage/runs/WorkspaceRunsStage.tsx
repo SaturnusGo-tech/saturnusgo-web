@@ -11,7 +11,7 @@ import { RunRepositoryBrowser } from "../../runs/repository/RunRepositoryBrowser
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { RunsView } from "../../runs/RunsView";
-import { useImpactList } from "../../../impact/application/list/useImpactList";
+import { useRunImpact } from "../../../impact/application/run/useRunImpact";
 import { RunImpactSummary } from "../../../impact/presentation/run/RunImpactSummary";
 import { TessiqLoader } from "../../common/loading/TessiqLoader";
 export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
@@ -21,9 +21,9 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
   const repository = useRunRepository(model, locale === "ru");
   const execution = useRunExecutionNavigation(model, repository, executionDirty);
   const impactScope = { workspaceId: model.data.workspace.id, projectId: model.project?.id ?? "" };
-  const impactEnabled = model.connection === "connected" && Boolean(model.selectedRun)
+  const impactEligible = model.connection === "connected" && Boolean(model.selectedRun)
     && model.data.meta.authorization.capabilities.includes("integration:read");
-  const impact = useImpactList(impactScope, impactEnabled, locale === "ru", model.selectedRun?.id);
+  const { enabled: impactEnabled, impact, startBlocked } = useRunImpact(impactScope, impactEligible, locale === "ru", model.selectedRun?.id);
   if (model.runResourceError) return <div role="alert">
     <p>{locale === "ru" ? "Не удалось открыть выбранный прогон. Проверьте доступ и повторите загрузку." : "The selected run could not be opened. Check access and retry."}</p>
     <button type="button" onClick={model.retryRunResource}>{locale === "ru" ? "Повторить" : "Retry"}</button>
@@ -45,7 +45,7 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
           onOpenCaseActivity={(caseId) => visitWorkspace(buildCaseDeepLink(window.location.href, {
             workspaceId: model.data.workspace.id, projectId: model.project!.id, caseId,
           }, { activity: true }))} />}
-        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={impactEnabled && (!impact.ready || Boolean(impact.error) || impact.items.some((item) => !item.approved))} />}
+        navigation={<RunRepositoryBrowser model={model} repository={repository} onEditRun={onEditRun} draftDirty={executionDirty} lifecycleBlocked={executionDirty || execution.pending} startBlocked={startBlocked} />}
         onDirtyChange={setExecutionDirty}
         workspaceId={model.data.workspace.id}
         offline={model.connection === "demo"}
