@@ -15,6 +15,7 @@ test("AI category and search expose a working Codex tile to managed users", () =
   const view = create(<IntegrationCatalog russian={false} copy={hooksCopy(false)} configuration={null} status={null} statusFailed={false}
     onRefresh={() => {}} onOpenYouTrack={() => {}} onOpenCodex={() => { opened = true; }} codexStatus="available" showCodex
     swaggerStatus="available" connections={[]} connectorState="ready" projectId="p" onOpenConnector={() => {}} />);
+  act(() => view.root.findByProps({ "aria-label": "Catalog options" }).props.onClick());
   const ai = view.root.findAllByType("button").find(node => node.children.includes("AI"))!;
   act(() => ai.props.onClick());
   const codex = view.root.findAllByType("button").find(node => node.findAllByType("strong").some(strong => strong.children.includes("Codex")));
@@ -24,6 +25,40 @@ test("AI category and search expose a working Codex tile to managed users", () =
   const search = view.root.findByProps({ type: "search" });
   act(() => search.props.onChange({ target: { value: "not-codex" } }));
   assert.match(JSON.stringify(view.toJSON()), /No services here/);
+});
+
+test("catalog options filter existing services and Connect opens an actionable service only", () => {
+  const opened: string[] = [];
+  const view = create(<IntegrationCatalog russian={false} copy={hooksCopy(false)} configuration={null} status={null} statusFailed={false}
+    onRefresh={() => {}} onOpenYouTrack={() => opened.push("youtrack")} onOpenCodex={() => opened.push("codex")} codexStatus="available" showCodex
+    swaggerStatus="available" connections={[]} connectorState="ready" projectId="p" onOpenConnector={provider => opened.push(provider)} />);
+  act(() => view.root.findByProps({ "aria-label": "Catalog options" }).props.onClick());
+  const soon = view.root.findByProps({ role: "dialog" }).findAllByType("button").find(node => node.children.includes("Coming soon"))!;
+  act(() => soon.props.onClick());
+  assert.equal(view.root.findAllByType("strong").some(node => node.children.includes("GitLab")), true);
+  assert.equal(view.root.findAllByType("strong").some(node => node.children.includes("YouTrack")), false);
+  act(() => view.root.findByProps({ "aria-label": "Connect" }).props.onClick());
+  const chooser = view.root.findByProps({ role: "dialog" });
+  assert.equal(chooser.findAllByType("button").some(node => node.children.includes("GitLab")), false);
+  act(() => chooser.findAllByType("button").find(node => node.children.includes("YouTrack"))!.props.onClick());
+  assert.deepEqual(opened, ["youtrack"]);
+  assert.equal(view.root.findAllByProps({ role: "dialog" }).length, 0);
+  act(() => view.unmount());
+});
+
+test("API shortcut reuses its real catalog group and the options dialog closes on Escape", () => {
+  const view = create(<IntegrationCatalog russian={false} copy={hooksCopy(false)} configuration={null} status={null} statusFailed={false}
+    onRefresh={() => {}} onOpenYouTrack={() => {}} onOpenCodex={() => {}} codexStatus="available" showCodex
+    swaggerStatus="available" connections={[]} connectorState="ready" projectId="p" onOpenConnector={() => {}} />);
+  act(() => view.root.findAllByType("button").find(node => node.children.includes("API & contracts"))!.props.onClick());
+  assert.deepEqual(view.root.findAllByType("strong").map(node => node.children[0]), ["Swagger"]);
+  act(() => view.root.findByProps({ "aria-label": "Catalog options" }).props.onClick());
+  const dialog = view.root.findByProps({ role: "dialog" });
+  let prevented = false;
+  act(() => dialog.parent!.props.onKeyDown({ key: "Escape", preventDefault() { prevented = true; }, stopPropagation() {} }));
+  assert.equal(prevented, true);
+  assert.equal(view.root.findAllByProps({ role: "dialog" }).length, 0);
+  act(() => view.unmount());
 });
 
 test("deep links and history searches resolve stable integration IDs", () => {
