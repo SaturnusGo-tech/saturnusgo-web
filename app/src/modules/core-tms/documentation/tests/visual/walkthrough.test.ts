@@ -39,7 +39,7 @@ test("practical guide articles contain complete, captioned screenshot sequences"
     for (const step of block.steps) {
       assert.ok(step.title && step.instruction.length > 40 && step.result.length > 40, article.id);
       assert.ok(step.image.alt.length > 30, article.id);
-      assert.match(step.image.src, /^\/falcon\/docs\/2026-09\/[a-z0-9-]+-en-20260928\.jpg$/);
+      assert.match(step.image.src, /^\/falcon\/docs\/(?:2026-09\/[a-z0-9-]+-en-20260928|2026-11\/falcon-codex-(?:setup|config|consent|permissions)-en)\.jpg$/);
     }
   }
 });
@@ -55,7 +55,10 @@ test("every published screenshot has accurate dimensions and fits the asset budg
   }
   assert.ok(total < 8_000_000, "guide screenshot budget");
   const assets = readdirSync("public/falcon/docs/2026-09").filter((file) => file.endsWith(".jpg")).sort();
-  const current = [...used.keys()].map(src => src.split("/").pop()).sort();
+  const current = [...used.keys()].filter(src => src.startsWith("/falcon/docs/2026-09/")).map(src => src.split("/").pop()).sort();
+  const newAssets = readdirSync("public/falcon/docs/2026-11").filter(file => file.endsWith(".jpg")).sort();
+  const newCurrent = [...used.keys()].filter(src => src.startsWith("/falcon/docs/2026-11/")).map(src => src.split("/").pop()).sort();
+  assert.deepEqual(newAssets, newCurrent);
   const retained = historicalGuideMedia.filter(item => item.locale === "en").map(item => item.src.split("/").pop()!);
   assert.deepEqual(current, Object.keys(screenshots).map(key => `${key}.jpg`).sort());
   assert.deepEqual(assets, [...current, ...retained].sort(), "only the explicit historical compatibility assets may remain outside the current guide");

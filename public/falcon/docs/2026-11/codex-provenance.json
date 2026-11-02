@@ -1,0 +1,74 @@
+{
+  "capturedAt": "2026-11-02T04:43:31.583909+00:00",
+  "frontendSource": "09ba4a69e",
+  "backendSource": "7acb8ad",
+  "method": "Actual Falcon components and server consent renderer captured in a supported in-app browser; JPEG transcoded from original PNG without semantic edits.",
+  "data": "Synthetic example.test company and project; not a production OAuth transaction. No consent approved or real grants created. Copy the URL from your own company setup, not the example.",
+  "desktopCodexScreenshots": "Unavailable; none fabricated.",
+  "files": [
+    {
+      "file": "/falcon/docs/2026-11/falcon-codex-setup-en.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "a919b530be3091695c3c7a92945cbbda7731fd73ec910f17ec0b4c38b88a0ef4",
+      "sourcePng": "falcon-codex-setup-en.png",
+      "sourcePngSha256": "a0029627c4d271306078d2f83f201534a26377c8775f94e999d214d036eea768"
+    },
+    {
+      "file": "/falcon/docs/2026-11/falcon-codex-config-en.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "68eb274f4a1fa3830b1adcd035417f6b5924d3e913f6a0889a25364645dc4b32",
+      "sourcePng": "falcon-codex-config-en.png",
+      "sourcePngSha256": "d1d22eaed93560aeee8d4c3266b216d9dd70b3e5d290c6f79b8fd4c38e0ba570"
+    },
+    {
+      "file": "/falcon/docs/2026-11/falcon-codex-consent-en.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "82a1cb530eeb682a81f826801c6da02defb1fc90d642e6f3b42134570860097f",
+      "sourcePng": "falcon-codex-consent-en.png",
+      "sourcePngSha256": "0292d8bb12c820ba868011c3485e75dd08b870b7048ca3c1f484cccc209c5ff7"
+    },
+    {
+      "file": "/falcon/docs/2026-11/falcon-codex-permissions-en.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "e25ebde19bc853ca313cc5231065822ec1a002ed1add13345ebd9d9952e4aaac",
+      "sourcePng": "falcon-codex-permissions-en.png",
+      "sourcePngSha256": "b486c45310f1e54372467736f3af54ecff2715e4caa15b8a43f902b33a97deae"
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/falcon-codex-setup-ru.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "63f30f14420de571a720fc192bc70eff8e72abe82d13cc4d365bca69a176e3d6",
+      "sourcePng": "falcon-codex-setup-ru.png",
+      "sourcePngSha256": "4bb677ae646cd03a542eb0b6a1508347a6f3e0230be8a0a09fe2c34e9b76faa6"
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/falcon-codex-config-ru.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "ae76466bdc4f302e8f21164d93bd9893564c51095a86a6f18ea0decc2152facf",
+      "sourcePng": "falcon-codex-config-ru.png",
+      "sourcePngSha256": "11d2d1cd1b304bc0d5ada566b39188b6f3e05e9d6fe954f4e19968f6f6dad054"
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/falcon-codex-consent-ru.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "da5e158a800646f4efa49aa6e2e080bb4c7605a0500d05de88c7f114353d7aaf",
+      "sourcePng": "falcon-codex-consent-ru.png",
+      "sourcePngSha256": "88352bdde32276b02baf791225a9fd177e01eb1fc5ff66e61746ccf9643d7a20"
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/falcon-codex-permissions-ru.jpg",
+      "width": 1280,
+      "height": 720,
+      "sha256": "bec78eb614dd1c47bdd2b461760a920ca4907d476ae414108b93066c71bda282",
+      "sourcePng": "falcon-codex-permissions-ru.png",
+      "sourcePngSha256": "25c70d202471e3fe2aa965fe87d9bc8e9a70830e7c0ab83cd76ef29c5592ee2c"
+    }
+  ]
+}

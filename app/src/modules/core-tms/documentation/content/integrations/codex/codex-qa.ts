@@ -1,5 +1,7 @@
 import { articles, bullets, note, paragraph, section, steps, table, warning, type DocArticle } from "../../../model/article";
 
+import { codexWalkthrough } from "./walkthrough";
+
 export const codexQaArticle: DocArticle = {
   id: "codex-web-qa", title: "Codex: connected web QA", group: "integrations",
   description: "Connect Codex to your company, review a web QA plan, run observed checks, and resume with authoritative Falcon records.",
@@ -19,6 +21,9 @@ export const codexQaArticle: DocArticle = {
       ["Authenticate", "Choose Authenticate. In the browser sign in to your company Falcon account, choose projects, and review the requested permissions. Approve only what you accept. No API key or client secret is needed."],
       ["Try a task", "Return to Codex and ask it to find existing cases or prepare a QA plan. Review the plan before approving writes or execution. The setup page also provides TOML and CLI commands with explicit scopes."]),
       warning("Connection problems", "If the seat quota is full, ask an administrator to free or change a seat. If access is denied, check your company entitlement and QA role. If authentication fails, retry with the company URL and your own account; contact an administrator if it persists. Never share tokens, cookies or MFA codes in chat.")),
+    section("visual-flow", "Falcon setup and consent", codexWalkthrough),
+    section("permissions", "Choose permissions for the work", paragraph("Read cases, runs and reports is required. For read-only research or finding existing cases, leave every optional permission unchecked; this cannot execute tests or change results. Choose only the projects needed."),
+      paragraph("For an end-to-end QA workflow, select the permissions the reviewed task actually requires: Create test cases and Write test cases for new or revised cases; Manage case repository, Manage suites and Manage environments only when those changes are needed; Create test runs and Manage runs for run preparation and management; Execute runs for recording execution; Manage defects and Manage attachments for failure records and evidence; and Manage QA workflows for the workflow. Your role and project access still apply. Review each action and do not approve all permissions automatically.")),
     section("plan", "Prepare the QA task", steps(
       ["Choose the basis and target", "A URL can start read-only research. If adequate reviewed Falcon cases already exist, execute their exact immutable revisions without an extra website capture, PDF or Figma. Otherwise provide explicit requirements or review proposed expectations and assumptions from URL research; PDF/Figma remain supported. State the website area, permitted origins and disposable effects."],
       ["Capture research privately", "Before a workflow exists, Codex may inspect the requested area without business or test effects, messages, payments, accounts or verdicts. URL research pins an actual private project file, content SHA, capture time and source URL. In the web source, source.scope names the website area, not OAuth permissions. The observed page describes today's implementation; matching its own capture does not prove a requirement. Review complete proposed cases and expectations before case writes."],

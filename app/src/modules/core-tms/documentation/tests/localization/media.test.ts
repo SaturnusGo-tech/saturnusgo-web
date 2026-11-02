@@ -10,7 +10,7 @@ test("Russian guide uses its own complete screenshot inventory with valid dimens
   const used = new Map(documentationCatalog("ru", true).docArticles.flatMap(a => a.sections.flatMap(s =>
     s.blocks.flatMap(b => b.kind === "walkthrough" ? b.steps.map(step => [step.image.src, step.image] as const) : []))));
   for (const [src, image] of used) {
-    assert.ok(src.startsWith("/falcon/docs/2026-09-ru/"), src);
+    assert.match(src, /^\/falcon\/docs\/(?:2026-09-ru\/[a-z0-9-]+|2026-11-ru\/falcon-codex-(?:setup|config|consent|permissions)-ru)\.jpg$/);
     assert.ok(image.alt.length > 20, src);
     const bytes = readFileSync(resolve("public", src.slice(1)));
     assert.equal(bytes.readUInt16BE(0), 0xffd8, src);
@@ -25,7 +25,10 @@ test("Russian guide uses its own complete screenshot inventory with valid dimens
     assert.deepEqual(dimensions, { width: image.width, height: image.height }, src);
   }
   const assets = readdirSync("public/falcon/docs/2026-09-ru").filter(f => f.endsWith(".jpg")).sort();
-  const current = [...used.keys()].map(src => src.split("/").pop()).sort();
+  const current = [...used.keys()].filter(src => src.startsWith("/falcon/docs/2026-09-ru/")).map(src => src.split("/").pop()).sort();
+  const newAssets = readdirSync("public/falcon/docs/2026-11-ru").filter(f => f.endsWith(".jpg")).sort();
+  const newCurrent = [...used.keys()].filter(src => src.startsWith("/falcon/docs/2026-11-ru/")).map(src => src.split("/").pop()).sort();
+  assert.deepEqual(newAssets, newCurrent);
   const retained = historicalGuideMedia.filter(item => item.locale === "ru").map(item => item.src.split("/").pop()!);
   assert.deepEqual(current, Object.keys(screenshots).map(key => `${key}.jpg`).sort());
   assert.deepEqual(assets, [...current, ...retained].sort(), "only the explicit historical compatibility assets may remain outside the current guide");
