@@ -15,3 +15,8 @@
 .notice { font-size:12px; }
 @media(max-width:600px) { .panel { padding:14px; } .actions > * { flex:1; text-align:center; } }
 @media(prefers-reduced-motion:reduce) { .panel * { transition:none !important; animation:none !important; } }
+
+.compact { padding:12px 14px; }
+.compact .header { margin-bottom:6px; }
+.compact p { margin:4px 0; }
+.compact .actions { margin-top:8px; }

@@ -86,3 +86,15 @@ test("pending tester, full quota manager and active viewer receive qualified gui
     if (row.occupied === row.limit) assert.match(text, /seat quota is full/);
   }
 });
+test("compact setup has one shared refresh, one seat explanation and semantic ordered steps", () => {
+  const view = create(<CodexDetail state={state} locale="en" onBack={() => {}} />);
+  const buttons = view.root.findAllByType("button").filter(button => button.children.includes("Refresh"));
+  assert.equal(buttons.length, 1);
+  const text = JSON.stringify(view.toJSON());
+  assert.equal((text.match(/One Codex employee occupies one billable seat/g) ?? []).length, 1);
+  const lists = view.root.findAllByType("ol");
+  assert.equal(lists.length, 1);
+  assert.equal(lists[0].findAllByType("li").length, 5);
+  assert.match(text, /Disable for company/);
+  assert.match(text, /Connections for this account/);
+});
