@@ -8,6 +8,7 @@ import { visitWorkspace } from '../../../state/navigation/browser/workspace-hist
 import { useNotificationInbox } from '../application/useNotificationInbox';
 import { useInboxPopup } from '../presentation/popup/useInboxPopup';
 import { NotificationInbox } from '../presentation/NotificationInbox';
+import { notificationSettingsHref } from '../model/presentation';
 import css from '../presentation/inbox.module.css';
 
 export function NotificationBell({ workspaceId, connected, navigationClasses }: {
@@ -28,12 +29,7 @@ export function NotificationBell({ workspaceId, connected, navigationClasses }: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, connected, popup.open]);
   const navigate = (href: string) => { popup.dismiss(); visitWorkspace(href); };
-  const settings = () => {
-    const url = new URL('/testcases/umbrella-home/work/', window.location.origin);
-    url.searchParams.set('workspaceId', workspaceId); url.searchParams.set('view', 'config'); url.searchParams.set('settings', 'notifications');
-    const project = new URLSearchParams(window.location.search).get('projectId'); if (project) url.searchParams.set('projectId', project);
-    navigate(url.href);
-  };
+  const settings = () => navigate(notificationSettingsHref(window.location.href, workspaceId));
   const content = popup.open && <NotificationInbox panel={popup.panel} id={id} model={model} locale={locale} workspaceId={workspaceId} pageUrl={window.location.href}
     fallback={Boolean(popup.portalHost)} onClose={popup.close} onNavigate={navigate} onSettings={settings}/>;
   return <div className={css.root} ref={popup.root}>

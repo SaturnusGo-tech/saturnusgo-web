@@ -39,19 +39,21 @@ async function setup(t: TestContext, initialCollapsed = true) {
   return { root, win, doc, popup, outside, independent, changes, collapsed: () => collapsed, reveal: () => reveal, emit, tick };
 }
 
-test("hover peeks temporarily without changing saved width; leaving closes the peek", async t => {
+test("a manually closed rail ignores hover and focus until a deliberate open gesture", async t => {
   const h = await setup(t); await h.emit(h.root, "pointerenter"); assert.equal(h.collapsed(), true);
-  await h.tick(120); assert.equal(h.reveal().revealed, true); assert.equal(h.collapsed(), true); assert.deepEqual(h.changes, []);
+  await h.tick(500); assert.equal(h.reveal().revealed, false);
+  await h.emit(h.root, "focusin"); assert.equal(h.reveal().revealed, false);
   await h.emit(h.root, "pointerleave", { relatedTarget: h.outside }); await h.tick(200);
   assert.equal(h.reveal().revealed, false); assert.equal(h.collapsed(), true); assert.deepEqual(h.changes, []);
 });
 
-test("keyboard focus peeks and owned Escape dismisses without saving or immediately reopening", async t => {
-  const h = await setup(t); await h.emit(h.root, "focusin"); assert.equal(h.reveal().revealed, true);
+test("owned Escape explicitly closes reveal mode until a deliberate keyboard reopen", async t => {
+  const h = await setup(t, false); await h.emit(h.root, "focusin"); assert.equal(h.reveal().revealed, true);
   h.doc.activeElement = h.root; await h.emit(h.doc, "keydown", { key: "Escape" }); assert.equal(h.reveal().revealed, false);
   await h.emit(h.root, "pointerenter"); await h.tick(120); assert.equal(h.reveal().revealed, false);
-  await h.emit(h.root, "pointerleave"); await h.emit(h.root, "pointerenter"); await h.tick(120); assert.equal(h.reveal().revealed, true);
-  assert.deepEqual(h.changes, []);
+  await h.emit(h.root, "pointerleave"); await h.emit(h.root, "pointerenter"); await h.tick(120); assert.equal(h.reveal().revealed, false);
+  await act(async () => h.reveal().setCollapsed(false)); assert.equal(h.reveal().revealed, true);
+  assert.deepEqual(h.changes, [true, false]);
 });
 
 test("long press then horizontal drag collapses and suppresses its click; vertical scroll stays native", async t => {
@@ -74,13 +76,22 @@ test("a quick or cancelled drag cannot change the saved sidebar width", async t 
   await h.emit(h.win, "pointercancel", { clientX: 100 }); assert.deepEqual(h.changes, []);
 });
 
-test("long press and drag right can reopen a collapsed rail", async t => {
+test("drag right enables transient reveal; drag left disables subsequent hover and focus", async t => {
   const h = await setup(t); await h.emit(h.root, "pointerdown", { pointerType: "touch", clientX: 10 }); await h.tick(180);
   await h.emit(h.win, "pointermove", { clientX: 90 }); await h.emit(h.win, "pointerup", { clientX: 90 });
   assert.equal(h.collapsed(), false); assert.deepEqual(h.changes, [false]);
-  assert.equal(h.reveal().revealed, false);
+  assert.equal(h.reveal().revealed, true);
   await h.emit(h.root, "pointerleave"); await h.tick(250); await h.emit(h.doc, "pointerdown");
-  assert.equal(h.collapsed(), false); assert.deepEqual(h.changes, [false]);
+  assert.equal(h.reveal().revealed, false); assert.equal(h.collapsed(), false); assert.deepEqual(h.changes, [false]);
+  await h.emit(h.root, "pointerenter"); await h.tick(120); assert.equal(h.reveal().revealed, true);
+  await h.emit(h.root, "pointerleave"); await h.tick(200); assert.equal(h.reveal().revealed, false);
+  await h.emit(h.doc, "keydown", { key: "Tab" }); await h.emit(h.root, "focusin"); assert.equal(h.reveal().revealed, true);
+  await h.emit(h.root, "focusout", { relatedTarget: h.outside }); await h.tick(200); assert.equal(h.reveal().revealed, false);
+  await h.emit(h.root, "pointerdown", { clientX: 180 }); await h.tick(180);
+  await h.emit(h.win, "pointermove", { clientX: 90 }); await h.emit(h.win, "pointerup", { clientX: 90 });
+  assert.equal(h.collapsed(), true); assert.deepEqual(h.changes, [false, true]);
+  await h.emit(h.root, "pointerleave"); await h.emit(h.root, "pointerenter"); await h.tick(500);
+  await h.emit(h.root, "focusin"); assert.equal(h.reveal().revealed, false);
 });
 
 test("unrelated Escape leaves an expanded sidebar unchanged; owned Escape closes it", async t => {
@@ -107,23 +118,23 @@ test("resize boundary drag works immediately and boundary hover does not reopen 
 });
 
 test("owned portal menus preserve the peek until pointer and focus leave navigation", async t => {
-  const h = await setup(t); await h.emit(h.root, "pointerenter"); await h.tick(120);
+  const h = await setup(t, false); await h.emit(h.root, "pointerenter"); await h.tick(120);
   await h.emit(h.root, "pointerleave", { relatedTarget: h.popup }); await h.tick(250);
   assert.equal(h.reveal().revealed, true);
   await h.emit(h.doc, "pointerover"); await h.tick(200); assert.equal(h.reveal().revealed, false);
   assert.deepEqual(h.changes, []);
 });
 
-test("pressing the body cancels pending hover and manual open pins instead of peeking", async t => {
+test("pressing the body cannot reveal a disabled rail before the open gesture commits", async t => {
   const h = await setup(t); await h.emit(h.root, "pointerenter");
   await h.emit(h.root, "pointerdown", { clientX: 10 }); await h.emit(h.root, "focusin"); await h.tick(180);
   assert.equal(h.reveal().revealed, false);
   await h.emit(h.win, "pointermove", { clientX: 90 }); await h.emit(h.win, "pointerup", { clientX: 90 });
-  assert.equal(h.collapsed(), false); assert.equal(h.reveal().revealed, false); assert.deepEqual(h.changes, [false]);
+  assert.equal(h.collapsed(), false); assert.equal(h.reveal().revealed, true); assert.deepEqual(h.changes, [false]);
 });
 
 for (const id of ["nav-account", "nav-notifications"]) test(`${id} hover/focus and its portal never reveal the main sidebar`, async t => {
-  const h = await setup(t), item = h.independent.find(value => value.id === id)!;
+  const h = await setup(t, false), item = h.independent.find(value => value.id === id)!;
   await h.emit(h.root, "pointerenter"); await h.emit(h.root, "pointerover", { target: item.control }); await h.tick(120);
   assert.equal(h.reveal().revealed, false);
   await h.emit(h.root, "focusin", { target: item.control }); assert.equal(h.reveal().revealed, false);

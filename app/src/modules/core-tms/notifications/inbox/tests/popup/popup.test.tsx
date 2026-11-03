@@ -5,6 +5,8 @@ import { popupHarness } from "./support/harness";
 test("native inbox remains in top layer, fits resized viewports and Escape restores the bell", t => {
   const h = popupHarness(t); h.open();
   assert.equal(h.state().portalHost, null); assert.equal(h.panel.shown, true); assert.equal(h.heading.focused, 1);
+  assert.equal(h.panel.style.width, "400px"); assert.equal(h.panel.style.height, "430px");
+  h.resize(410, 900); assert.equal(h.panel.style.width, "390px"); assert.equal(h.panel.style.left, "10px");
   h.resize(320, 240); assert.equal(h.panel.style.width, "300px"); assert.equal(h.panel.style.height, "220px");
   assert.equal(h.panel.style.left, "10px"); assert.equal(h.panel.style.top, "10px");
   const escape = h.emit(h.panel, "keydown", undefined, "Escape");

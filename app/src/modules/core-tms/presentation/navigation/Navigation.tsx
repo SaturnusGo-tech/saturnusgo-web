@@ -15,6 +15,7 @@ import { SidebarSectionsMenu } from "./sections-menu/SidebarSectionsMenu";
 import { RareNavigationMenu } from "./overflow/RareNavigationMenu";
 import css from "./styles/sidebar-system.module.css";
 import { useSidebarReveal } from "./reveal/useSidebarReveal";
+import { NavigationTooltip } from "./tooltip/NavigationTooltip";
 
 export function Navigation({ view, onChange, disabled, connected, collapsed, onCollapsedChange, workspaceId, activeRunCount, userCapabilities }: {
   view: View; onChange: (view: View) => void; disabled: boolean; collapsed: boolean;
@@ -24,7 +25,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
   const session = useOptionalTmsSession();
   const root = useRef<HTMLElement>(null);
   const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
-  const compact = collapsed && !reveal.revealed;
+  const compact = !reveal.revealed;
   const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, session?.kind === "managed") && workspaceViewAllowed(candidate, userCapabilities, session?.kind === "managed");
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
@@ -46,7 +47,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
     className={`${shellStyles.navigation} ${compact ? shellStyles.navigationCollapsed : ""} ${css.system}`} aria-label={t("nav.ariaLabel")}>
     <div className={css.header}>
       <button type="button" className={css.brand} onClick={() => navigate(available("dashboard") ? "dashboard" : "cases")}
-        aria-label={t("header.dashboardAria")}>
+        aria-label={t("header.dashboardAria")} data-nav-label={t("header.dashboardAria")}>
         <span className={css.mark} aria-hidden="true"/><span className={css.wordmark} aria-hidden="true">FALCON</span>
       </button>
     </div>
@@ -61,6 +62,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
       <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>
       <NavigationProfile collapsed={compact} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
     </div>
+    <NavigationTooltip collapsed={collapsed && compact} root={root}/>
     <div className={css.resizeHandle} data-sidebar-resize role="separator" aria-orientation="vertical" tabIndex={0}
       aria-label={locale === "ru" ? "Ширина навигации" : "Navigation width"} aria-valuemin={52} aria-valuemax={240} aria-valuenow={compact ? 52 : 240}
       aria-valuetext={locale === "ru" ? (compact ? "Свёрнута" : "Развёрнута") : (compact ? "Collapsed" : "Expanded")}

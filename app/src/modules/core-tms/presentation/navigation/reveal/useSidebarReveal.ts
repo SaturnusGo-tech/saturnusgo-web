@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-/** Hover peeks without saving; deliberate drags pin the same width into the layout. */
+/** A deliberate open enables transient reveals; a deliberate close disables them. */
 export function useSidebarReveal(root: RefObject<HTMLElement | null>, collapsed: boolean, onCollapsedChange: (next: boolean) => void) {
-  const [revealed, setRevealed] = useState(false), current = useRef({ collapsed, onCollapsedChange });
-  const actions = useRef({ dismiss: () => {}, setCollapsed: (_next: boolean) => {} });
+  const [revealed, setRevealed] = useState(!collapsed), current = useRef({ collapsed, onCollapsedChange });
+  const actions = useRef({ dismiss: () => {}, setCollapsed: (_next: boolean) => {}, sync: (_next: boolean) => {} });
   useEffect(() => { current.current = { collapsed, onCollapsedChange }; }, [collapsed, onCollapsedChange]);
+  useEffect(() => { actions.current.sync(collapsed); }, [collapsed]);
   useEffect(() => {
     const element = root.current;
     if (!element) return;
-    let shown = false, suppressed = false, touch = false, blockClick = false, fromPointer = false, independentHovered = false;
+    let shown = !current.current.collapsed, suppressed = false, touch = false, blockClick = false, fromPointer = false, independentHovered = false;
     let opening: ReturnType<typeof setTimeout> | undefined, closing: ReturnType<typeof setTimeout> | undefined, pressing: ReturnType<typeof setTimeout> | undefined;
     let gesture: { x: number; y: number; id: number; horizontal: boolean; armed: boolean; capture?: HTMLElement } | null = null;
     const clearOpening = () => { clearTimeout(opening); opening = undefined; };
@@ -28,19 +29,22 @@ export function useSidebarReveal(root: RefObject<HTMLElement | null>, collapsed:
         const id = trigger.getAttribute("aria-controls");
         return !!id && document.getElementById(id)?.contains(target as Node);
       }));
-    const hide = () => { clearOpening(); clearClosing(); shown = false; setRevealed(false); };
+    const hide = () => { clearOpening(); clearClosing(); shown = window.innerWidth <= 760 && !current.current.collapsed; setRevealed(shown); };
+    const show = () => { clearOpening(); clearClosing(); if (!current.current.collapsed) { shown = true; setRevealed(true); } };
     const change = (next: boolean) => {
-      hide(); suppressed = next;
-      if (current.current.collapsed !== next) current.current.onCollapsedChange(next);
+      const previous = current.current.collapsed;
+      current.current.collapsed = next; suppressed = next;
+      if (next) hide(); else show();
+      if (previous !== next) current.current.onCollapsedChange(next);
     };
-    actions.current = { dismiss: () => { hide(); suppressed = true; }, setCollapsed: change };
-    const show = () => { clearOpening(); clearClosing(); if (current.current.collapsed) { shown = true; setRevealed(true); } };
+    actions.current = { dismiss: () => { hide(); suppressed = true; }, setCollapsed: change,
+      sync: next => { current.current.collapsed = next; if (next) hide(); else show(); } };
     const edgeFor = (target: EventTarget | null) => (target as Element | null)?.closest?.<HTMLElement>("[data-sidebar-resize]");
     const enter = (event: PointerEvent) => {
       if (independentHovered || independent(event.target)) { hide(); return; }
       const right = element.getBoundingClientRect?.().right;
       if (edgeFor(event.target) || gesture || (right !== undefined && event.clientX >= right - 8)) { clearOpening(); return; }
-      if (event.pointerType === "touch" || suppressed || !current.current.collapsed || window.innerWidth <= 760) return;
+      if (event.pointerType === "touch" || suppressed || current.current.collapsed || window.innerWidth <= 760) return;
       fromPointer = true; clearClosing();
       if (!shown && !opening) opening = setTimeout(show, 120);
     };
@@ -55,7 +59,7 @@ export function useSidebarReveal(root: RefObject<HTMLElement | null>, collapsed:
     };
     const focus = (event: FocusEvent) => {
       if (independent(event.target)) { hide(); return; }
-      if (!edgeFor(event.target) && !gesture && !touch && !suppressed && window.innerWidth > 760) show();
+      if (!current.current.collapsed && !edgeFor(event.target) && !gesture && !touch && !suppressed && window.innerWidth > 760) show();
     };
     const blur = (event: FocusEvent) => { if (!owns(event.relatedTarget)) { clearClosing(); closing = setTimeout(hide, 200); } };
     const outside = (event: Event) => { if (independent(event.target) || (shown && !owns(event.target))) hide(); };
@@ -108,7 +112,7 @@ export function useSidebarReveal(root: RefObject<HTMLElement | null>, collapsed:
     window.addEventListener("pointermove", move, { passive: false }); window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", cancelGesture); window.addEventListener("blur", windowBlur); window.addEventListener("resize", resize);
     return () => {
-      clearOpening(); clearClosing(); cancelGesture(); actions.current = { dismiss: () => {}, setCollapsed: () => {} };
+      clearOpening(); clearClosing(); cancelGesture(); actions.current = { dismiss: () => {}, setCollapsed: () => {}, sync: () => {} };
       element.removeEventListener("pointerenter", enter); element.removeEventListener("pointerleave", leave); element.removeEventListener("pointerover", over);
       element.removeEventListener("focusin", focus); element.removeEventListener("focusout", blur); element.removeEventListener("pointerdown", down);
       element.removeEventListener("click", click, true); element.removeEventListener("webkitmouseforcewillbegin", forcePress);
@@ -118,5 +122,5 @@ export function useSidebarReveal(root: RefObject<HTMLElement | null>, collapsed:
       window.removeEventListener("pointercancel", cancelGesture); window.removeEventListener("blur", windowBlur); window.removeEventListener("resize", resize);
     };
   }, [root]);
-  return { revealed: collapsed && revealed, dismiss: () => actions.current.dismiss(), setCollapsed: (next: boolean) => actions.current.setCollapsed(next) };
+  return { revealed, dismiss: () => actions.current.dismiss(), setCollapsed: (next: boolean) => actions.current.setCollapsed(next) };
 }

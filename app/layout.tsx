@@ -60,13 +60,13 @@ export default function RootLayout({
         <meta name="color-scheme" content="dark light" />
 
         <Script id="sg-theme-init" strategy="beforeInteractive">{`
+          var t = 'dark';
           try {
-            var t = localStorage.getItem('sg-theme') || 'dark';
-            if (t === 'system') {
-              t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.classList.toggle('dark', t === 'dark');
+            var storedTheme = localStorage.getItem('sg-theme');
+            if (storedTheme === 'light' || storedTheme === 'dark') t = storedTheme;
+            else if (storedTheme) localStorage.setItem('sg-theme', 'dark');
           } catch (_) {}
+          document.documentElement.classList.toggle('dark', t === 'dark');
         `}</Script>
 
         <Script id="sg-locale-init" strategy="beforeInteractive">{`

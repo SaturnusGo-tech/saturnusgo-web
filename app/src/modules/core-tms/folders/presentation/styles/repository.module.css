@@ -6,7 +6,7 @@
   flex-direction: column;
   min-height: 0;
   padding: 18px 9px 12px;
-  background: var(--falcon-surface);
+  background: var(--falcon-sidebar);
   border-right: 1px solid var(--falcon-border-subtle);
   color: var(--falcon-text);
   --repository-guide: var(--falcon-border-subtle);
@@ -40,7 +40,7 @@
 .branchChildren:has(> .branchGuide:focus-visible) > .children > li::after { border-color: var(--falcon-border-strong); }
 .folderRow, .leaf { display: grid; grid-template-columns: 20px var(--repository-selection-width) minmax(0, 1fr) 21px; align-items: center; column-gap: 0; padding-inline: 0 3px; border-radius: 9px; }
 .folderRow { min-height: 34px; }
-.folderRow:hover, .leaf:hover { background: color-mix(in srgb, var(--falcon-text) 5%, var(--falcon-surface)); }
+.folderRow:hover, .leaf:hover { background: color-mix(in srgb, var(--falcon-text) 5%, var(--falcon-sidebar)); }
 .folderRow[data-selected]:hover, .leaf[data-selected]:hover, .leaf[data-active]:hover { background: var(--falcon-hover); }
 .disclosure { width: 20px; }
 .folderName { min-width: 0; display: flex; align-items: center; flex: 1; gap: 7px; padding: 7px 0 7px 4px; text-align: left; font-size: 12px !important; touch-action: pan-y; }
@@ -109,7 +109,7 @@
 .branch[data-drag-source], .leaf[data-drag-source] { opacity: .34; filter: blur(.45px); }
 @media (prefers-reduced-motion: reduce) { .branch, .folderRow, .leaf { transition: none; } .branch[data-drag-source], .leaf[data-drag-source] { filter: none; } }
 
-:global([data-appearance="glass"] [data-testid="cases-view"]) .repository { padding-top: 12px; border-color: var(--falcon-border); background: transparent; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .repository { padding-top: 12px; border-color: var(--falcon-border); background: var(--falcon-sidebar); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) :is(.folderRow, .leaf) { border-radius: 12px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-weight: 600; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }

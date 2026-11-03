@@ -28,7 +28,7 @@ function contrast(a, b) { const x = luminance(a), y = luminance(b); return (Math
 
 test('neutral controls and readable body text keep AA contrast in both themes', () => {
   for (const values of Object.values(reference.themes)) {
-    for (const role of ['text', 'text-secondary', 'text-muted']) for (const surface of ['surface', 'elevated', 'control']) {
+    for (const role of ['text', 'text-secondary', 'text-muted']) for (const surface of ['chrome', 'sidebar', 'surface', 'elevated', 'control']) {
       assert.ok(contrast(values[`--falcon-${role}`], values[`--falcon-${surface}`]) >= 4.5, `${role} on ${surface}`);
     }
     for (const role of ['action', 'action-hover', 'action-active']) assert.ok(contrast(values[`--falcon-${role}`], values['--falcon-on-action']) >= 4.5, role);

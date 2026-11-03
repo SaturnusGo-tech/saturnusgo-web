@@ -29,7 +29,7 @@ export function LocalizedWorkspace() {
   const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     try {

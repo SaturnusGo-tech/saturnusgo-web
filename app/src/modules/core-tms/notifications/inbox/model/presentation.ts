@@ -10,9 +10,17 @@ export function notificationHref(value: string, current: string, workspaceId: st
       || target.pathname !== '/testcases/umbrella-home/work/'
       || target.searchParams.get('workspaceId') !== workspaceId
       || (target.origin !== base.origin && target.origin !== 'https://tms.saturnusgo.com' && !managedOrigin)) return null;
-    target.protocol = base.protocol; target.host = base.host;
+    target.protocol = base.protocol; target.host = base.host; target.pathname = base.pathname;
     return target.href;
   } catch { return null; }
+}
+
+export function notificationSettingsHref(current: string, workspaceId: string): string {
+  const url = new URL(current), project = url.searchParams.get('projectId');
+  url.search = ''; url.hash = '';
+  url.searchParams.set('workspaceId', workspaceId); url.searchParams.set('view', 'config'); url.searchParams.set('settings', 'notifications');
+  if (project) url.searchParams.set('projectId', project);
+  return url.href;
 }
 
 export function notificationTime(value: string, locale: "ru" | "en", now = Date.now()): string {

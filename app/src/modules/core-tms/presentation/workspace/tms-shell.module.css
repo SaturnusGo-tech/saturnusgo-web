@@ -947,12 +947,12 @@ button.headerMetaItem:disabled { cursor: default; opacity: .55; }
 .environmentShortcut:hover:not(:disabled) { background: var(--control-hover); color: var(--ink); }
 .environmentShortcut:focus-visible { outline: 2px solid var(--tms-focus-border); outline-offset: -2px; }
 .environmentShortcut:disabled { opacity: .4; cursor: default; }
-.shell[data-appearance="glass"] :is(.header, .navigation) { --sidebar-frame: var(--falcon-sidebar); background: var(--falcon-sidebar); }
-.shell[data-appearance="glass"] .header { background: var(--falcon-sidebar); border-bottom: 0; gap: 10px; padding-inline: 14px; }
-:global(.dark) .shell[data-appearance="glass"] :is(.header, .navigation) { --sidebar-frame: var(--falcon-sidebar); background: var(--falcon-sidebar); }
+.shell[data-appearance="glass"] :is(.header, .navigation) { --sidebar-frame: var(--falcon-chrome); background: var(--falcon-chrome); }
+.shell[data-appearance="glass"] .header { background: var(--falcon-chrome); border-bottom: 0; gap: 10px; padding-inline: 14px; }
+:global(.dark) .shell[data-appearance="glass"] :is(.header, .navigation) { --sidebar-frame: var(--falcon-chrome); background: var(--falcon-chrome); }
 .shell[data-appearance="glass"] .workspaceColumn { border-radius: 0; }
-.shell[data-appearance="glass"] .workspaceColumn { background: var(--falcon-surface); }
-:global(.dark) .shell[data-appearance="glass"] .workspaceColumn { background: var(--falcon-surface); }
+.shell[data-appearance="glass"] .workspaceColumn { background: var(--falcon-chrome); }
+:global(.dark) .shell[data-appearance="glass"] .workspaceColumn { background: var(--falcon-chrome); }
 .shell[data-appearance="glass"] .stage.stage { border-radius: 16px 16px 0 0; overflow: hidden; background: var(--glass-panel); }
 .shell[data-appearance="glass"] .projectSelectorSlot > div > button:first-child { border-radius: 8px; }
 .projectEyebrow { display: none; }

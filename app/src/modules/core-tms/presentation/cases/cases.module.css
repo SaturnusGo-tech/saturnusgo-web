@@ -43,8 +43,6 @@
   color-scheme: dark;
 }
 
-:global(.dark) .repositoryColumn,
-:global(.dark) .repository { background: var(--falcon-sidebar); }
 :global(.dark) .detailPanel { --cases-bg: var(--falcon-surface); }
 :global(.dark) .savedViewActive,
 :global(.dark) .repositoryCaseActive,
@@ -69,7 +67,7 @@
   max-width: 480px;
   min-height: 0;
   flex: 0 0 var(--case-repository-width, 280px);
-  background: var(--falcon-surface);
+  background: var(--falcon-sidebar);
   border-right: 1px solid var(--falcon-border);
   transition:
     width 170ms cubic-bezier(.2, .72, .3, 1),
@@ -82,7 +80,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--falcon-surface);
+  background: var(--falcon-sidebar);
 }
 
 .repositoryTopbar {

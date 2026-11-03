@@ -1,9 +1,43 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { notificationHref, notificationTime } from "../../model/presentation";
+import { notificationHref, notificationSettingsHref, notificationTime } from "../../model/presentation";
+import { createNavigationHistory } from "../../../../state/navigation/history/history";
 
 const current = "http://localhost:4542/testcases/umbrella-home/work/?workspaceId=w&view=cases";
 const target = "/testcases/umbrella-home/work/?workspaceId=w&projectId=p&view=runs&runId=r&runItemId=i";
+function workspaceHistory(initialHref: string) {
+  let href = initialHref;
+  const history = createNavigationHistory({ href: () => href, state: () => null,
+    replace: (_state, next) => { href = next; }, push: (_state, next) => { href = next; },
+    changed() {}, session: () => "notification-test", readEnd: () => 0, writeEnd() {},
+  });
+  return { history, href: () => href };
+}
+
+test("canonical notification events stay in the active preview workspace and retain exact entity context", () => {
+  const preview = "http://localhost:4572/testcases/umbrella-home/ui-preview/?workspaceId=w&projectId=old&view=cases";
+  const event = notificationHref(`https://tms.saturnusgo.com${target}`, preview, "w");
+  assert.ok(event);
+  const navigation = workspaceHistory(preview);
+  assert.doesNotThrow(() => navigation.history.write(event));
+  const destination = new URL(navigation.href());
+  assert.equal(destination.pathname, new URL(preview).pathname);
+  assert.equal(destination.search, new URL(target, preview).search);
+  assert.equal(notificationHref(target.replace("workspaceId=w", "workspaceId=other"), preview, "w"), null);
+  assert.equal(notificationHref(`https://evil.example${target}`, preview, "w"), null);
+});
+
+test("notification settings preserve the active workspace path and clear unrelated entity state in preview and production", () => {
+  for (const path of ["/testcases/umbrella-home/ui-preview/", "/testcases/umbrella-home/work/"]) {
+    const source = `http://localhost:4572${path}?workspaceId=w&projectId=p&view=cases&caseId=old&folderId=f#old`;
+    const navigation = workspaceHistory(source);
+    const destination = notificationSettingsHref(source, "w");
+    assert.doesNotThrow(() => navigation.history.write(destination));
+    assert.equal(navigation.href(), `http://localhost:4572${path}?workspaceId=w&view=config&settings=notifications&projectId=p`);
+  }
+  const personal = notificationSettingsHref(current, "w");
+  assert.equal(new URL(personal).searchParams.has("projectId"), false);
+});
 test("production notification links rebase to the current Falcon origin without losing exact entity context", () => {
   const url = notificationHref(`https://tms.saturnusgo.com${target}`, current, "w");
   assert.equal(url, `http://localhost:4542${target}`); assert.equal(notificationHref(target, current, "w"), url);

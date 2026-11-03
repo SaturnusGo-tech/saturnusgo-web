@@ -20,7 +20,7 @@
   --control-hover: var(--falcon-hover);
   padding: 0;
   gap: 0;
-  background-color: var(--falcon-surface);
+  background-color: var(--falcon-chrome);
   background-image: none;
   background-position: center;
   background-size: cover;
@@ -46,7 +46,7 @@
   --tms-bg-sidebar: var(--falcon-sidebar);
   --paper: var(--falcon-panel);
   --control: var(--falcon-control);
-  background-color: var(--falcon-surface);
+  background-color: var(--falcon-chrome);
 }
 @media (max-width: 760px) {
   .glass.glass[data-appearance="glass"] { padding: 0 0 58px; gap: 0; }

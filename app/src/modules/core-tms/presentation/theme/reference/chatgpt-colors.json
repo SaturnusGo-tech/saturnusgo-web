@@ -2,7 +2,13 @@
   "source": "https://chatgpt.com/settings/appearance",
   "capturedAt": "2026-11-02",
   "notes": "Read-only computed CSS from ChatGPT desktop web UI. Original System theme restored. Active appearance/build colors, not a claim of an immutable public ChatGPT specification. Semantic surface text chosen for legibility; caution/warning/discovery solid text uses the neutral ink from this same palette when white would fail contrast.",
+  "shellReference": {
+    "source": "User-supplied Codex desktop screenshot, Screenshot 2026-11-03 at 8.33.30 PM.png",
+    "updatedAt": "2026-11-03",
+    "notes": "Dark chrome, secondary navigation and content sampled from solid pixels in the supplied screenshot: #272727, #1e1e1e, #181818. Light assigns the same surface hierarchy using existing captured neutral values; it is a Falcon adaptation, not a new ChatGPT computed-style capture. Other captured roles remain unchanged."
+  },
   "roles": {
+    "--falcon-chrome": "Outer navigation and header (desktop shell reference)",
     "--falcon-surface": "--color-surface",
     "--falcon-sidebar": "--color-surface-secondary",
     "--falcon-panel": "--color-surface",
@@ -78,9 +84,10 @@
   },
   "themes": {
     "light": {
-      "--falcon-surface": "#fcfcfc",
+      "--falcon-chrome": "#f3f3f3",
+      "--falcon-surface": "#ffffff",
       "--falcon-sidebar": "#fcfcfc",
-      "--falcon-panel": "#fcfcfc",
+      "--falcon-panel": "#ffffff",
       "--falcon-elevated": "#ffffff",
       "--falcon-control": "#ffffff",
       "--falcon-hover": "#0000000d",
@@ -152,9 +159,10 @@
       "--falcon-mask": "#000000"
     },
     "dark": {
-      "--falcon-surface": "#0e0e0e",
-      "--falcon-sidebar": "#0e0e0e",
-      "--falcon-panel": "#0e0e0e",
+      "--falcon-chrome": "#272727",
+      "--falcon-surface": "#181818",
+      "--falcon-sidebar": "#1e1e1e",
+      "--falcon-panel": "#181818",
       "--falcon-elevated": "#212121",
       "--falcon-control": "#303030",
       "--falcon-hover": "#ffffff1a",

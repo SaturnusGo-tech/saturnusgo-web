@@ -1,4 +1,4 @@
-.browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 9px 12px; border-right: 1px solid var(--falcon-border-subtle); background: var(--falcon-surface); font-size: 12px; }
+.browser { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 18px 9px 12px; border-right: 1px solid var(--falcon-border-subtle); background: var(--falcon-sidebar); font-size: 12px; }
 .browser button { cursor: pointer; font: inherit; }
 .scroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
 .empty { padding: 18px 8px; color: var(--falcon-text-muted); }

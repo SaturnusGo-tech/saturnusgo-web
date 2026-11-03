@@ -51,6 +51,7 @@ function fixture(native = true) {
 test("collapsed hover uses top layer and restores native title and existing descriptions on exit", () => {
   const f = fixture(); f.nav.emit("pointerover", { target: f.button, pointerType: "mouse" });
   assert.equal(f.tip.textContent, "Test runs"); assert.equal(f.tip.shown, true);
+  assert.ok(Number.parseFloat(f.tip.style.left) > f.nav.getBoundingClientRect().right, "label stays to the right of the rail");
   assert.equal(f.button.hasAttribute("title"), false);
   assert.match(f.button.getAttribute("aria-describedby") ?? "", /existing-help/);
   assert.notEqual(f.button.getAttribute("aria-describedby"), "existing-help");

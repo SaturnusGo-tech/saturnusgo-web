@@ -19,7 +19,7 @@ export function NotificationRow({ item, locale, workspaceId, pageUrl, onRead, on
   const category = categories[item.category] ?? { icon: Bell, ru: 'Falcon', en: 'Falcon' };
   const Icon = category.icon, href = notificationHref(item.url, pageUrl, workspaceId);
   const contents = <>
-    <span className={css.eventIcon} data-kind={item.category} aria-hidden="true"><Icon size={21} strokeWidth={1.65}/></span>
+    <span className={css.eventIcon} data-kind={item.category} aria-hidden="true"><Icon size={17} strokeWidth={1.65}/></span>
     <span className={css.copy}>
       <strong>{item.title}</strong>
       {item.body && <span className={css.body}>{item.body}</span>}
