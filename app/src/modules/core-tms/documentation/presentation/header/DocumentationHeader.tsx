@@ -1,15 +1,14 @@
-import { Menu, Moon, Search, Sun, X } from "@openai/apps-sdk-ui/components/Icon";
+import { Menu, Search, X } from "@openai/apps-sdk-ui/components/Icon";
 import type { MouseEvent } from "react";
 import { useDocumentationCopy } from "../../localization/useDocumentationCopy";
 import { documentationChatId } from "../../navigation/documentation-link";
 import type { useDocumentationNavigation } from "../../navigation/useDocumentationNavigation";
 import css from "./documentation-header.module.css";
 
-export function DocumentationHeader({ navigation, chatting, treeOpen, historyOpen = false, onTreeToggle, onNavigate, onSearch, isLight, onThemeChange }: {
+export function DocumentationHeader({ navigation, chatting, treeOpen, historyOpen = false, onTreeToggle, onNavigate, onSearch }: {
   navigation: ReturnType<typeof useDocumentationNavigation>; chatting: boolean; treeOpen: boolean;
   historyOpen?: boolean;
-  onTreeToggle: () => void; onNavigate: () => void; onSearch: () => void; isLight: boolean;
-  onThemeChange: (origin: { x: number; y: number }) => void;
+  onTreeToggle: () => void; onNavigate: () => void; onSearch: () => void;
 }) {
   const copy = useDocumentationCopy();
   const docsId = navigation.documentationId;
@@ -37,10 +36,6 @@ export function DocumentationHeader({ navigation, chatting, treeOpen, historyOpe
     <div className={css.actions}>
       {!chatting && <button type="button" className={css.iconButton} onClick={onSearch} aria-label={copy.searchDocumentation}
         title={`${copy.searchDocumentation} (⌘K / Ctrl+K)`}><Search width={18} height={18} /></button>}
-      <button type="button" className={css.iconButton} aria-label={isLight ? copy.darkTheme : copy.lightTheme}
-        onClick={event => onThemeChange({ x: event.clientX, y: event.clientY })}>
-        {isLight ? <Moon width={18} height={18} /> : <Sun width={18} height={18} />}
-      </button>
     </div>
   </header>;
 }

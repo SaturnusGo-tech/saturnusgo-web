@@ -30,7 +30,7 @@ function header(href = help, locale: "en" | "ru" = "en", historyOpen = false) {
     const view = () => {
       const navigation = useNavigation("owner");
       return render({ navigation, chatting: navigation.articleId === documentationChatId, treeOpen: true, historyOpen, onTreeToggle: () => toggles++,
-        onNavigate: () => navigated++, onSearch() {}, isLight: true, onThemeChange() {} });
+        onNavigate: () => navigated++, onSearch() {} });
     };
     h.render(view);
     return nodes(h.render(view));
@@ -58,6 +58,17 @@ test("the header exposes separate localized Docs and AI links with the selected 
       h.visit(chatHref); links = h.tabs();
       assert.equal(links[0].props["aria-current"], undefined);
       assert.equal(links[1].props["aria-current"], "page");
+    } finally { h.dispose(); }
+  }
+});
+
+test("documentation and AI headers leave appearance changes in Settings", () => {
+  for (const href of [help, chatHref]) for (const locale of ["en", "ru"] as const) {
+    const h = header(href, locale);
+    try {
+      const labels = h.all().filter(node => node.type === "button").map(node => node.props["aria-label"]);
+      assert.equal(labels.includes(documentationCopy[locale].darkTheme), false);
+      assert.equal(labels.includes(documentationCopy[locale].lightTheme), false);
     } finally { h.dispose(); }
   }
 });

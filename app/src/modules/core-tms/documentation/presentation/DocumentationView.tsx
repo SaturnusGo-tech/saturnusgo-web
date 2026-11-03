@@ -3,7 +3,6 @@ import { useDocumentationCopy } from "../localization/useDocumentationCopy";
 import { useDocumentationCatalog } from "../access/useDocumentationCatalog";
 
 import { useEffect, useRef, useState } from "react";
-import { useColorMode } from "../../../../shared/_hooks/useColorMode";
 import { useDocumentationNavigation } from "../navigation/useDocumentationNavigation";
 import { DocumentationTree } from "./navigation/DocumentationTree";
 import { DocumentationArticle } from "./article/DocumentationArticle";
@@ -20,7 +19,6 @@ export function DocumentationView() {
   const { articleById, locale } = useDocumentationCatalog();
   const chat = useDocumentationChat();
   const navigation = useDocumentationNavigation(chat.owner);
-  const { isLight, toggleAnimated } = useColorMode();
   const [query, setQuery] = useState("");
   const [treeOpen, setTreeOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -77,8 +75,7 @@ export function DocumentationView() {
   function select() { setQuery(""); setTreeOpen(false); }
   return <section ref={rootRef} className={styles.root} data-documentation-workspace lang={locale} aria-label={copy.workspace}>
     <DocumentationHeader navigation={navigation} chatting={chatting} treeOpen={treeOpen} historyOpen={history.open}
-      onTreeToggle={chatting ? history.toggle : () => setTreeOpen(current => !current)} onNavigate={select} onSearch={openSearch}
-      isLight={isLight} onThemeChange={toggleAnimated} />
+      onTreeToggle={chatting ? history.toggle : () => setTreeOpen(current => !current)} onNavigate={select} onSearch={openSearch} />
     {chatting ? <DocumentationChat chat={chat} navigation={navigation} onSource={select} history={history} /> : <div className={styles.frame}>
       <aside id="documentation-sidebar" className={styles.sidebar} data-open={treeOpen}>
         <DocumentationTree navigation={navigation} query={query} onQuery={setQuery} searchRef={searchRef} onNavigate={select} onSearch={() => setTreeOpen(false)} />
