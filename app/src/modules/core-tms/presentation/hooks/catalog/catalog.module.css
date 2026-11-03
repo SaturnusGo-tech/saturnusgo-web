@@ -4,14 +4,14 @@
 .catalog {
   --catalog-bg: var(--falcon-surface); --catalog-sidebar: var(--falcon-sidebar); --catalog-hover: var(--falcon-hover); --catalog-control: var(--falcon-control); --catalog-line: var(--falcon-border);
   --catalog-ink: var(--falcon-text); --catalog-muted: var(--falcon-text-muted); --catalog-placeholder: var(--falcon-text-muted); --yt-link: var(--falcon-link);
-  display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100%; width: 100%; color: var(--catalog-ink);
+  display: grid; grid-template-columns: 240px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 100%; min-height: 0; width: 100%; overflow: hidden; color: var(--catalog-ink);
   background: var(--catalog-bg); font: 400 14px/1.45 "Falcon Store Sans", system-ui, sans-serif;
   container: integrations / inline-size;
 }
 .catalog :is(button, input) { font-family: inherit; }
 .catalog ::selection { color: var(--catalog-bg); background: var(--catalog-ink); }
 .catalog :is(button, a, input):focus-visible { outline: 2px solid var(--catalog-muted); outline-offset: 2px; box-shadow: none; }
-.sidebar { position: sticky; top: 0; align-self: start; height: 100%; min-width: 0; padding: 12px 8px 24px; border-right: 1px solid var(--catalog-line); background: var(--catalog-sidebar); }
+.sidebar { align-self: stretch; min-height: 0; min-width: 0; overflow: auto; overscroll-behavior: contain; padding: 12px 8px 24px; border-right: 1px solid var(--catalog-line); background: var(--catalog-sidebar); }
 .sidebarHeader { display: flex; align-items: center; gap: 8px; padding-inline: 8px; margin-bottom: 16px; }
 .sidebarTitle, .sidebar h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 600; letter-spacing: -.015em; }
 .sidebarNav { display: grid; gap: 0; }
@@ -23,7 +23,7 @@
 .connected button > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .smallLogo { display: grid; place-items: center; width: 18px; height: 18px; flex: none; font-size: 18px; }
 .smallLogo :is(svg, img) { display: block; width: 18px; height: 18px; object-fit: contain; }
-.main { min-width: 0; width: min(100%, 960px); margin-inline: auto; padding: 30px 30px 64px; }
+.main { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; width: min(100%, 960px); margin-inline: auto; padding: 30px 30px 64px; }
 .header { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 24px; align-items: center; }
 .header h1 { margin: 0; font-size: 24px; line-height: 36px; font-weight: 500; letter-spacing: -.025em; }
 .subtitle { grid-column: 1 / -1; color: var(--catalog-muted); font-size: 16px; line-height: 24px; margin: 0; }

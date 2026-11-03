@@ -21,7 +21,7 @@ export function CustomFieldValues({ scope, field, canManage }: { scope: CustomFi
   }
   return <section aria-labelledby="custom-field-values-title">
     <h2 id="custom-field-values-title" className={css.sectionTitle}>{ru ? "Значения поля" : "Field values"}</h2>
-    <div className={css.valueTools}><label className={css.search}><Search size={15} aria-hidden="true" /><input value={page.search}
+    <div className={css.valueTools}><label className={css.search} data-input-shell><Search size={15} aria-hidden="true" /><input value={page.search}
       aria-label={ru ? "Найти значение" : "Find a value"} placeholder={ru ? "Найти значение" : "Find a value"} onChange={event => page.setSearch(event.target.value)} /></label>
       <div className={css.headActions}><label className={css.hint}><input type="checkbox" checked={page.status === "all"}
         onChange={event => page.setStatus(event.target.checked ? "all" : "active")} /> {ru ? "Показать архивные" : "Include archived"}</label>

@@ -19,7 +19,7 @@ export function useRunKeyboardShortcuts(options: RunKeyboardShortcutOptions) {
     const item = selectedItem;
     function handleShortcut(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
-      if (event.defaultPrevented || target?.closest("[role=dialog], [role=menu], [role=listbox]")) return;
+      if (event.defaultPrevented || document.querySelector("[data-defect-page]") || target?.closest("[role=dialog], [role=menu], [role=listbox]")) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       const index = items.findIndex((entry) => entry.id === item.id);
       const activeAttempt = item.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo)

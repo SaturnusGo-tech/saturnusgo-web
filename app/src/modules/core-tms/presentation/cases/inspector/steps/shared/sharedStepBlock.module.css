@@ -2,7 +2,7 @@
 .header { min-width: 0; display: grid; grid-template-columns: 18px 24px 22px minmax(0,1fr) auto; align-items: center; gap: 2px; margin: -1px 0 3px -53px; color: var(--falcon-discovery); }
 .collapse { width: 18px; height: 22px; display: grid; place-items: center; padding: 0; color: var(--falcon-text-disabled); background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
 .collapse:hover,.collapse:focus-visible { color: var(--falcon-text); background: var(--falcon-hover); outline: 0; }
-.order { box-sizing: border-box; padding-right: 6px; color: var(--falcon-text-disabled); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+.order { box-sizing: border-box; padding-right: 12px; color: var(--falcon-text-disabled); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
 .mark { width: 22px; height: 22px; display: grid; place-items: center; margin-left: 4px; background: var(--falcon-discovery-bg); border-radius: 7px; color: var(--falcon-discovery); }
 .header strong { min-width: 0; overflow: hidden; padding-left: 4px; font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .items { display: grid; }

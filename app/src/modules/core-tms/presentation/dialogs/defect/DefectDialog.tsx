@@ -12,7 +12,7 @@ import { defectClientLabels, inferLegacyDefectIntegrationTarget, resolveDefectIn
 import { useYouTrackRouteOptions } from "../../../defects/presentation/use-youtrack-route-options";
 import { defectRouteChoices } from "../../../defects/presentation/defect-route-choices";
 import { getDefectDialogCopy } from "./copy";
-import { useDrawerDismiss } from "../../common/drawer/useDrawerDismiss";
+import { useDefectPageDismiss } from "../defect-form/page/useDefectPageDismiss";
 import type { DefectCaseSource } from "../../../defects/model/case-source";
 type DefectDialogProps = {
   sourceCase?: DefectCaseSource;
@@ -25,7 +25,7 @@ export function DefectDialog({ workspaceId, projectId, run, item, sourceCase, co
   const attachments = useAttachmentClient();
   const { locale } = useTmsLocale();
   const copy = getDefectDialogCopy(locale);
-  const { closing, dismiss, panelRef } = useDrawerDismiss();
+  const { closing, dismiss, panelRef } = useDefectPageDismiss();
   const youTrack = useYouTrackRouteOptions(workspaceId, locale);
   const occurrence = run && item ? { run, item } : null;
   const attempt = item?.attempts.find((entry) => entry.attemptNo === item.activeAttemptNo) ?? item?.attempts[0];

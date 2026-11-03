@@ -3,3 +3,5 @@
 .panel{display:flex;flex-direction:column;overflow:hidden}.options{flex:1 1 auto;min-height:0}.search,.hint{flex-shrink:0}
 .trigger{height:36px;min-height:36px;box-sizing:border-box;overflow:hidden}.selection{flex:1;min-width:0;font-size:12px;line-height:18px}.selection>span{width:100%}
 @media(prefers-reduced-motion:reduce){.trigger .selection>span[data-overflow],.trigger .selection>span[data-overflow]>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}}
+
+.panel .search[data-input-shell]{min-height:34px;padding:0 8px;border:1px solid var(--falcon-border);border-radius:10px;color:var(--falcon-text-muted)}

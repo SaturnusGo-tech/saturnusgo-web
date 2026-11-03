@@ -12,3 +12,6 @@
 .existing { display: block; width: 100%; margin-block: 3px; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); text-align: left; font: inherit; overflow-wrap: anywhere; cursor: pointer; }.existing:hover { background: var(--control-hover); }.existing:disabled { color: var(--muted); cursor: default; }.error { color: var(--falcon-danger); }
 
 .options button:disabled { opacity: .45; cursor: default; }.options button:disabled:hover { background: transparent; }
+
+.root .search[data-input-shell] { border-radius: 10px; }
+.search > svg { flex: none; }

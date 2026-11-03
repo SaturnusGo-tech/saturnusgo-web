@@ -1,8 +1,9 @@
-import { ChevronRight, Play, Plus, Search, Stack, X } from "@openai/apps-sdk-ui/components/Icon";
+import { ChevronRight, Play, Plus, Stack } from "@openai/apps-sdk-ui/components/Icon";
 import type { Suite, SuiteSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import { filterSuiteCatalog, suiteCatalogCount, type SuiteCatalogFilter, type SuiteCatalogSort } from "../../../suites/catalog/suite-catalog";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { SuiteKindBadge } from "../shared/kind/SuiteKindBadge";
+import { AnimatedSearch } from "../../common/search/AnimatedSearch";
 import { SuiteCatalogFilters } from "./filters/SuiteCatalogFilters";
 import shared from "../suites.module.css";
 import css from "./catalog.module.css";
@@ -22,10 +23,8 @@ export function SuiteCatalog(props: Props) {
     <header className={shared.header}>
       <div><h1>{t("suite.title")} <span>{props.suites.length}</span></h1></div>
       <div className={css.toolbar}>
-        <label className={`${shared.search} ${css.search}`} data-input-shell><Search width={18} height={18} aria-hidden="true" />
-          <input aria-label={t("suite.searchAria")} placeholder={ru ? "Найти сьют" : "Find a suite"} value={props.query} onChange={e => props.onQuery(e.target.value)} />
-          {props.query && <button type="button" aria-label={ru ? "Очистить поиск" : "Clear search"} onClick={() => props.onQuery("")}><X width={14} height={14} /></button>}
-        </label>
+        <AnimatedSearch value={props.query} onChange={props.onQuery} label={t("suite.searchAria")}
+          placeholder={ru ? "Найти сьют" : "Find a suite"} openLabel={ru ? "Найти сьют" : "Search suites"} closeLabel={ru ? "Закрыть поиск" : "Close search"} />
         <SuiteCatalogFilters ru={ru} filter={props.filter} onFilter={props.onFilter} sort={props.sort} onSort={props.onSort} />
         {props.canManage && <button type="button" className={shared.primary} data-testid="new-suite" onClick={props.onCreate}><Plus width={18} height={18} />{ru ? "Новый сьют" : "New suite"}</button>}
       </div>

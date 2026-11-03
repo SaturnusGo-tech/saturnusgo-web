@@ -32,7 +32,7 @@ export function CustomFieldsPage({ workspaceId, projectId, canManageFields, canM
   return <section className={css.page} data-testid="custom-fields-page">
     <header className={css.head}><h1>{ru ? "Кастомные поля" : "Custom fields"}</h1>{manageable && <button type="button" className={css.primary} onClick={() => { write.clearError(); setEditing("new"); }}>
       <Plus size={15} />{ru ? "Создать поле" : "Create field"}</button>}</header>
-    <div className={css.toolbar}><label className={css.search}><Search size={15} aria-hidden="true"/><input value={page.search}
+    <div className={css.toolbar}><label className={css.search} data-input-shell><Search size={15} aria-hidden="true"/><input value={page.search}
       aria-label={ru ? "Найти поле" : "Find a field"} placeholder={ru ? "Найти поле" : "Find a field"} onChange={event => page.setSearch(event.target.value)} /></label>
       <label><input type="checkbox" checked={page.status === "all"} onChange={event => page.setStatus(event.target.checked ? "all" : "active")} />{ru ? "Показать архивные" : "Include archived"}</label></div>
     {write.error && <p className={css.error} role="alert">{write.error}</p>}

@@ -60,7 +60,7 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, ca
       <ChevronDown size={14} aria-hidden="true" />
     </button>
     {open && <div ref={panel} className={css.panel} id={id} popover="manual" role="dialog" aria-label={label}>
-      <label className={css.search}><Search size={14} aria-hidden="true" /><input ref={search} value={page.search} disabled={write.pending}
+      <label className={css.search} data-input-shell><Search size={14} aria-hidden="true" /><input ref={search} value={page.search} disabled={write.pending}
         placeholder={ru ? "Найти значение" : "Find a value"} aria-label={ru ? "Найти значение" : "Find a value"}
         onChange={event => { page.setSearch(event.target.value); write.reset(); }} /></label>
       <div className={css.options} role="listbox" aria-label={label} aria-multiselectable={field.multiple} aria-busy={page.loading}>

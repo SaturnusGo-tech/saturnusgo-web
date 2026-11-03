@@ -1,7 +1,6 @@
-import { Check, LoaderCircle } from "lucide-react";
-import { useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
-import { Modal } from "../../common/modal/Modal";
-import { AppOverlay } from "../../common/overlay/AppOverlay";
+import { LoaderCircle } from "lucide-react";
+import { useEffect, useId, useRef, useState, type FormEvent, type MutableRefObject } from "react";
+import { DefectPageHost } from "./page/DefectPageHost";
 import { FormError } from "../../common/error/FormError";
 import { NarrativeField } from "../../cases/inspector/markdown/plain/NarrativeField";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -28,6 +27,7 @@ export function DefectForm(props: Props) {
   const id = useId();
   const titleRef = useRef<HTMLInputElement>(null);
   const [attempted, setAttempted] = useState(false);
+  useEffect(() => { void import("../../cases/inspector/markdown/InitializedMarkdownEditor").catch(() => undefined); }, []);
   const errors: DefectDraftErrors = attempted ? validateDefectDraft(value, ru) : {};
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -37,18 +37,21 @@ export function DefectForm(props: Props) {
     if (Object.keys(next).length) { if (next.title) titleRef.current?.focus(); return; }
     props.onSubmit(event);
   };
-  return <AppOverlay><Modal title={copy.title} subtitle={props.context} drawer onClose={props.onClose}
-    panelClassName={`${css.panel} ${closing ? css.closing : ""}`}
-    headerActions={<button className={css.save} type="submit" form={id} disabled={submitting || closing}
-      data-testid="create-defect" aria-label={submitting ? copy.creating : copy.create} title={copy.create}>
-      {submitting ? <LoaderCircle className={css.spinner} size={19} /> : <Check size={20} />}
-    </button>}>
+  return <DefectPageHost onNavigate={props.onClose} pending={submitting}>
+    <section className={`${css.panel} ${closing ? css.closing : ""}`} data-defect-page aria-labelledby={`${id}-heading`}
+      onKeyDown={event => { if (event.key === "Escape" && !event.defaultPrevented && !submitting && !closing) { event.preventDefault(); props.onClose(); } }}
+      ref={element => { props.panelRef.current = element; }}>
+      <header><div><h1 id={`${id}-heading`}>{copy.title}</h1>{props.context && <p>{props.context}</p>}</div>
+        <div className={css.actions}><button type="button" className={css.cancel} disabled={submitting || closing} onClick={props.onClose}>{copy.cancel}</button>
+          <button className={css.save} type="submit" form={id} disabled={submitting || closing}
+            data-testid="create-defect">{submitting && <LoaderCircle className={css.spinner} size={16}/>} {submitting ? copy.creating : copy.create}</button></div>
+      </header>
     <form id={id} className={css.form} onSubmit={submit} noValidate aria-busy={submitting}
       data-testid={value.reproduction !== undefined ? "inline-defect-composer" : "defect-composer"}
-      ref={element => { props.panelRef.current = element?.parentElement ?? null; if (element) element.inert = closing || submitting; }}>
+      ref={element => { if (element) element.inert = closing || submitting; }}>
       <div className={css.body}>
         <div className={css.titleField}>
-          <label htmlFor={`${id}-title`}>{copy.summary}</label>
+          <label className={css.srOnly} htmlFor={`${id}-title`}>{copy.summary}</label>
           <input id={`${id}-title`} ref={titleRef} data-autofocus data-testid="defect-title" autoFocus
             value={value.title} onChange={event => onChange({ title: event.target.value })}
             placeholder={ru ? "Название дефекта" : "Defect title"} aria-required="true"
@@ -74,5 +77,6 @@ export function DefectForm(props: Props) {
         {props.error && <FormError message={props.error} />}
       </div>
     </form>
-  </Modal></AppOverlay>;
+    </section>
+  </DefectPageHost>;
 }

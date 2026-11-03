@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { customFieldTypes, type CustomFieldDefinition, type CustomFieldDraft, type CustomFieldScope } from "../../model/custom-field";
 import { fieldDraftError } from "../../model/field-validation";
@@ -22,8 +21,7 @@ export function CustomFieldEditor({ field, scope, canManageFields, canManageValu
     const saved = await write.save({ ...draft, name: draft.name.trim() }, field); if (saved) onSaved(saved);
   }
   return <section className={css.page}>
-    <header className={css.head}><div className={css.headActions}><button type="button" className={css.icon} onClick={onClose} disabled={write.pending}
-      aria-label={ru ? "Все кастомные поля" : "All custom fields"}><ArrowLeft size={18} /></button><h1>{field ? (ru ? "Настройка поля" : "Field settings") : (ru ? "Новое поле" : "New field")}</h1></div></header>
+    <header className={css.head}><h1>{field ? (ru ? "Настройка поля" : "Field settings") : (ru ? "Новое поле" : "New field")}</h1></header>
     <div className={css.scroll}>
       <form id="custom-field-definition" className={css.form} onSubmit={event => { event.preventDefault(); void save(); }}>
         <input className={css.nameInput} value={draft.name} placeholder={ru ? "Название поля" : "Field name"} aria-label={ru ? "Название поля" : "Field name"}

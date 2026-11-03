@@ -1,5 +1,4 @@
 .toolbar { display: flex; align-items: center; gap: 7px; }
-.search { width: 225px; min-width: 120px; }
 .repository { min-width: 0; }
 .project, .row { display: grid; grid-template-columns: minmax(260px, 1fr) 112px 96px 72px 32px; align-items: center; column-gap: 16px; }
 .project { min-height: 36px; margin-bottom: 3px; border-bottom: 1px solid var(--falcon-border-subtle); color: var(--falcon-text-muted); font-size: 11px; }
@@ -34,5 +33,5 @@
 .filterMenu :is(button, input) { font-family: inherit; }
 
 @container suites (max-width: 900px) { .project, .row { grid-template-columns: minmax(210px, 1fr) 105px 90px 30px; column-gap: 12px; } .date { display: none; } .key { flex-basis: 76px; font-size: 10px; } .name.name { gap: 10px; } }
-@container suites (max-width: 700px) { .toolbar { width: 100%; } .search { flex: 1; max-width: 360px; } .project, .row { grid-template-columns: minmax(160px, 1fr) 90px 30px; gap: 10px; } .project > :nth-child(3) { display: none; } .mode { grid-column: 2; grid-row: 1; } .count { grid-column: 2; font-size: 11px; align-self: end; padding-bottom: 1px; } .row { grid-template-rows: 22px 20px; row-gap: 0; padding-block: 8px; } .name.name { grid-row: 1 / span 2; display: grid; gap: 1px; } .key { font-size: 10px; } .copy { gap: 0; } .name strong { font-size: 13px; } .summary { display: none; } .mode { align-self: start; } .mode > span { min-height: 20px; padding-block: 0; font-size: 10px; } .run { grid-column: 3; grid-row: 1 / span 2; } .countLabel { display: inline; } }
+@container suites (max-width: 700px) { .toolbar { width: 100%; } .project, .row { grid-template-columns: minmax(160px, 1fr) 90px 30px; gap: 10px; } .project > :nth-child(3) { display: none; } .mode { grid-column: 2; grid-row: 1; } .count { grid-column: 2; font-size: 11px; align-self: end; padding-bottom: 1px; } .row { grid-template-rows: 22px 20px; row-gap: 0; padding-block: 8px; } .name.name { grid-row: 1 / span 2; display: grid; gap: 1px; } .key { font-size: 10px; } .copy { gap: 0; } .name strong { font-size: 13px; } .summary { display: none; } .mode { align-self: start; } .mode > span { min-height: 20px; padding-block: 0; font-size: 10px; } .run { grid-column: 3; grid-row: 1 / span 2; } .countLabel { display: inline; } }
 @media(prefers-reduced-motion: reduce) { .row { transition: none; } }

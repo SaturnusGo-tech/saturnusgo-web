@@ -24,6 +24,7 @@ function render(path: string, exported: string, props: unknown, menu = false) {
       };
       if (name.endsWith("inspector/model") || name === "./model") return model;
       if (name.endsWith("useCaseActivityNavigation")) return { useCaseActivityNavigation: () => {} };
+      if (name.endsWith("useCreateCaseExit")) return { useCreateCaseExit: () => (close: () => void) => close() };
       if (name.endsWith("useCreateCaseEntrance")) return { useCreateCaseEntrance: () => {} };
       if (name.endsWith("useScenarioLayout")) return { useScenarioLayout: () => ["list", () => {}] };
       if (name.endsWith("CaseAttachmentDraftContext")) return { useCaseAttachmentDraft: () => undefined, CaseAttachmentDraftProvider: "CaseAttachmentDraftProvider" };

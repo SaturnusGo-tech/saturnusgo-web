@@ -16,6 +16,7 @@ import { CaseOverview } from "./CaseOverview";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
+import { useCreateCaseExit } from "./motion/create/useCreateCaseExit";
 import { useCreateCaseEntrance } from "./motion/create/useCreateCaseEntrance";
 import { caseActivityForKey, type CaseCollaborationViewModel } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
@@ -60,6 +61,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
   useCreateCaseEntrance(panelRef, creating);
+  const closeWithMotion = useCreateCaseExit(panelRef, creating);
   const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);
   const uploadLocked = Boolean(props.editor?.submitting || props.editor?.attachmentsPending);
@@ -104,8 +106,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
 
   function cancelEditor() {
     if (props.editor?.submitting) return;
-    setHeaderEditing(null);
-    props.editor?.onCancel();
+    closeWithMotion(() => { setHeaderEditing(null); props.editor?.onCancel(); });
   }
 
   if (!props.testCase && !creating) return <div ref={panelRef} tabIndex={-1} className={styles.detailPanelInner}><div className={styles.detailEmpty}><ListChecks size={28} /><strong>{ru ? "Выберите тест-кейс" : "Select a test case"}</strong><span>{ru ? "Здесь появятся свойства, шаги и история." : "Properties, steps, and history will appear here."}</span><button className={styles.primaryButton} onClick={() => props.onNew(props.selectedFolder)}>{ru ? "Создать кейс" : "Create case"}</button></div></div>;
@@ -151,7 +152,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onClone={props.onClone}
         onCreateDefect={props.onCreateDefect}
         onArchive={props.onArchive}
-        onClose={props.onClose}
+        onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
       />
       {readyDefects > 0 && <div className={inspector.metaRow}>
         <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>

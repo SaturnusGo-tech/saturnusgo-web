@@ -16,7 +16,7 @@ test("both entry points save edited Markdown, fields and attachments, preserve c
     const resolve = (name: string) => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "ru", t: (key: string) => key }) };
       if (name.endsWith("copy")) return { getDefectDialogCopy };
-      if (name.endsWith("useDrawerDismiss")) return { useDrawerDismiss: () => ({ closing: false, panelRef: {}, dismiss: (done: () => void) => done() }) };
+      if (name.endsWith("useDefectPageDismiss")) return { useDefectPageDismiss: () => ({ closing: false, panelRef: {}, dismiss: (done: () => void) => done() }) };
       if (name.endsWith("use-youtrack-route-options")) return { useYouTrackRouteOptions: () => ({ configurationVersion: 2, enabled: false, options: [], status: "ready" }) };
       if (name.endsWith("integration-target")) return routing;
       if (name.endsWith("defect-route-choices")) return { defectRouteChoices };

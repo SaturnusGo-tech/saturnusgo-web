@@ -1,14 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
+import type { AnimatedSearch } from "../../common/search/AnimatedSearch";
 import type { SharedStepSearch } from "../catalog/SharedStepSearch";
 import type { SharedStepEmpty } from "../empty/SharedStepEmpty";
 
 test("search reveals on demand, focuses the input and Escape clears the hidden filter", t => {
   const h = componentHarness(undefined, { requestAnimationFrame: (callback: () => void) => callback() }); t.after(() => h.dispose());
-  const { SharedStepSearch: Search } = h.load<{ SharedStepSearch: typeof SharedStepSearch }>(new URL("../catalog/SharedStepSearch.tsx", import.meta.url));
+  const { AnimatedSearch: Search } = h.load<{ AnimatedSearch: typeof AnimatedSearch }>(new URL("../../common/search/AnimatedSearch.tsx", import.meta.url));
   let value = "", focused = 0, stopped = 0;
-  const render = () => nodes(h.render(() => Search({ value, onChange: next => { value = next; }, ru: false })));
+  const render = () => nodes(h.render(() => Search({ value, onChange: next => { value = next; }, label: "Find a shared step", placeholder: "Search by title", closeLabel: "Close search" })));
   let tree = render(); const input = tree.find(node => node.type === "input")!, trigger = tree.find(node => node.type === "button")!;
   (input.props.ref as { current: unknown }).current = { focus: () => focused++ };
   (trigger.props.ref as { current: unknown }).current = { focus: () => focused++ };
@@ -24,4 +25,20 @@ test("the initial empty state contains no duplicate create control", t => {
   const { SharedStepEmpty: Empty } = h.load<{ SharedStepEmpty: typeof SharedStepEmpty }>(new URL("../empty/SharedStepEmpty.tsx", import.meta.url));
   assert.equal(nodes(Empty({ searching: false, ru: false, onReset() {} })).some(node => node.type === "button"), false);
   assert.equal(nodes(Empty({ searching: true, ru: false, onReset() {} })).filter(node => node.type === "button").length, 1);
+});
+
+test("shared-step search delegates to the common control with localized labels", t => {
+  const h = componentHarness(); t.after(() => h.dispose());
+  const { SharedStepSearch: Search } = h.load<{ SharedStepSearch: typeof SharedStepSearch }>(new URL("../catalog/SharedStepSearch.tsx", import.meta.url));
+  const tree = nodes(Search({ value: "auth", onChange() {}, ru: true }));
+  assert.equal(tree[0].type, "AnimatedSearch"); assert.equal(tree[0].props.value, "auth");
+  assert.equal(tree[0].props.label, "Найти общий шаг"); assert.equal(tree[0].props.closeLabel, "Закрыть поиск");
+});
+test("restored queries start revealed and cannot hide an active filter", t => {
+  const h = componentHarness(); t.after(() => h.dispose());
+  const { AnimatedSearch: Search } = h.load<{ AnimatedSearch: typeof AnimatedSearch }>(new URL("../../common/search/AnimatedSearch.tsx", import.meta.url));
+  const tree = nodes(h.render(() => Search({ value: "checkout", onChange() {}, label: "Find a suite", placeholder: "Find a suite", closeLabel: "Close search" })));
+  assert.equal(tree.find(node => node.type === "button")!.props["aria-expanded"], true);
+  const reveal = tree.find(node => node.props["aria-hidden"] !== undefined)!; const element = { inert: true };
+  invoke(reveal, "ref", element); assert.equal(element.inert, false);
 });

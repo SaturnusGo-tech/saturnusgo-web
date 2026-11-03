@@ -46,3 +46,13 @@ test("dynamic counts remain unknown until matching detail resolves them; filtere
   invoke(all.find(node => node.type === "button" && node.props.children === "Reset search and filter")!, "onClick");
   assert.deepEqual(events, ["query:", "filter:all"]); h.dispose();
 });
+
+test("suite search uses the shared reveal control and preserves filtering callbacks", () => {
+  const { h, props, render, events } = setup(); let all = render();
+  const search = all.find(node => node.type === "AnimatedSearch")!;
+  assert.ok(search); assert.equal(search.props.value, ""); assert.equal(search.props.openLabel, "Search suites");
+  assert.equal(all.some(node => node.type === "input"), false);
+  invoke(search, "onChange", "release"); assert.deepEqual(events, ["query:release"]);
+  props.query = "not present"; all = render(); assert.equal(all.some(node => node.props["data-suite-id"]), false);
+  h.dispose();
+});

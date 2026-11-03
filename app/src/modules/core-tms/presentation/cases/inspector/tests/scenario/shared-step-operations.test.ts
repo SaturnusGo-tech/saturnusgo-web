@@ -62,7 +62,7 @@ test("shared-step editing stays dense and does not expose nested shared procedur
   assert.match(scenarioCss, /\.nestedLine \{[^}]*margin-left: 43px/s);
   assert.doesNotMatch(scenarioCss, /\.viewGroup \+ \.viewGroup \{[^}]*border-top/s);
   assert.doesNotMatch(scenarioCss, /\.stepFooter/);
-  assert.match(sharedBlockCss, /\.order \{[^}]*padding-right: 6px/s);
+  assert.match(sharedBlockCss, /\.order \{[^}]*padding-right: 12px/s);
 });
 
 test("shared-step canvas and action menu use opaque integrated surfaces", () => {

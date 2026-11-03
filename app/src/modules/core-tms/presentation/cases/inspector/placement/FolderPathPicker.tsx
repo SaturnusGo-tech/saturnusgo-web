@@ -59,7 +59,7 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
       <Folder size={14} aria-hidden="true"/><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
     </button>
     {visible && <div id={panelId} className={css.panel} ref={panel} popover="manual" role="dialog" aria-label={ru ? "Выбрать папку" : "Choose folder"}>
-      <label className={css.search}><Search size={14} aria-hidden="true"/>
+      <label className={css.search} data-input-shell><Search size={14} aria-hidden="true"/>
         <input autoFocus value={query} onChange={event => setQuery(event.target.value)} onKeyDown={submitSearch}
           placeholder={ru ? "Найти или создать папку" : "Find or create a folder"}
           aria-label={ru ? "Путь к папке" : "Folder path"}/>
