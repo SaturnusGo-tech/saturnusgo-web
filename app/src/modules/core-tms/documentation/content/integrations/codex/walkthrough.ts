@@ -15,7 +15,7 @@ export const codexWalkthrough = walkthrough("From the plugin to your company’s
     "At capture time, company Codex is Active with 8 of 10 seats occupied and one existing personal connection covering 12 projects. This page was inspected without activating, disabling or revoking access.",
     "Codex management in Umbrella Home showing Active company status, 8 of 10 seats and one existing account connection."),
   shot("codex-04-mcp", "Copy the settings from your own company",
-    "Expand **Falcon MCP** and use the copy icon beside **Server URL**. Use a distinct server name for each company. In Codex add the server using **Streamable HTTP**, authenticate, then inspect the Falcon projects and permissions before approving only the access needed for the task.",
-    "The actual Umbrella Home server URL is https://umbrella-falcon.saturnusgo.com/api/v1/mcp. The page includes config.toml and CLI examples with copy icons. No consent approval or Web QA execution is illustrated here; copy the URL from your own company’s settings.",
+    "Expand **Falcon MCP** and copy **Server URL**. Use a distinct server name for each company. In the Codex app follow **Settings → Plugins → Add → Add MCP server**, select **Streamable HTTP**, then **Plugins → MCPs → Servers → Authenticate**. The next section shows those exact Codex screens.",
+    "This Falcon capture predates the navigation wording correction: use it to locate the company URL and config.toml/CLI, and follow the NEXT section for the Codex menu path. Umbrella Home uses https://umbrella-falcon.saturnusgo.com/api/v1/mcp; copy the address from your own company’s settings.",
     "Expanded Falcon MCP setup with the actual company server URL, OAuth instructions and TOML and CLI examples."),
 ]);

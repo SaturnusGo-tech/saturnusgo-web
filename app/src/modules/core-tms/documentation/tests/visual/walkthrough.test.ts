@@ -48,11 +48,13 @@ test("practical guide articles retain meaningful, captioned screenshot states", 
 test("every published screenshot has accurate dimensions and fits the asset budget", () => {
   const used = new Map(flows.flatMap(({ block }) => block.steps.map(({ image }) => [image.src, image] as const)));
   const registered = new Set(Object.values(production).map(image => (image as { src: string }).src));
+  const supplied = new Set(JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8")).files
+    .filter((image: { source?: string }) => image.source === "user-supplied-codex-desktop").map((image: { file: string }) => image.file));
   let legacyTotal = 0, productionTotal = 0;
   for (const [src, image] of used) {
     const bytes = readFileSync(resolve("public", src.slice(1)));
     assert.deepEqual(jpegDimensions(bytes), { width: image.width, height: image.height }, src);
-    const captured = registered.has(src);
+    const captured = registered.has(src) || supplied.has(src);
     assert.ok(bytes.length < (captured ? 1_400_000 : 350_000), `${src}: compress without changing the capture viewport`);
     if (captured) productionTotal += bytes.length; else legacyTotal += bytes.length;
   }

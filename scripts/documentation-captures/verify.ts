@@ -75,11 +75,13 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, realpathSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import { documentationMediaLocale } from "../../app/src/modules/core-tms/documentation/model/visual/guide-media";
+import { verifySuppliedCodexCaptures } from "./supplied/verify";
 
 
 if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
   const module = "app/src/modules/core-tms/documentation", publicDirectory = resolve("public");
-  const images: CaptureInput["images"][number][] = [], records: CaptureRecord[] = [], media: CaptureInput["media"][number][] = [];
+  const images: CaptureInput["images"][number][] = [], records: CaptureRecord[] = [];
+  const media: (CaptureInput["media"][number] & { width: number; height: number })[] = [];
   const legacyDigests: string[] = [];
   for (const locale of ["en", "ru"] as const) {
     const edition = locale === "ru" ? "2026-11-ru" : "2026-11", content = locale === "ru" ? "content-ru" : "content";
@@ -88,13 +90,18 @@ if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
     records.push(...JSON.parse(readFileSync(`public/falcon/docs/${edition}/production-provenance.json`, "utf8")).captures);
     const catalog = require(resolve(module, content, "catalog.ts"));
     for (const article of catalog.docArticles) for (const section of article.sections) for (const block of section.blocks) {
-      if (block.kind === "walkthrough") media.push(...block.steps.map((step: { image: { src: string } }) => ({ src: step.image.src, locale })));
+      if (block.kind === "walkthrough") media.push(...block.steps.map((step: { image: { src: string; width: number; height: number } }) => ({ ...step.image, locale })));
     }
     const legacy = `public/falcon/docs/2026-09${locale === "ru" ? "-ru" : ""}`;
     for (const file of readdirSync(legacy).filter(file => file.endsWith(".jpg"))) legacyDigests.push(createHash("sha256").update(readFileSync(join(legacy, file))).digest("hex"));
   }
   const codexLegacy = JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8"));
-  legacyDigests.push(...codexLegacy.files.flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]));
-  verifyProductionCaptures({ publicDirectory, images, records, media, legacyDigests, complete: process.argv.includes("--complete") });
-  console.log(JSON.stringify({ productionCaptures: images.length, activeReferences: media.length, complete: process.argv.includes("--complete"), verified: true }));
+  const supplied = verifySuppliedCodexCaptures(publicDirectory,
+    codexLegacy.files.filter((file: { source?: string }) => file.source === "user-supplied-codex-desktop"), media);
+  legacyDigests.push(...codexLegacy.files.filter((file: { source?: string }) => file.source !== "user-supplied-codex-desktop")
+    .flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]));
+  verifyProductionCaptures({ publicDirectory, images, records, media: media.filter(image => !supplied.has(image.src)),
+    legacyDigests, complete: process.argv.includes("--complete") });
+  console.log(JSON.stringify({ productionCaptures: images.length, suppliedCodexCaptures: supplied.size,
+    activeReferences: media.length, complete: process.argv.includes("--complete"), verified: true }));
 }

@@ -40,11 +40,11 @@ export function CodexConnectionSetup({ employee, locale, open, onClose }: {
       <div className={css.label}>{ru ? "URL сервера" : "Server URL"}</div>
       <div className={css.codeBlock}><code className={css.singleValue}>{setup.mcpUrl}</code>{copyButton("url", setup.mcpUrl, ru ? "Копировать URL сервера" : "Copy server URL")}</div>
       <ol className={css.steps}>
-        <li>{ru ? "Откройте Codex: Settings → MCP servers → Add server." : "In Codex, open Settings → MCP servers → Add server."}</li>
-        <li>{ru ? "Укажите имя сервера и Server URL выше, выбрав Streamable HTTP." : "Enter the server name and Server URL above, choosing Streamable HTTP."}</li>
-        <li>{ru ? "Сохраните настройки и перезапустите Codex, затем выберите Authenticate." : "Save, restart Codex, then choose Authenticate."}</li>
+        <li>{ru ? "В приложении Codex откройте Settings → Plugins → Add → Add MCP server." : "In the Codex app, open Settings → Plugins → Add → Add MCP server."}</li>
+        <li>{ru ? "В Name укажите имя сервера выше. Переключите Type с STDIO на Streamable HTTP и вставьте Server URL. Поля Bearer token, переменных токена и Headers оставьте пустыми: Falcon использует вход OAuth." : "Enter the server name above in Name. Switch Type from STDIO to Streamable HTTP and paste the Server URL. Leave Bearer token, token environment variables and Headers empty: Falcon uses OAuth sign-in."}</li>
+        <li>{ru ? "Сохраните. В Settings → Plugins выберите вкладку MCPs. В разделе Servers найдите строку своего сервера и нажмите Authenticate справа. Это не карточка плагина Falcon. Перезапустите Codex, только если он попросит." : "Save. In Settings → Plugins select the MCPs tab. Under Servers, find your server’s row and click Authenticate on its right. This is separate from the Falcon plugin card. Restart Codex only if prompted."}</li>
         <li>{ru ? "В браузере войдите в Falcon своей компании, выберите проекты и проверьте запрашиваемые разрешения. Подтвердите только то, с чем согласны." : "In the browser, sign in to your company’s Falcon, select projects and review the requested permissions. Approve only what you accept."}</li>
-        <li>{ru ? "Вернитесь в Codex и попросите найти тест-кейсы или подготовить план QA. Проверьте план до выполнения действий." : "Return to Codex and ask it to find test cases or prepare a QA plan. Review the plan before actions are performed."}</li>
+        <li>{ru ? "Вернитесь в Codex и откройте новый чат. Попросите использовать MCP-сервер с выбранным именем и показать компанию, доступные проекты и разрешения, ничего не изменяя. Затем можно поручить QA-задачу и проверить её план." : "Return to Codex and open a new chat. Ask it to use the MCP server by the name you chose and show the company, available projects and permissions without changing anything. Then request a QA task and review its plan."}</li>
       </ol>
       <section className={css.advanced} aria-label={ru ? "Настройка через TOML и CLI" : "TOML and CLI setup"}>
         <h3>config.toml</h3><div className={css.codeBlock}><pre><code>{validName ? toml : ""}</code></pre>
