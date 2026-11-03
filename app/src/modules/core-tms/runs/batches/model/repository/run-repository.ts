@@ -13,13 +13,14 @@ export function runRepositoryEntries(runId: string, projectId: string, items: Ru
       createdAt: item.createdAt, updatedAt: item.updatedAt, etag: "" } };
   });
 }
-export function runRepositoryFolders(workspaceId: string, projectId: string, cases: TestCaseSummary[]): RepositoryFolder[] {
+export function runRepositoryFolders(workspaceId: string, projectId: string, cases: TestCaseSummary[], catalog: readonly RepositoryFolder[] = []): RepositoryFolder[] {
   const folders = new Map<string, RepositoryFolder>();
   for (const item of cases) {
     const segments = item.folderPath.split("/").filter(Boolean); let path = ""; let parentId: string | null = null;
     for (const name of segments) {
       path += `/${name}`; const id = `${projectId}:${path}`;
       if (!folders.has(id)) folders.set(id, { id, workspaceId, projectId, parentId, name, path,
+        appearance: catalog.find(folder => folder.workspaceId === workspaceId && folder.projectId === item.projectId && folder.path === path)?.appearance ?? null,
         archivedAt: null, etag: "", rowVersion: 1, createdAt: item.createdAt, updatedAt: item.updatedAt });
       parentId = id;
     }

@@ -103,7 +103,7 @@ export function RepositoryFolders(props: {
       {resource.error && <div className={css.loadError} role="alert"><span>{resource.error}</span><button onClick={resource.reload}>{ru ? "Обновить" : "Refresh"}</button></div>}
       {resource.loading && !resource.items.length ? <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка папок" : "Loading folders"}><i /><i /><i /><i /></div> : <ul className={css.tree}>
         {roots.map((node) => <RepositoryFolderBranch key={node.folder.id} node={node} depth={0} expanded={expanded} selected={props.selected}
-          creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
+          customize={!props.selectionMode} creation={creation} selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.activeCaseId} ru={ru} locked={props.locked || resource.busy || resource.loading}
           canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} onExpand={toggle} onReveal={reveal} onFolder={props.onFolder} onCase={props.onCase} onToggle={props.onToggle} onScope={props.onScope} onMenu={setMenu} />)}
         {tree.unfiled.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={0} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
           creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}

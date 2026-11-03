@@ -25,7 +25,7 @@
 .folderRow { width: 100%; display: flex; gap: 8px; align-items: center; border: 0; background: transparent; color: inherit; padding: 8px; border-radius: 9px; margin-block: 3px; cursor: pointer; text-align: left; font: inherit; font-size: 12px; }
 .folderRow:disabled { opacity: 1; cursor: default; }
 .folderRow:hover { background: var(--falcon-hover); }
-.folderRow > span, .caseRow > span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.folderRow > span:not([data-folder-visual]), .caseRow > span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
 .folderIcon { color: var(--falcon-folder); flex-shrink: 0; }
 .folderRow small { color: var(--falcon-success); font-size: 10px; white-space: nowrap; }
 .folderRow small[data-existing="true"] { color: var(--falcon-text-muted); }

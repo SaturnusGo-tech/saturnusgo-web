@@ -1,5 +1,6 @@
+import { FolderAppearanceControl } from "../appearance/control/FolderAppearanceControl";
 import { useRef } from "react";
-import { PiCaretDown, PiCaretRight, PiFolderOpenDuotone, PiFolderSimpleDuotone, PiPlus } from "react-icons/pi";
+import { PiCaretDown, PiCaretRight, PiPlus } from "react-icons/pi";
 import type { FolderNode } from "../../model/tree";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 import { InlineFolderForm } from "../creation/InlineFolderForm";
@@ -11,13 +12,12 @@ export function FolderStructureBranch({ node, collapsed, creation, disabled, bus
 }) {
   const { folder, children } = node, open = !collapsed.has(folder.id), editing = creation.activeFolderId === folder.id;
   const trigger = useRef<HTMLButtonElement>(null), childrenId = `folder-structure-children-${folder.id}`;
-  const Folder = open && children.length ? PiFolderOpenDuotone : PiFolderSimpleDuotone;
   return <li className={css.branch} data-structure-folder={folder.id}>
     <div className={css.row}>
       {children.length > 0 ? <button type="button" className={css.disclosure} disabled={busy} aria-expanded={open} aria-controls={childrenId}
         aria-label={`${open ? (ru ? "Свернуть" : "Collapse") : (ru ? "Раскрыть" : "Expand")} ${folder.name}`} onClick={() => onToggle(folder.id)}>
         {open ? <PiCaretDown size={12} /> : <PiCaretRight size={12} />}</button> : <span className={css.disclosure} aria-hidden="true" />}
-      <Folder size={18} className={css.folderIcon} aria-hidden="true" />
+      <FolderAppearanceControl folder={folder} open={open && !!children.length} editable={!disabled || busy} disabled={disabled} ru={ru} />
       <span className={css.name} title={folder.name}>{folder.name}</span>
       <span className={css.count} aria-label={`${ru ? "Подпапок" : "Subfolders"}: ${children.length}`}>{children.length}</span>
       <button ref={trigger} type="button" className={css.add} disabled={disabled}

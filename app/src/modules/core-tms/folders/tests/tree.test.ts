@@ -6,7 +6,7 @@ import { repositoryScope } from "../model/selection/folder-scope";
 import { buildFolderTree, dragCaseIds, validFolderDestinations } from "../model/tree";
 
 const folder = (id: string, path: string, parentId: string | null = null, archivedAt: string | null = null): RepositoryFolder => ({
-  id, path, parentId, archivedAt, name: path.split("/").slice(-1)[0], workspaceId: "workspace", projectId: "project", rowVersion: 1,
+  id, path, parentId, archivedAt, appearance: null, name: path.split("/").slice(-1)[0], workspaceId: "workspace", projectId: "project", rowVersion: 1,
   createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z", etag: `"${id}:1"`,
 });
 const item = (id: string, folderId: string | null, folderPath: string, archivedAt: string | null = null): TestCaseSummary => ({

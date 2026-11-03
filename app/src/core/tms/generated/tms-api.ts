@@ -5009,6 +5009,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/{folderId}/normalize-image": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Normalize private folder artwork before immutable upload
+         * @description Authorized active folder management only. Raw image bytes, maximum 10 MiB input/output, 16 million decoded pixels (all GIF frames), at most 200 GIF frames, one HEIC still image, eight-second worker deadline, two concurrent jobs per API process. PNG/JPEG/WebP/AVIF/HEIC/HEIF become metadata-stripped PNG fitted inside 1024x1024; GIF bytes and animation are preserved after full decode validation. SVG and malformed or spoofed media are rejected. No signed URLs are stored. No ETag or idempotency key is needed because this operation creates no durable state. Errors IMAGE_NORMALIZATION_TIMEOUT (408), IMAGE_NORMALIZATION_BUSY (429) and IMAGE_NORMALIZATION_CANCELLED (400) use the standard JSON error envelope.
+         */
+        post: operations["normalizeRepositoryFolderImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/test-cases/{caseId}/maintenance": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Read current case maintenance
+         * @description Requires test_case:read. Missing metadata is current at version zero. This live projection can be read beside an immutable run snapshot.
+         */
+        get: operations["getCaseMaintenance"];
+        put?: never;
+        /**
+         * Mark a case for repair or explicitly clear its maintenance flag
+         * @description Requires test_case:manage. Transitions current to needs_update or needs_update to current only. Mark validates exact workspace/project/case/run/item/attempt/revision relationship; historical pinned revisions are allowed. Clear removes current source provenance; prior mark remains in append-only audit. No content lifecycle/revision, run snapshot or execution outcome changes. Replays return the original response even after later transitions. Stale independent maintenance ETags fail with PRECONDITION_FAILED; same-state commands fail INVALID_TRANSITION; changed retry payload fails IDEMPOTENCY_KEY_REUSED.
+         */
+        post: operations["changeCaseMaintenance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5340,7 +5396,7 @@ export interface components {
         /** @description Stable workspace-scoped integration route id. android, ios, and backend remain valid legacy values. On defect representations and mutations, a null target remains Falcon-only under a v1 configuration and means automatic matcher-then-default routing only after an administrator explicitly saves configurationVersion 2. */
         DefectIntegrationTarget: string;
         /** @enum {string} */
-        AttachmentOwnerKind: "test_case_revision" | "shared_step_revision" | "run" | "run_attempt" | "defect" | "project" | "portfolio";
+        AttachmentOwnerKind: "test_case_revision" | "shared_step_revision" | "run" | "run_attempt" | "defect" | "project" | "portfolio" | "repository_folder";
         PageMeta: {
             limit: number;
             hasMore: boolean;
@@ -5718,7 +5774,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SIGNING_SECRET_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DICTATION_EMPTY" | "SERVICE_UNAVAILABLE" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_TURN_PENDING" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_ACCESS_CHANGED";
+        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
         ValidationIssue: {
             field: string;
             code: string;
@@ -5987,6 +6043,7 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             folderId: components["schemas"]["Identifier"] | null;
+            maintenance: components["schemas"]["CaseMaintenance"];
         };
         TestCaseCreateRequest: {
             projectId: components["schemas"]["Identifier"];
@@ -6196,6 +6253,7 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             folderId: components["schemas"]["Identifier"] | null;
+            maintenance: components["schemas"]["CaseMaintenance"];
             customFields: components["schemas"]["CustomFieldSnapshot"][];
             productGroupId: string | null;
             productId: string | null;
@@ -7165,7 +7223,7 @@ export interface components {
             revisionNo: number;
             stepId: components["schemas"]["Identifier"];
         };
-        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["SharedStepRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"] | components["schemas"]["ProjectAttachmentOwner"] | components["schemas"]["PortfolioAttachmentOwner"];
+        AttachmentOwner: components["schemas"]["TestCaseRevisionAttachmentOwner"] | components["schemas"]["SharedStepRevisionAttachmentOwner"] | components["schemas"]["RunAttachmentOwner"] | components["schemas"]["RunAttemptAttachmentOwner"] | components["schemas"]["DefectAttachmentOwner"] | components["schemas"]["ProjectAttachmentOwner"] | components["schemas"]["PortfolioAttachmentOwner"] | components["schemas"]["RepositoryFolderAttachmentOwner"];
         /** @description Private object metadata. Bucket, object key, provider details, and reusable public URLs are never exposed. */
         Attachment: {
             id: components["schemas"]["Identifier"];
@@ -7190,7 +7248,7 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
         } & (components["schemas"]["AttachmentMediaIdentity"] & unknown & unknown & unknown & unknown & unknown);
-        /** @description Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner. */
+        /** @description Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner. Repository folder artwork requires projectId and the exact active folder owner. Only PNG/JPEG/WebP/GIF up to 10 MiB are immutable upload types; normalize AVIF/HEIC/HEIF before creating an intent. Referenced artwork, including archived folder artwork, cannot be deleted. Ready unreferenced folder images become eligible for bounded cleanup after 24 hours. */
         AttachmentUploadIntentCreateRequest: {
             projectId?: components["schemas"]["Identifier"];
             owner: components["schemas"]["AttachmentOwner"];
@@ -7917,6 +7975,7 @@ export interface components {
             createdAt: components["schemas"]["Timestamp"];
             updatedAt: components["schemas"]["Timestamp"];
             etag: string;
+            appearance: components["schemas"]["RepositoryFolderAppearance"];
         };
         RepositoryFolderEnvelope: {
             data: components["schemas"]["RepositoryFolder"];
@@ -7932,10 +7991,12 @@ export interface components {
         RepositoryFolderCreateRequest: {
             name: string;
             parentId?: components["schemas"]["Identifier"] | null;
+            appearance?: components["schemas"]["RepositoryFolderAppearance"];
         };
         RepositoryFolderPatchRequest: {
             name?: string;
             parentId?: components["schemas"]["Identifier"] | null;
+            appearance?: components["schemas"]["RepositoryFolderAppearance"];
         };
         RepositoryFolderArchiveRequest: {
             /**
@@ -9488,6 +9549,73 @@ export interface components {
             id: string;
             /** Format: date-time */
             revokedAt: string;
+        };
+        /** @description Nullable shared artwork. Omission on PATCH retains the confirmed value; null resets the default. Archive/restore retains artwork. */
+        RepositoryFolderAppearance: null | components["schemas"]["RepositoryFolderIconAppearance"] | components["schemas"]["RepositoryFolderEmojiAppearance"] | components["schemas"]["RepositoryFolderImageAppearance"] | components["schemas"]["RepositoryFolderGifAppearance"];
+        /** @enum {string} */
+        RepositoryFolderIconId: "folder" | "briefcase" | "archive" | "box" | "code" | "bug" | "test-tube" | "flask" | "shield" | "lock" | "key" | "gear" | "wrench" | "database" | "cloud" | "globe" | "browser" | "devices" | "desktop" | "laptop" | "phone" | "tablet" | "terminal" | "robot" | "rocket" | "lightning" | "fire" | "heart" | "star" | "flag" | "bookmark" | "tag" | "note" | "file" | "image" | "camera" | "video" | "music" | "users" | "chart" | "compass" | "map" | "calendar" | "clock" | "check-circle" | "clipboard" | "list-checks" | "magnifying-glass" | "puzzle-piece" | "package";
+        RepositoryFolderIconAppearance: {
+            /** @constant */
+            kind: "icon";
+            iconId: components["schemas"]["RepositoryFolderIconId"];
+            color: null | string;
+        };
+        RepositoryFolderEmojiAppearance: {
+            /** @constant */
+            kind: "emoji";
+            /** @description Exactly one Unicode grapheme containing an emoji pictograph, regional indicator or keycap. Controls and whitespace are rejected. */
+            emoji: string;
+        };
+        RepositoryFolderImageAppearance: {
+            /** @constant */
+            kind: "image";
+            assetId: components["schemas"]["Identifier"];
+        };
+        RepositoryFolderAttachmentOwner: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "repository_folder";
+            folderId: components["schemas"]["Identifier"];
+        };
+        /** @enum {string} */
+        CaseMaintenanceStatus: "current" | "needs_update";
+        CaseMaintenanceSource: {
+            runId: components["schemas"]["Identifier"];
+            runItemId: components["schemas"]["Identifier"];
+            attemptNo: number;
+            revision: number;
+        };
+        CaseMaintenance: {
+            /** @enum {string} */
+            status: "current" | "needs_update";
+            rowVersion: number;
+            updatedBy: components["schemas"]["Identifier"] | null;
+            updatedAt: components["schemas"]["Timestamp"] | null;
+            note: string | null;
+            source: components["schemas"]["CaseMaintenanceSource"] | null;
+            etag: string;
+        };
+        CaseMaintenanceChange: {
+            /** @constant */
+            status: "needs_update";
+            source: components["schemas"]["CaseMaintenanceSource"];
+            note?: string;
+        } | {
+            /** @constant */
+            status: "current";
+            note?: string;
+        };
+        RepositoryFolderGifAppearance: {
+            /** @constant */
+            kind: "gif";
+            /** @constant */
+            provider: "klipy";
+            id: string;
+            /** @description Exact unmodified API media URL, including delivery query. HTTPS static.klipy.com/static1.klipy.com/static2.klipy.com only; no credentials, fragment or non-443 port. Loaded directly by client; never fetched, proxied or stored by backend. */
+            url: string;
+            sourceUrl?: string;
         };
     };
     responses: {
@@ -11505,12 +11633,8 @@ export interface operations {
                 /** @description Stable folder ID; root selects cases without a folder. Omit for all folders. */
                 folderId?: string;
                 includeDescendants?: boolean;
-                /** @description Stable catalog value identifier. */
-                productGroupId?: components["schemas"]["Identifier"];
-                /** @description Stable catalog value identifier. */
-                productId?: components["schemas"]["Identifier"];
-                /** @description Filter by the immutable case field snapshot; false is an explicit filter, not absence. */
-                regression?: "true" | "false";
+                /** @description Filter the live maintenance projection. Missing metadata counts as current. Bound to the pagination cursor. */
+                maintenanceStatus?: components["schemas"]["CaseMaintenanceStatus"];
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -11548,7 +11672,6 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     bulkMutateTestCases: {
@@ -14941,7 +15064,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     getRepositoryFolder: {
@@ -15026,7 +15148,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     archiveRepositoryFolder: {
@@ -15073,7 +15194,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     restoreRepositoryFolder: {
@@ -15116,7 +15236,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     moveRepositoryFolderCases: {
@@ -15159,7 +15278,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     archiveRepositoryFolderCases: {
@@ -15202,7 +15320,6 @@ export interface operations {
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ReleaseWritePaused"];
         };
     };
     listProjectComments: {
@@ -20596,6 +20713,147 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    normalizeRepositoryFolderImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workspaceId: components["parameters"]["WorkspaceIdPath"];
+                projectId: components["parameters"]["ProjectIdPath"];
+                folderId: components["schemas"]["Identifier"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "image/png": string;
+                "image/jpeg": string;
+                "image/webp": string;
+                "image/avif": string;
+                "image/gif": string;
+                "image/heic": string;
+                "image/heif": string;
+            };
+        };
+        responses: {
+            /** @description Transient normalized PNG or byte-identical validated animated GIF. No storage or folder mutation occurs. Hash these returned bytes when creating the ordinary private upload intent. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "X-Content-Sha256"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/gif": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Image processing deadline exceeded. Retry with a smaller image. */
+            408: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            413: components["responses"]["PayloadTooLarge"];
+            415: components["responses"]["UnsupportedMediaType"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCaseMaintenance: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current case maintenance. ETag is independent of the case content ETag. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "Idempotency-Replayed"?: boolean;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CaseMaintenance"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    changeCaseMaintenance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path: {
+                caseId: components["parameters"]["CaseIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseMaintenanceChange"];
+            };
+        };
+        responses: {
+            /** @description Current case maintenance. ETag is independent of the case content ETag. */
+            200: {
+                headers: {
+                    ETag?: string;
+                    "Idempotency-Replayed"?: boolean;
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CaseMaintenance"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ReleaseWritePaused"];
         };
     };
 }

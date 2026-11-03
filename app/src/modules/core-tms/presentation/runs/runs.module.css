@@ -117,7 +117,7 @@
 .stepActions { display: flex; gap: 4px; margin: 5px 0 0 45px; }
 .stepActions button { width: 28px; height: 28px; display: grid; place-items: center; padding: 0; color: var(--falcon-text-muted); background: transparent; border: 1px solid var(--falcon-border); border-radius: 5px; }
 .stepActions button:hover { color: var(--falcon-text); background: var(--falcon-hover); border-color: var(--runs-border-strong); }
-.actionPassActive { color: var(--falcon-success) !important; background: var(--falcon-success-bg) !important; border-color: color-mix(in srgb, var(--falcon-success) 66%, transparent) !important; }
+.actionPassActive { color: color-mix(in srgb, var(--falcon-success) 95%, var(--falcon-text)) !important; background: var(--falcon-success-bg) !important; border-color: color-mix(in srgb, var(--falcon-success) 66%, transparent) !important; }
 .actionFailActive { color: var(--falcon-danger) !important; background: var(--falcon-danger-bg) !important; border-color: color-mix(in srgb, var(--falcon-danger) 66%, transparent) !important; }
 .actionBlockActive { color: var(--falcon-warning) !important; background: var(--falcon-warning-bg) !important; border-color: color-mix(in srgb, var(--falcon-warning) 66%, transparent) !important; }
 .step_failed { border-radius: 5px; background: color-mix(in srgb, var(--falcon-danger-bg) 34%, transparent); }
@@ -125,9 +125,9 @@
 
 .executionBadge { max-width: 100%; min-height: 22px; width: max-content; display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; overflow: hidden; color: var(--falcon-on-action); border: 1px solid transparent; border-radius: 999px; font-size: 11px; font-weight: 650; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
 .executionBadge > svg { width: 12px; height: 12px; flex: 0 0 auto; }
-.execution_passed { color: var(--falcon-success-on-solid); background: var(--falcon-success-solid); border-color: var(--falcon-success-border); }
-.execution_failed { color: var(--falcon-danger-on-solid); background: var(--falcon-danger-solid); border-color: var(--falcon-danger-border); }
-.execution_blocked { color: var(--falcon-warning-on-solid); background: var(--falcon-warning-solid); border-color: var(--falcon-warning-border); }
+.execution_passed { color: color-mix(in srgb, var(--falcon-success) 95%, var(--falcon-text)); background: var(--falcon-success-bg); }
+.execution_failed { color: var(--falcon-danger); background: var(--falcon-danger-bg); }
+.execution_blocked { color: var(--falcon-warning); background: var(--falcon-warning-bg); }
 .execution_in_progress { color: var(--falcon-info-on-solid); background: var(--falcon-info-solid); border-color: var(--falcon-info-border); }
 .execution_not_run { color: var(--falcon-text-secondary); background: var(--falcon-control); border-color: var(--falcon-border-strong); }
 .execution_skipped { color: var(--falcon-discovery-on-solid); background: var(--falcon-discovery-solid); border-color: var(--falcon-discovery-border); }
@@ -217,10 +217,10 @@
   .steps[data-scenario-layout="grid"] .stepActual { grid-column: 1 / -1; margin-top: 0; }
   .steps[data-scenario-layout="grid"] .stepActions { grid-column: 1 / -1; margin-top: 0; }
 }
-.shell .footer .outcomeAction { --outcome-color: var(--falcon-warning-solid); display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; background: var(--outcome-color); color: var(--falcon-warning-on-solid); font-weight: 600; box-shadow: none; transition: background-color 140ms ease, opacity 140ms ease; }
-.shell .footer .outcomeAction[data-outcome="passed"] { --outcome-color: var(--falcon-success-solid); color: var(--falcon-success-on-solid); }
-.shell .footer .outcomeAction[data-outcome="failed"] { --outcome-color: var(--falcon-danger-solid); color: var(--falcon-danger-on-solid); }
-.shell .footer .outcomeAction:hover:not(:disabled) { background: color-mix(in srgb, var(--outcome-color) 88%, var(--falcon-text)); }
+.shell .footer .outcomeAction { --outcome-color: var(--falcon-warning); --outcome-bg: var(--falcon-warning-bg); display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; background: color-mix(in srgb, var(--outcome-bg) 65%, var(--falcon-surface)); color: var(--outcome-color); font-weight: 600; box-shadow: none; transition: background-color 140ms ease, opacity 140ms ease; }
+.shell .footer .outcomeAction[data-outcome="passed"] { --outcome-color: color-mix(in srgb, var(--falcon-success) 95%, var(--falcon-text)); --outcome-bg: var(--falcon-success-bg); }
+.shell .footer .outcomeAction[data-outcome="failed"] { --outcome-color: var(--falcon-danger); --outcome-bg: var(--falcon-danger-bg); }
+.shell .footer .outcomeAction:hover:not(:disabled) { background: var(--outcome-bg); }
 .shell .footer .outcomeAction:disabled { opacity: .42; cursor: not-allowed; }
 .shell .footer .outcomeAction:focus-visible { outline: 2px solid var(--falcon-action); outline-offset: 3px; box-shadow: none; }
 @container run-footer (max-width: 600px) { .shell .footer .outcomeAction { width: auto; padding-inline: 10px; } }

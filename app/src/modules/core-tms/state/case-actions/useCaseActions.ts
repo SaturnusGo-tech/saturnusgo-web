@@ -21,6 +21,7 @@ import {
 } from "../../test-cases/data/test-case-api";
 import type { useWorkspaceDerived } from "../workspace-derived/useWorkspaceDerived";
 import type { useWorkspaceState } from "../workspace/useWorkspaceState";
+import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-maintenance";
 
 function summaryOf(testCase: TestCase, etag: string): TestCaseSummary {
   const { current: _current, linkIds: _linkIds, ...summary } = testCase;
@@ -47,12 +48,12 @@ export function useCaseActions(
       ...current,
       testCases: append
         ? [...current.testCases, summary]
-        : current.testCases.map((item) => item.id === summary.id ? summary : item),
+        : current.testCases.map((item) => item.id === summary.id ? reconcileMaintenance(summary, item) : item),
     }));
     state.setSelectedCaseId(testCase.id);
     state.setSelectedFolder(testCase.folderPath);
     state.setSelectedFolderId(testCase.folderId ?? (testCase.folderPath === "/" ? "root" : ""));
-    state.setSelectedCaseDetail(testCase);
+    state.setSelectedCaseDetail(current => reconcileMaintenance(testCase, current));
     state.setSelectedCaseEtag(etag);
   }
 

@@ -1,8 +1,9 @@
 "use client";
-import { ChevronDown, History } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { History, X } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTmsHttpClient } from "../../../auth/http/TmsHttpClientContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { useAnchoredPopup } from "../../../presentation/common/popup/useAnchoredPopup";
 import { AnimatedSelect } from "../../../presentation/common/select/AnimatedSelect";
 import { useExecutionHistory } from "../application/useExecutionHistory";
 import { ExecutionHistory } from "../presentation/ExecutionHistory";
@@ -17,21 +18,27 @@ export function ExecutionHistoryFeature({ scope, attemptNo, version, steps, offl
   const [open, setOpen] = useState(false), [allAttempts, setAllAttempts] = useState(false), [stepId, setStepId] = useState("");
   const id = useId(), trigger = useRef<HTMLButtonElement>(null);
   const state = useExecutionHistory(http, { ...scope, ...(!allAttempts ? { attemptNo } : {}), ...(stepId ? { stepId } : {}) }, open && !offline, version);
-  // Closing retains the visible records while the reveal contracts; requests still cancel immediately.
-  const lastOpen = useRef(state); if (open) lastOpen.current = state;
-  const visible = open ? state : lastOpen.current;
+  const root = useRef<HTMLDivElement>(null), panel = useRef<HTMLDivElement>(null), closeButton = useRef<HTMLButtonElement>(null);
+  const dismiss = useCallback(() => setOpen(false), []);
+  useAnchoredPopup(open, false, root, trigger, panel, dismiss, 420);
+  useEffect(() => { if (open) closeButton.current?.focus({ preventScroll: true }); }, [open]);
+  const close = () => { dismiss(); trigger.current?.focus({ preventScroll: true }); };
   const filtered = allAttempts || Boolean(stepId);
-  const showFilters = attemptNo > 1 || filtered || visible.items.length > 0;
+  const showFilters = attemptNo > 1 || filtered || state.items.length > 0;
   const label = ru ? "История выполнения" : "Execution history";
-  return <section className={styles.history} onKeyDown={event => {
-    if (event.key === "Escape" && open && !event.defaultPrevented) { event.preventDefault(); event.stopPropagation(); setOpen(false); trigger.current?.focus(); }
+  return <div ref={root} className={styles.history} onKeyDown={event => {
+    if (event.key === "Escape" && open && !event.defaultPrevented) { event.preventDefault(); event.stopPropagation(); close(); }
+  }} onBlur={event => {
+    if (event.relatedTarget && !root.current?.contains(event.relatedTarget as Node)) dismiss();
   }}>
-    <button type="button" ref={trigger} className={styles.toggle} aria-label={label} aria-expanded={open} aria-controls={id} onClick={() => setOpen(value => !value)}>
-      <History size={15} strokeWidth={1.5} /><span>{label}</span>
-      <ChevronDown className={styles.chevron} size={14} data-open={open} />
+    <button type="button" ref={trigger} className={styles.toggle} aria-label={label} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined} onClick={() => setOpen(value => !value)}>
+      <History size={16} strokeWidth={1.5} aria-hidden="true" />
     </button>
-    <div id={id} className={styles.reveal} data-open={open} aria-hidden={!open} inert={!open}>
-      <div><div className={styles.content}>
+    {open && <div ref={panel} id={id} className={styles.panel} popover="manual" role="dialog" aria-labelledby={`${id}-title`}>
+      <header className={styles.header}><h2 id={`${id}-title`}>{label}</h2>
+        <button type="button" ref={closeButton} className={styles.close} onClick={close} aria-label={ru ? "Закрыть историю выполнения" : "Close execution history"}><X size={16} aria-hidden="true" /></button>
+      </header>
+      <div className={styles.content}>
         {offline ? <p className={styles.hint}>{ru ? "Подключитесь, чтобы посмотреть историю." : "Connect to view history."}</p> : <>
           {showFilters && <div className={styles.filters}>
             <AnimatedSelect compact label={ru ? "Попытка" : "Attempt"} value={allAttempts ? "all" : "current"}
@@ -41,9 +48,9 @@ export function ExecutionHistoryFeature({ scope, attemptNo, version, steps, offl
               options={[{ value: "", label: ru ? "Все записи" : "All activity" }, ...steps.map(step => ({ value: step.id, label: `${ru ? "Шаг" : "Step"} ${step.order}` }))]}
               onChange={setStepId} />}
           </div>}
-          <ExecutionHistory state={visible} locale={locale} workspaceId={scope.workspaceId} steps={steps} filtered={filtered} />
+          <ExecutionHistory state={state} locale={locale} workspaceId={scope.workspaceId} steps={steps} filtered={filtered} />
         </>}
-      </div></div>
-    </div>
-  </section>;
+      </div>
+    </div>}
+  </div>;
 }

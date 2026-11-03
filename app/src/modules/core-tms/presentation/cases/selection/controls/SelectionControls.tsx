@@ -22,7 +22,7 @@ export function useSelectionFilters(cases: TestCaseSummary[], initial: InitialSe
   const options = useMemo(() => ({ ...caseFieldOptions(cases), folders: [...new Set(cases.map((c) => c.folderPath))].sort(),
     components: [...new Set(cases.map((c) => c.component).filter(Boolean))].sort(), tags: [...new Set(cases.flatMap(item => item.tags))].sort() }), [cases]);
   const visible = useMemo(() => filterCaseRows(cases.filter((c) =>
-    (filters.includeArchived || !c.archivedAt) && (filters.type === "all" || c.type === filters.type)
+    (!filters.maintenanceStatus || filters.maintenanceStatus === "all" || (c.maintenance?.status ?? "current") === filters.maintenanceStatus) && (filters.includeArchived || !c.archivedAt) && (filters.type === "all" || c.type === filters.type)
     && (filters.priority === "all" || c.priority === filters.priority)
     && (filters.lifecycle === "all" || c.lifecycle === filters.lifecycle)
     && (!filters.tag || c.tags.some((tag) => tag.toLowerCase().includes(filters.tag.toLowerCase()))))
@@ -41,7 +41,7 @@ export function SelectionControls({ state, ru, onSelectAll, action, extraSection
   const queryTools = <>
       <button ref={qlButton} className={css.tool} type="button" disabled={disabled} aria-label={ru ? "QL-запрос" : "QL query"} data-active={Boolean(state.qlQuery) || undefined} aria-expanded={ql} onClick={() => setQl(!ql)}>QL</button>
       <div className={css.filter}><button className={css.tool} type="button" disabled={disabled} aria-expanded={filter} aria-haspopup="dialog" aria-controls="case-filter-panel"
-        data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
+        data-active={extraSections?.some((item) => item.active) || Boolean(fieldFilterCount(state.facets) || state.facets.owners?.length || state.facets.folders.length || state.facets.components.length || state.filters.tag || state.filters.type !== "all" || state.filters.priority !== "all" || state.filters.lifecycle !== "all" || (state.filters.maintenanceStatus && state.filters.maintenanceStatus !== "all") || state.filters.includeArchived) || undefined} aria-label={ru ? "Фильтры" : "Filters"} onClick={() => setFilter(!filter)}><PiFunnelSimple size={16} /></button>
         {filter && <CaseFilterMenu locale={ru ? "ru" : "en"} filters={state.filters} onFilters={state.setFilters}
           customSectionsOnly={inline} extraSections={extraSections} onResetExtra={onResetExtra} facets={state.facets} onFacets={state.setFacets} options={state.options} onClose={() => setFilter(false)} />}</div>
   </>;

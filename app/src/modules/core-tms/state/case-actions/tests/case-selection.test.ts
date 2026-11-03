@@ -7,6 +7,7 @@ import { saveCaseWithAttachments } from "../../../application/evidence/case/save
 import { componentHarness } from "../../../portfolios/tests/support/component-harness";
 import type { useCaseActions } from "../useCaseActions";
 import type { useCaseEditorState } from "../../case-editor/useCaseEditorState";
+import { reconcileMaintenance } from "../../../test-cases/maintenance/model/case-maintenance";
 
 function setup() {
   const h = componentHarness(undefined, { structuredClone });
@@ -23,6 +24,7 @@ function setup() {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
     if (name.endsWith("caseRevision")) return { createEmptyRevision, normalizeRevisionTags };
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
+    if (name.endsWith("case-maintenance")) return { reconcileMaintenance };
     if (name.endsWith("pendingCaseAttachment")) return { pendingCaseAttachmentSignature: () => "" };
     if (name.endsWith("saveCaseWithAttachments")) return { saveCaseWithAttachments };
     if (name.endsWith("test-case-api")) return { createTestCase: async () => ({ data: created, etag: '"created:1"' }), getTestCase: async () => ({ data: created, etag: '"created:1"' }) };
@@ -30,7 +32,7 @@ function setup() {
   const render = () => h.render(() => {
     const state = { ...editor.useCaseEditorState("en", () => { dialog = null; }), connection: "connected", selectedFolder: "/Login",
       selectedCaseId: selectedId, selectedCaseDetail: detail, selectedCaseEtag: etag,
-      setSelectedCaseId: (id: string) => { selectedId = id; }, setSelectedCaseDetail: (value: TestCase | null) => { detail = value; },
+      setSelectedCaseId: (id: string) => { selectedId = id; }, setSelectedCaseDetail: (value: TestCase | null | ((current: TestCase | null) => TestCase | null)) => { detail = typeof value === "function" ? value(detail) : value; },
       setSelectedCaseEtag: (value: string | null) => { etag = value; }, setSelectedFolder() {}, setSelectedFolderId() {},
       setDialog: (value: string | null) => { dialog = value; },
       setData: (update: (data: { testCases: TestCase[] }) => { testCases: TestCase[] }) => { items = update({ testCases: items }).testCases; },

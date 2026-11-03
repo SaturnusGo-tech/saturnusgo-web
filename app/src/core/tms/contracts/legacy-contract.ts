@@ -1,3 +1,4 @@
+import type { components } from "../generated/tms-api";
 import type { CaseFields } from "./custom-fields/case-fields";
 import type { TestCaseRevision, TestRunSummary } from "./execution-contract";
 export type {
@@ -33,6 +34,7 @@ export type Environment = {
 };
 
 export type TestCaseSummary = CaseFields & {
+  maintenance?: components["schemas"]["CaseMaintenance"];
   id: string;
   projectId: string;
   key: string;

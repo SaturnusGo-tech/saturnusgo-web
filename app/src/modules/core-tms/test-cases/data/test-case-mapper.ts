@@ -58,6 +58,7 @@ export function mapTestCaseRevision(dto: ApiRevision): TestCaseRevision {
 
 export function mapTestCaseSummary(dto: ApiSummary): TestCaseSummary {
   return {
+    ...(dto.maintenance ? { maintenance: { ...dto.maintenance, source: dto.maintenance.source ? { ...dto.maintenance.source } : null } } : {}),
     id: dto.id,
     projectId: dto.projectId,
     key: dto.key,
@@ -84,6 +85,7 @@ export function mapTestCaseSummary(dto: ApiSummary): TestCaseSummary {
 export function mapTestCase(dto: ApiCase): TestCase {
   const current = mapTestCaseRevision(dto.current);
   return {
+    ...(dto.maintenance ? { maintenance: { ...dto.maintenance, source: dto.maintenance.source ? { ...dto.maintenance.source } : null } } : {}),
     id: dto.id,
     projectId: dto.projectId,
     key: dto.key,

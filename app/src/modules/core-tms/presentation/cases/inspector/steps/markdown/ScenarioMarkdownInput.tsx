@@ -1,7 +1,7 @@
 "use client";
 
 import { Bold, Code, FileCode2, List, Pencil, Check } from "lucide-react";
-import { useLayoutEffect, useRef, useState, type ClipboardEventHandler } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode, type ClipboardEventHandler } from "react";
 import { ScenarioMarkdown } from "./ScenarioMarkdown";
 import { formatStepSelection, type StepFormat } from "./format/formatSelection";
 import { pasteMarkdown } from "./paste/pasteMarkdown";
@@ -14,17 +14,25 @@ import { RawHighlightToolbar } from "../../markdown/highlight/raw/RawHighlightTo
 import { formatHighlightSelection } from "../../markdown/highlight/selection/highlightSelection";
 import type { HighlightColor } from "../../markdown/highlight/model/highlightColors";
 
+import { EmojiButton } from "../../../../common/emoji/EmojiButton";
+import { useTextareaEmoji } from "../../../../common/emoji/selection/useTextareaEmoji";
+
 type Props = {
   id?: string; value: string; label: string; placeholder: string; ru: boolean;
   autoFocus?: boolean; onChange: (value: string) => void;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
+  renderFooter?: (emoji: ReactNode) => ReactNode;
 };
 
 export function ScenarioMarkdownInput(props: Props) {
   const [editing, setEditing] = useState(Boolean(props.autoFocus));
   const [writing, setWriting] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const history = useStepHistory(props.value, props.onChange, input);
+  const emoji = useTextareaEmoji(props.value, input, (next, caret) => {
+    history.boundary(); history.record(next, false, {start:caret,end:caret}); setEditing(true);
+  }, history.boundary);
   const shell = useRef<HTMLDivElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
   const markerSelection = useRef({ value: "", start: 0, end: 0 });
@@ -70,7 +78,7 @@ export function ScenarioMarkdownInput(props: Props) {
     { kind: "list", Icon: List, label: props.ru ? "Список" : "List" },
   ] as const;
   return <div ref={shell} className={css.input} data-editing={editing} onBlur={(event) => {
-    if (!writing && !event.currentTarget.contains(event.relatedTarget as Node | null)) setEditing(false);
+    if (!writing && !emojiOpen && !event.currentTarget.contains(event.relatedTarget as Node | null)) setEditing(false);
   }}>
     <div className={css.toolbarReveal}><div><div className={css.toolbar} role="group" aria-label={props.ru ? "Форматирование шага" : "Step formatting"}>
       <WritingAction ru={props.ru} capture={captureWriting} tabIndex={editing ? 0 : -1} onOpenChange={setWriting} />
@@ -100,5 +108,7 @@ export function ScenarioMarkdownInput(props: Props) {
       <button ref={editButton} id={props.id ? `${props.id}-edit` : undefined} type="button" className={css.edit}
         aria-label={`${props.ru ? "Изменить" : "Edit"}: ${props.label}`} onClick={edit}><Pencil size={13} /></button>
     </div>}
+    {props.renderFooter ? props.renderFooter(<EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />)
+      : <EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} onOpenChange={setEmojiOpen} />}
   </div>;
 }

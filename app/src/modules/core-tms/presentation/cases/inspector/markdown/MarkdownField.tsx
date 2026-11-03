@@ -29,6 +29,7 @@ type Props = {
   contextContent?: ReactNode;
   appearance?: "plain";
   onRequestEdit?: () => void;
+  renderFooter?: (emoji: ReactNode) => ReactNode;
 };
 
 const WysiwygMarkdownEditor = dynamic(
@@ -139,6 +140,7 @@ function MarkdownFieldContent(props: Props) {
     }}>
       <MarkdownContextContent.Provider value={props.contextContent}>
       <WysiwygMarkdownEditor
+        renderFooter={props.renderFooter}
         markdown={props.value}
         label={props.label}
         locale={locale}

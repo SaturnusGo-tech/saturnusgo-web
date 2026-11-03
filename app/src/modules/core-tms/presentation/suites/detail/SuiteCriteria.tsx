@@ -17,7 +17,7 @@ export function SuiteCriteria({ suite, folders, ru }: { suite: Suite; folders: r
     <p>{hasRules ? (ru ? "Активные кейсы, подходящие под все правила." : "Active cases matching every rule.") : (ru ? "Все активные кейсы этого проекта." : "All active cases in this project.")}</p>
     {hasRules && <ul className={css.criteria}>
       {(rule.folderId || rule.folderPathPrefix) && <li className={css.folderRule}>
-        <SuiteFolderPath path={folder?.path ?? rule.folderPathPrefix ?? "/"} ru={ru} unavailable={Boolean(rule.folderId && !folder)} />
+        <SuiteFolderPath appearance={folder?.appearance} folderId={folder?.id} projectId={suite.projectId} path={folder?.path ?? rule.folderPathPrefix ?? "/"} ru={ru} unavailable={Boolean(rule.folderId && !folder)} />
         <small>{ru ? "Включая вложенные" : "Includes subfolders"}</small>
       </li>}
       {rule.tags?.map(tag => <li className={css.criterion} key={`tag:${tag}`} title={ru ? "Кейс должен содержать этот тег" : "Cases must include this tag"}><span>{`#${tag}`}</span></li>)}

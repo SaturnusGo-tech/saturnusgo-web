@@ -1,24 +1,20 @@
 import { resolveTmsApiBase } from "../config/api-base";
 import type { components } from "../generated/tms-api";
-
 type ApiError = components["schemas"]["Error"];
 export type TmsApiErrorCode = ApiError["code"] | "HTTP_ERROR";
-
 export type MutationMethod = "POST" | "PATCH" | "DELETE";
 export type TmsAccessTokenProvider = (signal?: AbortSignal) => Promise<string>;
-
 export type TmsResource<T> = {
   readonly data: T;
   readonly etag: string | null;
 };
-
 export type TmsMutationOptions = {
   readonly signal?: AbortSignal;
   readonly ifMatch?: string;
   readonly idempotencyKey?: string;
 };
-
 export interface TmsHttpClient {
+  binary?(path: string, body: Blob, signal?: AbortSignal): Promise<Response>;
   stream?(path: string, body: unknown, signal?: AbortSignal): Promise<Response>;
   get<T>(path: string, signal?: AbortSignal): Promise<T>;
   getResource<T>(path: string, signal?: AbortSignal): Promise<TmsResource<T>>;
@@ -30,7 +26,6 @@ export interface TmsHttpClient {
     options?: TmsMutationOptions,
   ): Promise<TmsResource<T>>;
 }
-
 export interface TmsHttpClientConfiguration {
   readonly apiBase: string;
   readonly accessToken?: TmsAccessTokenProvider;
@@ -38,7 +33,6 @@ export interface TmsHttpClientConfiguration {
   readonly fetch?: typeof fetch;
   readonly production?: boolean;
 }
-
 export class TmsApiError extends Error {
   constructor(
     message: string,
@@ -52,13 +46,11 @@ export class TmsApiError extends Error {
     this.name = "TmsApiError";
   }
 }
-
 function boundedString(value: unknown, maximum: number): string | null {
   if (typeof value !== "string") return null;
   const normalized = value.trim();
   return normalized.length > 0 && normalized.length <= maximum ? normalized : null;
 }
-
 async function responseError(response: Response): Promise<TmsApiError> {
   let body: unknown;
   try {
@@ -142,6 +134,9 @@ export function createTmsHttpClient(
   }
 
   return Object.freeze({
+    async binary(path: string, body: Blob, signal?: AbortSignal): Promise<Response> {
+      return request(path, { method: "POST", headers: { "Content-Type": body.type || "application/octet-stream", Accept: "image/png, image/gif" }, body }, signal);
+    },
     async stream(path: string, body: unknown, signal?: AbortSignal): Promise<Response> {
       return request(path, {
         method: "POST",

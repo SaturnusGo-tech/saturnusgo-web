@@ -23,7 +23,7 @@ export function elements(node: unknown, matches: (element: Element) => boolean):
 }
 export const folder = (id: string, path: string, parentId: string | null = null): RepositoryFolder => ({
   id, path, parentId, name: path.split("/").slice(-1)[0], workspaceId: "workspace", projectId: "project",
-  archivedAt: null, rowVersion: 1, createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z", etag: `"${id}:1"`,
+  archivedAt: null, appearance: null, rowVersion: 1, createdAt: "2026-09-09T00:00:00Z", updatedAt: "2026-09-09T00:00:00Z", etag: `"${id}:1"`,
 });
 export const caseDrag = (caseId: string) => ({ id: `case:${caseId}`, data: { current: { kind: "case", caseId } },
   rect: { current: { initial: null, translated: null } } });
@@ -62,6 +62,7 @@ export function dragHarness(selected = new Set<string>()) {
       if (name === "@dnd-kit/core") return { DndContext: "DndContext", DragOverlay: "DragOverlay", PointerSensor, pointerWithin,
         useSensor: (sensor: unknown, options: unknown) => ({ sensor, options }), useSensors: (...sensors: unknown[]) => sensors };
       if (name === "react-icons/pi") return { PiFilesDuotone: "FilesIcon", PiFolderSimpleDuotone: "FolderIcon" };
+      if (name.endsWith("FolderVisual")) return { FolderVisual: "FolderIcon" };
       if (name.endsWith("repository-drop")) return { canDropRepositoryDrag, repositoryDrag };
       if (name.endsWith("drag-click")) return { DragClickContext: { Provider: "DragClickProvider" }, RepositoryDragSelectionContext: { Provider: "DragSelectionProvider" } };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };

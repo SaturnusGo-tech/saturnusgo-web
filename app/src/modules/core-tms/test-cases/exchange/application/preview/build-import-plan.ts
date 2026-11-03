@@ -6,7 +6,7 @@ import { importDestinationPath, validateImportFolderPath } from "../../validatio
 export function buildImportPlan(document: TestCaseExchangeDocument, destination: string,
   existing: readonly RepositoryFolder[]): ImportPlan {
   validateImportFolderPath(destination);
-  const known = new Set(existing.filter((folder) => !folder.archivedAt).map((folder) => folder.path));
+  const known = new Map(existing.filter((folder) => !folder.archivedAt).map((folder) => [folder.path, folder]));
   if (destination !== "/" && !known.has(destination)) throw new Error("The destination folder is unavailable.");
   const testCases = document.testCases.map((item) => ({ ...item,
     folderPath: importDestinationPath(destination, item.folderPath) }));
@@ -19,6 +19,7 @@ export function buildImportPlan(document: TestCaseExchangeDocument, destination:
     if (paths.size > 2_000) throw new Error("The import may contain at most 2,000 folders.");
   }
   const folders = [...paths].sort((left, right) => left.localeCompare(right)).map((path) => ({
+    folderId: known.get(path)?.id, appearance: known.get(path)?.appearance ?? null,
     path, name: path.slice(path.lastIndexOf("/") + 1), parentPath: path.slice(0, path.lastIndexOf("/")) || "/",
     exists: known.has(path), caseIndices: testCases.flatMap((item, index) => item.folderPath === path ? [index] : []),
   }));

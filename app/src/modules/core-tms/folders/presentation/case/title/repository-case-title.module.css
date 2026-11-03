@@ -1,0 +1,11 @@
+.viewport { display: block; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.track { display: inline-block; width: max-content; min-width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  :global(button:hover) .viewport[data-overflow] .track,
+  :global(button:focus-visible) .viewport[data-overflow] .track { animation: read-title var(--title-duration) 350ms linear infinite; }
+}
+@keyframes read-title { 0%, 10%, 100% { transform: translateX(0); } 45%, 60% { transform: translateX(var(--title-offset)); } }
+@media (prefers-reduced-motion: reduce) {
+  :global(button:hover) .viewport, :global(button:focus-visible) .viewport { white-space: normal; overflow-wrap: anywhere; }
+  :global(button:hover) .viewport .track, :global(button:focus-visible) .viewport .track { display: inline; width: auto; }
+}

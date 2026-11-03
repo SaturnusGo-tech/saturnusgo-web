@@ -48,7 +48,7 @@ function revisionWrite(revision: TestCaseRevision) {
   } satisfies Omit<Api["TestCasePatchRequest"], "folderPath">;
 }
 
-export async function listTestCases(http: TmsHttpClient, projectId: string, signal?: AbortSignal) {
+export async function listTestCases(http: TmsHttpClient, projectId: string, signal?: AbortSignal, maintenanceStatus?: "current" | "needs_update") {
   const items: Api["TestCaseSummary"][] = [];
   const seenCursors = new Set<string>();
   let cursor: string | null = null;
@@ -56,6 +56,7 @@ export async function listTestCases(http: TmsHttpClient, projectId: string, sign
   for (let page = 0; page < LIST_PAGE_LIMIT; page += 1) {
     signal?.throwIfAborted();
     const query = new URLSearchParams({ projectId, includeArchived: "true", limit: String(LIST_PAGE_SIZE) });
+    if (maintenanceStatus) query.set("maintenanceStatus", maintenanceStatus);
     if (cursor) query.set("cursor", cursor);
     const envelope = await http.get<Api["TestCaseListEnvelope"]>(`/test-cases?${query}`, signal);
     items.push(...envelope.data);

@@ -32,7 +32,7 @@ test("compact history is closed by default and keeps attempt/step filters bound 
   assert.match(JSON.stringify(view.toJSON()), /No matching records/);
   await act(async () => toggle().props.onClick());
   assert.equal(toggle().props["aria-expanded"], false);
-  assert.ok(view.root.findAll(node => node.props.inert === true).length);
+  assert.equal(view.root.findAllByProps({ role: "dialog" }).length, 0);
   await act(async () => view.unmount());
 });
 test("offline history opens a concise connection hint and never fetches", async () => {

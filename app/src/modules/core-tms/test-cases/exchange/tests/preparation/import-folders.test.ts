@@ -8,7 +8,7 @@ import { parseTestCaseExchange } from "../../validation/parse-test-case-exchange
 
 const scope = { workspaceId: "workspace", projectId: "project" };
 function folder(id: string, path: string, parentId: string | null = null): RepositoryFolder {
-  return { ...scope, id, path, parentId, name: path.slice(path.lastIndexOf("/") + 1), rowVersion: 1,
+  return { ...scope, id, path, parentId, appearance: null, name: path.slice(path.lastIndexOf("/") + 1), rowVersion: 1,
     archivedAt: null, createdAt: "2026-09-09", updatedAt: "2026-09-09", etag: `"folder:${id}:1"` };
 }
 function plan(existing: RepositoryFolder[] = []) {

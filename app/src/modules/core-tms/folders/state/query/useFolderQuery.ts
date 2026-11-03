@@ -21,11 +21,18 @@ export function useFolderQuery(http: TmsHttpClient, scope: FolderScope, enabled:
     setLoading(true); setError("");
     listFolders(http, scope, controller.signal).then((next) => {
       if (controller.signal.aborted) return;
-      loaded.current = scopeKey; setItems(next);
+      loaded.current = scopeKey; setItems(previous => next.map(folder => {
+        const confirmed = previous.find(item => item.id === folder.id && item.workspaceId === folder.workspaceId && item.projectId === folder.projectId);
+        return confirmed && confirmed.rowVersion > folder.rowVersion ? confirmed : folder;
+      }));
     }).catch((failure: unknown) => {
       if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Unable to load folders.");
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [http, scopeKey, enabled, generation]);
-  return { items: loaded.current === scopeKey ? items : [], loading: enabled && !error && (loaded.current !== scopeKey || loading), error, reload };
+  const reconcile = (folder: RepositoryFolder) => {
+    if (folder.workspaceId === scope.workspaceId && folder.projectId === scope.projectId)
+      setItems(current => current.map(item => item.id === folder.id && item.rowVersion <= folder.rowVersion ? folder : item));
+  };
+  return { reconcile, items: loaded.current === scopeKey ? items : [], loading: enabled && !error && (loaded.current !== scopeKey || loading), error, reload };
 }

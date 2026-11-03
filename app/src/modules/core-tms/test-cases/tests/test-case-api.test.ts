@@ -21,6 +21,7 @@ const summary: Api["TestCaseRevisionSummary"] = {
   createdBy: "identity-1", createdAt: time,
 };
 const caseSummary = (id: number): Api["TestCaseSummary"] => ({
+  maintenance: { status: "current", rowVersion: 0, updatedBy: null, updatedAt: null, note: null, source: null, etag: `"test-case-maintenance:case-${id}:v0"` },
   id: `case-${id}`, projectId: "project-1", key: `HOST-TC-${id}`,
   folderId: null, folderPath: "/Host", currentRevision: 1, title: `Case ${id}`, type: "automated",
   lifecycle: "ready", priority: "medium", customFields: [], productGroupId: null, productId: null, regression: false, component: "Host", ownerIdentityId: null,

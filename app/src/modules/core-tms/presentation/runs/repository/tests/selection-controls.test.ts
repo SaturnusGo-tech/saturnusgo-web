@@ -10,6 +10,7 @@ function browser() {
   const h = componentHarness(); const selected: string[][] = [];
   const { RunRepositoryBrowser: render } = h.load<{ RunRepositoryBrowser: typeof RunRepositoryBrowser }>(new URL("../RunRepositoryBrowser.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("useRunFolderAppearance")) return { useRunFolderAppearance: () => [] };
     if (name.endsWith("run-repository")) return { runRepositoryFolders: () => [] };
     if (name.endsWith("run-history")) return { isWorkingRun };
   });
@@ -45,7 +46,7 @@ test("run selection commands stay mounted and inaccessible until selection mode 
 });
 
 test("runs expose the selection toggle in repository controls and no refresh action", () => {
-  const h = browser(); const controls = h.all().find(node => node.type === "SelectionControls")!;
+  const h = browser(); assert.ok(h.all().filter(node => node.type === "SelectionTree").every(node => node.props.titleMode === "marquee")); const controls = h.all().find(node => node.type === "SelectionControls")!;
   assert.equal(controls.props.repository, true); assert.equal(controls.props.onSelectAll, undefined);
   const action = nodes(controls.props.action).find(node => node.type === "button")!;
   assert.equal(action.props["aria-label"], "Select test cases");

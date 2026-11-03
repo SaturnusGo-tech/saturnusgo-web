@@ -37,7 +37,7 @@ export function SuiteRepository(props: Props) {
       return <li key={item.id}><button type="button" className={css.case} onClick={() => props.onOpen(item)} aria-label={`${item.key}: ${item.title}`}>
         <PiListChecks size={17} aria-hidden="true" />
         <span className={css.caseCopy}><strong title={item.title}>{item.title}</strong><span className={css.caseContext}><span>{item.key}</span>
-          <SuiteFolderPath path={path} ru={props.ru} unavailable={Boolean(item.folderId && !folder)} />
+          <SuiteFolderPath appearance={folder?.appearance} folderId={folder?.id} projectId={item.projectId} path={path} ru={props.ru} unavailable={Boolean(item.folderId && !folder)} />
         </span></span>
         {item.priority && <PrioritySignal priority={item.priority} label={priority[item.priority]} size={13} />}
         <span className={css.lifecycle}><LifecycleBadge locale={props.ru ? "ru" : "en"} lifecycle={item.lifecycle} archived={Boolean(item.archivedAt)} /></span>

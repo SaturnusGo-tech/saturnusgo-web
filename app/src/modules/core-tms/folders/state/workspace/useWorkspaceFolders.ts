@@ -1,3 +1,4 @@
+import { AppearanceConflict } from "../../application/appearance/appearance-conflict";
 import { createMoveReceipt, restoreMove, type MoveReceipt } from "../../model/move/move-undo";
 import { useEffect, useRef, useState } from "react";
 import { TmsApiError } from "../../../../../core/tms/transport/http";
@@ -126,6 +127,22 @@ export function useWorkspaceFolders(state: ReturnType<typeof useWorkspaceState>,
     return Boolean(await command(`${operation}:${folder.id}:${folder.etag}`, (key) => transitionFolder(http, scope, folder, operation, key)));
   }
   return {
+    async saveAppearance(folder, appearance, key) {
+      if (!canManage || folder.archivedAt) throw new Error(ru ? "Нет доступа к настройке папки." : "Folder customization is unavailable.");
+      const isCurrent = captureCurrent();
+      try {
+        const result = await changeFolder(http, scope, folder, { appearance }, key);
+        if (isCurrent()) query.reconcile(result.data);
+        return result.data;
+      } catch (failure) {
+        if (failure instanceof TmsApiError && failure.status === 412) {
+          const current = await http.get<{ data: RepositoryFolder }>(`/workspaces/${encodeURIComponent(scope.workspaceId)}/projects/${encodeURIComponent(scope.projectId)}/folders/${encodeURIComponent(folder.id)}`);
+          if (isCurrent()) query.reconcile(current.data);
+          throw new AppearanceConflict(ru ? "Папка изменилась. Проверьте оформление и повторите." : "The folder changed. Review its appearance and retry.", current.data);
+        }
+        throw failure;
+      }
+    },
     ...query, reload, lastMove, undoMove, dismissMove, error: mutationError || query.error, busy, canManage,
     async create(name, parentId) {
       const result = await command(`create:${parentId}:${name}`, (key) => createFolder(http, scope, { name, parentId }, key));

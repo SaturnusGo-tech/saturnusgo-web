@@ -155,9 +155,9 @@ function ChecklistRow(props: {
       <ScenarioTextInput id={`checklist-${props.id}`} value={props.text}
         label={`${props.ru ? "Пункт" : "Item"} ${props.order}`}
         placeholder={props.ru ? "Проверка" : "Check"}
-        autoFocus={props.autoFocus} className={css.lineInput}
+        autoFocus={props.autoFocus} className={css.lineInput} ru={props.ru}
+        renderFooter={(emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`checklist:${props.id}`} />}
         onChange={(text) => props.onChange({ text })} onPaste={attachments.paste} />
-      <ScenarioAttachmentControls fieldKey={`checklist:${props.id}`} />
     </div>
     <label className={css.checklistRequired}>
       <input type="checkbox" checked={props.required}

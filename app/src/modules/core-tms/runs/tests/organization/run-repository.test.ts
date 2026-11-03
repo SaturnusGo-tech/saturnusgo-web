@@ -35,3 +35,11 @@ test("combined grouping deduplicates repeated tags and retains one item identity
   assert.deepEqual(groups.flatMap(group => group.cases.map(entry => entry.id)), ["item", "item"]);
   assert.equal(runRepositoryGroups([projected], [], [], true).length, 1);
 });
+
+test("run synthetic tree retains live folder artwork only from the matching project and workspace", () => {
+  const appearance = { kind: "emoji", emoji: "🧪" } as const;
+  const catalog = [{ id: "live-folder", workspaceId: "workspace", projectId: "project", path: "/Moved", appearance },
+    { id: "other", workspaceId: "workspace", projectId: "foreign", path: "/Moved", appearance: { kind: "emoji", emoji: "🐞" } }] as import("../../../folders/model/folder").RepositoryFolder[];
+  assert.deepEqual(runRepositoryFolders("workspace", "group:1", [projected], catalog)[0]?.appearance, appearance);
+  assert.equal(runRepositoryFolders("other-workspace", "group:1", [projected], catalog)[0]?.appearance, null);
+});

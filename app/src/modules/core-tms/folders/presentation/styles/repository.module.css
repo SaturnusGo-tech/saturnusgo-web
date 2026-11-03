@@ -44,8 +44,8 @@
 .folderRow[data-selected]:hover, .leaf[data-selected]:hover, .leaf[data-active]:hover { background: var(--falcon-hover); }
 .disclosure { width: 20px; }
 .folderName { min-width: 0; display: flex; align-items: center; flex: 1; gap: 7px; padding: 7px 0 7px 4px; text-align: left; font-size: 12px !important; touch-action: pan-y; }
-.folderName svg { flex-shrink: 0; color: var(--falcon-folder); }
-.folderName > span { min-width: 50px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
+.folderName > svg { flex-shrink: 0; color: var(--falcon-folder); }
+.folderName > .folderLabel { min-width: 50px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
 .folderName small { color: var(--falcon-text-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
 .menuButton { width: 21px; flex: 0 0 21px; opacity: 0; }
 .folderRow:hover .menuButton, .folderRow:focus-within .menuButton { opacity: 1; }
@@ -112,7 +112,7 @@
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository { padding-top: 12px; border-color: var(--falcon-border); background: var(--falcon-sidebar); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) :is(.folderRow, .leaf) { border-radius: 12px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-weight: 600; }
-:global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > .folderLabel { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderRow { padding-block: 3px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .caseCopy { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
 
@@ -134,3 +134,6 @@
 .treeHeading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .folderName, .caseButton { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+.folderIdentity { display: flex; align-items: center; gap: 4px; min-width: 0; padding-inline-start: 4px; }
+.folderIdentity .folderName { flex: 1; padding-inline-start: 0; }

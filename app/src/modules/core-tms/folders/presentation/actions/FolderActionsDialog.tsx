@@ -1,3 +1,5 @@
+import { FolderVisual } from "../appearance/visual/FolderVisual";
+import { FolderAppearanceControl } from "../appearance/control/FolderAppearanceControl";
 import { useState } from "react";
 import { PiArrowCounterClockwise, PiArchiveDuotone, PiFilePlusDuotone, PiFolderPlusDuotone, PiPencilSimple } from "react-icons/pi";
 import { FolderBreadcrumb } from "../../../presentation/dialogs/folder/breadcrumb/FolderBreadcrumb";
@@ -26,7 +28,7 @@ export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCas
     }} />;
   return <Modal title={folder.name} onClose={() => { if (!resource.busy) onClose(); }} panelClassName={css.dialog}>
     <div className={css.body}>
-      <p><FolderBreadcrumb path={folder.path} /></p>
+      <p><FolderVisual folderId={folder.id} /><FolderBreadcrumb path={folder.path} /></p>
       {action === "archive" ? <><p>{ru ? "Папка, вложенные папки и их кейсы будут отправлены в архив. История и прогоны сохранятся. Эту ветку можно восстановить целиком." : "This folder, its subfolders and cases will be archived. History and runs are preserved. You can restore the whole branch."}</p>
         <button className={shared.primaryButton} disabled={resource.busy} onClick={async () => { if (await resource.archive(folder)) onClose(); }}>{ru ? "Архивировать папку" : "Archive folder"}</button></>
         : <div className={css.actions}>
@@ -36,6 +38,7 @@ export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCas
               if (!onCreateFolder || resource.busy) return;
               onClose(); onCreateFolder(folder.id);
             }}><PiFolderPlusDuotone />{ru ? "Новая подпапка" : "New subfolder"}</button>
+            <FolderAppearanceControl folder={resource.items.find(item => item.id === folder.id) ?? folder} editable={resource.canManage} disabled={resource.busy} ru={ru} labelled />
             <button onClick={() => setAction("edit")}><PiPencilSimple />{ru ? "Название и расположение" : "Name and location"}</button>
             <button onClick={() => setAction("archive")}><PiArchiveDuotone />{ru ? "Архивировать папку" : "Archive folder"}</button>
           </>}

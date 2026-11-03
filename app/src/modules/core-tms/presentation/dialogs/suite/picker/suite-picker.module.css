@@ -14,9 +14,9 @@
 .folderNav{display:flex;flex-direction:column;gap:2px;min-width:0}
 .folderHeading{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--falcon-text-muted);font-size:11px;font-weight:500;padding:2px 8px 10px;line-height:16px}
 .allFolders,.folderButton{display:flex;align-items:center;gap:7px;min-width:0;min-height:34px;text-align:start;color:var(--falcon-text-muted);background:transparent;border:0;border-radius:7px;font:inherit;font-size:12px;padding:7px 8px;cursor:pointer}
-.allFolders{width:100%;margin-bottom:5px}.allFolders>span,.folderButton>span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.allFolders{width:100%;margin-bottom:5px}.allFolders>span:not([data-folder-visual]),.folderButton>span:not([data-folder-visual]){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .allFolders small,.folderButton small{font-size:11px;color:var(--falcon-text-muted);font-variant-numeric:tabular-nums;font-weight:400;flex:none}
-.allFolders svg,.folderButton svg{flex:none;color:var(--falcon-folder)}.allFolders[aria-current],.folderButton[aria-current]{background:var(--falcon-hover);color:var(--falcon-text)}
+.allFolders>svg,.folderButton>svg{flex:none;color:var(--falcon-folder)}.allFolders[aria-current],.folderButton[aria-current]{background:var(--falcon-hover);color:var(--falcon-text)}
 .folderRow{display:flex;align-items:center;gap:0;min-width:0}.folderButton{flex:1;padding-inline-start:2px}
 .folderChevron,.folderChevronSpace{display:grid;place-items:center;width:18px;height:30px;flex:none}
 .folderChevron{padding:0;border:0;border-radius:5px;background:transparent;color:var(--falcon-text-muted);cursor:pointer}

@@ -10,11 +10,11 @@ export function useStepHistory(value: string, onChange: (value: string) => void,
   if (state.current.entries[state.current.index].value !== value) {
     state.current = { entries: [{ value, start: 0, end: 0 }], index: 0, typedAt: 0 };
   }
-  function record(next: string, typing = false) {
+  function record(next: string, typing = false, caret?: {start:number;end:number}) {
     const history = state.current, node = input.current;
     if (next === history.entries[history.index].value) return;
     const now = Date.now();
-    const entry = { value: next, start: node?.selectionStart ?? next.length, end: node?.selectionEnd ?? next.length };
+    const entry = { value: next, start: caret?.start ?? node?.selectionStart ?? next.length, end: caret?.end ?? node?.selectionEnd ?? next.length };
     const coalesce = typing && history.typedAt && now - history.typedAt < 800 && history.index > 0;
     history.entries = history.entries.slice(0, history.index + 1);
     if (coalesce) history.entries[history.index] = entry;

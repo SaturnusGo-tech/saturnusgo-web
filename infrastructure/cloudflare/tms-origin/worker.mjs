@@ -42,7 +42,8 @@ const CONTENT_SECURITY_POLICY = [
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  "img-src 'self' data: blob: https://*.r2.cloudflarestorage.com",
+  "img-src 'self' data: blob: https://*.r2.cloudflarestorage.com " +
+    "https://static.klipy.com https://static1.klipy.com https://static2.klipy.com",
   "media-src 'self' blob: https://*.r2.cloudflarestorage.com",
   "connect-src 'self' https://api.tms.saturnusgo.com " +
     "https://dev-4v1srvqwzp1m7cdl.us.auth0.com https://*.r2.cloudflarestorage.com https:",

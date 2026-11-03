@@ -20,6 +20,7 @@ export type CaseFilters = {
   type: "all" | TestCaseRevision["type"];
   priority: "all" | TestCaseRevision["priority"];
   lifecycle: "all" | TestCaseRevision["lifecycle"];
+  maintenanceStatus?: "all" | "current" | "needs_update";
   tag: string;
   includeArchived: boolean;
 };

@@ -1,3 +1,4 @@
+import { AppearanceConflict } from "../../../application/appearance/appearance-conflict";
 import { createMoveReceipt, restoreMove } from "../../../model/move/move-undo";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
@@ -51,6 +52,7 @@ export function folderHarness() {
       if (name.endsWith("transport/http")) return { TmsApiError };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
       if (name.endsWith("useFolderQuery")) return { useFolderQuery: () => ({ items: [folder], loading: false, error: "", reload: () => { reloads++; } }) };
+      if (name.endsWith("appearance-conflict")) return { AppearanceConflict };
       if (name.endsWith("move-undo")) return { createMoveReceipt, restoreMove };
       if (name.endsWith("folder-api")) return { createFolder: write, changeFolder: write, transitionFolder: write, moveFolderCases: write, archiveFolderCases: write };
       throw new Error(`Unexpected import ${name}`);

@@ -19,6 +19,7 @@ export type AttachmentScope = { readonly projectId: string; readonly portfolioId
   | { readonly projectId?: never; readonly portfolioId: string };
 
 export type AttachmentOwner =
+  | { readonly kind: "repository_folder"; readonly folderId: string }
   | { readonly kind: "project"; readonly projectId: string }
   | { readonly kind: "portfolio"; readonly portfolioId: string }
   | { readonly kind: "shared_step_revision"; readonly sharedStepId: string; readonly revisionNo: number; readonly stepId: string }

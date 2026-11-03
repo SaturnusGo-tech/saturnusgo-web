@@ -19,7 +19,7 @@ export function PickerRows({ cases, selected, ru, readonly: readOnly, onToggle }
       <PiListChecks size={17} className={styles.caseIcon} aria-hidden="true" />
       <span className={styles.caseCopy}><span className={styles.caseTitle} title={item.title}>{item.title}</span>
         <span className={styles.caseMeta}><span>{item.key}</span><span aria-hidden="true">·</span>
-          <span className={styles.caseFolder} title={item.folderPath}><SuiteFolderPath path={item.folderPath} ru={ru} /></span>
+          <span className={styles.caseFolder} title={item.folderPath}><SuiteFolderPath path={item.folderPath} folderId={item.folderId ?? undefined} projectId={item.projectId} ru={ru} /></span>
         </span>
       </span>
       <span className={styles.priority}><PriorityBadge locale={ru ? "ru" : "en"} priority={item.priority} /></span>

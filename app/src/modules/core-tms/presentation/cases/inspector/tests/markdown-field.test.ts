@@ -64,7 +64,9 @@ test("WYSIWYG and saved Markdown share safe HTML, link, and emphasis policies", 
 
 test("case Markdown inputs attach or paste private files from the conventional lower-left position", () => {
   assert.match(toolbar, /<ListsToggle \/><CreateLink \/>/);
-  assert.match(initialized, /className=\{css\.editorFooter\}[\s\S]*<MarkdownAttachmentButton/);
+  assert.match(initialized, /addBottomAreaChild\$, MarkdownEmojiFooter/);
+  const footer = readFileSync(new URL("../markdown/emoji/MarkdownEmojiFooter.tsx", import.meta.url), "utf8");
+  assert.match(footer, /\{emoji\}[\s\S]*<MarkdownAttachmentButton/);
   assert.match(attachmentUi, /<Paperclip size=\{15\} \/>/);
   assert.match(attachmentUi, /type="file" multiple/);
   assert.doesNotMatch(attachmentUi, /accept=/);

@@ -6,7 +6,7 @@
 .fields { display: grid; gap: 18px; }
 .path { min-width: 0; display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; color: var(--falcon-text-muted); }
 .path > svg { margin-top: 3px; }
-.path > span { min-width: 0; display: grid; gap: 4px; }
+.path > span:not([data-folder-visual]) { min-width: 0; display: grid; gap: 4px; }
 .path small { color: var(--falcon-text-muted); font-size: 11px; }
 .path strong { overflow-wrap: anywhere; color: var(--falcon-text); font-size: 13px; font-weight: 500; }
 .path em { color: var(--falcon-danger); font-size: 12px; font-style: normal; }

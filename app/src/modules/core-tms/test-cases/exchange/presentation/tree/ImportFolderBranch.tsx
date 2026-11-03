@@ -1,5 +1,6 @@
+import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
 import { ChevronRight } from "lucide-react";
-import { PiFolderSimpleDuotone, PiListChecks } from "react-icons/pi";
+import { PiListChecks } from "react-icons/pi";
 import { useState } from "react";
 import type { ImportPlan, ImportFolderPreview } from "../../model/import-plan";
 import type { ImportCopy } from "../../localization/import-copy";
@@ -15,7 +16,7 @@ export function ImportFolderBranch({ folder, plan, level, copy }: {
     <button type="button" className={css.folderRow} onClick={() => setOpen(!open)}
       aria-expanded={count ? open : undefined} disabled={!count} title={folder.name}>
       <ChevronRight size={14} className={css.chevron} data-open={open && count > 0} data-hidden={!count} aria-hidden="true" />
-      <PiFolderSimpleDuotone size={18} className={css.folderIcon} aria-hidden="true" /><span>{folder.name}</span>
+      <FolderVisual appearance={folder.appearance ?? null} folderId={folder.folderId} open={open} /><span>{folder.name}</span>
       <small data-existing={folder.exists}>{folder.exists ? copy.existing : copy.new}</small>
     </button>
     {open && count > 0 && <ul className={css.treeChildren}>

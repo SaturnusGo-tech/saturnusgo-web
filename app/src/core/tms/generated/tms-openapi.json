@@ -1538,35 +1538,12 @@
             }
           },
           {
-            "name": "productGroupId",
             "in": "query",
-            "required": false,
+            "name": "maintenanceStatus",
             "schema": {
-              "$ref": "#/components/schemas/Identifier"
+              "$ref": "#/components/schemas/CaseMaintenanceStatus"
             },
-            "description": "Stable catalog value identifier."
-          },
-          {
-            "name": "productId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/Identifier"
-            },
-            "description": "Stable catalog value identifier."
-          },
-          {
-            "name": "regression",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "true",
-                "false"
-              ]
-            },
-            "description": "Filter by the immutable case field snapshot; false is an explicit filter, not absence."
+            "description": "Filter the live maintenance projection. Missing metadata counts as current. Bound to the pagination cursor."
           }
         ],
         "responses": {
@@ -1620,9 +1597,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         }
       }
@@ -8669,9 +8643,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8821,9 +8792,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -8919,9 +8887,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -9018,9 +8983,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "x-tms-idempotency": "required",
@@ -9093,9 +9055,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -9178,9 +9137,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/ReleaseWritePaused"
           }
         },
         "requestBody": {
@@ -20502,6 +20458,340 @@
           }
         }
       }
+    },
+    "/workspaces/{workspaceId}/projects/{projectId}/folders/{folderId}/normalize-image": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/WorkspaceIdPath"
+        },
+        {
+          "$ref": "#/components/parameters/ProjectIdPath"
+        },
+        {
+          "in": "path",
+          "name": "folderId",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "normalizeRepositoryFolderImage",
+        "summary": "Normalize private folder artwork before immutable upload",
+        "description": "Authorized active folder management only. Raw image bytes, maximum 10 MiB input/output, 16 million decoded pixels (all GIF frames), at most 200 GIF frames, one HEIC still image, eight-second worker deadline, two concurrent jobs per API process. PNG/JPEG/WebP/AVIF/HEIC/HEIF become metadata-stripped PNG fitted inside 1024x1024; GIF bytes and animation are preserved after full decode validation. SVG and malformed or spoofed media are rejected. No signed URLs are stored. No ETag or idempotency key is needed because this operation creates no durable state. Errors IMAGE_NORMALIZATION_TIMEOUT (408), IMAGE_NORMALIZATION_BUSY (429) and IMAGE_NORMALIZATION_CANCELLED (400) use the standard JSON error envelope.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cloudSession": []
+          },
+          {
+            "managedTenant": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/webp": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/avif": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/gif": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/heic": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            },
+            "image/heif": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 10485760
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transient normalized PNG or byte-identical validated animated GIF. No storage or folder mutation occurs. Hash these returned bytes when creating the ordinary private upload intent.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "X-Content-Sha256": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/gif": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Image processing deadline exceeded. Retry with a smaller image.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/test-cases/{caseId}/maintenance": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "$ref": "#/components/parameters/CaseIdPath"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Test cases"
+        ],
+        "summary": "Read current case maintenance",
+        "operationId": "getCaseMaintenance",
+        "description": "Requires test_case:read. Missing metadata is current at version zero. This live projection can be read beside an immutable run snapshot.",
+        "responses": {
+          "200": {
+            "description": "Current case maintenance. ETag is independent of the case content ETag.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CaseMaintenance"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Test cases"
+        ],
+        "summary": "Mark a case for repair or explicitly clear its maintenance flag",
+        "operationId": "changeCaseMaintenance",
+        "description": "Requires test_case:manage. Transitions current to needs_update or needs_update to current only. Mark validates exact workspace/project/case/run/item/attempt/revision relationship; historical pinned revisions are allowed. Clear removes current source provenance; prior mark remains in append-only audit. No content lifecycle/revision, run snapshot or execution outcome changes. Replays return the original response even after later transitions. Stale independent maintenance ETags fail with PRECONDITION_FAILED; same-state commands fail INVALID_TRANSITION; changed retry payload fails IDEMPOTENCY_KEY_REUSED.",
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseMaintenanceChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current case maintenance. ETag is independent of the case content ETag.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CaseMaintenance"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "503": {
+            "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -24563,7 +24853,8 @@
           "run_attempt",
           "defect",
           "project",
-          "portfolio"
+          "portfolio",
+          "repository_folder"
         ]
       },
       "PageMeta": {
@@ -26235,6 +26526,15 @@
           "AI_CONTEXT_BUDGET_EXCEEDED",
           "AI_DISABLED",
           "AI_DUPLICATE_CASE_ID",
+          "AI_GUIDE_ACCESS_CHANGED",
+          "AI_GUIDE_CHAT_CONFLICT",
+          "AI_GUIDE_CHAT_NOT_FOUND",
+          "AI_GUIDE_HISTORY_LIMIT",
+          "AI_GUIDE_IDEMPOTENCY_CONFLICT",
+          "AI_GUIDE_SHARED_ANSWER_NOT_FOUND",
+          "AI_GUIDE_TURN_CANCELLED",
+          "AI_GUIDE_TURN_FAILED",
+          "AI_GUIDE_TURN_PENDING",
           "AI_INVALID_JSON",
           "AI_NOT_CONFIGURED",
           "AI_OUTPUT_TRUNCATED",
@@ -26297,6 +26597,10 @@
           "DELIVERY_NOT_RETRYABLE",
           "DELIVERY_OUTCOME_UNKNOWN",
           "DESTINATION_NOT_ACCESSIBLE",
+          "DICTATION_EMPTY",
+          "DICTATION_INVALID_AUDIO",
+          "DICTATION_RATE_LIMITED",
+          "DICTATION_UNAVAILABLE",
           "DISCOVERY_LIMIT_EXCEEDED",
           "DUPLICATE_RULE",
           "EMPTY_SCOPE",
@@ -26309,6 +26613,9 @@
           "GENERATION_FAILED",
           "GITHUB_CONNECTION_REQUIRED",
           "IDEMPOTENCY_KEY_REUSED",
+          "IMAGE_NORMALIZATION_BUSY",
+          "IMAGE_NORMALIZATION_CANCELLED",
+          "IMAGE_NORMALIZATION_TIMEOUT",
           "IMPACT_PROCESSING_FAILED",
           "IMPORT_AI_UNAVAILABLE",
           "IMPORT_LIMIT_EXCEEDED",
@@ -26363,6 +26670,7 @@
           "RUN_NOT_FOUND",
           "RUN_RULE_REQUIRED",
           "SCOPE_NOT_REVIEWABLE",
+          "SERVICE_UNAVAILABLE",
           "SIGNING_SECRET_REQUIRED",
           "STALE_COMMENT",
           "STATUS_NOT_ACCESSIBLE",
@@ -26387,21 +26695,7 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
-          "DICTATION_INVALID_AUDIO",
-          "DICTATION_RATE_LIMITED",
-          "DICTATION_UNAVAILABLE",
-          "DICTATION_EMPTY",
-          "SERVICE_UNAVAILABLE",
-          "AI_GUIDE_CHAT_NOT_FOUND",
-          "AI_GUIDE_CHAT_CONFLICT",
-          "AI_GUIDE_TURN_PENDING",
-          "AI_GUIDE_TURN_CANCELLED",
-          "AI_GUIDE_TURN_FAILED",
-          "AI_GUIDE_IDEMPOTENCY_CONFLICT",
-          "AI_GUIDE_HISTORY_LIMIT",
-          "AI_GUIDE_SHARED_ANSWER_NOT_FOUND",
-          "AI_GUIDE_ACCESS_CHANGED"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
         ]
       },
       "ValidationIssue": {
@@ -27709,7 +28003,8 @@
           "archivedAt",
           "createdAt",
           "updatedAt",
-          "folderId"
+          "folderId",
+          "maintenance"
         ],
         "properties": {
           "id": {
@@ -27769,6 +28064,9 @@
                 "type": "null"
               }
             ]
+          },
+          "maintenance": {
+            "$ref": "#/components/schemas/CaseMaintenance"
           }
         }
       },
@@ -28746,6 +29044,7 @@
           "createdAt",
           "updatedAt",
           "folderId",
+          "maintenance",
           "customFields",
           "productGroupId",
           "productId",
@@ -28852,6 +29151,9 @@
                 "type": "null"
               }
             ]
+          },
+          "maintenance": {
+            "$ref": "#/components/schemas/CaseMaintenance"
           },
           "customFields": {
             "type": "array",
@@ -33074,6 +33376,9 @@
           },
           {
             "$ref": "#/components/schemas/PortfolioAttachmentOwner"
+          },
+          {
+            "$ref": "#/components/schemas/RepositoryFolderAttachmentOwner"
           }
         ],
         "discriminator": {
@@ -33085,7 +33390,8 @@
             "run_attempt": "#/components/schemas/RunAttemptAttachmentOwner",
             "defect": "#/components/schemas/DefectAttachmentOwner",
             "project": "#/components/schemas/ProjectAttachmentOwner",
-            "portfolio": "#/components/schemas/PortfolioAttachmentOwner"
+            "portfolio": "#/components/schemas/PortfolioAttachmentOwner",
+            "repository_folder": "#/components/schemas/RepositoryFolderAttachmentOwner"
           }
         }
       },
@@ -33392,7 +33698,7 @@
             }
           }
         ],
-        "description": "Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner."
+        "description": "Exactly one projectId or portfolioId is required. Organization owner IDs must match that scope. Existing project-bound evidence owners retain their current behavior; portfolioId requires a portfolio owner. Repository folder artwork requires projectId and the exact active folder owner. Only PNG/JPEG/WebP/GIF up to 10 MiB are immutable upload types; normalize AVIF/HEIC/HEIF before creating an intent. Referenced artwork, including archived folder artwork, cannot be deleted. Ready unreferenced folder images become eligible for bounded cleanup after 24 hours."
       },
       "AttachmentUploadIntent": {
         "type": "object",
@@ -36805,7 +37111,8 @@
           "archivedAt",
           "createdAt",
           "updatedAt",
-          "etag"
+          "etag",
+          "appearance"
         ],
         "properties": {
           "id": {
@@ -36830,7 +37137,7 @@
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 500,
+            "maxLength": 120,
             "pattern": "^[^/\\\\\\u0000-\\u001f\\u007f]+$"
           },
           "path": {
@@ -36858,6 +37165,9 @@
           "etag": {
             "type": "string",
             "pattern": "^\"repository-folder:[A-Za-z0-9._:-]+:v[1-9][0-9]*\"$"
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
       },
@@ -36938,6 +37248,9 @@
                 "type": "null"
               }
             ]
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         }
       },
@@ -36961,6 +37274,9 @@
                 "type": "null"
               }
             ]
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/RepositoryFolderAppearance"
           }
         },
         "minProperties": 1
@@ -43972,6 +44288,343 @@
           "id",
           "revokedAt"
         ]
+      },
+      "RepositoryFolderAppearance": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/RepositoryFolderIconAppearance"
+          },
+          {
+            "$ref": "#/components/schemas/RepositoryFolderEmojiAppearance"
+          },
+          {
+            "$ref": "#/components/schemas/RepositoryFolderImageAppearance"
+          },
+          {
+            "$ref": "#/components/schemas/RepositoryFolderGifAppearance"
+          }
+        ],
+        "description": "Nullable shared artwork. Omission on PATCH retains the confirmed value; null resets the default. Archive/restore retains artwork."
+      },
+      "RepositoryFolderIconId": {
+        "type": "string",
+        "enum": [
+          "folder",
+          "briefcase",
+          "archive",
+          "box",
+          "code",
+          "bug",
+          "test-tube",
+          "flask",
+          "shield",
+          "lock",
+          "key",
+          "gear",
+          "wrench",
+          "database",
+          "cloud",
+          "globe",
+          "browser",
+          "devices",
+          "desktop",
+          "laptop",
+          "phone",
+          "tablet",
+          "terminal",
+          "robot",
+          "rocket",
+          "lightning",
+          "fire",
+          "heart",
+          "star",
+          "flag",
+          "bookmark",
+          "tag",
+          "note",
+          "file",
+          "image",
+          "camera",
+          "video",
+          "music",
+          "users",
+          "chart",
+          "compass",
+          "map",
+          "calendar",
+          "clock",
+          "check-circle",
+          "clipboard",
+          "list-checks",
+          "magnifying-glass",
+          "puzzle-piece",
+          "package"
+        ]
+      },
+      "RepositoryFolderIconAppearance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "iconId",
+          "color"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "icon"
+          },
+          "iconId": {
+            "$ref": "#/components/schemas/RepositoryFolderIconId"
+          },
+          "color": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6}$"
+              }
+            ]
+          }
+        }
+      },
+      "RepositoryFolderEmojiAppearance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "emoji"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "emoji"
+          },
+          "emoji": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exactly one Unicode grapheme containing an emoji pictograph, regional indicator or keycap. Controls and whitespace are rejected."
+          }
+        }
+      },
+      "RepositoryFolderImageAppearance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "assetId"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "image"
+          },
+          "assetId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "RepositoryFolderAttachmentOwner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "folderId"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "repository_folder"
+          },
+          "folderId": {
+            "$ref": "#/components/schemas/Identifier"
+          }
+        }
+      },
+      "CaseMaintenanceStatus": {
+        "type": "string",
+        "enum": [
+          "current",
+          "needs_update"
+        ]
+      },
+      "CaseMaintenanceSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runId",
+          "runItemId",
+          "attemptNo",
+          "revision"
+        ],
+        "properties": {
+          "runId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "runItemId": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "attemptNo": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "CaseMaintenance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "rowVersion",
+          "updatedBy",
+          "updatedAt",
+          "note",
+          "source",
+          "etag"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "current",
+              "needs_update"
+            ]
+          },
+          "rowVersion": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updatedBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Identifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseMaintenanceSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "etag": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      },
+      "CaseMaintenanceChange": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "source"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "const": "needs_update"
+              },
+              "source": {
+                "$ref": "#/components/schemas/CaseMaintenanceSource"
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "const": "current"
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          }
+        ]
+      },
+      "RepositoryFolderGifAppearance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "provider",
+          "id",
+          "url"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "gif"
+          },
+          "provider": {
+            "type": "string",
+            "const": "klipy"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,200}$"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "^https://static[12]?\\.klipy\\.com(:443)?/[^#\\s\\\\]+$",
+            "description": "Exact unmodified API media URL, including delivery query. HTTPS static.klipy.com/static1.klipy.com/static2.klipy.com only; no credentials, fragment or non-443 port. Loaded directly by client; never fetched, proxied or stored by backend."
+          },
+          "sourceUrl": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "^https://klipy\\.com(:443)?/[^#\\s\\\\]+$"
+          }
+        }
       }
     }
   }

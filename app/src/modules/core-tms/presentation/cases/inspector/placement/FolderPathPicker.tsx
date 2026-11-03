@@ -1,5 +1,6 @@
+import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
 import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
-import { ArrowRight, Check, ChevronDown, Folder, Plus, Search } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Plus, Search } from "lucide-react";
 import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
 import { OverflowLabel } from "../../../common/select/overflow/OverflowLabel";
 import css from "./folderPathPicker.module.css";
@@ -56,7 +57,7 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
     <button type="button" ref={trigger} disabled={disabled} className={css.trigger} aria-label={ru ? "Папка" : "Folder"} aria-description={value}
       aria-haspopup="dialog" aria-expanded={visible} aria-controls={visible ? panelId : undefined}
       onClick={() => { setQuery(""); setOpen(!open); }}>
-      <Folder size={14} aria-hidden="true"/><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
+      <FolderVisual path={value} /><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
     </button>
     {visible && <div id={panelId} className={css.panel} ref={panel} popover="manual" role="dialog" aria-label={ru ? "Выбрать папку" : "Choose folder"}>
       <label className={css.search} data-input-shell><Search size={14} aria-hidden="true"/>
@@ -67,7 +68,7 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
       <div className={css.options}>
         {options.map(path => <button type="button" key={path} data-folder-choice data-folder-path={path}
           aria-pressed={path === value} onClick={() => choose(path)}>
-          <FolderBreadcrumb path={path}/>{path === value && <Check size={14} aria-hidden="true"/>}
+          <FolderVisual path={path} /><FolderBreadcrumb path={path}/>{path === value && <Check size={14} aria-hidden="true"/>}
         </button>)}
         {canCreate && <button type="button" className={css.create} data-folder-choice data-folder-create onClick={() => choose(candidate)}>
           <Plus size={14} aria-hidden="true"/><span>{ru ? "Создать папку" : "Create folder"}<FolderBreadcrumb path={candidate}/></span>

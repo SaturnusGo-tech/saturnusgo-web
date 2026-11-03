@@ -1,5 +1,6 @@
 "use client";
 
+import { FolderAppearanceProvider } from "../../folders/presentation/appearance/context/FolderAppearanceProvider";
 import { WorkspaceConnectorProvider } from "../../connectors/application/context/WorkspaceConnectorContext";
 import { WorkspacePeopleProvider } from "../../workspace/members/context/WorkspacePeopleContext";
 import { CheckCircle2 } from "lucide-react";
@@ -61,7 +62,7 @@ export function LocalizedWorkspace() {
   }
 
   return (
-    <WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
+    <FolderAppearanceProvider resource={model.folders} workspaceId={model.data.workspace.id} projectId={model.project?.id}><WorkspacePeopleProvider workspaceId={model.data.workspace.id} offline={model.connection !== "connected"}>
     <WorkspaceConnectorProvider workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} active={model.connection === "connected" && !!model.project && model.data.meta.authorization.capabilities.includes("integration:read")}>
     <div
       className={`${styles.app} ${shellStyles.shell} ${glassEnabled ? appearance.glass : ""}`}
@@ -109,7 +110,7 @@ export function LocalizedWorkspace() {
         </div>
       )}
       <WorkspaceDialogs model={model} />
-    </div></WorkspaceConnectorProvider></WorkspacePeopleProvider>
+    </div></WorkspaceConnectorProvider></WorkspacePeopleProvider></FolderAppearanceProvider>
   );
 }
 

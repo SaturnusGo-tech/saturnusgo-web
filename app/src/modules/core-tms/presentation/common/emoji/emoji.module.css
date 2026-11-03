@@ -1,0 +1,11 @@
+.trigger { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; flex:none; padding:0; border:0; border-radius:50%; background:transparent; color:var(--falcon-text-secondary); cursor:pointer; transition:background .15s,color .15s; }
+.trigger:hover { color:var(--falcon-text); background:var(--falcon-hover); }
+.trigger:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:2px; }
+.trigger:disabled { opacity:.4; cursor:default; }
+.popup { position:fixed; inset:auto; margin:0; padding:0; border:1px solid var(--falcon-border); border-radius:16px; overflow:auto; background:var(--falcon-elevated); color:var(--falcon-text); box-shadow:0 12px 40px #0003; z-index:1400; opacity:1; transform:translateY(0); transform-origin:bottom left; transition:opacity .12s,transform .12s; animation:emoji-enter .16s ease-out; }
+.popup[data-closing=true] { opacity:0; transform:translateY(3px) scale(.99); pointer-events:none; }
+.picker { min-height:300px; width:100%; position:relative; }
+.picker :global(em-emoji-picker) { width:100%; max-width:100%; --border-radius:15px; --font-family:inherit; --font-size:13px; }
+.loading { min-height:300px; display:grid; place-items:center; color:var(--falcon-text-secondary); font-size:13px; }
+@keyframes emoji-enter { from {opacity:0;transform:translateY(4px) scale(.99)} to {opacity:1;transform:none} }
+@media(prefers-reduced-motion:reduce) { .popup { animation:none;transition:none; } }

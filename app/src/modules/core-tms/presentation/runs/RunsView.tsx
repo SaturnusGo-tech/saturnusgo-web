@@ -1,3 +1,4 @@
+import { CaseMaintenanceFeature } from "../../test-cases/maintenance/composition/CaseMaintenanceFeature";
 import { ExecutionHistoryFeature } from "../../codex-employee/execution-history/composition/ExecutionHistoryFeature";
 import { ScenarioLayoutToggle } from "../common/scenario/ScenarioLayoutToggle";
 import { useScenarioLayout } from "../common/scenario/useScenarioLayout";
@@ -104,13 +105,12 @@ export function RunsView({ executionPending = false, emptyFiltered = false, navi
     {runNavigator}
     {panelHandle}
     <section key={`${selectedRun.id}-${selectedItem.id}`} className={`${runStyles.detail} ${focusStyles.detail} ${runStyles.detailTransition} ${archivePending ? runStyles.detailArchiving : ""}`}>
-      <RunExecutionHeader propertiesOpen={propertiesOpen} propertiesId={propertiesId} onToggleProperties={() => setPropertiesOpen(open => !open)} run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} archivePending={archivePending} canStart={false} startPending={startPending} onStart={onStart} />
+      <RunExecutionHeader actions={<CaseMaintenanceFeature caseId={selectedItem.caseId} initial={cases.find(item => item.id === selectedItem.caseId)?.maintenance} source={{ runId: selectedRun.id, runItemId: selectedItem.id, attemptNo: attempt.attemptNo, revision: selectedItem.revision }} blocked={executionPending || archivePending || Boolean(cases.find(item => item.id === selectedItem.caseId)?.archivedAt)} />} history={<ExecutionHistoryFeature key={`${selectedRun.id}:${selectedItem.id}`} scope={{workspaceId,projectId:selectedRun.projectId,runId:selectedRun.id,itemId:selectedItem.id}} attemptNo={attempt.attemptNo} version={selectedItem.rowVersion} steps={executionEntries} offline={offline} />} propertiesOpen={propertiesOpen} propertiesId={propertiesId} onToggleProperties={() => setPropertiesOpen(open => !open)} run={selectedRun} item={selectedItem} itemIndex={currentIndex} itemCount={items.length} archivePending={archivePending} canStart={false} startPending={startPending} onStart={onStart} />
       {startError && <FormError message={startError} />}
       <div className={runStyles.detailContent}>
         <div className={`${runStyles.overviewLayout} ${focusStyles.overview}`} data-properties-open={propertiesOpen}>
           <div className={`${runStyles.primaryColumn} ${focusStyles.primary}`}>
             {verificationContext}
-            <ExecutionHistoryFeature key={`${selectedRun.id}:${selectedItem.id}`} scope={{workspaceId,projectId:selectedRun.projectId,runId:selectedRun.id,itemId:selectedItem.id}} attemptNo={attempt.attemptNo} version={selectedItem.rowVersion} steps={executionEntries} offline={offline} />
             <section className={runStyles.contentSection}>
               <header><h2>{locale === "ru" ? "Описание" : "Description"}</h2></header>
               <MarkdownField value={selectedItem.snapshot.description ?? ""} label={locale === "ru" ? "Описание" : "Description"} emptyLabel={locale === "ru" ? "Описание не указано." : "No description."} allowAttachments={false} />

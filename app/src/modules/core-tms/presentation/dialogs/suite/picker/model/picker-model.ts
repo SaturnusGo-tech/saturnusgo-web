@@ -1,15 +1,16 @@
+import type { FolderAppearance } from "../../../../../folders/model/appearance/folder-appearance";
 import type { TestCaseSummary } from "../../../../../../../core/tms/contracts/legacy-contract";
 import type { RepositoryFolder } from "../../../../../folders/model/folder";
 import { buildFolderTree, type FolderNode } from "../../../../../folders/model/tree";
 
-export type PickerFolder = { id: string; name: string; path: string; depth: number; parentId: string | null; hasChildren: boolean; caseIds: readonly string[] };
+export type PickerFolder = { appearance?: FolderAppearance; id: string; name: string; path: string; depth: number; parentId: string | null; hasChildren: boolean; caseIds: readonly string[] };
 export type PickerPriority = "all" | TestCaseSummary["priority"];
 export const UNFILED = "suite-picker-unfiled";
 
 export function pickerFolders(folders: readonly RepositoryFolder[], cases: readonly TestCaseSummary[]): PickerFolder[] {
   const tree = buildFolderTree(folders, cases), entries: PickerFolder[] = [];
   function collect(node: FolderNode, depth: number) {
-    entries.push({ id: node.folder.id, name: node.folder.name, path: node.folder.path, parentId: node.folder.parentId,
+    entries.push({ appearance: node.folder.appearance, id: node.folder.id, name: node.folder.name, path: node.folder.path, parentId: node.folder.parentId,
       depth, hasChildren: Boolean(node.children.length), caseIds: node.caseIds });
     node.children.forEach(child => collect(child, depth + 1));
   }

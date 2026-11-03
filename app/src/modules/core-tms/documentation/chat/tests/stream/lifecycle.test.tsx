@@ -4,13 +4,25 @@ import { act } from "react-test-renderer";
 import { chatHarness, flush } from "../state/harness";
 
 async function delta(h: ReturnType<typeof chatHarness>, value: string) {
-  await act(async () => { h.backend.event(0, { type: "text_delta", delta: value }); await new Promise(resolve => setTimeout(resolve, 22)); });
+  const expected = h.get().partialText + value, deadline = performance.now() + 1000;
+  await act(async () => { h.backend.event(0, { type: "text_delta", delta: value }); await flush(); });
+  while (h.get().partialText !== expected && performance.now() < deadline) {
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  }
+  assert.equal(h.get().partialText, expected, "received text renders within the bounded wait");
 }
-test("real text renders provisionally and only persisted completion commits the assistant message", async () => {
-  const h = chatHarness(); h.draft("Question"); await h.send(); await delta(h, "Actual ");
+test("real text renders provisionally and only persisted completion commits the assistant message", async t => {
+  const h = chatHarness();
+  const frames = { requestAnimationFrame: globalThis.requestAnimationFrame, cancelAnimationFrame: globalThis.cancelAnimationFrame };
+  Object.assign(globalThis, {
+    requestAnimationFrame: (callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 60) as unknown as number,
+    cancelAnimationFrame: (handle: number) => clearTimeout(handle),
+  });
+  t.after(() => { h.unmount(); Object.assign(globalThis, frames); });
+  h.draft("Question"); await h.send(); await delta(h, "Actual ");
   assert.equal(h.get().partialText, "Actual "); assert.equal(h.get().messages.length, 1);
   await delta(h, "answer"); assert.equal(h.get().partialText, "Actual answer");
-  await h.reply(0, "Actual answer"); assert.equal(h.get().messages[1].content, "Actual answer"); assert.equal(h.get().partialText, ""); h.unmount();
+  await h.reply(0, "Actual answer"); assert.equal(h.get().messages[1].content, "Actual answer"); assert.equal(h.get().partialText, "");
 });
 test("persisted completion shows the full answer immediately and cancels a queued reveal", async t => {
   const h = chatHarness(), answer = "Received answer. ".repeat(100).trimEnd(); t.after(h.unmount); h.draft("Question"); await h.send();
@@ -27,21 +39,21 @@ test("a suggested question submits once on rapid repeated clicks and later freef
   h.draft("My own follow-up"); await h.send();
   assert.equal(h.requests.length, 2); assert.equal(h.requests[1].body.content, "My own follow-up"); await h.reply(1);
 });
-test("provider failure removes provisional text while keeping the saved question retryable", async () => {
-  const h = chatHarness(); h.draft("Keep my question"); await h.send(); await delta(h, "Unverified");
+test("provider failure removes provisional text while keeping the saved question retryable", async t => {
+  const h = chatHarness(); t.after(h.unmount); h.draft("Keep my question"); await h.send(); await delta(h, "Unverified");
   await h.fail(0, "AI_GUIDE_OUTPUT_INVALID");
   assert.equal(h.get().partialText, ""); assert.equal(h.get().messages.length, 1); assert.equal(h.get().draft, "Keep my question");
-  assert.equal(h.get().error, "invalid"); h.unmount();
+  assert.equal(h.get().error, "invalid");
 });
 for (const mode of ["stop", "new-chat", "workspace", "unmount"] as const) {
-  test(`${mode} aborts streaming and prevents partial text from becoming a saved answer`, async () => {
-    const h = chatHarness(); h.draft("Question"); await h.send(); await delta(h, "Partial");
+  test(`${mode} aborts streaming and prevents partial text from becoming a saved answer`, async t => {
+    const h = chatHarness(); t.after(h.unmount); h.draft("Question"); await h.send(); await delta(h, "Partial");
     if (mode === "stop") await h.run(() => h.get().cancel());
     if (mode === "new-chat") await h.run(() => h.get().newChat());
     if (mode === "workspace") await h.update({ workspaceId: "another-workspace" });
     if (mode === "unmount") h.unmount();
     await new Promise(resolve => setTimeout(resolve, 22));
     assert.equal(h.requests[0].signal.aborted, true); assert.equal(h.requests[0].cancelled, true);
-    if (mode !== "unmount") { assert.equal(h.get().partialText, ""); assert.ok(h.get().messages.every(message => message.role === "user")); h.unmount(); }
+    if (mode !== "unmount") { assert.equal(h.get().partialText, ""); assert.ok(h.get().messages.every(message => message.role === "user")); }
   });
 }

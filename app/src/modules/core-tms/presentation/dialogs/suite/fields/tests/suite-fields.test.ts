@@ -55,7 +55,7 @@ test("retained folder criteria use shared breadcrumbs without remapping a saved 
     const { SuiteEditableFields: View } = h.load<{ SuiteEditableFields: typeof SuiteEditableFields }>(new URL("../SuiteEditableFields.tsx", import.meta.url), name => name === "../copy" ? { getSuiteDialogCopy } : undefined);
     const retainedFilter = { folderId, folderPathPrefix, tags: [] };
     const all = nodes(h.render(() => View({ name: "Release", description: "", type: "dynamic", tags: "", creating: false, ru: false,
-      retainedFilter, folders: [{ id: "stable", path: "/Renamed/Calendar", name: "Calendar", workspaceId: "w", projectId: "p", parentId: null,
+      retainedFilter, folders: [{ id: "stable", appearance: null, path: "/Renamed/Calendar", name: "Calendar", workspaceId: "w", projectId: "p", parentId: null,
         rowVersion: 1, archivedAt: null, createdAt: "2026-11-02T00:00:00Z", updatedAt: "2026-11-02T00:00:00Z", etag: "folder-v1" }],
       onName() {}, onDescription() {}, onType() {}, onTags() {} })));
     const path = all.find(node => node.type === "SuiteFolderPath")!;

@@ -148,3 +148,14 @@ test("product IDs and regression combine with assignees without matching equal l
   assert.equal(h.facets().regression, false);
   invoke(h.fieldOptions(), "onChange", "all"); assert.equal(h.facets().regression, undefined);
 });
+test("maintenance is an independent repository filter and reset clears it without altering lifecycle", () => {
+  const h = menu();
+  assert.ok(h.render().some(node => node.props["data-filter-section"] === "maintenanceStatus"));
+  invoke(h.option("Готово"), "onClick");
+  h.section("maintenanceStatus"); invoke(h.option("На доработке"), "onClick");
+  assert.equal(h.filters().maintenanceStatus, "needs_update"); assert.equal(h.filters().lifecycle, "ready");
+  h.section("priority"); invoke(h.option("Высокий"), "onClick"); h.section("maintenanceStatus");
+  assert.equal(h.option("На доработке").props["aria-selected"], true);
+  invoke(h.render().find(node => node.type === "button" && node.props.children === "Сбросить")!, "onClick");
+  assert.equal(h.filters().maintenanceStatus, undefined);
+});

@@ -1,4 +1,5 @@
-import { PiCheck, PiCaretDown, PiCaretRight, PiMagnifyingGlass, PiFolderSimpleDuotone, PiFolderOpenDuotone } from "react-icons/pi";
+import { FolderVisual } from "../../../../folders/presentation/appearance/visual/FolderVisual";
+import { PiCheck, PiCaretDown, PiCaretRight, PiMagnifyingGlass } from "react-icons/pi";
 import { useCallback, useId, useRef, useState } from "react";
 import { sortFolderOptions } from "./folder-options";
 import { folderChoiceAncestors, folderChoiceRows } from "./tree/folder-choice-tree";
@@ -33,7 +34,7 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
         setOpen(!open); setQuery(""); setExpanded(folderChoiceAncestors(value));
         if (!open) requestAnimationFrame(() => search.current?.focus());
       }}>
-      <PiFolderSimpleDuotone size={18} aria-hidden="true" /><FolderBreadcrumb path={value} root={current?.label} />
+      <FolderVisual path={value} /><FolderBreadcrumb path={value} root={current?.label} />
       <PiCaretDown size={14} aria-hidden="true" />
     </button>}
     {(open || inline) && <div ref={menu} popover={inline ? undefined : "manual"} className={css.browser} data-inline={inline || undefined}>
@@ -59,7 +60,7 @@ export function ParentFolderPicker({ value, options, label, searchLabel, emptyLa
           <button type="button" role="option" aria-selected={option.value === value}
             tabIndex={option.value === value || (!visible.some((item) => item.value === value) && option === visible[0]) ? 0 : -1}
             onClick={() => { onChange(option.value); close(); }}>
-            {expanded.has(option.value) ? <PiFolderOpenDuotone size={18} /> : <PiFolderSimpleDuotone size={18} />}
+            <FolderVisual path={option.value} open={expanded.has(option.value)} />
             <span>{option.name}{query && option.depth > 0 && <small><FolderBreadcrumb path={option.parent} /></small>}</span>
             {option.value === value && <PiCheck size={15} className={css.check} aria-hidden="true" />}
           </button>

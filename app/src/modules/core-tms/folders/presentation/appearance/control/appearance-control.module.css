@@ -1,0 +1,9 @@
+.root { position: relative; flex: 0 0 26px; width: 26px; height: 26px; }
+.root .trigger { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 5px; background: transparent; cursor: pointer; position: relative; }
+.trigger:hover:not(:disabled) { background: var(--falcon-hover); }
+.trigger:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
+.trigger[data-failed]::after { content: ""; position: absolute; width: 5px; height: 5px; right: 0; bottom: 0; border-radius: 50%; background: var(--falcon-danger); }
+.panel { position: fixed; inset: auto; box-sizing: border-box; margin: 0; width: min(420px, calc(100vw - 24px)); max-height: min(420px, calc(100dvh - 24px)); padding: 12px; overflow: auto; border: 1px solid var(--falcon-border-strong); border-radius: 13px; background: var(--falcon-panel); color: var(--falcon-text); box-shadow: var(--falcon-shadow-popover); font: inherit; font-size: 12px; scrollbar-width: thin; scrollbar-color: var(--falcon-border-strong) transparent; }
+
+.root[data-labelled] { width: 100%; height: auto; flex-basis: auto; }
+.root[data-labelled] .trigger { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; height: auto; min-height: 42px; padding: 8px 10px; color: var(--falcon-text); font: inherit; font-size: 13px; text-align: left; }

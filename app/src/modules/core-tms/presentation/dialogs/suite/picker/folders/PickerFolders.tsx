@@ -1,6 +1,6 @@
+import { FolderVisual } from "../../../../../folders/presentation/appearance/visual/FolderVisual";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "@openai/apps-sdk-ui/components/Icon";
-import { PiFolderOpenDuotone, PiFolderSimpleDuotone } from "react-icons/pi";
 import { UNFILED, type PickerFolder } from "../model/picker-model";
 import styles from "../suite-picker.module.css";
 
@@ -17,7 +17,7 @@ export function PickerFolders({ folders, count, current, projectName, ru, onChoo
   return <nav className={styles.folderNav} aria-label={ru ? "Папки тест-кейсов" : "Test case folders"}>
     <span className={styles.folderHeading} title={projectName}>{projectName}</span>
     <button type="button" className={styles.allFolders} aria-current={!current ? "page" : undefined} onClick={() => onChoose("")}>
-      <PiFolderSimpleDuotone size={18} aria-hidden="true" /><span>{ru ? "Все кейсы" : "All cases"}</span><small>{count}</small>
+      <FolderVisual /><span>{ru ? "Все кейсы" : "All cases"}</span><small>{count}</small>
     </button>
     {visible.map(folder => <div key={folder.id} className={styles.folderRow} style={{ paddingInlineStart: Math.min(folder.depth, 5) * 12 }}>
       {folder.hasChildren ? <button type="button" className={styles.folderChevron}
@@ -27,7 +27,7 @@ export function PickerFolders({ folders, count, current, projectName, ru, onChoo
         })}>{collapsed.has(folder.id) ? <ChevronRight width={14} height={14} /> : <ChevronDown width={14} height={14} />}</button>
         : <span className={styles.folderChevronSpace} />}
       <button type="button" className={styles.folderButton} title={folder.path} aria-current={current === folder.id ? "page" : undefined}
-        onClick={() => onChoose(folder.id)}>{folder.hasChildren && !collapsed.has(folder.id) ? <PiFolderOpenDuotone size={18} aria-hidden="true" /> : <PiFolderSimpleDuotone size={18} aria-hidden="true" />}
+        onClick={() => onChoose(folder.id)}><FolderVisual folderId={folder.id} appearance={folder.appearance} open={folder.hasChildren && !collapsed.has(folder.id)} />
         <span>{folder.id === UNFILED ? (ru ? "Без папки" : "Unfiled") : folder.name}</span><small>{folder.caseIds.length}</small>
       </button>
     </div>)}

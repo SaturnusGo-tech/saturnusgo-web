@@ -4,6 +4,7 @@ import { componentHarness, invoke, nodes } from "../../../portfolios/tests/suppo
 import { browserHarness, elements } from "../../../presentation/cases/browser/tests/browser-harness";
 import type { FolderActionsDialog } from "../../presentation/actions/FolderActionsDialog";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
+import type { FolderResource, RepositoryFolder } from "../../model/folder";
 import type { FolderNode } from "../../model/tree";
 
 test("New subfolder closes the action menu and enters inline creation for that folder", () => {
@@ -28,8 +29,14 @@ test("unavailable or busy inline creation cannot close the menu or start a draft
   for (const busy of [false, true]) {
     const h = componentHarness(); let called = 0;
     const component = h.load<{ FolderActionsDialog: typeof FolderActionsDialog }>(new URL("../../presentation/actions/FolderActionsDialog.tsx", import.meta.url)).FolderActionsDialog;
-    const content = h.render(() => component({ folder: { name: "Web", id: "web", path: "/Web" },
-      resource: { busy }, ru: false, onClose: () => { called++; }, onCreateFolder: busy ? () => { called++; } : undefined } as never));
+    const folder: RepositoryFolder = { name: "Web", id: "web", path: "/Web", parentId: null,
+      workspaceId: "workspace", projectId: "project", appearance: null, archivedAt: null, rowVersion: 1,
+      createdAt: "2026-11-04T00:00:00Z", updatedAt: "2026-11-04T00:00:00Z", etag: '"web:v1"' };
+    const resource: FolderResource = { items: [folder], busy, loading: false, canManage: true, error: "", reload() {},
+      create: async () => null, update: async () => false, archive: async () => false, restore: async () => false,
+      moveCases: async () => ({ ok: false, message: "Unavailable" }), archiveCases: async () => ({ ok: false, message: "Unavailable" }) };
+    const content = h.render(() => component({ folder, resource, ru: false, onClose: () => { called++; },
+      onCreateCase() {}, onCreated() {}, onCreateFolder: busy ? () => { called++; } : undefined }));
     const create = nodes(content).find(node => node.type === "button" && (node.props.children as unknown[])?.includes("New subfolder")); assert.ok(create);
     assert.equal(create.props.disabled, true); invoke(create, "onClick"); assert.equal(called, 0);
   }

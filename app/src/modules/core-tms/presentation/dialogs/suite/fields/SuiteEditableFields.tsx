@@ -45,7 +45,7 @@ export function SuiteEditableFields(props: Props) {
       <p className={css.hint}>{props.type === "static" ? copy.staticModeHint : copy.dynamicModeHint}</p>
       {props.type === "dynamic" && <label className={css.tagsField}><span>{copy.tags}</span><input value={props.tags} onChange={e => props.onTags(e.target.value)} placeholder={copy.tagsPlaceholder} />
         <small>{props.ru ? "Кейс должен содержать все указанные теги. Разделяйте их запятыми." : "Cases must match all tags. Separate tags with commas."}</small></label>}
-      {(folderPath || retained.length > 0) && <p className={css.hint}>{props.ru ? "Также сохранены условия" : "Also keeping the saved criteria"}: {folderPath && <SuiteFolderPath path={folderPath} ru={props.ru} unavailable={Boolean(rule?.folderId && !retainedFolder)} />}{folderPath && retained.length > 0 && " · "}{retained.join(" · ")}</p>}
+      {(folderPath || retained.length > 0) && <p className={css.hint}>{props.ru ? "Также сохранены условия" : "Also keeping the saved criteria"}: {folderPath && <SuiteFolderPath appearance={retainedFolder?.appearance} folderId={retainedFolder?.id} projectId={retainedFolder?.projectId} path={folderPath} ru={props.ru} unavailable={Boolean(rule?.folderId && !retainedFolder)} />}{folderPath && retained.length > 0 && " · "}{retained.join(" · ")}</p>}
     </section>
   </div>;
 }

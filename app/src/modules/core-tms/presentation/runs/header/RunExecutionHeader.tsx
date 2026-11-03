@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { RunDetailsPopover } from "../repository/details/RunDetailsPopover";
 import { RunClock } from "../clock/RunClock";
 import { ResponsibleName } from "../../../workspace/members/presentation/ResponsibleName";
@@ -11,6 +12,7 @@ import styles from "../../../tms.module.css";
 import runStyles from "../runs.module.css";
 
 type Props = {
+  history?: ReactNode; actions?: ReactNode;
   propertiesOpen?: boolean; propertiesId?: string; onToggleProperties?: () => void;
   run: TestRunSummary;
   item: RunItem;
@@ -20,7 +22,7 @@ type Props = {
   canStart: boolean; startPending: boolean; onStart: () => void;
 };
 
-export function RunExecutionHeader({ propertiesOpen, propertiesId, onToggleProperties, run, item, archivePending, itemIndex, itemCount, canStart, startPending, onStart }: Props) {
+export function RunExecutionHeader({ history, actions, propertiesOpen, propertiesId, onToggleProperties, run, item, archivePending, itemIndex, itemCount, canStart, startPending, onStart }: Props) {
   const { workspaceId, offline } = useWorkspacePeople();
   const { locale } = useTmsLocale();
 
@@ -41,6 +43,8 @@ export function RunExecutionHeader({ propertiesOpen, propertiesId, onTogglePrope
           <span className={`${runStyles.executionBadge} ${runStyles[`execution_${item.status}`]}`}>{statusIcon[item.status]}{localizedLabel(locale, item.status)}</span>
           <span>{locale === "ru" ? "Исполнитель кейса:" : "Case assignee:"}</span>
           <ResponsibleName workspaceId={workspaceId} identityId={item.assigneeIdentityId} offline={offline} />
+          {history}
+          {actions}
           <RunDetailsPopover key={run.id} run={run} ru={locale === "ru"} />
           {onToggleProperties && <button type="button" className={runStyles.propertiesToggle} aria-expanded={propertiesOpen} aria-controls={propertiesId} onClick={onToggleProperties}>
             {locale === "ru" ? "Свойства" : "Properties"}<ChevronDown size={14} aria-hidden="true" />

@@ -1,4 +1,5 @@
-import { PiFolderSimpleDuotone as Folder, PiFolderPlusDuotone as FolderPlus } from "react-icons/pi";
+import { FolderVisual } from "../../../folders/presentation/appearance/visual/FolderVisual";
+import { PiFolderPlusDuotone as FolderPlus } from "react-icons/pi";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -40,7 +41,7 @@ export function FolderDialog({ existing, selectedParent, onClose, onCreated, ini
           </div>
         </div>
         {cleanName && <div className={`${styles.path} ${duplicate ? styles.pathError : ""}`}>
-          <Folder size={16} aria-hidden="true" />
+          <FolderVisual path={path} />
           <span><small>{copy.path}</small><strong><FolderBreadcrumb path={name.trim() ? path : parent} root={copy.root} /></strong>{duplicate && <em>{copy.duplicate}</em>}</span>
         </div>}
       </div>

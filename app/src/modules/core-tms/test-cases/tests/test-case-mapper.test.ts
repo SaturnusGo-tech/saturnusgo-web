@@ -6,6 +6,7 @@ import {
 } from "../data/test-case-mapper";
 
 type Api = components["schemas"];
+const maintenance: Api["CaseMaintenance"] = { status: "needs_update", rowVersion: 2, updatedBy: "qa", updatedAt: "2026-11-04T00:00:00Z", note: "Repair step", source: { runId: "run", runItemId: "item", attemptNo: 1, revision: 2 }, etag: "maintenance-etag" };
 const timestamps = { createdAt: "2026-08-28T00:00:00Z", updatedAt: "2026-08-28T00:00:01Z" };
 
 test("maps bounded case summaries without fabricating revision content", () => {
@@ -15,7 +16,7 @@ test("maps bounded case summaries without fabricating revision content", () => {
     priority: "critical", customFields: [], productGroupId: null, productId: null, regression: false, component: "Auth", ownerIdentityId: null,
     tags: ["smoke", "ci.backend"], estimatedMinutes: 5, revisionCount: 3, archivedAt: null,
     etag: '"case-1:3"',
-    ...timestamps,
+    maintenance, ...timestamps,
   };
   assert.deepEqual(mapTestCaseSummary(dto), dto);
   assert.equal("steps" in mapTestCaseSummary(dto), false);
@@ -34,8 +35,10 @@ test("maps full case detail with case links and immutable current revision", () 
   const detail = mapTestCase({
     id: "case-1", projectId: "project-1", key: "UH-TC-1", folderId: null, folderPath: "/Smoke",
     currentRevision: 3, current, revisionCount: 3, linkIds: ["link-1"],
-    archivedAt: null, ...timestamps,
+    archivedAt: null, maintenance, ...timestamps,
   });
+  assert.deepEqual(detail.maintenance, maintenance);
+  assert.equal("maintenance" in detail.current, false);
   assert.notEqual(detail.current, current);
   assert.equal(detail.current.title, "Sign in");
   assert.deepEqual(detail.current.attachmentIds, ["att-revision"]);

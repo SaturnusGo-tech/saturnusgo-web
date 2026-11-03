@@ -18,7 +18,7 @@ after(() => {
   for (const key of globals) { const value = previous.get(key); if (value) Object.defineProperty(globalThis, key, value); else Reflect.deleteProperty(globalThis, key); }
 });
 export function folder(id: string, name: string, parentId: string | null = null, path = `/${name}`): RepositoryFolder {
-  return { id, name, parentId, path, workspaceId: "w", projectId: "p", archivedAt: null, rowVersion: 1,
+  return { id, name, parentId, path, appearance: null, workspaceId: "w", projectId: "p", archivedAt: null, rowVersion: 1,
     createdAt: "2026-11-04T00:00:00Z", updatedAt: "2026-11-04T00:00:00Z", etag: `folder:${id}:1` };
 }
 export function fixture(t: TestContext, overrides: Partial<FolderResource> = {}) {

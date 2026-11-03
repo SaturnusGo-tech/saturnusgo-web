@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Send, X, Reply } from "lucide-react";
 import { MarkdownField } from "../../inspector/markdown/MarkdownField";
 import { MemberAvatar } from "../../../../workspace/members/avatar/MemberAvatar";
@@ -19,6 +20,7 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
 }) {
   const [original] = useState(() => readCommentAttachments(initial?.body ?? ""));
   const [body, setBody] = useState(original.text);
+  const [emojiHost, setEmojiHost] = useState<HTMLSpanElement | null>(null);
   const files = useCommentAttachments(projectId, original.attachments, ru);
   const serialized = writeCommentAttachments(body, files.references);
   const submitting = useRef(false);
@@ -43,6 +45,7 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
     <div ref={(element) => { if (element) element.inert = pending; }}>
       <MarkdownField allowAttachments={false} compact autoFocus={!persistent || Boolean(reply)} value={body}
         label={ru ? "Текст комментария" : "Comment text"} onChange={setBody}
+        renderFooter={(emoji) => emojiHost ? createPortal(emoji, emojiHost) : null}
         contextContent={reply && <div className={css.replyQuote} role="note" aria-label={ru ? "Исходное сообщение" : "Original message"}>
           <CommentBody body={reply.deletedAt ? (ru ? "Комментарий удалён" : "Comment deleted") : reply.body} ru={ru} />
         </div>} />
@@ -55,10 +58,11 @@ export function CommentComposer({ ru, projectId, initial, reply, pending, failur
     {serialized.length > 10_000 && <p role="alert">{ru ? "Максимум 10 000 символов" : "Maximum 10,000 characters"}</p>}
     {failure && <p className={css.error} role="alert">{failure}</p>}
     <CommentAttachmentList state={files} pending={pending} ru={ru} />
-    <footer><div className={css.mentions} ref={(element) => { if (element) element.inert = pending; }}><CommentAttachmentButton state={files} pending={pending} ru={ru} /><CommentMentions value={mentions} onChange={setMentions} ru={ru} /></div>
+    <footer><div className={css.mentions} ref={(element) => { if (element) element.inert = pending; }}><span ref={setEmojiHost} /><CommentAttachmentButton state={files} pending={pending} ru={ru} /><CommentMentions value={mentions} onChange={setMentions} ru={ru} /></div>
       <div className={css.submitActions}>{!persistent && <button type="button" disabled={pending} onClick={onCancel}>{ru ? "Отмена" : "Cancel"}</button>}
       <button type="button" className={css.send} disabled={cannotSubmit} onClick={() => void submit()}><Send size={14} />
         {pending ? (ru ? "Сохранение…" : "Saving…") : initial ? (ru ? "Сохранить" : "Save") : (ru ? "Отправить" : "Post")}</button></div></footer>
+
     {reply && <div className={css.reply}><Reply size={14} /><span>{ru ? "Ответить:" : "Reply to:"}</span>
       <span className={css.replyAuthor}><MemberAvatar identityId={reply.author.identityId} name={reply.author.displayName} />{reply.author.displayName}
         <button type="button" disabled={pending} onClick={onClearReply ?? onCancel} aria-label={ru ? "Убрать получателя ответа" : "Remove reply recipient"}><X size={14} /></button>

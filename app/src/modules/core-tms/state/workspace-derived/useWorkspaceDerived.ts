@@ -21,7 +21,7 @@ export function useWorkspaceDerived(
     const text = `${item.key} ${item.folderPath} ${item.title} ${item.component} ${item.tags.join(" ")}`.toLowerCase();
     const filters = state.caseFilters;
     return (
-      text.includes(state.query.toLowerCase()) &&
+      text.includes(state.query.toLowerCase()) && (!filters.maintenanceStatus || filters.maintenanceStatus === "all" || (item.maintenance?.status ?? "current") === filters.maintenanceStatus) &&
       (filters.includeArchived || !item.archivedAt) &&
       (filters.type === "all" || item.type === filters.type) &&
       (filters.priority === "all" || item.priority === filters.priority) &&

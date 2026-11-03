@@ -7,7 +7,7 @@
   animation: pickup 190ms cubic-bezier(.2,.7,.3,1) both;
 }
 .dragPreview > svg { flex: 0 0 auto; color: var(--falcon-icon-muted); }
-.dragPreview > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dragPreview > span:not([data-folder-visual]) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dragPreview > b { flex: 0 0 auto; display: grid; place-items: center; min-width: 23px; height: 23px; padding: 0 5px;
   border-radius: 99px; background: var(--falcon-panel); color: var(--falcon-text); font-size: 11px; font-variant-numeric: tabular-nums; }
 .dragPreview[data-stacked]::before, .dragPreview[data-stacked]::after {

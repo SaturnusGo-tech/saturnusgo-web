@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { reconcileMaintenance } from "../../test-cases/maintenance/model/case-maintenance";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   TestCase,
   TestCaseSummary,
@@ -18,10 +19,15 @@ export function useSelectedCaseResource(
   const [failed, setFailed] = useState(false);
   const [requestVersion, setRequestVersion] = useState(0);
 
+  const selected = testCases.find(item => item.id === caseId);
+  const selectedRef = useRef(selected); selectedRef.current = selected;
+  const contentKey = connection === "demo" ? selected : selected ? JSON.stringify([selected.projectId, selected.etag]) : "";
+  useEffect(() => {
+    setDetail(current => current ? reconcileMaintenance(current, selected) : current);
+  }, [caseId, selected?.maintenance]);
   useEffect(() => {
     setFailed(false);
     if (connection === "demo") {
-      const selected = testCases.find((item) => item.id === caseId);
       setDetail(selected && "current" in selected && "linkIds" in selected
         ? selected as unknown as TestCase
         : null);
@@ -34,13 +40,13 @@ export function useSelectedCaseResource(
     const controller = new AbortController();
     getTestCase(http, caseId, controller.signal).then((resource) => {
       if (controller.signal.aborted) return;
-      setDetail(resource.data);
+      setDetail(current => reconcileMaintenance(reconcileMaintenance(resource.data, current), selectedRef.current));
       setEtag(resource.etag);
     }).catch(() => {
       if (!controller.signal.aborted) setFailed(true);
     });
     return () => controller.abort();
-  }, [caseId, connection, http, requestVersion, testCases]);
+  }, [caseId, connection, http, requestVersion, contentKey]);
 
   const retry = useCallback(() => {
     setFailed(false);

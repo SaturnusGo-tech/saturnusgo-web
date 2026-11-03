@@ -48,7 +48,7 @@ export function useCasesViewController(
   const folderEmpty = Boolean(props.folders?.items.some((folder) => folder.id === props.selectedFolderId && !folder.archivedAt)
     && !allRows.some(({ testCase }) => folderScope.includes(testCase)));
   const baseRows = useMemo(() => filterCaseRows(allRows.filter(({ testCase }) => (
-    (props.folders || props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
+    (!props.filters.maintenanceStatus || props.filters.maintenanceStatus === "all" || (testCase.maintenance?.status ?? "current") === props.filters.maintenanceStatus) && (props.folders || props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)
     && (props.filters.type === "all" || testCase.type === props.filters.type)
     && (props.filters.priority === "all" || testCase.priority === props.filters.priority)
     && (props.filters.lifecycle === "all" || testCase.lifecycle === props.filters.lifecycle)
@@ -66,7 +66,7 @@ export function useCasesViewController(
   const rows = useMemo(() => matchingRows.filter(({ testCase }) => (!props.folders || folderScope.includes(testCase))
     && (props.filters.includeArchived || folderScope.archived || !testCase.archivedAt)), [matchingRows, props.folders, folderScope, props.filters.includeArchived]);
   const treeFiltered = Boolean(fieldFilterCount(facetFilters) || props.query.trim() || qlQuery.trim() || facetFilters.folders.length || facetFilters.components.length || facetFilters.owners?.length
-    || props.filters.type !== "all" || props.filters.priority !== "all" || props.filters.lifecycle !== "all" || props.filters.tag.trim());
+    || props.filters.type !== "all" || props.filters.priority !== "all" || props.filters.lifecycle !== "all" || props.filters.tag.trim() || (props.filters.maintenanceStatus && props.filters.maintenanceStatus !== "all"));
   const selectableRows = useMemo(() => allRows.filter(({ testCase }) => (
     !testCase.archivedAt && Boolean(testCase.etag)
   )), [allRows]);

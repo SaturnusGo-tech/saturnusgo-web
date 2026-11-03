@@ -14,13 +14,14 @@ import {
   toolbarPlugin,
   realmPlugin,
   addTopAreaChild$,
+  addBottomAreaChild$,
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { PendingCaseAttachment } from "../../../../application/evidence/case/pendingCaseAttachment";
 import type { TmsLocale } from "../../../../localization/model/locale";
-import { MarkdownAttachmentButton, MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
+import { MarkdownPendingAttachments } from "./attachments/MarkdownAttachmentUi";
 import { markdownEditorTranslation } from "./translations/markdownEditorTranslation";
 import css from "./markdownField.module.css";
 import { MarkdownCodeEditor } from "./code/MarkdownCodeEditor";
@@ -32,8 +33,10 @@ import { highlightPlugin } from "./highlight/editor/highlightPlugin";
 import typography from "./typography/markdownTypography.module.css";
 import markerCss from "./highlight/highlight.module.css";
 
+import { MarkdownEmojiFooter, MarkdownEmojiFooterContext } from "./emoji/MarkdownEmojiFooter";
+
 const contextContentPlugin = realmPlugin({
-  init(realm) { realm.pub(addTopAreaChild$, MarkdownContextArea); },
+  init(realm) { realm.pub(addTopAreaChild$, MarkdownContextArea); realm.pub(addBottomAreaChild$, MarkdownEmojiFooter); },
 });
 
 export type InitializedMarkdownEditorProps = {
@@ -47,6 +50,7 @@ export type InitializedMarkdownEditorProps = {
   pendingAttachments?: PendingCaseAttachment[];
   onAttachmentFiles?: (files: File[]) => void;
   onRemoveAttachment?: (id: string) => void;
+  renderFooter?: (emoji: ReactNode) => ReactNode;
 };
 
 export default function InitializedMarkdownEditor(props: InitializedMarkdownEditorProps) {
@@ -133,6 +137,7 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
 
   return <>
     <div ref={overlayAnchor} className={css.editorOverlayHost} />
+    <MarkdownEmojiFooterContext.Provider value={{locale: props.locale, onFiles: props.onAttachmentFiles, render: props.renderFooter}}>
     <MDXEditor
       ref={editorRef}
       overlayContainer={overlayContainer ?? undefined}
@@ -157,14 +162,12 @@ export default function InitializedMarkdownEditor(props: InitializedMarkdownEdit
         if (!initialNormalize) props.onChange(next);
       }}
     />
+    </MarkdownEmojiFooterContext.Provider>
     {props.onRemoveAttachment && <MarkdownPendingAttachments
       locale={props.locale}
       entries={props.pendingAttachments ?? []}
       onRemove={props.onRemoveAttachment}
     />}
-    {props.onAttachmentFiles && <div className={css.editorFooter}>
-      <MarkdownAttachmentButton locale={props.locale} onFiles={props.onAttachmentFiles} />
-    </div>}
     {!editorPainted && !onReady && <div className={`${css.editorLoading} ${css.editorBootOverlay} ${loadingHeight}`}>
       <textarea
         className={css.editorLoadingInput}

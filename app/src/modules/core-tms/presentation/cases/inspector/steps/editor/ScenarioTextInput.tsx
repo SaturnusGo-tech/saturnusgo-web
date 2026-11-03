@@ -1,6 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ClipboardEventHandler, type KeyboardEventHandler } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type ClipboardEventHandler, type KeyboardEventHandler } from "react";
+
+import { EmojiButton } from "../../../../common/emoji/EmojiButton";
+import { useTextareaEmoji } from "../../../../common/emoji/selection/useTextareaEmoji";
+import { useStepHistory } from "../markdown/history/useStepHistory";
 
 type Props = {
   id?: string;
@@ -12,10 +16,14 @@ type Props = {
   onChange: (value: string) => void;
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;
+  renderFooter?: (emoji: ReactNode) => ReactNode;
+  ru?: boolean;
 };
 
 export function ScenarioTextInput(props: Props) {
   const ref = useRef<HTMLTextAreaElement>(null);
+  const history = useStepHistory(props.value, props.onChange, ref);
+  const emoji = useTextareaEmoji(props.value, ref, (next, caret) => { history.boundary(); history.record(next, false, {start:caret,end:caret}); }, history.boundary);
 
   useLayoutEffect(() => {
     const node = ref.current;
@@ -24,7 +32,7 @@ export function ScenarioTextInput(props: Props) {
     node.style.height = `${node.scrollHeight}px`;
   }, [props.value]);
 
-  return <textarea
+  return <><textarea
     ref={ref}
     id={props.id}
     rows={1}
@@ -33,8 +41,8 @@ export function ScenarioTextInput(props: Props) {
     placeholder={props.placeholder}
     autoFocus={props.autoFocus}
     className={props.className}
-    onChange={(event) => props.onChange(event.target.value)}
-    onKeyDown={props.onKeyDown}
+    onChange={(event) => history.record(event.target.value, (event.nativeEvent as InputEvent).inputType === "insertText")}
+    onKeyDown={(event) => { if (!history.onKeyDown(event)) props.onKeyDown?.(event); }}
     onPaste={props.onPaste}
-  />;
+  />{props.renderFooter?.(<EmojiButton locale={props.ru ? "ru" : "en"} onOpen={emoji.remember} onSelect={emoji.insert} />)}</>;
 }

@@ -1,6 +1,6 @@
 import { caseFieldFilterSections } from "./fields/CaseFieldFilterSections";
 import { useRef, useState, type ReactNode, type KeyboardEvent } from "react";
-import { Bot, Box, Check, Circle, CircleDot, Flag, Folder, Search, Tags, Users, X } from "lucide-react";
+import { Bot, Box, Check, Circle, CircleDot, Flag, Folder, Search, Star, Tags, Users, X } from "lucide-react";
 import { useWorkspacePeople } from "../../../workspace/members/context/WorkspacePeopleContext";
 import { RunAssigneeFilter } from "../../runs/filters/assignee/RunAssigneeFilter";
 import { localizedComponentLabel } from "../../../localization/format/labels";
@@ -41,8 +41,8 @@ export function CaseFilterMenu(props: FilterProps) {
   const labels: Record<string, string> = { folders: ru ? "Папки" : "Folders", components: ru ? "Компоненты" : "Components", type: ru ? "Тип" : "Type", priority: ru ? "Приоритет" : "Priority", lifecycle: ru ? "Статус" : "Status", tag: ru ? "Теги" : "Tags" };
   const valueLabel = (value: string) => {
     const values: Record<string, string> = ru
-      ? { all: "Все", manual: "Ручной", checklist: "Чек-лист", automated: "Автоматизированный", critical: "Критический", high: "Высокий", medium: "Средний", low: "Низкий", ready: "Готово", draft: "Черновик", deprecated: "Устарел" }
-      : { all: "All", manual: "Manual", checklist: "Checklist", automated: "Automated", critical: "Critical", high: "High", medium: "Medium", low: "Low", ready: "Ready", draft: "Draft", deprecated: "Deprecated" };
+      ? { all: "Все", needs_update: "На доработке", current: "Актуальные", manual: "Ручной", checklist: "Чек-лист", automated: "Автоматизированный", critical: "Критический", high: "Высокий", medium: "Средний", low: "Низкий", ready: "Готово", draft: "Черновик", deprecated: "Устарел" }
+      : { all: "All", needs_update: "Needs update", current: "Current", manual: "Manual", checklist: "Checklist", automated: "Automated", critical: "Critical", high: "High", medium: "Medium", low: "Low", ready: "Ready", draft: "Draft", deprecated: "Deprecated" };
     return values[value] ?? value;
   };
   const navigation = [...sections, ...(!props.customSectionsOnly ? [
@@ -50,12 +50,13 @@ export function CaseFilterMenu(props: FilterProps) {
     { id: "type", label: labels.type, icon: <Bot size={16} />, active: props.filters.type !== "all", summary: "" },
     { id: "priority", label: labels.priority, icon: <Flag size={16} />, active: props.filters.priority !== "all", summary: "" },
     { id: "lifecycle", label: labels.lifecycle, icon: <CircleDot size={16} />, active: props.filters.lifecycle !== "all", summary: "" },
+    { id: "maintenanceStatus", label: ru ? "На доработке" : "Maintenance", icon: <Star size={16} />, active: Boolean(props.filters.maintenanceStatus && props.filters.maintenanceStatus !== "all"), summary: "" },
     { id: "tag", label: labels.tag, icon: <Tags size={16} />, active: !!props.filters.tag.trim(), summary: "" },
   ] : [])];
   const section = navigation.some(item => item.id === requestedSection) ? requestedSection : navigation[0]?.id ?? "";
   const current = navigation.find(item => item.id === section);
   const extra = sections.find(item => item.id === section);
-  const values = section === "folders" ? props.options.folders : section === "components" ? props.options.components : section === "type" ? caseTypes : section === "priority" ? priorities : lifecycles;
+  const values = section === "maintenanceStatus" ? ["all", "needs_update", "current"] : section === "folders" ? props.options.folders : section === "components" ? props.options.components : section === "type" ? caseTypes : section === "priority" ? priorities : lifecycles;
   const optionLabel = (value: string) => section === "components" ? localizedComponentLabel(props.locale, value) : valueLabel(value);
   const visibleValues = values.filter(value => optionLabel(value).toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()));
   function openSection(next: string) { setSearch(""); setSection(next); }
@@ -63,7 +64,7 @@ export function CaseFilterMenu(props: FilterProps) {
     if (section === "folders" || section === "components") {
       const currentValues = props.facets[section];
       props.onFacets({ ...props.facets, [section]: currentValues.includes(value) ? currentValues.filter(item => item !== value) : [...currentValues, value] });
-    } else if (section === "type" || section === "priority" || section === "lifecycle") {
+    } else if (section === "type" || section === "priority" || section === "lifecycle" || section === "maintenanceStatus") {
       props.onFilters({ ...props.filters, [section]: value });
     }
   }
@@ -109,7 +110,7 @@ export function CaseFilterMenu(props: FilterProps) {
               onKeyDown={event => navigate(event, "[role='option']")}>
               {visibleValues.map(value => {
                 const selected = section === "folders" ? props.facets.folders.includes(value) : section === "components" ? props.facets.components.includes(value)
-                  : section === "type" ? props.filters.type === value : section === "priority" ? props.filters.priority === value : props.filters.lifecycle === value;
+                  : section === "maintenanceStatus" ? (props.filters.maintenanceStatus ?? "all") === value : section === "type" ? props.filters.type === value : section === "priority" ? props.filters.priority === value : props.filters.lifecycle === value;
                 return <button type="button" role="option" aria-selected={selected} key={value} onClick={() => choose(value)}>
                   {(section === "lifecycle" || section === "priority") && value !== "all" && <Circle size={14} strokeWidth={2.5} className={styles.tone} data-value={value} />}
                   <span title={optionLabel(value)}>{optionLabel(value)}</span>{selected && <Check size={14} />}</button>;

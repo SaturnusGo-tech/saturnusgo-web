@@ -1,3 +1,4 @@
+import { useRunFolderAppearance } from "../../../folders/state/appearance-catalog/useRunFolderAppearance";
 import type { RunRepositoryModel } from "./state/useRunRepository";
 import { isWorkingRun } from "../../../runs/model/history/run-history";
 import { RunIncompleteDialog } from "../completion/RunIncompleteDialog";
@@ -29,6 +30,7 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
   const canManage = model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage");
   const canAssign = canManage && Boolean(run && !run.archivedAt && ["draft","active","paused"].includes(run.status));
   const activeChoice = browser.batch?.id ?? model.selectedRun?.id ?? "";
+  const folderCatalog = useRunFolderAppearance(groups.flatMap(group => group.cases.map(item => item.projectId)));
   return <aside className={css.browser} aria-label={ru ? "Кейсы прогона" : "Run repository"}>
     <RunRepositoryHeader onEdit={canManage && !draftDirty && !controlsLocked ? onEditRun : undefined} ru={ru} run={run} choices={browser.choices} value={activeChoice} canManage={canManage}
       disabled={navigationLocked} actionsDisabled={controlsLocked} startBlocked={startBlocked || controlsLocked}
@@ -50,7 +52,7 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
       {groups.map(({ id: key, label, cases: entries }) => {
         const projectId = `group:${key}`;
         const scoped = entries;
-        return <SelectionTree key={key} includeArchived={filters.filters.includeArchived} cases={scoped} folders={runRepositoryFolders(model.data.workspace.id, projectId, scoped)} selected={assignments.selected} selectable={canAssign && assignments.selecting} disabled={controlsLocked}
+        return <SelectionTree titleMode="marquee" key={key} includeArchived={filters.filters.includeArchived} cases={scoped} folders={runRepositoryFolders(model.data.workspace.id, projectId, scoped, folderCatalog)} selected={assignments.selected} selectable={canAssign && assignments.selecting} disabled={controlsLocked}
           ru={ru} onScope={assignments.toggleScope} onToggle={assignments.toggle} activeId={model.selectedRunItemId ?? undefined}
           heading={<><strong className={css.projectName}><span title={label}>{label}</span><small>{entries.length}</small></strong>
             {canAssign && <div className={selection.commands} role="group" aria-label={ru ? "Выбор тест-кейсов" : "Case selection"}

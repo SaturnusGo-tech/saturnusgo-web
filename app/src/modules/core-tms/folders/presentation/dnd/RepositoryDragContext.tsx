@@ -1,6 +1,7 @@
+import { FolderVisual } from "../appearance/visual/FolderVisual";
 import { DndContext, DragOverlay, PointerSensor, pointerWithin, useSensor, useSensors, type CollisionDetection, type DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { PiFilesDuotone, PiFolderSimpleDuotone } from "react-icons/pi";
+import { PiFilesDuotone } from "react-icons/pi";
 import { canDropRepositoryDrag, repositoryDrag, type RepositoryDrag } from "../../model/drag/repository-drop";
 import type { FolderResource } from "../../model/folder";
 import css from "./styles/drag.module.css";
@@ -66,7 +67,7 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
       }} onDragCancel={clear} onDragEnd={event => void finish(event)}>
       {children}
       <DragOverlay dropAnimation={null}>{drag && <div className={css.dragPreview} data-stacked={count > 1 || undefined}>
-        {drag.kind === "folder" ? <PiFolderSimpleDuotone size={18} /> : <PiFilesDuotone size={18} />}
+        {drag.kind === "folder" ? <FolderVisual folderId={drag.folderId} appearance={resource.items.find(item => item.id === drag.folderId)?.appearance} /> : <PiFilesDuotone size={18} />}
         <span>{label}</span>{count > 1 && <b>{count}</b>}
       </div>}</DragOverlay>
       {error && <div className={css.errorToast} role="alert">{error}<button onClick={() => setError("")} aria-label={ru ? "Закрыть" : "Dismiss"}>×</button></div>}

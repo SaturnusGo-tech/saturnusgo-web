@@ -1,3 +1,4 @@
+import type { FolderAppearance } from "./appearance/folder-appearance";
 import type { MoveReceipt } from "./move/move-undo";
 import type { components } from "../../../../core/tms/generated/tms-api";
 
@@ -5,6 +6,7 @@ export type RepositoryFolder = components["schemas"]["RepositoryFolder"];
 export type FolderScope = Readonly<{ workspaceId: string; projectId: string }>;
 export type FolderMutationResult = { ok: true } | { ok: false; message: string };
 export type FolderResource = {
+  saveAppearance?: (folder: RepositoryFolder, appearance: FolderAppearance, key: string) => Promise<RepositoryFolder>;
   lastMove?: MoveReceipt | null;
   undoMove?: (id: string) => Promise<FolderMutationResult>;
   dismissMove?: (id: string) => void;

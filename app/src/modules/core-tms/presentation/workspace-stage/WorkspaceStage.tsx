@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { WorkspaceMaintenanceProvider } from "../../test-cases/maintenance/composition/WorkspaceMaintenanceProvider";
 import { CodexPluginsSettings } from "../../codex-employee/composition/settings/CodexPluginsSettings";
 import { ImportCasesPage } from "../../test-cases/exchange/library/presentation/page/ImportCasesPage";
 import { CustomFieldsPage } from "../../custom-fields/presentation/catalog/CustomFieldsPage";
@@ -32,6 +34,7 @@ import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
   const session = useOptionalTmsSession();
+  const maintenance = (content: ReactNode) => <WorkspaceMaintenanceProvider model={model}>{content}</WorkspaceMaintenanceProvider>;
   async function selectDrillProject(projectId?: string) {
     if (projectId && projectId !== model.project?.id) await model.chooseProject(projectId);
   }
@@ -108,8 +111,8 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
-  if (model.view === "portfolios") return <WorkspacePortfoliosStage model={model} />;
-  if (model.view === "cases" && model.repositoryScope.aggregate) return <WorkspaceCasesStage model={model} />;
+  if (model.view === "portfolios") return maintenance(<WorkspacePortfoliosStage model={model} />);
+  if (model.view === "cases" && model.repositoryScope.aggregate) return maintenance(<WorkspaceCasesStage model={model} />);
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
     scope={{ workspaceId: model.data.workspace.id, projectId: model.projectId }} canManage={model.canManageIntegrations} />;
   if (model.view === "hooks" && (model.project || session?.kind === "managed")) return <HooksView workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""}
@@ -140,13 +143,13 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     );
   }
   if (model.view === "cases") {
-    return <WorkspaceCasesStage model={model} />;
+    return maintenance(<WorkspaceCasesStage model={model} />);
   }
   if (model.view === "shared-steps") {
     return <SharedStepsView key={model.project.id} resource={model.sharedSteps} />;
   }
   if (model.view === "suites") return <WorkspaceSuitesStage key={`${model.data.workspace.id}:${model.project.id}`} model={model} />;
-  if (model.view === "runs") return <WorkspaceRunsStage model={model} />;
+  if (model.view === "runs") return maintenance(<WorkspaceRunsStage model={model} />);
   return (
     <ReportsView connected={model.connection === "connected"} canComment={model.data.meta.authorization.capabilities.includes("defect:manage")} workspaceId={model.data.workspace.id} projectId={model.projectId} projectName={model.project.name}
       defects={model.reportDefects}

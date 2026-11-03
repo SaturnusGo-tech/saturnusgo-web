@@ -1,6 +1,8 @@
+import type { FolderAppearance } from "../../../folders/model/appearance/folder-appearance";
 import type { TestCaseExchangeDocument } from "./test-case-exchange";
 
 export type ImportFolderPreview = Readonly<{
+  folderId?: string; appearance?: FolderAppearance;
   path: string; name: string; parentPath: string; exists: boolean; caseIndices: readonly number[];
 }>;
 export type ImportPlan = Readonly<{

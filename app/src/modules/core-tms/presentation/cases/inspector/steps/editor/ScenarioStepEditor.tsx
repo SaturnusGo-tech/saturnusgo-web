@@ -69,11 +69,9 @@ export function ScenarioStepEditor(props: Props) {
             placeholder={props.ru ? "Действие или запрос" : "Action or request"}
             autoFocus={props.autoFocus}
             onChange={(action) => props.onChange({ action })}
-            onPaste={actionAttachments.paste} />}
+            onPaste={actionAttachments.paste}
+            renderFooter={(emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />} />}
       </div>
-      {!collapsed && !props.attachmentScope && <div className={css.actionAttachmentRow}>
-        <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />
-      </div>}
     </div>
 
     {!collapsed && <div className={css.expectedBlock} data-input-shell>
@@ -84,9 +82,9 @@ export function ScenarioStepEditor(props: Props) {
         label={`${props.ru ? "Ожидаемый результат шага" : "Expected result for step"} ${props.order}`}
         placeholder={props.ru ? "Что должно произойти" : "What should happen"}
         onChange={(expectedResult) => props.onChange({ expectedResult })}
+        renderFooter={!props.attachmentScope ? (emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} /> : undefined}
         onPaste={expectedAttachments.paste}
       />
-      {!props.attachmentScope && <ScenarioAttachmentControls fieldKey={`step:${props.step.id}:expected`} stepId={props.step.id} />}
     </div>}
 
     {!collapsed && (props.step.testData || (!props.attachmentScope && dataAttachments.pending.length > 0)) && <div className={css.optionalData} data-input-shell>
@@ -95,15 +93,10 @@ export function ScenarioStepEditor(props: Props) {
         label={`${props.ru ? "Тестовые данные шага" : "Test data for step"} ${props.order}`}
         placeholder={props.ru ? "Тестовые данные (необязательно)" : "Test data (optional)"}
         onChange={(testData) => props.onChange({ testData })}
+        renderFooter={!props.attachmentScope ? (emoji) => <ScenarioAttachmentControls prefix={emoji} fieldKey={`step:${props.step.id}:data`} stepId={props.step.id} /> : undefined}
         onPaste={dataAttachments.paste}
       />
-      {!props.attachmentScope && (props.step.testData || dataAttachments.pending.length > 0) && <ScenarioAttachmentControls
-        fieldKey={`step:${props.step.id}:data`}
-        stepId={props.step.id}
-      />}
     </div>}
-    {!collapsed && props.attachmentScope && <ScenarioAttachmentControls
-      fieldKey={`step:${props.step.id}:action`} stepId={props.step.id} />}
     {!collapsed && !props.attachmentScope && <SavedScenarioAttachments ids={props.step.attachmentIds} />}
     {!collapsed && props.attachments}
   </article>;

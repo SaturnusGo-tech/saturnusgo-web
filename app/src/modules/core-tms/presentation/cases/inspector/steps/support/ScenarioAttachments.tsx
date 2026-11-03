@@ -1,6 +1,6 @@
 "use client";
 
-import type { ClipboardEvent } from "react";
+import type { ClipboardEvent, ReactNode } from "react";
 import { filesFromClipboard } from "../../../../../application/evidence/case/pendingCaseAttachment";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { AttachmentLink } from "../../../../../attachments/presentation/link/AttachmentLink";
@@ -36,11 +36,12 @@ export function useScenarioAttachments({ fieldKey, stepId }: DraftAttachmentsPro
   };
 }
 
-export function ScenarioAttachmentControls(props: DraftAttachmentsProps) {
+export function ScenarioAttachmentControls(props: DraftAttachmentsProps & {prefix?: ReactNode}) {
   const { locale } = useTmsLocale();
   const attachments = useScenarioAttachments(props);
-  if (!attachments.enabled) return null;
+  if (!attachments.enabled) return props.prefix ?? null;
   return <div className={css.attachmentControls}>
+    {props.prefix}
     <MarkdownAttachmentButton locale={locale} onFiles={attachments.addFiles}
       text={locale === "ru" ? "Прикрепить файл" : "Attach file"} />
     {attachments.pending.length > 0 && attachments.remove && <MarkdownPendingAttachments

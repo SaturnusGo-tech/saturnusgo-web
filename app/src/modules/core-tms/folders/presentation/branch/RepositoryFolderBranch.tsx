@@ -1,7 +1,8 @@
+import { FolderAppearanceControl } from "../appearance/control/FolderAppearanceControl";
 import { useDisclosureMotion } from "../../../presentation/common/disclosure/useDisclosureMotion";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useContext, useRef, type ReactNode } from "react";
-import { PiCaretDown, PiCaretRight, PiDotsThree, PiFolderSimpleDuotone, PiFolderOpenDuotone } from "react-icons/pi";
+import { PiCaretDown, PiCaretRight, PiDotsThree } from "react-icons/pi";
 import type { TestCaseSummary } from "../../../../../core/tms/contracts/legacy-contract";
 import type { FolderNode } from "../../model/tree";
 import type { RepositoryFolder } from "../../model/folder";
@@ -14,8 +15,9 @@ import quick from "../creation/quick-add.module.css";
 import css from "../styles/repository.module.css";
 
 export type FolderBranchProps = {
+  customize?: boolean;
   creation?: RepositoryCreation;
-  hideRootCount?: boolean;
+  hideRootCount?: boolean; titleMode?: "marquee";
   trailing?: (item: TestCaseSummary) => ReactNode;
   canSelect?: boolean; allowArchivedSelection?: boolean; accessory?: (item: TestCaseSummary) => ReactNode;
   node: FolderNode; depth: number; expanded: ReadonlySet<string>; selected: ReadonlySet<string>;
@@ -49,11 +51,12 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       <input type="checkbox" ref={(element) => { checkbox.current = element; if (element) element.indeterminate = selectedCount > 0 && selectedCount < node.selectableCaseIds.length; }}
         checked={node.selectableCaseIds.length > 0 && selectedCount === node.selectableCaseIds.length} disabled={props.locked || !(props.canSelect ?? props.canManage) || !node.selectableCaseIds.length || Boolean(folder.archivedAt)}
         aria-label={`${ru ? "Выбрать кейсы папки" : "Select folder cases"} ${folder.name}`} onChange={() => props.onScope(node.selectableCaseIds)} />
+      <div className={css.folderIdentity}><FolderAppearanceControl folder={folder} open={open} editable={props.customize && props.canManage} disabled={props.locked} ru={ru} />
       <button ref={drag.setNodeRef} {...drag.attributes} {...drag.listeners} type="button" className={css.folderName} title={folder.name}
         disabled={props.locked} aria-disabled={props.locked || undefined}
         onClick={() => { if (!props.locked && Date.now() > suppress.current) { props.onFolder(folder.path, folder.id); if (!open) props.onExpand(folder.id); } }}>
-        {open ? <PiFolderOpenDuotone size={18} /> : <PiFolderSimpleDuotone size={18} />}<span>{folder.name}</span>{!(props.hideRootCount && depth === 0) && <small>{node.caseIds.length}</small>}
-      </button>
+        <span className={css.folderLabel}>{folder.name}</span>{!(props.hideRootCount && depth === 0) && <small>{node.caseIds.length}</small>}
+      </button></div>
       {props.canManage && <button type="button" className={css.menuButton} disabled={props.locked || !props.canManage} onClick={() => props.onMenu(folder)} aria-label={`${ru ? "Действия с папкой" : "Folder actions"} ${folder.name}`}><PiDotsThree size={19} /></button>}
     </div>
     {props.creation && props.canManage && !folder.archivedAt && <RepositoryQuickAdd target={{ kind: "folder", id: folder.id, name: folder.name }}
@@ -66,7 +69,7 @@ export function RepositoryFolderBranch(props: FolderBranchProps) {
       <ul id={childrenId} className={css.children}>
       {node.children.map((child) => <RepositoryFolderBranch key={child.folder.id} {...props} node={child} depth={depth + 1} />)}
       {node.cases.map((item) => <RepositoryCaseLeaf key={item.id} item={item} depth={depth + 1} selected={props.selected.has(item.id)} active={props.activeCaseId === item.id}
-        creation={folder.archivedAt ? undefined : props.creation} trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
+        titleMode={props.titleMode} creation={folder.archivedAt ? undefined : props.creation} trailing={props.trailing?.(item)} accessory={props.accessory?.(item)} locked={props.locked} canSelect={props.canSelect} allowArchivedSelection={props.allowArchivedSelection} canManage={props.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
       {!node.caseIds.length && !node.children.length && <li className={css.emptyFolder}>{ru ? "Папка пуста" : "Empty folder"}</li>}
       </ul>
     </div>}

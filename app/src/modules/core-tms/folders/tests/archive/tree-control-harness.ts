@@ -24,6 +24,7 @@ export function treeControl(path: string, exportName: string) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("useDisclosureMotion")) return { useDisclosureMotion: (open: boolean) => ({ ref: { current: null }, present: open }) };
       if (name === "react") return { useRef: (current: unknown) => ({ current }), useContext: () => ({ current: 0, active: false, caseIds: new Set(), folderId: null }) };
+      if (name.endsWith("FolderAppearanceControl")) return { FolderAppearanceControl: "FolderAppearanceControl" };
       if (name.endsWith("useFolderDropReveal")) return { useFolderDropReveal() {} };
       if (name === "@dnd-kit/core") return {
         useDraggable({ disabled }: { disabled: boolean }) {
@@ -35,6 +36,7 @@ export function treeControl(path: string, exportName: string) {
       if (name === "react-icons/pi") return new Proxy({}, { get: () => "Icon" });
       if (name.endsWith("RepositoryCaseLeaf")) return { RepositoryCaseLeaf: "CaseLeaf" };
       if (name.endsWith("RepositoryQuickAdd")) return { RepositoryQuickAdd: "RepositoryQuickAdd" };
+      if (name.endsWith("RepositoryCaseTitle")) return { RepositoryCaseTitle: "RepositoryCaseTitle" };
       if (name.endsWith("CaseQuickAdd")) return { CaseQuickAdd: "CaseQuickAdd" };
       if (name.endsWith("drag-click")) return { DragClickContext: {}, RepositoryDragSelectionContext: {} };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };

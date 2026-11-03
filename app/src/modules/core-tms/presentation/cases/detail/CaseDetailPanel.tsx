@@ -1,3 +1,4 @@
+import { CaseMaintenanceFeature } from "../../../test-cases/maintenance/composition/CaseMaintenanceFeature";
 import { useCaseActivityNavigation } from "../../../test-cases/navigation/activity/useCaseActivityNavigation";
 import { ListChecks, Pencil } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -154,6 +155,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onArchive={props.onArchive}
         onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
       />
+      {!creating && props.testCase && <div className={inspector.metaRow}><CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen} /></div>}
       {readyDefects > 0 && <div className={inspector.metaRow}>
         <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
       </div>}
