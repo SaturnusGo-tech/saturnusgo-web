@@ -7,9 +7,22 @@ import { useCodexEmployee } from "../../application/state/useCodexEmployee";
 import { createTmsHttpClient } from "../../../../../core/tms/transport/http";
 import { status, connection } from "../support/employee-fixture";
 let current: ReturnType<typeof useCodexEmployee>;
-function Probe({ api }: {
+function Probe({ api, statusOnly = false }: {
     api: ReturnType<typeof createCodexEmployeeApi>;
-}) { current = useCodexEmployee(api); return null; }
+    statusOnly?: boolean;
+}) { current = useCodexEmployee(api, true, { connections: !statusOnly }); return null; }
+test("workspace status view never requests personal grants", async () => {
+    const calls: string[] = [];
+    const api = createCodexEmployeeApi(createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
+        calls.push(String(input)); return Response.json({ data: status }, { headers: { etag: '"3"' } });
+    }}));
+    let view!: ReactTestRenderer;
+    await act(async () => { view = create(<Probe api={api} statusOnly />); });
+    assert.equal(current.employee?.status, "active");
+    assert.equal(current.connections.length, 0);
+    assert.equal(calls.length, 1); assert.match(calls[0], /company\/agents\/codex$/);
+    await act(async () => view.unmount());
+});
 test("tester can connect with server rights, revoke own grant after disable and cannot disable company", async () => {
     const calls: {
         path: string;

@@ -5,8 +5,8 @@ export function createCodexEmployeeApi(http: TmsHttpClient): CodexEmployeePort {
     return {
         async status(signal) {
             const result = await http.getResource<components["schemas"]["CodexEmployeeStatus"]>("/company/agents/codex", signal);
-            const { provider, status, identityId, rowVersion, capacity, canActivate, canDeactivate, canConnect, connectUrl, setup } = result.data;
-            return { provider, status, identityId, rowVersion, capacity: { ...capacity }, canActivate, canDeactivate, canConnect, connectUrl, setup: { ...setup, scopes: [...setup.scopes] }, etag: result.etag };
+            const { provider, status, identityId, rowVersion, capacity, canManage, canActivate, canDeactivate, canConnect, connectUrl, setup } = result.data;
+            return { provider, status, identityId, rowVersion, capacity: { ...capacity }, canManage, canActivate, canDeactivate, canConnect, connectUrl, setup: { ...setup, scopes: [...setup.scopes] }, etag: result.etag };
         },
         async connections(signal) {
             const result = await http.get<{

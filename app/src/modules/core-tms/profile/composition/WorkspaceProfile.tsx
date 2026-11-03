@@ -1,5 +1,4 @@
 "use client";
-import { PersonalCodexFeature } from "../../codex-employee/composition/PersonalCodexFeature";
 import { useMemo } from "react";
 import { useTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useTmsHttpClient } from "../../auth/http/TmsHttpClientContext";
@@ -13,6 +12,6 @@ export function WorkspaceProfile() {
   const http = useTmsHttpClient();
   const client = useMemo(() => createAdministrationClient(http), [http]);
   return <section className={`${administration.page} ${styles.profile}`} data-testid="workspace-profile">
-    <div className={styles.content}><ProfilePage client={client} onLoaded={session.updateProfile} personalConnection={session.kind === "managed" ? <PersonalCodexFeature /> : undefined} /></div>
+    <div className={styles.content}><ProfilePage client={client} onLoaded={session.updateProfile} /></div>
   </section>;
 }

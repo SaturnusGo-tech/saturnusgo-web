@@ -25,6 +25,8 @@ void test("admin tabs use local history, discard detail state and restore the se
     assert.equal(current.route.page, "audit"); assert.equal(current.route.id, null);
     await act(async () => { url = new URL(entries.pop()!); events.dispatchEvent(new Event("popstate")); });
     assert.equal(current.route.id, "member-a"); assert.equal(current.route.page, undefined);
+    await act(async () => current.navigate({ section: "admin", page: "codex", id: null, creating: false }));
+    assert.equal(url.search, "?page=codex"); assert.equal(current.route.page, "codex");
     await act(async () => current.navigate({ section: "profile", id: null, creating: false }));
     assert.equal(url.pathname, "/profile/"); assert.equal(current.route.section, "profile");
   } finally {

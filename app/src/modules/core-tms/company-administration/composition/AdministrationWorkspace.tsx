@@ -2,8 +2,7 @@
 
 import { createCodexEmployeeApi } from "../../codex-employee/data/http/codex-employee-api";
 import { useCodexEmployee } from "../../codex-employee/application/state/useCodexEmployee";
-import { PersonalCodexConnection } from "../../codex-employee/presentation/personal/PersonalCodexConnection";
-import { CodexEmployeeManagement } from "../../codex-employee/presentation/management/CodexEmployeeManagement";
+import { CompanyCodexAdminFeature } from "../../codex-employee/composition/admin/CompanyCodexAdminFeature";
 import { CodexEmployeeRow } from "../../codex-employee/presentation/directory/CodexEmployeeRow";
 import { CompanyOverview } from "../presentation/company-overview/CompanyOverview";
 import { AdministrationJournal } from "../presentation/audit/AdministrationJournal";
@@ -28,7 +27,7 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
   const http = useMemo(() => createAuthenticatedTmsHttpClient({ apiBase: `${window.location.origin}/api/v1`, credentials: "include" }), []);
   const client = useMemo(() => createAdministrationClient(http), [http]);
   const codexApi = useMemo(() => createCodexEmployeeApi(http), [http]);
-  const codex = useCodexEmployee(codexApi, session.audience === "tenant");
+  const codex = useCodexEmployee(codexApi, session.audience === "tenant" && session.identity.role === "workspace_admin", { connections: false });
   const { route, navigate } = useAdministrationNavigation();
   const section = route.section ?? initialSection;
   const { locale } = useTmsLocale();
@@ -48,13 +47,14 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
     employeeVersion.current = next;
   }, [codex.employee?.rowVersion, canReadCompany, company.refresh]);
   return <AdministrationShell companyName={company.value?.name} client={client} onNavigate={navigate} section={section} page={route.page} session={session} logout={logout}>
-    {forbidden ? <p>{copy.noPermission}</p> : section === "profile" ? <ProfilePage client={client} personalConnection={session.audience === "tenant" ? <PersonalCodexConnection state={codex} locale={locale} /> : undefined} />
+    {forbidden ? <p>{copy.noPermission}</p> : section === "profile" ? <ProfilePage client={client} />
+      : section === "admin" && route.page === "codex" ? <CompanyCodexAdminFeature http={http} status={codex} locale={locale} allowed={canReadCompany} onChanged={company.refresh} />
       : route.page === "audit" ? <AdministrationJournal client={client} platform={session.audience === "platform"} />
       : section === "admin" && route.page === "company" ? <CompanyOverview resource={company} />
       : section === "sandbox" ? (route.creating ? <CreateCompany client={client} onBack={onBack} onCreated={onOpen} />
         : route.id ? <CompanyDetail key={route.id} id={route.id} client={client} onBack={onBack} />
           : <CompanyList client={client} onOpen={onOpen} onCreate={onCreate} />)
-        : <MemberWorkspace employeeRow={<CodexEmployeeRow employee={codex.employee} locale={locale} management={<CodexEmployeeManagement state={codex} locale={locale} />} />}
+        : <MemberWorkspace employeeRow={<CodexEmployeeRow employee={codex.employee} locale={locale} href="/admin/?page=codex" loading={codex.loading} error={codex.error} retry={codex.refresh} />}
             client={client} session={session} id={route.id} creating={route.creating}
             onBack={onBack} onOpen={onOpen} onCreate={onCreate} />}
   </AdministrationShell>;

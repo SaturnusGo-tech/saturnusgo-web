@@ -1,24 +1,34 @@
 .expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 200ms ease, opacity 160ms ease; }
 .expansion[data-open] { grid-template-rows: 1fr; opacity: 1; }
 .clipped { min-height: 0; overflow: hidden; }
-.content { padding: 0 0 22px 58px; }
-.intro { margin: 0 0 20px; max-width: 72ch; color: var(--plugin-muted); }
-.field { display: grid; gap: 8px; max-width: 460px; }
-.field > span, .label { color: var(--plugin-text); font-weight: 500; }
-.field input { width: 100%; min-width: 0; height: 38px; padding: 8px 11px; border: 1px solid var(--plugin-line); border-radius: 8px; background: var(--plugin-bg); color: var(--plugin-text); caret-color: var(--plugin-text); }
+.content { padding: 0 0 16px 58px; }
+.intro { margin: 0 0 16px; color: var(--plugin-muted); font-size: 12px; }
+.intro span { padding-inline: 5px; }
+.field { display: grid; gap: 7px; }
+.field > label, .label { color: var(--plugin-text); font-weight: 500; }
+.nameField { position: relative; display: block; }
+.field input { width: 100%; min-width: 0; height: 40px; padding: 8px 44px 8px 12px; border: 1px solid var(--plugin-line); border-radius: 10px; background: var(--plugin-bg); color: var(--plugin-text); caret-color: var(--plugin-text); font: 12px/1.6 ui-monospace, monospace; }
 .field input[aria-invalid="true"] { border-color: var(--falcon-danger-border); }
-.label { margin-top: 20px; }
-.codeBlock { position: relative; min-width: 0; min-height: 44px; margin-top: 8px; padding-right: 44px; border: 1px solid var(--plugin-line); border-radius: 10px; color: var(--plugin-text); background: var(--plugin-bg); }
-.singleValue { display: block; min-width: 0; padding: 12px 10px 12px 14px; overflow-wrap: anywhere; font: 12px/1.6 ui-monospace, monospace; }
-.copy { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; color: var(--plugin-muted); background: transparent; cursor: pointer; }
+.label { margin-top: 16px; }
+.codeBlock { position: relative; min-width: 0; min-height: 40px; margin-top: 7px; padding-right: 44px; border: 1px solid var(--plugin-line); border-radius: 10px; color: var(--plugin-text); background: var(--plugin-bg); }
+.singleValue { display: block; min-width: 0; padding: 10px 10px 10px 12px; overflow-wrap: anywhere; font: 12px/1.6 ui-monospace, monospace; }
+.copy { position: absolute; top: 5px; right: 6px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 7px; color: var(--plugin-muted); background: transparent; cursor: pointer; }
 .copy:hover:not(:disabled) { color: var(--plugin-text); background: var(--plugin-hover); }
-.steps { margin: 22px 0; padding-left: 22px; }
-.steps li { padding-left: 4px; margin-top: 10px; max-width: 76ch; }
+.steps { margin: 22px 0 16px; padding-left: 19px; }
+.steps li { padding-left: 7px; margin-top: 17px; max-width: 76ch; color: var(--plugin-muted); font-size: 13px; }
+.steps li::marker { font-size: 12px; }
+.steps strong { color: var(--plugin-text); font-weight: 500; }
+.steps p { margin: 4px 0 0; overflow-wrap: anywhere; }
+.manualToggle { display: flex; align-items: center; gap: 7px; min-height: 32px; padding: 4px 0; border: 0; background: transparent; color: var(--plugin-text); cursor: pointer; font: inherit; font-size: 13px; }
+.manualToggle span { margin-left: 5px; color: var(--plugin-muted); font-size: 12px; }
+.manualToggle svg { transition: transform 180ms ease; }
+.manualToggle svg[data-open] { transform: rotate(90deg); }
+.copy:focus-visible, .manualToggle:focus-visible { outline: 2px solid var(--plugin-muted); outline-offset: 3px; }
 .advanced h3 { margin: 20px 0 8px; color: var(--plugin-muted); font-size: 13px; font-weight: 500; }
 .codeBlock pre { margin: 0; padding: 12px 10px 12px 14px; overflow-x: auto; font: 12px/1.6 ui-monospace, monospace; }
 .protocol { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 8px 14px; margin: 20px 0 0; font-size: 12px; }
 .protocol dt { color: var(--plugin-muted); }
 .protocol dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
-.feedback { min-height: 21px; margin: 12px 0 0; color: var(--plugin-muted); font-size: 13px; }
+.feedback { min-height: 18px; margin: 4px 0 0; color: var(--plugin-muted); font-size: 12px; }
 @media(max-width: 760px) { .content { padding-left: 0; } }
-@media(prefers-reduced-motion: reduce) { .expansion { transition: none; } }
+@media(prefers-reduced-motion: reduce) { .expansion, .manualToggle svg { transition: none; } }

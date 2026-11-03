@@ -3,26 +3,10 @@
 .rowButton > span > span, .rowLink > span > span { display: block; }
 .chevron { transition: transform 180ms ease; }
 .chevron[data-open] { transform: rotate(90deg) !important; }
-.company { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 0 4px; }
-.companyFacts { flex: 1; min-width: 0; display: grid; gap: 8px; margin: 0; }
-.companyFacts > div { display: flex; align-items: baseline; gap: 16px; }
-.companyFacts dt { flex: 0 0 150px; color: var(--plugin-muted); font-size: 13px; }
-.companyFacts dd { min-width: 0; margin: 0; font-size: 13px; }
-.status { display: inline-flex; align-items: center; gap: 7px; color: var(--plugin-text); }
-.status::before { content: ""; flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--plugin-muted); }
-.status[data-status="active"]::before { background: var(--falcon-success); }
-.capacity { font-variant-numeric: tabular-nums; color: var(--plugin-text); }
-.capacity span { color: var(--plugin-muted); }
-.companyActions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-
 .rowLink { border-radius: 12px; text-decoration: none; border-top: 1px solid var(--plugin-line); }
 .rowLink > svg { transition: transform 180ms ease; }
 .resource:empty { display: none; }
 .resource { color: var(--plugin-muted); }
-.resource button, .refresh { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; border: 0; border-radius: 8px; padding: 5px 8px; background: transparent; color: var(--plugin-text); cursor: pointer; font: inherit; }
-.resource button:hover, .refresh:hover { background: var(--plugin-hover); }
-.empty { margin: 0; padding: 18px 0; color: var(--plugin-muted); }
-.connectionDetails { margin-top: 8px; color: var(--plugin-muted); font-size: 12px; }
-.connectionDetails summary { cursor: pointer; }
-.connectionDetails p { margin: 8px 0 0; overflow-wrap: anywhere; }
-@media(max-width: 600px) { .company { align-items: flex-start; flex-direction: column; gap: 14px; } .companyFacts { width: 100%; } .companyFacts dt { flex-basis: 135px; } }
+.resource button { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; border: 0; border-radius: 8px; padding: 5px 8px; background: transparent; color: var(--plugin-text); cursor: pointer; font: inherit; }
+.resource button:hover { background: var(--plugin-hover); }
+@media(prefers-reduced-motion: reduce) { .chevron { transition: none; } }

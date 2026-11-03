@@ -1,6 +1,6 @@
 "use client";
 
-import { History, Building2, UsersRound, ArrowLeft } from "lucide-react";
+import { History, Building2, UsersRound, ArrowLeft, Bot } from "lucide-react";
 import { AdministrationAccount } from "../account/AdministrationAccount";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ import styles from "./administration.module.css";
 export function AdministrationShell({ children, section, page, session, logout, onNavigate, client, companyName }: {
   readonly client: AdministrationPort; readonly companyName?: string;
   readonly onNavigate: (route: AdministrationRoute) => void;
-  readonly page?: "company" | "audit"; readonly children: ReactNode; readonly section: "sandbox" | "admin" | "profile";
+  readonly page?: "company" | "audit" | "codex"; readonly children: ReactNode; readonly section: "sandbox" | "admin" | "profile";
   readonly session: SignedInCompanySession; readonly logout: () => Promise<void>;
 }) {
   const { locale } = useTmsLocale();
@@ -36,11 +36,12 @@ export function AdministrationShell({ children, section, page, session, logout, 
         if (target !== "sandbox" && target !== "admin" && target !== "profile") return;
         event.preventDefault();
         const next = url.searchParams.get("page");
-        onNavigate({ section: target, id: null, creating: false, ...(next === "audit" || next === "company" ? { page: next } : {}) });
+        onNavigate({ section: target, id: null, creating: false, ...(next === "audit" || next === "company" || next === "codex" ? { page: next } : {}) });
       }}>
         {session.audience === "platform" ? <a href="/sandbox/" aria-current={section === "sandbox" && !page ? "page" : undefined}><Building2 size={17} />{copy.companies}</a>
           : session.identity.role === "workspace_admin" && <a href="/admin/" aria-current={section === "admin" && !page ? "page" : undefined}><UsersRound size={17} />{copy.employees}</a>}
         {session.audience === "tenant" && session.identity.role === "workspace_admin" && <a href="/admin/?page=company" aria-current={section === "admin" && page === "company" ? "page" : undefined}><Building2 size={17} />{copy.companyDetails}</a>}
+        {session.audience === "tenant" && session.identity.role === "workspace_admin" && <a href="/admin/?page=codex" aria-current={section === "admin" && page === "codex" ? "page" : undefined}><Bot size={17} />Codex</a>}
         {(session.audience === "platform" || session.identity.role === "workspace_admin") && <a href={`${session.audience === "platform" ? "/sandbox/" : "/admin/"}?page=audit`} aria-current={page === "audit" ? "page" : undefined}><History size={17} />{locale === "ru" ? "Журнал действий" : "Activity log"}</a>}
       </nav>
       <div className={styles.sidebarBottom}>

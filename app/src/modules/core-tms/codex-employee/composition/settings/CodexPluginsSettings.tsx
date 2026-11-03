@@ -42,7 +42,7 @@ export function CodexPluginsSettings({ workspaceId, projectId, canManage, capabi
   const entries = catalogEntries({ ...catalog, showOthers: connectorAccess, showSwagger: apiEnabled, showCodex: available, projectId,
     codexStatus: codex.loading ? "checking" : codex.error ? "attention" : "available", codexCompanyStatus: codex.employee?.status });
   const change = (id: IntegrationId, next: boolean) => {
-    if (id === "codex") { if (next) open(id, true); else void codex.deactivate(); }
+    if (id === "codex") open(id, true);
     else if (id === "youtrack") { const config = catalog.configuration; if (!config?.baseUrl || !config.tokenConfigured || config.source !== "workspace" || config.configurationVersion !== 2 || validateYouTrackDraft(draftFromConfiguration(config), canReuseYouTrackToken(config, config.baseUrl))) open(id, true); else void youtrack.toggle(next); }
     else if (isProvider(id) && id !== "swagger") {
       if (!catalog.connections.some(connection => connection.provider === id && connection.projectId === projectId)) open(id, true);
@@ -54,6 +54,6 @@ export function CodexPluginsSettings({ workspaceId, projectId, canManage, capabi
   if (detail) return (detail === "swagger" ? apiEnabled : connectorAccess) ? <IntegrationPluginManager key={`${workspaceId}:${projectId}:${detail}`} id={detail}
     workspaceId={workspaceId} projectId={projectId} canManage={canManage} capabilities={capabilities} connected={connected} ru={ru} onUpdated={catalog.refresh} requestSetup={requestSetup || githubReview} onBack={() => open(null)} onViewDetails={() => browse(detail)} />
     : <CompanyFeatureUnavailable onReturn={() => open(null)} />;
-  return <PluginsList entries={entries} codex={codex} ru={ru} canManage={connectorAccess && connected} pending={!!toggle.pending || youtrack.pending}
+  return <PluginsList entries={entries} codex={codex} ru={ru} canManage={connectorAccess && connected} canAdminCodex={session?.workspaceRole === "workspace_admin"} pending={!!toggle.pending || youtrack.pending}
     error={toggle.error ?? youtrack.error} onManage={open} onBrowse={() => browse()} onToggle={change} />;
 }

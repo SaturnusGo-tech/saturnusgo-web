@@ -18,7 +18,8 @@ function setup() {
 test("all catalog services remain visible, planned services and individual Swagger sources have no fake switches", () => {
   const t = setup(), tree = t.render(), all = nodes(tree);
   for (const item of INTEGRATIONS) assert.match(text(tree), new RegExp(item.name));
-  assert.equal(all.filter(node => node.props.role === "switch").length, 8);
+  assert.equal(all.filter(node => node.props.role === "switch").length, 7);
+  assert.equal(all.some(node => node.props["aria-label"] === "Company Codex agent"), false);
   assert.equal(all.filter(node => node.type === "button" && node.props.disabled && /GitLab|Jenkins|TeamCity/.test(text(node))).length, 3);
   assert.ok(all.find(node => node.props["aria-label"] === "Manage Swagger")); t.h.dispose();
 });
@@ -27,17 +28,17 @@ test("switch delegates the requested value without replacing server truth", () =
   const github = all.find(node => node.props["aria-label"] === "Integration GitHub")!;
   invoke(github, "onClick"); assert.deepEqual(t.changes, [["github", false]]);
   assert.equal(nodes(t.render()).find(node => node.props["aria-label"] === "Integration GitHub")!.props["aria-checked"], true);
-  const codex = all.find(node => node.props["aria-label"] === "Company Codex agent")!;
-  invoke(codex, "onClick"); assert.deepEqual(t.changes[t.changes.length - 1], ["codex", true]);
+  assert.equal(all.some(node => node.props["aria-label"] === "Company Codex agent"), false);
   invoke(all.find(node => node.props["aria-label"] === "Manage Jira")!, "onClick"); assert.deepEqual(t.opened, [["jira", undefined]]); t.h.dispose();
 });
-test("permissions, pending mutations and Codex-specific capabilities disable their own switches", () => {
+test("only company administrators get a management link and company lifecycle has no workspace switch", () => {
   const t = setup(); t.props.canManage = false;
   let all = nodes(t.render()); assert.equal(all.find(node => node.props["aria-label"] === "Integration GitHub")!.props.disabled, true);
-  assert.equal(all.find(node => node.props["aria-label"] === "Company Codex agent")!.props.disabled, false);
+  assert.equal(all.some(node => node.type === "a" && node.props.href === "/admin/?page=codex"), false);
+  t.props.canAdminCodex = true;
+  all = nodes(t.render()); assert.equal(all.find(node => node.type === "a" && node.props.href === "/admin/?page=codex")?.props.children, "Company admin");
   t.props.pending = true; all = nodes(t.render()); assert.ok(all.filter(node => node.props.role === "switch").every(node => node.props.disabled));
-  t.props.pending = false; t.props.codex.employee = { ...t.props.codex.employee!, canActivate: false };
-  assert.equal(nodes(t.render()).find(node => node.props["aria-label"] === "Company Codex agent")!.props.disabled, true); t.h.dispose();
+  assert.equal(all.some(node => node.props["aria-label"] === "Company Codex agent"), false); t.h.dispose();
 });
 test("search, empty and failed update states retain a clear recovery path", () => {
   const t = setup(); t.props.error = "PRECONDITION_FAILED";

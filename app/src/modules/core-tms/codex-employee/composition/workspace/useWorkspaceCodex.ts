@@ -6,5 +6,5 @@ import { createCodexEmployeeApi } from "../../data/http/codex-employee-api";
 export function useWorkspaceCodex(enabled: boolean) {
   const http = useTmsHttpClient();
   const api = useMemo(() => createCodexEmployeeApi(http), [http]);
-  return useCodexEmployee(api, enabled);
+  return useCodexEmployee(api, enabled, { connections: false });
 }

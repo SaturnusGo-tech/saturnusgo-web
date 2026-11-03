@@ -11,7 +11,8 @@ type State = {
 };
 const empty = (owner: CodexEmployeePort): State => ({ owner, employee: null, connections: [], loading: true, pending: false, error: null, connectionsError: null });
 const errorCode = (error: unknown) => error && typeof error === "object" && "code" in error ? String(error.code) : "SERVICE_UNAVAILABLE";
-export function useCodexEmployee(api: CodexEmployeePort, enabled = true) {
+export function useCodexEmployee(api: CodexEmployeePort, enabled = true, options: { connections?: boolean } = {}) {
+    const includeConnections = options.connections !== false;
     const [state, setState] = useState(() => empty(api));
     const [version, setVersion] = useState(0);
     const active = useRef<AbortController | null>(null);
@@ -26,7 +27,7 @@ export function useCodexEmployee(api: CodexEmployeePort, enabled = true) {
             setState({ ...empty(api), loading: false });
             return () => controller.abort();
         }
-        void Promise.allSettled([api.status(controller.signal), api.connections(controller.signal)]).then(([employee, connections]) => {
+        void Promise.allSettled([api.status(controller.signal), includeConnections ? api.connections(controller.signal) : Promise.resolve([])]).then(([employee, connections]) => {
             if (controller.signal.aborted)
                 return;
             setState({ owner: api, employee: employee.status === "fulfilled" ? employee.value : null,
@@ -35,7 +36,7 @@ export function useCodexEmployee(api: CodexEmployeePort, enabled = true) {
                 connectionsError: connections.status === "rejected" ? errorCode(connections.reason) : null });
         });
         return () => { controller.abort(); mutation.current?.abort(); mutation.current = null; };
-    }, [api, enabled, version]);
+    }, [api, enabled, includeConnections, version]);
     const refresh = useCallback(() => setVersion(value => value + 1), []);
     const mutate = async (operation: (signal: AbortSignal) => Promise<void>) => {
         if (mutation.current || owner.current !== api || !enabled)
