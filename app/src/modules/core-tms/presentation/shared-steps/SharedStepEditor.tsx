@@ -52,7 +52,6 @@ export function SharedStepEditor({ draft, saving, locked = false, error, ru, onC
       <button type="button" className={styles.iconButton} onClick={onCancel} disabled={saving}
         aria-label={ru ? "Вернуться к списку" : "Back to list"}><ArrowLeft size={18} /></button>
       <div className={styles.titleField}>
-        <span>{ru ? "Блок общих шагов" : "Shared step block"}</span>
         <input data-inline-title autoFocus disabled={saving || locked} aria-label={ru ? "Название блока общих шагов" : "Shared step block title"}
           value={draft.title} onChange={(event) => onChange({ ...draft,
           title: event.target.value })} placeholder={ru ? "Например, авторизация" : "For example, authentication"} />

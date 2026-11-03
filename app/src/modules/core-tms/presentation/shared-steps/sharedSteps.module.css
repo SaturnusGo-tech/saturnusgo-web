@@ -31,10 +31,19 @@
 :global(.dark) .editor {
   --cases-hover-strong: var(--falcon-selected);
 }
-.view { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
-.header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-bottom: 1px solid var(--falcon-border-subtle); }
-.header h1 { margin: 0; font-size: 20px; font-weight: 650; line-height: 1.25; }
-.header p { margin: 3px 0 0; color: var(--falcon-text-muted); font-size: 12px; }
+@font-face { font-family: "Falcon Shared Sans"; src: url("/fonts/falcon-docs/OpenAISans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Falcon Shared Sans"; src: url("/fonts/falcon-docs/OpenAISans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Falcon Shared Sans"; src: url("/fonts/falcon-docs/OpenAISans-Semibold.woff2") format("woff2"); font-weight: 600 900; font-display: swap; }
+.view, .editor { font: 400 14px/1.45 "Falcon Shared Sans", system-ui, sans-serif; }
+.view *, .editor * { box-sizing: border-box; }
+.view { display: block; overflow: auto; padding: 26px 30px 56px; container: shared-steps / inline-size; scrollbar-color: var(--falcon-border-subtle) transparent; }
+.page { width: min(100%, 1050px); margin-inline: auto; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 44px; margin-bottom: 28px; }
+.header h1 { margin: 0; font-size: 24px; font-weight: 500; line-height: 34px; letter-spacing: -.025em; }
+.header h1 span { margin-left: 9px; color: var(--falcon-text-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
+.header p { margin: 4px 0 0; color: var(--falcon-text-muted); font-size: 13px; line-height: 21px; }
+.headerActions { display: flex; align-items: center; flex: none; min-width: 0; max-width: 100%; gap: 8px; }
+.view :is(button, input):focus-visible, .editor :is(button, input):focus-visible { outline: 2px solid var(--falcon-text-muted); outline-offset: 3px; box-shadow: none; }
 .primaryButton,
 .secondaryButton,
 .iconButton,
@@ -44,50 +53,36 @@
 .secondaryButton,.addButton { color: var(--falcon-text); background: var(--falcon-control); }
 .secondaryButton:hover,.addButton:hover { background: var(--falcon-hover); }
 .primaryButton:disabled,.secondaryButton:disabled { cursor: default; opacity: .48; }
-.toolbar { height: 52px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 20px; padding: 0 13px; color: var(--falcon-text-muted); background: var(--falcon-control); border: 1px solid var(--falcon-border-strong); border-radius: 12px; }
-.toolbar input { width: 100%; border: 0; outline: 0; color: var(--falcon-text); background: transparent; font: inherit; font-size: 13px; }
-.list { min-height: 0; overflow: auto; padding: 0 20px 24px; }
-.row { width: 100%; min-height: 64px; display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center; border-bottom: 1px solid var(--falcon-border-subtle); }
-.row:hover,.row:focus-within { background: var(--falcon-hover); }
-.rowOpen { min-width: 0; min-height: 64px; display: grid; grid-template-columns: 36px minmax(120px, 1fr) 72px 90px 94px; align-items: center; gap: 10px; padding: 8px 14px; color: var(--falcon-text); background: transparent; border: 0; cursor: pointer; text-align: left; }
-.rowOpen:focus-visible,.removeButton:focus-visible { outline: 1px solid var(--falcon-action); outline-offset: -2px; }
-.removeButton { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--falcon-text-muted); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
-.removeButton:hover { color: var(--falcon-text); background: var(--falcon-hover); }
-.removeButton:disabled { opacity: .4; cursor: default; }
-.rowIcon { width: 30px; height: 30px; display: grid; place-items: center; color: var(--falcon-discovery); background: var(--falcon-discovery-bg); border-radius: 9px; }
-.rowTitle,.rowMetric { min-width: 0; display: grid; gap: 2px; }
-.rowTitle strong { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.rowTitle small,.rowMetric small,.rowDate { color: var(--falcon-text-muted); font-size: 10px; }
-.rowMetric b { font-size: 12px; font-weight: 600; }
-.rowDate { text-align: right; }
-.state,.empty { height: 100%; min-height: 320px; display: grid; place-content: center; justify-items: center; gap: 12px; color: var(--falcon-text-muted); text-align: center; }
-.state strong,.empty strong { color: var(--falcon-text); font-size: 14px; font-weight: 600; }
-.empty > span { width: 52px; height: 52px; display: grid; place-items: center; color: var(--falcon-icon-muted); background: var(--falcon-panel); border-radius: 16px; }
+.state { display: grid; justify-items: center; align-content: center; gap: 12px; min-height: 280px; color: var(--falcon-text-muted); text-align: center; }
+.state strong { color: var(--falcon-text); font-size: 15px; font-weight: 500; }
+.view .primaryButton, .editor .primaryButton { flex: none; white-space: nowrap; border-radius: 999px; padding: 7px 15px; min-height: 36px; font-size: 13px; font-weight: 500; }
 .spin { animation: spin 900ms linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .editor { display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.editorHeader { min-height: 76px; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--falcon-border-subtle); }
+.editorHeader { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: min(100%, 1110px); margin-inline: auto; min-height: 88px; padding: 22px 30px; }
 .editor .editorHeader .iconButton { width: 36px; padding: 0; color: var(--falcon-text-muted); background: transparent; border-color: transparent; box-shadow: none; }
 .editor .editorHeader .iconButton:hover { color: var(--falcon-text); }
 .editor .editorHeader .iconButton:focus-visible { outline: 1px solid var(--falcon-action); outline-offset: 2px; }
 .titleField { min-width: 0; display: grid; gap: 3px; }
-.titleField span { color: var(--falcon-text-muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-.editor .editorHeader .titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--falcon-text); background: transparent; border: 0; border-radius: 0; outline: 0; box-shadow: none; font: inherit; font-size: 18px; font-weight: 620; caret-color: var(--falcon-text); }
+
+.editor .editorHeader .titleField input { width: 100%; min-height: 36px; padding: 0; color: var(--falcon-text); background: transparent; border: 0; border-radius: 0; outline: 0; box-shadow: none; font: inherit; font-size: 22px; font-weight: 500; caret-color: var(--falcon-text); }
 .editor .editorHeader .titleField input:focus,
 .editor .editorHeader .titleField input:focus-visible { background: transparent; outline: 0; box-shadow: none; }
 .editorActions { display: flex; align-items: center; gap: 8px; }
-.editorScroll { min-height: 0; overflow: auto; padding: 24px 28px 60px; background: var(--falcon-surface); }
+.editorScroll { min-height: 0; overflow: auto; padding: 8px 30px 56px; background: var(--falcon-surface); scrollbar-color: var(--falcon-border-subtle) transparent; }
+.editorScroll > * { width: min(100%, 1050px); margin-inline: auto; }
 .paper { width: min(920px, 100%); margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 .scenarioHeading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.scenarioHeading h2 { margin: 0; font-size: 15px; font-weight: 650; }
+.scenarioHeading h2 { margin: 0; font-size: 14px; font-weight: 500; }
 .scenarioHeading span { min-width: 20px; padding: 2px 6px; color: var(--falcon-text-muted); background: var(--falcon-hover); border-radius: 999px; font-size: 10px; text-align: center; }
 .sharedRail { padding-left: 10px; border-left: 1px solid var(--falcon-discovery-border); }
 .editor .paper .sharedRail textarea { color: var(--falcon-text); background: transparent; border-color: transparent; }
 .addButton { margin: 2px 0 0 35px; background: transparent; border-color: transparent; }
-@media (max-width: 720px) { .rowOpen { grid-template-columns: 30px minmax(0, 1fr) 50px; padding: 8px 6px; gap: 6px; }.rowMetric:nth-of-type(4),.rowDate { display: none; }.editorHeader { grid-template-columns: 36px minmax(0,1fr); }.editorActions { grid-column: 1/-1; justify-content: flex-end; }.editorScroll { padding: 18px 16px 42px; } }
+@container shared-steps (max-width: 760px) { .header { align-items: flex-start; flex-wrap: wrap; gap: 16px; } .headerActions { margin-left: auto; } }
+@media (max-width: 640px) { .view { padding: 24px 18px 48px; } .editorHeader { grid-template-columns: 30px minmax(0,1fr); padding: 18px; gap: 8px; } .editorActions { grid-column: 1/-1; justify-content: flex-end; } .editorScroll { padding: 8px 18px 42px; } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
 
-.editorFields { min-width: 0; border: 0; padding: 0; margin: 0; }
+.editorFields { min-width: 0; border: 0; padding: 0; margin: 0 auto; }
 .saveError { margin: 0 0 16px; color: var(--falcon-text); font-size: 13px; line-height: 1.5; }
 .savedAssets { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; margin: 8px 0 20px 35px; }
 

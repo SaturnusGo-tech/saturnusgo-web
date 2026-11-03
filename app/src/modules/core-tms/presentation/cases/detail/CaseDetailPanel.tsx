@@ -16,6 +16,7 @@ import { CaseOverview } from "./CaseOverview";
 import { CaseDetailHeaderActions } from "./header/CaseDetailHeaderActions";
 import { CaseContextTab, type DetailTab } from "./tabs/CaseContextTab";
 import { CaseDetailTabs } from "./tabs/CaseDetailTabs";
+import { useCreateCaseEntrance } from "./motion/create/useCreateCaseEntrance";
 import { caseActivityForKey, type CaseCollaborationViewModel } from "../collaboration/model";
 import { readyDefectCount } from "../../../test-cases/collaboration/model/test-case-collaboration";
 import styles from "../cases.module.css";
@@ -58,6 +59,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const headerReturnFocus = useRef<"title" | null>(null);
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
+  useCreateCaseEntrance(panelRef, creating);
   const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);
   const uploadLocked = Boolean(props.editor?.submitting || props.editor?.attachmentsPending);

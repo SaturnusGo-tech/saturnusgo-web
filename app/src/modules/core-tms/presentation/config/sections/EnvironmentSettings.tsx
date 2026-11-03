@@ -34,7 +34,7 @@ export function EnvironmentSettings({ environments, projectId, projectName, offl
     <header className={css.header}><div><h2 id="settings-environments-title">{ru ? "Окружения" : "Environments"} <span>{environments.length}</span></h2>
       <p>{ru ? `Стенды для проверок в ${projectName}.` : `Test environments in ${projectName}.`}</p></div>
       <button className={css.create} type="button" onClick={() => select("new")} disabled={busy || editing === "new"} data-testid="new-environment"><Plus size={14}/>{t("config.newEnvironment")}</button></header>
-    <label className={css.search}><Search size={14}/><input type="search" aria-label={ru ? "Найти окружение" : "Find an environment"}
+    <label className={css.search} data-input-shell><Search size={16} strokeWidth={1.6} aria-hidden="true"/><input type="search" aria-label={ru ? "Найти окружение" : "Find an environment"}
       placeholder={ru ? "Найти окружение" : "Find an environment"} value={query} disabled={busy} onChange={event => setQuery(event.target.value)} /></label>
     {error && <p role="alert" className={css.error}>{error}</p>}
     <div className={`${css.row} ${css.columns}`} aria-hidden="true"><span>{ru ? "Окружение" : "Environment"}</span><span>{ru ? "Ключ" : "Key"}</span><span>{ru ? "Адрес стенда" : "Base URL"}</span><span/></div>

@@ -1,0 +1,11 @@
+.empty { display: grid; align-content: center; justify-items: center; min-height: 380px; padding: 54px 20px 72px; color: var(--falcon-text-muted); text-align: center; }
+.empty h2 { margin: 27px 0 9px; color: var(--falcon-text); font-size: 18px; font-weight: 500; line-height: 27px; letter-spacing: -.015em; }
+.empty p { margin: 0; max-width: 370px; font-size: 13px; line-height: 22px; }
+.diagram { display: grid; justify-items: center; width: 270px; max-width: 100%; }
+.block { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--falcon-discovery-border); border-radius: 10px; color: var(--falcon-discovery); background: var(--falcon-discovery-bg); font-size: 12px; }
+.branches { display: flex; justify-content: space-between; gap: 28px; width: 100%; padding-top: 30px; position: relative; }
+.branches::before { content: ""; position: absolute; top: 0; left: 50%; height: 15px; width: 1px; background: var(--falcon-border-strong); }
+.branches::after { content: ""; position: absolute; top: 15px; left: 21%; right: 21%; height: 15px; border: 1px solid var(--falcon-border-strong); border-bottom: 0; border-radius: 7px 7px 0 0; }
+.branches > span { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; flex: 1; border: 1px solid var(--falcon-border-subtle); border-radius: 8px; color: var(--falcon-text-muted); background: var(--falcon-surface); font-size: 11px; }
+.reset { min-height: 32px; margin-top: 15px; padding: 5px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--falcon-text-secondary); font: inherit; font-size: 12px; cursor: pointer; }
+.reset:hover { background: var(--falcon-hover); color: var(--falcon-text); }

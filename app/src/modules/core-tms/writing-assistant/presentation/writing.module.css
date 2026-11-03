@@ -1,5 +1,5 @@
 .sphereButton { display: inline-flex !important; flex: 0 0 28px; width: 28px !important; height: 28px !important; align-items: center; justify-content: center; padding: 4px !important; border: 0 !important; border-radius: 8px !important; background: transparent !important; cursor: pointer; }
-.sphere { display: block; width: 19px; height: 19px; flex: 0 0 19px; border-radius: 50%; background: linear-gradient(135deg, var(--falcon-elevated), var(--falcon-panel)); box-shadow: var(--falcon-shadow); transition: transform 180ms ease, box-shadow 180ms ease; }
+.sphere { display: block; width: 19px; height: 19px; flex: 0 0 19px; border-radius: 50%; background: radial-gradient(circle at 30% 24%, color-mix(in srgb, var(--falcon-media-text) 90%, var(--falcon-info-border)), transparent 48%), linear-gradient(135deg, var(--falcon-info-border) 12%, var(--falcon-info-solid) 60%, var(--falcon-discovery-solid)); box-shadow: var(--falcon-shadow); transition: transform 180ms ease, box-shadow 180ms ease; }
 .sphereButton:hover .sphere, .sphereButton[aria-expanded="true"] .sphere { transform: scale(1.1); box-shadow: var(--falcon-shadow); }
 .sphereButton:focus-visible { outline: 2px solid var(--falcon-focus) !important; outline-offset: 2px; }
 .sphereButton:disabled { opacity: .45; cursor: default; }

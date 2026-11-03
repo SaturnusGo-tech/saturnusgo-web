@@ -61,7 +61,7 @@ export function ProjectSettings({ project, workspaceId, offline, canManage, onUp
       <div className={css.property}><dt>{copy.name}</dt><dd>{project.name}</dd></div>
       <div className={css.property}><dt>{copy.key}</dt><dd className={css.projectKey}><code>{project.key}</code>
         <ProjectKeyHelp id={`${id}-key-help`} value={project.key} locked /></dd></div>
-      <div className={css.property}><dt>{copy.description}</dt><dd className={css.description}>{project.description || copy.noDescription}</dd></div>
+      <div className={`${css.property} ${css.descriptionProperty}`}><dt>{copy.description}</dt><dd className={css.description} data-empty={!project.description || undefined}>{project.description || copy.noDescription}</dd></div>
       <div className={css.property}><dt>{copy.responsible}</dt><dd><ResponsibleName workspaceId={workspaceId} identityId={project.responsibleIdentityId ?? null} offline={offline} /></dd></div>
       <div className={css.property}><dt>{copy.portfolio}</dt><dd><PortfolioName id={project.portfolioId ?? null} offline={offline} /></dd></div>
       <div className={css.property}><dt>{copy.status}</dt><dd><span className={css.state} data-archived={archived}>{t(archived ? "common.archived" : "common.active")}</span></dd></div>
