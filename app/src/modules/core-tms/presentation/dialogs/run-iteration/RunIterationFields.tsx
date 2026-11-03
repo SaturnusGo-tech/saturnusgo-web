@@ -12,7 +12,7 @@ export function RunIterationFields({ state, ru }: {
       value={state.iterationId} onChange={state.setIterationId} options={[{ value: "", label: ru ? "Новая итерация" : "New iteration" },
         ...state.iterations.map((item) => ({ value: item.id, label: item.name }))]} /></label>
     {!state.iterationId && <>
-      <label className={css.fieldRow}><span>{ru ? "Название итерации" : "Iteration title"}</span><input required maxLength={200}
+      <label className={css.fieldRow}><span>{ru ? "Название" : "Title"}</span><input required maxLength={200} aria-label={ru ? "Название итерации" : "Iteration title"}
         value={state.name} onChange={(event) => state.setName(event.target.value)} placeholder={ru ? "Например, Релиз 2.4" : "For example, Release 2.4"} /></label>
       <div className={css.narrative}>
         <h3>{ru ? "Описание" : "Description"}</h3>

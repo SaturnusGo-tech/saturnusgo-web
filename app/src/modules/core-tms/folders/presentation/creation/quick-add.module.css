@@ -27,3 +27,5 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (hover: none) { .anchor > .reveal:not([data-disabled]) { grid-template-rows: 1fr; opacity: 1; visibility: visible; } }
 @media (prefers-reduced-motion: reduce) { .reveal { transition: none; } .spin { animation: none; } }
+
+.folderIcon { color: var(--falcon-folder); flex: none; }

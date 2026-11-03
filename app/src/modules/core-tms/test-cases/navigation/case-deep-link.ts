@@ -20,7 +20,7 @@ export function readCaseDeepLink(href: string): CaseDeepLink {
 export function buildCaseDeepLink(
   href: string,
   input: { caseId: string; projectId: string; workspaceId?: string; folderId?: string | null },
-  options: { activity?: boolean; preserveDefectSelection?: boolean; preserveProjectContext?: boolean; preserveCommentSelection?: boolean } = {},
+  options: { activity?: boolean; preserveDefectSelection?: boolean; preserveProjectContext?: boolean; preserveCommentSelection?: boolean; preserveFolderStructure?: boolean } = {},
 ) {
   const url = new URL(href);
   const embedded = options.preserveProjectContext && isProjectCaseContext(href, input.projectId)
@@ -41,7 +41,11 @@ export function buildCaseDeepLink(
     ? url.searchParams.get("defect") : null;
   const legacyReports = Boolean((defectId || legacyDefectId)
     && url.searchParams.get("view") === "reports");
-  url.hash = "";
+  const structure = options.preserveFolderStructure && url.hash === "#folders"
+    && url.searchParams.get(CASE_ID_PARAM) === input.caseId && url.searchParams.get(PROJECT_ID_PARAM) === input.projectId
+    && url.searchParams.get("workspaceId") === workspaceId
+    && (!url.searchParams.get("view") || url.searchParams.get("view") === "cases" || embedded);
+  url.hash = structure ? "#folders" : "";
   url.search = "";
   if (workspaceId) url.searchParams.set("workspaceId", workspaceId);
   url.searchParams.set(PROJECT_ID_PARAM, input.projectId);

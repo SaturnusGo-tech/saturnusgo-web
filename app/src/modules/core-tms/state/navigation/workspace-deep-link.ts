@@ -76,6 +76,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
       && /^[A-Za-z0-9._:-]{1,128}$/.test(catalogProjectId)) url.searchParams.set("catalogProjectId", catalogProjectId);
   }
   if ((input.view === "cases" || (input.view === "portfolios" && embeddedCases)) && sameScope && folderId && /^[A-Za-z0-9._:-]{1,128}$/.test(folderId)) url.searchParams.set("folderId", folderId);
+  if ((input.view === "cases" || (input.view === "portfolios" && embeddedCases)) && sameScope && section === "#folders") url.hash = section;
   if (input.view === "imports" && sameScope && importFile && /^[A-Za-z0-9._:-]{1,128}$/.test(importFile)) url.searchParams.set("importFile", importFile);
   if (input.view === "suites" && sameScope) {
     if (suiteEdit === "new") url.searchParams.set("suiteEdit", "new");
@@ -85,7 +86,7 @@ export function buildWorkspaceDeepLink(href: string, input: {
     }
   }
   if (input.view === "dashboard" && sameScope && detail && detail.length <= 6500) url.searchParams.set("dashboardDetail", detail);
-  if (input.view === "profile" && section === "#security") url.hash = section;
+  if (input.view === "profile" && (section === "#security" || section === "#sessions")) url.hash = section;
   if (input.view === "help") {
     if (article && /^[a-z][a-z0-9-]{0,63}$/.test(article)) url.searchParams.set("article", article);
     if (/^#[a-z][a-z0-9-]{0,63}$/.test(section)) url.hash = section;

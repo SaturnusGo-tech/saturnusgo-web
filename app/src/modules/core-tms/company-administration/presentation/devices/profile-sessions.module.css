@@ -1,12 +1,12 @@
 .list { display: grid; }
-.row { display: flex; align-items: center; gap: 20px; padding: 20px 0; }
+.row { display: flex; align-items: center; gap: 16px; padding: 14px 0; }
 .row + .row { border-top: 1px solid var(--admin-line); }
-.device { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; }
+.device { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
 .device > svg { flex-shrink: 0; color: var(--admin-muted); }
-.device > span { display: grid; gap: 5px; min-width: 0; }
-.device strong { font-size: 14px; line-height: 1.5; font-weight: 500; overflow-wrap: anywhere; }
+.device > span { display: grid; gap: 3px; min-width: 0; }
+.device strong { font-size: 13px; line-height: 1.5; font-weight: 500; overflow-wrap: anywhere; }
 .device small { color: var(--admin-muted); font-size: 12px; }
-.revoke { flex-shrink: 0; border: 0; border-radius: 10px; padding: 8px 10px; background: transparent; color: var(--admin-danger); font: inherit; font-size: 13px; cursor: pointer; }
+.revoke { flex-shrink: 0; border: 0; border-radius: 8px; padding: 6px 8px; background: transparent; color: var(--admin-danger); font: inherit; font-size: 12px; cursor: pointer; }
 .revoke:hover { background: var(--admin-hover); }
 .revoke:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
 .empty { padding-top: 18px; }

@@ -30,6 +30,6 @@ export function ProfileDetailsForm({ profile, client, onSaved }: { readonly prof
       <div className={profileStyles.identity}><span>{copy.email}</span><p>{profile.email}</p>{profile.role && <small>{copy.emailHint}</small>}</div>
     </div>
     {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
-    <div className={styles.actions}><button className={styles.primary} type="submit" disabled={command.pending}>{copy.save}</button></div>
+    <div className={profileStyles.actions}><button className={profileStyles.save} type="submit" disabled={command.pending}>{copy.save}</button></div>
   </form>;
 }

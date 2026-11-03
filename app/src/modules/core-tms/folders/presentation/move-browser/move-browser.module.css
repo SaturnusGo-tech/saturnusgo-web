@@ -1,0 +1,23 @@
+.task { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; padding: 0 7px; color: var(--falcon-text); animation: enter 180ms ease-out; }
+.heading { display: flex; align-items: center; gap: 7px; }
+.heading h2 { min-width: 0; margin: 0; font-size: 14px; font-weight: 550; letter-spacing: -.015em; outline: none; }
+.task .heading button { display: grid; place-items: center; width: 30px; height: 30px; flex: none; padding: 0; border-radius: 50%; color: var(--falcon-icon-muted); }
+.task .heading button:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
+.caption { margin: 7px 0 23px 37px; font-size: 12px; color: var(--falcon-text-muted); }
+.task form { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.destinations { min-height: 0; min-width: 0; margin: 0; padding: 0; border: 0; flex: 1; overflow: auto; }
+.destinations legend { padding: 0; margin-bottom: 10px; font-size: 11px; color: var(--falcon-text-muted); }
+.destinations [data-inline] { border: 0; padding: 0; background: transparent; }
+.destinations [role="listbox"] { max-height: none; }
+.destinations [data-input-shell] { border: 1px solid var(--falcon-border); border-radius: 10px !important; background: transparent; }
+.destinations [data-input-shell] input { background: transparent !important; border: 0 !important; border-radius: 0; }
+.destinations [role="option"] > svg { color: var(--falcon-folder); }
+.destinations:disabled { opacity: .55; }
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px 0 3px; margin-top: auto; }
+.destination { min-width: 0; flex: 1 1 100px; font-size: 11px; color: var(--falcon-text-muted); overflow: hidden; }
+.destination > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.task .footer button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 7px 13px; border-radius: 999px; background: var(--falcon-action); color: var(--falcon-on-action); font-size: 12px; font-weight: 500; }
+.task .footer button:hover:not(:disabled) { background: var(--falcon-action-hover); }
+.error { color: var(--falcon-danger); font-size: 12px; line-height: 1.5; margin: 12px 0 0; }
+@keyframes enter { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .task { animation: none; } }

@@ -1,8 +1,14 @@
 import { PortfolioRepository } from "../../../repository-scope/presentation/browser/PortfolioRepository";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { FolderStructurePage } from "../../../folders/presentation/structure/FolderStructurePage";
+import { useFolderStructureScreen } from "../../../folders/state/structure/useFolderStructureScreen";
 import { CasesView } from "../../cases/CasesView";
 
 export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
+  const { locale } = useTmsLocale();
+  const structure = useFolderStructureScreen();
+  if (structure.open && !model.repositoryScope.aggregate) return <FolderStructurePage key={`${model.data.workspace.id}:${model.project?.id}`} resource={model.folders} ru={locale === "ru"} onBack={structure.close} />;
   const selectionAllowed = !model.repositoryScope.aggregate || model.portfolioRepository.catalog?.projects.some(project => project.id === model.selectedCase?.projectId);
   return <CasesView key={model.repositoryScope.aggregate ? model.repositoryScope.key : model.project?.id}
     repository={model.repositoryScope.aggregate ? <PortfolioRepository key={model.repositoryScope.key} model={model} /> : undefined}
@@ -39,7 +45,7 @@ export function WorkspaceCasesStage({ model }: { model: WorkspaceModel }) {
     onOpenDefect={model.openDefect}
     filters={model.caseFilters}
     onFilters={model.setCaseFilters}
-    onNewFolder={() => model.setDialog("folder")}
+    onNewFolder={structure.show}
     detailLoadError={model.selectedCaseDetailError}
     onRetryDetail={model.retrySelectedCaseDetail}
     sharedSteps={model.sharedSteps.items}

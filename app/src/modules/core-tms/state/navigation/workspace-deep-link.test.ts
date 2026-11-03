@@ -178,3 +178,14 @@ test("Codex detail and setup intent survive reload only in their scoped destinat
   const detail = "https://tms.example/work/?workspaceId=w&projectId=p&view=hooks&integration=codex";
   assert.equal(new URL(buildWorkspaceDeepLink(detail, { ...scope, view: "hooks" })).searchParams.get("integration"), "codex");
 });
+
+test("profile sessions and password destinations survive reload canonicalization without leaking into other views", () => {
+  const scope = { workspaceId: "w", projectId: "p", view: "profile" as const, runId: null };
+  for (const section of ["security", "sessions"]) {
+    const href = `https://tms.example/work/?workspaceId=w&projectId=p&view=profile#${section}`;
+    assert.equal(buildWorkspaceDeepLink(href, scope), href);
+    assert.equal(buildWorkspaceDeepLink(buildWorkspaceDeepLink(href, scope), scope), href);
+    assert.equal(new URL(buildWorkspaceDeepLink(href, { ...scope, view: "cases" })).hash, "");
+  }
+  assert.equal(new URL(buildWorkspaceDeepLink("https://tms.example/work/?view=profile#unknown", scope)).hash, "");
+});

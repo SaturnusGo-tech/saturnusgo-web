@@ -5,7 +5,7 @@ import { CaseBrowserEmpty } from "./browser/layout/CaseBrowserEmpty";
 import browser from "./browser/layout/browser.module.css";
 import { CasesRepositoryList } from "./workspace/CasesRepositoryList";
 import { RepositoryDragContext } from "../../folders/presentation/dnd/RepositoryDragContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../common/loading/TessiqLoader";
 import { CaseDetailPanel } from "./detail/CaseDetailPanel";
@@ -20,10 +20,25 @@ import styles from "./cases.module.css";
 export function CasesView(props: CasesViewProps) {
   const { locale, languageTag, t } = useTmsLocale();
   const view = useCasesViewController(props, locale, languageTag);
+  const [selectionAction, setSelectionAction] = useState<"move" | "archive" | null>(null);
   const detailPanelRef = useRef<HTMLElement>(null);
   const listPaneRef = useRef<HTMLElement>(null);
+  const moveWasOpen = useRef(false);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const captureBrowserFocus = useCaseBrowserFocus(Boolean(props.folders), view.inspectorOpen, view.detailFullscreen, view.workspaceRef, detailPanelRef);
+
+  useEffect(() => {
+    if (selectionAction === "move") { moveWasOpen.current = true; return; }
+    if (!moveWasOpen.current) return;
+    moveWasOpen.current = false;
+    requestAnimationFrame(() => {
+      const root = view.workspaceRef.current;
+      const target = [root?.querySelector<HTMLButtonElement>('[data-bulk-move]:not(:disabled)'),
+        root?.querySelector<HTMLButtonElement>('[data-repository-tree] button:not(:disabled)'), detailPanelRef.current]
+        .find(element => Boolean(element?.getClientRects().length));
+      target?.focus({ preventScroll: true });
+    });
+  }, [selectionAction]);
 
   useEffect(() => {
     if (props.folders || !view.inspectorOpen || !view.inspectorResize.overlay) return;
@@ -71,8 +86,8 @@ export function CasesView(props: CasesViewProps) {
     data-bulk-active={view.bulkSelection.selectedIds.length > 0 || undefined}
     data-testid="cases-view"
   >
-    <div className={props.folders ? browser.panes : undefined} style={props.folders ? undefined : { display: "contents" }} data-open={view.inspectorOpen || undefined} data-fullscreen={view.detailFullscreen || undefined}>
-    {props.repository ?? <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} />}
+    <div className={props.folders ? browser.panes : undefined} style={props.folders ? undefined : { display: "contents" }} data-open={view.inspectorOpen || undefined} data-fullscreen={view.detailFullscreen || undefined} data-task={selectionAction === "move" ? "move" : undefined}>
+    {props.repository ?? <CasesRepositoryList props={props} view={view} locale={locale} listPaneRef={listPaneRef} move={selectionAction === "move" ? { ids: view.bulkSelection.selectedIds, onClose: () => setSelectionAction(null), onMoved: view.bulkSelection.clear } : undefined} />}
     {!props.folders && view.inspectorOpen && !view.detailFullscreen && <div
       {...view.inspectorResize.handleProps}
       className={styles.detailResizeHandle}
@@ -130,7 +145,7 @@ export function CasesView(props: CasesViewProps) {
           />}
     </aside>}
     </div>
-    <CasesSelectionActions props={props} view={view} locale={locale} />
+    <CasesSelectionActions props={props} view={view} locale={locale} action={selectionAction} onAction={setSelectionAction} />
   </div>;
   return props.folders ? <RepositoryDragContext resource={props.folders} selected={view.bulkSelection.selected} ru={locale === "ru"} locked={Boolean(props.editor) || props.folders.busy}>{content}<MoveToast resource={props.folders} ru={locale === "ru"} raised={view.bulkSelection.selectedIds.length > 0} /></RepositoryDragContext> : content;
 }

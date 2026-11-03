@@ -64,7 +64,7 @@ export function WorkspaceHeader({
         </div>
       </div>}
 
-      {model.project && <button type="button" className={shellStyles.environmentShortcut}
+      {model.project && (model.view === "dashboard" || model.view === "cases") && <button type="button" className={shellStyles.environmentShortcut}
         onClick={editEnvironment} disabled={!workspaceReady} data-testid="open-environments"
         title={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}
         aria-label={languageTag.startsWith("ru") ? "Открыть окружения" : "Open environments"}>

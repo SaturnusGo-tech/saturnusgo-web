@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 
-export function useInlineFolderDraft(parentId: string, creation: RepositoryCreation, disabled: boolean, ru: boolean) {
+export function useInlineFolderDraft(parentId: string | null, creation: RepositoryCreation, disabled: boolean, ru: boolean) {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");

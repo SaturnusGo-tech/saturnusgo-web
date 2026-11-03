@@ -13,7 +13,7 @@ const apiBase = "http://127.0.0.1:4573/api/v1";
 const identity: TmsSessionIdentity = {
   kind: "managed", subject: "preview:mercury", label: "Mercury Rucks",
   workspaceId: "workspace_ui_preview", workspaceRole: "workspace_admin",
-  companyCapabilities: ["core", "integrations", "api_testing", "analytics"],
+  companyCapabilities: ["core", "integrations", "api_testing", "analytics", "automation"],
   signOut: async () => {},
 };
 

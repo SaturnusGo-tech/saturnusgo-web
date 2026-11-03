@@ -62,7 +62,7 @@ export function RunSelector({ ru, choices, value, onChoose, onEdit, disabled }: 
       {run && <span className={css.status} data-status={run.status}>{status}</span>}
     </button>
     {visible && <div className={css.menu} role="dialog" aria-label={ru ? "Выбрать прогон" : "Choose a run"}>
-      <label className={css.search}><Search size={14} aria-hidden="true"/><input
+      <label className={css.search} data-input-shell><Search size={14} aria-hidden="true"/><input
         aria-label={ru ? "Найти прогон или тег" : "Find run or tag"} placeholder={ru ? "Найти прогон или тег" : "Find run or tag"}
         value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => {
           if (event.key === "ArrowDown") { event.preventDefault(); root.current?.querySelector<HTMLButtonElement>("[data-run-select], [data-archive-toggle]")?.focus(); }

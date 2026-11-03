@@ -1,6 +1,5 @@
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
-import { FolderDialog } from "../dialogs/folder/FolderDialog";
 import { ProjectDialog } from "../dialogs/project/ProjectDialog";
 import { WorkspaceExecutionDialogs } from "./WorkspaceExecutionDialogs";
 
@@ -34,25 +33,6 @@ export function WorkspaceDialogs({ model }: { model: WorkspaceModel }) {
         onUpdated={(project, etag) => {
           model.acceptProjectUpdate(project, etag);
           close();
-        }}
-      />
-    );
-  }
-  if (model.dialog === "folder" && model.project) {
-    return (
-      <FolderDialog
-        existing={model.folders.items.filter((folder) => !folder.archivedAt).map((folder) => folder.path)}
-        selectedParent={model.selectedFolder}
-        busy={model.folders.busy} error={model.folders.error}
-        onClose={() => { if (!model.folders.busy) close(); }}
-        onCreated={async (folderPath) => {
-          const parts = folderPath.split("/").filter(Boolean); const name = parts.pop()!;
-          const parentPath = `/${parts.join("/")}`;
-          const parent = model.folders.items.find((folder) => folder.path === parentPath && !folder.archivedAt);
-          const result = await model.folders.create(name, parent?.id ?? null);
-          if (!result) return;
-          model.selectFolder(result.path, result.id); model.setSelectedCaseId(""); close();
-          model.notify(t("actions.folderCreated", { path: result.path }));
         }}
       />
     );

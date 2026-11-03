@@ -1,26 +1,20 @@
+.page { width: min(100%, 720px); min-width: 0; font-size: 13px; }
+.heading { margin-bottom: 24px; }
+.heading h1 { margin: 0; font-size: 20px; line-height: 28px; letter-spacing: -.4px; font-weight: 550; }
+.heading p { margin: 7px 0 0; color: var(--admin-muted); line-height: 1.6; }
 .back, .security {
-  display: inline-flex; align-items: center; gap: 10px;
-  border: 0; border-radius: 12px; background: transparent;
+  display: flex; align-items: center; gap: 10px;
+  border: 0; border-radius: 8px; background: transparent;
   color: var(--admin-text); font: inherit; cursor: pointer;
   transition: background 160ms ease, color 160ms ease;
 }
-.back { padding: 8px 10px; margin: 0 0 18px -10px; color: var(--admin-muted); }
-.security { justify-self: start; padding: 12px 14px; margin-left: -14px; }
-.security > svg { color: var(--admin-muted); }
-.security > svg:last-child { margin-left: 18px; }
-.content { display: grid; gap: 28px; width: 100%; min-width: 0; }
-.accountActions { display: flex; flex-wrap: wrap; gap: 8px 32px; padding-top: 16px; border-top: 1px solid var(--admin-line); }
-.sessionsDialog.sessionsDialog { width: min(680px, 100%); background: var(--admin-surface); color: var(--admin-text); border: 1px solid var(--admin-line); border-radius: 22px; }
-.sessionsDialog.sessionsDialog > header { flex-shrink: 0; padding: 20px 24px; }
-.sessionsDialog.sessionsDialog > header h2 { font-size: 20px; font-weight: 550; letter-spacing: -.4px; }
-.sessionsDialog.sessionsDialog > header p { font-size: 13px; color: var(--admin-muted); }
-.sessionsBody { min-height: 0; overflow: auto; padding: 8px 24px 20px; overscroll-behavior: contain; }
-@media (max-width: 600px) {
-  .content { gap: 24px; }
-  .accountActions { display: grid; gap: 4px; }
-  .sessionsDialog.sessionsDialog > header { padding: 18px; }
-  .sessionsBody { padding: 6px 18px 18px; }
-}
+.back { width: max-content; padding: 6px 8px; margin: 0 0 14px -8px; color: var(--admin-muted); }
+.content { display: grid; gap: 24px; width: 100%; min-width: 0; }
+.accountActions { display: grid; gap: 2px; padding-top: 12px; border-top: 1px solid var(--admin-line); }
+.security { width: 100%; min-height: 38px; padding: 8px; text-align: left; }
+.security > svg { flex-shrink: 0; color: var(--admin-muted); }
+.security > svg:last-child { margin-left: auto; }
 .back:hover, .security:hover { background: var(--admin-hover); }
 .back:focus-visible, .security:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+@media (max-width: 600px) { .content { gap: 20px; } .heading { margin-bottom: 20px; } }
 @media (prefers-reduced-motion: reduce) { .back, .security { transition: none; } }

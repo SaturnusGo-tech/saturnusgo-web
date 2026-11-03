@@ -73,7 +73,7 @@ export function CaseBulkActionBar(props: {
       <strong className={styles.bulkCount} title={ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}>
         {ru ? `Выбрано: ${props.selectedCount}` : `${props.selectedCount} selected`}
       </strong>
-      {props.onMove && <button type="button" className={styles.bulkAction} disabled={busy} onClick={props.onMove} aria-label={ru ? "Переместить выбранные кейсы" : "Move selected cases"}>
+      {props.onMove && <button type="button" className={styles.bulkAction} disabled={busy} data-bulk-move onClick={props.onMove} aria-label={ru ? "Переместить выбранные кейсы" : "Move selected cases"}>
         <PiArrowBendDownRightDuotone size={17} aria-hidden="true" /><span>{ru ? "Переместить" : "Move"}</span>
       </button>}
       <button type="button" className={styles.bulkPrimary} disabled={busy} onClick={props.onCreateRun}><Play size={15} /><span>{ru ? "Создать тест-ран" : "Create test run"}</span></button>

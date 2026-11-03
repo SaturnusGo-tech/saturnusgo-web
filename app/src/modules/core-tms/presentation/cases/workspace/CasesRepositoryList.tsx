@@ -1,3 +1,4 @@
+import { MoveCasesDialog } from "../../../folders/presentation/dialog/MoveCasesDialog";
 import type { RefObject } from "react";
 import { RepositorySelectionCommands } from "../browser/selection/RepositorySelectionCommands";
 import { RepositoryControls } from "../browser/controls/RepositoryControls";
@@ -9,12 +10,12 @@ import type { CasesViewProps } from "../types";
 import type { TmsLocale } from "../../../localization/model/locale";
 import styles from "../cases.module.css";
 
-export function CasesRepositoryList({ props, view, locale, listPaneRef }: {
-  props: CasesViewProps; view: ReturnType<typeof useCasesViewController>; locale: TmsLocale; listPaneRef: RefObject<HTMLElement | null>;
+export function CasesRepositoryList({ props, view, locale, listPaneRef, move }: {
+  props: CasesViewProps; view: ReturnType<typeof useCasesViewController>; locale: TmsLocale; listPaneRef: RefObject<HTMLElement | null>; move?: { ids: readonly string[]; onClose: () => void; onMoved: () => void };
 }) {
   const focusEditorActions = () => document.getElementById("case-editor-actions")?.focus();
   return <>
-    {props.folders && <RepositoryFolders resource={props.folders} cases={view.matchingRows.map(({ testCase }) => testCase)} filtered={view.treeFiltered} selectionMode={view.selectionMode} includeArchived={props.filters.includeArchived} onArchiveChange={view.setRepositoryArchived}
+    {props.folders && <RepositoryFolders task={move ? <MoveCasesDialog resource={props.folders} ids={move.ids} ru={locale === "ru"} onClose={move.onClose} onMoved={move.onMoved} /> : undefined} resource={props.folders} cases={view.matchingRows.map(({ testCase }) => testCase)} filtered={view.treeFiltered} selectionMode={view.selectionMode} includeArchived={props.filters.includeArchived} onArchiveChange={view.setRepositoryArchived}
       selectionActions={<RepositorySelectionCommands props={props} view={view} ru={locale === "ru"} />}
       controls={<RepositoryControls props={props} view={view} locale={locale} />} selected={view.bulkSelection.selected}
       selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.selectedCaseId} ru={locale === "ru"} locked={Boolean(props.editor)}

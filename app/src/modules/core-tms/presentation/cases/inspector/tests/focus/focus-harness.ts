@@ -37,7 +37,8 @@ export function focusHarness(initialVisible = true) {
       removeEventListener: (name: string) => listeners.delete(name) },
     require(name: string) {
       if (name === "react") return { useEffect: (callback: typeof effect) => { effect = callback; },
-        useRef: () => ({ current: [panel, list, null][refs++] }) };
+        useState: (initial: unknown) => [initial, () => {}],
+        useRef: (initial: unknown) => ({ current: refs++ === 0 ? panel : refs === 2 ? list : initial }) };
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", languageTag: "en-US", t: (key: string) => key }) };
       if (name.endsWith("useCaseBrowserFocus")) return { useCaseBrowserFocus: () => () => {} };

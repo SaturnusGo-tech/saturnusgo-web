@@ -8,21 +8,21 @@ import { validFolderDestinations } from "../../model/tree";
 import shared from "../../../tms.module.css";
 import css from "../styles/dialog.module.css";
 
-export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCase, onCreated }: {
+export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCase, onCreated, onCreateFolder }: {
   folder: RepositoryFolder; resource: FolderResource; ru: boolean; onClose: () => void;
   onCreateCase: (path: string) => void; onCreated: (path: string, id?: string) => void;
+  onCreateFolder?: (folderId: string) => void;
 }) {
-  const [action, setAction] = useState<"menu" | "edit" | "create" | "archive">("menu");
-  if (action === "edit" || action === "create") return <FolderDialog
-    existing={(action === "edit" ? validFolderDestinations(resource.items, folder) : resource.items.filter((item) => !item.archivedAt)).map((item) => item.path)}
-    selectedParent={action === "create" ? folder.path : (resource.items.find((item) => item.id === folder.parentId)?.path ?? "/")}
-    initialName={action === "edit" ? folder.name : undefined} editing={action === "edit"} busy={resource.busy} error={resource.error}
+  const [action, setAction] = useState<"menu" | "edit" | "archive">("menu");
+  if (action === "edit") return <FolderDialog
+    existing={validFolderDestinations(resource.items, folder).map(item => item.path)}
+    selectedParent={resource.items.find(item => item.id === folder.parentId)?.path ?? "/"}
+    initialName={folder.name} editing busy={resource.busy} error={resource.error}
     onClose={onClose} onCreated={async (path) => {
       const parts = path.split("/").filter(Boolean); const name = parts.pop()!;
       const parentPath = `/${parts.join("/")}`;
       const parent = resource.items.find((item) => item.path === parentPath && !item.archivedAt);
-      if (action === "edit") { if (await resource.update(folder, { name, parentId: parent?.id ?? null })) { onCreated(path, folder.id); onClose(); } }
-      else { const result = await resource.create(name, parent?.id ?? null); if (result) { onCreated(result.path, result.id); onClose(); } }
+      if (await resource.update(folder, { name, parentId: parent?.id ?? null })) { onCreated(path, folder.id); onClose(); }
     }} />;
   return <Modal title={folder.name} onClose={() => { if (!resource.busy) onClose(); }} panelClassName={css.dialog}>
     <div className={css.body}>
@@ -32,7 +32,10 @@ export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCas
         : <div className={css.actions}>
           {folder.archivedAt ? <button disabled={resource.busy} onClick={async () => { if (await resource.restore(folder)) onClose(); }}><PiArrowCounterClockwise />{ru ? "Восстановить папку" : "Restore folder"}</button> : <>
             <button onClick={() => { onClose(); onCreateCase(folder.path); }}><PiFilePlusDuotone />{ru ? "Новый тест-кейс" : "New test case"}</button>
-            <button onClick={() => setAction("create")}><PiFolderPlusDuotone />{ru ? "Новая подпапка" : "New subfolder"}</button>
+            <button disabled={!onCreateFolder || resource.busy} onClick={() => {
+              if (!onCreateFolder || resource.busy) return;
+              onClose(); onCreateFolder(folder.id);
+            }}><PiFolderPlusDuotone />{ru ? "Новая подпапка" : "New subfolder"}</button>
             <button onClick={() => setAction("edit")}><PiPencilSimple />{ru ? "Название и расположение" : "Name and location"}</button>
             <button onClick={() => setAction("archive")}><PiArchiveDuotone />{ru ? "Архивировать папку" : "Archive folder"}</button>
           </>}

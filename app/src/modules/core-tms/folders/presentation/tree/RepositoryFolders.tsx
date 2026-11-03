@@ -19,7 +19,7 @@ export function RepositoryFolders(props: {
   activeCaseId: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void; onCreate: (path?: string) => void;
   onNewFolder: () => void; onImport: () => void;
-  controls?: ReactNode; selectionActions?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; onArchiveChange?: (archived: boolean) => void;
+  controls?: ReactNode; selectionActions?: ReactNode; task?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; onArchiveChange?: (archived: boolean) => void;
 }) {
   const { resource, ru } = props;
   const moving = useContext(RepositoryDragSelectionContext);
@@ -36,6 +36,7 @@ export function RepositoryFolders(props: {
     if (archive || props.locked || !resource.canManage || !resource.items.some(folder => folder.id === activeCreator && !folder.archivedAt)) setActiveCreator(null);
   }, [archive, props.locked, resource.canManage, resource.items, activeCreator]);
   const creation: RepositoryCreation | undefined = !archive && resource.canManage && !props.selectionMode ? {
+    folders: resource.items.filter(folder => !folder.archivedAt),
     activeFolderId: activeCreator, begin: setActiveCreator, close: () => setActiveCreator(null), create: resource.create,
     created: folder => {
       setCreatedFolderId(folder.id);
@@ -85,11 +86,12 @@ export function RepositoryFolders(props: {
   }
   return <aside ref={resize.ref} style={resize.style} data-resizing={resize.resizing || undefined} data-selection={props.selectionMode || undefined} data-repository-tree className={css.repository} aria-label={ru ? "Папки и тест-кейсы" : "Folders and test cases"}>
     {moving.active && <RepositoryDropReveal onReveal={reveal} />}
+    {props.task ?? <>
     <header className={css.heading}>
       <button className={css.repositoryTitle} disabled={props.locked} title={ru ? "Показать все тест-кейсы" : "Show all test cases"}
         onClick={() => { setArchive(false); props.onFolder(""); }}>{ru ? "Репозиторий" : "Repository"}</button><div>
       <button disabled={props.locked || !resource.canManage} onClick={props.onImport} className={css.headerAction} aria-label={ru ? "Импорт тест-кейсов" : "Import test cases"}><PiUploadSimple size={16} /><span>{ru ? "Импорт" : "Import"}</span></button>
-      <button disabled={props.locked || !resource.canManage} onClick={props.onNewFolder} className={`${css.headerAction} ${css.newFolder}`} title={ru ? "Новая папка" : "New folder"} aria-label={ru ? "Новая папка" : "New folder"}><PiFolderPlusDuotone size={18} /><span>{ru ? "Новая папка" : "New folder"}</span></button>
+      <button disabled={props.locked || !resource.canManage || props.selectionMode} onClick={props.onNewFolder} className={`${css.headerAction} ${css.newFolder}`} title={ru ? "Новая папка" : "New folder"} aria-label={ru ? "Новая папка" : "New folder"}><PiFolderPlusDuotone size={18} /><span>{ru ? "Новая папка" : "New folder"}</span></button>
       <button className={css.newCase} disabled={props.locked || !resource.canManage || archive} onClick={() => props.onCreate()} aria-label={ru ? "Новый тест-кейс" : "New test case"} title={ru ? "Новый тест-кейс" : "New test case"}><PiPlus size={18} /></button>
     </div></header>
     {props.controls}
@@ -107,10 +109,10 @@ export function RepositoryFolders(props: {
           creation={creation} locked={props.locked || resource.busy || resource.loading} canManage={resource.canManage} canSelect={Boolean(props.selectionMode) && resource.canManage} ru={ru} onToggle={props.onToggle} onOpen={props.onCase} />)}
         {!roots.length && !tree.unfiled.length && !resource.error && <li className={css.empty}>{props.filtered ? (ru ? "Тест-кейсы не найдены. Измените поиск или фильтры." : "No matching test cases. Adjust the search or filters.") : archive ? (ru ? "В архиве пока пусто" : "The archive is empty") : (ru ? "Создайте первую папку или импортируйте структуру из JSON." : "Create your first folder or import a structure from JSON.")}</li>}
       </ul>}
-    </div>
+    </div></>}
     <div {...resize.handleProps} className={css.resizeHandle} role="separator" tabIndex={0} aria-orientation="vertical"
       aria-label={ru ? "Изменить ширину репозитория" : "Resize repository"} aria-valuemin={REPOSITORY_MIN} aria-valuemax={REPOSITORY_MAX} aria-valuenow={resize.width}
       title={ru ? "Потяните, чтобы изменить ширину. Двойной клик — сбросить." : "Drag to resize. Double click to reset."} />
-    {menu && <FolderActionsDialog folder={menu} resource={resource} ru={ru} onClose={() => setMenu(null)} onCreateCase={props.onCreate} onCreated={props.onFolder} />}
+    {menu && <FolderActionsDialog folder={menu} resource={resource} ru={ru} onClose={() => setMenu(null)} onCreateCase={props.onCreate} onCreated={props.onFolder} onCreateFolder={creation?.begin} />}
   </aside>;
 }

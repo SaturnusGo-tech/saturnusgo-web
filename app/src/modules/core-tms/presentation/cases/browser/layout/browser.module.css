@@ -1,7 +1,7 @@
 .browser { flex-direction: column; }
 .panes { position: relative; display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
 .panes .detail { position: relative; inset: auto; width: auto; min-width: 0; max-width: none; flex: 1; display: flex; border: 0; box-shadow: none; animation: none; transform: none; transition: none; }
-.panes[data-fullscreen] > [data-repository-tree] { display: none; }
+.panes[data-fullscreen]:not([data-task]) > [data-repository-tree] { display: none; }
 .empty { background: var(--falcon-surface); flex: 1; min-height: 200px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--falcon-text-muted); text-align: center; }
 .emptyIcon { flex: none; color: var(--falcon-icon-muted); margin-bottom: 20px; }
 .empty h2 { margin: 0 0 8px; color: var(--falcon-text); font-size: 18px; font-weight: 550; letter-spacing: -.025em; }
@@ -9,8 +9,9 @@
 @container cases-workspace (max-width: 719px) {
   .panes { flex-direction: column; }
   .panes > [data-repository-tree] { width: 100%; max-height: none; flex: 1; border: 0; }
-  .panes[data-open] > [data-repository-tree] { display: none; }
+  .panes[data-open]:not([data-task]) > [data-repository-tree] { display: none; }
   .panes:not([data-open]) .detail { display: none; }
+  .panes[data-task] .detail { display: none; }
   .panes [role=separator] { display: none; }
 }
 

@@ -47,6 +47,6 @@ export function ProfilePasswordForm({ profile, client, onSaved }: { readonly pro
     {mismatch && <p className={styles.error} role="alert">{locale === "ru" ? "Пароли не совпадают." : "Passwords do not match."}</p>}
     {command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
     {saved && <p className={styles.success} role="status">{copy.passwordSaved}</p>}
-    <div className={styles.actions}><button type="submit" className={styles.primary} disabled={command.pending}>{copy.updatePassword}</button></div>
+    <div className={passwordStyles.actions}><button type="submit" className={passwordStyles.save} disabled={command.pending}>{copy.updatePassword}</button></div>
   </form>;
 }

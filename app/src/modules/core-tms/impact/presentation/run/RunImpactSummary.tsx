@@ -1,20 +1,59 @@
+import { useState } from "react";
+import { ArrowUpRight, ChevronRight, X } from "lucide-react";
+import { useOptionalTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import type { useImpactList } from "../../application/list/useImpactList";
-import type { ImpactScope } from "../../model/impact-types";
+import type { ImpactAnalysis, ImpactScope } from "../../model/impact-types";
+import { impactLabel } from "../../model/impact-copy";
 import { impactHref } from "../../navigation/impact-navigation";
-import css from "../styles/impact.module.css";
+import css from "./run-impact.module.css";
+
 export function RunImpactSummary({ state, scope, ru }: {
   state: ReturnType<typeof useImpactList>; scope: ImpactScope; ru: boolean;
 }) {
-  if (state.ready && !state.items.length) return null;
-  if (state.error) return <div className={css.root}><div className={css.error} role="alert">
-    {ru ? "Не удалось проверить предложение для этого прогона." : "Could not check the proposal for this run."}
-    <button type="button" onClick={() => void state.refresh()}>{ru ? "Повторить" : "Retry"}</button></div></div>;
+  const subject = useOptionalTmsSession()?.subject;
+  const [dismissed, setDismissed] = useState<ReadonlySet<string>>(() => new Set());
+  const proposalKey = (item: ImpactAnalysis) => `falcon.run-impact.dismissed.v1:${JSON.stringify([
+    subject, scope.workspaceId, scope.projectId, item.runId, item.id, item.rowVersion, item.change.sha,
+  ])}`;
+  const hidden = (item: ImpactAnalysis) => {
+    const key = proposalKey(item);
+    if (dismissed.has(key)) return true;
+    try { return Boolean(subject && typeof window !== "undefined" && window.localStorage.getItem(key) === "1"); }
+    catch { return false; }
+  };
+  const dismiss = (item: ImpactAnalysis) => {
+    const key = proposalKey(item);
+    setDismissed(previous => new Set([...previous, key]));
+    try { if (subject) window.localStorage.setItem(key, "1"); } catch { /* Dismissal still works in this view when storage is unavailable. */ }
+  };
+  if (state.error) return <div className={`${css.root} ${css.error}`} role="alert">
+    <span>{ru ? "Не удалось проверить предложение для этого прогона." : "Could not check the proposal for this run."}</span>
+    <button type="button" onClick={() => void state.refresh()}>{ru ? "Повторить" : "Retry"}</button></div>;
   if (!state.ready) return null;
-  return <div className={css.root}><div className={css.notice}>
-    {state.items.map((analysis) => <div className={css.rowHeading} key={analysis.id}>
-      <span><strong>Impact Analysis</strong> · {analysis.change.repository} · {analysis.approved
-        ? (ru ? "Состав подтверждён QA" : "Scope approved by QA") : (ru ? "Перед запуском требуется подтверждение состава" : "Scope approval is required before starting")}</span>
-      <a className={css.button} href={impactHref(typeof window === "undefined" ? "https://tms.invalid/work/" : window.location.href, scope, analysis.id)}>{ru ? "Причины и состав" : "Review reasons and scope"}</a>
-    </div>)}
-  </div></div>;
+  const visible = state.items.filter(item => !hidden(item));
+  if (!visible.length) return null;
+  return <section className={css.root} aria-label="Impact Analysis">
+    {visible.map(item => <article className={css.proposal} key={proposalKey(item)}>
+      <details className={css.details}>
+        <summary><ChevronRight className={css.chevron} size={15} strokeWidth={1.6} aria-hidden="true" />
+          <span className={css.copy}><span className={css.heading}><strong>Impact Analysis</strong>
+            <span className={css.repository} title={item.change.repository}>{item.change.repository}{item.change.prNumber ? ` #${item.change.prNumber}` : ""}</span></span>
+            <span className={css.status}>{item.approved ? (ru ? "Состав подтверждён QA" : "Scope approved by QA")
+              : (ru ? "Перед запуском подтвердите состав" : "Review the scope before starting")}</span>
+          </span>
+        </summary>
+        <div className={css.evidence}>
+          <p>{item.result?.summary || (ru ? "Результат анализа ещё не получен." : "Analysis results are not available yet.")}</p>
+          <p className={css.metadata}>{ru ? "Тестов в составе" : "Tests in scope"}: {item.scope.filter(row => row.included).length}
+            {item.result && <> · {ru ? "Риск" : "Risk"}: {impactLabel(item.result.riskLevel, ru)}</>}</p>
+          {item.approvalBlockedReasons.length > 0 && <ul>{item.approvalBlockedReasons.map(reason => <li key={reason}>{impactLabel(reason, ru)}</li>)}</ul>}
+        </div>
+      </details>
+      <a className={css.review} href={impactHref(typeof window === "undefined" ? "https://tms.invalid/work/" : window.location.href, scope, item.id)}>
+        {ru ? "Причины и состав" : "Reasons and scope"}<ArrowUpRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
+      <button type="button" className={css.dismiss} onClick={() => dismiss(item)}
+        aria-label={`${ru ? "Скрыть предложение анализа" : "Dismiss analysis proposal"}: ${item.change.repository}`}
+        title={ru ? "Скрыть это предложение" : "Dismiss this proposal"}><X size={15} strokeWidth={1.6} aria-hidden="true" /></button>
+    </article>)}
+  </section>;
 }

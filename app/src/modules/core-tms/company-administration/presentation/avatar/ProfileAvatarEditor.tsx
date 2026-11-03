@@ -7,10 +7,11 @@ import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { ManagedAvatarImage } from "../../../auth/managed/presentation/avatar/ManagedAvatarImage";
 import { administrationError } from "../copy/administration-errors";
 import styles from "../layout/administration.module.css";
+import photoStyles from "./profile-avatar.module.css";
 
-export function ProfileAvatarEditor({ identityId = null, name, hasAvatar, version, client, disabled, onSaved }: {
+export function ProfileAvatarEditor({ identityId = null, name, hasAvatar, version, client, disabled, compact = false, onSaved }: {
   readonly identityId?: string | null; readonly name: string; readonly hasAvatar: boolean; readonly version: number;
-  readonly client: AdministrationPort; readonly disabled?: boolean; readonly onSaved: () => void;
+  readonly client: AdministrationPort; readonly disabled?: boolean; readonly compact?: boolean; readonly onSaved: () => void;
 }) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
@@ -24,20 +25,20 @@ export function ProfileAvatarEditor({ identityId = null, name, hasAvatar, versio
     if (saved) onSaved();
   }
   return <section className={styles.section} aria-busy={command.pending} aria-label={ru ? "Фотография профиля" : "Profile photo"}>
-    <div className={styles.photoEditor}>
-      <ManagedAvatarImage className={styles.profilePhoto} name={name} hasAvatar={hasAvatar} version={version} load={load} />
+    <div className={compact ? photoStyles.editor : styles.photoEditor}>
+      <ManagedAvatarImage className={compact ? photoStyles.photo : styles.profilePhoto} name={name} hasAvatar={hasAvatar} version={version} load={load} />
       <div>
-        <div className={styles.photoActions}>
-          <button type="button" className={styles.button} disabled={disabled || command.pending} onClick={() => field.current?.click()}>
-            <Camera size={16} />{command.pending ? (ru ? "Обрабатываем…" : "Processing…") : ru ? (hasAvatar ? "Изменить фото" : "Добавить фото") : (hasAvatar ? "Change photo" : "Add photo")}
+        <div className={compact ? photoStyles.actions : styles.photoActions}>
+          <button type="button" className={compact ? photoStyles.button : styles.button} disabled={disabled || command.pending} onClick={() => field.current?.click()}>
+            <Camera size={compact ? 14 : 16} aria-hidden="true" />{command.pending ? (ru ? "Обрабатываем…" : "Processing…") : ru ? (hasAvatar ? "Изменить фото" : "Добавить фото") : (hasAvatar ? "Change photo" : "Add photo")}
           </button>
-          {hasAvatar && <button type="button" className={styles.button} disabled={disabled || command.pending} onClick={() => {
+          {hasAvatar && <button type="button" className={compact ? photoStyles.button : styles.button} disabled={disabled || command.pending} onClick={() => {
             void command.execute(JSON.stringify([identityId, version, "remove"]), async (_, signal) => {
               await client.removeAvatar(identityId, version, signal); return true;
             }).then((saved) => { if (saved) onSaved(); });
-          }}><Trash2 size={15} />{ru ? "Удалить" : "Remove"}</button>}
+          }}><Trash2 size={compact ? 14 : 15} aria-hidden="true" />{ru ? "Удалить" : "Remove"}</button>}
         </div>
-        <p className={styles.hint}>JPG, PNG, WebP · {ru ? "Уменьшим автоматически" : "Resized automatically"}</p>
+        <p className={compact ? photoStyles.hint : styles.hint}>JPG, PNG, WebP · {ru ? "Уменьшим автоматически" : "Resized automatically"}</p>
       </div>
     </div>
     <input ref={field} type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={disabled || command.pending}
