@@ -35,3 +35,22 @@ test("body fallback carries Falcon theme tokens and removes listeners on unmount
   h.unmount(); assert.equal(h.disconnected(), 1);
   assert.equal(h.emit(h.panel, "contextmenu").stopped, false);
 });
+
+for (const native of [true, false]) test(`account hover dismisses the ${native ? "native" : "fallback"} inbox without returning focus`, t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const h = popupHarness(t, native); h.open(); h.hoverPeer();
+  h.advance(140);
+  assert.equal(h.state().open, false);
+  assert.equal(h.panel.shown, false);
+  assert.equal(h.peer().open, true);
+  assert.equal(h.trigger.focused, 0);
+});
+
+test("opening notifications closes an existing account popup and cancels its pending hover", t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const h = popupHarness(t); h.hoverPeer(); h.advance(140);
+  assert.equal(h.peer().open, true);
+  h.open(); assert.equal(h.state().open, true); assert.equal(h.peer().open, false);
+  h.open(); h.hoverPeer(); h.open(); h.advance(200);
+  assert.equal(h.state().open, true); assert.equal(h.peer().open, false);
+});

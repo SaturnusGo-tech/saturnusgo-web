@@ -2,6 +2,7 @@ import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import type { TestContext } from "node:test";
 import { useInboxPopup } from "../../../presentation/popup/useInboxPopup";
+import { useRailPopup } from "../../../../../presentation/navigation/popup/useRailPopup";
 
 class Element extends EventTarget {
   parent: Element | null = null;
@@ -13,13 +14,15 @@ class Element extends EventTarget {
   showPopover() { this.shown = true; }
   hidePopover() { this.shown = false; }
   matches() { return this.shown; }
-  getBoundingClientRect() { return { right: 80, bottom: 790 }; }
+  getBoundingClientRect() { return { right: 80, bottom: 790, top: 746, height: 44 }; }
   closest(_selector: string): Element | null { return null; }
   querySelector(_selector: string): Element | null { return null; }
 }
 export function popupHarness(t: TestContext, native = true, hasApp = true) {
-  const window = new EventTarget(), document = Object.assign(new EventTarget(), { body: new Element() });
+  const window = Object.assign(new EventTarget(), { innerWidth: 1440, innerHeight: 900 });
+  const document = Object.assign(new EventTarget(), { body: new Element(), activeElement: null });
   const app = new Element(), nav = new Element(), root = new Element(), trigger = new Element(), panel = new Element(), heading = new Element();
+  const peerRoot = new Element(), peerTrigger = new Element(), peerPanel = new Element(); peerTrigger.parent = peerRoot;
   nav.parent = app; root.parent = nav; trigger.parent = root; heading.parent = panel;
   trigger.closest = selector => selector === "nav" ? nav : hasApp ? app : null;
   panel.querySelector = () => heading;
@@ -31,10 +34,13 @@ export function popupHarness(t: TestContext, native = true, hasApp = true) {
   const descriptors = new Map(Object.keys(values).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   for (const [key, value] of Object.entries(values)) Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
   let state!: ReturnType<typeof useInboxPopup>, renderer!: ReactTestRenderer;
+  let peer!: ReturnType<typeof useRailPopup>;
   function Probe() {
     state = useInboxPopup(); state.root.current = root as unknown as HTMLDivElement; state.trigger.current = trigger as unknown as HTMLButtonElement;
     state.panel.current = state.open ? panel as unknown as HTMLDivElement : null;
     panel.parent = state.portalHost ? state.portalHost as unknown as Element : root;
+    peer = useRailPopup(); peer.root.current = peerRoot as unknown as HTMLDivElement; peer.trigger.current = peerTrigger as unknown as HTMLButtonElement;
+    peer.panel.current = peer.open ? peerPanel as unknown as HTMLDivElement : null;
     return null;
   }
   act(() => { renderer = create(<Probe/>); });
@@ -42,7 +48,8 @@ export function popupHarness(t: TestContext, native = true, hasApp = true) {
   t.after(() => { unmount(); for (const [key, descriptor] of descriptors) {
     if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key);
   } });
-  return { state: () => state, app, panel, trigger, heading, document, window, disconnected: () => disconnected,
+  return { state: () => state, peer: () => peer, hoverPeer: () => act(() => peer.openHover()), advance: (ms: number) => act(() => t.mock.timers.tick(ms)),
+    app, panel, trigger, heading, document, window, disconnected: () => disconnected,
     open: () => act(() => state.toggle()), unmount,
     resize: (width: number, height: number) => act(() => { Object.assign(globalThis, { innerWidth: width, innerHeight: height }); window.dispatchEvent(new Event("resize")); }),
     emit: (target: EventTarget, type: string, eventTarget?: unknown, key?: string) => {

@@ -1,11 +1,24 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
+const openedEvent = "falcon:rail-popup-opened";
+
 export function useInboxPopup() {
   const [open, setOpen] = useState(false);
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
   const root = useRef<HTMLDivElement>(null), trigger = useRef<HTMLButtonElement>(null), panel = useRef<HTMLDivElement>(null);
-  const dismiss = useCallback(() => setOpen(false), []);
-  const close = useCallback(() => { setOpen(false); trigger.current?.focus({ preventScroll: true }); }, []);
+  const opened = useRef(false), instance = useRef({});
+  const dismiss = useCallback(() => { opened.current = false; setOpen(false); }, []);
+  const close = useCallback(() => { dismiss(); trigger.current?.focus({ preventScroll: true }); }, [dismiss]);
+  const toggle = useCallback(() => {
+    if (opened.current) { dismiss(); return; }
+    document.dispatchEvent(new CustomEvent(openedEvent, { detail: instance.current }));
+    opened.current = true; setOpen(true);
+  }, [dismiss]);
+  useLayoutEffect(() => {
+    const otherOpened = (event: Event) => { if ((event as CustomEvent).detail !== instance.current) dismiss(); };
+    document.addEventListener(openedEvent, otherOpened);
+    return () => document.removeEventListener(openedEvent, otherOpened);
+  }, [dismiss]);
   useLayoutEffect(() => {
     const element = panel.current, button = trigger.current;
     if (!open || !element || !button) return;
@@ -51,5 +64,5 @@ export function useInboxPopup() {
       if (!portalHost && element.matches(':popover-open')) element.hidePopover();
     };
   }, [open, close, dismiss, portalHost]);
-  return { root, trigger, panel, open, portalHost, toggle: () => setOpen(value => !value), close, dismiss };
+  return { root, trigger, panel, open, portalHost, toggle, close, dismiss };
 }
