@@ -25,7 +25,8 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canM
       disabled={locked} aria-disabled={locked || undefined}
       aria-label={`${item.key} · ${item.title}`} aria-current={active ? "page" : undefined}
       onClick={() => { if (!locked && Date.now() > suppress.current) onOpen(item); }} title={`${item.key} · ${item.title}`}>
-      {accessory ?? <PiListChecks size={17} />}<span>{item.title}<small>{item.key}</small></span>{trailing}
+      <span className={css.caseAccessory}>{accessory ?? <PiListChecks size={17} />}</span>
+      <span className={css.caseCopy}>{item.title}<small>{item.key}</small></span>{trailing}
     </button>
     {quickCreate && <CaseQuickAdd folderPath={item.folderPath || "/"} onCreate={creation.createCase} disabled={locked} ru={ru} />}
   </li>;

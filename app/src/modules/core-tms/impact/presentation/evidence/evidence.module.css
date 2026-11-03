@@ -1,0 +1,18 @@
+.evidence { display: grid; gap: 16px; min-width: 0; }
+.evidence h3 { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--falcon-text); }
+.evidence h3 > span { margin-left: 6px; color: var(--falcon-text-muted); font-size: 12px; font-weight: 400; }
+.areas, .files, .notes { margin: 0; padding: 0; list-style: none; }
+.areas > li { padding: 12px 0; border-bottom: 1px solid var(--falcon-border-subtle); }
+.areas summary { display: list-item; color: var(--falcon-text-muted); font-size: 12px; }
+.areas summary strong { margin-right: 10px; color: var(--falcon-text); font-size: 13px; font-weight: 500; }
+.areas summary > span { display: inline-block; }
+.notes, .files { margin: 10px 0 0 18px; color: var(--falcon-text-muted); font-size: 12px; line-height: 21px; overflow-wrap: anywhere; }
+.files { font-family: ui-monospace, monospace; font-size: 11px; }
+.file { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--falcon-border-subtle); color: var(--falcon-text-muted); }
+.file > svg { flex: none; }
+.file > span { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.file strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--falcon-text-secondary); font: 400 12px/20px ui-monospace, monospace; }
+.file small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.technical { padding-top: 16px; border-top: 1px solid var(--falcon-border-subtle); }
+.technical summary { color: var(--falcon-text-muted); font-size: 12px; }
+.muted { color: var(--falcon-text-muted); font-size: 12px; line-height: 21px; }

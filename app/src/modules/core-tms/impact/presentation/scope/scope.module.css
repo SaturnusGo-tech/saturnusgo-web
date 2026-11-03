@@ -1,0 +1,56 @@
+.scope { display: grid; align-content: start; min-width: 0; gap: 18px; scroll-margin-top: 76px; }
+.scope > div > ul { gap: 0; }
+.heading { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.heading > div { flex: 1 1 240px; min-width: 0; }
+.heading h3 { margin: 0; color: var(--falcon-text); font-size: 18px; line-height: 26px; font-weight: 500; }
+.heading h3 span { margin-left: 9px; color: var(--falcon-text-muted); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.heading p { margin: 5px 0 0; max-width: 70ch; color: var(--falcon-text-muted); font-size: 13px; line-height: 21px; }
+.row { min-width: 0; margin: 0; border-bottom: 1px solid var(--falcon-border-subtle); }
+.row:last-child { border-bottom: 0; }
+.rowMain { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 64px; padding-block: 10px; }
+.rowMain[data-recommendation] { grid-template-columns: minmax(0, 1fr) auto; }
+.selection { position: relative; display: grid; place-items: center; width: 16px; height: 16px; }
+.selection > input { width: 15px; height: 15px; margin: 0; accent-color: var(--falcon-action); cursor: pointer; }
+.selection > input:disabled { cursor: default; opacity: .5; }
+.selection > input[aria-disabled=true] { cursor: wait; }
+.selection[data-saving] > input { opacity: 0; }
+.selection[data-saving]:focus-within { outline: 2px solid var(--falcon-focus); outline-offset: 3px; border-radius: 3px; }
+.saving { position: absolute; inset: 0; margin: auto; color: var(--falcon-text-muted); pointer-events: none; animation: savingSpin 800ms linear infinite; }
+@keyframes savingSpin { to { transform: rotate(360deg); } }
+.copy { display: grid; gap: 4px; min-width: 0; }
+.copy strong { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--falcon-text); font-size: 14px; line-height: 20px; font-weight: 500; }
+.row[data-included=false] .copy strong { color: var(--falcon-text-muted); }
+.metadata { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-width: 0; color: var(--falcon-text-muted); font-size: 11px; line-height: 16px; }
+.metadata > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scope .detailsToggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 5px 0 5px 6px; border: 0; background: transparent; color: var(--falcon-text-muted); font-size: 11px; cursor: pointer; }
+.scope .detailsToggle:hover { color: var(--falcon-text); background: transparent; }
+.detailsToggle > svg { flex: none; transition: transform 220ms cubic-bezier(.22,.61,.36,1); }
+.detailsToggle[aria-expanded=true] > svg { transform: rotate(90deg); }
+.reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 220ms cubic-bezier(.22,.61,.36,1), opacity 220ms cubic-bezier(.22,.61,.36,1); }
+.reveal[data-open=true] { grid-template-rows: 1fr; opacity: 1; }
+.revealClip { min-height: 0; overflow: hidden; }
+.explanation { container: scope-evidence / inline-size; display: grid; gap: 12px; margin: 0 0 12px 28px; padding: 14px 16px; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; background: var(--falcon-elevated); color: var(--falcon-text-secondary); font-size: 13px; line-height: 21px; }
+.explanationHeader { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.explanationHeader h4 { margin: 0; color: var(--falcon-text); font-size: 13px; font-weight: 500; }
+.confidence { padding: 2px 7px; border-radius: 6px; color: var(--falcon-text-secondary); background: var(--falcon-control); font-size: 10px; line-height: 17px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.explanationBody { display: grid; min-width: 0; gap: 20px; }
+.explanationBody[data-files] { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.reason { min-width: 0; max-width: 65ch; margin: 0; overflow-wrap: anywhere; }
+.relatedFiles { min-width: 0; }
+.relatedFiles h5 { display: flex; align-items: center; gap: 8px; margin: 0 0 7px; font-size: 11px; font-weight: 500; line-height: 18px; }
+.relatedFiles h5 > span { color: var(--falcon-text-muted); font-size: 10px; font-weight: 400; }
+.files { display: grid; gap: 2px; max-height: 180px; overflow: auto; overscroll-behavior: contain; list-style: none; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--falcon-border-strong) transparent; }
+.files:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; border-radius: 4px; }
+.files li { display: flex; align-items: center; gap: 8px; min-width: 0; padding-block: 5px; }
+.files li > svg { flex: none; color: var(--falcon-icon-muted); }
+.files li > span { display: grid; min-width: 0; gap: 1px; }
+.files strong, .files small { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files strong { color: var(--falcon-text-secondary); font-size: 11px; font-weight: 400; line-height: 16px; }
+.files small { color: var(--falcon-text-muted); font-size: 10px; line-height: 15px; }
+.blockers { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: var(--falcon-warning); font-size: 12px; line-height: 20px; }
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 16px; border-top: 1px solid var(--falcon-border-subtle); }
+.footer > p { flex: 1 1 260px; }
+.scope :is(input, button):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+@container scope-evidence (max-width: 560px) { .explanationBody[data-files] { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+@media(max-width: 560px) { .rowMain { gap: 8px; } .metadata { gap: 3px 8px; } .detailsToggle > span { display: none; } .explanation { margin-left: 24px; padding: 12px 14px; } .explanationBody[data-files] { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+@media(prefers-reduced-motion: reduce) { .detailsToggle > svg, .reveal { transition: none; } .saving { animation: none; } }

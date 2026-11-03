@@ -14,11 +14,13 @@ const previousCss = require.extensions[".css"];
 const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
 let AnalysisList: typeof import("../../presentation/list/AnalysisList")["AnalysisList"];
 let AnalysisDetail: typeof import("../../presentation/detail/AnalysisDetail")["AnalysisDetail"];
+let CoverageGaps: typeof import("../../presentation/gaps/CoverageGaps")["CoverageGaps"];
 before(async () => {
   require.extensions[".css"] = module => { module.exports = {}; };
   Object.assign(globalThis, { React });
   ({ AnalysisList } = await import("../../presentation/list/AnalysisList"));
   ({ AnalysisDetail } = await import("../../presentation/detail/AnalysisDetail"));
+  ({ CoverageGaps } = await import("../../presentation/gaps/CoverageGaps"));
 });
 after(() => {
   if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
@@ -40,10 +42,12 @@ function historical(aiEnabled: boolean, status: "complete" | "disabled" = "compl
       inputTokens: 50, outputTokens: 25, cost: null, latencyMs: 30, candidateCount: 1 },
   } });
 }
-async function detail(item: ImpactAnalysis, subject: string) {
+async function detail(item: ImpactAnalysis, subject: string, openDetails = true, audit = false) {
   const commands: { path: string; body: unknown; etag: string | null; key: string | null }[] = [];
+  const focusedTabs: number[] = [];
   const http = createTmsHttpClient({ apiBase: "https://api.falcon.test/api/v1", credentials: "include", fetch: async (url, init) => {
     const path = new URL(String(url)).pathname;
+    if (path.endsWith("/activity")) return Response.json({ data: [], nextCursor: null });
     if (init?.method === "POST") {
       const headers = new Headers(init.headers);
       commands.push({ path, body: JSON.parse(String(init.body)), etag: headers.get("if-match"), key: headers.get("idempotency-key") });
@@ -52,8 +56,17 @@ async function detail(item: ImpactAnalysis, subject: string) {
   } });
   let root!: ReactTestRenderer;
   await act(async () => { root = create(tree(http, subject, React.createElement(AnalysisDetail,
-    { scope, id: item.id, permissions, ru: false, onBack: () => {} }))); });
-  return { root, commands };
+    { scope, id: item.id, permissions: { ...permissions, audit }, ru: false, onBack: () => {} })), { createNodeMock: node =>
+      node.type === "nav" && node.props.role === "tablist" ? { querySelectorAll: () => [0, 1, 2, 3].map(index => ({ focus: () => focusedTabs.push(index) })) } : null }); });
+  const revokeAudit = () => root.update(tree(http, subject, React.createElement(AnalysisDetail, { scope, id: item.id, permissions, ru: false, onBack: () => {} })));
+  if (!openDetails) return { root, commands, focusedTabs, revokeAudit };
+  const recommendation = root.root.findAllByType("button").find(node => String(node.props["aria-label"]).startsWith("Selection details:"));
+  if (recommendation) await act(async () => recommendation.props.onClick());
+  const gapsTab = root.root.findAllByProps({ role: "tab" }).find(tab => tab.props["aria-controls"]?.includes("gaps"));
+  if (gapsTab) await act(async () => gapsTab.props.onClick());
+  const firstGap = root.root.findAllByType("button").find(item => String(item.props["aria-label"]).startsWith("Expand coverage gap:"));
+  if (firstGap) await act(async () => firstGap.props.onClick());
+  return { root, commands, focusedTabs, revokeAudit };
 }
 
 test("an empty list shows the optional-AI banner only after the server disables AI", async () => {
@@ -69,7 +82,7 @@ test("an empty list shows the optional-AI banner only after the server disables 
     const banner = root.root.findByProps({ "aria-label": "AI availability" });
     assert.equal(banner.type, "aside"); assert.equal(banner.props.role, "status");
     assert.match(content(root), /No analyses yet/); assert.match(content(root), /manual review remain available/);
-    await act(async () => button(root, "Refresh")!.props.onClick());
+    await act(async () => root.root.findByProps({ "aria-label": "Refresh analyses" }).props.onClick());
     await act(async () => respond(Response.json({ data: [], nextCursor: null, aiEnabled: true })));
     assert.equal(root.root.findAllByProps({ "aria-label": "AI availability" }).length, 0);
   } finally { await act(async () => root?.unmount()); }
@@ -97,5 +110,73 @@ test("current AI-enabled configuration exposes generation despite a historical d
     await act(async () => generate.props.onClick());
     assert.equal(commands[0].path, "/api/v1/impact/analyses/analysis_qa/gaps/gap_legacy/generate");
     assert.deepEqual(commands[0].body, { mode: "ai" }); assert.equal(commands[0].etag, "v7"); assert.ok(commands[0].key);
+  } finally { await act(async () => root.unmount()); }
+});
+
+test("gap review expands one row and preserves acknowledgment text while pending commands disable actions", async () => {
+  const item = historical(false), first = item.result!.coverageGaps[0];
+  item.result!.coverageGaps.push({ ...first, id: "gap_second", area: "Session recovery" });
+  const commands: unknown[] = [], command = async (value: unknown) => { commands.push(value); };
+  const props = { analysis: item, ru: false, writable: true, pending: false, command };
+  const regions = new Map<string, { inert: boolean }>();
+  let root!: ReactTestRenderer;
+  try {
+    await act(async () => { root = create(React.createElement(CoverageGaps, props) as React.JSX.Element, { createNodeMock: node => {
+      if (node.props.role !== "region") return null;
+      const element = { inert: false }; regions.set(node.props.id, element); return element;
+    } }); });
+    const trigger = (area: string) => root.root.findAllByType("button").find(node => String(node.props["aria-label"]).endsWith(`coverage gap: ${area}`))!;
+    assert.ok(root.root.findAllByProps({ role: "region" }).every(node => node.props["aria-hidden"] === true));
+    assert.ok([...regions.values()].every(element => element.inert));
+    await act(async () => trigger(first.area).props.onClick());
+    assert.equal(trigger(first.area).props["aria-expanded"], true);
+    assert.equal([...regions.values()].filter(element => !element.inert).length, 1);
+    await act(async () => button(root, "Acknowledge gap")!.props.onClick());
+    await act(async () => root.root.findByType("textarea").props.onChange({ target: { value: "Covered in the release regression." } }));
+    await act(async () => trigger("Session recovery").props.onClick());
+    assert.equal(trigger(first.area).props["aria-expanded"], false); assert.equal(trigger("Session recovery").props["aria-expanded"], true);
+    await act(async () => trigger(first.area).props.onClick());
+    await act(async () => button(root, "Acknowledge gap")!.props.onClick());
+    assert.equal(root.root.findByType("textarea").props.value, "Covered in the release regression.");
+    await act(async () => root.update(React.createElement(CoverageGaps, { ...props, pending: true }) as React.JSX.Element));
+    assert.equal(root.root.findByType("textarea").props.disabled, true);
+    assert.ok(root.root.findAllByType("button").filter(node => node.children.includes("Create manual draft")).every(node => node.props.disabled));
+    await act(async () => root.root.findByType("form").props.onSubmit({ preventDefault() {} }));
+    assert.deepEqual(commands, []);
+  } finally { await act(async () => root?.unmount()); }
+});
+
+test("analysis tabs keep sections mounted, reveal only the selected panel and support keyboard navigation", async () => {
+  const { root, focusedTabs } = await detail(historical(false), "availability-detail-tabs", false);
+  const panel = (suffix: string) => root.root.findAllByProps({ role: "tabpanel" }).find(node => node.props.id.endsWith(`-${suffix}`))!;
+  const tab = (label: string) => root.root.findByProps({ role: "tab", "aria-label": label });
+  try {
+    assert.equal(panel("scope").props.hidden, false); assert.equal(panel("gaps").props.hidden, true);
+    assert.equal(tab("Verification scope").props.tabIndex, 0);
+    assert.equal(root.root.findAllByProps({ id: "impact-coverage-gaps" }).length, 1);
+    assert.equal(root.root.findAllByProps({ role: "tab" }).length, 3);
+    let prevented = false;
+    await act(async () => root.root.findByProps({ role: "tablist" }).props.onKeyDown({ key: "ArrowRight", preventDefault() { prevented = true; } }));
+    assert.equal(prevented, true); assert.deepEqual(focusedTabs, [1]);
+    assert.equal(tab("Coverage gaps").props["aria-selected"], true);
+    assert.equal(panel("scope").props.hidden, true); assert.equal(panel("gaps").props.hidden, false);
+    await act(async () => tab("Verification scope").props.onClick());
+    assert.equal(panel("scope").props.hidden, false); assert.equal(panel("gaps").props.hidden, true);
+    assert.equal(root.root.findAllByProps({ id: "impact-coverage-gaps" }).length, 1);
+    assert.equal(root.root.findAllByProps({ id: "impact-scope-review" }).length, 1);
+    assert.equal(root.root.findAllByProps({ role: "tab" }).some(node => node.props["aria-controls"].endsWith("-activity")), false);
+  } finally { await act(async () => root.unmount()); }
+});
+
+test("revoking audit access restores a visible keyboard-accessible review tab", async () => {
+  const { root, revokeAudit } = await detail(historical(false), "availability-revoke-audit", false, true);
+  try {
+    await act(async () => root.root.findByProps({ role: "tab", "aria-label": "Activity" }).props.onClick());
+    assert.equal(root.root.findByProps({ role: "tab", "aria-label": "Activity" }).props["aria-selected"], true);
+    await act(async () => revokeAudit());
+    assert.equal(root.root.findAllByProps({ role: "tab", "aria-label": "Activity" }).length, 0);
+    const scopeTab = root.root.findByProps({ role: "tab", "aria-label": "Verification scope" });
+    assert.equal(scopeTab.props["aria-selected"], true); assert.equal(scopeTab.props.tabIndex, 0);
+    assert.equal(root.root.findAllByProps({ role: "tabpanel" }).find(node => node.props.id.endsWith("-scope"))!.props.hidden, false);
   } finally { await act(async () => root.unmount()); }
 });

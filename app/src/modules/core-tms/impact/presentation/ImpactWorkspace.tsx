@@ -17,7 +17,7 @@ export function ImpactWorkspace({ scope, ru, permissions, catalog, connectionId 
   }, [scope.workspaceId, scope.projectId]);
   const open = (id: string | null) => { window.history.replaceState(window.history.state, "", impactHref(window.location.href, scope, id)); setSelected(id); };
   if (!permissions.read) return <p className={css.notice}>{ru ? "Анализ доступен после подключения и проверки прав проекта." : "Analysis is available after connecting and checking project access."}</p>;
-  return <div className={css.root}>
+  return <div className={`${css.root} ${css.workspace}`} data-impact-workspace>
     {!selected && <div className={css.tabs} aria-label={ru ? "Разделы Impact Analysis" : "Impact Analysis sections"}>
       <button type="button" aria-pressed={tab === "analyses"} onClick={() => setTab("analyses")}>{ru ? "Анализы" : "Analyses"}</button>
       <button type="button" aria-pressed={tab === "repositories"} onClick={() => setTab("repositories")}>{ru ? "Репозитории" : "Repositories"}</button></div>}

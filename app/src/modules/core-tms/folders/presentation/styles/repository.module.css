@@ -57,7 +57,8 @@
 .leaf > input { margin-top: 10px; }
 .caseButton { grid-column: 3 / -1; display: flex; align-items: flex-start; gap: 7px; padding: 8px 3px 8px 4px; min-width: 0; width: 100%; text-align: left; touch-action: pan-y; }
 .caseButton svg { color: var(--falcon-case-icon); flex-shrink: 0; margin-top: 0; }
-.caseButton > span { font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+.caseAccessory { display: inline-flex; flex: none; overflow: visible; }
+.caseCopy { flex: 1; min-width: 0; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
 .caseButton small { font-size: 10px; display: block; color: var(--falcon-text-muted); }
 .leaf[data-quick-create] { grid-template-columns: 20px var(--repository-selection-width) minmax(0, 1fr) 25px; }
 .leaf[data-quick-create] > .caseButton { grid-column: 3; }
@@ -113,12 +114,12 @@
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-weight: 600; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderRow { padding-block: 3px; }
-:global([data-appearance="glass"] [data-testid="cases-view"]) .caseButton > span { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .caseCopy { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
 
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository { --repository-guide: var(--falcon-border-subtle); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .leaf[data-active] { background: var(--falcon-selected); }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .folderName { font-size: 13px !important; }
-:global([data-appearance="glass"] [data-testid="cases-view"]) .caseButton > span { font-size: 13px; }
+:global([data-appearance="glass"] [data-testid="cases-view"]) .caseCopy { font-size: 13px; }
 :global([data-appearance="glass"] [data-testid="cases-view"]) .repository :is(button, input):focus-visible { outline-color: var(--falcon-focus) !important; }
 @container repository-pane (min-width: 360px) {
   :global([data-appearance="glass"] [data-testid="cases-view"]) .heading .newFolder { width: auto; padding-inline: 7px; }

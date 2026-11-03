@@ -23,7 +23,9 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
   const refresh = onUpdated ?? connectors.refresh;
   const [open, setOpen] = useState(requestSetup), [visited, setVisited] = useState(requestSetup), [settled, setSettled] = useState(requestSetup);
   const heading = useRef<HTMLHeadingElement>(null), trigger = useRef<HTMLButtonElement>(null), requested = useRef(requestSetup);
+  const wasOpen = useRef(open);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [id]);
+  useEffect(() => { if (wasOpen.current && !open) trigger.current?.focus(); wasOpen.current = open; }, [open]);
   const reveal = (next: boolean) => {
     if (next) setVisited(true);
     setOpen(next); setSettled(next && Boolean(typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches));
@@ -34,16 +36,16 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
   const group = integration?.group === "tracker" ? (ru ? "Задачи и планирование" : "Tasks and planning") : integration?.group === "delivery"
     ? (ru ? "Код и сборки" : "Code and builds") : integration?.group === "api" ? (ru ? "API и контракты" : "API and contracts")
       : (ru ? "Коммуникация и знания" : "Communication and knowledge");
-  return <main className={surface.surface}>
-    <div className={surface.breadcrumb}><button type="button" onClick={onBack}>{ru ? "Настройки плагинов" : "Plugin settings"}</button><ChevronRight width={16} height={16} /><span>{integration?.name ?? id}</span></div>
+  return <main className={`${surface.surface} ${css.manager}`}>
+    <div className={`${surface.breadcrumb} ${css.breadcrumb}`}><button type="button" onClick={onBack}>{ru ? "Настройки плагинов" : "Plugin settings"}</button><ChevronRight width={16} height={16} /><span>{integration?.name ?? id}</span></div>
     <div className={surface.main}>
-      <header className={surface.header}><div className={surface.identity}><div className={`${surface.logo} ${css.brand}`}><IntegrationBrand provider={id} /></div>
+      <header className={surface.header} data-manager-overview><div className={surface.identity}><div className={`${surface.logo} ${css.brand}`}><IntegrationBrand provider={id} /></div>
         <div><h1 ref={heading} tabIndex={-1}>{integration?.name ?? id}</h1><p>{integration?.description[ru ? "ru" : "en"]}</p></div></div>
         <div className={surface.actions}><button type="button" className={surface.quiet} onClick={onViewDetails}>{ru ? "Открыть карточку" : "View details"}</button></div>
       </header>
       {!available ? <p className={surface.notice}>{ru ? "Настройка этого сервиса пока недоступна." : "Setup is not available for this service yet."}</p> : <>
-        <section className={surface.section} aria-label={ru ? "Подключения" : "Uses"}>
-          <h2 className={surface.sectionTitle}>{ru ? "Подключения" : "Uses"}</h2>
+        <section className={`${surface.section} ${css.usesSection}`} aria-label={ru ? "Подключения" : "Uses"}>
+          <h2 className={surface.sectionTitle} data-manager-overview>{ru ? "Подключения" : "Uses"}</h2>
           <div className={`${surface.group} ${css.usesGroup}`}>
             <button ref={trigger} type="button" className={`${surface.row} ${css.rowButton}`} aria-expanded={open} aria-controls={panelId}
               onClick={() => reveal(!open)}>
@@ -76,7 +78,7 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
             </IntegrationGuideLink>
           </div>
         </section>
-        <section className={surface.section} aria-label={ru ? "О плагине" : "About"}>
+        <section className={surface.section} data-manager-overview aria-label={ru ? "О плагине" : "About"}>
           <h2 className={surface.sectionTitle}>{ru ? "О плагине" : "About"}</h2><div className={surface.group}><dl className={surface.about}>
             <dt>{ru ? "Категория" : "Category"}</dt><dd>{group}</dd>
             <dt>{ru ? "Разработчик интеграции" : "Integration developer"}</dt><dd>Falcon</dd>
