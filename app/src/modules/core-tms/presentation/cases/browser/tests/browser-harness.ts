@@ -26,7 +26,7 @@ function runtime() {
 }
 const jsx = (type: unknown, props: unknown) => ({ type, props });
 const proxy = new Proxy({}, { get: (_target, key) => String(key) });
-export function browserHarness() {
+export function browserHarness(transition = (update: () => void) => update()) {
   const h = runtime(), repository = runtime();
   const folders = [
     { id: "pay", name: "Payments", path: "/Payments", parentId: null },
@@ -53,7 +53,7 @@ export function browserHarness() {
   } as unknown as CasesViewProps;
   const bulk = h.load<{ useCaseBulkSelection: typeof useCaseBulkSelection }>(new URL("../../bulk/selection-hook/useCaseBulkSelection.ts", import.meta.url), () => selection);
   const controller = h.load<{ useCasesViewController: typeof useCasesViewController }>(new URL("../../view/useCasesViewController.ts", import.meta.url), (name) => {
-    if (name.endsWith("content-transition")) return { transitionContent: (update: () => void) => update() };
+    if (name.endsWith("content-transition")) return { transitionContent: transition };
     if (name.endsWith("WorkspacePeopleContext")) return { useWorkspacePeople: () => ({ workspaceId: "w", offline: true }) };
     if (name.endsWith("useMemberDirectory")) return { useMemberDirectory: () => ({ members: new Map(), items: [], loading: false, error: false }) };
     if (name.endsWith("folder-scope")) return scope;

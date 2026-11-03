@@ -21,16 +21,26 @@ function fixture() {
     }
   } };
 }
-test("create close retains the draft until leftward exit completes and ignores repeated close", async () => {
+test("create close retains the draft until rightward exit completes and ignores repeated close", async () => {
   const f = fixture(); let renderer!: ReactTestRenderer, closed = 0;
   try {
     act(() => { renderer = create(<f.Probe/>); });
     act(() => { f.exit(() => closed++); f.exit(() => closed++); });
     assert.equal(closed, 0); assert.equal(f.element.inert, true); assert.equal(f.calls.length, 1);
-    assert.equal(f.calls[0].frames[1].transform, "translateX(-100%)");
+    assert.equal(f.calls[0].frames[1].transform, "translateX(100%)");
     await act(async () => { f.calls[0].finish(); });
     assert.equal(closed, 1); assert.equal(f.element.inert, false); assert.equal(f.listeners.size, 0);
     act(() => renderer.unmount());
+  } finally { f.restore(); }
+});
+test("dismissal replaces the draft before releasing the final hidden frame", async () => {
+  const f = fixture(); let renderer!: ReactTestRenderer, cancelledAtCommit = true;
+  try {
+    act(() => { renderer = create(<f.Probe/>); });
+    act(() => f.exit(() => { cancelledAtCommit = f.calls[0].cancelled; }));
+    await act(async () => { f.calls[0].finish(); });
+    assert.equal(cancelledAtCommit, false, "the filled exit must still hide the live draft while React commits its replacement");
+    assert.equal(f.calls[0].cancelled, true); act(() => renderer.unmount());
   } finally { f.restore(); }
 });
 test("unmount cancels exit without closing a different screen", async () => {

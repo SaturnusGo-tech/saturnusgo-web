@@ -60,7 +60,7 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
   const headerReturnFocus = useRef<"title" | null>(null);
   const ru = props.locale === "ru";
   const creating = props.editor?.mode === "create";
-  useCreateCaseEntrance(panelRef, creating);
+  useCreateCaseEntrance(panelRef, creating, creating ? undefined : props.testCase?.id);
   const closeWithMotion = useCreateCaseExit(panelRef, creating);
   const archived = !creating && Boolean(props.testCase?.archivedAt);
   const editorOpen = Boolean(props.editor);

@@ -14,8 +14,8 @@ function fixture() {
   const ref = { current: { animate(frames: Keyframe[]) {
     const call = { frames, cancelled: false }; calls.push(call); return { cancel() { call.cancelled = true; } };
   } } as unknown as HTMLElement };
-  function Probe({ creating, draft = "" }: { creating: boolean; draft?: string }) {
-    useCreateCaseEntrance(ref, creating); return <span>{draft}</span>;
+  function Probe({ creating, draft = "", caseId }: { creating: boolean; draft?: string; caseId?: string }) {
+    useCreateCaseEntrance(ref, creating, caseId); return <span>{draft}</span>;
   }
   return { Probe, ref, calls, listeners, preference, restore() {
     if (original) Object.defineProperty(globalThis, "window", original); else Reflect.deleteProperty(globalThis, "window");
@@ -33,6 +33,21 @@ test("only create entry animates; draft edits retain the form and close cancels 
     act(() => renderer.update(<f.Probe creating={false} />)); assert.equal(f.calls[0].cancelled, true);
     act(() => renderer.update(<f.Probe creating />)); assert.equal(f.calls.length, 2);
     act(() => renderer.unmount()); assert.equal(f.calls[1].cancelled, true); assert.equal(f.listeners.size, 0);
+  } finally { f.restore(); }
+});
+test("ready case changes reveal only the new surface and cancel an interrupted reveal", () => {
+  const f = fixture(); let renderer!: ReactTestRenderer;
+  try {
+    act(() => { renderer = create(<f.Probe creating={false} caseId="A" draft="Case A"/>); });
+    assert.equal(f.calls.length, 1);
+    assert.equal(f.calls[0].frames[0].opacity, 0);
+    assert.equal(f.calls[0].frames[0].transform, undefined, "reading a case must not move the repository layout");
+    act(() => renderer.update(<f.Probe creating={false} caseId="B" draft="Case B"/>));
+    assert.equal(f.calls[0].cancelled, true); assert.equal(f.calls.length, 2);
+    assert.equal(renderer.root.findByType("span").children[0], "Case B");
+    act(() => renderer.update(<f.Probe creating={false} caseId="B" draft="Same case refreshed"/>));
+    assert.equal(f.calls.length, 2, "updates within a case must not restart the reveal");
+    act(() => renderer.unmount()); assert.equal(f.calls[1].cancelled, true);
   } finally { f.restore(); }
 });
 

@@ -105,6 +105,7 @@ export function CasesView(props: CasesViewProps) {
             </div>
           : <TessiqLoader pane label={t("common.loading")} testId="case-detail-loading" />
         : <CaseDetailPanel
+            key={props.editor?.mode === "create" ? "create" : props.testCase?.id}
             locale={locale}
             languageTag={languageTag}
             testCase={props.testCase}
