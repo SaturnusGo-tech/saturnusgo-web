@@ -24,7 +24,7 @@ export function FolderAppearancePicker({ folder, ru, editor }: {
           event.preventDefault(); const tabs = Array.from(event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []);
           const next = (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
           tabs[next]?.click(); tabs[next]?.focus();
-        }}>{value === "icons" ? (ru ? "Иконки" : "Icons") : value === "emoji" ? (ru ? "Эмодзи" : "Emojis") : (ru ? "Загрузка" : "Upload")}</button>)}
+        }}>{value === "icons" ? (ru ? "Иконки" : "Icons") : value === "emoji" ? (ru ? "Эмодзи" : "Emojis") : "GIF"}</button>)}
     </div>
     <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${tab}`} className={css.content}>
       {tab === "icons" && <FolderAppearanceIcons editor={editor} ru={ru} />}

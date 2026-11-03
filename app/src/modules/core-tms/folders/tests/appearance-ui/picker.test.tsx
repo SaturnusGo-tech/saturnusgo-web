@@ -69,13 +69,17 @@ test("compact customization exposes color first, fifty icons in a horizontal thr
   assert.equal(choices.length, 1, "arrow navigation does not save an icon until activation");
 });
 
-test("the Upload tab separates the attributed GIF gallery from the user's own image upload", t => {
+test("the GIF tab is discoverable in English and Russian and retains the user's own image upload", t => {
   const editor = { preview: null, busy: false, failed: false, uploadFailed: false, error: "", uploading: false, canUpload: true,
     choose() {}, image() {}, previewColor() {}, retry() {}, retryUpload() {}, cancelUpload() {},
   } as unknown as ReturnType<typeof useFolderAppearanceEditor>;
   let view!: ReturnType<typeof create>; act(() => { view = create(<Picker folder={{ appearance: null } as RepositoryFolder} ru={false} editor={editor} />); });
   t.after(() => act(() => view.unmount()));
-  act(() => view.root.findAllByProps({ role: "tab" })[2]!.props.onClick());
+  const gif = view.root.findAllByProps({ role: "tab" }).find(tab => tab.children.includes("GIF")); assert.ok(gif);
+  act(() => gif.props.onClick());
   assert.equal(view.root.findAllByType("a").some(link => link.children.includes("Powered by KLIPY")), true);
   assert.equal(view.root.findAllByProps({ type: "file" }).length, 1);
+  act(() => view.update(<Picker folder={{ appearance: null } as RepositoryFolder} ru editor={editor} />));
+  assert.equal(view.root.findAllByProps({ role: "tab" }).some(tab => tab.children.includes("GIF")), true);
+  assert.equal(view.root.findAllByProps({ type: "search" }).length, 1);
 });

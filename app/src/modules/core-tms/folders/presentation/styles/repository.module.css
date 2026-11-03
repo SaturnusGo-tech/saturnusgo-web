@@ -49,9 +49,9 @@
 .folderName small { color: var(--falcon-text-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
 .menuButton { width: 21px; flex: 0 0 21px; opacity: 0; }
 .folderRow:hover .menuButton, .folderRow:focus-within .menuButton { opacity: 1; }
-.folderRow input, .leaf input { width: 14px; height: 14px; margin: 0 0 0 4px; accent-color: var(--falcon-icon); opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.65); cursor: pointer; transition: opacity 180ms ease, transform 220ms cubic-bezier(.22,.61,.36,1), visibility 0s 220ms; }
+.folderRow > input[type="checkbox"], .leaf > input[type="checkbox"] { width: 14px; height: 14px; margin: 0 0 0 4px; accent-color: var(--falcon-icon); opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.65); cursor: pointer; transition: opacity 180ms ease, transform 220ms cubic-bezier(.22,.61,.36,1), visibility 0s 220ms; }
 .repository[data-selection] :is(.folderRow, .leaf) > input { opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1); transition-delay: 0s; }
-.repository .folderRow input:disabled { visibility: hidden; }
+.repository .folderRow > input[type="checkbox"]:disabled { visibility: hidden; }
 .leaf { min-height: 43px; align-items: start; }
 .caseRail { height: 34px; }
 .leaf > input { margin-top: 10px; }
@@ -80,7 +80,7 @@
 .repository :is(button,input):focus-visible { outline: 2px solid var(--falcon-border-strong) !important; outline-offset: 2px; }
 @keyframes breathe { to { opacity: .35; } }
 @media(prefers-reduced-motion:reduce) { .skeleton i { animation: none; } }
-@media(prefers-reduced-motion:reduce) { .folderRow input, .leaf input { transition: none; } }
+@media(prefers-reduced-motion:reduce) { .folderRow > input[type="checkbox"], .leaf > input[type="checkbox"] { transition: none; } }
 
 @media(max-width:650px) { .repository { width: 100%; flex-basis: auto; max-height: 260px; border-right: 0; border-bottom: 1px solid var(--falcon-border-subtle); } .resizeHandle { display: none; } .heading { padding-bottom: 5px; } .hint { display: none; } .treeHeading { padding-top: 6px; } }
 

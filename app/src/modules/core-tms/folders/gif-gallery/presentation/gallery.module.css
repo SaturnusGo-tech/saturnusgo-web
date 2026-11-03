@@ -1,6 +1,12 @@
 .upload, .gallery { display: grid; gap: 8px; min-width: 0; }
-.gallery input { width: 100%; min-width: 0; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--falcon-border-strong); border-radius: 6px; background: var(--falcon-panel); color: var(--falcon-text); font: inherit; font-size: 12px; caret-color: var(--falcon-text); }
-.gallery input::placeholder { color: var(--falcon-text-muted); }
+.gallery .search { display: flex; align-items: center; gap: 7px; box-sizing: border-box; width: 100%; min-width: 0; height: 34px; margin: 0; padding: 0 10px; border: 1px solid var(--falcon-border-subtle); border-radius: 10px; background: transparent; color: var(--falcon-text-muted); }
+.search > svg { flex: none; }
+.gallery .search input { display: block; flex: 1; width: 100%; min-width: 0; height: 30px; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent !important; color: var(--falcon-text); font: inherit; font-size: 12px; caret-color: var(--falcon-text); outline: none; box-shadow: none; }
+.search input::placeholder { color: var(--falcon-text-muted); opacity: 1; }
+.search input::-webkit-search-cancel-button { display: none; }
+.gallery .clear { display: grid; place-items: center; flex: none; width: 24px; height: 24px; min-height: 0; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.gallery .search:focus-within { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
+.gallery .search input:focus-visible { outline: none !important; }
 .attribution { justify-self: end; color: var(--falcon-text-muted); font-size: 10px; text-underline-offset: 2px; }
 .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-height: 235px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--falcon-border-strong) transparent; }
 .item { min-width: 0; }
