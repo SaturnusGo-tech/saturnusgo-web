@@ -34,7 +34,7 @@ export function SuiteCasePicker({ cases, folders, selected, projectName, ru, rea
   const filtered = Boolean(query || scope || priority !== "all" || (selectedOnly && !readOnly));
   return <section className={styles.picker} aria-label={ru ? "Выбор тест-кейсов" : "Choose test cases"}>
     <div className={styles.toolbar}>
-      <div className={styles.search}><Search width={17} height={17} aria-hidden="true" />
+      <div className={styles.search} data-input-shell><Search width={17} height={17} aria-hidden="true" />
         <label className={styles.srOnly} htmlFor={searchId}>{ru ? "Найти тест-кейс" : "Find a test case"}</label>
         <input id={searchId} type="search" placeholder={ru ? "Найти тест-кейс" : "Find a test case"} value={query}
           onChange={event => setQuery(event.target.value)} autoComplete="off" />

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { RunRepositoryBrowser } from "../RunRepositoryBrowser";
+import type { RunRepositoryHeader } from "../header/RunRepositoryHeader";
+import { isWorkingRun } from "../../../../runs/model/history/run-history";
 import type { SelectionControls } from "../../../cases/selection/controls/SelectionControls";
 import { componentHarness, invoke, nodes } from "../../../../portfolios/tests/support/component-harness";
 
@@ -9,9 +11,10 @@ function browser() {
   const { RunRepositoryBrowser: render } = h.load<{ RunRepositoryBrowser: typeof RunRepositoryBrowser }>(new URL("../RunRepositoryBrowser.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
     if (name.endsWith("run-repository")) return { runRepositoryFolders: () => [] };
+    if (name.endsWith("run-history")) return { isWorkingRun };
   });
   const props = { model: { connection: "connected", data: { meta: { authorization: { capabilities: ["run:manage"] } }, workspace: { id: "w" } } },
-    repository: { browser: { choices: [] }, rows: [], run: { status: "active" }, cases: [], visible: [{ id: "a" }, { id: "b" }],
+    repository: { browser: { choices: [], ready: true }, rows: [], run: { status: "active" }, cases: [], visible: [{ id: "a" }, { id: "b" }],
       assignments: { selecting: false, selected: new Set(), toggleScope: (ids: string[]) => selected.push(ids) }, runFilters: { sections: [] },
       filters: { filters: {} }, groups: [{ id: "p1", label: "Project one", cases: [{ id: "a" }] }, { id: "p2", label: "Project two", cases: [{ id: "b" }] }], lookup: new Map() },
     lifecycleBlocked: false } as unknown as Parameters<typeof RunRepositoryBrowser>[0];
@@ -64,4 +67,61 @@ test("repository control placement preserves run-creation and suite selection ac
     assert.equal(Boolean(selectAll), !repository);
     if (selectAll) { invoke(selectAll, "onClick"); assert.equal(selected, 1); }
   }
+});
+
+test("same-scope background reload keeps repository trees and active identity mounted but locks interaction", () => {
+  const h = browser();
+  h.props.model.selectedRunItemId = "b";
+  h.props.repository.browser.loading = true;
+  const all = h.all(), trees = all.filter(node => node.type === "SelectionTree");
+  assert.equal(trees.length, 2, "the confirmed folder trees must survive a background reload");
+  assert.equal(all.some(node => node.type === "RunCasesSkeleton"), false);
+  assert.equal(all.find(node => node.type === "SelectionControls")?.props.disabled, true);
+  assert.equal(all.find(node => node.type === "RunRepositoryHeader")?.props.disabled, false, "run navigation remains available during a read refresh");
+  assert.equal(all.find(node => node.type === "RunRepositoryHeader")?.props.actionsDisabled, true);
+  assert.ok(trees.every(node => node.props.disabled && node.props.activeId === "b"));
+  h.props.repository.browser.loading = false; h.props.repository.browser.ready = false;
+  assert.equal(h.all().filter(node => node.type === "SelectionTree").length, 2);
+  assert.equal(h.all().find(node => node.type === "SelectionControls")?.props.disabled, true, "the revision changes before its loading effect runs");
+});
+
+test("initial repository load uses skeleton without an empty-state flash", () => {
+  const h = browser();
+  h.props.repository.browser.loading = true; h.props.repository.groups = []; h.props.repository.visible = [];
+  const all = h.all();
+  assert.equal(all.filter(node => node.type === "RunCasesSkeleton").length, 1);
+  assert.equal(all.some(node => node.type === "SelectionTree"), false);
+  assert.equal(all.some(node => node.props.className === "empty"), false);
+});
+
+
+test("failed repository reads keep the run chooser and creation available while lifecycle actions stay locked", () => {
+  const h = browser(); const chosen: string[] = []; let created = 0;
+  h.props.model.setProjectId = id => chosen.push(`project:${id}`);
+  h.props.model.setSelectedRunId = value => { chosen.push(`run:${value}`); };
+  h.props.model.setSelectedRunItemId = value => { chosen.push(`item:${value}`); };
+  h.props.model.openRunDialog = () => { created++; };
+  h.props.repository.browser.ready = false; h.props.repository.browser.error = "Read failed";
+  h.props.repository.browser.choices = [{ id: "other", name: "Other run", tags: [], runs: [{ id: "other", projectId: "p2", status: "draft", archivedAt: null }] }] as never;
+  const all = h.all(), header = all.find(node => node.type === "RunRepositoryHeader")!;
+  assert.equal(header.props.disabled, false); assert.equal(header.props.actionsDisabled, true);
+  assert.equal(header.props.onEdit, undefined);
+  invoke(header, "onChoose", "other"); invoke(header, "onCreate");
+  assert.deepEqual(chosen, ["project:p2", "run:other", "item:null"]); assert.equal(created, 1);
+  assert.equal(all.find(node => node.type === "SelectionControls")?.props.disabled, true);
+  assert.ok(all.filter(node => node.type === "SelectionTree").every(node => node.props.disabled));
+});
+
+test("header lifecycle lock does not block recovery navigation or New run", () => {
+  const h = componentHarness();
+  const { RunRepositoryHeader: View } = h.load<{ RunRepositoryHeader: typeof RunRepositoryHeader }>(new URL("../header/RunRepositoryHeader.tsx", import.meta.url), name => {
+    if (name === "framer-motion") return { useReducedMotion: () => true, AnimatePresence: "AnimatePresence", motion: { button: "button" } };
+  });
+  const props = { ru: false, run: { status: "active", archivedAt: null }, choices: [], value: "r", disabled: false, actionsDisabled: true, startBlocked: false, canManage: true,
+    onChoose() {}, onCreate() {}, onAction() {} } as unknown as Parameters<typeof View>[0];
+  const all = nodes(h.render(() => View(props)));
+  assert.equal(all.find(node => node.type === "RunSelector")?.props.disabled, false);
+  assert.equal(all.find(node => node.props.className === "newRun")?.props.disabled, false);
+  assert.equal(all.find(node => node.props["aria-label"] === "Pause run")?.props.disabled, true);
+  assert.equal(all.find(node => node.props["aria-label"] === "Complete run")?.props.disabled, true);
 });

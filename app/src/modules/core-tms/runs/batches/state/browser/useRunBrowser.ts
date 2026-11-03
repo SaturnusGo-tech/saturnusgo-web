@@ -163,6 +163,7 @@ export function useRunBrowser(input: { workspaceId: string; selected: TestRunSum
     void reconcileCompletion();
     return () => controller.abort();
   }, [http, input.workspaceId, selectedId, input.selected?.status, batchId]);
-  return { ready: !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries, loading, busy, error, act, selectedRuns,
+  const scopedEntries = input.connected && entriesScope.current === `${input.workspaceId}:${memberIds}` ? entries : [];
+  return { ready: !memberIds || loadedScope === `${input.workspaceId}:${memberIds}:${revision}`, incomplete, dismissIncomplete: () => setIncomplete(false), batch, choices, entries: scopedEntries, loading, busy, error, act, selectedRuns,
     refresh: () => setRevision((n) => n + 1) };
 }

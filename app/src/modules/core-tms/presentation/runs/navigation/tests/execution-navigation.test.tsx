@@ -14,23 +14,27 @@ async function harness() {
   let nav!: ReturnType<typeof useRunExecutionNavigation>; let renderer!: ReactTestRenderer;
   let selected = { id: "outside", run: "run-p", project: "p" };
   let values = [a,b,c], dirty = false, ready = true, scope = "batch", stale = false, writes = 0;
+  let loading = false, busy = false, missing = false, error = "", workspace = "w", connection = "connected";
   const committed: string[] = [];
   let write: () => Promise<boolean> = async () => true;
   function Probe() {
     const [id, setId] = useState(selected.id); const [run, setRun] = useState(selected.run);
     const [project, setProject] = useState(selected.project); selected = {id,run,project};
-    const model = { data:{workspace:{id:"w"}},selectedRunId:run,selectedRunItemId:id,
-      selectedRunItem: {id:stale?"old-detail":id}, setSelectedRunItemId:setId, setSelectedRunId:setRun, setProjectId:setProject,
+    const model = { data:{workspace:{id:workspace}},projectId:project,connection,selectedRunId:run,selectedRunItemId:id,
+      selectedRunItem: missing ? null : {id:stale?"old-detail":id}, setSelectedRunItemId:setId, setSelectedRunId:setRun, setProjectId:setProject,
       unblockItem:async(onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},
       setItemStatus:async(_status:unknown, onCommitted:(item:unknown)=>void)=>{writes++;const saved=await write();if(saved)onCommitted?.({id});return saved;},setStepStatus:async()=>{writes++;return write();} } as unknown as WorkspaceModel;
-    nav = useRunExecutionNavigation(model, { entries:values,rememberItem:(item:{id:string})=>committed.push(item.id),browser:{ready,loading:false,error:"",batch:{id:scope}} } as unknown as RunRepositoryModel,dirty);
+    nav = useRunExecutionNavigation(model, { entries:values,rememberItem:(item:{id:string})=>committed.push(item.id),browser:{ready,loading,busy,error,batch:{id:scope}} } as unknown as RunRepositoryModel,dirty);
     return null;
   }
   await act(async()=>{renderer=create(<Probe/>);});
   return { get nav(){return nav;}, get selected(){return selected;}, get writes(){return writes;}, committed,
     write(fn:()=>Promise<boolean>){write=fn;},
-    async update(opts:{entries?:RunRepositoryEntry[];dirty?:boolean;ready?:boolean;scope?:string;stale?:boolean}) {
+    async update(opts:{entries?:RunRepositoryEntry[];dirty?:boolean;ready?:boolean;scope?:string;stale?:boolean;
+      loading?:boolean;busy?:boolean;missing?:boolean;error?:string;workspace?:string;connection?:string}) {
       values=opts.entries??values;dirty=opts.dirty??dirty;ready=opts.ready??ready;scope=opts.scope??scope;stale=opts.stale??stale;
+      loading=opts.loading??loading;busy=opts.busy??busy;missing=opts.missing??missing;error=opts.error??error;
+      workspace=opts.workspace??workspace;connection=opts.connection??connection;
       await act(async()=>renderer.update(<Probe/>));
     },async close(){await act(async()=>renderer.unmount());} };
 }
@@ -96,5 +100,36 @@ test("unblocking updates the selected row without auto-advancing and respects dr
     await h.update({ dirty: true });
     await act(async () => { assert.equal(await h.nav.unblock(), false); });
     assert.equal(h.writes, 1);
+  } finally { await h.close(); }
+});
+
+test("lifecycle refresh keeps the confirmed case visible while writes and navigation stay locked", async () => {
+  const h = await harness(); try {
+    const shown = h.nav.selectedItem;
+    await h.update({ busy: true });
+    assert.equal(h.nav.selectedItem, shown); assert.equal(h.nav.detailReady, false);
+    await h.update({ busy: false, loading: true, ready: false, missing: true });
+    assert.equal(h.nav.selectedItem, shown);
+    await act(async () => { h.nav.select("b"); assert.equal(await h.nav.mark("passed"), false);
+      assert.equal(await h.nav.step("s", "passed"), false); assert.equal(await h.nav.unblock(), false); });
+    assert.equal(h.selected.id, "a"); assert.equal(h.writes, 0);
+    await h.update({ loading: false, ready: true });
+    assert.equal(h.nav.selectedItem, shown); assert.equal(h.nav.detailReady, false);
+    await h.update({ missing: false });
+    assert.equal(h.nav.detailReady, true); assert.notEqual(h.nav.selectedItem, shown);
+  } finally { await h.close(); }
+});
+
+test("retained presentation never crosses owners, errors, hidden rows or stale detail", async () => {
+  for (const change of [{ scope: "other-batch" }, { workspace: "other-workspace" }, { connection: "disconnected" },
+    { error: "Denied" }, { entries: [c] }]) {
+    const h = await harness(); try {
+      await h.update({ missing: true, loading: true, ready: false, ...change });
+      assert.equal(h.nav.selectedItem, null);
+    } finally { await h.close(); }
+  }
+  const h = await harness(); try {
+    await h.update({ stale: true }); assert.equal(h.nav.selectedItem, null);
+    await h.update({ stale: false, missing: true }); assert.equal(h.nav.selectedItem, null);
   } finally { await h.close(); }
 });

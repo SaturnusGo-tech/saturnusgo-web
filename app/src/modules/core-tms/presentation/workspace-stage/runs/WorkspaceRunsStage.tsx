@@ -59,9 +59,9 @@ export function WorkspaceRunsStage({ model }: { model: WorkspaceModel }) {
         onStepActual={model.updateStepActualResult}
         onSaveStepActual={execution.step}
         onItemStatus={execution.mark} onUnblock={execution.unblock}
-        executionPending={execution.pending}
+        executionPending={execution.pending || repository.browser.busy || scopeLoading || !execution.ready}
         emptyFiltered={execution.ready && repository.rows.length > 0}
-        canExecute={execution.selected && model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:execute")}
+        canExecute={execution.detailReady && model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:execute")}
         startPending={model.startPending}
         startError={model.startError}
         onStart={model.startSelectedRun}

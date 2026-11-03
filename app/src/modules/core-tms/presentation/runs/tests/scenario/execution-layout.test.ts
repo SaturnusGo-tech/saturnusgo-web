@@ -113,3 +113,29 @@ test("only a writable blocked case offers unblock and guards pending execution",
   props.canExecute = false;
   assert.equal(all().some(n => n.props["data-testid"] === "unblock-case"), false);
 });
+
+test("pause and resume keep the footer and read-only pager while execution actions follow write access", () => {
+  const { all, props, statuses } = setup(); const selected: string[] = [];
+  props.items = [props.selectedItem!, { ...props.selectedItem!, id: "next" }];
+  props.onSelectItem = id => selected.push(id); props.onUnblock = () => statuses.push("unblock");
+  props.selectedItem!.status = "blocked";
+  for (const status of ["active", "paused", "completed", "active"] as const) {
+    props.selectedRun!.status = status;
+    const view = all();
+    assert.equal(view.filter(node => node.props["data-run-execution-footer"] !== undefined).length, 1, `${status} retains footer geometry`);
+    assert.equal(Boolean(view.find(node => node.props["data-testid"] === "unblock-case")), status === "active");
+    if (status !== "active") assert.equal(view.some(node => ["pass-case", "fail-case", "report-defect"].includes(node.props["data-testid"] as string)), false);
+  }
+  props.selectedRun!.status = "paused";
+  invoke(all().find(node => node.props["aria-label"] === "runs.next")!, "onClick");
+  assert.deepEqual(selected, ["next"]); assert.deepEqual(statuses, []);
+  props.scopeLoading = true;
+  assert.equal(all().find(node => node.props["aria-label"] === "runs.next")?.props.disabled, true);
+});
+
+test("retained execution content cannot expose write or defect actions without fresh permission", () => {
+  const { all, props } = setup();
+  props.selectedItem!.status = "failed"; props.canExecute = false;
+  assert.ok(all().find(node => node.props["data-run-execution-footer"] !== undefined));
+  assert.equal(all().some(node => ["pass-case", "fail-case", "report-defect", "unblock-case"].includes(node.props["data-testid"] as string)), false);
+});

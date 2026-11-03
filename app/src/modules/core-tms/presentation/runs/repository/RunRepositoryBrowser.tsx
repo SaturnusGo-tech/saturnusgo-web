@@ -20,40 +20,43 @@ import selection from "../../cases/browser/selection/repository-selection.module
 export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty = false, lifecycleBlocked = false, startBlocked = false }: { model: WorkspaceModel; repository: RunRepositoryModel; onEditRun?: () => void; draftDirty?: boolean; lifecycleBlocked?: boolean; startBlocked?: boolean }) {
   const { locale } = useTmsLocale(); const ru = locale === "ru";
   const { browser, rows, run, assignments, runFilters, cases, filters, visible, groups, lookup } = repository;
+  const navigationLocked = browser.busy || assignments.busy || lifecycleBlocked;
+  const controlsLocked = navigationLocked || !browser.ready || browser.loading || Boolean(browser.error);
   const choose = (runId: string, projectId: string, itemId: string | null = null) => {
+    if (navigationLocked) return;
     model.setProjectId(projectId); model.setSelectedRunId(runId); model.setSelectedRunItemId(itemId);
   };
   const canManage = model.connection === "connected" && model.data.meta.authorization.capabilities.includes("run:manage");
   const canAssign = canManage && Boolean(run && !run.archivedAt && ["draft","active","paused"].includes(run.status));
   const activeChoice = browser.batch?.id ?? model.selectedRun?.id ?? "";
   return <aside className={css.browser} aria-label={ru ? "Кейсы прогона" : "Run repository"}>
-    <RunRepositoryHeader onEdit={canManage && !draftDirty && !lifecycleBlocked && !browser.loading ? onEditRun : undefined} ru={ru} run={run} choices={browser.choices} value={activeChoice} canManage={canManage}
-      disabled={browser.busy || assignments.busy || lifecycleBlocked} startBlocked={startBlocked || browser.loading}
+    <RunRepositoryHeader onEdit={canManage && !draftDirty && !controlsLocked ? onEditRun : undefined} ru={ru} run={run} choices={browser.choices} value={activeChoice} canManage={canManage}
+      disabled={navigationLocked} actionsDisabled={controlsLocked} startBlocked={startBlocked || controlsLocked}
       onCreate={()=>model.openRunDialog()} onAction={action=>void browser.act(action)}
       onChoose={id=>{const runs=browser.choices.find(c=>c.id===id)?.runs;const next=runs?.find(isWorkingRun)??runs?.[0];if(next)choose(next.id,next.projectId);}}/>
-    <SelectionControls disabled={lifecycleBlocked} inline repository state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
+    <SelectionControls disabled={controlsLocked} inline repository state={filters} ru={ru} extraSections={runFilters.sections} onResetExtra={runFilters.reset}
       action={canAssign && <button type="button" className={`${controls.tool} ${controls.select}`}
-        disabled={browser.loading || browser.busy || assignments.busy || lifecycleBlocked} aria-pressed={assignments.selecting}
+        disabled={controlsLocked} aria-pressed={assignments.selecting}
         aria-label={ru ? "Выбрать тест-кейсы" : "Select test cases"} onClick={assignments.toggleSelection}>
         <span>{assignments.selecting ? (ru ? "Готово" : "Done") : (ru ? "Выбрать" : "Select")}</span></button>}/>
     {assignments.error && <FormError message={assignments.error} />}
-    {browser.incomplete && <RunIncompleteDialog ru={ru} busy={browser.busy} canArchive={model.canArchiveRun}
+    {browser.incomplete && <RunIncompleteDialog ru={ru} busy={controlsLocked} canArchive={model.canArchiveRun}
       onClose={browser.dismissIncomplete} onArchive={() => void browser.act("archive")} />}
     {draftDirty && <p role="status">{ru ? "Сохраните результат шага перед изменением прогона." : "Save the step result before changing the run."}</p>}
-    {run?.archivedAt && model.canArchiveRun && <button type="button" className={css.restore} disabled={browser.busy} onClick={() => void browser.act("restore")}>{ru ? "Вернуть из архива" : "Restore from archive"}</button>}
+    {run?.archivedAt && model.canArchiveRun && <button type="button" className={css.restore} disabled={controlsLocked} onClick={() => void browser.act("restore")}>{ru ? "Вернуть из архива" : "Restore from archive"}</button>}
     {browser.error && <FormError message={browser.error} />}
     <div className={css.scroll} aria-busy={browser.loading}>
-      {browser.loading && <RunCasesSkeleton />}
-      {!browser.loading && groups.map(({ id: key, label, cases: entries }) => {
+      {browser.loading && groups.length === 0 && <RunCasesSkeleton />}
+      {groups.map(({ id: key, label, cases: entries }) => {
         const projectId = `group:${key}`;
         const scoped = entries;
-        return <SelectionTree key={key} includeArchived={filters.filters.includeArchived} cases={scoped} folders={runRepositoryFolders(model.data.workspace.id, projectId, scoped)} selected={assignments.selected} selectable={canAssign && assignments.selecting} disabled={assignments.busy || browser.busy || lifecycleBlocked}
-          ru={ru} onScope={assignments.toggleScope} onToggle={assignments.toggle} activeId={model.selectedRunItem?.id}
+        return <SelectionTree key={key} includeArchived={filters.filters.includeArchived} cases={scoped} folders={runRepositoryFolders(model.data.workspace.id, projectId, scoped)} selected={assignments.selected} selectable={canAssign && assignments.selecting} disabled={controlsLocked}
+          ru={ru} onScope={assignments.toggleScope} onToggle={assignments.toggle} activeId={model.selectedRunItemId ?? undefined}
           heading={<><strong className={css.projectName}><span title={label}>{label}</span><small>{entries.length}</small></strong>
             {canAssign && <div className={selection.commands} role="group" aria-label={ru ? "Выбор тест-кейсов" : "Case selection"}
               data-open={assignments.selecting || undefined} aria-hidden={!assignments.selecting}
               ref={element => { if (element) element.inert = !assignments.selecting; }}>
-              <button type="button" disabled={!assignments.selecting || browser.loading || browser.busy || assignments.busy || lifecycleBlocked}
+              <button type="button" disabled={!assignments.selecting || controlsLocked}
                 onClick={() => assignments.toggleScope(entries.map(item => item.id))}>{ru ? "Выбрать все" : "Select all"}</button>
             </div>}</>}
           trailing={(item) => <span className={css.assignee}><ResponsibleName workspaceId={model.data.workspace.id}
@@ -65,6 +68,6 @@ export function RunRepositoryBrowser({ model, repository, onEditRun, draftDirty 
     </div>
     <RunAssignmentTools state={assignments} workspaceId={model.data.workspace.id} ru={ru} allowed={canAssign}
       paths={[...new Set(cases.map(c=>c.folderPath))]} archived={rows.some(row=>assignments.selected.has(row.item.id)&&row.item.archivedAt)}
-      disabled={browser.loading || browser.busy || lifecycleBlocked}/>
+      disabled={controlsLocked}/>
   </aside>;
 }

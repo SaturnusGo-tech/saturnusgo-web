@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import type { RunItemSummary, TestRunSummary } from "../../../../../../core/tms/contracts/legacy-contract";
+import { runRepositoryEntries } from "../../model/repository/run-repository";
 import { componentHarness } from "../../../../portfolios/tests/support/component-harness";
 import { resolvePendingOperation } from "../../../../../../core/tms/idempotency/pending-operation";
 import { TmsApiError } from "../../../../../../core/tms/transport/http";
@@ -13,6 +14,7 @@ function fixture(remaining: TestRunSummary[] = []) {
   const h = componentHarness(); const finished: (TestRunSummary | null)[] = []; let refreshes = 0;
   const current = run("current", "active"); const updates: TestRunSummary[][] = [];
   let transition: () => Promise<{ data: TestRunSummary }> = async () => ({ data: run("current", "completed") });
+  let loadItems: () => Promise<RunItemSummary[]> = async () => [];
   const input = { workspaceId: "w", selected: current as TestRunSummary | null, selectedId: "current", knownRuns: [current, ...remaining],
     connected: true, ru: true, onUpdate: (runs: TestRunSummary[]) => { updates.push(runs); },
     onRefreshSelected: () => { refreshes++; }, onFinished: (next: TestRunSummary | null) => { finished.push(next); } };
@@ -22,7 +24,8 @@ function fixture(remaining: TestRunSummary[] = []) {
     if (name.endsWith("pending-operation")) return { resolvePendingOperation };
     if (name.endsWith("transport/http")) return { TmsApiError };
     if (name.endsWith("batch-api")) return { listRunBatches: async () => [] };
-    if (name.endsWith("run-api")) return { listRunItems: async () => ({ items: [] }),
+    if (name.endsWith("run-repository")) return { runRepositoryEntries };
+    if (name.endsWith("run-api")) return { listRunItems: async () => ({ items: await loadItems() }),
       getRun: async () => ({ data: current, etag: '"v1"' }), transitionRun: () => transition() };
     if (name.endsWith("mutation-failure")) return { toTmsMutationFailure: () => ({ code: "CONFLICT" }), formatTmsMutationFailure: (_error: unknown, text: string) => text };
     return undefined;
@@ -31,6 +34,7 @@ function fixture(remaining: TestRunSummary[] = []) {
   const render = () => h.render(() => useBrowser(input));
   const prepare = async () => { render(); await tick(); render(); await tick(); return render(); };
   return { h, input, finished, updates, render, prepare, refreshes: () => refreshes,
+    items: (value: typeof loadItems) => { loadItems = value; },
     transition: (value: typeof transition) => { transition = value; } };
 }
 
@@ -77,4 +81,19 @@ test("opening historical results does not redirect and completed retests keep th
   retest.input.selected = { ...run("current", "completed"), configuration: { fixVerificationScope: "defect-a" } };
   retest.render(); await tick(); assert.equal(retest.finished.length, 0);
   assert.equal(retest.updates[0][0].status, "completed"); retest.h.dispose();
+});
+
+test("background refresh retains rows only for the same run and workspace", async () => {
+  const f = fixture();
+  f.items(async () => [{ id: "case-current", caseKey: "TC-1" } as RunItemSummary]);
+  try {
+    const initial = await f.prepare(); assert.equal(initial.ready, true); assert.equal(initial.entries.length, 1);
+    f.items(() => new Promise(() => {})); initial.refresh();
+    const refreshing = f.render(); assert.equal(refreshing.ready, false);
+    assert.equal(refreshing.entries[0].item.id, "case-current");
+    f.input.selected = run("next", "draft"); f.input.selectedId = "next";
+    assert.equal(f.render().entries.length, 0, "old run rows must disappear before loading effects run");
+    f.input.workspaceId = "different-workspace";
+    assert.equal(f.render().entries.length, 0);
+  } finally { f.h.dispose(); }
 });
