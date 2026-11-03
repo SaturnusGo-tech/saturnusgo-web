@@ -25,7 +25,7 @@ scope and remove selectors belonging to other screens.
   customer data or temporary QA endpoints.
 - Mark unavailable connectors as `planned`. The catalog test compares their
   availability with the application’s integration definitions.
-- Update the visible editorial date in `DocumentationArticle.tsx` after a
+- Update the visible editorial date in `localization/ui-copy.ts` after a
   substantive content review.
 
 ## Checking changes
@@ -68,11 +68,14 @@ into available capabilities. Every section retains its stable source ID.
 After editing either edition, export the corpus to the backend checkout:
 
 ```bash
-npx tsx scripts/documentation-ai/export.ts --output ../.tms-run-builds-backend/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json
-npx tsx scripts/documentation-ai/export.ts --check ../.tms-run-builds-backend/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json
+FALCON_BACKEND_CHECKOUT=/absolute/path/to/verified-release-backend
+npx tsx scripts/documentation-ai/export.ts --output "$FALCON_BACKEND_CHECKOUT/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json"
+npx tsx scripts/documentation-ai/export.ts --check "$FALCON_BACKEND_CHECKOUT/src/documentation-assistant/infrastructure/knowledge/guide-corpus.json"
 npx tsx --test scripts/documentation-ai/tests/*.test.ts
 ```
 
+Choose the backend checkout against the active production release before exporting;
+a similarly named old artifact directory is not proof of the deployed source.
 The path is explicit so a release checkout can target its corresponding backend.
 `--check` fails on missing or stale content without rewriting it. The version is
 the SHA-256 of canonical article JSON; ordering and output do not depend on the
@@ -86,10 +89,14 @@ Regenerate and verify the server corpus in the same release as guide changes.
 
 `content/walkthroughs/` describes numbered sequences with an instruction,
 actual UI screenshot, expected outcome and descriptive alt text per step.
-Capture real Falcon UI using neutral data in the isolated Falcon Guide project
-or a disposable guide workspace for workspace-level features.
-Do not generate or retouch interface controls, expose credentials, or capture
-customer records. Clearly label hypothetical defects and unsaved setup forms.
+The November refresh uses the owner's authenticated **production Umbrella Home**
+account, with the current production UI. Synthetic UI previews and the previous
+isolated Guide workspace are not acceptable replacement captures. Use existing
+authorized records and unsaved setup forms; do not trigger invitations, OAuth
+grants, external tests or destructive actions merely to obtain an illustration.
+Do not generate or repaint interface controls or expose credentials, private
+invitation URLs or unrelated personal data. Keep untouched original captures;
+arrows belong in a separate annotation layer with its original preserved.
 
 The guide follows Falcon's interface locale through `useDocumentationCatalog`.
 English articles live in `content/`; Russian articles live in `content-ru/`.
@@ -98,21 +105,60 @@ Update both editions when behavior changes and retain stable article/section IDs
 lookup, navigation and search. `localization/ui-copy.ts` contains UI labels.
 Do not force a guide language independently of the user's interface preference.
 
-Store JPEG captures under `public/falcon/docs/<edition>/`. English captures use
-`2026-09/`; Russian captures use `2026-09-ru/`. Each edition has its own walkthrough
-references and inventory. Preserve both editions when updating screenshots.
-Company administration is documented in text without screenshots containing
-personal administrator information. Swagger illustrations show configuration
-previews; the AI guide distinguishes unavailable demo service from successful flow.
-`media/screenshots.json` records actual intrinsic dimensions for every image;
-`screenshotStep` restricts references to this inventory.
+Capture the MacBook Pro 16 layout at a logical **1728×1117 viewport, DPR2**:
+the untouched source is **3456×2234 pixels**. Verify the actual capture dimensions;
+do not upscale or crop another viewport to manufacture this size. JPEG and PNG
+raw captures are accepted. This layout check is not a claim of physical-device testing.
+
+New JPEG assets live under `public/falcon/docs/2026-11/` and `2026-11-ru/`.
+Each locale's `walkthroughs/media/screenshots.production.json` explicitly registers
+the new source, intrinsic dimensions and stable screenshot key. `screenshotStep`
+uses a registered production capture and retains the old source until that exact
+step is replaced. New keys can also be registered for additional procedures.
+Never copy old screenshot bytes into the new edition. Retain September assets,
+the 20 historical aliases and the old Codex assets for saved AI answer links.
+The importer records exact replacements in `model/visual/compatibility/production-aliases-en.json`
+and `production-aliases-ru.json`. A saved answer resolves only the registered old
+image ID and URL in its original locale, visible article and section. Do not add
+URL wildcards or redirect unrelated screenshots to a convenient current image.
+Obsolete gallery states can be removed while their procedures remain as text;
+retaining an old file does not require displaying it in a current walkthrough.
+
+From the frontend checkout, import an actual capture after inspecting it:
+
+```bash
+npx tsx scripts/documentation-captures/import.ts --locale en --key navigation-01-workspace-20260928-inbox20260928-en-20260928 --raw /absolute/path/to/raw-capture.jpg --origin https://umbrella-falcon.saturnusgo.com --source-url 'https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?view=cases' --release-sha 38c7171d380d7a08339e66628e6503cf195e520c --captured-at 2026-11-03T12:00:00Z
+npx tsx scripts/documentation-captures/verify.ts
+npx tsx scripts/documentation-captures/verify.ts --complete
+```
+
+Use the actual stable key, capture timestamp, full release commit, company origin
+and exact source-state URL (including resource selectors). Sensitive query fields
+such as OAuth state, codes or tokens are removed before public provenance is saved;
+their values must never be written into guide assets or examples.
+For an actual Codex host screenshot add `--surface codex --origin codex://desktop`
+(or `https://chatgpt.com` for its web UI). The importer never captures the screen:
+it transcodes an existing source without resize/crop, records SHA-256 and the safe
+source-state URL, and rejects an existing key/file instead of overwriting it.
+The normal verifier checks registered captures; **`--complete` is the final refresh
+gate** and fails while any active EN/RU illustration still uses an old source.
+It checks provenance, locale, intrinsic size, digest, legacy reuse and budgets.
+The DPR2 budget is 1.4 MB per image and 32 MB per locale; legacy limits remain
+350 KB per image and 8 MB for English. Images remain lazy-loaded.
+
+Frame company administration controls without unrelated personal administrator
+records. Distinguish Swagger configuration previews and unavailable services from
+an actually connected API and successfully completed request.
+`media/screenshots.json` retains the legacy dimensions; the production inventory
+and `production-provenance.json` record the new captures. Do not alter provenance
+to claim a synthetic or resized illustration is an authenticated production image.
 When replacing captures, update dimensions and provenance together. The visual
 catalog tests check JPEG headers, size limits, coverage and discoverability.
 
 Images load lazily with reserved dimensions. A native modal dialog provides
 enlargement, previous/next, arrow keys and Escape; it uses the current theme.
 Test keyboard focus restoration, article navigation, image loading, and narrow
-screens. Capture dimensions can vary with the real browser viewport.
+screens. Retained legacy images keep their original dimensions.
 The `/falcon/` public prefix is included in the existing Pages export pipeline.
 
 The `company-access` article is admin-only. `useDocumentationCatalog` filters

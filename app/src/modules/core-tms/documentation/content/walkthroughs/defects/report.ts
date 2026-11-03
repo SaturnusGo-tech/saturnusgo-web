@@ -1,20 +1,17 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const defectWalkthrough = walkthrough("Prepare a bug report from a test case", [
-  shot("defect-01-context-20260913-en-20260928",
-    "Check the source case",
-    "Open **PAY-TC-34 · Open Falcon help** and review its scenario and expected result. Use the case's **More actions** menu to start a bug report when an observed discrepancy needs to be recorded.",
-    "The screenshot shows the saved case before its action menu is opened. The following report is explicitly hypothetical; no actual defect was discovered, saved or sent to a tracker in this example.",
-    "Saved PAY-TC-34 Open Falcon help case with its highlighted description, scenario and expected result before opening More actions."),
-  shot("defect-02-fields-20260913-en-20260928",
-    "Separate actual and expected results",
-    "In **New bug report**, enter a specific title and describe the observation under **Actual result**. Keep the intended behavior in **Expected result**. This example is titled **Example only: guide search does not appear** and labels its observation as hypothetical.",
-    "The unsaved form inherits the case description. It describes a visible article list with a missing search field, while the expected result requires both. The top checkmark creates the report; it has not been used in this example.",
-    "Unsaved bug report for PAY-TC-34 with a hypothetical missing-search observation and separate actual and expected results."),
-  shot("defect-routing-light-20260914-en-20260928",
-    "Check properties and delivery",
-    "Review the component, severity, priority, reproducibility and assignee, then open **Delivery**. This example uses Transfers QA, High severity, Medium priority, Always and Not assigned. When a tracker is connected and available, choose the intended delivery route.",
-    "Only **Automatic** appears in this demo because no tracker is enabled. The screenshot does not show an external destination or successful delivery. The example remains unsaved with no defect key, and no external message was sent.",
-    "Hypothetical bug report with the Delivery picker expanded and Automatic as its only available option."),
+export const defectWalkthrough = walkthrough("Prepare a report, inspect its context and plan verification", [
+  shot("defect-00-list", "Find the report in its project context",
+    "Open **Bug reports** and check the project. Use **Active**, **Closed** or **All**, then search by key, title, component or label. Expand the intended component and open a report, or choose **New bug report** for a new observation.",
+    "The screenshot shows Umbrella-Host’s existing active reports grouped by component, with their keys, severity, status and assignee. Reading the list does not close a report or verify a fix.",
+    "Existing Umbrella-Host bug report list grouped by component, with state tabs, search and report identities."),
+  shot("defect-02-fields-20260913-en-20260928", "Describe the discrepancy",
+    "In **Bug reports**, choose **New bug report**. Enter a specific title and click a text field to open the Markdown editor. Describe the observation under **Actual result** and the intended behavior under **Expected result**. Review component, severity, priority, reproducibility, assignee and delivery below the attachments before saving.",
+    "The screenshot shows an unsaved report with its description editor open. The field checkmark finishes editing that field; the report’s Create action saves the whole report. No defect was created or sent to a tracker for this illustration.",
+    "Unsaved New bug report page with the Markdown description editor and report properties below attachments."),
+  shot("defect-routing-light-20260914-en-20260928", "Prepare a retest",
+    "Open the saved report and check its key, status, results and tracker link. Select **Retest**, choose an environment and enter the fixed build in the inline section. Review the linked cases before using **Create run**.",
+    "Existing HOST-BUG-023 is Ready for QA with High severity and priority and a YouTrack issue link. Its inline Retest section shows Host QA, one linked case and an empty Fixed build field. No run was created and no fix was confirmed for the screenshot.",
+    "Inline retest setup above HOST-BUG-023, with environment, fixed-build field, linked cases and Create run action."),
 ]);

@@ -1,20 +1,17 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const suiteWalkthrough = walkthrough("Prepare a test suite and inspect an existing suite", [
-  shot("suite-01-create-20260913-en-20260928",
-    "Choose the suite's cases",
-    "Open **Suites → New suite**, enter a name and choose how to build it. For a manual suite, choose **Choose exact cases** and select cases or folders in the tree. The example name is Guide checks.",
-    "The form contains 15 selected cases and has not been saved. **Create suite** saves the selection; **Cancel** leaves the catalog unchanged. This example was canceled before the next screenshot.",
-    "Unsaved Guide checks suite form in Payments with Choose exact cases and 15 selected cases."),
-  shot("suite-02-list-20260913-en-20260928",
-    "Find an existing suite",
-    "Return to the catalog and find **Release smoke**. Each row shows the suite key, selection method and case count. Use search to narrow the list or select **New suite** to prepare another selection.",
-    "The catalog contains three existing suites: Account security with 6 cases, Transfer regression with 12 and Release smoke with 15. Guide checks was not created by the preceding example.",
-    "Payments suite catalog with Account security, Transfer regression and Release smoke and their case counts."),
-  shot("suite-03-detail-20260913-en-20260928",
-    "Review the cases and create a run",
-    "Open **Release smoke**. Read its description and inspect the 15 cases in the repository tree. **Configure** edits this suite; the round play button opens the new-run form with the suite selected.",
-    "The screenshot shows the saved Release smoke suite, not the unsaved Guide checks example. Review the new run's iteration, build, owner and selected cases before creating it.",
-    "Saved Release smoke suite with its Release checks description, 15 cases and Configure and run controls."),
+export const suiteWalkthrough = walkthrough("Inspect a suite and prepare its selection", [
+  shot("suite-02-list-20260913-en-20260928", "Find the intended suite",
+    "Open **Suites**. Each row shows the key, selection method and case count. Use the search magnifier or filters when needed, then open the intended suite. **New suite** prepares a separate selection.",
+    "The listing contains existing project suites. Reading their membership or opening their details does not start testing or modify the suite.",
+    "Actual Umbrella-Host test suite catalog with membership types, case counts and run actions."),
+  shot("suite-03-detail-20260913-en-20260928", "Review the saved membership",
+    "Open the suite and inspect its description and case tree. **Configure** edits its definition; **Run suite** opens the new-run form with that suite selected. Review the run’s iteration, build and ownership before creating it.",
+    "The screenshot shows an existing suite with six Android cases. No suite was created, configured or launched to produce this frame.",
+    "Existing Umbrella-Host suite detail with six Android cases and Configure and Run suite controls."),
+  shot("suite-01-create-20260913-en-20260928", "Prepare a new suite without changing existing ones",
+    "Select **New suite**, enter its name and choose **Manual selection** or **Automatic**. Manual selection lets you choose exact cases or folders; an automatic suite uses its configured rules. Review the resolved scope before saving your own suite.",
+    "The unsaved draft is named Android smoke · next release, with Manual selection and zero selected cases. It does not show a newly saved suite or a started run. Cancel returns without creating it.",
+    "Unsaved New suite form with manual and automatic selection choices and zero selected cases."),
 ]);

@@ -6,6 +6,7 @@ export const communicationArticles: DocArticle[] = [
     sources: [{ title: "Slack: creating an app", url: "https://docs.slack.dev/quickstart/" },
       { title: "Slack: posting messages", url: "https://docs.slack.dev/reference/methods/chat.postMessage/" }],
     sections: [
+      section("open", "Open the plugin settings", paragraph("Open **More sections → Hooks** and select this service. If needed, click **Install plugin** and wait for **Installing** to finish. Choose **Manage → Uses → Connection setup**. You can return through **Settings → Plugins**; Guide opens this instruction. Installation alone does not connect or enable the service.")),
       section("walkthrough", "Where to configure it in Falcon", slackWalkthrough),
       section("app", "Prepare the Slack app", steps(
         ["Create or choose a Slack app", "In Slack's app dashboard, use your team's app for Falcon. Select the correct workspace."],
@@ -13,16 +14,16 @@ export const communicationArticles: DocArticle[] = [
         ["Install the app", "Install the app in the workspace and obtain its Bot User OAuth Token. Changing scopes may require reinstalling it."],
         ["Add the bot to the channel", "Invite the app to the selected channel. Copy the channel ID; Falcon expects an ID, not a name such as #qa."])),
       section("connect", "Connect the channel", steps(
-        ["Open Hooks → Slack", "Enter the bot token and Slack channel ID."],
-        ["Check access", "Click Check access. If the channel is unavailable, verify the token, scopes, and bot membership."],
+        ["Open Integrations → Slack", "Enter the bot token and Slack channel ID."],
+        ["Verify access", "Click Verify access. If the channel is unavailable, verify the token, scopes, and bot membership."],
         ["Choose events", "Under Automation, select only the notifications you need."],
         ["Enable and save", "Enable the integration and click Save. This setup does not need a Slack incoming webhook."])),
       section("events", "What to send the team", table(["Group", "Available events"],
         ["Test runs", "Created, started, completed, stopped."], ["Defects", "Created, status changed, fix confirmed."],
         ["GitHub", "Release published and Actions build failed. These events arrive through a connected GitHub integration."]),
         code("text", "Example selection for a QA channel", "run.complete\nrun.abort\ndefect.created\ndefect.fix_confirmed\ngithub.release\ngithub.workflow_failed")),
-      section("verify", "Check a notification", paragraph("Perform an agreed action from the selected list, such as completing a test run. Check delivery in **Log and links**, then open the Slack message. It should contain the event, available results, and a source link."),
-        note("Checking access does not send a message", "It confirms that the resource is accessible. The log entry and channel message prove actual delivery. The card in Automation explains what the notification contains.")),
+      section("verify", "Check a notification", paragraph("Perform an agreed action from the selected list, such as completing a test run. Check delivery in **Activity & links**, then open the Slack message. It should contain the event, available results, and a source link."),
+        note("Verifying access does not send a message", "It confirms that the resource is accessible. The log entry and channel message prove actual delivery. The card in Automation explains what the notification contains.")),
       section("errors", "If the bot is silent", paragraph("Check that the enabled state is saved, the event is selected, and the channel and bot membership are correct. missing_scope means permissions are missing; not_in_channel means the bot has not joined the channel. After fixing the cause, retry the failed delivery from the log.")),
     ] },
   { id: "confluence", title: "Confluence", group: "integrations", description: "Publish completed run results as report pages in your team's space.",
@@ -30,6 +31,7 @@ export const communicationArticles: DocArticle[] = [
     sources: [{ title: "Atlassian: API tokens", url: "https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/" },
       { title: "Confluence Cloud: pages and permissions", url: "https://developer.atlassian.com/cloud/confluence/rest/v2/api-group-page/" }],
     sections: [
+      section("open", "Open the plugin settings", paragraph("Open **More sections → Hooks** and select this service. If needed, click **Install plugin** and wait for **Installing** to finish. Choose **Manage → Uses → Connection setup**. You can return through **Settings → Plugins**; Guide opens this instruction. Installation alone does not connect or enable the service.")),
       section("walkthrough", "Where to configure it in Falcon", confluenceWalkthrough),
       section("prepare", "Prepare the space", paragraph("You need Confluence Cloud, an existing space, and a parent page for reports. The API token owner must be able to view the space and create/edit pages, including any parent-page restrictions.")),
       section("fields", "Required values", table(["Falcon field", "Value"],
@@ -38,13 +40,13 @@ export const communicationArticles: DocArticle[] = [
         ["Confluence space ID", "The numeric API v2 space ID, not its short key."],
         ["Parent page ID", "The ID of an existing page within the selected space."])),
       section("connect", "Configure publishing", steps(
-        ["Open Hooks → Confluence", "Enter the address, email, token, space ID, and parent page ID."],
-        ["Check access", "Click Check access. Falcon checks the space and confirms that the parent page belongs to it."],
+        ["Open Integrations → Confluence", "Enter the address, email, token, space ID, and parent page ID."],
+        ["Verify access", "Click Verify access. Falcon checks the space and confirms that the parent page belongs to it."],
         ["Choose the event", "In Automation, enable Run completed — run.complete."],
         ["Enable and save", "Enable the integration and save. No incoming Confluence webhook is required."])),
       section("report", "What the report contains", paragraph("After a run completes, Falcon creates a child page with the run name, build, environment, result summary, and a link to the full run and evidence in Falcon. Each run is linked to one page; repeated delivery updates that page."),
         note("Publishing results", "This connector publishes run reports. It does not import arbitrary Confluence articles into test cases or manage this Falcon knowledge base.")),
       section("verify", "Check and update a report", paragraph("Complete a test run, check successful delivery, and open the linked page. Compare the build, environment, and counts with Falcon. **Update report** is available in the log for an existing delivered report."),
-        warning("If the response is lost", "For Needs reconciliation, first check the page's contents and version in Confluence, then restore the link using its ID. Automatic republishing does not run in this situation.")),
+        warning("If the response is lost", "For Reconciliation needed, first check the page's contents and version in Confluence, then restore the link using its ID. Automatic republishing does not run in this situation.")),
     ] },
 ];

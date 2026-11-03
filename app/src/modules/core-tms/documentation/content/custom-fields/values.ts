@@ -12,9 +12,9 @@ export const customFieldValuesArticle: DocArticle = {
       ["Open the field", "In the selected project's Custom fields section, click a field name. Field values appears below its settings."],
       ["Click Add", "Enter a value of the selected type. For a product, choose a product group first. For a Boolean field, choose Yes or No."],
       ["Review and save", "Click Add. If Falcon finds an exact match or similar entries, resolve the warning first. After a successful save, the value appears in the list."]),
-      paragraph("**Find value** filters the catalog; use **Show more** to continue a long list. The table shows the value, modification time, and who changed it. **⋯** offers editing and archiving according to your permissions.")),
+      paragraph("**Find a value** filters the catalog; use **Show more** to continue a long list. The table shows the value, modification time, and who changed it. **⋯** offers editing and archiving according to your permissions.")),
     section("choose", "Select a value in a case", steps(
-      ["Open Custom fields", "When creating a case, Custom fields is on the right. For an existing case, click the pencil next to that section."],
+      ["Open Custom fields", "When creating a case, Custom fields is on the right. For an existing case, click the field value directly; a pencil is an alternative where shown."],
       ["Find the value", "Click the field and start typing in Find value. The list opens beside the field and scrolls within the popup; click Show more to continue it."],
       ["Make your selection", "For a single-value field, selecting a value closes the list. For a multiple-value field, click each option you need: checkmarks show selected values; clicking again deselects them. Clear removes the entire selection."],
       ["Save the case", "Apply the section change if that button is shown. For a new case, click Create at the bottom right of the form; for an existing case, click Save. Selecting an option alone does not save the test case."]),
@@ -38,7 +38,7 @@ export const customFieldValuesArticle: DocArticle = {
     section("edit-archive", "Edit, archive, or restore", bullets(
       "Open a value by clicking its name or choosing ⋯ → Edit, make your change, and click Save value. The new name goes through the same duplicate and similarity checks.",
       "Archiving and changing the parent group are blocked if at least one case revision references the value. For a product group, active child products also block the action.",
-      "Enable Show archived to view archived options. Restore them through the entry menu; an archived entry must be restored before it can be edited.",
+      "Enable Include archived to view archived options. Restore them through the entry menu; an archived entry must be restored before it can be edited.",
       "The built-in Regression field's true and false values cannot be archived. A Boolean value cannot be changed from true to false or vice versa.",
       "If you see a concurrent change message, refresh the page and check the latest data before saving again."),
       note("History stays unchanged", "Case revisions store snapshots of field names and values. Renaming a catalog entry does not rewrite older revisions or the contents of an existing run.")),

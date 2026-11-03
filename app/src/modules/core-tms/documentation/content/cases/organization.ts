@@ -8,6 +8,7 @@ export const caseOrganization: DocArticle[] = [
     sections: [
       section("walkthrough", "Walkthrough: a procedure with an image and a file", sharedStepsWalkthrough),
       section("use", "When to use shared steps", paragraph("Use a shared step for a procedure repeated across tests, such as signing in, preparing an order, or clearing test data. Shared steps belong to a project.")),
+      section("catalog", "Find a shared procedure", paragraph("Click the **Search shared steps** magnifier to reveal search. The compact list shows **Name**, **Steps**, **Used in**, **Revision**, and **Updated**. A row opens the procedure. When the library is empty, create the first procedure with **Shared step** in the header; if a search has no matches, clear it to return to the library.")),
       section("create", "Create a procedure", steps(
         ["Open Shared steps", "Click Shared step at the top of the list."],
         ["Give it a clear name", "For example, Sign in as a user with an active subscription. The name should describe the procedure's outcome."],
@@ -81,10 +82,10 @@ export const caseOrganization: DocArticle[] = [
         note("Remove from folder", "**Remove from folder** moves selected cases to **No folder**. They remain active in the same project. Use archiving to retire cases.")),
       section("bulk-actions", "Other selection actions", paragraph("A compact toolbar at the bottom shows the selected case count, **Move**, **Create test run**, **Status**, **Priority**, **Remove from folder**, and **Archive**. Actions depend on your permissions; the cross clears the selection."),
         note("Selection survives an error", "If an operation fails, read the message and retry after resolving the cause. While cases are selected, the floating Verify fixes button is hidden; clearing the selection brings it back if fixes are available for verification.")),
-      section("drag", "Move by holding and dragging", steps(
-        ["Hold a case", "Press and briefly hold a case row in the tree, then start dragging."],
-        ["Check the count", "If the held case is already selected, the entire selection moves. If it is not selected, only that case moves; you do not need to check its box first."],
-        ["Drop over a folder", "Hover over the destination folder. Pausing over a collapsed folder expands it so you can choose a subfolder. To move to the root, use the **Move to repository root** area that appears, then release. To choose a destination without dragging, use **Move** in the actions toolbar."])),
+      section("drag", "Move by dragging", steps(
+        ["Start a drag", "Press a case row and move the pointer. A normal drag starts after a short movement; no force click or long press is required."],
+        ["Check the count", "Dragging a selected case moves the entire selected set, including selected cases in other folders. Dragging an unselected case moves only that case. A folder containing selected cases uses the current selected set; check the drag count before dropping."],
+        ["Choose the destination", "Hover over a destination folder. Pausing over a collapsed folder expands it. For the root, use Move to repository root. Release to move; if dragging is inconvenient, use Move in the selection toolbar. The completion toast offers Undo for 15 seconds."])),
       section("folder-archive", "Archive and restore a branch", steps(
         ["Archive the folder", "Open the folder menu, choose **Archive folder**, and confirm. Its active subfolders and cases are archived with it; history and runs are preserved."],
         ["Open the folder archive", "Click the archive icon beside **Folders**. Select the root folder of the branch you archived."],
@@ -102,7 +103,7 @@ export const caseOrganization: DocArticle[] = [
         ["Export the data", "Click **Export test cases** at the top right to download JSON containing current case revisions, their paths, and the active folder structure, including empty folders. See Transfer scope below for what is included."],
         ["Check the file", "Verify the case count and project before using the file to transfer data."])),
       section("import", "Import cases", steps(
-        ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import test cases** page opens. Check the selected **Project**."],
+        ["Open the import page", "In **Test cases**, click import in the repository header or go through **Settings → Import and export**. A dedicated **Import and export** page opens. Check the selected **Project**."],
         ["Choose a file", "Click **Choose file** or drag in JSON. You can use a Falcon export or external test case JSON. The limits are 5 MB and 2,000 recognized cases."],
         ["Choose the destination", "In **Folder**, expand the tree or search by folder name; choose **Project root** for the top level. Opening import from a selected folder prefills that destination; check it before starting."],
         ["Start the import", "Click **Import**. Falcon automatically recognizes external JSON, prepares folders, and creates cases. The server uses OpenAI if needed. A preparation error stops case creation. After completion, check the case count, expand the structure tree, and open a few scenarios."])),

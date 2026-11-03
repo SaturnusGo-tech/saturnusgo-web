@@ -5,7 +5,8 @@ import { documentationSectionMedia } from "../../../model/visual/guide-media";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import type { GuideVisual } from "../../model/conversation";
 import { validateGuideAnswer } from "../../data/validate-answer";
-import { historicalGuideMedia } from "../../../model/visual/compatibility/historical-media";
+import { historicalGuideMedia, matchesHistoricalGuideMedia } from "../../../model/visual/compatibility/historical-media";
+import { matchesProductionGuideMedia, type ProductionMediaAlias } from "../../../model/visual/compatibility/production-media";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -55,8 +56,8 @@ test("all 20 explicitly retained screenshot tuples resolve to current canonical 
     for (const context of alias.contexts) {
       const article = catalog.articleById.get(context.articleId)!;
       const section = article.sections.find(item => item.id === context.sectionId)!;
-      const canonical = documentationSectionMedia(section).find(item => item.id === alias.currentId)!;
-      assert.equal(canonical.src, alias.currentSrc);
+      const canonical = documentationSectionMedia(section).find(item => matchesHistoricalGuideMedia(context.articleId, context.sectionId, alias, item))!;
+      assert.ok(canonical, alias.src);
       const supplied = { ...canonical, id: alias.id, src: alias.src, title: "Untrusted saved title", alt: "Untrusted alt" };
       const visible = visibleGuideVisuals([{ ...context, layout: "steps", items: [supplied] }], catalog.articleById);
       assert.equal(visible.length, 1, `${alias.locale}:${context.articleId}:${alias.id}`);
@@ -71,7 +72,8 @@ test("historical compatibility rejects changed IDs, URLs, locale, section and in
   for (const alias of historicalGuideMedia) {
     const catalog = documentationCatalog(alias.locale, true), context = alias.contexts[0];
     const article = catalog.articleById.get(context.articleId)!;
-    const canonical = documentationSectionMedia(article.sections.find(item => item.id === context.sectionId)!).find(item => item.id === alias.currentId)!;
+    const canonical = documentationSectionMedia(article.sections.find(item => item.id === context.sectionId)!)
+      .find(item => matchesHistoricalGuideMedia(context.articleId, context.sectionId, alias, item))!;
     const item = { ...canonical, id: alias.id, src: alias.src }, visual = { ...context, layout: "gallery", items: [item] } as GuideVisual;
     for (const unsafe of [
       { ...visual, items: [{ ...item, src: `${alias.src}?tracking=1` }] },
@@ -90,8 +92,25 @@ test("mixed historical and current selections preserve canonical order without d
   const catalog = documentationCatalog("en", true), article = catalog.articleById.get("navigation")!;
   const section = article.sections.find(item => item.id === "walkthrough")!, media = documentationSectionMedia(section);
   const aliases = historicalGuideMedia.filter(item => item.locale === "en" && item.contexts.some(context => context.articleId === "navigation"));
-  const items = aliases.map(alias => ({ ...media.find(item => item.id === alias.currentId)!, id: alias.id, src: alias.src }));
-  items.reverse(); items.push(media.find(item => item.id === aliases[0].currentId)!);
+  const match = (alias: typeof aliases[number], item: typeof media[number]) => matchesHistoricalGuideMedia(article.id, section.id, alias, item);
+  const items = aliases.map(alias => ({ ...media.find(item => match(alias, item))!, id: alias.id, src: alias.src }));
+  items.reverse(); items.push(media.find(item => match(aliases[0], item))!);
   const visible = visibleGuideVisuals([{ articleId: article.id, sectionId: section.id, layout: "steps", items }], catalog.articleById);
-  assert.deepEqual(visible[0].steps.map(item => item.id), media.filter(item => aliases.some(alias => alias.currentId === item.id)).map(item => item.id));
+  assert.deepEqual(visible[0].steps.map(item => item.id), media.filter(item => aliases.some(alias => match(alias, item))).map(item => item.id));
+});
+
+test("a saved answer resolves only its exact registered image tuple in the same visible article section", () => {
+  const alias: ProductionMediaAlias = { locale: "en", articleId: "navigation", sectionId: "walkthrough",
+    id: "navigation-old", src: "/falcon/docs/2026-09/navigation-old.jpg",
+    currentId: "navigation-production", currentSrc: "/falcon/docs/2026-11/navigation-production.jpg" };
+  const canonical = { id: alias.currentId, src: alias.currentSrc, title: "Current", instruction: "Actual procedure", result: "Actual outcome", alt: "Current image" };
+  const supplied = { id: alias.id, src: alias.src };
+  const match = (article = alias.articleId, section = alias.sectionId, item = supplied, target = canonical) =>
+    matchesProductionGuideMedia(article, section, item, target, [alias]);
+  assert.equal(match(), true);
+  assert.equal(match("another-article"), false); assert.equal(match(alias.articleId, "another-section"), false);
+  assert.equal(match(alias.articleId, alias.sectionId, { ...supplied, id: alias.currentId }), false);
+  assert.equal(match(alias.articleId, alias.sectionId, { ...supplied, src: alias.src + "?token=x" }), false);
+  assert.equal(match(alias.articleId, alias.sectionId, supplied, { ...canonical, src: "/falcon/docs/2026-11-ru/navigation-production.jpg" }), false);
+  assert.equal(matchesProductionGuideMedia(alias.articleId, alias.sectionId, supplied, canonical, []), false);
 });

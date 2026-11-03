@@ -15,14 +15,14 @@ export const portfoliosArticle: DocArticle = {
       ["Folder", "A section of test cases within a project."]),
       paragraph("A project can exist **without a portfolio**. Adding it to a portfolio preserves its cases and history. Assigning an owner identifies a team contact and does not change access permissions.")),
     section("catalog", "Open the catalog", steps(
-      ["Select Portfolios and projects", "Open the section in the global sidebar. All shows portfolios and projects; Portfolios shows groups; No portfolio shows independent projects."],
+      ["Select Portfolios and projects", "Open More sections → Portfolios and projects, or its pinned sidebar shortcut. All shows portfolios and projects; Portfolios shows groups; No portfolio shows independent projects."],
       ["Find the name you need", "Enter a name in search. Search narrows the loaded rows; if the record is missing, click Load more. To find archived objects, change the status to Archived."],
       ["Open the page", "Click the portfolio or project name. Breadcrumbs above the title take you back to the portfolio and full catalog."])),
-    section("editor-controls", "Saving and required fields", paragraph("When creating a project or portfolio, the round blue checkmark at the right of the header saves it; the cross cancels creation. If a field is invalid, click the checkmark to show the error beside the field. A project key is required: 2–12 Latin letters or digits, starting with a letter. Status and assignee appear below the portfolio description; project properties sit below the test plan. The Test cases tab opens the repository up to the global header, without an extra project header.")),
+    section("editor-controls", "Saving and required fields", paragraph("When creating a project or portfolio, the round save checkmark at the right of the header saves it; the cross cancels creation. If a field is invalid, click the checkmark to show the error beside the field. A project key is required: 2–12 Latin letters or digits, starting with a letter. Status and assignee appear below the portfolio description; project properties sit below the test plan. The Test cases tab opens the repository up to the global header, without an extra project header.")),
     section("create-portfolio", "Create a portfolio", steps(
       ["Click New portfolio", "A dedicated creation page opens. Enter its name in the heading. Click the description field to add text, then click Done. Controls to create or cancel the entire page are at the top."],
       ["Assign an owner", "Open Assignee. Find an active workspace member by name or email. You can leave it Unassigned."],
-      ["Save the portfolio", "Click the blue Create portfolio checkmark at the right of the header. Its dedicated page opens; the Projects tab offers actions to create or add projects."])),
+      ["Save the portfolio", "Click the Create portfolio checkmark at the right of the header. Its dedicated page opens; the Projects tab offers actions to create or add projects."])),
     section("create-project", "Create a project", steps(
       ["Choose a location", "Click Create project in the catalog, project selector, or portfolio page. A dedicated page opens. When opened from a portfolio, that portfolio is already selected; change it or choose No portfolio if needed."],
       ["Enter the name and key", "The key starts with a Latin letter, contains 2–12 Latin letters or digits, and forms part of case and run identifiers. The key is permanent after creation."],
@@ -34,7 +34,7 @@ export const portfoliosArticle: DocArticle = {
       ["Change the name", "Click the title to edit it in place. The checkmark saves it; the cross or Escape cancels the edit."],
       ["Edit the description or plan", "Click the text or empty-field prompt. Falcon's shared Markdown editor opens. **Save** below the field applies the edit and returns to reading view; **Cancel** keeps the previous text. If saving fails, the draft stays open."],
       ["Set properties", "Status and assignee appear below the description, or below the test plan for a project. Selecting a new value saves it immediately. Properties stay in the same location while editing."]),
-      note("During creation", "Fields on a new page remain a draft until you click the blue checkmark in the header. Done beside the description or plan collapses the editor and keeps the text in that draft.")),
+      note("During creation", "Fields on a new page remain a draft until you click the save checkmark in the header. Done beside the description or plan collapses the editor and keeps the text in that draft.")),
     section("attach", "Add an existing project", steps(
       ["Open the portfolio", "On the Projects tab, click Add existing."],
       ["Choose a project without a portfolio", "Find a project by name or key, select one row, and click Add project. Its cases and results stay where they are."],
@@ -49,7 +49,7 @@ export const portfoliosArticle: DocArticle = {
     section("checklist", "Maintain a checklist", steps(
       ["Open Checklist", "The action appears below a project's or portfolio's description. Enter an item and click plus or press Enter. You can add up to 100 items of 500 characters each."],
       ["Mark progress", "Check completed items. The pencil edits wording; the trash icon deletes an item. The counter shows how many items are complete."],
-      ["Save changes", "On an existing page, changes save immediately. On a creation page, use the blue checkmark at the top. If an error occurs, the item remains in the input for another attempt. Refresh data loads the latest object version while preserving open drafts."])),
+      ["Save changes", "On an existing page, changes save immediately. On a creation page, use the save checkmark at the top. If an error occurs, the item remains in the input for another attempt. Refresh data loads the latest object version while preserving open drafts."])),
     section("files", "Attach and download files", steps(
       ["Create the object first", "Files require a saved project or portfolio. During creation, a hint appears below the description; Attach files becomes available after saving."],
       ["Choose files", "Click Attach files and select up to 20 files at a time. Upload progress appears beside each filename. On failure, click Retry; confirmed uploads are not uploaded again."],

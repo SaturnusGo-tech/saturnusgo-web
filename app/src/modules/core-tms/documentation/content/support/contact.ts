@@ -3,7 +3,7 @@ export const supportArticle:DocArticle={
  id:"contact-support",title:"Contact us",description:"Ask a question, report a bug, or suggest an improvement to Falcon.",group:"reference",
  keywords:["request","support","contact","screenshot","file","error","question","suggestion"],
  sections:[
-  section("create","New support request",paragraph("Near the bottom of the sidebar, click Contact us below Help. The form is available to company employees, including before the first project is created."),
+  section("create","New support request",paragraph("Open the avatar menu at the bottom of the sidebar and choose **Contact us**. The form is available to company employees, including before the first project is created."),
    steps(["Choose a type and section","Choose a question, bug, or improvement. Specify the Falcon section your request concerns."],
     ["Describe the situation","Fill in the subject and description. The page link is inserted automatically; you can edit or remove it. It is optional for questions, bugs, and improvements. For a bug, describe the actions, expected result, and what happened. The editor supports lists, links, and code blocks."],
     ["Add evidence","Click the paperclip, paste a file from the clipboard, or drag it into the form. Add screenshot captures the current Falcon screen without the request window. Click its thumbnail to review it or the cross to remove it."],

@@ -6,13 +6,14 @@ export const trackerArticles: DocArticle[] = [
     sources: [{ title: "Atlassian: API tokens", url: "https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/" },
       { title: "Jira: webhooks and signatures", url: "https://developer.atlassian.com/cloud/jira/platform/webhooks/" }],
     sections: [
+      section("open", "Open the plugin settings", paragraph("Open **More sections → Hooks** and select this service. If needed, click **Install plugin** and wait for **Installing** to finish. Choose **Manage → Uses → Connection setup**. You can return through **Settings → Plugins**; Guide opens this instruction. Installation alone does not connect or enable the service.")),
       section("walkthrough", "Where to configure it in Falcon", jiraWalkthrough),
       section("prepare", "Prepare access", paragraph("The connection is designed for Jira Cloud. You need a site address, Atlassian email, and API token for an account allowed to read the project, create and edit issues, and execute workflow transitions."),
         note("Token type", "The current connector calls company.atlassian.net directly. Use a compatible API token without scopes: scoped tokens use a different Atlassian API route. Set an expiry and limit the account's access to required resources.")),
       section("connect", "Configure the connection", steps(
         ["Create an Atlassian token", "In your account's security settings, open API tokens and create a token with a clear name and expiry. Copy it into Falcon; your Google password is not used."],
-        ["Open Hooks → Jira", "Enter the site address, email, API token, and Jira project key, such as QA."],
-        ["Check access", "Click Check access. Choose an available issue type, such as Bug. If the type requires extra mandatory fields, make sure the project permits issue creation using Falcon's fields."],
+        ["Open Integrations → Jira", "Enter the site address, email, API token, and Jira project key, such as QA."],
+        ["Verify access", "Click Verify access. Choose an available issue type, such as Bug. If the type requires extra mandatory fields, make sure the project permits issue creation using Falcon's fields."],
         ["Save while disabled", "Copy the Webhook URL from Incoming updates."])),
       section("webhook", "Configure incoming events", steps(
         ["Create a Jira webhook", "A Jira administrator opens system webhooks and creates one. Paste the exact URL from Falcon."],
@@ -27,19 +28,20 @@ export const trackerArticles: DocArticle[] = [
     keywords: ["Linear", "linear", "team", "team", "API key"], related: ["integration-overview", "retest", "integration-troubleshooting"],
     sources: [{ title: "Linear: webhooks", url: "https://linear.app/developers/webhooks" }, { title: "Linear: API access", url: "https://linear.app/developers/graphql" }],
     sections: [
+      section("open", "Open the plugin settings", paragraph("Open **More sections → Hooks** and select this service. If needed, click **Install plugin** and wait for **Installing** to finish. Choose **Manage → Uses → Connection setup**. You can return through **Settings → Plugins**; Guide opens this instruction. Installation alone does not connect or enable the service.")),
       section("walkthrough", "Where to configure it in Falcon", linearWalkthrough),
       section("access", "Prepare the team and key", paragraph("You need an **API key** with access to the selected team and permission to read and manage issues, plus the **Linear team ID**. Limit the key to the relevant team. Creating a webhook requires a Linear workspace administrator.")),
       section("connect", "Connect Falcon", steps(
         ["Create a key", "In Linear, open Security & access settings and create a personal API key for Falcon. Grant the permissions needed to create, update, and read issues."],
-        ["Fill in the service card", "In Hooks → Linear, enter the key and team ID. Do not use a project identifier or short issue prefix instead of the team ID."],
-        ["Check access", "Click Check access and verify the displayed team and statuses."],
+        ["Fill in the service card", "In Integrations → Linear, enter the key and team ID. Do not use a project identifier or short issue prefix instead of the team ID."],
+        ["Verify access", "Click Verify access and verify the displayed team and statuses."],
         ["Save while disabled", "Copy the Webhook URL from incoming update settings."])),
       section("webhook", "Add a Linear webhook", steps(
         ["Open API settings", "In Linear, create a New webhook. Enter the Falcon URL and a descriptive connection name."],
         ["Choose events", "Limit the webhook to the required team and the Issues resource type."],
         ["Copy the signing secret", "Copy the secret from Linear's webhook page into Falcon's Signing secret. This is separate from the API key."])),
       section("workflow", "Configure statuses", paragraph("In **Automation**, select defect events and team statuses that indicate readiness for retest. Set outgoing mappings for a verified fix and return to work. Enable the integration and save."),
-        note("Statuses belong to a team", "Use the options loaded by Check access. Status names and IDs from another team are not valid.")),
+        note("Statuses belong to a team", "Use the options loaded by Verify access. Status names and IDs from another team are not valid.")),
       section("verify", "Test the connection", paragraph("Create a defect in the connected Falcon project. Open its linked Linear issue. Move it to the readiness status and refresh Falcon: the defect should return for retesting, while the test result remains unchanged until execution is repeated.")),
     ] },
 ];

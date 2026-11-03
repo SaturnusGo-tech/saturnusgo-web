@@ -10,7 +10,7 @@ export const notificationsArticle: DocArticle = {
   related: ["settings", "telegram-notifications", "browser-notifications", "integration-overview", "retest"],
   sections: [
     section("start", "Where to configure notifications", steps(
-      ["Open your company", "Sign in to Falcon with your own account. Open **Settings**, then **Notifications** under **Personal settings**. These preferences are available without selecting a project; no admin panel access is required."],
+      ["Open your company", "Sign in to Falcon with your own account. Open the avatar menu → **Settings**, then **Notifications** under **Personal settings**. These preferences are available without selecting a project; no admin panel access is required."],
       ["Connect a channel", "Enable browser notifications or connect Telegram. You can use both. Each employee connects their own channels."],
       ["Choose events", "Expand Event preferences and enable the categories you want. Changes save immediately; there is no separate Save button."]),
       note("Before your first connection", "All categories are selected by default, but no channel is enabled automatically. Detailed connection instructions follow below."),
@@ -35,13 +35,13 @@ export const notificationsArticle: DocArticle = {
     section("assignments", "Assignment notifications", paragraph("Enable **Assignments** to receive personal messages when assigned a run, a case, a test within a run, a defect, a project, or a portfolio. Changing executors for selected run cases creates events for each changed test; a bulk assignment may produce several messages."),
       note("Run owner is a separate field", "Assigning a run owner notifies that employee. It does not replace the executors of individual cases within the run."),
       paragraph("An unchanged assignee does not receive another notification. Changing the assignee notifies the new employee. Clearing an assignment cancels a notification that has not yet been sent. Delivered messages remain in history. Assigning yourself also sends a notification.")),
-    section("integrations", "Events from integrations", paragraph("First configure the relevant service under **Hooks** for the selected project. Connecting Telegram alone does not link Falcon to a tracker or enable incoming status updates."),
+    section("integrations", "Events from integrations", paragraph("First configure the relevant service under **Integrations** for the selected project. Connecting Telegram alone does not link Falcon to a tracker or enable incoming status updates."),
       steps(
         ["Link the defect to an issue", "For YouTrack, Trello, Jira, or Linear, the Falcon defect must be linked to the external issue. Configure incoming events and status mapping in the integration."],
         ["Enable Defects", "When a configured integration sends fix readiness for retesting and Falcon accepts the change, a Fix ready for verification message is sent. Moving an unlinked card does not create this message."],
         ["Open the test", "The message button opens the linked defect in your company's Falcon. Retest and record the result; enable Test runs for messages about the run itself."]),
       paragraph("YouTrack updates belong to **Defects**. If GitHub creates a run through a configured rule, its creation message belongs to **Test runs**. Subscribing does not mean being notified about every action in an external service."),
-      paragraph("Slack delivery and Confluence report publishing are configured separately in Hooks. Connecting Swagger does not create a personal alert. Enabling Integrations does not replace service configuration."),
+      paragraph("Slack delivery and Confluence report publishing are configured separately in Integrations. Connecting Swagger does not create a personal alert. Enabling Integrations does not replace service configuration."),
       articles("youtrack", "trello", "jira", "linear", "github")),
     section("feed", "The Falcon event feed", bullets(
       "Click the **Notifications** bell near the bottom of the sidebar. The feed opens beside the menu while your current workspace screen stays in place. It is available without connecting Telegram or browser notifications.",
@@ -63,7 +63,7 @@ export const notificationsArticle: DocArticle = {
       ["Check the company and time", "Make sure the event happened in the company where the channel is connected, after connection. Older events remain only in the feed."],
       ["Check the category", "For example, a defect becoming ready for retest belongs to Defects even when its status comes from an external tracker."],
       ["Check the channel state", "Open Settings → Notifications, then expand Telegram and Browser notifications. Check for Telegram is connected and Notifications are enabled in this browser, and confirm that the browser switch is on. Start confirmation and site permission are required to finish connecting."],
-      ["Check the event itself", "Open the sidebar bell and look for the event in the feed. If an expected tracker update is missing, check that integration's log in Hooks."],
+      ["Check the event itself", "Open the sidebar bell and look for the event in the feed. If an expected tracker update is missing, check that integration's log in Integrations."],
       ["Contact your administrator", "If the event exists and its category is selected but the connected channel is silent, share the event time, link, company name, and channel. Do not send your password, bot token, or personal connection link."]),
       paragraph("Delivery runs in the background. Falcon retries temporary service failures, so a message may arrive later. An ambiguous Telegram network failure can cause a duplicate message for the same event."),
       articles("telegram-notifications", "browser-notifications", "integration-troubleshooting")),

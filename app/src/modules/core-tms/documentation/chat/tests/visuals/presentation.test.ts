@@ -6,7 +6,7 @@ import { guideChatCopy } from "../../localization/copy";
 import type { VisibleGuideVisual } from "../../model/visuals/visible-visuals";
 import { visibleGuideVisuals } from "../../model/visuals/visible-visuals";
 import type { GuideMessage } from "../../presentation/messages/GuideMessage";
-import { documentationCatalog } from "../../../localization/catalog/locale-catalog";
+import type { DocArticle } from "../../../model/article";
 import { documentationSectionMedia } from "../../../model/visual/guide-media";
 import type { GuideVisual } from "../../model/conversation";
 
@@ -34,13 +34,17 @@ test("gallery is a keyboard reachable scroll region and opens the existing guide
 });
 
 test("all seven images across 5+2 sections use continuous positions in the shared image viewer", () => {
-  const catalog = documentationCatalog("en", false), h = componentHarness();
-  const group = (articleId: string, count: number): GuideVisual => {
+  const article = (id: string, count: number): DocArticle => ({ id, title: id, description: "Viewer fixture", group: "start", keywords: [], related: [],
+    sections: [{ id: "procedure", title: "Procedure", blocks: [{ kind: "walkthrough", title: "Viewer fixture",
+      steps: Array.from({ length: count }, (_, index) => ({ title: `Step ${index + 1}`, instruction: "Inspect the fixture", result: "Expected outcome",
+        image: { src: `/falcon/docs/2026-11/fixture-${id}-${index}.jpg`, alt: `Fixture screenshot ${index + 1}`, width: 3456, height: 2234 } })) }] }] });
+  const catalog = { articleById: new Map([article("first", 5), article("second", 2)].map(value => [value.id, value])) }, h = componentHarness();
+  const group = (articleId: string): GuideVisual => {
     const article = catalog.articleById.get(articleId)!;
-    const section = article.sections.find(value => documentationSectionMedia(value).length >= count)!;
-    return { articleId, sectionId: section.id, layout: "steps", items: documentationSectionMedia(section).slice(0, count) };
+    const section = article.sections[0];
+    return { articleId, sectionId: section.id, layout: "steps", items: documentationSectionMedia(section) };
   };
-  const message = { role: "assistant" as const, content: "Follow these steps.", visuals: [group("workspace", 5), group("portfolios", 2)] };
+  const message = { role: "assistant" as const, content: "Follow these steps.", visuals: [group("first"), group("second")] };
   const { GuideMessage: renderMessage } = h.load<{ GuideMessage: typeof GuideMessage }>(new URL("../../presentation/messages/GuideMessage.tsx", import.meta.url), name => {
     if (name.endsWith("useDocumentationCatalog")) return { useDocumentationCatalog: () => catalog };
     if (name.endsWith("localization/copy")) return { guideChatCopy };

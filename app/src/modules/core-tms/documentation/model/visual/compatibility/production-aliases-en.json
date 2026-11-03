@@ -1,0 +1,659 @@
+[
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-02-appearance-20260928-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-02-appearance-20260928-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-02-appearance-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-02-appearance-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-02-appearance-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-02-appearance-20260928-en-20260928.jpg",
+    "currentId": "settings-02-appearance-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-02-appearance-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-01-general-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-01-general-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-01-general-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-01-general-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-01-general-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-01-general-20260928-rows-en-20260928.jpg",
+    "currentId": "settings-01-general-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-01-general-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-04-edit-project-20260928-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-04-edit-project-20260928-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-04-edit-project-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-04-edit-project-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-04-edit-project-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-04-edit-project-20260928-en-20260928.jpg",
+    "currentId": "settings-04-edit-project-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-04-edit-project-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "workspace",
+    "sectionId": "walkthrough",
+    "id": "workspace-v2-02-environment-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/workspace-v2-02-environment-20260913-en-20260928.jpg",
+    "currentId": "workspace-v2-02-environment-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/workspace-v2-02-environment-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-05-session-20260928-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-05-session-20260928-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-05-session-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-05-session-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-05-session-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-05-session-20260928-en-20260928.jpg",
+    "currentId": "settings-05-session-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-05-session-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-01-overview-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-01-overview-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "notifications-01-overview-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-01-overview-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-01-overview-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-01-overview-20260928-rows-en-20260928.jpg",
+    "currentId": "notifications-01-overview-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-01-overview-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-02-browser-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-02-browser-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "notifications-02-browser-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-02-browser-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-02-browser-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-02-browser-20260928-rows-en-20260928.jpg",
+    "currentId": "notifications-02-browser-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-02-browser-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-03-inbox-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-03-inbox-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "notifications-03-inbox-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-03-inbox-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "notifications",
+    "sectionId": "walkthrough",
+    "id": "notifications-03-inbox-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/notifications-03-inbox-20260928-rows-en-20260928.jpg",
+    "currentId": "notifications-03-inbox-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/notifications-03-inbox-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "import-export",
+    "sectionId": "walkthrough",
+    "id": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-03-exchange-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "import-export",
+    "sectionId": "walkthrough",
+    "id": "settings-03-exchange-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-03-exchange-20260928-rows-en-20260928.jpg",
+    "currentId": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-03-exchange-20260928-rows-inbox20260928-en-20260928.jpg",
+    "currentId": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "permissions",
+    "sectionId": "settings-walkthrough",
+    "id": "settings-03-exchange-20260928-rows-en-20260928",
+    "src": "/falcon/docs/2026-09/settings-03-exchange-20260928-rows-en-20260928.jpg",
+    "currentId": "settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/settings-03-exchange-20260928-rows-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "navigation",
+    "sectionId": "walkthrough",
+    "id": "navigation-02-context-20260928-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/navigation-02-context-20260928-inbox20260928-en-20260928.jpg",
+    "currentId": "navigation-02-context-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/navigation-02-context-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "navigation",
+    "sectionId": "walkthrough",
+    "id": "navigation-02-context-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/navigation-02-context-20260928-en-20260928.jpg",
+    "currentId": "navigation-02-context-20260928-inbox20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/navigation-02-context-20260928-inbox20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "linear",
+    "sectionId": "walkthrough",
+    "id": "integrations-01-catalog-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/integrations-01-catalog-20260914-en-20260928.jpg",
+    "currentId": "integrations-01-catalog-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/integrations-01-catalog-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "trello",
+    "sectionId": "walkthrough",
+    "id": "integrations-01-catalog-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/integrations-01-catalog-20260914-en-20260928.jpg",
+    "currentId": "integrations-01-catalog-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/integrations-01-catalog-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "slack",
+    "sectionId": "walkthrough",
+    "id": "slack-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/slack-01-connection-20260914-en-20260928.jpg",
+    "currentId": "slack-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/slack-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "slack",
+    "sectionId": "walkthrough",
+    "id": "slack-03-log-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/slack-03-log-20260914-en-20260928.jpg",
+    "currentId": "slack-03-log-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/slack-03-log-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "confluence",
+    "sectionId": "walkthrough",
+    "id": "confluence-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/confluence-01-connection-20260914-en-20260928.jpg",
+    "currentId": "confluence-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/confluence-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "jira",
+    "sectionId": "walkthrough",
+    "id": "jira-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/jira-01-connection-20260914-en-20260928.jpg",
+    "currentId": "jira-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/jira-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "linear",
+    "sectionId": "walkthrough",
+    "id": "linear-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/linear-01-connection-20260914-en-20260928.jpg",
+    "currentId": "linear-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/linear-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "trello",
+    "sectionId": "walkthrough",
+    "id": "trello-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/trello-01-connection-20260914-en-20260928.jpg",
+    "currentId": "trello-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/trello-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "github",
+    "sectionId": "walkthrough",
+    "id": "github-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/github-01-connection-20260914-en-20260928.jpg",
+    "currentId": "github-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/github-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "swagger",
+    "sectionId": "visual-flow",
+    "id": "swagger-01-catalog-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/swagger-01-catalog-20260914-en-20260928.jpg",
+    "currentId": "swagger-01-catalog-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/swagger-01-catalog-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "swagger",
+    "sectionId": "visual-flow",
+    "id": "swagger-01-connection-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/swagger-01-connection-20260914-en-20260928.jpg",
+    "currentId": "swagger-01-connection-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/swagger-01-connection-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-test-case",
+    "sectionId": "walkthrough",
+    "id": "organization-folder-01-tree-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-folder-01-tree-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "archive-test-case",
+    "sectionId": "walkthrough",
+    "id": "organization-folder-01-tree-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-folder-01-tree-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "archive-test-case",
+    "sectionId": "folder-walkthrough",
+    "id": "organization-folder-01-tree-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-folder-01-tree-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "organize-cases",
+    "sectionId": "folder-walkthrough",
+    "id": "organization-folder-01-tree-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-folder-01-tree-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "navigation",
+    "sectionId": "walkthrough",
+    "id": "navigation-03-collapsed-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/navigation-03-collapsed-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "navigation",
+    "sectionId": "walkthrough",
+    "id": "navigation-03-collapsed-20260928-inbox20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/navigation-03-collapsed-20260928-inbox20260928-en-20260928.jpg",
+    "currentId": "organization-folder-01-tree-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-01-tree-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "navigation",
+    "sectionId": "walkthrough",
+    "id": "navigation-expanded-en-20260928",
+    "src": "/falcon/docs/2026-09/navigation-expanded-en-20260928.jpg",
+    "currentId": "navigation-expanded-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/navigation-expanded-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "edit-test-case",
+    "sectionId": "walkthrough",
+    "id": "edit-03-history-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/edit-03-history-20260913-en-20260928.jpg",
+    "currentId": "edit-03-history-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/edit-03-history-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-test-case",
+    "sectionId": "walkthrough",
+    "id": "case-04-ready-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/case-04-ready-20260928-en-20260928.jpg",
+    "currentId": "case-04-ready-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/case-04-ready-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "colored-marker",
+    "sectionId": "walkthrough",
+    "id": "marker-01-palette-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/marker-01-palette-20260913-en-20260928.jpg",
+    "currentId": "marker-01-palette-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/marker-01-palette-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "falcon-ai-writing",
+    "sectionId": "walkthrough",
+    "id": "ai-01-request-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/ai-01-request-20260913-en-20260928.jpg",
+    "currentId": "ai-01-request-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/ai-01-request-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "organize-cases",
+    "sectionId": "folder-walkthrough",
+    "id": "organization-folder-04-move-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-folder-04-move-20260928-en-20260928.jpg",
+    "currentId": "organization-folder-04-move-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-folder-04-move-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "archive-test-case",
+    "sectionId": "walkthrough",
+    "id": "archive-02-filter-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/archive-02-filter-20260913-en-20260928.jpg",
+    "currentId": "archive-02-filter-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/archive-02-filter-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "custom-field-values",
+    "sectionId": "walkthrough",
+    "id": "fields-04-case-picker-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/fields-04-case-picker-20260928-en-20260928.jpg",
+    "currentId": "fields-04-case-picker-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/fields-04-case-picker-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "custom-fields",
+    "sectionId": "walkthrough",
+    "id": "fields-01-catalog-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/fields-01-catalog-20260928-en-20260928.jpg",
+    "currentId": "fields-01-catalog-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/fields-01-catalog-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "custom-fields",
+    "sectionId": "walkthrough",
+    "id": "fields-02-definition-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/fields-02-definition-20260928-en-20260928.jpg",
+    "currentId": "fields-02-definition-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/fields-02-definition-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "custom-field-values",
+    "sectionId": "walkthrough",
+    "id": "fields-02-definition-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/fields-02-definition-20260928-en-20260928.jpg",
+    "currentId": "fields-02-definition-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/fields-02-definition-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "shared-steps",
+    "sectionId": "walkthrough",
+    "id": "shared-01-library-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/shared-01-library-20260914-en-20260928.jpg",
+    "currentId": "shared-01-library-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/shared-01-library-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "shared-steps",
+    "sectionId": "walkthrough",
+    "id": "shared-02-editor-assets-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/shared-02-editor-assets-20260914-en-20260928.jpg",
+    "currentId": "shared-02-editor-assets-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/shared-02-editor-assets-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "test-suites",
+    "sectionId": "walkthrough",
+    "id": "suite-02-list-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/suite-02-list-20260913-en-20260928.jpg",
+    "currentId": "suite-02-list-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/suite-02-list-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "test-suites",
+    "sectionId": "walkthrough",
+    "id": "suite-03-detail-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/suite-03-detail-20260913-en-20260928.jpg",
+    "currentId": "suite-03-detail-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/suite-03-detail-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "test-suites",
+    "sectionId": "walkthrough",
+    "id": "suite-01-create-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/suite-01-create-20260913-en-20260928.jpg",
+    "currentId": "suite-01-create-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/suite-01-create-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "dashboard",
+    "sectionId": "walkthrough",
+    "id": "dashboard-06-overview-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/dashboard-06-overview-20260913-en-20260928.jpg",
+    "currentId": "dashboard-06-overview-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/dashboard-06-overview-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "dashboard",
+    "sectionId": "walkthrough",
+    "id": "dashboard-02-catalog-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/dashboard-02-catalog-20260913-en-20260928.jpg",
+    "currentId": "dashboard-02-catalog-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/dashboard-02-catalog-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "dashboard",
+    "sectionId": "walkthrough",
+    "id": "dashboard-08-records-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/dashboard-08-records-20260928-en-20260928.jpg",
+    "currentId": "dashboard-08-records-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/dashboard-08-records-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "portfolios",
+    "sectionId": "walkthrough",
+    "id": "organization-01-catalog-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-01-catalog-20260913-en-20260928.jpg",
+    "currentId": "organization-01-catalog-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-01-catalog-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "portfolios",
+    "sectionId": "walkthrough",
+    "id": "organization-02-portfolio-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-02-portfolio-20260913-en-20260928.jpg",
+    "currentId": "organization-02-portfolio-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-02-portfolio-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "portfolios",
+    "sectionId": "walkthrough",
+    "id": "organization-05-portfolio-create-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-05-portfolio-create-20260913-en-20260928.jpg",
+    "currentId": "organization-05-portfolio-create-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-05-portfolio-create-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "portfolios",
+    "sectionId": "walkthrough",
+    "id": "organization-03-project-dialog-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/organization-03-project-dialog-20260913-en-20260928.jpg",
+    "currentId": "organization-03-project-dialog-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/organization-03-project-dialog-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-defect",
+    "sectionId": "walkthrough",
+    "id": "defect-02-fields-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/defect-02-fields-20260913-en-20260928.jpg",
+    "currentId": "defect-02-fields-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/defect-02-fields-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-defect",
+    "sectionId": "walkthrough",
+    "id": "defect-routing-light-20260914-en-20260928",
+    "src": "/falcon/docs/2026-09/defect-routing-light-20260914-en-20260928.jpg",
+    "currentId": "defect-routing-light-20260914-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/defect-routing-light-20260914-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "walkthrough",
+    "id": "run-04-started-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-04-started-20260928-en-20260928.jpg",
+    "currentId": "run-04-started-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-04-started-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "walkthrough",
+    "id": "run-edit-01-selector-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-edit-01-selector-20260928-en-20260928.jpg",
+    "currentId": "run-edit-01-selector-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-edit-01-selector-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "edit",
+    "id": "run-edit-01-selector-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-edit-01-selector-20260928-en-20260928.jpg",
+    "currentId": "run-edit-01-selector-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-edit-01-selector-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "edit",
+    "id": "run-edit-02-settings-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-edit-02-settings-20260928-en-20260928.jpg",
+    "currentId": "run-edit-02-settings-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-edit-02-settings-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "workspace",
+    "sectionId": "walkthrough",
+    "id": "run-03-target-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-03-target-20260928-en-20260928.jpg",
+    "currentId": "run-03-target-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-03-target-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "walkthrough",
+    "id": "run-03-target-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-03-target-20260928-en-20260928.jpg",
+    "currentId": "run-03-target-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-03-target-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "execute-run",
+    "sectionId": "walkthrough",
+    "id": "execute-04-completed-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/execute-04-completed-20260928-en-20260928.jpg",
+    "currentId": "execute-04-completed-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/execute-04-completed-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "create-run",
+    "sectionId": "edit",
+    "id": "run-edit-03-saved-20260928-en-20260928",
+    "src": "/falcon/docs/2026-09/run-edit-03-saved-20260928-en-20260928.jpg",
+    "currentId": "run-edit-03-saved-20260928-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/run-edit-03-saved-20260928-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "workspace",
+    "sectionId": "walkthrough",
+    "id": "workspace-03-project-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/workspace-03-project-20260913-en-20260928.jpg",
+    "currentId": "workspace-03-project-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/workspace-03-project-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "workspace",
+    "sectionId": "walkthrough",
+    "id": "workspace-04-portfolio-20260913-en-20260928",
+    "src": "/falcon/docs/2026-09/workspace-04-portfolio-20260913-en-20260928.jpg",
+    "currentId": "workspace-04-portfolio-20260913-en-20260928-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/workspace-04-portfolio-20260913-en-20260928-en-production20261103.jpg"
+  }
+]

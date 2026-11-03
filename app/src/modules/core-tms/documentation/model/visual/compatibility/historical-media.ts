@@ -1,5 +1,6 @@
 import type { DocumentationMedia } from "../guide-media";
 import { documentationMediaLocale } from "../guide-media";
+import { matchesProductionGuideMedia } from "./production-media";
 
 type HistoricalMedia = {
   locale: "en" | "ru"; id: string; src: string; currentId: string; currentSrc: string;
@@ -35,7 +36,8 @@ export const historicalGuideMedia: readonly HistoricalMedia[] = [
 
 export function matchesHistoricalGuideMedia(articleId: string, sectionId: string,
   supplied: Pick<DocumentationMedia, "id" | "src">, canonical: DocumentationMedia): boolean {
-  return historicalGuideMedia.some(alias => alias.locale === documentationMediaLocale(canonical.src)
+  return matchesProductionGuideMedia(articleId, sectionId, supplied, canonical)
+    || historicalGuideMedia.some(alias => alias.locale === documentationMediaLocale(canonical.src)
     && alias.id === supplied.id && alias.src === supplied.src
     && alias.currentId === canonical.id && alias.currentSrc === canonical.src
     && alias.contexts.some(context => context.articleId === articleId && context.sectionId === sectionId));

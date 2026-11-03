@@ -13,6 +13,6 @@ export const coloredMarkerArticle: DocArticle = {
       ["Choose a color", "Yellow, blue, green, pink, and lilac are available. The color appears immediately, before saving. The translucent stroke works with bold text, links, and other formatting. In a scenario, choosing a color shows the formatted draft; click it to continue editing."],
       ["Save or remove highlighting", "The color remains after saving and reopening the field, in both light and dark themes. To remove it, select the relevant text, open **Highlighter**, and click **Remove highlight**."])),
     section("runs", "Colors in a run", paragraph("Highlights appear in the case description, preconditions, and scenario within a run. The run uses its captured revision; later source case changes do not alter an existing run.")),
-    section("independent", "Highlighting works without Falcon AI", paragraph("Choosing a color does not send an AI request. It is a text formatting tool. Use the separate blue Ask Falcon AI orb to change the wording.")),
+    section("independent", "Highlighting works without Falcon AI", paragraph("Choosing a color does not send an AI request. It is a text formatting tool. Use the separate Ask Falcon AI orb to change the wording.")),
   ],
 };

@@ -46,7 +46,10 @@ test("every exported illustration exactly matches a real localized guide step", 
       }
     }
   }
-  assert.ok(count >= 190);
+  const sourceCount = [...en, ...ru].flatMap(article => article.sections)
+    .reduce((total, source) => total + documentationSectionMedia(source).length, 0);
+  assert.ok(sourceCount > 0);
+  assert.equal(count, sourceCount);
   verifyGuideMedia(corpus, join(process.cwd(), "public"));
 });
 

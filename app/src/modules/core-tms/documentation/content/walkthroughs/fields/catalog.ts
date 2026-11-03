@@ -1,32 +1,24 @@
 import { walkthrough } from "../../../model/visual/walkthrough";
 import { screenshotStep as shot } from "../media/screenshot-step";
 
-export const customFieldsWalkthrough = walkthrough("Field catalog and settings", [
-  shot("fields-01-catalog-20260928-en-20260928", "Review the project's fields",
-    "Select a project and open **Custom fields**. The example uses Payments. Check names, identifiers and types; use search to find a specific field.",
-    "The catalog contains three built-in fields and the additional Release channel QA field. Separate columns show multiple-value support and whether a field is required.",
-    "Payments field catalog showing Product group, Product, Regression and the additional Release channel QA field."),
-  shot("fields-02-definition-20260928-en-20260928", "Define a new field",
-    "Select **Create field**. Enter a name and unique identifier, choose a type, and select one or multiple values. The example uses **Platform**, **platform**, **String** and **Single**, with Required off. Select **Save** to create it.",
-    "The screenshot shows an unsaved form. Platform was not created in this example. You can add values after saving the field definition.",
-    "Unsaved Platform field with identifier platform, String type, a single value and Required switched off."),
-  shot("fields-03-product-20260928-en-20260928", "Open an existing field's values",
-    "Return to the catalog and open **Product**. Review **Field values** and use **Find a value** to locate an existing product. **Add** opens the form for a new value when one is needed.",
-    "The screenshot shows the existing Product catalog with Release QA, Security, Transfers, Payments and Transfers QA. No value-creation form is open and no product has been added in this step.",
-    "Product field settings in Payments with existing values, Find a value, Include archived and the Add control."),
+export const customFieldsWalkthrough = walkthrough("Review the field catalog and its definitions", [
+  shot("fields-01-catalog-20260928-en-20260928", "Find the project's fields",
+    "Select a project and open **More sections → Custom fields**. Review the field names, identifiers and types. Search narrows the list when needed; the columns distinguish multiple values from required fields.",
+    "The real project catalog contains Product group, Product and Regression. Viewing it does not create a field or change which values a case requires.",
+    "Umbrella-Host custom field catalog with Product group, Product and Regression."),
+  shot("fields-02-definition-20260928-en-20260928", "Understand a field before changing it",
+    "Open an existing field to review its definition and values. For a new definition, use **Create field** in the catalog, enter a name and unique identifier, choose a type and single or multiple values, then save when ready.",
+    "The screenshot shows the existing Product definition with identifier product, its String and Single settings, requirement control and current value rows. It is not a newly created example field; no definition was changed for this capture.",
+    "Existing Product custom field definition and its current value list."),
 ]);
 
-export const customFieldValuesWalkthrough = walkthrough("From the catalog to case field values", [
-  shot("fields-03-product-20260928-en-20260928", "Review the product catalog",
-    "Open the existing **Product** field and check its values before editing a case. Use **Find a value** to locate the product. When adding a new product through **Add**, select its product group as well as its name.",
-    "The screenshot shows existing values; entries without a group are marked Unclassified. The next step uses the existing Transfers QA product in the Mobile banking group.",
-    "Payments Product field catalog with existing products and Unclassified labels beneath values that have no group."),
-  shot("fields-04-case-picker-20260928-en-20260928", "Choose a product in an existing case",
-    "Open PAY-TC-34 and select the pencil beside **Custom fields**. Choose **Mobile banking**, then open **Product**. Search with **Find a value** if needed and select **Transfers QA**.",
-    "The screenshot edits the saved Open Falcon help case with Transfers QA selected. **Apply** updates the field editor; the main **Save** button saves the case revision.",
-    "Existing PAY-TC-34 in editing mode with Mobile banking, the open Transfers QA picker and Apply and Save controls."),
-  shot("case-05-saved-20260928-en-20260928", "Check the saved values",
-    "Apply the custom-field changes and select the main **Save** button. In the saved case, review the selected product group, product and regression flag under **Custom fields**.",
-    "PAY-TC-34 has Draft status, Mobile banking, Transfers QA and regression false. Saving the case does not create duplicate entries in the field catalog.",
-    "Saved PAY-TC-34 with Mobile banking as the product group, Transfers QA as the product and regression false."),
+export const customFieldValuesWalkthrough = walkthrough("Use catalog values in a case", [
+  shot("fields-02-definition-20260928-en-20260928", "Review existing values first",
+    "Open **Product** and inspect **Field values** before editing a case. Use the value search when needed. **Add** prepares a new value; provide its product group when that field requires one, and save only when you intend to extend the catalog.",
+    "The current Product values are shown. No product was added for the image. Reuse a suitable existing value instead of creating a duplicate entry.",
+    "Product field definition with its existing values and Add action."),
+  shot("fields-04-case-picker-20260928-en-20260928", "Inspect the case's product selector",
+    "In an existing case, select its custom-field value to open the picker. Choose the product group first when applicable, then find the intended product. Apply the field edit and save the case only when the new value is intended.",
+    "The real HOST-TC-11 case has the Custom fields editor open, with Host Dashboard selected in the closed Product control. No alternative was selected and no new case revision was saved for this screenshot.",
+    "Custom fields editor in HOST-TC-11 with Product set to Host Dashboard, Product group not specified, and Cancel and Apply actions."),
 ]);

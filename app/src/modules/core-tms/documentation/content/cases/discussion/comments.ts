@@ -13,8 +13,8 @@ export const caseCommentsArticle: DocArticle = {
       note("Discussion access", "Comments are available to members who can access the relevant test case or bug report. Writing, editing, and deleting messages depend on the user's role and permissions.")),
     section("reply", "Reply to a message", steps(
       ["Choose the original message", "Click the reply arrow to the right of a comment or **⋯ → Reply**. This works for both the first message and any nested reply."],
-      ["Check the context", "Falcon scrolls smoothly to the shared comment field above the feed and focuses it. A quote with a blue line appears below the formatting toolbar. The editor's lower strip shows the original author's name and photo."],
-      ["Write your reply", "Type below the quote. The quote provides context and is not inserted into your text. After posting, the message appears in the appropriate thread: the original quote with its blue line, followed by your reply. If the original comment was deleted, a deletion marker replaces the quote."],
+      ["Check the context", "Falcon scrolls smoothly to the shared comment field above the feed and focuses it. A quote with a quote line appears below the formatting toolbar. The editor's lower strip shows the original author's name and photo."],
+      ["Write your reply", "Type below the quote. The quote provides context and is not inserted into your text. After posting, the message appears in the appropriate thread: the original quote with its quote line, followed by your reply. If the original comment was deleted, a deletion marker replaces the quote."],
       ["Change the recipient if needed", "Click Reply on another message to replace the quote and recipient while keeping your draft. The cross beside the recipient cancels the reply and keeps the text as a normal comment. The quote and lower strip disappear, but the editor stays open."]),
       paragraph("New comments and replies share one input; no extra forms open beneath messages. Collapse a thread using the button below a message or by clicking its branch line; reopen it with **Show replies**.")),
     section("attachments", "Attach an image or file", steps(

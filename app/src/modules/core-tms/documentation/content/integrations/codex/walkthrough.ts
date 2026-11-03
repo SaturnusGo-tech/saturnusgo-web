@@ -1,11 +1,21 @@
-import { walkthrough, type ScreenshotStep } from "../../../model/visual/walkthrough";
+import { walkthrough } from "../../../model/visual/walkthrough";
+import { screenshotStep as shot } from "../../walkthroughs/media/screenshot-step";
 
-const shot = (name: string, title: string, instruction: string, result: string, alt: string): ScreenshotStep => ({
-  title, instruction, result, image: { src: `/falcon/docs/2026-11/falcon-codex-${name}-en.jpg`, alt, width: 1280, height: 720 },
-});
-export const codexWalkthrough = walkthrough("Falcon connection walkthrough", [
-  shot("setup", "Open the Codex setup", "In Falcon open **Integrations → AI → Codex** and check company status and seats.", "This is a synthetic company example; no account was connected.", "Falcon Codex setup for an example company."),
-  shot("config", "Copy your company server URL", "Copy **Server URL** from your own company setup into Codex. The TOML and CLI examples also use this company-specific URL.", "The example.test host is demonstration data: do not copy it for your company.", "Falcon setup showing example server configuration."),
-  shot("consent", "Review projects", "Sign in with your own Falcon account and select only the projects needed for this connection, including selections on other pages.", "This is a rendered example, not an approved OAuth transaction.", "Example Falcon consent screen with project selection."),
-  shot("permissions", "Review permissions", "Review each requested permission for the task. For read-only use, leave optional permissions unchecked. Select write and execution permissions only when needed and authorized.", "This example displays every optional permission checked to show the available fields; it does not recommend or record approval.", "Example consent permission fields with optional permissions checked."),
+export const codexWalkthrough = walkthrough("From the plugin to your company’s Falcon MCP settings", [
+  shot("codex-01-plugins", "Find Codex in plugin settings",
+    "Open the account menu → **Settings → Plugins**, then select **Codex**. The integration directory also lists it under **AI**. Open **Manage** to inspect the company connection before changing any setting.",
+    "These are the actual Umbrella Home plugin settings. The Company Codex agent switch is on. A listed or installed plugin alone does not grant a person access to every project.",
+    "Umbrella-Host Plugins settings with Codex enabled and the current integration states."),
+  shot("codex-02-card", "Review the plugin’s capabilities",
+    "Read the description and example QA requests. For a first installation, choose **Install plugin**, wait for **Installing**, then open **Manage**. Installation in Falcon and OAuth authorization in Codex are separate steps.",
+    "The screenshot shows the existing Codex plugin card. Its examples describe supported tasks; viewing the card has not created cases, started a run or granted access.",
+    "Codex plugin detail card in Falcon with example QA tasks and its connection entry."),
+  shot("codex-03-manage", "Inspect company and personal access",
+    "In **Plugin settings → Codex**, select **Falcon MCP** to expand connection setup. **Guide** opens this documentation and **View details** returns to the plugin card. Review company status and occupied seats before activation or revocation.",
+    "At capture time, company Codex is Active with 8 of 10 seats occupied and one existing personal connection covering 12 projects. This page was inspected without activating, disabling or revoking access.",
+    "Codex management in Umbrella Home showing Active company status, 8 of 10 seats and one existing account connection."),
+  shot("codex-04-mcp", "Copy the settings from your own company",
+    "Expand **Falcon MCP** and use the copy icon beside **Server URL**. Use a distinct server name for each company. In Codex add the server using **Streamable HTTP**, authenticate, then inspect the Falcon projects and permissions before approving only the access needed for the task.",
+    "The actual Umbrella Home server URL is https://umbrella-falcon.saturnusgo.com/api/v1/mcp. The page includes config.toml and CLI examples with copy icons. No consent approval or Web QA execution is illustrated here; copy the URL from your own company’s settings.",
+    "Expanded Falcon MCP setup with the actual company server URL, OAuth instructions and TOML and CLI examples."),
 ]);

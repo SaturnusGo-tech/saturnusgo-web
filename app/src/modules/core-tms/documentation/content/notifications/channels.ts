@@ -10,7 +10,7 @@ export const notificationChannelArticles: DocArticle[] = [
     related: ["notifications", "browser-notifications", "company-access"],
     sources: [{ title: "Telegram: how bot start links work", url: "https://core.telegram.org/bots/features#deep-linking" }],
     sections: [
-      section("before", "Before connecting", paragraph("Sign in to your company's Falcon with your own account. Open **Settings**, then **Notifications** under **Personal settings**. The bot connects to a personal Telegram chat. Groups and channels are not used for this subscription."),
+      section("before", "Before connecting", paragraph("Sign in to your company's Falcon with your own account. Open the avatar menu → **Settings**, then **Notifications** under **Personal settings**. The bot connects to a personal Telegram chat. Groups and channels are not used for this subscription."),
         note("Start from Falcon", "Finding @Falcon_tms_bot in Telegram and pressing Start is not enough. Falcon's Open bot button contains a personal link that associates Telegram with your account and company.")),
       section("connect", "Connect the bot", steps(
         ["Get a link", "In the Telegram row, click Connect, then Open bot."],
@@ -48,7 +48,7 @@ export const notificationChannelArticles: DocArticle[] = [
     ],
     sections: [
       section("enable", "Enable on this device", steps(
-        ["Open Falcon in a browser", "Sign in at your company's HTTPS address in a normal Chrome or Safari window. Open Settings → Notifications under Personal settings."],
+        ["Open Falcon in a browser", "Sign in at your company's HTTPS address in a normal Chrome or Safari window. Open the avatar menu → Settings → Notifications under Personal settings."],
         ["Turn on the switch", "In **Browser notifications**, enable the switch on the right. It is available even when the section is collapsed. The permission request appears after your action."],
         ["Allow site notifications", "Allow notifications in the browser's system prompt. If permission was already granted, you may not see another prompt."],
         ["Check the connection", "Click the section heading and wait for **Notifications are enabled in this browser**. Choose categories in **Event preferences**. Both browser permission and the Falcon connection must be enabled."]),

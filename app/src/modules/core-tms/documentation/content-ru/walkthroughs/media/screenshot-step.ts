@@ -1,8 +1,13 @@
 import type { ScreenshotStep } from "../../../model/visual/walkthrough";
 import screenshots from "./screenshots.json";
+import production from "./screenshots.production.json";
 
-export function screenshotStep(file: keyof typeof screenshots, title: string, instruction: string, result: string, alt: string): ScreenshotStep {
+export function screenshotStep(file: keyof typeof screenshots | keyof typeof production, title: string, instruction: string, result: string, alt: string): ScreenshotStep {
+  const captures: Readonly<Record<string, { src: string; width: number; height: number }>> = production;
+  const previous = screenshots[file as keyof typeof screenshots];
+  const image = captures[file] ?? (previous && { src: `/falcon/docs/2026-09-ru/${file}.jpg`, ...previous });
+  if (!image) throw new Error(`Unregistered Russian guide screenshot: ${file}`);
   return { title, instruction, result, image: {
-    src: `/falcon/docs/2026-09-ru/${file}.jpg`, alt, ...screenshots[file],
+    ...image, alt,
   } };
 }
