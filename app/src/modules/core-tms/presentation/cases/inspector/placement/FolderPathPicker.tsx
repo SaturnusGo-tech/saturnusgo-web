@@ -1,6 +1,7 @@
 import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowRight, Check, ChevronDown, Folder, Plus, Search } from "lucide-react";
 import { useAnchoredPopup } from "../../../common/popup/useAnchoredPopup";
+import { OverflowLabel } from "../../../common/select/overflow/OverflowLabel";
 import css from "./folderPathPicker.module.css";
 
 export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
@@ -52,10 +53,10 @@ export function FolderPathPicker({ value, folders, onChange, ru, disabled }: {
   }
   return <div className={css.root} ref={root} onKeyDown={navigate}>
     <span className={css.label}>{ru ? "Папка" : "Folder"}</span>
-    <button type="button" ref={trigger} disabled={disabled} className={css.trigger} aria-label={ru ? "Папка" : "Folder"}
+    <button type="button" ref={trigger} disabled={disabled} className={css.trigger} aria-label={ru ? "Папка" : "Folder"} aria-description={value}
       aria-haspopup="dialog" aria-expanded={visible} aria-controls={visible ? panelId : undefined}
       onClick={() => { setQuery(""); setOpen(!open); }}>
-      <Folder size={14} aria-hidden="true"/><FolderBreadcrumb path={value}/><ChevronDown size={13} aria-hidden="true"/>
+      <Folder size={14} aria-hidden="true"/><span className={css.selection}><OverflowLabel text={value}/></span><ChevronDown size={13} aria-hidden="true"/>
     </button>
     {visible && <div id={panelId} className={css.panel} ref={panel} popover="manual" role="dialog" aria-label={ru ? "Выбрать папку" : "Choose folder"}>
       <label className={css.search}><Search size={14} aria-hidden="true"/>

@@ -60,7 +60,8 @@ test("YouTrack workspace scope and read-only permissions reach its existing sett
 });
 test("Swagger reuses API source manager only with management rights; planned providers expose no setup", () => {
   const admin = fixture({ id: "swagger", requestSetup: true }); const config = admin.render().find(node => node.type === "ApiSourceManager")!;
-  assert.equal(config.props.workspaceId, "w"); assert.equal(config.props.projectId, "p"); assert.equal(config.props.embedded, true);
+  assert.equal(config.props.workspaceId, "w"); assert.equal(config.props.projectId, "p"); assert.equal(config.props.embedded, undefined);
+  assert.equal(admin.render().some(node => node.props["aria-controls"]), false);
   invoke(config, "onSaved"); assert.equal(admin.counts().refreshed, 1);
   const reader = fixture({ id: "swagger", requestSetup: true, canManage: false }).render();
   assert.equal(reader.some(node => node.type === "ApiSourceManager" || node.type === "ConnectorSettings"), false);

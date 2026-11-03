@@ -116,3 +116,14 @@ test("archiving an open draft disables title/save, retains cancel and displays t
   invoke(all.find(node => node.type === "button" && text(node.props.children) === "Cancel")!);
   assert.deepEqual([edits, runs, submits, cancels, prevented], [0, 0, 0, 1, 1]);
 });
+
+test("creation has one accessible conventional title input instead of duplicate visible title labels", () => {
+  const all = render("../../../detail/CaseDetailPanel.tsx", "CaseDetailPanel", {
+    locale: "en", languageTag: "en-US", revision, activity: [], collaboration: { defects: { items: [] } },
+    editor: { mode: "create", value: revision, folderPath: "/", onChange() {}, onCancel() {}, onSubmit() {} },
+  });
+  const inputs = all.filter(node => node.type === "input" && node.props["aria-label"] === "Test case title");
+  assert.equal(inputs.length, 1);
+  assert.equal(inputs[0].props["data-inline-title"], undefined, "creation must retain its input surface rather than inline-heading styles");
+  assert.equal(all.some(node => node.type === "span" && text(node.props.children).includes("Test case title")), false);
+});

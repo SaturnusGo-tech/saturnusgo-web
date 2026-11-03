@@ -36,7 +36,7 @@ export function InspectorSectionView(props: Props) {
     restoreFocus();
   }
   return <section
-    className={css.section}
+    className={`${css.section} ${props.section === "description" || props.section === "preconditions" ? css.narrativeSection : ""}`}
     onKeyDown={(event) => {
       if (!active || props.persistentEditing || event.key !== "Escape") return;
       event.preventDefault();

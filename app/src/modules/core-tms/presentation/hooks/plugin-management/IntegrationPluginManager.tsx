@@ -36,6 +36,9 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
   const group = integration?.group === "tracker" ? (ru ? "Задачи и планирование" : "Tasks and planning") : integration?.group === "delivery"
     ? (ru ? "Код и сборки" : "Code and builds") : integration?.group === "api" ? (ru ? "API и контракты" : "API and contracts")
       : (ru ? "Коммуникация и знания" : "Communication and knowledge");
+  if (id === "swagger" && open && canManage) return <main className={`${surface.surface} ${css.manager}`}>
+    <ApiSourceManager workspaceId={workspaceId} projectId={projectId} onBack={close} onSaved={refresh}/>
+  </main>;
   return <main className={`${surface.surface} ${css.manager}`}>
     <div className={`${surface.breadcrumb} ${css.breadcrumb}`}><button type="button" onClick={onBack}>{ru ? "Настройки плагинов" : "Plugin settings"}</button><ChevronRight width={16} height={16} /><span>{integration?.name ?? id}</span></div>
     <div className={surface.main}>
@@ -66,8 +69,7 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
                 }}>
                 {visited && (id === "youtrack" ? <YouTrackSettings embedded workspaceId={workspaceId} status={null} languageTag={ru ? "ru-RU" : "en-US"}
                   russian={ru} canManage={canManage} onBack={close} onStatusChange={refresh} />
-                  : id === "swagger" ? canManage ? <ApiSourceManager embedded workspaceId={workspaceId} projectId={projectId} onBack={close} onSaved={refresh} />
-                    : <p className={surface.notice}>{ru ? "Настройка API доступна администратору или QA-менеджеру." : "An administrator or QA manager can configure APIs."}</p>
+                  : id === "swagger" ? <p className={surface.notice}>{ru ? "Настройка API доступна администратору или QA-менеджеру." : "An administrator or QA manager can configure APIs."}</p>
                   : isProvider(id) && <ConnectorSettings embedded key={`${workspaceId}:${projectId}:${id}`} workspaceId={workspaceId} projectId={projectId} provider={id}
                     ru={ru} canManage={canManage} capabilities={capabilities} connected={connected} onBack={close} onSaved={refresh} />)}
               </div>

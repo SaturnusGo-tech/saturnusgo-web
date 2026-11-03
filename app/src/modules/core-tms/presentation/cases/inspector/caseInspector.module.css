@@ -105,9 +105,8 @@
 
 .creationHeader { background: var(--falcon-surface); }
 .creationHeader .utilityRow { min-height: 44px; padding-block: 7px; }
-.creationHeader .titleRow { min-height: 70px; grid-template-columns: minmax(0, 1fr); gap: 6px; padding-top: 8px; }
-.createTitleLabel { color: var(--falcon-text-muted); font-size: 10px; font-weight: 500; }
-.createTitleLabel b { color: var(--falcon-on-action); }
+.creationHeader .titleRow { min-height: 64px; grid-template-columns: minmax(0, 1fr); padding-top: 4px; padding-bottom: 16px; }
+.creationHeader .titleInput { min-height: 40px; font-size: 15px; font-weight: 500; }
 .creationContent { padding-top: 24px; }
 .creationSection { animation: none; }
 .creationFooter { min-height: 48px; flex: 0 0 auto; justify-content: flex-end; padding: 8px 24px; background: var(--falcon-surface); border-top: 1px solid var(--falcon-border); box-shadow: none; }
@@ -169,3 +168,12 @@
 .additionalInput [data-editor-shell] > div:has(> textarea) { height: 32px; min-height: 32px; }
 .additionalInput textarea { height: 32px !important; min-height: 32px !important; padding: 4px 2px !important; }
 .additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 26px; padding-block: 0; }
+
+.section.narrativeSection [data-editor-shell][data-appearance="plain"],
+.section.narrativeSection [data-editor-shell][data-appearance="plain"]:is(:hover, :focus-within) { padding: 8px 10px; border: 1px solid var(--falcon-border-strong) !important; border-radius: 12px; background: var(--falcon-control) !important; }
+.section.narrativeSection [data-editor-shell][data-appearance="plain"]:focus-within { border-color: var(--falcon-focus) !important; }
+.section.narrativeSection [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 28px; padding: 0 0 5px; border-bottom: 1px solid var(--falcon-border-subtle); }
+.section.narrativeSection [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { min-height: 102px; }
+.section.narrativeSection [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { min-height: 68px; }
+.section.narrativeSection [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
+.section.narrativeSection [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) { min-height: 68px; }

@@ -25,6 +25,6 @@ test("individual event authors survive later human updates; initial not_run inve
   assert.equal(view.root.findAllByType("li").length,2);assert.equal(view.root.findAllByType("time").length,2);
   assert.deepEqual(view.root.findAllByType("strong").map(node=>node.children.join("")),["Step result recorded by","Step result recorded by"]);
   await act(async()=>view.update(render(true)));const initial=JSON.stringify(view.toJSON());
-  assert.match(initial,/No execution records. Result author is unknown./);assert.doesNotMatch(initial,/Codex|Ada|recorded by/);
+  assert.match(initial,/No execution activity yet./);assert.doesNotMatch(initial,/Codex|Ada|recorded by/);
   await act(async()=>view.unmount());
 });

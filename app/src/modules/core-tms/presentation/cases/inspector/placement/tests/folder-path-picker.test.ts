@@ -84,3 +84,17 @@ test("submitting closes access to the picker without changing the staged path", 
   assert.equal(h.render().some(node => node.props.role === "dialog"), false);
   assert.deepEqual(h.changes, []);
 });
+
+test("long selected folder paths keep their complete accessible value in the compact marquee", () => {
+  const h = picker();
+  const path = "/Web/My home/Tasks and assignees/Guest arrival preparation";
+  h.props.value = path;
+  assert.equal(h.trigger().props["aria-description"], path);
+  const label = h.render().find(node => node.type === "OverflowLabel");
+  assert.equal(label?.props.text, path);
+  h.open();
+  const selected = h.render().find(node => node.props["data-folder-path"] === path);
+  assert.equal(selected?.props["aria-pressed"], true);
+  invoke(selected!, "onClick");
+  assert.deepEqual(h.changes, [path]);
+});

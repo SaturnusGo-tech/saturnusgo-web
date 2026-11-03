@@ -9,7 +9,7 @@ export function SourceProjects({ draft, projects, ru, onChange }: { draft: ApiSo
     <label className={css.check}><input type="checkbox" checked={draft.allProjects} onChange={event => onChange({ ...draft, allProjects: event.target.checked, projectIds: [] })}/>
       <span>{ru ? "Все проекты рабочего пространства" : "All workspace projects"}</span></label>
     {draft.allProjects ? <p>{ru ? "Включая проекты, которые будут созданы позже." : "Includes projects created in the future."}</p> : <>
-      <label className={css.search}><Search size={15}/><input value={search} onChange={event => setSearch(event.target.value)} aria-label={ru ? "Найти проект" : "Find a project"} placeholder={ru ? "Найти проект" : "Find a project"}/></label>
+      {projects.length > 6 && <label className={css.search}><Search size={15}/><input value={search} onChange={event => setSearch(event.target.value)} aria-label={ru ? "Найти проект" : "Find a project"} placeholder={ru ? "Найти проект" : "Find a project"}/></label>}
       <div className={css.projectList}>{visible.map(project => <label className={css.check} key={project.id}>
         <input type="checkbox" checked={draft.projectIds.includes(project.id)} onChange={() => onChange({ ...draft, projectIds: draft.projectIds.includes(project.id) ? draft.projectIds.filter(id => id !== project.id) : [...draft.projectIds, project.id] })}/><span>{project.name}</span>
       </label>)}</div>
