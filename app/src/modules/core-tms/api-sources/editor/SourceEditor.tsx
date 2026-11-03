@@ -5,6 +5,7 @@ import { useApiSourceEditor } from "./useApiSourceEditor";
 import { apiSourceError } from "../model/api-source-error";
 import { SourceCredentials } from "../forms/SourceCredentials";
 import { SourceProjects } from "../forms/SourceProjects";
+import { ApiSourceIcon } from "../presentation/identity/ApiSourceIcon";
 import css from "./editor.module.css";
 export function SourceEditor({ workspaceId, projectId, source, catalog, projects, ru, onClose, onSaved, onExisting, onReload, onPendingChange }: {
   workspaceId: string; projectId: string; source: ApiSource | null; catalog: readonly ApiSource[]; projects: readonly NamedOption[];
@@ -16,8 +17,8 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
   useEffect(() => { onPendingChange?.(state.pending); }, [state.pending, onPendingChange]);
   const duplicate = !source && catalog.find(api => api.sourceUrl.trim() === draft.sourceUrl.trim());
   return <form className={css.panel} aria-labelledby="api-source-title" onSubmit={event => { event.preventDefault(); void state.save(); }}>
-    <header><h1 id="api-source-title">{source ? source.name : (ru ? "Подключить API" : "Connect API")}</h1>
-      <p>{ru ? "Спецификация OpenAPI или Swagger в формате JSON или YAML." : "An OpenAPI or Swagger specification in JSON or YAML."}</p></header>
+    <header><ApiSourceIcon id={source?.id} size={44}/><div><h1 id="api-source-title">{source ? source.name : (ru ? "Подключить API" : "Connect API")}</h1>
+      <p>{ru ? "Спецификация OpenAPI или Swagger в формате JSON или YAML." : "An OpenAPI or Swagger specification in JSON or YAML."}</p></div></header>
     <fieldset disabled={state.pending}>
       <legend className={css.srOnly}>{ru ? "Подключение API" : "API connection"}</legend>
       <div className={css.fields}>

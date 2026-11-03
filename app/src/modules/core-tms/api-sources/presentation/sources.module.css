@@ -8,15 +8,23 @@
 .breadcrumb button:hover { color:var(--falcon-text); }
 .breadcrumb > span { min-width:0; overflow-wrap:anywhere; }
 .primary { margin-left:auto; background:var(--falcon-action); border:0; border-radius:12px; min-height:36px; padding:8px 13px; color:var(--falcon-on-action); display:inline-flex; align-items:center; gap:7px; white-space:nowrap; font-size:13px!important; }
-.rows { border:1px solid var(--falcon-border); border-radius:16px; background:var(--falcon-panel); padding:0 20px; }
-.rows .row:last-child { border-bottom:0; }
-.row { display:flex; align-items:center; gap:18px; padding:18px 0; width:100%; text-align:left; color:var(--falcon-text); background:transparent; border:0; border-bottom:1px solid var(--falcon-border); border-radius:10px; }
-.row:hover strong { text-decoration:underline; text-underline-offset:4px; }
-.row > span:first-child { min-width:0; flex:1; }
-.row > svg { flex:none; color:var(--falcon-text-muted); }
-.row strong { display:block; font-size:14px; font-weight:500; overflow-wrap:anywhere; }
-.row small { display:block; margin-top:5px; color:var(--falcon-text-muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.projectNames { max-width:30%; color:var(--falcon-text-muted); font-size:12px; overflow-wrap:anywhere; }
+/* Same open-row rhythm as the Suite catalog; color identifies sources, not containers. */
+.total { margin-left:12px; color:var(--falcon-text-muted); font-size:13px; font-weight:400; vertical-align:middle; }
+.repository { min-width:0; container-type:inline-size; }
+.columns,.row { display:grid; grid-template-columns:minmax(200px,1fr) minmax(100px,180px) 90px 20px; align-items:center; gap:16px; }
+.columns { min-height:36px; margin-bottom:3px; border-bottom:1px solid var(--falcon-border-subtle); color:var(--falcon-text-muted); font-size:11px; }
+.rows { padding:0; margin:0; list-style:none; }
+.row { min-height:64px; margin-inline:-8px; padding:8px; width:calc(100% + 16px); text-align:left; color:var(--falcon-text); background:transparent; border:0; border-radius:8px; transition:background-color 120ms ease; }
+.row:hover,.row:focus-visible { background:var(--falcon-hover); }
+.identity { display:flex; align-items:center; gap:14px; min-width:0; }
+.copy { display:grid; gap:2px; min-width:0; }
+.copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; line-height:20px; font-weight:500; }
+.copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--falcon-text-muted); font-size:12px; line-height:18px; }
+.row > svg { color:var(--falcon-text-muted); justify-self:end; }
+.projectNames { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--falcon-text-muted); font-size:12px; }
+.status { display:flex; align-items:center; gap:6px; color:var(--falcon-text-muted); font-size:12px; white-space:nowrap; }
+.status i { width:6px; height:6px; flex:none; border-radius:50%; background:var(--falcon-icon-muted); }
+.status[data-enabled] i { background:var(--falcon-success); }
 .notice,.state { color:var(--falcon-text-muted); font-size:13px; line-height:1.6; }
 .notice { margin:0 0 18px; }
 .state { padding:24px 0; }
@@ -27,4 +35,8 @@
 .skeleton { height:230px; border-radius:12px; background:repeating-linear-gradient(transparent 0 50px,var(--falcon-border) 50px 51px,transparent 51px 68px); animation:pulse 1.2s ease-in-out infinite alternate; }
 @keyframes pulse { to { opacity:.35; } }
 @media(prefers-reduced-motion:reduce) { .skeleton { animation:none; } }
-@media(max-width:720px) { .rows { padding-inline:14px; } .manager > header { flex-wrap:wrap; gap:12px; } .manager > header :is(h1,h3) { font-size:24px; } .projectNames { display:none; } }
+@media(max-width:720px) { .manager > header { flex-wrap:wrap; gap:12px; } .manager > header :is(h1,h3) { font-size:24px; } }
+
+@container (max-width:650px) { .columns,.row { grid-template-columns:minmax(140px,1fr) 80px 16px; gap:10px; } .columns > :nth-child(2),.projectNames { display:none; } .identity { gap:10px; } }
+@container (max-width:400px) { .copy strong { font-size:13px; } }
+@media(prefers-reduced-motion:reduce) { .row { transition:none; } }

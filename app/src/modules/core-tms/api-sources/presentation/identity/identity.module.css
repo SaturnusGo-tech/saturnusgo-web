@@ -1,0 +1,7 @@
+.icon { display:block; flex:none; }
+.neutral { color:var(--falcon-icon); }
+.tone0 { color:var(--falcon-info); }
+.tone1 { color:var(--falcon-discovery); }
+.tone2 { color:var(--falcon-success); }
+.tone3 { color:var(--falcon-warning); }
+.tone4 { color:var(--falcon-caution); }
