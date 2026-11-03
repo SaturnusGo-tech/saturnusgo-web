@@ -12,8 +12,8 @@ type State = {
     error: boolean;
 };
 const empty = (owner: TmsHttpClient, key: string, enabled: boolean): State => ({ owner, key, items: [], nextCursor: null, loading: enabled, pending: false, error: false });
-export function useExecutionHistory(http: TmsHttpClient, scope: ExecutionHistoryScope, enabled: boolean, version?: number) {
-    const key = JSON.stringify([scope.workspaceId, scope.projectId, scope.runId, scope.itemId, scope.attemptNo ?? null, scope.stepId ?? null, version, enabled]);
+export function useExecutionHistory(http: TmsHttpClient, scope: ExecutionHistoryScope, enabled: boolean, version?: number, limit = 30) {
+    const key = JSON.stringify([scope.workspaceId, scope.projectId, scope.runId, scope.itemId, scope.attemptNo ?? null, scope.stepId ?? null, version, enabled, limit]);
     const [state, setState] = useState(() => empty(http, key, enabled));
     const [reload, setReload] = useState(0);
     const active = useRef<AbortController | null>(null);
@@ -24,7 +24,7 @@ export function useExecutionHistory(http: TmsHttpClient, scope: ExecutionHistory
         active.current = controller;
         setState(empty(http, key, enabled));
         if (enabled)
-            void listExecutionHistory(http, scope, null, controller.signal).then(page => {
+            void listExecutionHistory(http, scope, null, controller.signal, limit).then(page => {
                 if (!controller.signal.aborted)
                     setState({ owner: http, key, ...page, loading: false, pending: false, error: false });
             }).catch(() => { if (!controller.signal.aborted)
@@ -41,7 +41,7 @@ export function useExecutionHistory(http: TmsHttpClient, scope: ExecutionHistory
         active.current = controller;
         setState({ ...visible, pending: true, error: false });
         try {
-            const page = await listExecutionHistory(http, scope, visible.nextCursor, controller.signal);
+            const page = await listExecutionHistory(http, scope, visible.nextCursor, controller.signal, limit);
             if (!controller.signal.aborted && current.current.key === key && current.current.http === http)
                 setState({ ...visible, items: [...visible.items, ...page.items.filter(event => !visible.items.some(old => old.id === event.id))], nextCursor: page.nextCursor, pending: false });
         }

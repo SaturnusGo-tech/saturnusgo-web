@@ -1,8 +1,9 @@
 import type { components } from "../../../../../core/tms/generated/tms-api";
 import type { TmsHttpClient } from "../../../../../core/tms/transport/http";
 import type { ExecutionHistoryScope, ExecutionHistoryPage } from "../domain/execution-history";
-export async function listExecutionHistory(http: TmsHttpClient, scope: ExecutionHistoryScope, cursor: string | null, signal: AbortSignal): Promise<ExecutionHistoryPage> {
-    const query = new URLSearchParams({ workspaceId: scope.workspaceId, projectId: scope.projectId, runId: scope.runId, itemId: scope.itemId, limit: "30" });
+export async function listExecutionHistory(http: TmsHttpClient, scope: ExecutionHistoryScope, cursor: string | null, signal: AbortSignal, limit = 30): Promise<ExecutionHistoryPage> {
+    if (!Number.isInteger(limit) || limit < 1 || limit > 30) throw new Error("Invalid execution history page budget");
+    const query = new URLSearchParams({ workspaceId: scope.workspaceId, projectId: scope.projectId, runId: scope.runId, itemId: scope.itemId, limit: String(limit) });
     if (scope.attemptNo !== undefined)
         query.set("attemptNo", String(scope.attemptNo));
     if (scope.stepId)
@@ -10,7 +11,7 @@ export async function listExecutionHistory(http: TmsHttpClient, scope: Execution
     if (cursor)
         query.set("cursor", cursor);
     const result = await http.get<components["schemas"]["ExecutionHistoryEnvelope"]>(`/execution-history?${query}`, signal);
-    if (result.data.length > 30 || result.data.some(event => event.workspaceId !== scope.workspaceId || event.projectId !== scope.projectId ||
+    if (result.data.length > limit || result.data.some(event => event.workspaceId !== scope.workspaceId || event.projectId !== scope.projectId ||
         event.runId !== scope.runId || event.itemId !== scope.itemId || (scope.attemptNo !== undefined && event.attemptNo !== scope.attemptNo) ||
         (scope.stepId !== undefined && event.stepId !== scope.stepId) || (event.kind === "step_result_recorded" && !event.stepId)))
         throw new Error("Execution history scope mismatch");

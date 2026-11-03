@@ -17,13 +17,15 @@ function wrapper(http: TmsHttpClient, offline = false) {
 }
 test("compact history is closed by default and keeps attempt/step filters bound to the request", async () => {
   const requests: URL[] = [];
-  const http = { get: async (path: string) => { const url = new URL(`https://test${path}`); requests.push(url); return { data: [], meta: { hasMore: false, nextCursor: null } }; } } as unknown as TmsHttpClient;
+  const event = { id: "e", ...scope, attemptNo: 1, kind: "result_recorded", status: "passed", actor: "Author", actorIdentityId: null, createdAt: "2026-01-01T00:00:00Z" };
+  const http = { get: async (path: string) => { const url = new URL(`https://test${path}`); requests.push(url); return { data: url.searchParams.has("stepId") ? [] : [{ ...event, attemptNo: Number(url.searchParams.get("attemptNo") ?? 1) }], meta: { hasMore: false, nextCursor: null } }; } } as unknown as TmsHttpClient;
   let view!: ReactTestRenderer; await act(async () => { view = create(wrapper(http)); });
-  assert.equal(requests.length, 0); assert.equal(view.root.findAllByType("details").length, 0);
+  assert.equal(requests.length, 1); assert.equal(requests[0].searchParams.get("limit"), "1");
+  assert.equal(requests[0].searchParams.has("attemptNo"), false); assert.equal(view.root.findAllByType("details").length, 0);
   const toggle = () => view.root.findByProps({ "aria-label": "Execution history" });
   assert.equal(toggle().props["aria-expanded"], false);
   await act(async () => toggle().props.onClick());
-  assert.equal(requests[0].searchParams.get("attemptNo"), "2");
+  assert.equal(requests[1].searchParams.get("attemptNo"), "2");
   assert.equal(toggle().props["aria-expanded"], true);
   await act(async () => view.root.findAllByType(AnimatedSelect)[0].props.onChange("all"));
   assert.equal(requests[requests.length - 1]!.searchParams.has("attemptNo"), false);
