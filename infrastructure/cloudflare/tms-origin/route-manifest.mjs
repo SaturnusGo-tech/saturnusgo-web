@@ -25,6 +25,7 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  ...["Regular", "RegularItalic", "Medium", "Semibold", "Bold"].map((weight) => `/falcon/docs/fonts/OpenAISans-${weight}.woff2`),
   "/assets/integrations/codex/codex-light.png",
   "/assets/integrations/codex/codex-dark.png",
   ...["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"].map((id) => `/falcon/landing/2026-10/${id}.png`),

@@ -1,8 +1,8 @@
-@font-face { font-family: "Falcon Docs Sans"; src: url("/fonts/falcon-docs/OpenAISans-Regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
-@font-face { font-family: "Falcon Docs Sans"; src: url("/fonts/falcon-docs/OpenAISans-RegularItalic.woff2") format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
-@font-face { font-family: "Falcon Docs Sans"; src: url("/fonts/falcon-docs/OpenAISans-Medium.woff2") format("woff2"); font-style: normal; font-weight: 500; font-display: swap; }
-@font-face { font-family: "Falcon Docs Sans"; src: url("/fonts/falcon-docs/OpenAISans-Semibold.woff2") format("woff2"); font-style: normal; font-weight: 600; font-display: swap; }
-@font-face { font-family: "Falcon Docs Sans"; src: url("/fonts/falcon-docs/OpenAISans-Bold.woff2") format("woff2"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: "Falcon Docs Sans"; src: url("/falcon/docs/fonts/OpenAISans-Regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Falcon Docs Sans"; src: url("/falcon/docs/fonts/OpenAISans-RegularItalic.woff2") format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Falcon Docs Sans"; src: url("/falcon/docs/fonts/OpenAISans-Medium.woff2") format("woff2"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: "Falcon Docs Sans"; src: url("/falcon/docs/fonts/OpenAISans-Semibold.woff2") format("woff2"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: "Falcon Docs Sans"; src: url("/falcon/docs/fonts/OpenAISans-Bold.woff2") format("woff2"); font-style: normal; font-weight: 700; font-display: swap; }
 .root {
   --font-openai-sans: "Falcon Docs Sans";
   --docs-bg: var(--falcon-surface);

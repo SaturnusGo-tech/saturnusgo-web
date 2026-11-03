@@ -106,6 +106,7 @@ if (process.env.INCLUDE_LOGIN === "1") write("out/login/index.html", "FALCON LOG
 write("out/testcases/umbrella-home/work/index.html", "CURRENT TMS\\n");
 write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
+for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) if (process.env.OMIT_DOCS_FONT !== weight) write("out/falcon/docs/fonts/OpenAISans-" + weight + ".woff2", "font asset");
 for (const theme of ["light", "dark"]) if (process.env.OMIT_CODEX_ASSET !== theme) write("out/assets/integrations/codex/codex-" + theme + ".png", "reviewed " + theme);
 write("out/assets/integrations/codex/private.json", "private fixture");
 write("out/assets/private.txt", "private fixture");
@@ -215,6 +216,9 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
   }
   assert.equal(existsSync(join(fixture.pages, "assets/integrations/codex/private.json")), false);
   assert.equal(existsSync(join(fixture.pages, "assets/private.txt")), false);
+  for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) {
+    assert.equal(readFileSync(join(fixture.pages, `falcon/docs/fonts/OpenAISans-${weight}.woff2`), "utf8"), "font asset");
+  }
   assert.match(git(fixture.pages, "log", "-1", "--pretty=%s").stdout, /^deploy: TMS /);
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
 });
@@ -249,6 +253,15 @@ test("fails closed when a manifest-required public asset is absent", (context) =
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*falcon-mark-dark\.png/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
+});
+
+test("fails closed before publishing when a documentation font is absent", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_DOCS_FONT: "Regular" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*OpenAISans-Regular\.woff2/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
 test("fails closed when the cinematic landing asset is absent", (context) => {

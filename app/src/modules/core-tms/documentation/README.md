@@ -40,7 +40,7 @@ The production static export must pass the normal repository workflow.
 The module is loaded through `DocumentationEntry` only when Help is opened.
 It uses the existing Falcon color-mode hook and scoped neutral documentation
 tokens. Reference OpenAI Sans assets are self-hosted under
-`public/fonts/falcon-docs/`, with provenance in `SOURCES.md`; they do not replace
+`public/falcon/docs/fonts/`, with provenance in `SOURCES.md`; they do not replace
 the rest of Falcon's fonts. The main workspace stage clips its top corners to16px.
 Articles and screenshots remain available without an AI response. Chat uses the
 authenticated documentation-assistant API and its configured server-side model.

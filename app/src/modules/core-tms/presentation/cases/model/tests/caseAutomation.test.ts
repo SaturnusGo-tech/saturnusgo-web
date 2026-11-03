@@ -54,8 +54,8 @@ test("case metadata uses semantic pills in the header, properties, and edit menu
   assert.match(detail, /<LifecycleBadge[\s\S]*<span>\{ru \? "Создан"/);
   assert.match(metadata, /className=\{styles\.controlLabel\}/);
   assert.match(metadataCss, /\.chip[\s\S]*border-radius: 999px/);
-  assert.match(metadataCss, /\.lifecycleReady \{ --metadata-fg: #fff; --metadata-bg: #13824a/);
-  assert.match(metadataCss, /\.lifecycleDeprecated \{ --metadata-fg: #352300; --metadata-bg: #f3a712/);
+  assert.match(metadataCss, /\.lifecycleReady \{ --metadata-fg: var\(--falcon-success-on-solid\); --metadata-bg: var\(--falcon-success-solid\)/);
+  assert.match(metadataCss, /\.lifecycleDeprecated \{ --metadata-fg: var\(--falcon-warning-on-solid\); --metadata-bg: var\(--falcon-warning-solid\)/);
   assert.match(metadataCss, /\.trigger[\s\S]*border-radius: 10px/);
   assert.match(metadataCss, /\.menu[\s\S]*border-radius: 12px/);
   assert.doesNotMatch(metadataCss, /\.readControls[^{]*\{[^}]*background:\s*transparent/);

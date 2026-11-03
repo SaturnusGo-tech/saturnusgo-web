@@ -25,6 +25,7 @@ function successfulFetch(requests) {
     if (/\.jpe?g$/.test(url.pathname)) return response("asset", "image/jpeg");
     if (/\.mp4$/.test(url.pathname)) return response("asset", "video/mp4");
     if (/\.vtt$/.test(url.pathname)) return response("WEBVTT\n", "text/vtt");
+    if (/\.woff2$/.test(url.pathname)) return response("font", "font/woff2");
     return response("asset", "image/png");
   };
 }
@@ -40,6 +41,9 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
   assert.deepEqual(result.checkedRoutes, ["/privacy/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
+  for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) {
+    assert.ok(result.checkedAssets.includes(`/falcon/docs/fonts/OpenAISans-${weight}.woff2`));
+  }
   for (const theme of ["light", "dark"]) assert.ok(result.checkedAssets.includes(`/assets/integrations/codex/codex-${theme}.png`));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.mp4"));
   assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.vtt"));
@@ -99,4 +103,14 @@ for (const theme of ["light", "dark"]) test(`readiness rejects a missing Codex $
     fetchImpl: async (input, options) => new URL(input).pathname === path
       ? new Response("missing", { status: 404 }) : successfulFetch([])(input, options),
   }), new RegExp(`Required asset ${path.replaceAll(".", "\\.")} returned 404`));
+});
+
+test("readiness rejects a missing or HTML fallback documentation font", async () => {
+  const path = "/falcon/docs/fonts/OpenAISans-Regular.woff2";
+  for (const fontResponse of [new Response("missing", { status: 404 }), response("<html>fallback</html>", "text/html")]) {
+    await assert.rejects(verifyPagesOriginReadiness({
+      sourceOrigin: "https://origin.example", sourceSha,
+      fetchImpl: (input, options) => new URL(input).pathname === path ? fontResponse : successfulFetch([])(input, options),
+    }), /Required asset .*OpenAISans-Regular\.woff2 returned (?:404|unexpected content-type text\/html)/);
+  }
 });
