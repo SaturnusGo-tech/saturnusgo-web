@@ -1785,6 +1785,90 @@
       "sha256": "b365fb413b17fbc56fbc7b514f98b960cf68940769f54bfde0ea7c8030641517",
       "rawFilename": "falcon-codex-setup-active-production.jpg",
       "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/codex-v2-setup-ru-production20261103.jpg",
+      "locale": "ru",
+      "source": "authenticated-production-umbrella",
+      "surface": "falcon",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "workspace": "Umbrella Home",
+      "capturedAt": "2026-11-03T17:19:46.173Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins&plugin=codex&pluginSetup=connect",
+      "releaseSha": "d6b780c2c07dfead0512a0fdbacd430231829d4e",
+      "redactedQueryKeys": [],
+      "rawSha256": "f0ab04940cbaa49fa7ed980aacc7fb7ab8bad6293f0a5cdcba8d32d19d0ee112",
+      "sha256": "1f4756ea808208664728f786d8db6efc9854b48f0e41e281c2eac51cca611f6f",
+      "rawFilename": "codex-v2-setup-ru.png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/codex-v2-plugins-ru-production20261103.jpg",
+      "locale": "ru",
+      "source": "authenticated-production-umbrella",
+      "surface": "falcon",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "workspace": "Umbrella Home",
+      "capturedAt": "2026-11-03T17:20:04.640Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=config&settings=plugins",
+      "releaseSha": "d6b780c2c07dfead0512a0fdbacd430231829d4e",
+      "redactedQueryKeys": [],
+      "rawSha256": "4610251c318296be36777ac89a9c31c3893fcd9250c96f246eae3235985dfeec",
+      "sha256": "4e7aa1cb7ef378b076ea9ef76fcf9e28354e317b86018f5479759f15cb964af3",
+      "rawFilename": "codex-v2-plugins-ru.png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/codex-v2-card-ru-production20261103.jpg",
+      "locale": "ru",
+      "source": "authenticated-production-umbrella",
+      "surface": "falcon",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "workspace": "Umbrella Home",
+      "capturedAt": "2026-11-03T17:21:00.702Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace_umbrella_home&projectId=project_59c48ce2121f461c8e604f35a9706aa3&view=hooks&integration=codex",
+      "releaseSha": "d6b780c2c07dfead0512a0fdbacd430231829d4e",
+      "redactedQueryKeys": [],
+      "rawSha256": "87189eea93b5b11e9388ccceeeb442c7d41391c57c5982dca35c2e63690936a5",
+      "sha256": "44807f7e7b32d489180c2e3936cb573cce592272d6beb6e1de43b894fb98280a",
+      "rawFilename": "codex-v2-card-ru.png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
+    },
+    {
+      "file": "/falcon/docs/2026-11-ru/codex-v2-admin-ru-production20261103.jpg",
+      "locale": "ru",
+      "source": "authenticated-production-umbrella",
+      "surface": "falcon",
+      "origin": "https://umbrella-falcon.saturnusgo.com",
+      "workspace": "Umbrella Home",
+      "capturedAt": "2026-11-03T17:36:12.731Z",
+      "viewport": {
+        "width": 1728,
+        "height": 1117,
+        "deviceScaleFactor": 2
+      },
+      "sourceUrl": "https://umbrella-falcon.saturnusgo.com/admin/?page=codex",
+      "releaseSha": "d6b780c2c07dfead0512a0fdbacd430231829d4e",
+      "redactedQueryKeys": [],
+      "rawSha256": "818d29058c3f6caadd3d791d635403f95ff1aed726394372c23070bf3e2fbdf7",
+      "sha256": "ed9bb9f73bce0901c1b412cbacc5d6d3ea493224267e9cca8d2a689f581224ba",
+      "rawFilename": "codex-v2-admin-ru.png",
+      "method": "Actual authenticated production browser/app capture; JPEG transcoded without crop, resize or semantic edits."
     }
   ]
 }

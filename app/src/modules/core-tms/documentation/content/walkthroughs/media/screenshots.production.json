@@ -348,5 +348,25 @@
     "src": "/falcon/docs/2026-11/workspace-04-portfolio-20260913-en-20260928-en-production20261103.jpg",
     "width": 3456,
     "height": 2234
+  },
+  "codex-v2-plugins": {
+    "src": "/falcon/docs/2026-11/codex-v2-plugins-en-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-setup": {
+    "src": "/falcon/docs/2026-11/codex-v2-setup-en-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-card": {
+    "src": "/falcon/docs/2026-11/codex-v2-card-en-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-admin": {
+    "src": "/falcon/docs/2026-11/codex-v2-admin-en-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
   }
 }

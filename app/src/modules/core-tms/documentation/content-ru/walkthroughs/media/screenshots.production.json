@@ -423,5 +423,25 @@
     "src": "/falcon/docs/2026-11-ru/codex-04-mcp-active-ru-production20261103.jpg",
     "width": 3456,
     "height": 2234
+  },
+  "codex-v2-setup": {
+    "src": "/falcon/docs/2026-11-ru/codex-v2-setup-ru-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-plugins": {
+    "src": "/falcon/docs/2026-11-ru/codex-v2-plugins-ru-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-card": {
+    "src": "/falcon/docs/2026-11-ru/codex-v2-card-ru-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
+  },
+  "codex-v2-admin": {
+    "src": "/falcon/docs/2026-11-ru/codex-v2-admin-ru-production20261103.jpg",
+    "width": 3456,
+    "height": 2234
   }
 }

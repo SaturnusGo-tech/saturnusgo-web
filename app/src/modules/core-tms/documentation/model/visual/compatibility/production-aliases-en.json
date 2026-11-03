@@ -655,5 +655,41 @@
     "src": "/falcon/docs/2026-09/workspace-04-portfolio-20260913-en-20260928.jpg",
     "currentId": "workspace-04-portfolio-20260913-en-20260928-en-production20261103",
     "currentSrc": "/falcon/docs/2026-11/workspace-04-portfolio-20260913-en-20260928-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "codex-web-qa",
+    "sectionId": "visual-flow",
+    "id": "codex-01-plugins-en-production20261103",
+    "src": "/falcon/docs/2026-11/codex-01-plugins-en-production20261103.jpg",
+    "currentId": "codex-v2-plugins-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/codex-v2-plugins-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "codex-web-qa",
+    "sectionId": "visual-flow",
+    "id": "codex-04-mcp-en-production20261103",
+    "src": "/falcon/docs/2026-11/codex-04-mcp-en-production20261103.jpg",
+    "currentId": "codex-v2-setup-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/codex-v2-setup-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "codex-web-qa",
+    "sectionId": "visual-flow",
+    "id": "codex-02-card-en-production20261103",
+    "src": "/falcon/docs/2026-11/codex-02-card-en-production20261103.jpg",
+    "currentId": "codex-v2-card-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/codex-v2-card-en-production20261103.jpg"
+  },
+  {
+    "locale": "en",
+    "articleId": "codex-web-qa",
+    "sectionId": "visual-flow",
+    "id": "codex-03-manage-en-production20261103",
+    "src": "/falcon/docs/2026-11/codex-03-manage-en-production20261103.jpg",
+    "currentId": "codex-v2-admin-en-production20261103",
+    "currentSrc": "/falcon/docs/2026-11/codex-v2-admin-en-production20261103.jpg"
   }
 ]
