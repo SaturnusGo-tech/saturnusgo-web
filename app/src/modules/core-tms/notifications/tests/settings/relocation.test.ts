@@ -28,7 +28,8 @@ test("settings remain reachable while project data is unavailable", () => {
     if (name.endsWith("company-features")) return { companyViewAvailable: () => true };
   });
   for (const view of ["config", "notifications"] as const) {
-    const all = nodes(h.render(() => render({ model: { view, connection: "loading", project: undefined, data: { workspace: { id: "w" } } } as never })));
+    const all = nodes(h.render(() => render({ model: { view, connection: "loading", project: undefined,
+      data: { workspace: { id: "w" }, meta: { authorization: { capabilities: [] } } } } as never })));
     assert.ok(all.some(node => node.type === "ConfigView")); assert.equal(all.some(node => node.type === "ProjectOnboarding"), false);
   }
 });

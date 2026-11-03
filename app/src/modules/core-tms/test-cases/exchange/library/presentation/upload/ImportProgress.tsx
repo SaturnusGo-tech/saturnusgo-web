@@ -1,4 +1,4 @@
-import { CheckCircle2, LoaderCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, LoaderCircle } from "lucide-react";
 import type { useImportCases } from "../../../state/import/use-import-cases";
 import { importCopy } from "../../../localization/import-copy";
 import { ImportPreviewTree } from "../../../presentation/ImportPreviewTree";
@@ -17,8 +17,8 @@ export function ImportProgress({ state, ru }: { state: ReturnType<typeof useImpo
     {state.phase === "importing" && <progress value={state.attempted} max={state.document?.testCases.length || 1} aria-label={copy.processed} />}
     {state.error && <p className={css.error} role="alert">{state.error}</p>}
     {!state.context && state.error && <button className={css.link} type="button" onClick={state.retryContext}>{copy.retryLoad}</button>}
-    {state.failed.length > 0 && <details><summary>{copy.errors}: {state.failed.length}</summary><ul>{state.failed.map((item, index) => <li key={index}>{item.sourceKey}: {item.message}</li>)}</ul></details>}
+    {state.failed.length > 0 && <details><summary><ChevronRight size={15} aria-hidden="true" />{copy.errors}: {state.failed.length}</summary><ul>{state.failed.map((item, index) => <li key={index}>{item.sourceKey}: {item.message}</li>)}</ul></details>}
     {(state.phase === "partial" || state.phase === "stopped") && <p className={css.hint}>{copy.partialRule}</p>}
-    {state.plan && !state.busy && <details className={css.previewTree}><summary>{copy.preview}</summary><ImportPreviewTree plan={state.plan} copy={copy} /></details>}
+    {state.plan && !state.busy && <details className={css.previewTree}><summary><ChevronRight size={15} aria-hidden="true" />{copy.preview}</summary><ImportPreviewTree plan={state.plan} copy={copy} /></details>}
   </div>;
 }

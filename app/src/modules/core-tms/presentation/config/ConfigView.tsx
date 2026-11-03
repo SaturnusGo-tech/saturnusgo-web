@@ -52,8 +52,8 @@ export function ConfigView(props: ConfigViewProps) {
       </nav>
     </aside>
     <div className={css.content}>
-      {available.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={id === "plugins" ? undefined : `settings-${id}-title`} aria-label={id === "plugins" ? copy[id][0] : undefined} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
-        {id !== "environments" && id !== "plugins" && <header className={css.header}>
+      {available.map((id) => <section key={id} id={`settings-${id}`} hidden={section !== id} aria-labelledby={id === "plugins" || id === "exchange" ? undefined : `settings-${id}-title`} aria-label={id === "plugins" || id === "exchange" ? copy[id][0] : undefined} className={css.panel} data-layout={id === "general" || id === "exchange" ? "rows" : undefined}>
+        {id !== "environments" && id !== "plugins" && id !== "exchange" && <header className={css.header}>
           <h2 id={`settings-${id}-title`}>{copy[id][0]}</h2><p>{copy[id][1]}</p></header>}
         {id === "general" && section === id && props.project && <ProjectSettings key={props.project.id} project={props.project}
           workspaceId={props.workspaceId} offline={props.offline} canManage={props.canManageProject}

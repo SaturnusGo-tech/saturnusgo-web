@@ -1,4 +1,6 @@
-import { FileJson, Inbox, LoaderCircle, Search } from "lucide-react";
+import { FileJson, Inbox, LoaderCircle } from "lucide-react";
+import { useRef } from "react";
+import { AnimatedSearch } from "../../../../../presentation/common/search/AnimatedSearch";
 import { useTmsLocale } from "../../../../../localization/context/useTmsLocale";
 import { ResponsibleName } from "../../../../../workspace/members/presentation/ResponsibleName";
 import { useImportHistory } from "../../state/useImportHistory";
@@ -14,11 +16,16 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
   const history = useImportHistory(scope, revision);
   const actions = useImportFileActions(scope, ru, canManage, history.reload);
   const groups = groupImportHistory(history.items, new Date(), ru);
+  const scopeKey = `${scope.workspaceId}:${scope.projectId}`;
+  const searchable = useRef({ scope: scopeKey, available: false });
+  if (searchable.current.scope !== scopeKey) searchable.current = { scope: scopeKey, available: false };
+  if (!history.loading && !history.searching && !history.error && !history.query.trim()) searchable.current.available = history.items.length > 0;
+  const showSearch = searchable.current.available || history.items.length > 0 || Boolean(history.query);
   return <section className={css.history} aria-label={ru ? "История файлов" : "File history"}>
     <header className={css.historyHeader}><h2>{ru ? "История файлов" : "File history"}</h2>
-      <label className={css.search}><Search size={17} aria-hidden="true" /><input value={history.query} maxLength={200}
-        onChange={event => history.setQuery(event.target.value)} placeholder={ru ? "Найти файл" : "Find a file"}
-        aria-label={ru ? "Найти файл в истории" : "Find a file in history"} /></label></header>
+      {showSearch && <AnimatedSearch value={history.query} onChange={history.setQuery}
+        label={ru ? "Найти файл в истории" : "Find a file in history"} placeholder={ru ? "Найти файл" : "Find a file"}
+        closeLabel={ru ? "Закрыть поиск" : "Close search"}/>}</header>
     {actions.notice && <p className={css.notice} role="status">{actions.notice}</p>}
     {actions.error && !actions.deletion && !actions.preview && <p className={css.error} role="alert">{actions.error}</p>}
     {history.error && <p className={css.error} role="alert">{ru ? "Не удалось загрузить историю." : "Could not load history."} <button type="button" onClick={history.reload}>{ru ? "Повторить" : "Retry"}</button></p>}
@@ -27,7 +34,7 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
         <h3>{group.label && <strong>{group.label}</strong>}<span>{group.date}</span></h3>
         <ul className={css.fileList}>{group.items.map(file => {
           return <li className={css.fileRow} key={file.id} data-deleted={file.deleted || undefined}>
-            <FileJson className={css.fileIcon} size={27} strokeWidth={1.4} aria-hidden="true" />
+            <FileJson className={css.fileIcon} size={23} strokeWidth={1.4} aria-hidden="true" />
             <div className={css.fileInfo}><button type="button" disabled={!file.available || actions.pending} onClick={() => void actions.open(file)} title={file.fileName}>{file.fileName}</button>
               <span title={file.destinationPath}>{file.destinationPath === "/" ? (ru ? "Корень проекта" : "Project root") : file.destinationPath.replace(/^\//, "").split("/").join(" / ")} · {importFileSize(file.byteSize, ru)}{file.deleted ? (ru ? " · Файл удалён" : " · File deleted") : !file.available ? (ru ? " · Недоступен" : " · Unavailable") : ""}</span></div>
             <div className={css.author}><div><ResponsibleName workspaceId={scope.workspaceId} identityId={file.authorId} />
@@ -39,7 +46,7 @@ export function ImportHistory({ scope, revision, canManage }: { scope: ImportSco
       </section>)}
     </div>
     {(history.loading || history.searching) && <p className={css.message} role="status"><LoaderCircle size={18} className={css.spin} />{ru ? "Загружаем файлы…" : "Loading files…"}</p>}
-    {!history.loading && !history.searching && !history.error && !history.items.length && <div className={css.empty}><Inbox size={48} strokeWidth={1.2} aria-hidden="true" />
+    {!history.loading && !history.searching && !history.error && !history.items.length && <div className={css.empty} role="status"><Inbox size={36} strokeWidth={1.2} aria-hidden="true" />
       <h3>{history.query ? (ru ? "Файлы не найдены" : "No matching files") : (ru ? "Пока нет импортов" : "No imports yet")}</h3>
       <p>{history.query ? (ru ? "Попробуйте изменить поисковый запрос." : "Try a different search.") : (ru ? "Здесь появятся исходные файлы новых импортов." : "Original files from new imports will appear here.")}</p></div>}
     {history.cursor && <button type="button" className={css.more} disabled={history.loading} onClick={history.loadMore}>{ru ? "Загрузить ещё" : "Load more"}</button>}

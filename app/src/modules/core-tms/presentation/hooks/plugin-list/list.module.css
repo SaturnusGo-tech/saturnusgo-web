@@ -2,6 +2,7 @@
 .header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 38px; }
 .header h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 36px; letter-spacing: -.025em; }
 .header p { margin: 6px 0 0; color: var(--plugin-muted); font-size: 14px; }
+.page .addButton { border-radius: 999px; }
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
 .toolbar > span { border-radius: 12px; padding: 7px 12px; color: var(--plugin-text); background: var(--plugin-panel); }
 .toolbar small { margin-left: 6px; color: var(--plugin-muted); font-size: inherit; }

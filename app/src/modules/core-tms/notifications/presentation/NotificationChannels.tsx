@@ -71,7 +71,7 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
           </h2>
           <div className={styles.channelActions}>
             {(!s?.pendingTelegram || s?.telegramConnected) && (
-              <button type="button" className={styles.connectionButton} disabled={m.busy || !s?.telegramUsername}
+              <button type="button" className={`${styles.connectionButton} ${!s?.telegramConnected ? styles.connectionPrimary : ""}`} disabled={m.busy || !s?.telegramUsername}
                 aria-describedby={!s?.telegramUsername ? `${id}-telegram-notice` : undefined}
                 onClick={() => {
                   if (!s?.telegramConnected) setTelegramExpanded(true);
@@ -92,14 +92,14 @@ export function NotificationChannels({ model: m, ru }: { model: NotificationsSta
           {m.telegramUrl && (
             <div className={styles.linkFlow}>
               <p>{ru ? "Откройте бота, нажмите Start и вернитесь, чтобы подтвердить подключение." : "Open the bot, press Start, then return to confirm the connection."}</p>
-              <a className={styles.connectionButton} href={m.telegramUrl} target="_blank" rel="noopener noreferrer">{ru ? "Открыть бота" : "Open bot"}<ArrowUpRight size={15} aria-hidden="true" /></a>
+              <a className={`${styles.connectionButton} ${styles.connectionPrimary}`} href={m.telegramUrl} target="_blank" rel="noopener noreferrer">{ru ? "Открыть бота" : "Open bot"}<ArrowUpRight size={15} aria-hidden="true" /></a>
               <button type="button" className={styles.connectionButton} disabled={m.busy} onClick={() => void m.refreshTelegram()}>{ru ? "Я нажал Start" : "I pressed Start"}</button>
             </div>
           )}
           {s?.pendingTelegram && (
             <div className={styles.pending} role="status">
               <span>{ru ? "Подключить аккаунт" : "Connect account"} <strong>{s.pendingTelegram.name}</strong>?</span>
-              <button type="button" className={styles.connectionButton} disabled={m.busy} onClick={() => void m.confirmTelegram()}>{ru ? "Подтвердить" : "Confirm"}</button>
+              <button type="button" className={`${styles.connectionButton} ${styles.connectionPrimary}`} disabled={m.busy} onClick={() => void m.confirmTelegram()}>{ru ? "Подтвердить" : "Confirm"}</button>
             </div>
           )}
         </div>

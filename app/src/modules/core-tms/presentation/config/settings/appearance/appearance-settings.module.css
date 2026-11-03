@@ -1,0 +1,8 @@
+.surface .row { min-height:64px; padding-block:14px; gap:14px 24px; flex-wrap:wrap; }
+.row > :first-child { flex:1 1 200px; }
+.choices { display:inline-flex; align-items:center; flex:0 0 auto; flex-wrap:wrap; max-width:100%; gap:6px; }
+.choice { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:34px; margin:0; padding:6px 10px; border:1px solid transparent; border-radius:8px; background:transparent; color:var(--falcon-text-muted); font:inherit; font-size:13px; line-height:20px; white-space:nowrap; cursor:pointer; transition:background-color 140ms ease,color 140ms ease; }
+.choice[data-selected] { border-color:var(--falcon-border); background:var(--falcon-selected); color:var(--falcon-text); }
+.choice:hover { background:var(--falcon-hover); color:var(--falcon-text); }
+.choice input { appearance:auto; flex:none; width:14px; height:14px; margin:0; accent-color:var(--falcon-action); cursor:pointer; }
+@media(prefers-reduced-motion:reduce) { .choice { transition:none; } }

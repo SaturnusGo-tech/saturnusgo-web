@@ -66,8 +66,10 @@
 .channelTrigger { gap: 12px; }
 .channelActions { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; }
 .channelIcon { display: none; }
-.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 32px; padding: 5px 10px; border: 1px solid var(--notification-line); border-radius: 8px; color: var(--notification-ink); background: transparent; font-size: 13px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
+.connectionButton { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 34px; padding: 6px 14px; border: 1px solid var(--notification-line); border-radius: 999px; color: var(--notification-ink); background: transparent; font-size: 13px; line-height: 1.5; text-decoration: none; white-space: nowrap; }
 .connectionButton:hover:not(:disabled) { background: var(--notification-hover); border-color: var(--notification-muted); }
+.connectionPrimary { background: var(--falcon-action); color: var(--falcon-on-action); border-color: transparent; }
+.connectionPrimary:hover:not(:disabled) { background: var(--falcon-action); color: var(--falcon-on-action); border-color: transparent; opacity: .88; }
 .channelNotice { margin: -8px 0 16px; color: var(--notification-muted); font-size: 12px; line-height: 1.5; }
 .sectionBody { margin: 0; padding: 0 0 20px; }
 .connectionStatus { margin: 0; color: var(--notification-ink); }
@@ -146,4 +148,3 @@
 .page[data-embedded="true"] { height: auto; overflow: visible; padding: 0; background: transparent; }
 .page[data-embedded="true"] { --notification-surface: var(--falcon-panel); --notification-ink: var(--falcon-text); --notification-muted: var(--falcon-text-muted); --notification-line: var(--falcon-border); --notification-hover: var(--falcon-hover); }
 .page[data-embedded="true"] .channels { margin-bottom: 24px; }
-.page[data-embedded="true"] .connectionButton { background: var(--settings-selected); }

@@ -98,26 +98,34 @@ test("import settings keep category navigation and a single selected content pan
   assert.equal(active[0].props.id, "settings-exchange");
 });
 
-test("appearance dropdowns keep animated theme changes and validate language selections", () => {
+test("appearance radio groups keep animated theme changes, native grouping and no-op selections", () => {
   const h = componentHarness();
   const toggles: unknown[] = [], languages: string[] = [];
   const { AppearanceSettings: render } = h.load<{ AppearanceSettings: typeof AppearanceSettings }>(new URL("../../settings/AppearanceSettings.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key, setLocale: (value: string) => languages.push(value) }) };
     if (name.endsWith("useColorMode")) return { useColorMode: () => ({ isLight: true, toggleAnimated: (position: unknown) => toggles.push(position) }) };
-    if (name.endsWith("AppearanceDropdown")) return { AppearanceDropdown: "AppearanceDropdown" };
   });
   const all = nodes(h.render(render));
-  const theme = all.find(node => node.type === "AppearanceDropdown" && node.props.value === "light");
-  const language = all.find(node => node.type === "AppearanceDropdown" && node.props.value === "en");
-  assert.ok(theme, "theme uses the shared appearance dropdown"); assert.ok(language);
-  const changeTheme = theme.props.onChange as (value: string, position: { x: number; y: number }) => void;
-  const changeLanguage = language.props.onChange as (value: string) => void;
-  changeTheme("light", { x: 70, y: 25 });
+  assert.equal(all.filter(node => node.props.role === "radiogroup").length, 2);
+  assert.equal(all.some(node => node.type === "AppearanceDropdown"), false);
+  const radios = all.filter(node => node.type === "input" && node.props.type === "radio");
+  assert.equal(radios.length, 4);
+  const light = radios.find(node => node.props.value === "light")!, dark = radios.find(node => node.props.value === "dark")!;
+  const english = radios.find(node => node.props.value === "en")!, russian = radios.find(node => node.props.value === "ru")!;
+  assert.equal(light.props.name, dark.props.name); assert.equal(english.props.name, russian.props.name);
+  assert.notEqual(light.props.name, english.props.name);
+  assert.equal(light.props.checked, true); assert.equal(dark.props.checked, false);
+  assert.equal(english.props.checked, true); assert.equal(russian.props.checked, false);
+  const event = (value: string, checked = true) => ({ currentTarget: { value, checked,
+    closest: () => ({ getBoundingClientRect: () => ({ left: 40, top: 10, width: 90, height: 34 }) }) } });
+  invoke(light, "onChange", event("light"));
   assert.equal(toggles.length, 0);
-  changeTheme("dark", { x: 70, y: 25 });
+  invoke(dark, "onChange", event("dark", false)); assert.equal(toggles.length, 0);
+  invoke(dark, "onChange", event("dark"));
   assert.equal(toggles.length, 1);
-  assert.equal((toggles[0] as { x: number }).x, 70); assert.equal((toggles[0] as { y: number }).y, 25);
-  changeLanguage("ru");
-  changeLanguage("unsupported");
+  assert.equal((toggles[0] as { x: number }).x, 85); assert.equal((toggles[0] as { y: number }).y, 27);
+  invoke(english, "onChange", event("en"));
+  invoke(russian, "onChange", event("ru"));
+  invoke(russian, "onChange", event("unsupported"));
   assert.deepEqual(languages, ["ru"]);
 });

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { settingsCopy } from "../navigation/settings-sections";
-import styles from "../../../tms.module.css";
 import css from "../config.module.css";
 
 export function AccountSettings() {
@@ -20,7 +19,7 @@ export function AccountSettings() {
         <p className={css.settingTitle}>{t("auth.signOut")}</p>
         <p className={css.settingDescription}>{locale === "ru" ? "Завершить текущую сессию в этом браузере." : "End your current session in this browser."}</p>
       </div>
-      <button type="button" className={styles.secondaryButton} disabled={pending} aria-busy={pending}
+      <button type="button" className={css.signOut} disabled={pending} aria-busy={pending}
         onClick={() => {
           setFailed(false); setPending(true);
           void session.signOut().catch(() => { setFailed(true); setPending(false); });

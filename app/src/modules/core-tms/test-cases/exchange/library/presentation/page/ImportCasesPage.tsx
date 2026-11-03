@@ -19,7 +19,7 @@ export function ImportCasesPage(props: ImportCasesPageProps) {
   return <main className={css.page} data-import-page>
     <div className={css.content}>
       <button className={css.back} type="button" onClick={props.onBack}><ChevronLeft size={16} aria-hidden="true" />{ru ? "Настройки" : "Settings"}</button>
-      <header className={css.pageHeader}><div><h1>{ru ? "Импорт тест-кейсов" : "Import test cases"}</h1>
+      <header className={css.pageHeader}><div><h1>{ru ? "Импорт и экспорт" : "Import and export"}</h1>
         <p>{ru ? "Добавьте JSON-файл и выберите, куда перенести кейсы." : "Add a JSON file and choose where to import your test cases."}</p></div>
         {catalog.project && <ExportCasesAction key={catalog.project.id} project={catalog.project} enabled={props.exportEnabled} />}
       </header>
