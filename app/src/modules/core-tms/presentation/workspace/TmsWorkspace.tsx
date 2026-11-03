@@ -26,7 +26,7 @@ const glassEnabled = process.env.NEXT_PUBLIC_FALCON_GLASS_EXPERIMENT !== "false"
 
 export function LocalizedWorkspace() {
   const model = useWorkspaceModel();
-  const pageRef = usePageAppearance([model.view, model.project?.id, model.selectedCaseId, model.selectedRunId, model.selectedRunItemId, model.selectedSuiteId, model.connection].join(":"));
+  const pageRef = usePageAppearance([model.view, model.project?.id, model.repositoryScope.key, model.connection].join(":"));
   useHistoryScroll(pageRef);
   const { t } = useTmsLocale();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
