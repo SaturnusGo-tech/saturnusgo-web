@@ -29,3 +29,11 @@ Use case: productivity-visual. Asset type: premium developer-tool extension mark
 ### empty-library.webp
 
 Background extraction of the existing modular line illustration. Real alpha, transparent module interiors, no construction-grid backdrop. Encoded as lossless 768 × 512 WebP; source PNG is exec-45352d13-f252-4dae-af72-1c5dcd0c4afe.png in the Codex generated_images directory.
+
+## Metric detail pages
+
+All 29 catalog presentations share the same detail surface: compact record lists for runs and defects, the existing folder tree for cases, and run-grouped execution checks. The detail header retains a text link to Dashboard and the project/period context; the global header continues to own backward/forward navigation.
+
+Filters expand inline above the records. Product group, product and regression refine the server query while preserving the metric’s entity, time basis and predicates. Case product scopes retain selection and run preparation. Project/type/status/priority selectors support multiple values; active list filters remain visible as removable chips when the filter area is collapsed. Search, local list filters and sorting apply to loaded records, with a notice whenever another page exists. Loading more retains existing rows.
+
+Record layouts use bounded title/product/status columns and responsive secondary metadata. Full values remain available through tooltips and opening the record. The same token palette, focus behavior and status/progress signals apply in Light and Dark themes. Keyboard Escape closes a selector before its parent filter area; leaving a facet selector with Tab dismisses its menu.

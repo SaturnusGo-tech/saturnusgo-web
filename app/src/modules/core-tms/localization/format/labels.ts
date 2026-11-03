@@ -25,6 +25,7 @@ const labels: Record<string, readonly [string, string]> = {
   not_started: ["Not started", "Не начат"],
   open: ["Open", "Открыт"],
   passed: ["Passed", "Пройден"],
+  paused: ["Paused", "Приостановлен"],
   quarantined: ["Quarantined", "На карантине"],
   ready: ["Ready", "Готов"],
   ready_for_retest: ["Ready for QA", "На проверку"],

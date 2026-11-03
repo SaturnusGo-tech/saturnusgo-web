@@ -1,6 +1,7 @@
 import type { DashboardDrillRow } from "../../../../dashboards/model/dashboard-analytics";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
 import { localizedLabel } from "../../../../localization/format/labels";
+import { FacetPicker } from "./picker/FacetPicker";
 import styles from "../../detail/detail.module.css";
 import type { DashboardLocalFilters } from "../dashboard-drill-navigation";
 
@@ -34,17 +35,16 @@ export function DashboardDrillFacets({ rows, value, onChange }: {
       [key]: selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option],
     });
   };
-  return <div aria-label={t("dashboard.refineList")}>
+  return <div className={styles.facets} aria-label={t("dashboard.refineList")}>
     {(["type", "project", "status", "priority"] as const).map((key) => {
       const options = facetValues(rows, key);
       if (!options.length) return null;
-      return <fieldset key={key}><legend>{label(key)}</legend>{options.map(([option, count]) => <label key={option}>
-        <input type="checkbox" checked={value[key].includes(option)} onChange={() => toggle(key, option)} />
-        <span>{key === "project" ? option : localizedLabel(locale, option)}</span><b>{count}</b>
-      </label>)}</fieldset>;
+      return <FacetPicker key={key} label={label(key)} allLabel={locale === "ru" ? "Все" : "All"}
+        selected={value[key]} onToggle={option => toggle(key, option)} options={options.map(([option, count]) => ({ value: option,
+          label: key === "project" ? option : localizedLabel(locale, option), count }))} />;
     })}
     {(Boolean(value.query) || selectedCount > 0) && <button type="button" className={styles.quiet} onClick={() => onChange({
       query: "", project: [], type: [], component: [], status: [], priority: [],
-    })}>{locale === "ru" ? "Сбросить уточнения" : "Reset refinements"}</button>}
+    })}>{locale === "ru" ? "Сбросить фильтры списка" : "Reset list filters"}</button>}
   </div>;
 }

@@ -1,0 +1,11 @@
+.field { display: grid; min-width: 0; gap: 7px; }
+.label { color: var(--falcon-text-muted); font-size: 12px; }
+.trigger { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 12px; width: 100%; min-height: 34px; padding: 6px 10px; border: 1px solid var(--falcon-border); border-radius: 8px; background: transparent; color: var(--falcon-text); font: inherit; font-size: 12px; cursor: pointer; }
+.trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.trigger > svg { flex: none; color: var(--falcon-text-muted); }
+.trigger:hover, .trigger[aria-expanded="true"] { background: var(--falcon-hover); }
+.menu { position: fixed; inset: auto; z-index: 90; display: grid; gap: 2px; margin: 0; padding: 6px; overflow-y: auto; border: 1px solid var(--falcon-border-subtle); border-radius: 12px; background: var(--falcon-elevated); box-shadow: var(--falcon-shadow-popover); color: var(--falcon-text); font: 400 12px/1.45 "Falcon Detail Sans", system-ui, sans-serif; scrollbar-width: thin; }
+.menu label { display: flex; align-items: center; gap: 9px; min-height: 34px; padding: 7px 8px; border-radius: 7px; cursor: pointer; }
+.menu label:hover, .menu label:focus-within { background: var(--falcon-hover); }
+.menu input { flex: none; accent-color: var(--falcon-action); }
+.menu label > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.menu small { flex: none; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
