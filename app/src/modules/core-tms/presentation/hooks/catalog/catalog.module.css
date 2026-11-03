@@ -60,8 +60,10 @@
 .section h2 button svg { color: var(--catalog-muted); }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; row-gap: 0; }
 .row { min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 70px; width: 100%; padding: 8px 0; border: 0; border-radius: 10px; color: var(--catalog-ink); background: transparent; text-align: left; }
-button.row { cursor: pointer; transition: background 140ms ease; }
-button.row:hover { background: var(--catalog-hover); }
+button.row { cursor: pointer; }
+button.row:hover, button.row:focus-visible { background: transparent; }
+button.row:is(:hover, :focus-visible) .name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+button.row:is(:hover, :focus-visible) .rowAction { color: var(--catalog-ink); }
 .logo { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border: 1px solid var(--catalog-line); border-radius: 10px; background: var(--catalog-bg); font-size: 26px; }
 .logo > :is(svg, img, span) { display: block; width: 26px; height: 26px; object-fit: contain; }
 .logo[data-provider="youtrack"] img { border-radius: 5px; }
@@ -73,7 +75,7 @@ button.row:hover { background: var(--catalog-hover); }
 .rowCopy { min-width: 0; flex: 1; display: grid; gap: 4px; }
 .name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; line-height: 22px; font-weight: 500; }
 .description { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--catalog-muted); font-size: 14px; line-height: 20px; }
-.rowAction { display: inline-flex; align-items: center; justify-content: flex-end; gap: 5px; flex: none; color: var(--catalog-muted); font-size: 11px; max-width: 98px; line-height: 16px; }
+.rowAction { transition: color 140ms ease; display: inline-flex; align-items: center; justify-content: flex-end; gap: 5px; flex: none; color: var(--catalog-muted); font-size: 11px; max-width: 98px; line-height: 16px; }
 .rowAction > span:not(.srOnly) { overflow-wrap: anywhere; text-align: right; }
 .rowAction > svg { flex: none; }
 .rowAction[data-status="checking"] { animation: statusPulse 1.6s ease-in-out infinite; }
