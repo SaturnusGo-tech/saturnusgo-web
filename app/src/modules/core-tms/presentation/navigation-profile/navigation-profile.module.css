@@ -14,10 +14,10 @@
 .identity { display: flex; align-items: center; gap: 10px; padding: 5px 6px 8px; }
 .identity .avatar { background: var(--tms-bg-hover, var(--falcon-surface)); color: inherit; }
 .identity > div:last-child { min-width: 0; }
-.identity strong, .identity span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.identity strong { font-size: 14px; font-weight: 500; }
-.identity span { margin-top: 1px; color: var(--tms-text-muted, var(--falcon-text)); font-size: 12px; }
-:global(.dark) .identity span { color: var(--falcon-text); }
+.identity > div:last-child > :is(strong, span) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.identity > div:last-child > strong { font-size: 14px; font-weight: 500; }
+.identity > div:last-child > span { margin-top: 1px; color: var(--tms-text-muted, var(--falcon-text)); font-size: 12px; }
+:global(.dark) .identity > div:last-child > span { color: var(--falcon-text); }
 .separator { height: 1px; margin: 5px 5px; background: var(--falcon-border); }
 :global(.dark) .separator { background: var(--falcon-border); }
 .action, .supportButton { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 8px 6px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; text-decoration: none; text-align: left; cursor: pointer; }

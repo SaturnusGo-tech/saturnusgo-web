@@ -63,7 +63,7 @@
 button.row { cursor: pointer; transition: background 140ms ease; }
 button.row:hover { background: var(--catalog-hover); }
 .logo { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border: 1px solid var(--catalog-line); border-radius: 10px; background: var(--catalog-bg); font-size: 26px; }
-.logo :is(svg, img) { display: block; width: 26px; height: 26px; object-fit: contain; }
+.logo > :is(svg, img, span) { display: block; width: 26px; height: 26px; object-fit: contain; }
 .logo[data-provider="youtrack"] img { border-radius: 5px; }
 .logo[data-provider="slack"] img { width: 26px; height: 26px; }
 .logo[data-provider="jira"], .logo[data-provider="confluence"] { color: #1868db; }

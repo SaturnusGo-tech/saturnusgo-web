@@ -52,5 +52,129 @@
       "#c64a42"
     ],
     "reason": "Existing official integration brand mark paint; branding is content, not Falcon interface chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.preview::background": {
+    "values": [
+      "#65546d",
+      "#173457",
+      "#29374d",
+      "#494660"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.preview::color": {
+    "values": [
+      "#f5f5f5"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.prompts button::background": {
+    "values": [
+      "#1c1b28"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.prompts button::color": {
+    "values": [
+      "#f2f2f5"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.prompts button:hover::background": {
+    "values": [
+      "#292736"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.prompts button strong::color": {
+    "values": [
+      "#b3b0bf"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.prompts button > svg::background": {
+    "values": [
+      "#3b3948"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/codex-employee/presentation/plugin-preview/preview.module.css::.feedback::color": {
+    "values": [
+      "#e2deec"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview::--glow": {
+    "values": [
+      "#74667c"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview::background": {
+    "values": [
+      "#25343e",
+      "#30333d"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview::color": {
+    "values": [
+      "#f3f3f3"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"jira\"], .preview[data-brand=\"trello\"]::--glow": {
+    "values": [
+      "#456587"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"linear\"], .preview[data-brand=\"youtrack\"]::--glow": {
+    "values": [
+      "#71516e"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"swagger\"]::--glow": {
+    "values": [
+      "#4e6b54"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"slack\"]::--glow": {
+    "values": [
+      "#785b6e"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"confluence\"]::--glow": {
+    "values": [
+      "#436477"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.preview[data-brand=\"github\"]::--glow": {
+    "values": [
+      "#686877"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.workflows > div::border": {
+    "values": [
+      "#ffffff0c"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.workflows > div::background": {
+    "values": [
+      "#191b22e8"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
+  },
+  "app/src/modules/core-tms/presentation/hooks/plugin-detail/detail.module.css::.falcon::color": {
+    "values": [
+      "#b8b9c3"
+    ],
+    "reason": "Approved integration workflow artwork restored at user request. Its gradient and embedded example cards keep one readable dark illustration palette in both interface themes; not application chrome."
   }
 }

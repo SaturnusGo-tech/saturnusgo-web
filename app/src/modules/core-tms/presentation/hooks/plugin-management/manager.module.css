@@ -1,11 +1,11 @@
 .brand :is(svg, img) { width: 48px; height: 48px; object-fit: contain; }
-.rowBrand :is(svg, img) { width: 26px; height: 26px; object-fit: contain; }
+.rowBrand :is(svg, img) { width: 28px; height: 28px; object-fit: contain; }
 .usesGroup { overflow: visible; }
-.rowButton { width: 100%; padding: 16px; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; font: inherit; }
+.rowButton { width: 100%; padding: 16px 0; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; font: inherit; }
 .rowButton > span > span, .rowLink > span > span { display: block; }
-.rowButton:hover { background: var(--plugin-hover); }
-.rowLink { padding-inline: 16px; text-decoration: none; border-top: 1px solid var(--plugin-line); border-radius: 12px; }
-.rowLink:hover { background: var(--plugin-hover); }
+.rowButton:hover, .rowButton:focus-visible { background: transparent; }
+.rowLink { padding-inline: 0; text-decoration: none; border-top: 1px solid var(--plugin-line); border-radius: 12px; }
+.rowLink:hover { background: transparent; }
 .chevron { flex: none; transition: transform 180ms ease; }
 .chevron[data-open] { transform: rotate(90deg); }
 .expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 200ms ease, opacity 160ms ease; }

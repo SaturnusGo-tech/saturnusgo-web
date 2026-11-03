@@ -46,7 +46,7 @@ The self-contained Cloudflare unavailable-company document has the same captured
 
 ## Content and explicit exceptions
 
-Integration logos, user avatars, screenshots, recorded evidence, authored illustrations and videos are content. Theme changes do not recolor those assets. Rich Markdown highlight swatches preserve the existing authored content colors. Their five exact CSS exceptions and four integration-brand declarations are listed with reasons in `scripts/falcon-theme-exceptions.json`. Marker RGB channels encode saved content and remain paired with the existing highlight semantics. Neutral menu chrome around them uses the shared roles.
+Integration logos, user avatars, screenshots, recorded evidence, authored illustrations and videos are content. Theme changes do not recolor those assets. Rich Markdown highlight swatches preserve the existing authored content colors. Their five exact CSS exceptions, four integration-brand declarations and restored integration-workflow artwork paints are listed with reasons in `scripts/falcon-theme-exceptions.json`. Marker RGB channels encode saved content and remain paired with the existing highlight semantics. Neutral menu chrome around them uses the shared roles. Integration workflow previews retain their approved gradient artwork and readable dark example cards in both themes; search, settings, connection rows and menus continue to use interface tokens.
 
 Decorative empty-state rasters in case selection, first-project onboarding, empty dashboards and the employee directory are replaced by small existing library icons. Their foreground follows the theme; they do not require a separate light/dark bitmap or a saturation/brightness filter.
 
@@ -58,7 +58,7 @@ For an intentional future palette update, recapture both reference themes, updat
 
 ## Migration verification — 2026-11-02
 
-- 221 Falcon stylesheets pass the literal-color, missing-role, inverse-action-foreground and malformed-shadow guard; 73 roles and nine precise content/brand exceptions.
+- Falcon stylesheets pass the literal-color, missing-role, inverse-action-foreground and malformed-shadow guard; 73 roles and precise content/brand exceptions.
 - Captured role completeness, Falcon-only document/portal scope and AA neutral/solid-action contrast tests pass. Full TypeScript and architecture (1607 files) pass.
 - Relevant operational regression, documentation/popup/dashboard/API, public/auth/admin, navigation and plugin-manager tests pass.
 - Browser checks cover both desktop themes: repository/case detail, suite catalog/create, runs, settings/menu, integrations, documentation and AI. Dark suite catalog fits 390px without horizontal document overflow. The dark theme dropdown resolves to `#212121` with `#ededed` text, while the main canvas resolves to `#0e0e0e`.

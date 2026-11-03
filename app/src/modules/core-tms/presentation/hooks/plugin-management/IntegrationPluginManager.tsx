@@ -7,6 +7,7 @@ import { useWorkspaceConnectors } from "../../../connectors/application/context/
 import { ApiSourceManager } from "../../../api-sources/presentation/ApiSourceManager";
 import { INTEGRATIONS, type IntegrationId } from "../catalog/integration-definitions";
 import { IntegrationBrand } from "../shared/brand/IntegrationBrand";
+import { ConnectionTitle } from "../shared/connection/ConnectionTitle";
 import { IntegrationGuideLink } from "../shared/theme/IntegrationGuideLink";
 import { YouTrackSettings } from "../youtrack/YouTrackSettings";
 import surface from "../../../codex-employee/presentation/plugin-surface/plugin.module.css";
@@ -47,7 +48,7 @@ export function IntegrationPluginManager({ id, workspaceId, projectId, canManage
             <button ref={trigger} type="button" className={`${surface.row} ${css.rowButton}`} aria-expanded={open} aria-controls={panelId}
               onClick={() => reveal(!open)}>
               <span className={`${surface.icon} ${css.rowBrand}`}><IntegrationBrand provider={id} /></span>
-              <span className={surface.rowCopy}><span className={surface.rowTitle}>{ru ? "Настроить подключение" : "Connection setup"}</span>
+              <span className={surface.rowCopy}><span className={surface.rowTitle}><ConnectionTitle>{ru ? "Настроить подключение" : "Connection setup"}</ConnectionTitle></span>
                 <span className={surface.rowDescription}>{id === "swagger" ? (ru ? "Подключённые API, спецификации и доступ к проектам" : "Connected APIs, specifications and project access")
                   : (ru ? "Авторизация, правила и состояние интеграции" : "Authorization, rules and integration status")}</span></span>
               <ChevronRight width={18} height={18} className={css.chevron} data-open={open || undefined} />
