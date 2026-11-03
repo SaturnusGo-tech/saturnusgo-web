@@ -8,8 +8,8 @@ import { useWorkspaceMembers } from "../state/useWorkspaceMembers";
 import { useMemberName } from "../state/useMemberName";
 import styles from "./responsible-picker.module.css";
 
-export function ResponsiblePicker({ workspaceId, value, onChange, disabled = false, offline = false, selectedName, ariaLabel, unselectedLabel, noSelection = false }: {
-  workspaceId: string; value: string | null; onChange: (value: string | null) => void; disabled?: boolean; offline?: boolean; selectedName?: string | null; ariaLabel?: string; unselectedLabel?: string; noSelection?: boolean;
+export function ResponsiblePicker({ workspaceId, value, onChange, disabled = false, offline = false, selectedName, ariaLabel, unselectedLabel, noSelection = false, autoOpen = false }: {
+  workspaceId: string; value: string | null; onChange: (value: string | null) => void; disabled?: boolean; offline?: boolean; selectedName?: string | null; ariaLabel?: string; unselectedLabel?: string; noSelection?: boolean; autoOpen?: boolean;
 }) {
   const { locale } = useTmsLocale();
   const ru = locale === "ru";
@@ -28,6 +28,7 @@ export function ResponsiblePicker({ workspaceId, value, onChange, disabled = fal
   const search = useRef<HTMLInputElement>(null);
   const listId = useId();
   const selected = members.items.find((item) => item.id === value)?.name ?? (chosen?.id === value ? chosen.name : selectedName) ?? member.name;
+  useEffect(() => { if (autoOpen && !disabled && !offline) setOpen(true); }, [autoOpen, disabled, offline]);
   useEffect(() => { if (disabled || offline) setOpen(false); }, [disabled, offline]);
   useEffect(() => {
     if (!open) return;

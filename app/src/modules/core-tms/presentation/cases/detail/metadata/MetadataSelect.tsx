@@ -18,12 +18,14 @@ export function MetadataSelect<T extends string>({
   options,
   onChange,
   autoFocus,
+  autoOpen = false,
 }: {
   label: string;
   value: T;
   options: readonly MetadataOption<T>[];
   onChange: (value: T) => void;
   autoFocus?: boolean;
+  autoOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -35,6 +37,8 @@ export function MetadataSelect<T extends string>({
   useMetadataPopover(open, triggerRef, menuRef);
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
   const selected = options[selectedIndex] ?? options[0];
+
+  useEffect(() => { if (autoOpen) openAt(selectedIndex); }, [autoOpen]);
 
   useEffect(() => {
     if (!open) return;

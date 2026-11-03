@@ -159,9 +159,13 @@
   :global([data-appearance="glass"]) .sideRail { border-left: 1px solid var(--falcon-border); padding-left: 22px; }
 }
 
-.additionalInput>div { padding:10px 12px; }
-.additionalInput textarea { height:72px!important; min-height:60px!important; padding:8px 10px!important; }
-
-.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { min-height:80px; }
-.additionalInput [data-editor-shell] :global(.mdxeditor-root-contenteditable),
-.additionalInput [data-editor-shell] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]) { min-height:44px; padding:7px 10px; }
+.additionalInput > div { padding: 4px 8px; }
+.additionalInput [data-editor-shell][data-appearance="plain"] > :global(.mdxeditor) { height: auto; min-height: 0; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-toolbar) { min-height: 28px; padding: 0 0 3px; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable) { height: auto; min-height: 32px; max-height: 200px; padding: 0; }
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-contenteditable-wrapper > [contenteditable]),
+.additionalInput [data-editor-shell][data-appearance="plain"] :global(.mdxeditor-root-contenteditable > div:not(.mdxeditor-contenteditable-wrapper)) { min-height: 32px; padding: 4px 2px; }
+.additionalInput [data-editor-shell] :global([class*="_placeholder_"]) { padding: 4px 2px; }
+.additionalInput [data-editor-shell] > div:has(> textarea) { height: 32px; min-height: 32px; }
+.additionalInput textarea { height: 32px !important; min-height: 32px !important; padding: 4px 2px !important; }
+.additionalInput [data-editor-shell][data-appearance="plain"] > div:has(> button) { min-height: 26px; padding-block: 0; }

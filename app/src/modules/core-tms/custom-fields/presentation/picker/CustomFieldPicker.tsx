@@ -12,9 +12,9 @@ import css from "./customFieldPicker.module.css";
 
 export type CustomFieldPickerProps = CustomFieldScope & { field: CustomFieldDefinition;
   selected: readonly CustomFieldSelection[]; onChange(values: readonly CustomFieldSelection[]): void;
-  parentValueId?: string | null; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean };
+  parentValueId?: string | null; canCreate?: boolean; disabled?: boolean; placeholder?: string; invalid?: boolean; autoOpen?: boolean };
 export function CustomFieldPicker({ field, selected, onChange, parentValueId, canCreate = false,
-  disabled = false, placeholder, invalid, workspaceId, projectId }: CustomFieldPickerProps) {
+  disabled = false, placeholder, invalid, autoOpen = false, workspaceId, projectId }: CustomFieldPickerProps) {
   const { locale } = useTmsLocale(); const ru = locale === "ru"; const id = useId();
   const [open, setOpen] = useState(false); const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null); const panel = useRef<HTMLDivElement>(null); const search = useRef<HTMLInputElement>(null);
@@ -25,6 +25,9 @@ export function CustomFieldPicker({ field, selected, onChange, parentValueId, ca
   useAnchoredPopup(open, false, root, trigger, panel, close, 310);
   useEffect(() => { if (open) search.current?.focus({ preventScroll: true }); }, [open]);
   useEffect(() => { close(); }, [field.id, workspaceId, projectId, parentValueId, disabled, close]);
+  useEffect(() => {
+    if (autoOpen && !disabled) setOpen(true);
+  }, [autoOpen, disabled]);
   const label = customFieldLabel(field, ru); const candidate = parseFieldValue(page.search, field.type);
   const exact = page.items.find(value => normalizedFieldLabel(value.label) === normalizedFieldLabel(page.search));
   const parentNeeded = field.systemKey === "product" && !parentValueId;

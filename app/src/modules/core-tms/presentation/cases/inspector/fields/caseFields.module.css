@@ -5,3 +5,4 @@
 .facts { margin:0; display:grid; gap:12px; }
 .facts>div { display:grid; gap:4px; min-width:0; }
 .facts dd { margin:0; font-size:13px; overflow-wrap:anywhere; }
+.editing { gap:14px; }

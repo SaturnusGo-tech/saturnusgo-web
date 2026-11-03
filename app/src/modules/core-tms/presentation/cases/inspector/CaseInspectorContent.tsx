@@ -31,6 +31,7 @@ export function CaseInspectorContent({
   const attachmentDraft = useCaseAttachmentDraft();
   const [visible, setVisible] = useState(() => copyInspectorRevision(revision));
   const [editing, setEditing] = useState<ReadonlySet<InspectorSection>>(() => new Set());
+  const [inlineComponent, setInlineComponent] = useState(false);
   const snapshots = useRef<Partial<Record<InspectorSection, TestCaseRevision>>>({});
   const folderSnapshots = useRef<Partial<Record<InspectorSection, string>>>({});
   const editorMode = editor?.mode;
@@ -41,6 +42,7 @@ export function CaseInspectorContent({
   useEffect(() => {
     if (editor) return;
     setEditing(new Set());
+    setInlineComponent(false);
     snapshots.current = {};
     folderSnapshots.current = {};
   }, [editor]);
@@ -67,6 +69,7 @@ export function CaseInspectorContent({
     closeSection(section);
   }
   function closeSection(section: InspectorSection) {
+    if (section === "component") setInlineComponent(false);
     delete snapshots.current[section];
     delete folderSnapshots.current[section];
     setEditing((current) => {
@@ -89,6 +92,10 @@ export function CaseInspectorContent({
     onSave: saveSection,
     disabled: readOnly || editor?.submitting || editor?.attachmentsPending,
   });
+  const requestField = (section: InspectorSection) => !readOnly && !editor?.submitting && !editor?.attachmentsPending ? () => {
+    if (section === "component") setInlineComponent(true);
+    begin(section);
+  } : undefined;
   const sectionEditing = (section: InspectorSection) => (
     !readOnly && Boolean(editor) && isInspectorSectionEditing(editorMode, editing, section)
   );
@@ -116,15 +123,15 @@ export function CaseInspectorContent({
     </main>
     <aside className={css.sideRail} aria-label={ru ? "Свойства тест-кейса" : "Test case properties"}>
       <InspectorSectionView title={ru ? "Поля" : "Custom fields"} {...controls("component")}>
-        {sectionEditing("component") && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
-        <CaseCustomFields projectId={editor?.projectId} revision={value} editing={sectionEditing("component")} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
+        {sectionEditing("component") && !inlineComponent && editor && <FolderPathPicker value={editor.folderPath} folders={editor.folders} onChange={editor.onFolderPath} ru={ru} disabled={editor.submitting} />}
+        <CaseCustomFields onRequestEdit={requestField("component")} projectId={editor?.projectId} revision={value} editing={sectionEditing("component")} canCreate={editor?.canCreateFieldValues} disabled={editor?.submitting || editor?.attachmentsPending} ru={ru} onPatch={patch} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Свойства" : "Properties"} editLabel={ru ? "Изменить свойства" : "Edit properties"} {...controls("properties")}>
-        <CaseMetadataControls locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
+        <CaseMetadataControls onRequestEdit={requestField("properties")} locale={locale} revision={value} archived={archived} editing={sectionEditing("properties")}
           autoFocus={!creating} showLabels onChange={readOnly ? undefined : editor?.onChange} />
       </InspectorSectionView>
       <InspectorSectionView title={ru ? "Дополнительно" : "Additional details"} {...controls("details")}>
-        <InspectorDetails testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />
+        <InspectorDetails onRequestEdit={requestField("details")} disabled={editor?.submitting || editor?.attachmentsPending} testCaseId={testCaseId} revision={value} editing={sectionEditing("details")} autoFocus={!creating} ru={ru} onPatch={patch} />
       </InspectorSectionView>
     </aside>
   </div>;
