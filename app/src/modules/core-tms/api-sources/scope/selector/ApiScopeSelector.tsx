@@ -1,6 +1,6 @@
 import { PortfolioIcon } from "../../../portfolios/presentation/icon/PortfolioIcon";
 import { ChevronDown, Search } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { WorkspaceModel } from "../../../state/model/useWorkspaceModel";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useRepositoryCatalog } from "../../../repository-scope/state/catalog/useRepositoryCatalog";
@@ -12,6 +12,7 @@ export function ApiScopeSelector({ model }: { model: WorkspaceModel }) {
   const scope = useApiContext(model.projectId); const portfolios = useRepositoryCatalog(model.data.workspace.id, true);
   const [open, setOpen] = useState(false); const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"projects" | "portfolios">("projects"); const [draft, setDraft] = useState<ApiContext>(scope.context);
+  const menuId = useId();
   const root = useRef<HTMLDivElement>(null); const trigger = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!open) return;
@@ -32,20 +33,21 @@ export function ApiScopeSelector({ model }: { model: WorkspaceModel }) {
   }
   return <div className={css.root} ref={root} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); setOpen(false); trigger.current?.focus(); } }}>
     <button className={css.trigger} ref={trigger} type="button" aria-label={ru ? "Проекты или портфель для API" : "API projects or portfolio"}
-      aria-expanded={open} aria-haspopup="dialog" onClick={() => { setDraft(scope.context); setTab(scope.context.portfolioId ? "portfolios" : "projects"); setSearch(""); setOpen(!open); }}>
-      {scope.context.portfolioId && <PortfolioIcon size={16}/>}<strong>{label}</strong><ChevronDown size={15}/>
+      aria-expanded={open} aria-haspopup="dialog" aria-controls={open ? menuId : undefined} onClick={() => { setDraft(scope.context); setTab(scope.context.portfolioId ? "portfolios" : "projects"); setSearch(""); setOpen(!open); }}>
+      {scope.context.portfolioId && <PortfolioIcon size={16}/>}<strong>{label}</strong><ChevronDown size={15} aria-hidden="true"/>
     </button>
-    {open && <div className={css.menu} role="dialog" aria-label={ru ? "Область API" : "API scope"}>
+    {open && <div id={menuId} className={css.menu} role="dialog" aria-label={ru ? "Область API" : "API scope"}>
       <div className={css.tabs}>{(["projects", "portfolios"] as const).map(value => <button key={value} type="button" aria-pressed={tab === value} onClick={() => { setTab(value); setSearch(""); }}>
         {value === "projects" ? (ru ? "Проекты" : "Projects") : (ru ? "Портфели" : "Portfolios")}</button>)}</div>
-      <label className={css.search}><Search size={15}/><input value={search} onChange={event => setSearch(event.target.value)} aria-label={ru ? "Найти проект или портфель" : "Find a project or portfolio"} placeholder={ru ? "Поиск" : "Search"}/></label>
+      <label className={css.search} data-input-shell><Search size={15} aria-hidden="true"/><input value={search} onChange={event => setSearch(event.target.value)} aria-label={ru ? "Найти проект или портфель" : "Find a project or portfolio"} placeholder={ru ? "Поиск" : "Search"}/></label>
       <div className={css.list}>
-        {tab === "portfolios" && portfolios.loading ? <p>{ru ? "Загрузка…" : "Loading…"}</p> : tab === "portfolios" && portfolios.error ? <button type="button" onClick={portfolios.retry}>{ru ? "Повторить загрузку" : "Retry"}</button> : items.map(item => <label className={css.option} key={item.id}>
+        {tab === "portfolios" && portfolios.loading ? <p role="status">{ru ? "Загрузка…" : "Loading…"}</p> : tab === "portfolios" && portfolios.error ? <button type="button" className={css.retry} onClick={portfolios.retry}>{ru ? "Повторить загрузку" : "Retry"}</button> : items.map(item => <label className={css.option} key={item.id}>
           <input type={tab === "projects" ? "checkbox" : "radio"} name="api-scope" disabled={tab === "projects" && (draft.projectIds?.length ?? 0) >= 100 && !draft.projectIds?.includes(item.id)} checked={tab === "projects" ? Boolean(draft.projectIds?.includes(item.id)) : draft.portfolioId === item.id}
             onChange={() => setDraft(tab === "portfolios" ? { portfolioId: item.id } : { projectIds: draft.projectIds?.includes(item.id) ? draft.projectIds.filter(id => id !== item.id) : [...draft.projectIds ?? [], item.id] })}/>{tab === "portfolios" && <PortfolioIcon size={16} />}<span>{item.name}</span>
         </label>)}
+        {!items.length && !(tab === "portfolios" && (portfolios.loading || portfolios.error)) && <p>{ru ? "Ничего не найдено" : "Nothing found"}</p>}
       </div>
-      <footer><button type="button" disabled={!draft.portfolioId && !draft.projectIds?.length} onClick={() => void apply()}>{ru ? "Применить" : "Apply"}</button></footer>
+      <footer><span>{ru ? "Выбрано" : "Selected"}: {draft.portfolioId ? 1 : draft.projectIds?.length ?? 0}</span><button className={css.apply} type="button" disabled={!draft.portfolioId && !draft.projectIds?.length} onClick={() => void apply()}>{ru ? "Применить" : "Apply"}</button></footer>
     </div>}
   </div>;
 }

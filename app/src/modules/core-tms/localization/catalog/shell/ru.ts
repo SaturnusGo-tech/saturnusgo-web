@@ -89,6 +89,7 @@ export const ruShellMessages = {
   "workspace.loadingDescription": "Подключаемся к TMS API и загружаем актуальное состояние проекта.",
   "workspace.connectionRequired": "Требуется подключение",
   "workspace.unavailable": "Рабочее пространство недоступно",
+  "workspace.retryDescription": "Не удалось открыть рабочее пространство. Попробуйте ещё раз чуть позже.",
   "workspace.noLocalReplacement": "Данные рабочего пространства не были заменены или сохранены локально.",
   "workspace.openDemo": "Открыть демо-режим",
   "workspace.productionProtected": "Продакшен-данные защищены",

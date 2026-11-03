@@ -13,7 +13,7 @@ test("workspace loading keeps copy screen-reader-only", () => {
   );
   const loadingBranch = workspaceSource.slice(
     workspaceSource.indexOf("if (!failure)"),
-    workspaceSource.indexOf("const status"),
+    workspaceSource.indexOf("<section"),
   );
 
   assert.match(loadingBranch, /testId="workspace-loading"/);

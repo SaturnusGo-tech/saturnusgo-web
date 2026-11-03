@@ -103,9 +103,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     return (
       <WorkspaceLoadState
         failure={model.failure}
-        demoAvailable={model.demoAvailable}
         onRetry={model.retryBootstrap}
-        onUseDemo={model.useDevelopmentDemo}
       />
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { Braces, Database, FileJson2, RefreshCw, Server, Settings2 } from "lucide-react";
+import { Braces, Database, FileJson2, Server } from "lucide-react";
 import { visitWorkspace } from "../../state/navigation/browser/workspace-history";
 import { pluginSettingsLink } from "../config/navigation/plugins/plugin-settings-route";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
@@ -13,6 +13,7 @@ import { useApiSelection } from "../../api-sources/selection/useApiSelection";
 import { apiSourceError } from "../../api-sources/model/api-source-error";
 import { AnimatedSelect } from "../common/select/AnimatedSelect";
 import { ContentSkeleton } from "../common/skeleton/ContentSkeleton";
+import { ApiTestingActions } from "./actions/ApiTestingActions";
 import surface from "./api-testing.module.css";
 const SwaggerDocument = dynamic(() => import("./renderer/SwaggerDocument"), {
   ssr: false, loading: () => <ContentSkeleton label="Swagger" />,
@@ -25,15 +26,16 @@ export function ApiTestingView({ scope, canManage }: { scope: Scope; canManage: 
   const source = selection.source;
   const state = useApiDocument(scope.workspaceId, context, source);
   const configure = () => visitWorkspace(pluginSettingsLink(window.location.href, "swagger", true));
+  const manage = () => visitWorkspace(pluginSettingsLink(window.location.href, "swagger"));
   const retry = () => { list.refresh(); state.reload(); };
   const error = list.error || state.error;
   return <section className={surface.page} data-testid="api-testing-view">
     <header className={surface.header}><h1>{t("apiTesting.title")}</h1>
-      {!list.loading && list.items.length > 0 && <AnimatedSelect className={surface.sourceSelector} label={ru ? "Сервис API" : "API service"}
+      {!list.loading && list.items.length > 1 && <AnimatedSelect className={surface.sourceSelector} label={ru ? "Сервис API" : "API service"}
         value={source?.id ?? ""} options={[{ value: "", label: ru ? "Выберите API" : "Choose an API" }, ...list.items.map(item => ({ value: item.id, label: `${item.name}${item.enabled ? "" : ru ? " · отключён" : " · disabled"}` }))]}
         onChange={value => { if (value) selection.select(value); }} />}
-      <div className={surface.actions}>{canManage && list.items.length > 0 && <button type="button" onClick={configure}><Settings2 size={15}/>{ru ? "Настроить Swagger" : "Manage Swagger"}</button>}
-        <button type="button" onClick={retry} disabled={list.loading || state.loading} aria-label={ru ? "Обновить API" : "Refresh API"}><RefreshCw size={15}/></button></div>
+      {list.items.length === 1 && <span className={surface.sourceName} title={source?.name}>{source?.name}</span>}
+      <ApiTestingActions canManage={canManage && list.items.length > 0} disabled={list.loading || state.loading} ru={ru} onManage={manage} onRefresh={retry} />
     </header>
     <div className={surface.webview}>
       {(list.loading || state.loading) && <ContentSkeleton variant="list" label={t("common.loading")}/>}

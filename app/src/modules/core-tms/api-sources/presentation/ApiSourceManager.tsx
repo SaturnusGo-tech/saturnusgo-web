@@ -29,7 +29,7 @@ export function ApiSourceManager({ workspaceId, projectId, onBack, onSaved, embe
         onSaved={source => { setPending(false); setEditing(null); setSaved(source.name); catalog.refresh(); onSaved?.(source); }}/>
     </> : <>
       <nav className={css.breadcrumb} aria-label={ru ? "Навигация Swagger" : "Swagger navigation"}><button type="button" disabled={pending} onClick={onBack}>Swagger</button><ChevronRight size={15}/><span>{ru ? "Подключения" : "Connections"}</span></nav>
-      {catalog.items.length > 0 && <header><Heading ref={heading} tabIndex={-1}>{ru ? "Подключения Swagger" : "Swagger connections"}</Heading><button className={css.primary} type="button" disabled={!ready} onClick={() => select("new")}><Plus size={16}/>{ru ? "Подключить API" : "Connect API"}</button></header>}
+      {catalog.items.length > 0 && <header><div><Heading ref={heading} tabIndex={-1}>{ru ? "Подключённые API" : "API connections"}</Heading><p>{ru ? "Спецификации и доступ к проектам." : "Specifications and project access."}</p></div><button className={css.primary} type="button" disabled={!ready} onClick={() => select("new")}><Plus size={16}/>{ru ? "Подключить API" : "Connect API"}</button></header>}
       {saved && <p className={css.notice} role="status">{ru ? `Подключение «${saved}» сохранено.` : `${saved} connection saved.`}</p>}
       {(catalog.loading || projects.loading) && <div className={css.skeleton} role="status" aria-label={ru ? "Загрузка подключений" : "Loading connections"}/>}
       {(catalog.error || projects.error) && <div className={css.state} role="alert"><p>{apiSourceError(catalog.error || projects.error,ru)}</p><button type="button" onClick={() => { catalog.refresh(); projects.retry(); }}>{ru ? "Повторить" : "Retry"}</button></div>}

@@ -87,6 +87,7 @@ export const enShellMessages = {
   "workspace.loadingDescription": "Connecting to the TMS API and loading the latest project state.",
   "workspace.connectionRequired": "Connection required",
   "workspace.unavailable": "Workspace unavailable",
+  "workspace.retryDescription": "We couldn’t open your workspace. Please try again in a moment.",
   "workspace.noLocalReplacement": "No workspace data was replaced or saved locally.",
   "workspace.openDemo": "Open development demo",
   "workspace.productionProtected": "Production data remains protected",

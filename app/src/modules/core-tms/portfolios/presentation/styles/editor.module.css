@@ -1,8 +1,7 @@
 .editor { min-height: 500px; }
 .titleField { flex: 1; min-width: 200px; }
-.titleField input { width: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: clamp(21px, 2vw, 27px); font-weight: 620; line-height: 1.35; letter-spacing: -.5px; transition: border-color 160ms ease; }
-.titleField input::placeholder { color: var(--muted); opacity: .75; }
-.titleField input:focus-visible { outline: none; border-color: var(--action); box-shadow: none; }
+.editor .titleField input { box-sizing: border-box; width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid var(--falcon-border-strong); border-radius: 12px; background: transparent; color: var(--falcon-text); font: inherit; font-size: 15px; font-weight: 450; line-height: 1.4; transition: border-color 160ms ease; }
+.titleField input::placeholder { color: var(--falcon-text-muted); opacity: 1; }
 .activeTab { display: inline-flex; padding: 12px 0; border-bottom: 2px solid var(--action); color: var(--ink); font-size: 13px; font-weight: 550; }
 .mainFields { display: grid; align-content: start; gap: 25px; }
 .markdownSection { min-width: 0; }
@@ -19,12 +18,11 @@
 .property { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: center; gap: 9px; min-width: 0; width: 100%; margin: 0; font-size: 12px; }
 .property > span { color: var(--muted); }
 .property > .propertyLabel { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
-.property > input { min-width: 0; width: min(100%, 16ch); min-height: 30px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; padding: 5px 7px; color: var(--ink); background: transparent; font: inherit; }
+.editor .property > input { box-sizing: border-box; min-width: 0; width: min(100%, 16ch); min-height: 36px; border: 1px solid var(--falcon-border-strong); border-radius: 10px; padding: 7px 10px; color: var(--falcon-text); background: transparent; font: inherit; }
 .property > div { min-width: 0; width: max-content; max-width: 100%; }
 .property > div > button[aria-haspopup="listbox"] { min-height: 30px; border: 0; background: transparent; padding: 5px 7px; font-size: 12px; box-shadow: none; }
 .property > div > button[aria-haspopup="listbox"]:hover { background: var(--control-hover); }
-.property > input:focus-visible { outline: none; border-color: var(--action); box-shadow: none; }
-.editor [aria-invalid="true"] { border-color: var(--danger, var(--falcon-danger-border)); }
+.editor :is(.titleField, .property) input[aria-invalid="true"] { border-color: var(--falcon-danger-border); }
 .property > .limit { grid-column: 2; color: var(--danger, var(--falcon-text)); }
 .property > .note, .property > button { grid-column: 2; margin: 0; justify-self: start; }
 .property > .note { max-width: 42ch; }
@@ -40,14 +38,11 @@
 @media (prefers-reduced-motion:reduce) { .spin { animation: none; } .markdownFrame, .titleField input { transition: none; } }
 .note { margin: -7px 0 23px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .note code { font: inherit; white-space: nowrap; }
-@media(max-width:700px) { .titleField { min-width: 0; } .titleField input { font-size: 23px; } .mainFields { gap: 20px; } }
+@media(max-width:700px) { .titleField { min-width: 0; } .mainFields { gap: 20px; } }
 
 
 .markdownContent { --cases-text: var(--falcon-text); --cases-secondary-text: var(--falcon-text-secondary); --cases-strong: var(--falcon-text); --cases-muted: var(--falcon-text-muted); --cases-hover: var(--falcon-hover); --cases-primary: var(--falcon-action); --cases-link: var(--falcon-link); --cases-control-border: var(--falcon-border); --cases-raised: var(--falcon-elevated); }
 
-.editor .properties .property > input[data-field] { background: transparent; border-color: transparent; }
-.editor .titleField input:focus-visible, .editor .properties .property > input[data-field]:is(:focus, :focus-visible) { outline: none !important; box-shadow: none !important; }
-.editor .titleField input[aria-invalid="true"]:focus-visible { border-color: var(--danger, var(--falcon-focus)); }
 .headerActions.headerActions button { width: 36px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--ink); }
 .headerActions.headerActions button[data-save-organization] { background: var(--falcon-action); color: var(--falcon-on-action); border-color: var(--falcon-border); }
 .headerActions.headerActions button[data-save-organization] svg { color: inherit !important; }

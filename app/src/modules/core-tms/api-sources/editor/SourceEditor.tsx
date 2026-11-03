@@ -16,17 +16,24 @@ export function SourceEditor({ workspaceId, projectId, source, catalog, projects
   useEffect(() => { onPendingChange?.(state.pending); }, [state.pending, onPendingChange]);
   const duplicate = !source && catalog.find(api => api.sourceUrl.trim() === draft.sourceUrl.trim());
   return <form className={css.panel} aria-labelledby="api-source-title" onSubmit={event => { event.preventDefault(); void state.save(); }}>
-    <header><h1 id="api-source-title">{source ? (ru ? "Настройки API" : "API settings") : (ru ? "Подключить Swagger" : "Connect Swagger")}</h1>
-      <p>{ru ? "Добавьте спецификацию и выберите проекты, где API будет доступен." : "Add a specification and choose the projects that can use this API."}</p></header>
+    <header><h1 id="api-source-title">{source ? source.name : (ru ? "Подключить API" : "Connect API")}</h1>
+      <p>{ru ? "Спецификация OpenAPI или Swagger в формате JSON или YAML." : "An OpenAPI or Swagger specification in JSON or YAML."}</p></header>
     <fieldset disabled={state.pending}>
       <legend className={css.srOnly}>{ru ? "Подключение API" : "API connection"}</legend>
-      <label className={css.field}>{ru ? "Название" : "Name"}<input ref={nameInput} maxLength={255} value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} placeholder={ru ? "Например, API бронирований" : "For example, Booking API"}/></label>
-      <label className={css.field}>{ru ? "Ссылка на спецификацию" : "Specification URL"}<input required type="url" maxLength={2048} spellCheck={false} autoComplete="off" value={draft.sourceUrl} onChange={event => setDraft({ ...draft, sourceUrl: event.target.value })} placeholder="https://api.company.com/openapi.json"/><small>{ru ? "OpenAPI или Swagger в формате JSON или YAML." : "OpenAPI or Swagger in JSON or YAML format."}</small></label>
+      <div className={css.fields}>
+      <label className={css.settingField}><span>{ru ? "Название" : "Name"}</span><input ref={nameInput} maxLength={255} value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} placeholder={ru ? "API бронирований" : "Booking API"}/></label>
+      <label className={css.settingField}><span>{ru ? "Спецификация" : "Specification"}</span><input required type="url" maxLength={2048} spellCheck={false} autoComplete="off" value={draft.sourceUrl} onChange={event => setDraft({ ...draft, sourceUrl: event.target.value })} placeholder="https://api.company.com/openapi.json"/></label>
+      </div>
       {duplicate && <div className={css.duplicate}><span>{ru ? "Этот адрес уже подключён:" : "This URL is already connected:"} {duplicate.name}</span><button type="button" onClick={() => onExisting(duplicate)}>{ru ? "Использовать подключение" : "Use existing connection"}</button></div>}
-      <SourceCredentials source={source} draft={draft} ru={ru} onChange={setDraft}/>
-      <SourceProjects projects={projects} draft={draft} ru={ru} onChange={setDraft}/>
-      {source && <section className={css.lifecycle}><label className={css.check}><input type="checkbox" checked={draft.enabled} onChange={event => setDraft({ ...draft, enabled: event.target.checked })}/><span>{ru ? "API включён" : "API enabled"}</span></label>
-        <p>{ru ? "Изменения документации и отключение действуют во всех связанных проектах. Чтобы убрать API только из одного проекта, снимите его выбор выше." : "Documentation changes and disabling apply to every linked project. To unlink a single project, deselect it above."}</p></section>}
+      <div className={css.options}>
+        <SourceCredentials source={source} draft={draft} ru={ru} onChange={setDraft}/>
+        <SourceProjects projects={projects} draft={draft} ru={ru} onChange={setDraft}/>
+        {source && <section className={css.lifecycle}><label><span>{ru ? "API включён" : "API enabled"}
+          {(draft.allProjects || draft.projectIds.length > 1) && <small>{draft.allProjects
+            ? (ru ? "Отключение действует во всех проектах рабочего пространства." : "Disabling affects every project in this workspace.")
+            : (ru ? "Отключение действует во всех выбранных проектах." : "Disabling affects all selected projects.")}</small>}
+          </span><input type="checkbox" role="switch" checked={draft.enabled} onChange={event => setDraft({ ...draft, enabled: event.target.checked })}/></label></section>}
+      </div>
     </fieldset>
     {Boolean(state.error) && <div className={css.error} role="alert"><p>{apiSourceError(state.error, ru)}</p>
       {state.error instanceof TmsApiError && state.error.status === 412 && <button type="button" onClick={onReload}>{ru ? "Обновить данные" : "Reload data"}</button>}</div>}

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { SourceEditor } from "../../editor/SourceEditor";
-import { sourceDraft } from "../../model/api-source";
+import { keepsSourceCredentials, sourceDraft, type ApiSource } from "../../model/api-source";
+import type { SourceCredentials } from "../../forms/SourceCredentials";
+import type { SourceProjects } from "../../forms/SourceProjects";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 test("Swagger full-page form retains validation, pending gate and saved callback without a modal", () => {
   const h = componentHarness(); let saves = 0, cancels = 0;
@@ -18,4 +20,41 @@ test("Swagger full-page form retains validation, pending gate and saved callback
   state.pending = true; all = nodes(h.render(() => View(props)));
   assert.equal(all.find(node => node.type === "fieldset")?.props.disabled, true);
   assert.equal(all.find(node => node.props.type === "submit")?.props.disabled, true);
+});
+test("documentation access opens on request and changing its method clears incompatible secrets", () => {
+  const h = componentHarness(); let draft = sourceDraft(null, "p");
+  const { SourceCredentials: View } = h.load<{ SourceCredentials: typeof SourceCredentials }>(new URL("../../forms/SourceCredentials.tsx", import.meta.url), name => name.endsWith("api-source") ? { keepsSourceCredentials } : undefined);
+  const render = () => nodes(h.render(() => View({ draft, source: null, ru: false, onChange: value => { draft = value; } })));
+  let all = render(); assert.equal(all.some(node => node.type === "AnimatedSelect" || node.type === "input"), false);
+  invoke(all.find(node => node.type === "button")!, "onClick"); all = render();
+  const selector = all.find(node => node.type === "AnimatedSelect")!; assert.ok(selector);
+  draft.secrets = { username: "saved", password: "secret" };
+  invoke(selector, "onChange", "bearer"); assert.equal(draft.authMode, "bearer"); assert.deepEqual(Object.keys(draft.secrets), []);
+  all = render(); const token = all.find(node => node.type === "input" && node.props.type === "password")!;
+  invoke(token, "onChange", { target: { value: "new-token" } }); assert.equal(draft.secrets.apiToken, "new-token");
+  invoke(render().find(node => node.type === "button")!, "onClick"); assert.equal(render().some(node => node.type === "input"), false);
+  assert.equal(draft.secrets.apiToken, "new-token", "collapsing settings preserves the draft");
+});
+test("project access starts compact without losing its scope when opened or closed", () => {
+  const h = componentHarness(); let draft = sourceDraft(null, "p");
+  const { SourceProjects: View } = h.load<{ SourceProjects: typeof SourceProjects }>(new URL("../../forms/SourceProjects.tsx", import.meta.url));
+  const render = () => nodes(h.render(() => View({ draft, projects: [{ id: "p", name: "Release" }, { id: "q", name: "Web" }], ru: false, onChange: value => { draft = value; } })));
+  let all = render(); assert.equal(all.some(node => node.type === "input"), false); assert.deepEqual(Array.from(draft.projectIds), ["p"]);
+  invoke(all.find(node => node.type === "button")!, "onClick"); all = render();
+  assert.equal(all.filter(node => node.type === "input").length, 3);
+  const web = all.find(node => node.type === "label" && nodes(node.props.children).some(child => child.type === "span" && child.props.children === "Web"))!;
+  invoke(nodes(web.props.children).find(node => node.type === "input")!, "onChange"); assert.deepEqual(Array.from(draft.projectIds), ["p", "q"]);
+  invoke(render().find(node => node.type === "button")!, "onClick"); assert.equal(render().some(node => node.type === "input"), false);
+  assert.deepEqual(Array.from(draft.projectIds), ["p", "q"]);
+});
+test("a shared API explains disable scope without adding a notice to single-project connections", () => {
+  const h = componentHarness();
+  const state = { draft: sourceDraft(null, "p"), setDraft() {}, pending: false, error: null, save() {} };
+  const { SourceEditor: View } = h.load<{ SourceEditor: typeof SourceEditor }>(new URL("../../editor/SourceEditor.tsx", import.meta.url), name => name.endsWith("useApiSourceEditor") ? { useApiSourceEditor: () => state } : undefined);
+  const source = { id: "api", name: "Booking API" } as ApiSource;
+  const render = () => nodes(h.render(() => View({ workspaceId: "w", projectId: "p", source, catalog: [], projects: [], ru: false, onClose() {}, onSaved() {}, onExisting() {}, onReload() {} })));
+  const notice = () => render().find(node => node.type === "small" && typeof node.props.children === "string" && node.props.children.startsWith("Disabling affects"))?.props.children;
+  assert.equal(notice(), undefined);
+  state.draft.projectIds = ["p", "q"]; assert.equal(notice(), "Disabling affects all selected projects.");
+  state.draft.allProjects = true; assert.equal(notice(), "Disabling affects every project in this workspace.");
 });

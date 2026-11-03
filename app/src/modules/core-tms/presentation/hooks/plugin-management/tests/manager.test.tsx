@@ -70,6 +70,13 @@ test("Swagger reuses API source manager only with management rights; planned pro
     assert.equal(planned.some(node => node.props["aria-controls"] || node.type === "ConnectorSettings"), false);
   }
 });
+test("Swagger Manage starts with the shared plugin overview rather than exposing its connection form", () => {
+  const all = fixture({ id: "swagger" }).render();
+  assert.equal(all.some(node => node.type === "ApiSourceManager" || node.type === "input"), false);
+  assert.ok(all.some(node => node.type === "h2" && node.props.children === "Uses"));
+  assert.ok(all.some(node => node.type === "h2" && node.props.children === "About"));
+  assert.equal(all.find(node => node.type === "IntegrationGuideLink")?.props.article, "swagger");
+});
 test("manager navigation and guides retain the selected provider", () => {
   const f = fixture({ id: "github" }); const all = f.render();
   invoke(all.find(node => node.type === "button" && node.props.children === "Plugin settings")!, "onClick");
