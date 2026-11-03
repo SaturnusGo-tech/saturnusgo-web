@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import React, {useRef,useState} from "react";
+import React, {useLayoutEffect,useRef,useState} from "react";
 import {create,act} from "react-test-renderer";
 import {useTextareaEmoji} from "../selection/useTextareaEmoji";
 import {useStepHistory} from "../../../cases/inspector/steps/markdown/history/useStepHistory";
@@ -24,4 +24,31 @@ test("textarea emoji is one undoable replacement with caret restoration and redo
     act(()=>api.history.onKeyDown(key())); assert.equal(api.value,"hello world"); assert.equal(node.selectionStart,6);assert.equal(node.selectionEnd,11);
     act(()=>api.history.onKeyDown(key(true))); assert.equal(api.value,"hello 👩🏽‍💻");assert.equal(node.selectionStart,13);
   } finally {act(()=>tree!.unmount());globalThis.requestAnimationFrame=original;}
+});
+
+test("emoji caret restores after a deferred parent value commit", () => {
+  const original = globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame = callback => { callback(0); return 1; };
+  const node = { value: "Check access then continue", selectionStart: 6, selectionEnd: 12,
+    isConnected: true, readOnly: false, disabled: false, focus() {},
+    setSelectionRange(start: number, end: number) { this.selectionStart = start; this.selectionEnd = end; } };
+  let pending = "";
+  let api!: { emoji: ReturnType<typeof useTextareaEmoji>; apply(): void };
+  function Harness() {
+    const [value, setValue] = useState(node.value), input = useRef(node as unknown as HTMLTextAreaElement);
+    // Controlled DOM writes happen before layout effects and can reset selection to the end.
+    useLayoutEffect(() => { node.value = value; node.selectionStart = node.selectionEnd = value.length; }, [value]);
+    const emoji = useTextareaEmoji(value, input, next => { pending = next; });
+    api = { emoji, apply() { setValue(pending); } }; return null;
+  }
+  let tree!: ReturnType<typeof create>;
+  try {
+    act(() => { tree = create(<Harness />); });
+    node.selectionStart = 6; node.selectionEnd = 12;
+    act(() => api.emoji.remember()); act(() => api.emoji.insert("👍"));
+    assert.equal(node.value, "Check access then continue", "the owner has not accepted the controlled update yet");
+    act(() => api.apply());
+    assert.equal(node.value, "Check 👍 then continue");
+    assert.equal(node.selectionStart, 8); assert.equal(node.selectionEnd, 8);
+  } finally { act(() => tree.unmount()); globalThis.requestAnimationFrame = original; }
 });

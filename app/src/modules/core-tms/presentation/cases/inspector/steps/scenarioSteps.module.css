@@ -137,7 +137,7 @@
 .attachmentControls {
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   gap: 3px;
   margin-top: 2px;
