@@ -1,7 +1,7 @@
 "use client";
 import { ProfileAvatarEditor } from "../avatar/ProfileAvatarEditor";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { Profile } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { useAdministrationResource } from "../../application/state/useAdministrationResource";
@@ -16,7 +16,7 @@ import { useProfileScreen } from "./useProfileScreen";
 import { ArrowLeft, ChevronRight, KeyRound, MonitorSmartphone } from "lucide-react";
 import profileStyles from "./profile-page.module.css";
 
-export function ProfilePage({ client, onLoaded }: { readonly client: AdministrationPort; readonly onLoaded?: (profile: Profile) => void }) {
+export function ProfilePage({ client, onLoaded, accountAction }: { readonly client: AdministrationPort; readonly onLoaded?: (profile: Profile) => void; readonly accountAction?: ReactNode }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
   const resource = useAdministrationResource(useCallback((signal: AbortSignal) => client.profile(signal), [client]));
@@ -41,6 +41,7 @@ export function ProfilePage({ client, onLoaded }: { readonly client: Administrat
         <ProfileAvatarEditor compact name={profile.name} hasAvatar={profile.hasAvatar} version={profile.version} client={client} onSaved={resource.refresh} />
         <ProfileDetailsForm key={profile.version} profile={profile} client={client} onSaved={() => { setSaved(true); resource.refresh(); }} />
         <nav className={profileStyles.accountActions} aria-label={locale === "ru" ? "Безопасность аккаунта" : "Account security"}>
+          {accountAction}
           <button type="button" className={profileStyles.security} onClick={() => navigate("security")}>
             <KeyRound size={17} strokeWidth={1.6} aria-hidden="true" />
             <span>{copy.updatePassword}</span><ChevronRight size={16} aria-hidden="true" />

@@ -9,7 +9,7 @@ export function googleEmailProof(search: string): GoogleEmailProof | null {
   const intent = query.get("intent");
   if (!challengeId || !/^[\w-]{1,128}$/.test(challengeId) || !email || email.length > 320
     || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !expiresAt || !Number.isFinite(Date.parse(expiresAt))
-    || !query.has("retryAfterSeconds") || !Number.isInteger(retryAfterSeconds) || retryAfterSeconds < 0 || retryAfterSeconds > 3600
+    || !query.has("retryAfterSeconds") || !Number.isInteger(retryAfterSeconds) || retryAfterSeconds !== 60
     || (intent !== "login" && intent !== "signup")) return null;
-  return { intent, email, challenge: { challengeId, expiresAt, retryAfterSeconds } };
+  return { intent, email, challenge: { challengeId, expiresAt, retryAfterSeconds: 60 } };
 }

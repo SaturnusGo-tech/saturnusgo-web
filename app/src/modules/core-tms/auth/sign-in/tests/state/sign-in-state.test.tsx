@@ -3,6 +3,7 @@ import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useSignIn } from "../../application/useSignIn";
+import type { EmailChallenge } from "../../domain/sign-in";
 import type { SignInPort } from "../../application/sign-in-port";
 
 let current: ReturnType<typeof useSignIn>;
@@ -71,8 +72,8 @@ void test("unavailable providers cannot initiate requests and signup cannot sele
   await act(async () => renderer.unmount());
 });
 void test("changing tenant or unmounting discards old email and redirect responses", async () => {
-  let finish!: (value: { challengeId: string; expiresAt: string; retryAfterSeconds: number }) => void;
-  const client = { ...fixture(), startEmail: () => new Promise<{ challengeId: string; expiresAt: string; retryAfterSeconds: number }>(resolve => { finish = resolve; }) };
+  let finish!: (value: EmailChallenge) => void;
+  const client = { ...fixture(), startEmail: () => new Promise<EmailChallenge>(resolve => { finish = resolve; }) };
   const renderer = await mount(client);
   let pending!: Promise<void>;
   await act(async () => { pending = current.startEmail("old@example.test"); });

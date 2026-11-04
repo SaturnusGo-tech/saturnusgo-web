@@ -1,0 +1,8 @@
+.root { padding: 0; }
+.action { display: flex; align-items: center; gap: 10px; min-height: 38px; width: 100%; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: var(--admin-text, var(--falcon-text)); text-decoration: none; text-align: left; font: inherit; cursor: pointer; }
+.action svg { flex: 0 0 auto; color: var(--admin-muted, var(--falcon-text-muted)); }
+.action:hover { background: var(--admin-hover, var(--falcon-control)); }
+.action:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+.action:disabled { cursor: default; opacity: .6; }
+.hint { margin: 0 8px 12px 35px; font-size: 12px; line-height: 1.6; color: var(--admin-muted, var(--falcon-text-muted)); }
+.error { margin: 8px; font-size: 13px; color: var(--falcon-danger); }
