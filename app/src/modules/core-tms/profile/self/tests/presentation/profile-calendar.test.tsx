@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { test } from "node:test";
+import React from "react";
+import { act, create, type ReactTestRenderer } from "react-test-renderer";
+import type { SelfProfileActivity } from "../../domain/profile-model";
+
+void test("QA calendar offers recent years only and labels recorded work in the user's language", async t => {
+  const require = createRequire(import.meta.url), css = require.extensions[".css"], previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
+  require.extensions[".css"] = module => { module.exports = {}; };
+  Object.assign(globalThis, { React });
+  t.after(() => { if (css) require.extensions[".css"] = css; else delete require.extensions[".css"]; if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React"); });
+  const { ProfileCalendar } = await import("../../presentation/calendar/ProfileCalendar");
+  const year = new Date().getUTCFullYear(), selected: number[] = [];
+  const value = { series: [{ date: `${year}-01-01`, authoredCases: 1, executedCases: 0, defects: 0, runs: 0 }] } as SelfProfileActivity;
+  const props = { value, loading: false, error: null, year, ru: false, onYear: (next: number) => selected.push(next), retry() {} };
+  let renderer!: ReactTestRenderer;
+  await act(async () => { renderer = create(<ProfileCalendar {...props} />); });
+  assert.equal(renderer.root.findByType("h2").children.join(""), "QA activity");
+  assert.match(JSON.stringify(renderer.toJSON()), /1 recorded action/);
+  assert.doesNotMatch(JSON.stringify(renderer.toJSON()), /contribut/i);
+  const years = renderer.root.findByProps({ "aria-label": "Activity year" }).findAllByType("button");
+  assert.deepEqual(years.map(button => button.children.join("")), [String(year), String(year - 1)]);
+  assert.deepEqual(years.map(button => button.props["aria-pressed"]), [true, false]);
+  await act(async () => years[1].props.onClick());
+  assert.deepEqual(selected, [year - 1]);
+  await act(async () => renderer.update(<ProfileCalendar {...props} ru />));
+  assert.equal(renderer.root.findByType("h2").children.join(""), "Активность QA");
+  assert.match(JSON.stringify(renderer.toJSON()), /1 действие/);
+  await act(async () => renderer.unmount());
+});
