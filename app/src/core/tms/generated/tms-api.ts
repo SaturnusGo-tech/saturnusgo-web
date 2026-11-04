@@ -22457,7 +22457,18 @@ export interface operations {
                 };
                 content?: never;
             };
-            400: components["responses"]["BadRequest"];
+            /** @description Invalid, expired or cancelled desktop authorization renders branded restart-from-Falcon HTML at status400. The page contains no callback credentials, automatic refresh or arbitrary destination. Other delivery validation failures may use the standard safe error envelope. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                    "text/html": string;
+                };
+            };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
