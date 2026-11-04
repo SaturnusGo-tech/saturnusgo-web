@@ -8,7 +8,7 @@ const auth = new Map([
  ['cloud-auth/session',['GET','HEAD']], ['cloud-auth/logout',['POST']],
 ]);
 const personalProfile = new Map([
- ['me/profile',['GET','PATCH']], ['me/profile/activity',['GET']],
+ ['me/profile',['GET','PATCH']], ['me/profile/activity',['GET']], ['me/profile/achievements',['GET']],
  ['me/profile/avatar',['POST','DELETE']], ['me/profile/banner',['POST','DELETE']],
 ]);
 const personalFeatures = new Map([

@@ -5692,9 +5692,32 @@ export interface paths {
         };
         /**
          * Read own recorded QA contributions
-         * @description Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days.
+         * @description Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days. Choose a UTC calendar year (365/366 zero-filled days), or days=30|90|365 (default 30); the two options are mutually exclusive. Future calendar days are zero. The calendar is recorded activity, not a quality score.
          */
         get: operations["getSelfProfileActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/profile/achievements": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read own forty QA achievements
+         * @description Current active human workspace membership required. Server projection reads immutable, direct human audit evidence; cloned authorship, delegated agents and repeated status clicks do not create award credit. Only conditions already satisfied at the schema88 migration cutoff are silent; a delayed first projection still notifies achievements satisfied after that cutoff. A durable unique workspace/identity/achievement ledger prevents repeated awards; later unlocks enqueue one owner-only Falcon inbox event and one durable email job. Rules without recorded domain evidence remain locked with requires_recorded_evidence. Earned awards are retained; current progress is capped at target. Self-scoped only; no userId input.
+         */
+        get: operations["getSelfProfileAchievements"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10471,8 +10494,7 @@ export interface components {
             imageBase64: string;
         };
         SelfProfileActivity: {
-            /** @enum {integer} */
-            days: 30 | 90 | 365;
+            days: number;
             /** Format: date-time */
             from: string;
             /** Format: date-time */
@@ -10495,6 +10517,25 @@ export interface components {
                 defects: number;
                 runs: number;
             }[];
+            year?: number;
+        };
+        SelfProfileAchievement: {
+            id: number;
+            slug: string;
+            progress: number;
+            target: number;
+            /** @enum {string} */
+            status: "locked" | "earned";
+            /** Format: date-time */
+            earnedAt: string | null;
+            evidenceCount: number;
+            /** @enum {string} */
+            tracking: "available" | "requires_recorded_evidence";
+        };
+        SelfProfileAchievements: {
+            /** @constant */
+            catalogVersion: 1;
+            items: components["schemas"]["SelfProfileAchievement"][];
         };
     };
     responses: {
@@ -23088,6 +23129,8 @@ export interface operations {
                 /** @description Required tenant boundary for the query. */
                 workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
                 days?: 30 | 90 | 365;
+                /** @description UTC calendar year, exclusive with days; not later than the current UTC year. */
+                year?: number;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -23108,6 +23151,45 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["SelfProfileActivity"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSelfProfileAchievements: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileAchievements"];
                     };
                 };
             };

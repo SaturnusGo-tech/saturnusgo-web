@@ -55,3 +55,15 @@ void test("activity is explicitly scoped and failed writes do not trigger a succ
   await assert.rejects(client.remove(profile, "avatar", signal), error => error === failure);
   assert.equal(reads.length, 1);
 });
+
+void test("calendar and achievements requests preserve workspace scope and never combine year with days", async () => {
+  const signal = new AbortController().signal, reads: unknown[][] = [];
+  const http = { getResource: async (...args: unknown[]) => { reads.push(args); return { data: { items: [] } }; } } as unknown as TmsHttpClient;
+  const client = createSelfProfileClient(http);
+  await client.calendar("company & space", 2024, signal);
+  await client.achievements("company & space", signal);
+  assert.deepEqual(reads, [
+    ["/me/profile/activity?workspaceId=company+%26+space&year=2024", signal],
+    ["/me/profile/achievements?workspaceId=company+%26+space", signal],
+  ]);
+});

@@ -12,6 +12,8 @@ export function profilePort(overrides: Partial<SelfProfilePort> = {}): SelfProfi
     update: async (_profile, details) => ({ ...profile, ...details, version: 4 }),
     upload: async () => ({ ...profile, hasAvatar: true, version: 4 }),
     remove: async () => ({ ...profile, version: 4 }),
+    achievements: async () => ({ catalogVersion: 1, items: [] }),
+    calendar: async () => activity("calendar"),
     activity: async () => activity("default"),
     ...overrides,
   };

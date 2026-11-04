@@ -23512,7 +23512,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "description": "Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days.",
+        "description": "Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days. Choose a UTC calendar year (365/366 zero-filled days), or days=30|90|365 (default 30); the two options are mutually exclusive. Future calendar days are zero. The calendar is recorded activity, not a quality score.",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -23528,7 +23528,94 @@
                 365
               ],
               "default": 30
+            },
+            "required": false
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "description": "UTC calendar year, exclusive with days; not later than the current UTC year.",
+            "schema": {
+              "type": "integer",
+              "minimum": 2000
             }
+          }
+        ]
+      }
+    },
+    "/me/profile/achievements": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getSelfProfileAchievements",
+        "summary": "Read own forty QA achievements",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileAchievements"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Current active human workspace membership required. Server projection reads immutable, direct human audit evidence; cloned authorship, delegated agents and repeated status clicks do not create award credit. Only conditions already satisfied at the schema88 migration cutoff are silent; a delayed first projection still notifies achievements satisfied after that cutoff. A durable unique workspace/identity/achievement ledger prevents repeated awards; later unlocks enqueue one owner-only Falcon inbox event and one durable email job. Rules without recorded domain evidence remain locked with requires_recorded_evidence. Earned awards are retained; current progress is capped at target. Self-scoped only; no userId input.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
           }
         ]
       }
@@ -48331,11 +48418,8 @@
         "properties": {
           "days": {
             "type": "integer",
-            "enum": [
-              30,
-              90,
-              365
-            ]
+            "minimum": 1,
+            "maximum": 366
           },
           "from": {
             "type": "string",
@@ -48383,7 +48467,7 @@
           },
           "series": {
             "type": "array",
-            "maxItems": 365,
+            "maxItems": 366,
             "items": {
               "type": "object",
               "additionalProperties": false,
@@ -48417,6 +48501,10 @@
                 "runs"
               ]
             }
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 2000
           }
         },
         "required": [
@@ -48427,6 +48515,86 @@
           "timezone",
           "totals",
           "series"
+        ]
+      },
+      "SelfProfileAchievement": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 40
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "progress": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "target": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "locked",
+              "earned"
+            ]
+          },
+          "earnedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "evidenceCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tracking": {
+            "type": "string",
+            "enum": [
+              "available",
+              "requires_recorded_evidence"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "progress",
+          "target",
+          "status",
+          "earnedAt",
+          "evidenceCount",
+          "tracking"
+        ]
+      },
+      "SelfProfileAchievements": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "catalogVersion": {
+            "type": "integer",
+            "const": 1
+          },
+          "items": {
+            "type": "array",
+            "minItems": 40,
+            "maxItems": 40,
+            "items": {
+              "$ref": "#/components/schemas/SelfProfileAchievement"
+            }
+          }
+        },
+        "required": [
+          "catalogVersion",
+          "items"
         ]
       }
     }

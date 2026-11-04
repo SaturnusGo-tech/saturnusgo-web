@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { requiredPublicAssets } from "./route-manifest.mjs";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const expectedPagesRemote = "https://github.com/SaturnusGo-tech/saturnusgo-web.github.io.git";
@@ -115,6 +116,7 @@ write("out/assets/private.txt", "private fixture");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
 write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
+for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
 for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
 for (const id of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) write("out/falcon/landing/2026-11/product-" + id + ".webp", "Product screen");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
@@ -266,6 +268,15 @@ test("fails closed before publishing when a documentation font is absent", (cont
   const result = deploy(fixture, "--publish", { OMIT_DOCS_FONT: "Regular" });
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*OpenAISans-Regular\.woff2/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+test("fails closed before publishing when an approved achievement image is absent", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_ACHIEVEMENT: "/falcon/achievements/40-full-qa-cycle.webp" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*40-full-qa-cycle\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 

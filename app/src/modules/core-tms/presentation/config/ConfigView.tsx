@@ -1,10 +1,12 @@
 import { AvatarProfile, Bell, ColorTheme, Cube, Download, Plugin, Search, Settings, X } from "@openai/apps-sdk-ui/components/Icon";
 import { transitionContent } from "../workspace/motion/transition/content-transition";
 import { useState, type ReactNode } from "react";
+import { KeyRound } from "lucide-react";
 import type { Environment, Project } from "../../../../core/tms/contracts/legacy-contract";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { AppearanceSettings } from "./settings/AppearanceSettings";
 import { AccountSettings } from "./settings/AccountSettings";
+import { SecuritySettings } from "./security/SecuritySettings";
 import { ProjectSettings } from "./sections/ProjectSettings";
 import { EnvironmentSettings } from "./sections/EnvironmentSettings";
 import { settingsCopy, settingsSections } from "./navigation/settings-sections";
@@ -18,16 +20,16 @@ type ConfigViewProps = {
   onProjectUpdated: (project: Project, etag: string | null) => void;
   onToggleProject: () => void; exchange: ReactNode;
 };
-const icons = { general: Settings, environments: Cube, exchange: Download, appearance: ColorTheme, notifications: Bell, account: AvatarProfile, plugins: Plugin };
+const icons = { general: Settings, environments: Cube, exchange: Download, appearance: ColorTheme, notifications: Bell, security: KeyRound, account: AvatarProfile, plugins: Plugin };
 export function ConfigView(props: ConfigViewProps) {
   const { locale } = useTmsLocale();
   const copy = settingsCopy[locale];
   const [query, setQuery] = useState("");
   const { section, select } = useSettingsSection(Boolean(props.project));
-  const available = props.project ? settingsSections : settingsSections.filter(id => ["appearance", "notifications", "account", "plugins"].includes(id));
+  const available = props.project ? settingsSections : settingsSections.filter(id => ["appearance", "notifications", "security", "account", "plugins"].includes(id));
   const matching = available.filter(id => copy[id].join(" ").toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const groups = [{ label: copy.projectGroup, ids: matching.filter(id => ["general", "environments", "exchange"].includes(id)) },
-    { label: copy.personalGroup, ids: matching.filter(id => ["appearance", "notifications", "account"].includes(id)) },
+    { label: copy.personalGroup, ids: matching.filter(id => ["appearance", "notifications", "security", "account"].includes(id)) },
     { label: copy.integrationsGroup, ids: matching.filter(id => id === "plugins") }];
   return <div className={css.page} data-testid="config-view">
     <aside className={css.sidebar}>
@@ -62,6 +64,7 @@ export function ConfigView(props: ConfigViewProps) {
         {id === "exchange" && section === id && props.project && <div className={css.exchange}>{props.exchange}</div>}
         {id === "appearance" && <AppearanceSettings />}
         {id === "notifications" && section === id && props.notifications}
+        {id === "security" && section === id && <SecuritySettings />}
         {id === "account" && <AccountSettings />}
         {id === "plugins" && section === id && props.plugins}
       </section>)}

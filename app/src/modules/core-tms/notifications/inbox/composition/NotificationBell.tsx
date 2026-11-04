@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell } from '@openai/apps-sdk-ui/components/Icon';
 import { useTmsHttpClient } from '../../../auth/http/TmsHttpClientContext';
@@ -6,6 +6,8 @@ import { useTmsLocale } from '../../../localization/context/useTmsLocale';
 import { notificationInboxClient } from '../../data/inbox-client';
 import { visitWorkspace } from '../../../state/navigation/browser/workspace-history';
 import { useNotificationInbox } from '../application/useNotificationInbox';
+import { useInboxRefresh } from '../application/useInboxRefresh';
+import { useNativeAchievements } from '../native/useNativeAchievements';
 import { useInboxPopup } from '../presentation/popup/useInboxPopup';
 import { NotificationInbox } from '../presentation/NotificationInbox';
 import { notificationSettingsHref } from '../model/presentation';
@@ -17,17 +19,9 @@ export function NotificationBell({ workspaceId, connected, navigationClasses }: 
   const http = useTmsHttpClient(), { locale } = useTmsLocale(), id = useId();
   const client = useMemo(() => notificationInboxClient(http, workspaceId, locale), [http, workspaceId, locale]);
   const model = useNotificationInbox(client, connected), popup = useInboxPopup();
+  useNativeAchievements(workspaceId, model.items, connected && !model.loading && !model.error);
   const ru = locale === 'ru', label = ru ? 'Уведомления' : 'Notifications';
-  useEffect(() => {
-    if (!connected) { popup.dismiss(); return; }
-    if (popup.open) void model.refresh();
-    const refresh = () => { if (document.visibilityState === 'visible') void model.refresh(!popup.open); };
-    const timer = window.setInterval(refresh, 30000);
-    window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
-    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
-    // The client/scope and popup state own refresh lifetime, not every resource update.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, connected, popup.open]);
+  useInboxRefresh(client, connected, popup.open, model.refresh, popup.dismiss);
   const navigate = (href: string) => { popup.dismiss(); visitWorkspace(href); };
   const settings = () => navigate(notificationSettingsHref(window.location.href, workspaceId));
   const content = popup.open && <NotificationInbox panel={popup.panel} id={id} model={model} locale={locale} workspaceId={workspaceId} pageUrl={window.location.href}

@@ -8,6 +8,33 @@
         "value": "falcon public docs",
         "createdAt": "2026-11-04T14:19:35.667Z",
         "reason": "Implementation review: this is the existing self-hosted OpenAI Sans documentation face; the supplied Linear Docs reference and the shared-reader scope retain it. Root DESIGN.md governs marketing, outside this docs surface boundary."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/profile/self/**"
+        ],
+        "createdAt": "2026-11-04T20:51:12.528Z",
+        "reason": "The approved internal QA profile uses compact Falcon product typography; root DESIGN.md describes public marketing."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/profile/self/**"
+        ],
+        "createdAt": "2026-11-04T20:51:12.619Z",
+        "reason": "The approved internal QA profile uses Falcon product card and control radii; root DESIGN.md describes public marketing."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/profile/self/**"
+        ],
+        "createdAt": "2026-11-04T20:51:12.701Z",
+        "reason": "The approved internal QA profile uses Falcon semantic product tokens and portrait overlays; root DESIGN.md describes public marketing."
       }
     ]
   }

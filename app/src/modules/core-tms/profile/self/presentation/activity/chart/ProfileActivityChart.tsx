@@ -56,8 +56,8 @@ export function ProfileActivityChart({ value, metric, ru }: {
           <Tooltip cursor={{ stroke: "var(--falcon-border-strong, var(--falcon-text-muted))", strokeWidth: 1 }}
             content={<ActivityTooltip metricLabel={metricLabel} dateLabel={dateLabel} numberLabel={count => numbers.format(count)} />}
             isAnimationActive={reducedMotion === false} animationDuration={120} />
-          <Area dataKey="count" name={metricLabel} type="linear" stroke="var(--profile-series)" strokeWidth={2}
-            strokeLinecap="round" strokeLinejoin="round" fill="var(--profile-series)" fillOpacity={0.065}
+          <Area dataKey="count" name={metricLabel} type="monotone" stroke="var(--profile-series)" strokeWidth={2}
+            strokeLinecap="round" strokeLinejoin="round" fill="var(--profile-series)" fillOpacity={0.09}
             dot={data.length === 1 ? { r: 3, strokeWidth: 0 } : false}
             activeDot={{ r: 4, fill: "var(--profile-series)", stroke: "var(--falcon-surface)", strokeWidth: 2 }}
             isAnimationActive={reducedMotion === false} animationDuration={240} connectNulls={false} />

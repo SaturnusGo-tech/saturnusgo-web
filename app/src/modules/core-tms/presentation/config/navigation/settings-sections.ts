@@ -1,4 +1,4 @@
-export const settingsSections = ["general", "environments", "exchange", "appearance", "notifications", "account", "plugins"] as const;
+export const settingsSections = ["general", "environments", "exchange", "appearance", "notifications", "security", "account", "plugins"] as const;
 export type SettingsSection = typeof settingsSections[number];
 export const settingsCopy = {
   ru: {
@@ -9,6 +9,7 @@ export const settingsCopy = {
     exchange: ["Импорт и экспорт", "Переносите тестовую базу между проектами Falcon."],
     appearance: ["Оформление и язык", "Настройте Falcon под привычный способ работы."],
     notifications: ["Уведомления", "Выберите события Falcon и каналы, в которых хотите их получать."],
+    security: ["Безопасность и вход", "Способы входа, пароль и устройства."],
     account: ["Аккаунт и сессия", "Ваш вход в рабочее пространство Falcon."],
     plugins: ["Плагины", "Управляйте плагинами и MCP-подключениями Falcon."],
     themePreview: "Предпросмотр темы", archiveHint: "Архивный проект сохраняет историю. Его можно восстановить.",
@@ -24,6 +25,7 @@ export const settingsCopy = {
     exchange: ["Import and export", "Move your test library between Falcon projects."],
     appearance: ["Appearance and language", "Make Falcon fit the way you work."],
     notifications: ["Notifications", "Choose which Falcon events to receive and where."],
+    security: ["Security and login", "Sign-in methods, password and devices."],
     account: ["Account and session", "Your access to the Falcon workspace."],
     plugins: ["Plugins", "Manage Falcon plugins and MCP connections."],
     themePreview: "Theme preview", archiveHint: "Archived projects retain their history and can be restored.",

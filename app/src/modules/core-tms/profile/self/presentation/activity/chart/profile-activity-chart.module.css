@@ -2,7 +2,7 @@
 .figure[data-metric=authoredCases] { --profile-series:var(--profile-authoredCases,var(--falcon-text)); }
 .figure[data-metric=defects] { --profile-series:var(--profile-defects,var(--falcon-warning)); }
 .figure[data-metric=runs] { --profile-series:var(--profile-runs,var(--falcon-success)); }
-.chart { width:100%; height:250px; min-width:0; font-variant-numeric:tabular-nums; }
+.chart { width:100%; height:205px; min-width:0; font-variant-numeric:tabular-nums; }
 .tooltip { padding:11px 13px; color:var(--falcon-text); background:var(--falcon-elevated,var(--falcon-panel)); border:1px solid var(--falcon-border); border-radius:10px; font-size:11px; line-height:1.5; }
 .tooltip > span { display:block; color:var(--falcon-text-muted); margin-bottom:7px; }
 .tooltip > div { display:flex; align-items:center; gap:7px; }

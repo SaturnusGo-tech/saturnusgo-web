@@ -1,0 +1,253 @@
+{
+  "source": "Approved Falcon achievement image set, 2026-11-05",
+  "promptManifests": [
+    "/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-achievements-review-20261105/manifests/approved.json",
+    "/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-achievements-review-20261105/manifests/coverage.json",
+    "/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-achievements-review-20261105/manifests/execution.json",
+    "/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-achievements-review-20261105/manifests/defects.json",
+    "/Users/mercuryrucks/Desktop/SaturnusGo-Universe/output/falcon-achievements-review-20261105/manifests/collaboration.json"
+  ],
+  "processing": "Resized to 384px and transcoded to WebP; artwork unchanged.",
+  "items": [
+    {
+      "file": "01-first-scenario.webp",
+      "original": "01-first-scenario.png",
+      "sha256": "36fdb2080d50257e0e4a0435ff46def0ed71d453b1686b97677d03926ad67f3f",
+      "bytes": 24840
+    },
+    {
+      "file": "02-product-map.webp",
+      "original": "02-product-map.png",
+      "sha256": "ae311d190127a984d9fbb578b624a04dcc4122b6604c9f360344fbf4129c8cf1",
+      "bytes": 26436
+    },
+    {
+      "file": "03-boundary-patrol.webp",
+      "original": "03-boundary-patrol.png",
+      "sha256": "3c3eb06ec00da6a67489bfaa23e60cf81777582c5ee813272ca00140c4f0bc7d",
+      "bytes": 22532
+    },
+    {
+      "file": "04-reverse-move.webp",
+      "original": "04-reverse-move.png",
+      "sha256": "daf008b4ec538af88654465fb9fa3acb540425ef8b436ab29a330aa3b763ccb2",
+      "bytes": 26072
+    },
+    {
+      "file": "05-end-to-end-route.webp",
+      "original": "05-end-to-end-route.png",
+      "sha256": "a5939fc747d606da94b7dc78b4e5fbee5130e52ef3d17e3403368037e9c753a5",
+      "bytes": 21986
+    },
+    {
+      "file": "06-permissions-under-control.webp",
+      "original": "06-permissions-under-control.png",
+      "sha256": "08896d1c6a183a396145f87513c1cc95ae7da31d23a6572ba70dc4c23ab4c5e4",
+      "bytes": 25410
+    },
+    {
+      "file": "07-regression-remembers.webp",
+      "original": "07-regression-remembers.png",
+      "sha256": "4d0132cb7831d51a194afad901e2278c65aba5a088fee8cf97ace351c77bf8c1",
+      "bytes": 23262
+    },
+    {
+      "file": "08-common-language.webp",
+      "original": "08-common-language.png",
+      "sha256": "c894d77e767c1bb1f53071df3f4bb5b068467bbe00876d079a776a76e887799d",
+      "bytes": 23598
+    },
+    {
+      "file": "09-suite-architect.webp",
+      "original": "09-suite-architect.png",
+      "sha256": "6fe1e15069724df37688e832d3eadd2642bdd46af4a25a10617f307302e908f5",
+      "bytes": 24440
+    },
+    {
+      "file": "10-coverage-works.webp",
+      "original": "10-coverage-works.png",
+      "sha256": "f923a3154e3155593632bce0817e837f4e16cb7d93a0d4dc195633332ab319d8",
+      "bytes": 26546
+    },
+    {
+      "file": "11-first-result.webp",
+      "original": "11-first-result.png",
+      "sha256": "75fde728bad6397bb2fbafe4f90d1213671c0b209d4b2a6ab03182c4d52976d7",
+      "bytes": 27214
+    },
+    {
+      "file": "12-hundred-checks.webp",
+      "original": "12-hundred-checks.png",
+      "sha256": "800eefa83308f203155566a4d5d3fdb60e0fc4ac44d4cd67ff18a7860d0df90e",
+      "bytes": 25040
+    },
+    {
+      "file": "13-no-gaps.webp",
+      "original": "13-no-gaps.png",
+      "sha256": "865a62764af1495f9e05d6aa1454f310ec49692de03409c59792d49b397ee333",
+      "bytes": 25460
+    },
+    {
+      "file": "14-smoke-checked.webp",
+      "original": "14-smoke-checked.png",
+      "sha256": "0773999ddb99b6cb85dc5d8000375be7154718606bfcf5fd20492f79d2ad51da",
+      "bytes": 29798
+    },
+    {
+      "file": "15-regression-assembled.webp",
+      "original": "15-regression-assembled.png",
+      "sha256": "c5a15d04e8110c84f45d9f3643c9b09550d28ee19755875a92bb7e1a906e5124",
+      "bytes": 29792
+    },
+    {
+      "file": "16-precision-on-repeat.webp",
+      "original": "16-precision-on-repeat.png",
+      "sha256": "24e388585b446640b5a4103eb3052494b4cc3f6f36fd6526e9e80eb929832f7f",
+      "bytes": 26576
+    },
+    {
+      "file": "17-two-environments.webp",
+      "original": "17-two-environments.png",
+      "sha256": "a077b94c74d4ee07c6b1127aae7332e052b2883fefbab5302511783977779d04",
+      "bytes": 24446
+    },
+    {
+      "file": "18-two-platforms.webp",
+      "original": "18-two-platforms.png",
+      "sha256": "d60ac5b11660837ec12aa1a1ff45c940908dcf7805dc59dc02dbf5c408c2e893",
+      "bytes": 29302
+    },
+    {
+      "file": "19-obstacle-removed.webp",
+      "original": "19-obstacle-removed.png",
+      "sha256": "b82db000c1b87850a6bcd160b2d376d1bf3cddd129cfcc81c398b80384db5694",
+      "bytes": 26242
+    },
+    {
+      "file": "20-evidence-included.webp",
+      "original": "20-evidence-included.png",
+      "sha256": "5060fb4990b58269f8a07f2fa4e38d395caa466231b8373926eeac79261c95fd",
+      "bytes": 24848
+    },
+    {
+      "file": "21-first-signal.webp",
+      "original": "21-first-signal.png",
+      "sha256": "d4e295dd4df5f6f36a01fe44a0598a7acacaf55151bafa1150fcb9f8c5c3e0ee",
+      "bytes": 27974
+    },
+    {
+      "file": "22-keen-eye.webp",
+      "original": "22-keen-eye.png",
+      "sha256": "9e8f46d1732ac6bbc10a0d57f8329d4942694d94fe1540b2ead86975e04eeabd",
+      "bytes": 26870
+    },
+    {
+      "file": "23-reproducible.webp",
+      "original": "23-reproducible.png",
+      "sha256": "6c89dee0db9d889cdcfac46883b83f453a1075d16355f5b6c76dd4e4c476d203",
+      "bytes": 24828
+    },
+    {
+      "file": "24-important-find.webp",
+      "original": "24-important-find.png",
+      "sha256": "31c10e82c05824cd1c09a8c8adf95ffab144c009fbddea8443b8c480c98121eb",
+      "bytes": 23318
+    },
+    {
+      "file": "25-before-release.webp",
+      "original": "25-before-release.png",
+      "sha256": "469c4827b4306c5424da11ad715c203d00c2147a1dcf5175696f83e989eef30d",
+      "bytes": 31112
+    },
+    {
+      "file": "26-link-established.webp",
+      "original": "26-link-established.png",
+      "sha256": "9908388d9cf6263814bcb408b278ece5a3f7676314f0e8264ea2e506d084e537",
+      "bytes": 24144
+    },
+    {
+      "file": "27-recurrence-noticed.webp",
+      "original": "27-recurrence-noticed.png",
+      "sha256": "a1ae6fe4bfbc246b9d6a9c66fe51b09bb82091aaa2122573e12fe4dd76ee2ef8",
+      "bytes": 27688
+    },
+    {
+      "file": "28-fixed-and-verified.webp",
+      "original": "28-fixed-and-verified.png",
+      "sha256": "8b2e8edeb7ce418602b8f4166295a48f20d52c6d7f54ca65593a192ea530cf25",
+      "bytes": 28318
+    },
+    {
+      "file": "29-reliable-control.webp",
+      "original": "29-reliable-control.png",
+      "sha256": "4729510ea082856082e07f8eb45152256727f0b7bd29314380fcc7220aa724cf",
+      "bytes": 22320
+    },
+    {
+      "file": "30-closed-loop.webp",
+      "original": "30-closed-loop.png",
+      "sha256": "71bb3a92d8f5a91199fa1ec038612219107cfe3701b5ddafe7e9ce593d678863",
+      "bytes": 23306
+    },
+    {
+      "file": "31-second-life.webp",
+      "original": "31-second-life.png",
+      "sha256": "68250dbc5a7fc65240dc0efe965c647d6a23487d17606f5a4455586242caba09",
+      "bytes": 24902
+    },
+    {
+      "file": "32-keeper-of-relevance.webp",
+      "original": "32-keeper-of-relevance.png",
+      "sha256": "746152f5a688a0f22e27898ba0c7129656da5e1d1eb9fe6d14f8ee7af3f90140",
+      "bytes": 21838
+    },
+    {
+      "file": "33-fixed-at-source.webp",
+      "original": "33-fixed-at-source.png",
+      "sha256": "bfeff07000a3716953a8668e80daf41079824b953339565678b0b35cc2ead2fb",
+      "bytes": 23924
+    },
+    {
+      "file": "34-second-pair-of-eyes.webp",
+      "original": "34-second-pair-of-eyes.png",
+      "sha256": "77b2e7d35af73fc50cb0d0637d0d8a6abeb13c7cb4f016deb1d071db97428dd5",
+      "bytes": 25318
+    },
+    {
+      "file": "35-team-support.webp",
+      "original": "35-team-support.png",
+      "sha256": "cb5bc1c68fc3195d4965b435f319650f896ee5f06c5558a542214c13dc54d7c3",
+      "bytes": 26904
+    },
+    {
+      "file": "36-clear-without-author.webp",
+      "original": "36-clear-without-author.png",
+      "sha256": "039bc01b219588db8c4e0bd628e704a69356244ef28233c65e7af2bc9a95b4d1",
+      "bytes": 24566
+    },
+    {
+      "file": "37-team-suite.webp",
+      "original": "37-team-suite.png",
+      "sha256": "918edf04c53a69ac3cbef2b124b45baaa9e3469f4bffc49a98246b92ef91ba3c",
+      "bytes": 26546
+    },
+    {
+      "file": "38-useful-observation.webp",
+      "original": "38-useful-observation.png",
+      "sha256": "0e4b39ea27f441918fe0f971fce88f3a8621e954d2abff90b771d19feec29eef",
+      "bytes": 25482
+    },
+    {
+      "file": "39-broad-context.webp",
+      "original": "39-broad-context.png",
+      "sha256": "d78d081cbf3638817265af1ce8cd148c3a920b8a840dee0a1046c42cf0b64509",
+      "bytes": 24480
+    },
+    {
+      "file": "40-full-qa-cycle.webp",
+      "original": "40-full-qa-cycle.png",
+      "sha256": "18a094f87491d7464a4b9f350518bd5cf186f9c52a0fe8706f46134c0d170fc0",
+      "bytes": 26200
+    }
+  ]
+}

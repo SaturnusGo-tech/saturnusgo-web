@@ -8,8 +8,12 @@ export function workspaceProfileUrl(href: string, section?: "security"): string 
     const value = source.searchParams.get(key);
     if (value && /^[A-Za-z0-9._:-]{1,128}$/.test(value)) url.searchParams.set(key, value);
   }
-  url.searchParams.set("view", "profile");
-  if (section === "security" || (source.pathname === "/profile/" && source.hash === "#security")) url.hash = "security";
+  const security = section === "security" || (source.pathname === "/profile/" && ["#security", "#sessions"].includes(source.hash));
+  url.searchParams.set("view", security ? "config" : "profile");
+  if (security) {
+    url.searchParams.set("settings", "security");
+    if (source.pathname === "/profile/" && source.hash === "#sessions") url.hash = "sessions";
+  }
   return `${url.pathname}${url.search}${url.hash}`;
 }
 

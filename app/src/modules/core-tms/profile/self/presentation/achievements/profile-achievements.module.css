@@ -1,0 +1,18 @@
+ .collection { padding:22px 18px 15px; border-radius:14px; background:var(--falcon-elevated); }
+.collection header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 3px; margin-bottom:16px; }
+.collection h2 { margin:0; font-size:13px; line-height:1.5; font-weight:550; }
+.collection header > span { font-size:12px; color:var(--falcon-text); font-variant-numeric:tabular-nums; }
+.collection header > span > span { color:var(--falcon-text-muted); }
+.badges { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px 2px; }
+.badge { position:relative; display:grid; place-items:center; aspect-ratio:1; min-width:0; padding:6px; border:0; border-radius:12px; background:transparent; cursor:pointer; transition:background 150ms ease,transform 150ms ease; }
+.badge > img { display:block; width:100%; height:100%; object-fit:contain; transition:filter 160ms ease,opacity 160ms ease; }
+.badge:hover { transform:translateY(-2px); background:var(--falcon-hover); }
+.badge[data-locked=true] > img { filter:blur(1.6px) saturate(.55); opacity:.4; }
+.badge[data-locked=true]:hover > img { opacity:.55; }
+.lock { position:absolute; left:50%; top:50%; display:grid; place-items:center; width:25px; height:25px; transform:translate(-50%,-50%); border-radius:50%; color:var(--falcon-warning); background:var(--falcon-elevated); box-shadow:0 1px 8px #00000020; }
+.expand,.retry { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:9px 10px; margin-top:12px; border:0; border-radius:8px; color:var(--falcon-text-muted); background:transparent; font:inherit; font-size:11px; cursor:pointer; }
+.expand:hover,.retry:hover { color:var(--falcon-text); background:var(--falcon-hover); }
+.expand svg { transition:transform 170ms ease; }
+.expand svg[data-expanded=true] { transform:rotate(180deg); }
+.collection button:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:2px; }
+@media(prefers-reduced-motion:reduce) { .badge,.badge > img,.expand svg { transition:none; } }

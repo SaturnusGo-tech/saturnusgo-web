@@ -64,7 +64,7 @@ const personalFeatureRoutes = [
  ['GET','impact/repositories'], ['PATCH','impact/repositories/repo_123'],
  ['GET','impact/analyses'], ['GET','impact/analyses/analysis_123'],
  ...['scope','approve','retry','gaps/gap_123/generate','gaps/gap_123/acknowledge'].map(action=>['POST',`impact/analyses/analysis_123/${action}`]),
- ['GET','me/profile'], ['PATCH','me/profile'], ['GET','me/profile/activity'],
+ ['GET','me/profile'], ['PATCH','me/profile'], ['GET','me/profile/activity'], ['GET','me/profile/achievements'],
  ...['avatar','banner'].flatMap(kind=>[['POST',`me/profile/${kind}`],['DELETE',`me/profile/${kind}`]]),
 ];
 test('personal feature requests retain exact query/body, session isolation and verifiable signing',async t=>{

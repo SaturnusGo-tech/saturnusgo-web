@@ -17,16 +17,17 @@ test("personal profile keeps tenant/project context without opening an admin rou
 
 test("old profile bookmarks resolve inside TMS even before the first project exists", () => {
   assert.equal(workspaceProfileUrl(`${origin}/profile/`), "/testcases/umbrella-home/work/?view=profile");
-  assert.equal(workspaceProfileUrl(`${origin}/profile/#security`), "/testcases/umbrella-home/work/?view=profile#security");
+  assert.equal(workspaceProfileUrl(`${origin}/profile/#security`), "/testcases/umbrella-home/work/?view=config&settings=security");
   assert.equal(isWorkspaceProfileNavigation(`${origin}/profile/`), false);
   assert.equal(isWorkspaceProfileNavigation(`${work}?view=cases`), true);
   assert.equal(companyViewAvailable("profile", []), true);
 });
 
-test("security anchor survives workspace URL reconciliation", () => {
+test("security opens its separate settings page and survives workspace URL reconciliation", () => {
   const url = new URL(workspaceProfileUrl(`${work}?workspaceId=w&projectId=p`, "security"), origin);
-  const reconciled = buildWorkspaceDeepLink(url.href, {workspaceId:"w",projectId:"p",view:"profile",runId:null});
-  assert.equal(new URL(reconciled).hash, "#security");
+  assert.equal(url.searchParams.get("view"), "config");
+  const reconciled = buildWorkspaceDeepLink(url.href, {workspaceId:"w",projectId:"p",view:"config",runId:null});
+  assert.equal(new URL(reconciled).searchParams.get("settings"), "security");
   const cases = buildWorkspaceDeepLink(reconciled, {workspaceId:"w",projectId:"p",view:"cases",runId:null});
   assert.equal(new URL(cases).hash, "");
 });
@@ -42,5 +43,5 @@ test("opening profile from its password screen returns to personal details", () 
   const url = new URL(workspaceProfileUrl(`${work}?workspaceId=w&projectId=p&view=profile#security`), origin);
   assert.equal(url.hash, "");
   assert.equal(url.searchParams.get("projectId"), "p");
-  assert.equal(new URL(workspaceProfileUrl(url.href, "security"), origin).hash, "#security");
+  assert.equal(new URL(workspaceProfileUrl(url.href, "security"), origin).searchParams.get("settings"), "security");
 });

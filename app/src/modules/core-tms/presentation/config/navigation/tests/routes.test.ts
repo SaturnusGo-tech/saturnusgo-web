@@ -17,8 +17,8 @@ test("legacy notifications open personal Settings and canonicalize without losin
   assert.equal(new URL(buildWorkspaceDeepLink(origin, { ...scope, view: "notifications" })).searchParams.get("settings"), "notifications");
 });
 
-test("notification, account and environment deep links work without a project and clear unrelated screen selections", () => {
-  for (const section of ["notifications", "account", "environments"] as const) {
+test("notification, security, account and environment deep links work without a project and clear unrelated screen selections", () => {
+  for (const section of ["notifications", "security", "account", "environments"] as const) {
     const href = new URL(settingsSectionLink(`${origin}&runId=old&caseId=old#section`, section), origin).href;
     assert.equal(readSettingsSection(href), section);
     const query = new URL(href).searchParams;
@@ -74,7 +74,7 @@ test("empty settings search can be cleared and personal settings never reveal pr
   assert.equal(all.filter(node => node.type === "button" && node.props["aria-controls"]).length, 0);
   invoke(all.find(node => node.type === "button" && node.props["aria-label"] === "Очистить поиск")!, "onClick");
   const targets = h.draw().filter(node => node.type === "button" && node.props["aria-controls"]).map(node => node.props["aria-controls"]);
-  assert.deepEqual(targets, ["settings-appearance", "settings-notifications", "settings-account", "settings-plugins"]);
+  assert.deepEqual(targets, ["settings-appearance", "settings-notifications", "settings-security", "settings-account", "settings-plugins"]);
 });
 
 test("Plugins is project-independent and owns a single content heading", () => {
