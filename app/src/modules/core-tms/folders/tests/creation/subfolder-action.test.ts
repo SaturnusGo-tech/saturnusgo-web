@@ -36,7 +36,7 @@ test("unavailable or busy inline creation cannot close the menu or start a draft
       create: async () => null, update: async () => false, archive: async () => false, restore: async () => false,
       moveCases: async () => ({ ok: false, message: "Unavailable" }), archiveCases: async () => ({ ok: false, message: "Unavailable" }) };
     const content = h.render(() => component({ folder, resource, ru: false, onClose: () => { called++; },
-      onCreateCase() {}, onCreated() {}, onCreateFolder: busy ? () => { called++; } : undefined }));
+      onCreateCase() {}, onCreateFolder: busy ? () => { called++; } : undefined }));
     const create = nodes(content).find(node => node.type === "button" && (node.props.children as unknown[])?.includes("New subfolder")); assert.ok(create);
     assert.equal(create.props.disabled, true); invoke(create, "onClick"); assert.equal(called, 0);
   }
@@ -49,5 +49,24 @@ test("New folder opens the structure screen and leaves selection untouched", () 
   (create.props.onClick as () => void)();
   assert.equal(opened, 1); assert.equal(app.props.selectedCaseId, "profile-case");
   assert.equal(elements(app.renderTree(), item => item.type === "InlineFolderForm").length, 0);
+  app.dispose();
+});
+
+test("Name and location closes the only menu and opens architecture for that folder", () => {
+  const app = browserHarness(), h = componentHarness();
+  const opened: string[] = []; app.props.onManageFolder = id => { opened.push(id); };
+  app.props.selectedCaseId = "profile-case";
+  const branch = elements(app.renderTree(), node => node.type === "RepositoryFolderBranch")[0];
+  const folder = (branch.props.node as FolderNode).folder;
+  (branch.props.onMenu as (item: typeof folder) => void)(folder);
+  const menu = elements(app.renderTree(), node => node.type === "FolderActionsDialog")[0]; assert.ok(menu);
+  const component = h.load<{ FolderActionsDialog: typeof FolderActionsDialog }>(new URL("../../presentation/actions/FolderActionsDialog.tsx", import.meta.url)).FolderActionsDialog;
+  const content = () => nodes(h.render(() => component(menu.props as never)));
+  const edit = content().find(node => node.type === "button" && (node.props.children as unknown[])?.includes("Name and location")); assert.ok(edit);
+  invoke(edit, "onClick");
+  assert.deepEqual(opened, [folder.id]);
+  assert.equal(elements(app.renderTree(), node => node.type === "FolderActionsDialog").length, 0);
+  assert.equal(content().some(node => node.type === "FolderDialog"), false);
+  assert.equal(app.props.selectedCaseId, "profile-case");
   app.dispose();
 });

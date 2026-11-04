@@ -1,0 +1,15 @@
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 30px; margin-bottom: 12px; }
+.toolbar button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 4px 9px; border: 0; border-radius: 999px; background: transparent; color: var(--falcon-text-secondary); font: inherit; font-size: 12px; cursor: pointer; }
+.toolbar button:hover:not(:disabled), .toolbar button[aria-pressed="true"] { background: var(--falcon-hover); color: var(--falcon-text); }
+.toolbar .move { background: var(--falcon-selected); color: var(--falcon-text); }
+.selectionCount { color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.rename { position: relative; display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; border: 1px solid var(--falcon-border-strong); border-radius: 7px; background: var(--falcon-surface); }
+.rename:focus-within { border-color: var(--falcon-focus); }
+.rename input { flex: 1; min-width: 0; width: 100%; height: 30px; padding: 5px 8px; border: 0; border-radius: 7px; outline: none; background: transparent; color: var(--falcon-text); font: inherit; font-size: 13px; }
+.rename input:focus-visible { outline: none; }
+.rename button { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 26px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-icon); cursor: pointer; }
+.rename button:hover:not(:disabled) { color: var(--falcon-text); background: var(--falcon-hover); }
+.renameError { position: absolute; top: calc(100% + 4px); inset-inline-start: 0; z-index: 2; width: max-content; max-width: 100%; padding: 5px 8px; border-radius: 6px; background: var(--falcon-surface); color: var(--falcon-danger); font-size: 11px; }
+.spin { animation: folderRenameSpin .8s linear infinite; }
+@keyframes folderRenameSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

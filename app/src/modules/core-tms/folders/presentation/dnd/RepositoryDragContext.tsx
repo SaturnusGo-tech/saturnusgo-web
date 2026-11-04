@@ -1,11 +1,13 @@
 import { FolderVisual } from "../appearance/visual/FolderVisual";
 import { DndContext, DragOverlay, PointerSensor, pointerWithin, useSensor, useSensors, type CollisionDetection, type DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { PiFilesDuotone } from "react-icons/pi";
+import { PiListChecks } from "react-icons/pi";
 import { canDropRepositoryDrag, repositoryDrag, type RepositoryDrag } from "../../model/drag/repository-drop";
 import type { FolderResource } from "../../model/folder";
 import css from "./styles/drag.module.css";
 import { DragClickContext, RepositoryDragSelectionContext } from "./drag-click";
+import { captureRepositoryRow, type RepositoryRowSnapshot } from "./preview/row-snapshot";
+import { RepositoryRowPreview } from "./preview/RepositoryRowPreview";
 
 const emptySelection = { active: false, caseIds: new Set<string>(), folderId: null };
 export function RepositoryDragContext({ children, resource, selected, ru, locked }: {
@@ -13,6 +15,7 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
 }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const [drag, setDrag] = useState<RepositoryDrag | null>(null);
+  const [snapshot, setSnapshot] = useState<RepositoryRowSnapshot | null>(null);
   const [selection, setSelection] = useState<{ active: boolean; caseIds: ReadonlySet<string>; folderId: string | null }>(emptySelection);
   const [error, setError] = useState("");
   const gesture = useRef<{ id: string; drag: RepositoryDrag } | null>(null);
@@ -28,7 +31,7 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
       !target.disabled && canDropRepositoryDrag(moving ?? null, target.data.current?.folderId, resource.items)) });
   };
   function clear() {
-    gesture.current = null; setDrag(null); setSelection(emptySelection); suppressUntil.current = Date.now() + 350;
+    gesture.current = null; setDrag(null); setSnapshot(null); setSelection(emptySelection); suppressUntil.current = Date.now() + 350;
   }
   async function finish(event: DragEndEvent) {
     const captured = gesture.current; clear();
@@ -57,19 +60,20 @@ export function RepositoryDragContext({ children, resource, selected, ru, locked
   return <DragClickContext.Provider value={suppressUntil}><RepositoryDragSelectionContext.Provider value={selection}>
     <DndContext sensors={sensors} collisionDetection={collisionDetection}
       accessibility={{ screenReaderInstructions: { draggable: ru ? "Перетащите строку в папку. Escape отменяет перенос." : "Drag a row to a folder. Escape cancels the move." } }}
-      onDragStart={({ active }) => {
+      onDragStart={({ active, activatorEvent }) => {
         if (disabled || pending.current) return;
         const moving = repositoryDrag(active.data.current, selected, resource.items);
         if (!moving) return;
+        setSnapshot(captureRepositoryRow(String(active.id), activatorEvent, active.rect.current.initial));
         gesture.current = { id: String(active.id), drag: moving };
         setError(""); setDrag(moving);
         setSelection({ active: true, caseIds: new Set(moving.kind === "case" ? moving.ids : []), folderId: moving.kind === "folder" ? moving.folderId : null });
       }} onDragCancel={clear} onDragEnd={event => void finish(event)}>
       {children}
-      <DragOverlay dropAnimation={null}>{drag && <div className={css.dragPreview} data-stacked={count > 1 || undefined}>
-        {drag.kind === "folder" ? <FolderVisual folderId={drag.folderId} appearance={resource.items.find(item => item.id === drag.folderId)?.appearance} /> : <PiFilesDuotone size={18} />}
+      <DragOverlay dropAnimation={null}>{drag && (snapshot ? <RepositoryRowPreview snapshot={snapshot} count={count} /> : <div className={css.dragPreview} data-stacked={count > 1 || undefined} aria-hidden="true">
+        {drag.kind === "folder" ? <FolderVisual folderId={drag.folderId} appearance={resource.items.find(item => item.id === drag.folderId)?.appearance} /> : <PiListChecks size={18} />}
         <span>{label}</span>{count > 1 && <b>{count}</b>}
-      </div>}</DragOverlay>
+      </div>)}</DragOverlay>
       {error && <div className={css.errorToast} role="alert">{error}<button onClick={() => setError("")} aria-label={ru ? "Закрыть" : "Dismiss"}>×</button></div>}
     </DndContext></RepositoryDragSelectionContext.Provider></DragClickContext.Provider>;
 }

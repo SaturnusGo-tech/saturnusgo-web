@@ -1,0 +1,24 @@
+.panel { margin: 0 0 20px; padding: 16px 0; border-block: 1px solid var(--falcon-border); }
+.heading { display: flex; align-items: flex-start; gap: 9px; color: var(--falcon-icon); }
+.heading > svg { margin-top: 2px; }
+.heading div { flex: 1; }
+.heading h2 { margin: 0; color: var(--falcon-text); font-size: 13px; line-height: 1.5; font-weight: 550; }
+.heading p { margin: 3px 0 0; color: var(--falcon-text-muted); font-size: 12px; }
+.panel .close, .panel .expand { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 28px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-icon); cursor: pointer; }
+.destinations { max-height: 250px; overflow: auto; margin-top: 12px; scrollbar-width: thin; scrollbar-color: var(--falcon-border) transparent; }
+.tree, .children { list-style: none; margin: 0; padding: 0; }
+.children { margin-inline-start: 22px; border-inline-start: 1px solid var(--falcon-border); padding-inline-start: 6px; }
+.destinationRow { display: flex; align-items: center; }
+.panel .destination { display: flex; align-items: center; flex: 1; gap: 7px; min-width: 0; width: 100%; min-height: 32px; padding: 5px 8px; border: 0; border-radius: 7px; background: transparent; color: var(--falcon-text-secondary); text-align: start; font: inherit; font-size: 12px; cursor: pointer; }
+.destination span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.destination > svg:first-child { color: var(--falcon-folder); }
+.panel .destination:hover:not(:disabled), .panel .destination[aria-pressed="true"] { background: var(--falcon-hover); color: var(--falcon-text); }
+.destination:disabled { opacity: .4; }
+.footer { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.footer > span { flex: 1; color: var(--falcon-text-muted); font-size: 11px; }
+.panel .cancel, .panel .confirm { min-height: 30px; padding: 5px 12px; border: 0; border-radius: 999px; font: inherit; font-size: 12px; cursor: pointer; }
+.panel .cancel { color: var(--falcon-text); background: transparent; }
+.panel .confirm { background: var(--falcon-action); color: var(--falcon-on-action); }
+.cancel:hover:not(:disabled), .close:hover:not(:disabled), .expand:hover:not(:disabled) { background: var(--falcon-hover); }
+.confirm:hover:not(:disabled) { background: var(--falcon-action-hover); }
+.error { margin: 12px 0 0; color: var(--falcon-danger); font-size: 12px; }

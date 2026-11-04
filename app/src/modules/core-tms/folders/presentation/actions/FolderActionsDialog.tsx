@@ -4,27 +4,16 @@ import { useState } from "react";
 import { PiArrowCounterClockwise, PiArchiveDuotone, PiCaretRight, PiFilePlusDuotone, PiFolderPlusDuotone, PiPencilSimple } from "react-icons/pi";
 import { FolderBreadcrumb } from "../../../presentation/dialogs/folder/breadcrumb/FolderBreadcrumb";
 import { Modal } from "../../../presentation/common/modal/Modal";
-import { FolderDialog } from "../../../presentation/dialogs/folder/FolderDialog";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
-import { validFolderDestinations } from "../../model/tree";
 import css from "./folder-actions.module.css";
 
-export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCase, onCreated, onCreateFolder }: {
+export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCase, onCreateFolder, onManageFolder }: {
   folder: RepositoryFolder; resource: FolderResource; ru: boolean; onClose: () => void;
-  onCreateCase: (path: string) => void; onCreated: (path: string, id?: string) => void;
+  onCreateCase: (path: string) => void;
   onCreateFolder?: (folderId: string) => void;
+  onManageFolder?: (folderId: string) => void;
 }) {
-  const [action, setAction] = useState<"menu" | "edit" | "archive">("menu");
-  if (action === "edit") return <FolderDialog
-    existing={validFolderDestinations(resource.items, folder).map(item => item.path)}
-    selectedParent={resource.items.find(item => item.id === folder.parentId)?.path ?? "/"}
-    initialName={folder.name} editing busy={resource.busy} error={resource.error}
-    onClose={onClose} onCreated={async (path) => {
-      const parts = path.split("/").filter(Boolean); const name = parts.pop()!;
-      const parentPath = `/${parts.join("/")}`;
-      const parent = resource.items.find((item) => item.path === parentPath && !item.archivedAt);
-      if (await resource.update(folder, { name, parentId: parent?.id ?? null })) { onCreated(path, folder.id); onClose(); }
-    }} />;
+  const [action, setAction] = useState<"menu" | "archive">("menu");
   return <Modal title={action === "archive" ? (ru ? "Архивировать папку?" : "Archive folder?") : folder.name}
     onClose={() => { if (!resource.busy) onClose(); }} panelClassName={css.dialog}>
     <div className={css.context}>
@@ -49,7 +38,10 @@ export function FolderActionsDialog({ folder, resource, ru, onClose, onCreateCas
             </div>
             <div className={css.group} role="group" aria-label={ru ? "Настройки папки" : "Folder settings"}>
               <div className={css.appearance}><FolderAppearanceControl folder={resource.items.find(item => item.id === folder.id) ?? folder} editable={resource.canManage} disabled={resource.busy} ru={ru} labelled /></div>
-              <button type="button" disabled={resource.busy} onClick={() => setAction("edit")}><PiPencilSimple />{ru ? "Название и расположение" : "Name and location"}<PiCaretRight className={css.chevron} aria-hidden="true" /></button>
+              <button type="button" disabled={!onManageFolder || resource.busy || resource.loading || !resource.canManage} onClick={() => {
+                if (!onManageFolder || resource.busy || resource.loading || !resource.canManage) return;
+                onClose(); onManageFolder(folder.id);
+              }}><PiPencilSimple />{ru ? "Название и расположение" : "Name and location"}<PiCaretRight className={css.chevron} aria-hidden="true" /></button>
             </div>
             <div className={css.group}>
               <button type="button" className={css.archive} disabled={resource.busy} onClick={() => setAction("archive")}><PiArchiveDuotone />{ru ? "Архивировать папку" : "Archive folder"}</button>

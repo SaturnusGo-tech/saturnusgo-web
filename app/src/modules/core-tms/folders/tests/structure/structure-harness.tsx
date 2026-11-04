@@ -23,7 +23,8 @@ export function folder(id: string, name: string, parentId: string | null = null,
   return { id, name, parentId, path, appearance: null, workspaceId: "w", projectId: "p", archivedAt: null, rowVersion: 1,
     createdAt: "2026-11-04T00:00:00Z", updatedAt: "2026-11-04T00:00:00Z", etag: `folder:${id}:1` };
 }
-export function fixture(t: TestContext, overrides: Partial<FolderResource> = {}, ru = false) {
+export function fixture(t: TestContext, overrides: Partial<FolderResource> = {}, ru = false,
+  props: { focusFolderId?: string | null; onFocusHandled?: () => void } = {}) {
   const calls: { name: string; parentId: string | null }[] = [];
   let back = 0, reloads = 0;
   const resource: FolderResource = { items: [folder("api", "API"), folder("auth", "Auth", "api", "/API/Auth"),
@@ -34,7 +35,7 @@ export function fixture(t: TestContext, overrides: Partial<FolderResource> = {},
     async moveCases() { return { ok: false, message: "unused" }; }, async archiveCases() { return { ok: false, message: "unused" }; }, ...overrides };
   let root!: ReactTestRenderer;
   const render = () => <FolderAppearanceContext.Provider value={{ folders: resource.items, save: resource.canManage ? resource.saveAppearance : undefined }}>
-    <Page resource={resource} ru={ru} onBack={() => { back++; }} />
+    <Page resource={resource} ru={ru} onBack={() => { back++; }} {...props} />
   </FolderAppearanceContext.Provider>;
   act(() => { root = create(render()); });
   t.after(() => act(() => root.unmount()));

@@ -149,7 +149,12 @@ export function useWorkspaceFolders(state: ReturnType<typeof useWorkspaceState>,
       return result?.data ?? null;
     },
     async update(folder, patch) {
-      const result = await command(`update:${folder.id}:${folder.etag}:${JSON.stringify(patch)}`, (key) => changeFolder(http, scope, folder, patch, key));
+      const isCurrent = captureCurrent();
+      const result = await command(`update:${folder.id}:${folder.etag}:${JSON.stringify(patch)}`, async (key) => {
+        const confirmed = await changeFolder(http, scope, folder, patch, key);
+        if (isCurrent()) query.reconcile(confirmed.data);
+        return confirmed;
+      });
       if (result && latest.current === scopeKey && (state.selectedFolder === folder.path || state.selectedFolder.startsWith(`${folder.path}/`))) {
         state.setSelectedFolder(result.data.path + state.selectedFolder.slice(folder.path.length));
       }

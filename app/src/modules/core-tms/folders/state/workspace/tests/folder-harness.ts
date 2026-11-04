@@ -15,6 +15,7 @@ type Effect = { dependencies: unknown[]; cleanup?: () => void };
 export function folderHarness() {
   const requests = createWorkspaceRequests();
   const writes: Write[] = [];
+  const reconciled: RepositoryFolder[] = [];
   const refreshes: { resolve: (value: unknown) => void }[] = [];
   const slots: unknown[] = [];
   const effects: (() => void)[] = [];
@@ -51,7 +52,7 @@ export function folderHarness() {
       if (name.endsWith("TmsHttpClientContext")) return { useTmsHttpClient: () => ({}) };
       if (name.endsWith("transport/http")) return { TmsApiError };
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
-      if (name.endsWith("useFolderQuery")) return { useFolderQuery: () => ({ items: [folder], loading: false, error: "", reload: () => { reloads++; } }) };
+      if (name.endsWith("useFolderQuery")) return { useFolderQuery: () => ({ items: [folder], loading: false, error: "", reload: () => { reloads++; }, reconcile: (item: RepositoryFolder) => reconciled.push(item) }) };
       if (name.endsWith("appearance-conflict")) return { AppearanceConflict };
       if (name.endsWith("move-undo")) return { createMoveReceipt, restoreMove };
       if (name.endsWith("folder-api")) return { createFolder: write, changeFolder: write, transitionFolder: write, moveFolderCases: write, archiveFolderCases: write };
@@ -64,6 +65,6 @@ export function folderHarness() {
     effects.splice(0).forEach((effect) => effect());
     return result;
   }
-  return { requests, writes, refreshes, state, derived, render, reloads: () => reloads,
+  return { requests, writes, reconciled, refreshes, state, derived, render, reloads: () => reloads,
     unmount: () => slots.forEach((slot) => (slot as Effect | undefined)?.cleanup?.()) };
 }

@@ -61,10 +61,12 @@ export function dragHarness(selected = new Set<string>()) {
       };
       if (name === "@dnd-kit/core") return { DndContext: "DndContext", DragOverlay: "DragOverlay", PointerSensor, pointerWithin,
         useSensor: (sensor: unknown, options: unknown) => ({ sensor, options }), useSensors: (...sensors: unknown[]) => sensors };
-      if (name === "react-icons/pi") return { PiFilesDuotone: "FilesIcon", PiFolderSimpleDuotone: "FolderIcon" };
+      if (name === "react-icons/pi") return { PiListChecks: "CaseIcon", PiFolderSimpleDuotone: "FolderIcon" };
       if (name.endsWith("FolderVisual")) return { FolderVisual: "FolderIcon" };
       if (name.endsWith("repository-drop")) return { canDropRepositoryDrag, repositoryDrag };
       if (name.endsWith("drag-click")) return { DragClickContext: { Provider: "DragClickProvider" }, RepositoryDragSelectionContext: { Provider: "DragSelectionProvider" } };
+      if (name.endsWith("row-snapshot")) return { captureRepositoryRow: () => null };
+      if (name.endsWith("RepositoryRowPreview")) return { RepositoryRowPreview: "RepositoryRowPreview" };
       if (name.endsWith(".css")) return { default: new Proxy({}, { get: (_target, key) => key }) };
       throw new Error(`Unexpected import ${name}`);
     },

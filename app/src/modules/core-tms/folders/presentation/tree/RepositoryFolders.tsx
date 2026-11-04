@@ -19,7 +19,7 @@ export function RepositoryFolders(props: {
   resource: FolderResource; cases: readonly TestCaseSummary[]; selected: ReadonlySet<string>; selectedFolder: string; selectedFolderId?: string;
   activeCaseId: string; ru: boolean; locked: boolean; onToggle: (id: string) => void; onScope: (ids: readonly string[]) => void;
   onFolder: (path: string, id?: string) => void; onCase: (item: TestCaseSummary) => void; onCreate: (path?: string) => void;
-  onNewFolder: () => void; onImport: () => void;
+  onNewFolder: () => void; onImport: () => void; onManageFolder?: (folderId: string) => void;
   controls?: ReactNode; selectionActions?: ReactNode; task?: ReactNode; filtered?: boolean; selectionMode?: boolean; includeArchived?: boolean; hasArchivedCases?: boolean; onArchiveChange?: (archived: boolean) => void;
 }) {
   const { resource, ru } = props;
@@ -118,6 +118,6 @@ export function RepositoryFolders(props: {
     <div {...resize.handleProps} className={css.resizeHandle} role="separator" tabIndex={0} aria-orientation="vertical"
       aria-label={ru ? "Изменить ширину репозитория" : "Resize repository"} aria-valuemin={REPOSITORY_MIN} aria-valuemax={REPOSITORY_MAX} aria-valuenow={resize.width}
       title={ru ? "Потяните, чтобы изменить ширину. Двойной клик — сбросить." : "Drag to resize. Double click to reset."} />
-    {menu && <FolderActionsDialog folder={menu} resource={resource} ru={ru} onClose={() => setMenu(null)} onCreateCase={props.onCreate} onCreated={props.onFolder} onCreateFolder={creation?.begin} />}
+    {menu && <FolderActionsDialog folder={menu} resource={resource} ru={ru} onClose={() => setMenu(null)} onCreateCase={props.onCreate} onCreateFolder={creation?.begin} onManageFolder={props.onManageFolder} />}
   </aside>;
 }

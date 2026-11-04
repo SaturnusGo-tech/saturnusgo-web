@@ -5,22 +5,27 @@ import type { RepositoryCreation } from "../../model/creation/repository-creatio
 import { buildFolderTree } from "../../model/tree";
 import { useFolderAppearanceContext } from "../../state/appearance/folder-appearance-context";
 import { useFolderAppearanceTip } from "../../state/appearance-onboarding/useFolderAppearanceTip";
+import { useFolderStructureEditing } from "../../state/structure/editing/useFolderStructureEditing";
 import { InlineFolderForm } from "../creation/InlineFolderForm";
-import { FolderStructureBranch } from "./FolderStructureBranch";
+import { RepositoryDragContext } from "../dnd/RepositoryDragContext";
+import { FolderStructureBranch, FolderStructureRootDrop } from "./FolderStructureBranch";
+import { FolderStructureToolbar } from "./editing/FolderStructureToolbar";
+import { FolderMovePanel } from "./move/FolderMovePanel";
 import { FolderAppearanceTip } from "./onboarding/FolderAppearanceTip";
 import css from "./structure.module.css";
 
 const ROOT = "folder-structure-root";
-export function FolderStructurePage({ resource, ru, onBack }: {
-  resource: FolderResource; ru: boolean; onBack: () => void;
+const EMPTY_SELECTION = new Set<string>();
+export function FolderStructurePage({ resource, ru, onBack, focusFolderId, onFocusHandled }: {
+  resource: FolderResource; ru: boolean; onBack: () => void; focusFolderId?: string | null; onFocusHandled?: () => void;
 }) {
-  const [draftParent, setDraftParent] = useState<string | null | undefined>(null);
+  const [draftParent, setDraftParent] = useState<string | null | undefined>(focusFolderId ? undefined : null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
   const [confirmed, setConfirmed] = useState<RepositoryFolder[]>([]);
   const [saving, setSaving] = useState(false), [notice, setNotice] = useState("");
   const pending = useRef(false), mounted = useRef(false), rootDraft = useRef<HTMLDivElement>(null), newFolder = useRef<HTMLButtonElement>(null);
   const tree = useRef<HTMLUListElement>(null);
-  const titleId = useId(), busy = resource.busy || saving, disabled = busy || resource.loading || !resource.canManage;
+  const titleId = useId(), focused = useRef<string | null>(null);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
     setConfirmed(previous => {
@@ -31,6 +36,20 @@ export function FolderStructurePage({ resource, ru, onBack }: {
   const folders = useMemo(() => [...new Map([...confirmed, ...resource.items].map(folder => [folder.id, folder])).values()]
     .filter(folder => !folder.archivedAt), [resource.items, confirmed]);
   const roots = useMemo(() => buildFolderTree(folders, []).roots, [folders]);
+  const editing = useFolderStructureEditing(resource, folders, saving, ru);
+  const busy = resource.busy || saving || editing.saving, disabled = busy || resource.loading || !resource.canManage;
+  useEffect(() => {
+    if (!focusFolderId) { focused.current = null; return; }
+    if (focused.current === focusFolderId || resource.loading || busy) return;
+    const folder = folders.find(item => item.id === focusFolderId);
+    if (!folder) { onFocusHandled?.(); return; }
+    focused.current = focusFolderId; setDraftParent(undefined);
+    const ancestors = folders.filter(parent => folder.path.startsWith(`${parent.path}/`));
+    setCollapsed(previous => new Set([...previous].filter(id => !ancestors.some(parent => parent.id === id))));
+    editing.beginRename(folder.id); onFocusHandled?.();
+    requestAnimationFrame(() => [...(tree.current?.querySelectorAll<HTMLElement>("[data-structure-folder]") ?? [])]
+      .find(element => element.dataset.structureFolder === folder.id)?.scrollIntoView?.({ block: "nearest" }));
+  }, [focusFolderId, resource.loading, busy, folders, onFocusHandled, editing.beginRename]);
   const appearance = useFolderAppearanceContext();
   const appearanceTip = useFolderAppearanceTip(roots[0]?.folder, !disabled && !resource.error && Boolean(appearance.save));
   function dismissTip() {
@@ -45,7 +64,7 @@ export function FolderStructurePage({ resource, ru, onBack }: {
       const ancestors = folders.filter(folder => folder.id === parentId || parent.path.startsWith(`${folder.path}/`));
       setCollapsed(previous => new Set([...previous].filter(id => !ancestors.some(folder => folder.id === id))));
     }
-    setDraftParent(parentId); setNotice("");
+    editing.cancelRename(); setDraftParent(parentId); setNotice("");
     if (parentId === null) requestAnimationFrame(() => rootDraft.current?.querySelector<HTMLInputElement>("input")?.focus());
   }
   const creation: RepositoryCreation = {
@@ -68,7 +87,10 @@ export function FolderStructurePage({ resource, ru, onBack }: {
     if (busy || pending.current) return;
     setCollapsed(previous => { const next = new Set(previous); next.has(id) ? next.delete(id) : next.add(id); return next; });
   }
-  return <section className={css.page} aria-labelledby={titleId} aria-busy={busy || resource.loading}>
+  function rename(id: string) { if (!disabled) { setDraftParent(undefined); editing.beginRename(id); } }
+  return <RepositoryDragContext resource={{ ...resource, items: folders }} selected={EMPTY_SELECTION} ru={ru}
+    locked={saving || editing.saving || Boolean(editing.renamingId) || editing.selecting}>
+    <section className={css.page} aria-labelledby={titleId} aria-busy={busy || resource.loading}>
     <div className={css.content}>
       <nav className={css.breadcrumb} aria-label={ru ? "Навигация по репозиторию" : "Repository navigation"}>
         <button type="button" disabled={busy} aria-label={ru ? "Вернуться в репозиторий" : "Back to repository"}
@@ -80,6 +102,9 @@ export function FolderStructurePage({ resource, ru, onBack }: {
         <button ref={newFolder} type="button" className={css.newFolder} disabled={disabled} aria-label={ru ? "Новая папка" : "New folder"}
           onClick={() => begin(null)}><PiPlus size={14} aria-hidden="true" />{ru ? "Новая папка" : "New folder"}</button>
       </header>
+      {resource.canManage && <FolderStructureToolbar editing={editing} disabled={disabled} ru={ru}
+        onSelect={() => { if (!disabled) { setDraftParent(undefined); editing.toggleSelecting(); } }} />}
+      {editing.moveOpen && <FolderMovePanel folders={folders} editing={editing} disabled={disabled} ru={ru} />}
       {resource.error && <div className={css.error} role="alert"><span>{resource.error}</span>
         <button type="button" disabled={busy || resource.loading} onClick={() => { if (!busy && !resource.loading) resource.reload(); }}>{ru ? "Повторить" : "Retry"}</button></div>}
       {resource.canManage && draftParent === null && <div className={css.rootDraft} ref={rootDraft}>
@@ -87,13 +112,15 @@ export function FolderStructurePage({ resource, ru, onBack }: {
           restoreFocus={() => requestAnimationFrame(() => newFolder.current?.focus({ preventScroll: true }))} />
       </div>}
       {appearanceTip.visible && <FolderAppearanceTip ru={ru} onDismiss={dismissTip} />}
+      <div className={css.treeStage}><FolderStructureRootDrop disabled={disabled} ru={ru} />
       <ul ref={tree} className={css.tree} aria-label={ru ? "Папки репозитория" : "Repository folders"}>
         {roots.map(node => <FolderStructureBranch key={node.folder.id} node={node} collapsed={collapsed} creation={creation}
-          disabled={disabled} busy={busy} ru={ru} onToggle={toggle} onAppearanceOpen={appearanceTip.dismiss} />)}
-      </ul>
+          disabled={disabled} busy={busy} ru={ru} onToggle={toggle} onAppearanceOpen={appearanceTip.dismiss} editing={editing} onRename={rename} />)}
+      </ul></div>
       {!folders.length && <p className={css.empty} role="status">{resource.loading ? (ru ? "Загрузка папок…" : "Loading folders…")
         : (ru ? "Создайте первую папку, чтобы организовать репозиторий." : "Create the first folder to organize your repository.")}</p>}
       {notice && <p className={css.notice} role="status">{notice}</p>}
+      {editing.notice && <p className={css.notice} role="status">{editing.notice}</p>}
     </div>
-  </section>;
+  </section></RepositoryDragContext>;
 }

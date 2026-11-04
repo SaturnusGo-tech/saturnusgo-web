@@ -135,3 +135,21 @@ test("a late 412 cannot refresh the destination project", async () => {
   assert.equal(h.reloads(), 0);
   assert.equal(h.render().error, "");
 });
+
+test("a confirmed folder edit appears before refresh completes and never reconciles into another project", async () => {
+  const h = folderHarness();
+  const updated = { ...folder, name: "Renamed", path: "/Renamed", rowVersion: 2, etag: '"folder-a:2"' };
+  const save = h.render().update(folder, { name: updated.name });
+  h.writes[0].resolve({ data: updated });
+  await setImmediate();
+  assert.deepEqual(h.reconciled, [updated]);
+  assert.equal(h.refreshes.length, 1);
+  h.refreshes[0].resolve({});
+  assert.equal(await save, true);
+
+  const late = h.render().update(updated, { name: "Other" });
+  h.derived.project.id = "project-b"; h.render();
+  h.writes[1].resolve({ data: { ...updated, name: "Other", rowVersion: 3 } });
+  assert.equal(await late, false);
+  assert.deepEqual(h.reconciled, [updated]);
+});

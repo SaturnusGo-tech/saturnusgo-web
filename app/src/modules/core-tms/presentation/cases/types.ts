@@ -49,6 +49,7 @@ export type CasesViewProps = {
   filters: CaseFilters;
   onFilters: (filters: CaseFilters) => void;
   onNewFolder: () => void;
+  onManageFolder?: (folderId: string) => void;
   detailLoadError: boolean;
   onRetryDetail: () => void;
   sharedSteps: readonly SharedStepSummary[];

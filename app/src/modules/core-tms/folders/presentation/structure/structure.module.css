@@ -16,7 +16,16 @@
 .disclosure, .add { display: inline-grid; place-items: center; width: 24px; height: 28px; flex: 0 0 24px; padding: 0; border: 0; border-radius: 6px; color: var(--falcon-icon); background: transparent; cursor: pointer; }
 .disclosure:hover:not(:disabled), .add:hover:not(:disabled) { background: var(--falcon-selected); color: var(--falcon-text); }
 .folderIcon { flex-shrink: 0; color: var(--falcon-info); }
-.name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 1.5; }
+.row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 5px 3px; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-text); text-align: start; font: inherit; font-size: 13px; line-height: 1.5; cursor: text; touch-action: none; }
+.row .name:disabled { opacity: 1; }
+.row[data-drop], .row[data-selected] { background: var(--falcon-selected); }
+.row[data-drop] { box-shadow: inset 0 0 0 1px var(--falcon-focus); }
+.row[data-dragging] { opacity: .45; }
+.checkbox { width: 14px; height: 14px; margin: 0 3px; accent-color: var(--falcon-text); cursor: pointer; }
+.treeStage { position: relative; }
+.rootDrop { position: absolute; z-index: 3; inset-inline: 0; top: -35px; min-height: 30px; display: flex; align-items: center; padding: 6px 10px; border: 1px dashed var(--falcon-border-strong); border-radius: 7px; background: var(--falcon-surface); color: var(--falcon-text-secondary); font-size: 12px; opacity: 0; pointer-events: none; }
+.rootDrop[data-visible] { opacity: 1; pointer-events: auto; }
+.rootDrop[data-drop] { border-color: var(--falcon-focus); background: var(--falcon-selected); }
 .count { width: 28px; flex-shrink: 0; text-align: right; color: var(--falcon-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .branchChildren { position: relative; margin-inline-start: 10px; padding-inline-start: 18px; padding-block-start: 4px; }
 .branchChildren[hidden] { display: none; }

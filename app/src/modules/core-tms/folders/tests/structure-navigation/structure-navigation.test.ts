@@ -7,20 +7,23 @@ import { buildWorkspaceDeepLink } from "../../../state/navigation/workspace-deep
 test("structure navigation keeps the selected case and handles Back, Forward and close", () => {
   const original = "https://tms.example/work/?workspaceId=w&projectId=p&caseId=c";
   const h = hookHarness(original);
-  const hook = h.load<{ useFolderStructureScreen: () => { open: boolean; show: () => void; close: () => void } }>(new URL("../../state/structure/useFolderStructureScreen.ts", import.meta.url), name => {
+  const hook = h.load<{ useFolderStructureScreen: () => { open: boolean; focusFolderId?: string; show: (id?: string) => void; close: () => void; clearFocus: () => void } }>(new URL("../../state/structure/useFolderStructureScreen.ts", import.meta.url), name => {
     assert.ok(name.endsWith("workspace-history"));
     return { HISTORY_CHANGE: "falcon:navigation", visitWorkspace(href: string) { h.navigate(new URL(href, h.window.location.href).href); h.emit("popstate"); } };
   }).useFolderStructureScreen;
   assert.equal(h.settle(hook).open, false);
-  h.settle(hook).show();
+  h.settle(hook).show("target-folder");
   const opened = h.window.location.href;
   assert.equal(new URL(opened).hash, "#folders"); assert.equal(new URL(opened).searchParams.get("caseId"), "c");
   assert.equal(h.settle(hook).open, true);
+  assert.equal(h.settle(hook).focusFolderId, "target-folder");
+  h.settle(hook).clearFocus(); assert.equal(h.settle(hook).focusFolderId, undefined);
   h.navigate(original); h.emit("popstate"); assert.equal(h.settle(hook).open, false);
   h.navigate(opened); h.emit("popstate"); assert.equal(h.settle(hook).open, true);
   h.settle(hook).close(); assert.equal(h.window.location.href, original); assert.equal(h.settle(hook).open, false);
   h.navigate(opened); h.emit("falcon:navigation"); assert.equal(h.settle(hook).open, true);
   h.navigate(original); h.emit("falcon:navigation"); assert.equal(h.settle(hook).open, false);
+  h.settle(hook).show(); assert.equal(h.settle(hook).focusFolderId, undefined);
   h.dispose();
 });
 

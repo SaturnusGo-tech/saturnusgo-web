@@ -18,7 +18,7 @@ export function RepositoryCaseLeaf({ item, depth, selected, active, locked, canM
   const suppress = useContext(DragClickContext);
   const moving = useContext(RepositoryDragSelectionContext);
   const quickCreate = creation && canManage && !item.archivedAt;
-  return <li className={css.leaf} data-quick-create={quickCreate || undefined} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} data-drag-source={moving.caseIds.has(item.id) || undefined}>
+  return <li className={css.leaf} data-repository-drag-row data-repository-drag-id={`tree-case:${item.id}`} data-quick-create={quickCreate || undefined} data-depth={depth} data-selected={selected || undefined} data-active={active || undefined} data-drag-source={moving.caseIds.has(item.id) || undefined}>
     <span className={css.caseRail} aria-hidden="true" />
     <input type="checkbox" checked={selected} disabled={locked || !(canSelect ?? canManage) || (Boolean(item.archivedAt) && !allowArchivedSelection)}
       aria-label={`${ru ? "Выбрать" : "Select"} ${item.key}`} onChange={() => onToggle(item.id)} />
