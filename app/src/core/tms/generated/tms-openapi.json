@@ -22619,6 +22619,221 @@
           }
         }
       }
+    },
+    "/auth/spaces": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listAuthAccountSpaces",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "accountSpaces": [],
+            "cloudSession": []
+          },
+          {
+            "accountSpaces": [],
+            "federationBrowser": []
+          }
+        ],
+        "description": "Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching.",
+        "responses": {
+          "200": {
+            "description": "Authorized account space result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthAccountSpaces"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/auth/spaces/select": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "selectAuthAccountSpace",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "accountSpaces": [],
+            "cloudSession": []
+          },
+          {
+            "accountSpaces": [],
+            "federationBrowser": []
+          }
+        ],
+        "description": "Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. Selection consumes the proof atomically. A company result starts a fresh canonical company Google authorization and retains local MFA; no company cookie is issued centrally.",
+        "responses": {
+          "200": {
+            "description": "Authorized account space result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthRedirect"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthSpaceSelectionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/launch": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "launchCompanyGoogle",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [],
+        "description": "Starts a fresh company-bound Google authorization on its exact canonical hostname. It issues only the federation browser binding; local password/MFA policy remains mandatory at completion.",
+        "x-tms-auth-redirect": true,
+        "responses": {
+          "303": {
+            "description": "Configured Google authorization.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -22646,6 +22861,18 @@
         "in": "cookie",
         "name": "__Host-falcon_platform_session",
         "description": "Opaque host-only session accepted only through the verified same-origin gateway. Tenant and platform sessions are separate."
+      },
+      "accountSpaces": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_spaces",
+        "description": "Five-minute, one-use chooser proof bound to the initiating Google browser or active verified personal session."
+      },
+      "federationBrowser": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_federation",
+        "description": "Short-lived Google/SAML browser proof; no workspace access by itself."
       }
     },
     "parameters": {
@@ -28521,6 +28748,8 @@
           "SCOPE_NOT_REVIEWABLE",
           "SERVICE_UNAVAILABLE",
           "SIGNING_SECRET_REQUIRED",
+          "SPACE_PROOF_INVALID",
+          "SPACE_SELECTION_INVALID",
           "SSO_CONFLICT",
           "SSO_FORBIDDEN",
           "SSO_REQUIRED",
@@ -47120,6 +47349,64 @@
             "type": "string",
             "minLength": 10,
             "maxLength": 1000
+          }
+        }
+      },
+      "AuthAccountSpace": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company"
+            ]
+          }
+        }
+      },
+      "AuthAccountSpaces": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "spaces"
+        ],
+        "properties": {
+          "spaces": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "$ref": "#/components/schemas/AuthAccountSpace"
+            }
+          }
+        }
+      },
+      "AuthSpaceSelectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "spaceId"
+        ],
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
           }
         }
       }

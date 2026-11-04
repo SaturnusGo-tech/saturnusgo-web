@@ -5516,6 +5516,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/spaces": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. */
+        get: operations["listAuthAccountSpaces"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/spaces/select": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. Selection consumes the proof atomically. A company result starts a fresh canonical company Google authorization and retains local MFA; no company cookie is issued centrally. */
+        post: operations["selectAuthAccountSpace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google/launch": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Starts a fresh company-bound Google authorization on its exact canonical hostname. It issues only the federation browser binding; local password/MFA policy remains mandatory at completion. */
+        get: operations["launchCompanyGoogle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6225,7 +6285,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
+        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
         ValidationIssue: {
             field: string;
             code: string;
@@ -10221,6 +10281,18 @@ export interface components {
         };
         CompanySsoRecoveryRequest: {
             reason: string;
+        };
+        AuthAccountSpace: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            kind: "personal" | "company";
+        };
+        AuthAccountSpaces: {
+            spaces: components["schemas"]["AuthAccountSpace"][];
+        };
+        AuthSpaceSelectionRequest: {
+            spaceId: string;
         };
     };
     responses: {
@@ -22399,6 +22471,109 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAuthAccountSpaces: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized account space result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthAccountSpaces"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    selectAuthAccountSpace: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthSpaceSelectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized account space result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthRedirect"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    launchCompanyGoogle: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Configured Google authorization. */
+            303: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
         };
     };

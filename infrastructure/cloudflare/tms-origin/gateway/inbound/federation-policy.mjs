@@ -1,10 +1,10 @@
 import { companyHost } from '../company-host.mjs';
 import { TMS_HOST } from '../../route-manifest.mjs';
 
-const federation=/^\/api\/v1\/auth\/(?:google\/(?:start|callback|finish)|saml\/(?:start|launch)|saml\/[A-Za-z0-9._:-]{1,128}\/(?:acs|metadata)|federation\/cancel)$/;
+const federation=/^\/api\/v1\/auth\/(?:google\/(?:start|callback|finish|launch)|saml\/(?:start|launch)|saml\/[A-Za-z0-9._:-]{1,128}\/(?:acs|metadata)|federation\/cancel)$/;
 export function federationRoutePolicy(pathname,audience) {
  if(!['tenant','platform','personal'].includes(audience)||!(federation.test(pathname)||pathname==='/api/v1/company/sso/test')) return null;
- return {kind:'inbound',allowServerPost:pathname.endsWith('/acs'),allowCrossSitePost:pathname.endsWith('/acs'),cookieNames:['__Host-falcon_federation'],maximumBodyBytes:400000};
+ return {kind:'inbound',allowServerPost:pathname.endsWith('/acs'),allowCrossSitePost:pathname.endsWith('/acs'),cookieNames:['__Host-falcon_federation',...(audience==='personal'&&pathname==='/api/v1/auth/federation/cancel'?['__Host-falcon_spaces']:[])],maximumBodyBytes:400000};
 }
 export function federationResponsePolicy(request,response,audience,env) {
  const path=new URL(request.url).pathname;

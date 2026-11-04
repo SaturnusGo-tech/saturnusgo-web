@@ -1,3 +1,4 @@
+import { accountSpaceCookieAllowed } from "./account-spaces/cookie-policy.mjs";
 import { desktopResponsePolicy } from "./desktop/desktop-policy.mjs";
 import { federationResponsePolicy } from "./inbound/federation-policy.mjs";
 import { signedApiRequest, GatewayRequestError } from "./signed-api-request.mjs";
@@ -24,7 +25,7 @@ export async function proxyCompanyApi(request, env, audience, send = fetch) {
       const ordinary = cookie.startsWith(`${name}=`) && !/;\s*domain\s*=/i.test(cookie) &&
         /;\s*path=\/(?:;|$)/i.test(cookie) && /;\s*secure(?:;|$)/i.test(cookie) &&
         /;\s*httponly(?:;|$)/i.test(cookie) && /;\s*samesite=lax(?:;|$)/i.test(cookie);
-      if (!ordinary && !protocol.permitsCookie(cookie)) {
+      if (!ordinary && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie)) {
         return gatewayError(502, "INVALID_SESSION_COOKIE");
       }
       headers.append("set-cookie", cookie);

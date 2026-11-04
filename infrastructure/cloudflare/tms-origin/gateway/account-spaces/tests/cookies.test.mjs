@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import worker from '../../../worker.mjs';
+import {proxyCompanyApi} from '../../proxy-company-api.mjs';
+const env={FALCON_PUBLIC_AUTH_ENABLED:'true',FALCON_MANAGED_GATEWAY_KEY:'07'.repeat(32),FALCON_API_ORIGIN:'https://api.example.test'};
+const proof=`__Host-falcon_spaces=${'s'.repeat(43)}`;
+const cookie=`${proof}; Path=/; Max-Age=300; HttpOnly; Secure; SameSite=Lax`;
+test('only public account choice endpoints forward the chooser proof and accept its bounded host cookie',async t=>{
+ const previous=globalThis.fetch;t.after(()=>{globalThis.fetch=previous;});let incoming;
+ globalThis.fetch=async request=>{incoming=request;return Response.json({data:{spaces:[]}});};
+ const request=new Request('https://tms.saturnusgo.com/api/v1/auth/spaces',{headers:{cookie:proof}});
+ assert.equal((await worker.fetch(request,env)).status,200);assert.equal(incoming.headers.get('cookie'),proof);
+ const callback=new Request('https://tms.saturnusgo.com/api/v1/auth/google/callback');
+ const allowed=await proxyCompanyApi(callback,env,'personal',()=>Promise.resolve(new Response(null,{headers:{'set-cookie':cookie}})));
+ assert.equal(allowed.status,200);assert.equal(allowed.headers.get('set-cookie'),cookie);
+ const denied=await proxyCompanyApi(new Request('https://tms.saturnusgo.com/api/v1/projects'),env,'personal',()=>Promise.resolve(new Response(null,{headers:{'set-cookie':cookie}})));
+ assert.equal(denied.status,502);
+ const domain=await proxyCompanyApi(callback,env,'personal',()=>Promise.resolve(new Response(null,{headers:{'set-cookie':`${cookie}; Domain=saturnusgo.com`}})));
+ assert.equal(domain.status,502);
+});
