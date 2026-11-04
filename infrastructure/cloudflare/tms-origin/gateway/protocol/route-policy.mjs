@@ -9,7 +9,7 @@ export function protocolRoutePolicy(pathname, audience) {
   if(audience==='personal' && ['/api/v1/auth/spaces','/api/v1/auth/spaces/select'].includes(pathname)) {
     return {kind:'account-spaces',allowServerPost:false,cookieNames:['__Host-falcon_spaces','__Host-falcon_federation']};
   }
-  if(audience==='personal' && pathname==='/api/v1/auth/email/verify') {
+  if(audience==='personal' && ['/api/v1/auth/email/verify','/api/v1/auth/email/resend'].includes(pathname)) {
     return {kind:'email-proof',allowServerPost:false,cookieNames:['__Host-falcon_federation']};
   }
   const desktop = desktopRoutePolicy(pathname,audience);

@@ -22834,6 +22834,83 @@
           }
         }
       }
+    },
+    "/auth/email/resend": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "Resend an existing personal email proof without changing its purpose",
+        "operationId": "resendAuthEmail",
+        "security": [],
+        "description": "Rotate the code on the existing unconsumed, unexpired proof after the resend cooldown. The server preserves purpose, transaction binding, browser binding, expiry and failed verification attempts. A Google link requires the original federation browser cookie. Expired or exhausted proofs require restarting sign-in. No client-selected purpose is accepted.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthEmailChallenge"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthEmailResendRequest"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -47407,6 +47484,19 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 128
+          }
+        }
+      },
+      "AuthEmailResendRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "challengeId"
+        ],
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       }

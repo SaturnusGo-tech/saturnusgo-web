@@ -5576,6 +5576,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/email/resend": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend an existing personal email proof without changing its purpose
+         * @description Rotate the code on the existing unconsumed, unexpired proof after the resend cooldown. The server preserves purpose, transaction binding, browser binding, expiry and failed verification attempts. A Google link requires the original federation browser cookie. Expired or exhausted proofs require restarting sign-in. No client-selected purpose is accepted.
+         */
+        post: operations["resendAuthEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -10293,6 +10316,10 @@ export interface components {
         };
         AuthSpaceSelectionRequest: {
             spaceId: string;
+        };
+        AuthEmailResendRequest: {
+            /** Format: uuid */
+            challengeId: string;
         };
     };
     responses: {
@@ -22567,6 +22594,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resendAuthEmail: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthEmailResendRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthEmailChallenge"];
+                    };
+                };
             };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];

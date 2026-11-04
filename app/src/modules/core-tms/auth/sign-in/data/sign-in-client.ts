@@ -17,6 +17,7 @@ export function createSignInClient(send: typeof fetch = fetch): SignInPort {
     cancelFederation: signal => request("/auth/federation/cancel", {}, signal),
     methods: signal => request("/auth/methods", undefined, signal),
     startEmail: (email, intent, signal) => request("/auth/email/start", { email, intent }, signal),
+    resendEmail: (challengeId, signal) => request("/auth/email/resend", { challengeId }, signal),
     verifyEmail: (challengeId, code, signal) => request("/auth/email/verify", { challengeId, code }, signal),
     startGoogle: (intent, signal) => request("/auth/google/start", { intent }, signal),
     startSaml: (organization, signal) => request("/auth/saml/start", { organization }, signal),

@@ -4,6 +4,7 @@ export interface SignInPort {
   cancelFederation(signal?: AbortSignal): Promise<void>;
   methods(signal?: AbortSignal): Promise<SignInMethods>;
   startEmail(email: string, intent: SignInIntent, signal?: AbortSignal): Promise<EmailChallenge>;
+  resendEmail(challengeId: string, signal?: AbortSignal): Promise<EmailChallenge>;
   verifyEmail(challengeId: string, code: string, signal?: AbortSignal): Promise<AuthRedirect>;
   startGoogle(intent: GoogleIntent, signal?: AbortSignal): Promise<AuthorizationRedirect>;
   startSaml(organization: string, signal?: AbortSignal): Promise<AuthorizationRedirect>;

@@ -74,7 +74,13 @@ export function useSignIn(client: SignInPort, intent: SignInIntent, proof?: { re
     });
   }
   return { state, select, back, startEmail, retryMethods: () => setGeneration(value => value + 1),
-    resend: async () => { if (Date.now() >= state.retryAt && state.email) await startEmail(state.email); },
+    resend: async () => {
+      if (Date.now() < state.retryAt || !state.challenge) return;
+      await perform(async signal => {
+        const challenge=await client.resendEmail(state.challenge!.challengeId,signal);
+        return {challenge,retryAt:Date.now()+challenge.retryAfterSeconds*1000};
+      });
+    },
     verify: async (code: string) => {
       if (!state.challenge) return;
       if (Date.parse(state.challenge.expiresAt) <= Date.now()) {

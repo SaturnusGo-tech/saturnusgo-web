@@ -13,6 +13,7 @@ function Probe({ client, intent = "login" }: { client: SignInPort; intent?: "log
 const fixture = (): SignInPort => ({
   methods: async () => ({ google: true, email: true, saml: true, signup: true }),
   startEmail: async () => ({ challengeId: "proof-1", expiresAt: "2030-01-01T00:00:00Z", retryAfterSeconds: 60 }),
+  resendEmail: async challengeId => ({ challengeId, expiresAt: "2030-01-01T00:00:00Z", retryAfterSeconds: 60 }),
   verifyEmail: async () => ({ redirectUrl: "https://tms.example.test/welcome/" }),
   startGoogle: async () => ({ authorizationUrl: "https://accounts.google.com/authorize" }),
   startSaml: async () => ({ authorizationUrl: "https://idp.example.test/authorize" }),
