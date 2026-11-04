@@ -1,3 +1,4 @@
+import { publicAuthEnabled, publicApiAllowed } from "./gateway/inbound/public-policy.mjs";
 import { proxyDemo } from "./demo/proxy.mjs";
 import { discoveryResponse } from './seo.mjs';
 import {
@@ -239,6 +240,7 @@ async function proxyToPublicSite(request, incoming, originPath, managed = false,
 export default {
   async fetch(request, env) {
     const incoming = new URL(request.url);
+    const publicPersonal = publicAuthEnabled(incoming.hostname,env);
     const audience = companyHost(incoming.hostname, env);
     if (incoming.hostname !== TMS_HOST && !audience) return notFoundResponse();
     if (incoming.protocol === "http:") {
@@ -263,8 +265,8 @@ export default {
       return incoming.hostname === TMS_HOST ? secureResponse(await proxyDemo(request, env)) : notFoundResponse();
     }
     if (incoming.pathname.startsWith("/api/v1/")) {
-      if (!audience) return notFoundResponse();
-      const response = await proxyCompanyApi(request, env, audience);
+      if (!audience && !(publicPersonal && publicApiAllowed(incoming.pathname,request.method))) return notFoundResponse();
+      const response = await proxyCompanyApi(request, env, audience ?? "personal");
       return secureResponse(response, true, readConsentPolicy(request, response, audience));
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
@@ -285,7 +287,7 @@ export default {
       }
     }
     if (!audience && /^\/(sandbox|admin|profile)(?:\/|$)/.test(incoming.pathname)) return notFoundResponse();
-    if (["/signup", "/signup/"].includes(incoming.pathname)) return redirectToCanonicalPath(incoming, "/cloud-login/");
+    if (!publicPersonal && ["/signup", "/signup/"].includes(incoming.pathname)) return redirectToCanonicalPath(incoming, "/cloud-login/");
     const canonicalPath = canonicalPublicPath(incoming.pathname);
     if (canonicalPath) return redirectToCanonicalPath(incoming, canonicalPath);
     const originPath = originPathFor(incoming.pathname);

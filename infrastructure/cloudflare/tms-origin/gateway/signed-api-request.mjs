@@ -47,10 +47,11 @@ export async function signedApiRequest(request, env, audience) {
   }
   const origin = request.headers.get("origin") ?? "";
   if (!["GET", "HEAD"].includes(request.method) && origin !== incoming.origin &&
-    !(origin === "" && request.method === "POST" && protocol?.allowServerPost)) {
+    !(origin === "" && request.method === "POST" && protocol?.allowServerPost) &&
+    !(request.method === "POST" && protocol?.allowCrossSitePost)) {
     throw new GatewayRequestError(403, "ORIGIN_DENIED");
   }
-  const cookieName = audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
+  const cookieName = audience === "personal" ? "__Host-falcon_cloud_session" : audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
   const cookie = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim())
     .filter((part) => part.startsWith(`${cookieName}=`) ||
       protocol?.cookieNames.includes(part.slice(0, part.indexOf("=")))).join("; ");
@@ -73,7 +74,7 @@ export async function signedApiRequest(request, env, audience) {
   if (cookie) headers.set("cookie", cookie);
   const timestamp = String(Date.now());
   const clientIp = request.headers.get("cf-connecting-ip") ?? "";
-  const body = await readBody(request, dictation ? 12_810_000 : MAXIMUM_BODY_BYTES);
+  const body = await readBody(request, protocol?.maximumBodyBytes ?? (dictation ? 12_810_000 : MAXIMUM_BODY_BYTES));
   const fields = [protocol?.kind === "mcp" ? "falcon-gateway-v2" : "falcon-gateway-v1", request.method,
     incoming.pathname + incoming.search, incoming.hostname, timestamp, clientIp, origin, await digest(cookie), await digest(body)];
   if (protocol?.kind === "mcp") fields.push(await digest(headers.get("authorization") ?? ""));

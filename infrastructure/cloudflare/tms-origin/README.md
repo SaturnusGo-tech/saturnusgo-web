@@ -91,3 +91,11 @@ Use the pinned local Wrangler with `CLOUDFLARE_ACCOUNT_ID=4b485e3b82c9e0b429aa9a
 commands. Publishing an MP3 uses `wrangler r2 object put cdn-saturnusgo/<key> --remote --file <mp3>`
 with `--content-type audio/mpeg --cache-control "public, max-age=31536000, immutable"`.
 Verify the stored object and public GET/HEAD/Range responses before referencing its URL in a release.
+
+### Personal sign-in opt-in
+
+Public sign-in remains closed unless Worker `FALCON_PUBLIC_AUTH_ENABLED=true`. It applies only to the fixed `tms.saturnusgo.com` host and is mutually exclusive with `FALCON_LEGACY_HOST_MANAGED=true`. The existing managed gateway key and API origin remain mandatory. Public requests forward only the host-only cloud session and, on explicit federation routes, the five-minute federation binding cookie. The retired `/cloud-auth/register` and `/cloud-auth/login` remain blocked on the public gateway.
+
+The backend must independently enable `FALCON_PUBLIC_AUTH_ENABLED=true`, configure `FALCON_PERSONAL_EMAIL_ENCRYPTION_KEY` (64 lowercase hex characters) and `FALCON_PERSONAL_TERMS_VERSION`, retain secure `__Host-falcon_cloud_session` cookies, include `https://tms.saturnusgo.com` in CORS, and configure the existing access-email SMTP service. Apply and verify migrations before enabling either side. No flags, secrets, domain bindings or live deployment were changed by this implementation.
+
+SAML accepts a cross-site form POST only on `/api/v1/auth/saml/:companyId/acs`, with a 400 KB limit and a host-only Secure HttpOnly `__Host-falcon_federation` cookie (`SameSite=None`, maximum age 300 seconds). Other mutations retain exact same-origin checks. Callback redirects remain restricted to HTTPS Falcon hosts; provider initiation routes may return a server-validated HTTPS IdP destination. Public OAuth provider and MCP routes are not enabled by the personal sign-in flag.
