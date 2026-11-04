@@ -1,0 +1,20 @@
+{
+  "asset": "public/falcon/landing/2026-11/concept-release.webp",
+  "generatedOn": "2026-11-04",
+  "generationTool": "image_gen.imagegen (built-in)",
+  "generationMode": "new original image",
+  "sourceImage": "/Users/mercuryrucks/.codex/generated_images/01a1a67c-ced8-7f22-8723-626c2eb225d5/exec-919d8f6a-77bf-4040-a51e-ded56732fbab.png",
+  "referenceInspected": ".impeccable/review/landing-20261104/linear-features.png",
+  "referenceUse": "Visual aesthetic research only. No source pixels, existing branding, text, or screenshot content included in generated illustration.",
+  "finalPrompt": "Use case: stylized-concept\nAsset type: original raster product concept illustration for a premium Falcon QA software landing page, one image in a coordinated three-column feature section.\nScene/backdrop: completely seamless uniform near-black background #08090a, no floor line, no atmosphere, no border or container.\nSubject: a single precise sculpture of seven thin rectangular graphite planes ascending diagonally from low front-left to high rear-right like measured release momentum, with subtle gaps and a restrained sense of forward progress. The planes overlap in isometric perspective and form a single compact architectural composition. Pure thin rectangles with subtle bevels, no symbolic arrows, no charts or axes.\nStyle/medium: extremely refined monochrome 3D architectural wireframe rendering, isometric view from slightly above. Almost-black graphite faces, delicate dim silver and graphite edges, subtle beveled corners. Restrained precision, dark quiet technical sophistication. Original composition, not a reproduction of any existing illustration.\nComposition/framing: landscape 4:3. Sculpture occupies approximately 60 percent of the canvas width and 65 percent of the height, centered with generous even black negative space all around. Entire sculpture visible with no cropping. Match the quiet graphite technical aesthetic of stacked specification sheets and modular cubes.\nLighting/mood: very soft top-left studio edge light, enough contrast to read on a dark website at small size, no shine or bright glow. Clean anti-aliased fine lines with nuanced low-contrast depth.\nColor palette: strictly grayscale, background #08090a, black/charcoal object faces, a few silver-gray fine edges. No blue, purple, gold or saturated color.\nConstraints: no words, no text, no logo, no watermark, no UI screenshot, no background gradients, no people, no icons outside the sculpture, no extra objects, no contact sheet, no typography. Single finished image only.",
+  "processing": {
+    "command": "cwebp -quiet -q 88 -m 6 SOURCE.png -o concept-release.webp",
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "bytes": 21196,
+    "sha256": "6e9efdf503a13c58d33d1f20d9d0976ff4561091996c42170633f7818eb6e2cb"
+  },
+  "inspection": "Generated PNG and optimized WebP visually inspected. Single centered monochrome architectural sculpture; no text, logo, watermark, extra panels or contact sheet. All object edges visible within the frame."
+}

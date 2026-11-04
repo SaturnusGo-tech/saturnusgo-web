@@ -1,11 +1,12 @@
 "use client";
 import { ProfileLink } from "../../../profile/presentation/ProfileLink";
-import { Building2, LogOut, ShieldCheck, UserRound } from "lucide-react";
+import { Building2, Download, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { TmsSessionIdentity } from "../session/TmsSessionContext";
 import { ManagedAvatarImage } from "../../managed/presentation/avatar/ManagedAvatarImage";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { DesktopDownloadsPanel } from "../../../desktop-downloads/presentation/DesktopDownloadsPanel";
 import shell from "../../../tms.module.css";
 import styles from "./profile-menu.module.css";
 
@@ -14,6 +15,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
   const [anchor, setAnchor] = useState<{ left: number; bottom: number } | null>(null);
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const ru = locale === "ru";
@@ -31,6 +33,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
   return <div className={shell.authSession}>
     <button ref={trigger} className={shell.authSessionButton} type="button" aria-label={ru ? "Меню профиля" : "Profile menu"}
       title={session.label} aria-haspopup="menu" aria-expanded={Boolean(anchor)} onClick={() => {
+        if (downloadsOpen) { setDownloadsOpen(false); return; }
         const rect = trigger.current?.getBoundingClientRect();
         setAnchor(anchor || !rect ? null : { left: Math.max(12, Math.min(rect.right + 10, window.innerWidth - 270)),
           bottom: Math.max(16, Math.min(window.innerHeight - rect.bottom, window.innerHeight - 290)) });
@@ -51,6 +54,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
       <div className={styles.name}>{session.label}</div>
       <ProfileLink role="menuitem" onClick={() => setAnchor(null)}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</ProfileLink>
       <ProfileLink role="menuitem" section="security" onClick={() => setAnchor(null)}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</ProfileLink>
+      <button role="menuitem" type="button" onClick={() => { setAnchor(null); trigger.current?.focus({ preventScroll: true }); setDownloadsOpen(true); }}><Download size={17} strokeWidth={1.7} />{ru ? "Скачать приложение" : "Download app"}</button>
       {session.administrationPath && <a role="menuitem" href={session.administrationPath}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</a>}
       <button role="menuitem" type="button" disabled={pending} onClick={() => {
         setFailed(false); setPending(true);
@@ -58,5 +62,6 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
       }}><LogOut size={17} />{t("auth.signOut")}</button>
       {failed && <p className={styles.error} role="alert">{t("auth.logoutError")}</p>}
     </div>, document.body)}
+    <DesktopDownloadsPanel open={downloadsOpen} anchor={trigger} onClose={() => setDownloadsOpen(false)} />
   </div>;
 }

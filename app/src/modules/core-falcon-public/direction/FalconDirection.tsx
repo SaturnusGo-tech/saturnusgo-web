@@ -1,63 +1,44 @@
 "use client";
-import { ArrowRight, BookOpen, Play } from 'lucide-react';
+import { ArrowRight, BookOpen, Layers3, ListChecks, Menu, Play, Workflow, X } from 'lucide-react';
+import { useState } from 'react';
 import { useLandingLocale } from '../landing/localization/context/LandingLocaleProvider';
 import { LanguageSelector } from '../landing/localization/presentation/LanguageSelector';
 import { FalconDemoForm } from '../demo/FalconDemoForm';
 import { DirectionMarquee } from './DirectionMarquee';
+import { ProductScene } from './scenes/ProductScene';
 import { directionCopy } from './content/copy';
 import styles from './direction.module.css';
 
 export function FalconDirection({ onWorkflow, onAI, onDemo }: { onWorkflow: () => void; onAI: () => void; onDemo: () => void }) {
   const { locale } = useLandingLocale();
+  const [menu, setMenu] = useState(false);
   const c = directionCopy[locale];
-  const art = '/falcon/landing/2026-10/';
+  const docs = locale === 'ru' ? '/ru/docs/' : '/docs/';
+  const open = `/cloud-login/?lang=${locale}`;
   return <div className={styles.page} lang={locale}>
-    <a href="#repository" className={styles.skipLink}>{c.product}</a>
+    <a href="#main-content" className={styles.skipLink}>{c.skip}</a>
     <header className={styles.navigation}>
-      <a className={styles.brand} href="#top" aria-label="Falcon"><img src="/falcon/falcon-mark-light.png" width={30} height={30} alt="" /><span>FALCON</span></a>
-      <nav aria-label={c.resources}><a href="#repository">{c.product}</a><a href="#connected-tools">{c.integrations}</a><a href="#resources">{c.resources}</a></nav>
-      <div className={styles.navActions}><button className={styles.primary} onClick={onDemo}>{c.demo}</button><LanguageSelector /></div>
+      <div className={styles.navigationInner}>
+        <a className={styles.brand} href="#top" aria-label="Falcon"><img src="/falcon/landing/2026-11/falcon-line-mark.svg" width={30} height={30} alt="" /><span>Falcon</span></a>
+        <nav className={styles.desktopNav} aria-label={c.product}><a href="#repository">{c.product}</a><a href="#falcon-ai">{c.integrations}</a><a href="#resources">{c.resources}</a><button onClick={onDemo}>{c.contact}</button></nav>
+        <div className={styles.navActions}><LanguageSelector /><a className={styles.docsLink} href={docs}>{c.docs}</a><a className={styles.primary} href={open}>{c.open}</a><button className={styles.menuButton} onClick={() => setMenu(!menu)} aria-label={menu ? c.closeMenu : c.menu} aria-expanded={menu} aria-controls="landing-menu">{menu ? <X size={20} /> : <Menu size={20} />}</button></div>
+        {menu && <nav id="landing-menu" className={styles.mobileNav} aria-label={c.menu} onKeyDown={event => { if (event.key === 'Escape') setMenu(false); }} onClick={() => setMenu(false)}><a href="#repository">{c.product}</a><a href="#falcon-ai">{c.integrations}</a><a href={docs}>{c.docs}</a><button onClick={onDemo}>{c.contact}</button></nav>}
+      </div>
     </header>
-    <main id="top">
-      <section className={styles.hero} aria-labelledby="direction-title">
-        <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>{c.eyebrow}</p>
-          <h1 id="direction-title">{c.title[0]}<br />{c.title[1]}</h1>
-          <p className={styles.heroLead}>{c.lead[0]}<br />{c.lead[1]}</p>
-          <div className={styles.heroActions}><a href="#repository" className={styles.primary}>{c.explore} <ArrowRight size={14} /></a><button className={styles.ghost} onClick={onWorkflow}>{c.workflow}</button></div>
-        </div>
-        <div className={styles.heroStage}>
-          <img className={styles.heroPreview} src={`${art}hero-preview.png?v=9a4c27dd`} width={2512} height={1660} alt={c.heroAlt} fetchPriority="high" />
-        </div>
+    <main id="main-content">
+      <section className={styles.hero} id="top" aria-labelledby="direction-title">
+        <div className={styles.heroCopy}><h1 id="direction-title">{c.title[0]}<br />{c.title[1]}</h1><div className={styles.heroSubline}><p>{c.lead}</p><button className={styles.textLink} onClick={onWorkflow}><Play size={14} aria-hidden="true" />{c.workflow}<ArrowRight size={16} aria-hidden="true" /></button></div></div>
+        <ProductScene kind="hero" locale={locale} />
       </section>
-      <DirectionMarquee title={c.tools} pause={c.pause} resume={c.resume} />
-      <section id="repository" className={styles.repository} aria-labelledby="repository-title">
-        <p className={styles.eyebrow}>{c.repositoryLabel}</p>
-        <h2 id="repository-title">{c.repositoryTitle[0]}<br />{c.repositoryTitle[1]}</h2>
-        <p className={styles.body}>{c.repositoryBody[0]}{" "}<br className={styles.desktopBreak} />{c.repositoryBody[1]}</p>
-        <img className={styles.repositoryStage} src={`${art}repository-stage.png`} width={1280} height={440} alt={c.repositoryAlt} loading="lazy" />
-      </section>
-      <section id="execution" className={styles.execution} aria-labelledby="execution-title">
-        <p className={styles.eyebrow}>{c.executionLabel}</p>
-        <div className={styles.executionHeading}><h2 id="execution-title">{c.executionTitle[0]}<br />{c.executionTitle[1]}</h2><p className={styles.body}>{c.executionBody}</p></div>
-        <img className={styles.runStage} src={`${art}run-stage.png`} width={1280} height={690} alt={c.runAlt} loading="lazy" />
-        <p className={styles.caption}>{c.executionCaption}</p>
-      </section>
-      <section id="falcon-ai" className={styles.ai} aria-labelledby="ai-title">
-        <div className={styles.aiIntro}><p className={styles.eyebrow}>{c.aiLabel}</p><h2 id="ai-title">{c.aiTitle[0]}<br />{c.aiTitle[1]}</h2><p className={styles.body}>{c.aiBody}</p><p className={styles.aiSource}><BookOpen size={17} />{c.aiSource}</p><button className={styles.secondary} onClick={onAI}>{c.aiAction} <ArrowRight size={14} /></button></div>
-        <img src={`${art}ai-stage.png`} width={820} height={630} alt={c.aiAlt} loading="lazy" />
-      </section>
-      <section className={styles.closing}><p className={styles.eyebrow}>{c.closeLabel}</p><h2>{c.closeTitle[0]}<br />{c.closeTitle[1]}</h2><div className={styles.closingActions}><button className={styles.primary} onClick={onDemo}>{c.demo} <ArrowRight size={14} /></button><button className={styles.secondary} onClick={onWorkflow}><Play size={14} aria-hidden="true" />{c.workflow}</button></div></section>
+      <DirectionMarquee title={c.tools} note={c.toolsNote} pause={c.pause} resume={c.resume} />
+      <section className={styles.principles} aria-labelledby="principles-title"><h2 id="principles-title">{c.statement[0]} <span>{c.statement[1]}</span></h2><div className={styles.principleGrid}>{c.principles.map(item => <article key={item.image}><img src={`/falcon/landing/2026-11/concept-${item.image}.webp`} alt="" width={1448} height={1086} loading="lazy" /><h3>{item.title}</h3><p>{item.body}</p></article>)}</div></section>
+      <section id="repository" className={styles.chapter} aria-labelledby="repository-title"><div className={styles.chapterHeading}><div><ListChecks size={22} strokeWidth={1.5} aria-hidden="true" /><h2 id="repository-title">{c.repositoryTitle}</h2></div><div><p>{c.repositoryBody}</p><a className={styles.textLink} href={`${docs}?article=create-test-case`}>{c.repositoryLink}<ArrowRight size={16} aria-hidden="true" /></a></div></div><ProductScene kind="coverage" locale={locale} /><div className={styles.details}>{c.details.map(([title, body], i) => <div key={title}>{i === 0 ? <ListChecks size={17} aria-hidden="true" /> : i === 1 ? <Layers3 size={17} aria-hidden="true" /> : <BookOpen size={17} aria-hidden="true" />}<h3>{title}</h3><p>{body}</p></div>)}</div></section>
+      <section id="execution" className={styles.chapter} aria-labelledby="execution-title"><div className={styles.chapterHeading}><div><Layers3 size={22} strokeWidth={1.5} aria-hidden="true" /><h2 id="execution-title">{c.executionTitle}</h2></div><div><p>{c.executionBody}</p><a className={styles.textLink} href={`${docs}?article=create-run`}>{c.executionLink}<ArrowRight size={16} aria-hidden="true" /></a></div></div><ProductScene kind="execution" locale={locale} /></section>
+      <section id="falcon-ai" className={styles.chapter} aria-labelledby="ai-title"><div className={styles.chapterHeading}><div><Workflow size={22} strokeWidth={1.5} aria-hidden="true" /><h2 id="ai-title">{c.aiTitle}</h2></div><div><p>{c.aiBody}</p><a className={styles.textLink} href={`${docs}?article=codex-web-qa`}>{c.aiLink}<ArrowRight size={16} aria-hidden="true" /></a></div></div><ProductScene kind="integrations" locale={locale} /><div className={styles.sceneFootnote}><span>{c.demoLabel}</span><button className={styles.textLink} onClick={onAI}>{c.aiAction}<ArrowRight size={16} aria-hidden="true" /></button></div></section>
+      <section id="resources" className={styles.resources}><BookOpen size={26} strokeWidth={1.5} aria-hidden="true" /><h2>{c.guideTitle}</h2><p>{c.guideBody}</p><a className={styles.secondary} href={docs}>{c.readDocs}<ArrowRight size={16} aria-hidden="true" /></a></section>
+      <section className={styles.closing}><h2>{c.closeTitle}</h2><p>{c.closeBody}</p><a className={styles.primary} href={open}>{c.open}<ArrowRight size={16} aria-hidden="true" /></a></section>
       <section id="book-demo" className={styles.demoSection} aria-label={c.demo}><FalconDemoForm locale={locale} /></section>
     </main>
-    <footer className={styles.footer} id="resources">
-      <div className={styles.footerLinks}>
-        <div className={styles.footerIdentity}><a className={styles.brand} href="#top"><img src="/falcon/falcon-mark-light.png" width={26} height={26} alt="" /><span>FALCON</span></a><p>{c.brand}</p></div>
-        <nav aria-label={c.product}><strong>{c.product}</strong><a href="#repository">{c.cases}</a><a href="#execution">{c.runs}</a><a href="#falcon-ai">Falcon AI</a></nav>
-        <nav aria-label={c.resources}><strong>{c.resources}</strong><button onClick={onWorkflow}>{c.guide}</button><button onClick={onDemo}>{c.contact}</button><a href={`/privacy/?lang=${locale}`}>{c.privacy}</a></nav>
-      </div>
-      <div className={styles.footerMeta}><small>© 2026 Falcon · SaturnusGo. All rights reserved.</small><a href="#top">{c.back} ↑</a></div>
-      <div className={styles.wordmark} aria-hidden="true">FALCON</div>
-    </footer>
+    <footer className={styles.footer}><a className={styles.brand} href="#top"><img src="/falcon/landing/2026-11/falcon-line-mark.svg" width={28} height={28} alt="" /><span>Falcon</span></a><p>{c.brand}</p><nav aria-label={c.resources}><a href={docs}>{c.docs}</a><a href="https://t.me/falcon_tms">{c.contact}</a><a href={`/privacy/?lang=${locale}`}>{c.privacy}</a><a href={`/trial-terms/?lang=${locale}`}>{c.terms}</a><a href="#top">{c.back}<ArrowRight size={14} aria-hidden="true" /></a></nav><small>© 2026 Falcon · SaturnusGo</small></footer>
   </div>;
 }

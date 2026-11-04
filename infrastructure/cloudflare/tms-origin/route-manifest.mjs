@@ -10,6 +10,8 @@ export const publicRoutes = Object.freeze([
   ...["sandbox", "admin", "profile"].map((name) => Object.freeze({ publicPath: `/${name}/`, artifactPath: `${name}/index.html`, required: true })),
   Object.freeze({ publicPath: "/", artifactPath: "index.html", required: true }),
   Object.freeze({ publicPath: "/ru/", artifactPath: "ru/index.html", required: true }),
+  Object.freeze({ publicPath: "/docs/", artifactPath: "docs/index.html", required: true }),
+  Object.freeze({ publicPath: "/ru/docs/", artifactPath: "ru/docs/index.html", required: true }),
   Object.freeze({ publicPath: "/signup/", artifactPath: "signup/index.html", required: true }),
   Object.freeze({
     publicPath: "/cloud-login/",
@@ -26,6 +28,9 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  "/falcon/landing/2026-11/falcon-line-mark.svg",
+  ...["coverage", "agents", "release"].map((id) => `/falcon/landing/2026-11/concept-${id}.webp`),
+  ...["repository", "suites", "dashboard", "run", "integrations", "codex"].map((id) => `/falcon/landing/2026-11/product-${id}.webp`),
   ...["Regular", "RegularItalic", "Medium", "Semibold", "Bold"].map((weight) => `/falcon/docs/fonts/OpenAISans-${weight}.woff2`),
   "/assets/integrations/codex/codex-light.png",
   "/assets/integrations/codex/codex-dark.png",

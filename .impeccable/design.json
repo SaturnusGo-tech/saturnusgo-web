@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T13:20:04.990998+00:00",
+  "title": "Design System: Falcon Public Marketing",
+  "extensions": {
+    "colorMeta": {
+      "landing-bg": {
+        "role": "neutral",
+        "displayName": "Near-black",
+        "tonalRamp": [
+          "oklch(15% 0.00295 246.26)",
+          "oklch(26% 0.00295 246.26)",
+          "oklch(38% 0.00295 246.26)",
+          "oklch(49% 0.00295 246.26)",
+          "oklch(61% 0.00295 246.26)",
+          "oklch(72% 0.00295 246.26)",
+          "oklch(84% 0.00295 246.26)",
+          "oklch(95% 0.00295 246.26)"
+        ]
+      },
+      "landing-text": {
+        "role": "primary",
+        "displayName": "Off-white",
+        "tonalRamp": [
+          "oklch(15% 0.00106 197.14)",
+          "oklch(26% 0.00106 197.14)",
+          "oklch(38% 0.00106 197.14)",
+          "oklch(49% 0.00106 197.14)",
+          "oklch(61% 0.00106 197.14)",
+          "oklch(72% 0.00106 197.14)",
+          "oklch(84% 0.00106 197.14)",
+          "oklch(95% 0.00106 197.14)"
+        ]
+      },
+      "landing-muted": {
+        "role": "neutral",
+        "displayName": "Muted silver",
+        "tonalRamp": [
+          "oklch(15% 0.01015 279.62)",
+          "oklch(26% 0.01015 279.62)",
+          "oklch(38% 0.01015 279.62)",
+          "oklch(49% 0.01015 279.62)",
+          "oklch(61% 0.01015 279.62)",
+          "oklch(72% 0.01015 279.62)",
+          "oklch(84% 0.01015 279.62)",
+          "oklch(95% 0.01015 279.62)"
+        ]
+      },
+      "landing-line": {
+        "role": "neutral",
+        "displayName": "Graphite rule",
+        "tonalRamp": [
+          "oklch(15% 0.00931 276.77)",
+          "oklch(26% 0.00931 276.77)",
+          "oklch(38% 0.00931 276.77)",
+          "oklch(49% 0.00931 276.77)",
+          "oklch(61% 0.00931 276.77)",
+          "oklch(72% 0.00931 276.77)",
+          "oklch(84% 0.00931 276.77)",
+          "oklch(95% 0.00931 276.77)"
+        ]
+      },
+      "falcon-border": {
+        "role": "neutral",
+        "displayName": "Field border",
+        "tonalRamp": [
+          "oklch(15% 0.00898 276.85)",
+          "oklch(26% 0.00898 276.85)",
+          "oklch(38% 0.00898 276.85)",
+          "oklch(49% 0.00898 276.85)",
+          "oklch(61% 0.00898 276.85)",
+          "oklch(72% 0.00898 276.85)",
+          "oklch(84% 0.00898 276.85)",
+          "oklch(95% 0.00898 276.85)"
+        ]
+      },
+      "falcon-on-action": {
+        "role": "neutral",
+        "displayName": "Action ink",
+        "tonalRamp": [
+          "oklch(15% 0.00262 247.98)",
+          "oklch(26% 0.00262 247.98)",
+          "oklch(38% 0.00262 247.98)",
+          "oklch(49% 0.00262 247.98)",
+          "oklch(61% 0.00262 247.98)",
+          "oklch(72% 0.00262 247.98)",
+          "oklch(84% 0.00262 247.98)",
+          "oklch(95% 0.00262 247.98)"
+        ]
+      },
+      "falcon-control": {
+        "role": "neutral",
+        "displayName": "Control graphite",
+        "tonalRamp": [
+          "oklch(15% 0.00426 264.47)",
+          "oklch(26% 0.00426 264.47)",
+          "oklch(38% 0.00426 264.47)",
+          "oklch(49% 0.00426 264.47)",
+          "oklch(61% 0.00426 264.47)",
+          "oklch(72% 0.00426 264.47)",
+          "oklch(84% 0.00426 264.47)",
+          "oklch(95% 0.00426 264.47)"
+        ]
+      },
+      "falcon-panel": {
+        "role": "neutral",
+        "displayName": "Panel graphite",
+        "tonalRamp": [
+          "oklch(15% 0.00431 264.47)",
+          "oklch(26% 0.00431 264.47)",
+          "oklch(38% 0.00431 264.47)",
+          "oklch(49% 0.00431 264.47)",
+          "oklch(61% 0.00431 264.47)",
+          "oklch(72% 0.00431 264.47)",
+          "oklch(84% 0.00431 264.47)",
+          "oklch(95% 0.00431 264.47)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Soft off-white",
+        "tonalRamp": [
+          "oklch(15% 0.00685 277.16)",
+          "oklch(26% 0.00685 277.16)",
+          "oklch(38% 0.00685 277.16)",
+          "oklch(49% 0.00685 277.16)",
+          "oklch(61% 0.00685 277.16)",
+          "oklch(72% 0.00685 277.16)",
+          "oklch(84% 0.00685 277.16)",
+          "oklch(95% 0.00685 277.16)"
+        ]
+      },
+      "secondary-border": {
+        "role": "neutral",
+        "displayName": "Secondary stroke",
+        "tonalRamp": [
+          "oklch(15% 0.00876 276.90)",
+          "oklch(26% 0.00876 276.90)",
+          "oklch(38% 0.00876 276.90)",
+          "oklch(49% 0.00876 276.90)",
+          "oklch(61% 0.00876 276.90)",
+          "oklch(72% 0.00876 276.90)",
+          "oklch(84% 0.00876 276.90)",
+          "oklch(95% 0.00876 276.90)"
+        ]
+      },
+      "secondary-hover": {
+        "role": "neutral",
+        "displayName": "Secondary hover",
+        "tonalRamp": [
+          "oklch(15% 0.00942 276.74)",
+          "oklch(26% 0.00942 276.74)",
+          "oklch(38% 0.00942 276.74)",
+          "oklch(49% 0.00942 276.74)",
+          "oklch(61% 0.00942 276.74)",
+          "oklch(72% 0.00942 276.74)",
+          "oklch(84% 0.00942 276.74)",
+          "oklch(95% 0.00942 276.74)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus silver",
+        "tonalRamp": [
+          "oklch(15% 0.00824 278.62)",
+          "oklch(26% 0.00824 278.62)",
+          "oklch(38% 0.00824 278.62)",
+          "oklch(49% 0.00824 278.62)",
+          "oklch(61% 0.00824 278.62)",
+          "oklch(72% 0.00824 278.62)",
+          "oklch(84% 0.00824 278.62)",
+          "oklch(95% 0.00824 278.62)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Marketing hero only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Product chapters."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Principle titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Marketing introductions."
+      },
+      "detail": {
+        "displayName": "Detail",
+        "purpose": "Supporting explanations."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Marketing actions."
+      },
+      "navigation": {
+        "displayName": "Navigation",
+        "purpose": "Compact top-level navigation."
+      }
+    },
+    "shadows": [
+      {
+        "name": "product-frame",
+        "value": "0 24px 80px #0009",
+        "purpose": "Broad depth beneath actual product evidence."
+      },
+      {
+        "name": "product-overlay",
+        "value": "-18px -8px 65px #0008, 0 24px 80px #0009",
+        "purpose": "Separates the overlay screenshot from the main frame."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-transition",
+        "value": ".18s",
+        "purpose": "Background and color state changes."
+      },
+      {
+        "name": "scene-settle",
+        "value": "1.3s cubic-bezier(.16,1,.3,1) both",
+        "purpose": "One hero entrance from translateY(22px) rotateX(7deg) to rest."
+      },
+      {
+        "name": "marquee",
+        "value": "48s linear infinite",
+        "purpose": "Pausable integration strip; disabled with reduced motion."
+      },
+      {
+        "name": "text-link-arrow",
+        "value": "transform .2s",
+        "purpose": "Arrow moves 3px on hover; disabled with reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1600px"
+      },
+      {
+        "name": "compact",
+        "value": "1000px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      },
+      {
+        "name": "demo-stack",
+        "value": "680px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Open Falcon through the web login.",
+      "html": "<a class=\"ds-primary\" href=\"#\">Open app</a>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:42px;padding:0 19px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;text-decoration:none;transition:background .18s,box-shadow .18s;font-family:var(--font-geist-sans),Arial,sans-serif;background:#f7f8f8;color:#101112;border:1px solid #f7f8f8}.ds-primary:hover{background:#dfe0e5}.ds-primary:focus-visible{outline:2px solid #d8d9df;outline-offset:4px}"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet documentation action on the marketing page.",
+      "html": "<a class=\"ds-secondary\" href=\"#\">Read the documentation<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-7-7 7 7-7 7\"/></svg></a>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:42px;padding:0 19px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;text-decoration:none;transition:background .18s,box-shadow .18s;font-family:var(--font-geist-sans),Arial,sans-serif;background:#141517;color:#f7f8f8;border:1px solid #38393e}.ds-secondary:hover{background:#232429}.ds-secondary:focus-visible{outline:2px solid #d8d9df;outline-offset:4px}"
+    },
+    {
+      "name": "Workflow text link",
+      "kind": "button",
+      "description": "Lightweight action with a directional arrow.",
+      "html": "<button class=\"ds-link\">See Falcon in action<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-7-7 7 7-7 7\"/></svg></button>",
+      "css": ".ds-link{display:inline-flex;align-items:center;gap:9px;font-size:14px;line-height:1.5;color:#d7d8df;background:none;border:0;padding:0;cursor:pointer;font-family:var(--font-geist-sans),Arial,sans-serif;}.ds-link:hover{color:#fff}.ds-link svg{transition:transform .2s}.ds-link:hover svg{transform:translateX(3px)}.ds-link:focus-visible{outline:2px solid #d8d9df;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-link svg{transition:none}}"
+    },
+    {
+      "name": "Marketing navigation",
+      "kind": "nav",
+      "refersTo": "navigation-primary",
+      "description": "Compact navigation grouping; the original Falcon SVG remains the production identity asset.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Marketing preview\"><span class=\"ds-brand\">Falcon</span><a class=\"ds-docs\" href=\"#\">Docs</a><a class=\"ds-open\" href=\"#\">Open app</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:20px;min-height:72px;padding:0 24px;background:rgba(8,9,10,.92);backdrop-filter:blur(18px);border-bottom:1px solid #ffffff0d;color:#f7f8f8;font-family:var(--font-geist-sans),Arial,sans-serif;}.ds-brand{margin-right:auto;font-size:20px;font-weight:600;letter-spacing:-.035em}.ds-docs{font-size:13px;color:#a0a1a8;text-decoration:none;border-left:1px solid #26272c;padding-left:22px;transition:color .18s}.ds-docs:hover{color:#fff}.ds-open{display:inline-flex;align-items:center;min-height:35px;padding:0 16px;background:#f7f8f8;color:#101112;border-radius:999px;font-size:13px;font-weight:500;text-decoration:none;transition:background .18s}.ds-open:hover{background:#dfe0e5}.ds-nav a:focus-visible{outline:2px solid #d8d9df;outline-offset:4px}"
+    },
+    {
+      "name": "Demo email field",
+      "kind": "input",
+      "refersTo": "demo-field",
+      "description": "Labeled email field from the embedded demo request form.",
+      "html": "<label class=\"ds-label\" for=\"ds-email\">Work email</label><input class=\"ds-email\" id=\"ds-email\" type=\"email\" placeholder=\"you@company.com\">",
+      "css": ".ds-label{display:block;margin-bottom:10px;color:#f7f8f8;font-size:13px;font-family:var(--font-geist-sans),Arial,sans-serif;}.ds-email{min-width:0;border:1px solid #303136;border-radius:6px;padding:15px 16px;font-size:15px;color:#f7f8f8;background:#161719;font-family:var(--font-geist-sans),Arial,sans-serif;}.ds-email:focus-visible{outline:2px solid var(--falcon-danger-border,color-mix(in oklab,#fa423e 40%,transparent));outline-offset:4px} .ds-email[aria-invalid=\"true\"]{border-color:var(--falcon-danger-border,color-mix(in oklab,#fa423e 40%,transparent))}"
+    },
+    {
+      "name": "Demo submit",
+      "kind": "button",
+      "refersTo": "demo-submit",
+      "description": "Compact submit control with a pending disabled state.",
+      "html": "<button class=\"ds-submit\">Talk to us <span aria-hidden=\"true\">↗</span></button>",
+      "css": ".ds-submit{display:inline-flex;align-items:center;justify-content:center;gap:18px;padding:15px 18px;border:1px solid #f7f8f8;border-radius:6px;background:#f7f8f8;color:#101112;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-geist-sans),Arial,sans-serif;}.ds-submit:disabled{opacity:.6;cursor:wait}.ds-submit:focus-visible{outline:2px solid var(--falcon-danger-border,color-mix(in oklab,#fa423e 40%,transparent));outline-offset:4px} .ds-submit:hover{background:var(--falcon-action-hover,#ededed)}"
+    },
+    {
+      "name": "Product evidence frame",
+      "kind": "custom",
+      "refersTo": "product-frame",
+      "description": "Frame material only; production scenes contain actual product captures.",
+      "html": "<figure class=\"ds-frame\"><figcaption>Current Falcon product capture</figcaption></figure>",
+      "css": ".ds-frame{margin:0;min-height:130px;display:grid;place-items:center;border:1px solid #ffffff18;border-radius:12px;overflow:hidden;background:#171717;box-shadow:0 24px 80px #0009;color:#a0a1a8;font-size:13px;font-family:var(--font-geist-sans),Arial,sans-serif;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quality Workspace",
+    "overview": "Falcon's accepted marketing world pairs a near-black canvas with off-white type, quiet graphite rules and precise Geist typography. Spacious chapters let current product screens explain coverage, execution and connected tools. Original silver isometric illustrations support the story without competing with the product.\n\n**Scope:** this document governs the public marketing direction implemented by `app/src/modules/core-falcon-public/direction/FalconDirection.tsx`, including its embedded demo form. It does not prescribe colors, density, layout or controls for authenticated TMS, authentication, administration or documentation readers. Those surfaces retain their own references and module systems. Product screens shown here are evidence, not a new theme for the application.",
+    "keyCharacteristics": [
+      "Monochrome contrast and restrained controls.",
+      "Large left-aligned headings with compact navigation.",
+      "Current product captures, layered with shallow perspective.",
+      "Content remains readable when motion is paused or reduced."
+    ],
+    "rules": [
+      {
+        "name": "The Product Evidence Rule",
+        "body": "Keep the marketing chrome monochrome; preserve meaningful semantic colors inside the actual product captures.",
+        "section": "colors"
+      },
+      {
+        "name": "The Evidence Depth Rule",
+        "body": "Use elevated framing for product evidence; keep surrounding prose and sections on the continuous canvas.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve the current linear Falcon mark, Geist typography and monochrome marketing chrome.",
+      "Do use current product captures and original silver illustrations with asset provenance.",
+      "Do keep Open app pointed at web login, desktop downloads in the authenticated profile and public Docs readable without sign-in.",
+      "Do preserve keyboard focus, marquee pause and reduced-motion behavior."
+    ],
+    "donts": [
+      "Don't apply this marketing token set to authenticated TMS, authentication, administration or documentation-reader interfaces.",
+      "Don't replace product evidence with generic SaaS cards or introduce decorative color into the marketing chrome.",
+      "Don't make the content depend on animation or invent product capabilities in illustrative screens."
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import type { DesktopDownloadsPanel } from "../presentation/DesktopDownloadsPanel";
+import release from "../model/release.json";
+import { componentHarness, nodes } from "../../portfolios/tests/support/component-harness";
+
+test("download panel exposes the verified beta platforms and signing facts without automatic downloads", () => {
+  const h = componentHarness(undefined, { document: { body: {} } });
+  const { DesktopDownloadsPanel: render } = h.load<{ DesktopDownloadsPanel: typeof DesktopDownloadsPanel }>(new URL("../presentation/DesktopDownloadsPanel.tsx", import.meta.url), name => {
+    if (name === "react-dom") return { createPortal: (value: unknown) => value };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("release.json")) return { default: release };
+  });
+  // Only rendered links may initiate a download; mounting the closed composition has no effects.
+  assert.equal(h.render(() => render({ open: false, anchor: { current: null }, onClose() {} })), null);
+  h.dispose();
+  const noEffects = componentHarness(undefined, { document: { body: {} } });
+  const { DesktopDownloadsPanel: openRender } = noEffects.load<{ DesktopDownloadsPanel: typeof DesktopDownloadsPanel }>(new URL("../presentation/DesktopDownloadsPanel.tsx", import.meta.url), name => {
+    if (name === "react-dom") return { createPortal: (value: unknown) => value };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("release.json")) return { default: release };
+  });
+  // Evaluate the JSX before effects; geometry and dismissal are verified separately.
+  const all = nodes(openRender({ open: true, anchor: { current: null }, onClose() {} }));
+  const downloads = all.filter(node => node.type === "a" && node.props.download !== release.checksums);
+  assert.equal(downloads.length, 3);
+  assert.deepEqual(downloads.map(node => node.props.href), release.artifacts.map(build => `${release.baseUrl}${build.file}`));
+  assert.ok(all.some(node => node.props.children === "macOS: ad-hoc signed, not notarized. Windows: unsigned."));
+  assert.ok(all.some(node => node.type === "div" && node.props.role === "dialog" && node.props["aria-modal"] === "false"));
+});

@@ -1,0 +1,20 @@
+{
+  "asset": "public/falcon/landing/2026-11/concept-coverage.webp",
+  "generatedOn": "2026-11-04",
+  "generationTool": "image_gen.imagegen (built-in)",
+  "generationMode": "new original image",
+  "sourceImage": "/Users/mercuryrucks/.codex/generated_images/01a1a67c-ced8-7f22-8723-626c2eb225d5/exec-8d8a1034-33e5-410e-a3f6-d3c66994e587.png",
+  "referenceInspected": ".impeccable/review/landing-20261104/linear-features.png",
+  "referenceUse": "Visual aesthetic research only. No source pixels, existing branding, text, or screenshot content included in generated illustration.",
+  "finalPrompt": "Use case: stylized-concept\nAsset type: original raster product concept illustration for a premium Falcon QA software landing page, one image in a coordinated three-column feature section.\nScene/backdrop: completely seamless uniform near-black background #08090a, no floor line, no atmosphere, no border or container.\nSubject: a single small centered sculpture of five precisely stacked floating rectangular test specification sheets, fine thin planes with subtly offset heights and corners, suggesting layers of test coverage. A few tiny simple empty check-box outline indentations may be barely visible on one plane; no marks that resemble lettering.\nStyle/medium: extremely refined monochrome 3D architectural wireframe rendering, isometric view from slightly above. Almost-black graphite faces, delicate dim silver and graphite edges, subtle beveled corners. Restrained precision, dark quiet technical sophistication. Original composition, not a reproduction of an existing illustration.\nComposition/framing: landscape 4:3. Sculpture occupies approximately 60 percent of the canvas width and 65 percent of the height, centered with generous even black negative space all around. Entire sculpture visible with no cropping. Camera and scale suitable for matching two companion concept illustrations.\nLighting/mood: very soft top-left studio edge light, enough contrast to read on a dark website at small size, no shine or bright glow. Clean anti-aliased lines with nuanced low-contrast depth.\nColor palette: strictly grayscale, background #08090a, black/charcoal object faces, a few silver-gray fine edges. No blue, purple, gold or any saturated color.\nConstraints: no words, no text, no logo, no watermark, no UI screenshot, no gradients in background, no people, no icons outside the sculpture, no extra objects, no contact sheet, no typography. Single finished image only.",
+  "processing": {
+    "command": "cwebp -quiet -q 88 -m 6 SOURCE.png -o concept-coverage.webp",
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "bytes": 37848,
+    "sha256": "699c2816d0183157ed7b6a3b6dd1765423b5315c36e47f3e64faf6c3f882e81f"
+  },
+  "inspection": "Generated PNG and optimized WebP visually inspected. Single centered monochrome architectural sculpture; no text, logo, watermark, extra panels or contact sheet. All object edges visible within the frame."
+}

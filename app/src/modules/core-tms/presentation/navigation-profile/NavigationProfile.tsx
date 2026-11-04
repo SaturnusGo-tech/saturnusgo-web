@@ -1,11 +1,13 @@
 import { AvatarProfile, BuildingWorkspace, ChatTripleDots, Lifesaver, Logout, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
+import { Download } from "lucide-react";
 import { ProfileLink } from "../../profile/presentation/ProfileLink";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { ManagedAvatarImage } from "../../auth/managed/presentation/avatar/ManagedAvatarImage";
 import { SupportContact } from "../../support/composition/SupportContact";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { DesktopDownloadsPanel } from "../../desktop-downloads/presentation/DesktopDownloadsPanel";
 import { useRailPopup } from "../navigation/popup/useRailPopup";
 import css from "./navigation-profile.module.css";
 
@@ -19,13 +21,14 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const session = useOptionalTmsSession(), { locale, t } = useTmsLocale(), ru = locale === "ru";
   const popup = useRailPopup(), id = useId();
   const [pending, setPending] = useState(false), [failed, setFailed] = useState(false);
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
   const label = session?.label || t("auth.account");
   const role = session?.workspaceRole ? roles[session.workspaceRole][ru ? 1 : 0]
     : session?.kind === "admin" ? (ru ? "Администратор" : "Administrator") : (ru ? "Аккаунт Falcon" : "Falcon account");
   const navigate = (action: () => void) => { popup.dismiss(); action(); };
-  return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
+  return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (!downloadsOpen && event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
     <button ref={popup.trigger} type="button" className={css.profile} data-collapsed={collapsed} data-active={popup.open}
-      onClick={popup.toggle} onKeyDown={popup.triggerKeyDown} aria-label={`${t("auth.account")}: ${label}`}
+      onClick={() => { setDownloadsOpen(false); popup.toggle(); }} onKeyDown={popup.triggerKeyDown} aria-label={`${t("auth.account")}: ${label}`}
       aria-haspopup="menu" aria-expanded={popup.open} aria-controls={popup.open ? id : undefined} data-testid="nav-account">
       <ManagedAvatarImage className={css.avatar} name={label} hasAvatar={Boolean(session?.hasAvatar)} load={session?.avatarLoader} version={session?.avatarVersion} />
       <span className={css.name}>{label}</span>
@@ -47,6 +50,9 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>
         <Settings width={20} height={20} aria-hidden="true"/><span>{t("nav.config")}</span>
       </button>
+      {session && <button role="menuitem" type="button" className={css.action} data-testid="account-download-app" onClick={() => { popup.close(true); setDownloadsOpen(true); }}>
+        <Download size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Скачать приложение" : "Download app"}</span>
+      </button>}
       {session?.administrationPath && <a role="menuitem" className={css.action} href={session.administrationPath} onClick={popup.dismiss}>
         <BuildingWorkspace width={20} height={20} aria-hidden="true"/><span>{ru ? "Управление компанией" : "Company administration"}</span>
       </a>}
@@ -67,5 +73,6 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       </>}
       {failed && <p className={css.error} role="alert">{t("auth.logoutError")}</p>}
     </div>, document.body)}
+    <DesktopDownloadsPanel open={downloadsOpen} anchor={popup.trigger} onClose={() => setDownloadsOpen(false)} />
   </div>;
 }

@@ -1,0 +1,20 @@
+{
+  "asset": "public/falcon/landing/2026-11/concept-agents.webp",
+  "generatedOn": "2026-11-04",
+  "generationTool": "image_gen.imagegen (built-in)",
+  "generationMode": "new original image",
+  "sourceImage": "/Users/mercuryrucks/.codex/generated_images/01a1a67c-ced8-7f22-8723-626c2eb225d5/exec-66dcf26b-bf70-420b-a786-a461dad105c2.png",
+  "referenceInspected": ".impeccable/review/landing-20261104/linear-features.png",
+  "referenceUse": "Visual aesthetic research only. No source pixels, existing branding, text, or screenshot content included in generated illustration.",
+  "finalPrompt": "Use case: stylized-concept\nAsset type: original raster product concept illustration for a premium Falcon QA software landing page, one image in a coordinated three-column feature section.\nScene/backdrop: completely seamless uniform near-black background #08090a, no floor line, no atmosphere, no border or container.\nSubject: one tightly composed sculpture of six dark modular cubes in an intelligent interlocking isometric arrangement, one precise thin graphite wire connects two modules, a human-and-agent QA workflow suggested only by coordinated modular geometry, absolutely no people or robot faces. Mix two taller columns, two medium cubes, and two thin floating modular slabs, connected into a compact single coherent sculpture with subtle gaps. Entire silhouette architectural and elegant.\nStyle/medium: extremely refined monochrome 3D architectural wireframe rendering, isometric view from slightly above. Almost-black graphite faces, delicate dim silver and graphite edges, subtle beveled corners. Restrained precision, dark quiet technical sophistication. Original composition, not a reproduction of any existing illustration.\nComposition/framing: landscape 4:3. Sculpture occupies approximately 60 percent of the canvas width and 65 percent of the height, centered with generous even black negative space all around. Entire sculpture visible with no cropping. Match the quiet graphite technical aesthetic of stacked thin specification sheets.\nLighting/mood: very soft top-left studio edge light, enough contrast to read on a dark website at small size, no shine or bright glow. Clean anti-aliased fine lines with nuanced low-contrast depth.\nColor palette: strictly grayscale, background #08090a, black/charcoal object faces, a few silver-gray fine edges. No blue, purple, gold or saturated color.\nConstraints: no words, no text, no logo, no watermark, no UI screenshot, no background gradients, no people, no icons outside the sculpture, no extra objects, no contact sheet, no typography. Single finished image only.",
+  "processing": {
+    "command": "cwebp -quiet -q 88 -m 6 SOURCE.png -o concept-agents.webp",
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "bytes": 37964,
+    "sha256": "9c93c612d8882fc5d6568d66ec815233c7f7e93a1877ea622b50580c111f6e33"
+  },
+  "inspection": "Generated PNG and optimized WebP visually inspected. Single centered monochrome architectural sculpture; no text, logo, watermark, extra panels or contact sheet. All object edges visible within the frame."
+}

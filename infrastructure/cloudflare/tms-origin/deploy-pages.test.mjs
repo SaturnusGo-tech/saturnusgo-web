@@ -95,6 +95,8 @@ if (process.argv.slice(2).join(" ") === "run clean") {
 if (process.argv.slice(2).join(" ") !== "run build") process.exit(2);
 for (const name of ["privacy", "trial-terms", "sandbox", "admin", "profile"]) write("out/" + name + "/index.html", "FALCON MANAGED ACCESS");
 write("out/ru/index.html", "FALCON RUSSIAN LANDING");
+write("out/docs/index.html", "FALCON PUBLIC DOCUMENTATION");
+write("out/ru/docs/index.html", "FALCON RUSSIAN PUBLIC DOCUMENTATION");
 write("out/index.html", "FALCON LANDING\\n");
 write("out/index.txt", "FALCON LANDING DATA\\n");
 if (process.env.OMIT_SIGNUP !== "1") {
@@ -112,6 +114,9 @@ write("out/assets/integrations/codex/private.json", "private fixture");
 write("out/assets/private.txt", "private fixture");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
+write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
+for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
+for (const id of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) write("out/falcon/landing/2026-11/product-" + id + ".webp", "Product screen");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
 if (process.env.OMIT_IMPACT_BANNER !== "1") write("out/falcon/impact/ai-paused-20261018.webp", "ai paused asset");

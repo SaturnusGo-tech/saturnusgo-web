@@ -4,9 +4,8 @@ import { Pause, Play } from 'lucide-react';
 import styles from './direction.module.css';
 import { INTEGRATIONS } from '../../core-tms/presentation/hooks/catalog/integration-definitions';
 const brandImages: Record<string, string> = { jira: 'jira.svg', youtrack: 'youtrack.svg', confluence: 'confluence.svg', slack: 'slack.png' };
-const midpoint = Math.ceil(INTEGRATIONS.length / 2);
-const rows = [INTEGRATIONS.slice(0, midpoint), INTEGRATIONS.slice(midpoint)];
-export function DirectionMarquee({ title, pause, resume }: { title: string; pause: string; resume: string }) {
+const rows = [INTEGRATIONS];
+export function DirectionMarquee({ title, note, pause, resume }: { title: string; note: string; pause: string; resume: string }) {
   const [paused, setPaused] = useState(false);
   return <section className={styles.integrations} id="connected-tools" aria-labelledby="tools-title">
     <h2 id="tools-title">{title}</h2>
@@ -19,6 +18,7 @@ export function DirectionMarquee({ title, pause, resume }: { title: string; paus
         </ul>)}
       </div>)}
     </div>
+    <p className={styles.integrationNote}>{note}</p>
     <button type="button" className={styles.motionControl} onClick={() => setPaused(value => !value)} aria-label={paused ? resume : pause} aria-pressed={paused}>
       {paused ? <Play size={14} /> : <Pause size={14} />}
     </button>
