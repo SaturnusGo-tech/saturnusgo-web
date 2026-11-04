@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { continuationFromLocation, hasContinuationContext } from "../domain/continuation-path";
 import { takeBrowserContinuation } from "../application/browser-continuation";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
 export function AuthContinuation({ children, workspaceId }: { readonly children: ReactNode; readonly workspaceId?: string | null }) {
@@ -9,7 +10,9 @@ export function AuthContinuation({ children, workspaceId }: { readonly children:
     if (checked.current) return;
     checked.current = true;
     const saved = takeBrowserContinuation(workspaceId);
-    const destination = saved && saved !== `${window.location.pathname}${window.location.search}${window.location.hash}` ? saved : null;
+    const current = continuationFromLocation(window.location);
+    const explicit = current && hasContinuationContext(current, window.location.origin);
+    const destination = saved && !explicit && saved !== `${window.location.pathname}${window.location.search}${window.location.hash}` ? saved : null;
     setTarget(destination);
     if (destination) window.location.replace(destination);
   }, [workspaceId]);

@@ -28,3 +28,9 @@ export function continuationFromLocation(location: Pick<Location, "origin" | "pa
   return values.length === 1 && /^[A-Za-z0-9_-]{1,128}$/.test(values[0])
     ? `${workspace}?falconMcpInteraction=${encodeURIComponent(values[0])}` : null;
 }
+export function hasContinuationContext(path: string, origin: string): boolean {
+  try {
+    const target = new URL(path, origin);
+    return target.pathname !== workspace || !!target.hash || [...target.searchParams.keys()].some(key => key !== "workspaceId");
+  } catch { return false; }
+}

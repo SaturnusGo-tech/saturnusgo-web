@@ -1,4 +1,4 @@
-import { continuationFromLocation, safeContinuationPath } from "../domain/continuation-path";
+import { continuationFromLocation, hasContinuationContext, safeContinuationPath } from "../domain/continuation-path";
 export const CONTINUATION_KEY = "falcon.auth.continuation.v1";
 const ttl = 5 * 60_000;
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -6,9 +6,7 @@ export function rememberContinuation(storage: Store, location: Pick<Location, "o
   try {
     const path = continuationFromLocation(location);
     if (!path) return;
-    const target = new URL(path, location.origin);
-    if (target.pathname === "/testcases/umbrella-home/work/" && !target.hash
-      && [...target.searchParams.keys()].every(key => key === "workspaceId")) return;
+    if (!hasContinuationContext(path, location.origin)) return;
     storage.setItem(CONTINUATION_KEY, JSON.stringify({ version: 1, origin: location.origin, path, createdAt: now }));
   } catch { /* Per-tab continuation is optional when browser storage is unavailable. */ }
 }
