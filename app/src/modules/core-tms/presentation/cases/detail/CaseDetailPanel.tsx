@@ -155,7 +155,6 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
         onArchive={props.onArchive}
         onClose={props.onClose ? () => { if (!props.editor?.submitting) closeWithMotion(() => props.onClose?.()); } : undefined}
       />
-      {!creating && props.testCase && <div className={inspector.metaRow}><CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen} /></div>}
       {readyDefects > 0 && <div className={inspector.metaRow}>
         <span className={inspector.retestBadge} role="status">{localizedLabel(props.locale, "ready_for_retest")} · {readyDefects}</span>
       </div>}
@@ -172,7 +171,8 @@ export function CaseDetailPanel(props: CaseDetailPanelProps) {
       </div>
       {!creating && editorActions}
       {!creating && <CaseDetailTabs locale={props.locale} active={activeTab} tabsId={tabsId} creating={creating}
-        fileCount={attachmentIds.length} activityCount={caseActivity.length} onActive={setTab} />}
+        fileCount={attachmentIds.length} activityCount={caseActivity.length} onActive={setTab}
+        actions={props.testCase && <CaseMaintenanceFeature caseId={props.testCase.id} initial={props.testCase.maintenance} blocked={archived || editorOpen} />} />}
     </header>
     <CaseAttachmentDraftProvider locale={props.locale} enabled={!archived && Boolean(props.editor)} locked={uploadLocked} entries={files} onEntries={setFiles} validStepIds={new Set(revision.steps.map(({ id }) => id))}>
     <form id={formId} className={inspector.panelForm} onBeforeInput={(event) => { if (uploadLocked) event.preventDefault(); }} onSubmit={(event) => {

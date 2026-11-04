@@ -11,7 +11,7 @@ export function RepositorySelectionCommands({ props, view, ru }: {
     ref={element => { if (element) element.inert = !view.selectionMode; }}>
     <button type="button" disabled={locked || !view.selectableVisibleCount} onClick={view.bulkSelection.selectVisible}>
       {ru ? "Выбрать в папке" : "Select in folder"}</button>
-    <button type="button" disabled={locked || !view.selectableCount} onClick={view.bulkSelection.selectAll}>
+    <button type="button" disabled={locked || !view.selectableMatchingCount} onClick={view.bulkSelection.selectAll}>
       {ru ? "Выбрать все" : "Select all"}</button>
   </div>;
 }

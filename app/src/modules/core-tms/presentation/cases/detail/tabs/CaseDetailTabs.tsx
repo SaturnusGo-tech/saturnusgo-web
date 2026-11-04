@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import layout from "./case-detail-tabs.module.css";
 import { transitionContent } from "../../../workspace/motion/transition/content-transition";
 import type { TmsLocale } from "../../../../localization/model/locale";
 import {
@@ -14,12 +16,13 @@ type Props = {
   active: InspectorTabId;
   tabsId: string;
   creating: boolean;
+  actions?: ReactNode;
   fileCount?: number;
   activityCount?: number;
   onActive: (tab: InspectorTabId) => void;
 };
 
-export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0, activityCount = 0, onActive }: Props) {
+export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0, activityCount = 0, actions, onActive }: Props) {
   const ru = locale === "ru";
   const labels: Record<InspectorTabId, string> = {
     overview: ru ? "Общее" : "General",
@@ -27,8 +30,8 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0
     activity: ru ? "История" : "Change history",
   };
   const tabs = inspectorTabsForMode(creating);
-  return <div
-    className={`${styles.detailTabs} ${inspector.tabs}`}
+  return <div className={layout.row}><div
+    className={`${styles.detailTabs} ${inspector.tabs} ${layout.tabs}`}
     role="tablist"
     aria-label={ru ? "Разделы кейса" : "Case sections"}
     onKeyDown={(event) => {
@@ -53,5 +56,5 @@ export function CaseDetailTabs({ locale, active, tabsId, creating, fileCount = 0
     >{labels[tab]}{tab === "files" && fileCount > 0 && <span>{fileCount}</span>}
       {tab === "activity" && activityCount > 0 && <span>{activityCount}</span>}
     </button>)}
-  </div>;
+  </div>{actions && <div className={layout.actions}>{actions}</div>}</div>;
 }

@@ -15,7 +15,7 @@ export function CasesRepositoryList({ props, view, locale, listPaneRef, move }: 
 }) {
   const focusEditorActions = () => document.getElementById("case-editor-actions")?.focus();
   return <>
-    {props.folders && <RepositoryFolders task={move ? <MoveCasesDialog resource={props.folders} ids={move.ids} ru={locale === "ru"} onClose={move.onClose} onMoved={move.onMoved} /> : undefined} resource={props.folders} cases={view.matchingRows.map(({ testCase }) => testCase)} filtered={view.treeFiltered} selectionMode={view.selectionMode} includeArchived={props.filters.includeArchived} onArchiveChange={view.setRepositoryArchived}
+    {props.folders && <RepositoryFolders task={move ? <MoveCasesDialog resource={props.folders} ids={move.ids} ru={locale === "ru"} onClose={move.onClose} onMoved={move.onMoved} /> : undefined} resource={props.folders} cases={view.matchingRows.map(({ testCase }) => testCase)} filtered={view.treeFiltered} selectionMode={view.selectionMode} includeArchived={props.filters.includeArchived} hasArchivedCases={props.testCases.some(item => Boolean(item.archivedAt))} onArchiveChange={view.setRepositoryArchived}
       selectionActions={<RepositorySelectionCommands props={props} view={view} ru={locale === "ru"} />}
       controls={<RepositoryControls props={props} view={view} locale={locale} />} selected={view.bulkSelection.selected}
       selectedFolder={props.selectedFolder} selectedFolderId={props.selectedFolderId} activeCaseId={props.selectedCaseId} ru={locale === "ru"} locked={Boolean(props.editor)}

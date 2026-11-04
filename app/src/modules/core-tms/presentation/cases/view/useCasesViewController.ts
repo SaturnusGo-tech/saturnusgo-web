@@ -78,7 +78,13 @@ export function useCasesViewController(
     () => rows.filter(({ testCase }) => !repositoryArchived && selectableIds.has(testCase.id)),
     [rows, selectableIds, repositoryArchived],
   );
-  const bulkSelection = useCaseBulkSelection(selectableRows, selectableVisibleRows);
+  const selectableMatchingRows = useMemo(
+    () => matchingRows.filter(({ testCase }) => !repositoryArchived && selectableIds.has(testCase.id)),
+    [matchingRows, selectableIds, repositoryArchived],
+  );
+  const bulkSelection = useCaseBulkSelection(
+    selectableRows, selectableVisibleRows, props.folders ? selectableMatchingRows : selectableRows,
+  );
   const totalCount = allRows.filter(({ testCase }) => props.filters.includeArchived || folderScope.archived || !testCase.archivedAt).length;
   const totalLabel = formatCount(locale, totalCount, ["test case", "test cases"], ["тест-кейс", "тест-кейса", "тест-кейсов"]);
   const countLabel = rows.length === totalCount
@@ -168,5 +174,6 @@ export function useCasesViewController(
     selectRow, createCase, closeInspector, selectionMode, toggleSelectionMode,
     bulkSelection, selectableIds, setRepositoryArchived,
     selectableCount: selectableRows.length, selectableVisibleCount: selectableVisibleRows.length,
+    selectableMatchingCount: selectableMatchingRows.length,
   };
 }

@@ -105,11 +105,9 @@
 
 .repository { container: repository-pane / inline-size; }
 .heading > div { align-items: center; gap: 7px; }
-.heading .headerAction { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; height: 30px; padding: 0 10px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--falcon-text) 4%, var(--falcon-surface)); color: var(--falcon-text) !important; font-size: 12px; white-space: nowrap; transition: background 150ms ease; }
-.heading .headerAction > svg { color: var(--falcon-icon-muted); }
-.heading .newFolder { background: transparent; }
-.heading .newFolder > svg { color: var(--falcon-folder); }
-.heading .headerAction:hover:not(:disabled) { background: color-mix(in srgb, var(--falcon-text) 8%, var(--falcon-surface)); }
+.heading .headerAction { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; height: 30px; padding: 0 10px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--falcon-text) 8%, var(--falcon-surface)); color: var(--falcon-text) !important; font-size: 12px; white-space: nowrap; transition: background 150ms ease; }
+.heading .headerAction > svg { color: inherit; }
+.heading .headerAction:hover:not(:disabled) { background: color-mix(in srgb, var(--falcon-text) 12%, var(--falcon-surface)); }
 .heading .newCase { flex-shrink: 0; width: 29px; height: 29px; border-radius: 50%; background: var(--falcon-action); color: var(--falcon-on-action) !important; }
 .heading .newCase:hover:not(:disabled) { background: var(--falcon-action-hover); }
 .heading .repositoryTitle { font-size: 15px; font-weight: 600; }

@@ -1,0 +1,27 @@
+.dialog { width: min(384px, calc(100vw - 32px)) !important; max-height: calc(100dvh - 48px); border-radius: 16px !important; overflow: auto; background: var(--falcon-panel) !important; }
+.dialog.dialog > header { min-height: 0; padding: 17px 18px 8px; border-bottom: 0; gap: 12px; }
+.dialog.dialog > header h2 { font-size: 15px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
+.dialog.dialog > header > button { flex-shrink: 0; width: 28px; height: 28px; min-height: 28px; border-radius: 7px; }
+.context { display: flex; align-items: center; gap: 9px; min-width: 0; margin: 0 18px 12px; color: var(--falcon-text-secondary); font-size: 12px; line-height: 1.5; }
+.folder { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 7px; background: var(--falcon-surface); }
+.badge { flex-shrink: 0; margin-left: auto; padding: 2px 6px; border-radius: 5px; color: var(--falcon-text-muted); background: var(--falcon-hover); font-size: 11px; }
+.actions { padding: 0 8px 8px; }
+.group { display: grid; gap: 2px; padding: 5px 0; }
+.group + .group { border-top: 1px solid var(--falcon-border); }
+:is(.actions > button, .group > button) { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 38px; padding: 8px 10px; border: 0; border-radius: 7px; color: var(--falcon-text); background: transparent; font: inherit; font-size: 13px; line-height: 1.4; text-align: left; cursor: pointer; transition: background 140ms ease, color 140ms ease; }
+:is(.actions > button, .group > button):hover:not(:disabled) { background: var(--falcon-hover); }
+:is(.actions > button, .group > button):focus-visible, .footer button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: -2px; }
+:is(.actions > button, .group > button):disabled, .footer button:disabled { opacity: .45; cursor: default; }
+:is(.actions > button, .group > button) > svg { flex: 0 0 18px; width: 18px; height: 18px; color: var(--falcon-icon-muted); }
+:is(.actions > button, .group > button) > .chevron { margin-left: auto; flex-basis: 14px; width: 14px; height: 14px; }
+.dialog .actions .appearance > div[data-labelled] > button { min-height: 38px; border-radius: 7px; gap: 10px; }
+.appearance > [data-labelled] > button [data-folder-visual] { flex: 0 0 18px; width: 18px; height: 18px; min-width: 18px; font-size: 18px; }
+.appearance > [data-labelled] > button [data-folder-visual] > svg, .appearance > [data-labelled] > button [data-folder-visual] > img { width: 18px; height: 18px; }
+.actions .archive { color: var(--falcon-text-secondary); }
+.confirmation { padding: 0 18px 18px; }
+.confirmation > p { margin: 0; color: var(--falcon-text-secondary); font-size: 13px; line-height: 1.65; }
+.footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.footer button { min-height: 34px; border: 1px solid var(--falcon-border); border-radius: 9px; padding: 7px 12px; color: var(--falcon-text); background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
+.footer .primary { color: var(--falcon-on-action); border-color: transparent; background: var(--falcon-action); }
+.error { margin: 6px 18px 16px; color: var(--falcon-danger); font-size: 12px; line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) { :is(.actions > button, .group > button) { transition: none; } }

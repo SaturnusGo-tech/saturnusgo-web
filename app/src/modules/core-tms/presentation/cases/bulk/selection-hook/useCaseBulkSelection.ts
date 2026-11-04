@@ -11,6 +11,7 @@ import {
 export function useCaseBulkSelection(
   allRows: readonly CaseListRow[],
   visibleRows: readonly CaseListRow[],
+  selectionRows: readonly CaseListRow[] = allRows,
 ) {
   const [selected, setSelected] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -22,6 +23,10 @@ export function useCaseBulkSelection(
   const visibleIds = useMemo(
     () => visibleRows.map(({ testCase }) => testCase.id),
     [visibleRows],
+  );
+  const selectionIds = useMemo(
+    () => selectionRows.map(({ testCase }) => testCase.id),
+    [selectionRows],
   );
   const selectedIds = useMemo(
     () => selectedIdsInOrder(selected, allIds),
@@ -47,7 +52,7 @@ export function useCaseBulkSelection(
       setScopeSelected(current, visibleIds, true)
     )),
     selectAll: () => setSelected((current) => (
-      setScopeSelected(current, allIds, true)
+      setScopeSelected(current, selectionIds, true)
     )),
     clear: () => setSelected(new Set()),
   };
