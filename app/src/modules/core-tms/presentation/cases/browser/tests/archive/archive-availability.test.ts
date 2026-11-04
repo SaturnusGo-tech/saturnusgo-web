@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { browserHarness, elements } from "./browser-harness";
+import { browserHarness, elements } from "../browser-harness";
 
 const archiveButton = (tree: unknown) => elements(tree, item => item.props["aria-label"] === "Show archived folders");
 
