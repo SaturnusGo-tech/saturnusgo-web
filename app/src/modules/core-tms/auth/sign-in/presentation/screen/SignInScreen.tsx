@@ -31,6 +31,8 @@ export function SignInScreen({ signIn, signup = false }: { readonly signIn: Retu
         {state.step !== "methods" ? <button className={styles.linkButton} onClick={signIn.back}><ArrowLeft size={16} aria-hidden="true" />{copy.back}</button>
           : <a href={signup ? "/cloud-login/" : "/signup/"}>{signup ? copy.loginLink : copy.signupLink}</a>}
       </footer>
+      {signup && <p className={styles.disclosure}>{copy.termsStart}<a href={`/trial-terms/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.trialTerms}</a>
+        {copy.privacyBridge}<a href={`/privacy/?lang=${locale}`} target="_blank" rel="noopener noreferrer">{copy.privacy}</a>{copy.termsEnd}</p>}
     </section>
   </main>;
 }

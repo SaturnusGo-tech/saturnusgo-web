@@ -18,3 +18,5 @@ html:has(.page),body:has(.page){height:auto;min-height:100%;overflow-x:clip;over
 .page a:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 6px; }
 .content footer { border-top: 1px solid var(--falcon-border); margin-top: 52px; padding-top: 28px; font-size: 14px; }
 @media (max-width: 640px) { .header { padding: 24px; align-items: flex-start; flex-direction: column; } .languages { gap: 16px; } .content { padding-top: 48px; } }
+
+.translation { font-size: 14px; line-height: 1.7; color: var(--falcon-text-secondary); }

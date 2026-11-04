@@ -199,7 +199,7 @@ async function proxyToPublicSite(request, incoming, originPath, managed = false,
     : await fetch(upstreamRequest);
   const responseHeaders = new Headers(upstreamResponse.headers);
   if ((incoming.pathname === APP_PATH || routeForRequestPath(incoming.pathname)) &&
-      !['/', '/ru/', '/privacy/'].includes(incoming.pathname)) responseHeaders.set('x-robots-tag','noindex, nofollow');
+      !['/', '/ru/', '/privacy/', '/trial-terms/'].includes(incoming.pathname)) responseHeaders.set('x-robots-tag','noindex, nofollow');
   responseHeaders.delete("set-cookie");
   const location = responseHeaders.get("location");
 

@@ -35,13 +35,15 @@ export function FalconPrivacyPage() {
       <p className={styles.updated}>{copy.updated}</p>
       <h1>{copy.title}</h1>
       <p className={styles.intro}>{copy.intro}</p>
+      {(locale === "es" || locale === "pt") && <p className={styles.translation}>{locale === "es" ? "Traducción anterior para la web y demos. Política actual de cuentas:" : "Tradução anterior para o site e demonstrações. Política atual de contas:"}{" "}
+        <a href="?lang=en">English</a>{" · "}<a href="?lang=ru">Русский</a></p>}
       <a className={styles.contact} href="mailto:falcon@saturnusgo.com">falcon@saturnusgo.com ↗</a>
       {copy.sections.map(([heading, ...paragraphs], index) => <section key={index} aria-labelledby={`privacy-${index}`}>
         <h2 id={`privacy-${index}`}>{heading}</h2>
         {paragraphs.map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}
       </section>)}
       <p><a href="https://www.argentina.gob.ar/aaip/datospersonales/derechos" target="_blank" rel="noopener noreferrer">{copy.rightsLink} ↗</a></p>
-      <footer><a href={`/?lang=${locale}#book-demo`}>{copy.back} ↗</a></footer>
+      <footer><a href={`/trial-terms/?lang=${locale === "ru" ? "ru" : "en"}`}>{locale === "ru" ? "Условия личного пробного доступа" : "Personal trial terms"}</a><br /><br /><a href={`/?lang=${locale}#book-demo`}>{copy.back} ↗</a></footer>
     </main>
   </div>;
 }

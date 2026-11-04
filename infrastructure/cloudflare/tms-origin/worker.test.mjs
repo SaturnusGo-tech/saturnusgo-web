@@ -334,3 +334,18 @@ test('demo intake is available only on the public TMS host and fails closed with
   const unknown = await worker.fetch(new Request('https://unknown.example/api/falcon-demo/request', options), {});
   assert.equal(unknown.status, 404);
 });
+
+test("trial terms are a public isolated document without forwarding account cookies", async context => {
+  mockFetch(context, async request => {
+    assert.equal(request.url, "https://www.saturnusgo.com/tms-origin/trial-terms/index.html?lang=ru");
+    assert.equal(request.headers.has("cookie"), false);
+    assert.equal(request.headers.has("authorization"), false);
+    return new Response("<h1>Personal trial terms</h1>", { headers: { "content-type": "text/html" } });
+  });
+  const response = await worker.fetch(new Request("https://tms.saturnusgo.com/trial-terms/?lang=ru", {
+    headers: { cookie: "private-session=value", authorization: "Bearer private" },
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.has("x-robots-tag"), false);
+  assert.match(await response.text(), /Personal trial terms/);
+});

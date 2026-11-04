@@ -11,6 +11,7 @@ export function signInCopy(locale: "ru" | "en") {
     expired: "Код истёк или не подходит. Проверьте код или запросите новый.", cancel: "Отменить вход",
     trial: "Ваши 7 дней с Falcon начались", ends: "Пробный период до", team: "Для команды", close: "Закрыть уведомление",
     payment: "Оплата пока недоступна", readonly: "Пробный период завершён. Просмотр и экспорт доступны.",
+    termsStart: "Продолжая, вы принимаете ", trialTerms: "условия пробного доступа", privacyBridge: ". Обработка данных описана в ", privacy: "политике конфиденциальности", termsEnd: ".",
     retry: "Повторить", signupOff: "Создание личного пространства пока недоступно.",
   } : {
     browser: "Continue in browser", login: "Log in to Falcon", signup: "Create your personal workspace", google: "Continue with Google",
@@ -24,6 +25,7 @@ export function signInCopy(locale: "ru" | "en") {
     expired: "The code has expired or is incorrect. Check it or request a new code.", cancel: "Cancel sign-in",
     trial: "Your 7 days with Falcon have started", ends: "Trial ends", team: "For your team", close: "Dismiss notification",
     payment: "Payments are not available yet", readonly: "Your trial has ended. Viewing and export remain available.",
+    termsStart: "By continuing, you accept the ", trialTerms: "personal trial terms", privacyBridge: ". Read how Falcon handles data in the ", privacy: "privacy policy", termsEnd: ".",
     retry: "Try again", signupOff: "Personal workspace signup is not available yet.",
   };
 }

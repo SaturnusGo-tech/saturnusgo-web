@@ -11,7 +11,7 @@ import { htmlLanguageForPath, isFalconPublicPath } from "../../../../../../share
 const root = process.cwd();
 
 test("Falcon landing owns its language independently from company entry", () => {
-  for (const pathname of ["/signup", "/signup/", "/cloud-login/", "/login/"]) {
+  for (const pathname of ["/signup", "/signup/", "/cloud-login/", "/login/", "/trial-terms/"]) {
     assert.equal(isFalconPublicPath(pathname), true);
     assert.equal(htmlLanguageForPath(pathname, "en"), "ru");
   }

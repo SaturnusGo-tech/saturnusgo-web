@@ -1,5 +1,6 @@
+import { withAccountPrivacy } from "../account/account-copy";
 export type PrivacyCopy = { title: string; intro: string; updated: string; back: string; language: string; rightsLink: string; sections: [string, ...string[]][] };
-export const en: PrivacyCopy = {
+const demoEn: PrivacyCopy = {
   title: "Falcon privacy policy", updated: "Updated 18 October 2026", back: "Back to Falcon", language: "Language", rightsLink: "Personal data rights · Argentina’s AAIP",
   intro: "This policy explains how personal data is handled when you visit the Falcon website, request a demo or contact the project.",
   sections: [
@@ -14,7 +15,7 @@ export const en: PrivacyCopy = {
     ["9. Changes", "The current policy is published here with its update date. A new publication does not itself authorize new purposes. Material changes will be communicated as required by applicable law. All four language versions describe the same processing and preserve your statutory rights."],
   ],
 };
-export const ru: PrivacyCopy = {
+const demoRu: PrivacyCopy = {
   title: "Политика конфиденциальности Falcon", updated: "Обновлено 18 октября 2026 года", back: "Вернуться к Falcon", language: "Язык", rightsLink: "Права в отношении персональных данных · AAIP Аргентины",
   intro: "Эта политика объясняет обработку персональных данных при посещении сайта Falcon, запросе демо и обращении к проекту.",
   sections: [
@@ -29,3 +30,6 @@ export const ru: PrivacyCopy = {
     ["9. Изменения", "Актуальная политика опубликована здесь с датой обновления. Новая публикация сама по себе не разрешает новые цели обработки. О существенных изменениях сообщается согласно применимому праву. Все четыре языковые версии описывают одну обработку и сохраняют ваши законные права."],
   ],
 };
+
+export const en = withAccountPrivacy(demoEn, "en");
+export const ru = withAccountPrivacy(demoRu, "ru");

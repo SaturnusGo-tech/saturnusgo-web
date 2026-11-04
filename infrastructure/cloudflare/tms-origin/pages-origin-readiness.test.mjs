@@ -38,7 +38,7 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
     sourceSha,
   });
 
-  assert.deepEqual(result.checkedRoutes, ["/privacy/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/signup/", "/cloud-login/"]);
+  assert.deepEqual(result.checkedRoutes, ["/privacy/", "/trial-terms/", "/sandbox/", "/admin/", "/profile/", "/", "/ru/", "/signup/", "/cloud-login/"]);
   assert.ok(result.checkedAssets.includes("/_next/static/chunks/app.js"));
   assert.ok(result.checkedAssets.includes("/falcon/falcon-mark-dark.png"));
   for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) {

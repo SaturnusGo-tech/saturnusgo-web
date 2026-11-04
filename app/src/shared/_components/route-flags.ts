@@ -1,5 +1,5 @@
 export function isFalconPublicPath(pathname: string | null | undefined): boolean {
-  return pathname === "/" || pathname === '/ru/' || /^\/(signup|login|cloud-login|privacy)(\/|$)/i.test(pathname ?? "");
+  return pathname === "/" || pathname === '/ru/' || /^\/(signup|login|cloud-login|privacy|trial-terms)(\/|$)/i.test(pathname ?? "");
 }
 
 export function htmlLanguageForPath(pathname: string | null | undefined, fallback: string, landingLocale?: string): string {
