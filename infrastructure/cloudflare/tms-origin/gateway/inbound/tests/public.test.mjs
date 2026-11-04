@@ -64,6 +64,8 @@ const personalFeatureRoutes = [
  ['GET','impact/repositories'], ['PATCH','impact/repositories/repo_123'],
  ['GET','impact/analyses'], ['GET','impact/analyses/analysis_123'],
  ...['scope','approve','retry','gaps/gap_123/generate','gaps/gap_123/acknowledge'].map(action=>['POST',`impact/analyses/analysis_123/${action}`]),
+ ['GET','me/profile'], ['PATCH','me/profile'], ['GET','me/profile/activity'],
+ ...['avatar','banner'].flatMap(kind=>[['POST',`me/profile/${kind}`],['DELETE',`me/profile/${kind}`]]),
 ];
 test('personal feature requests retain exact query/body, session isolation and verifiable signing',async t=>{
  const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});const calls=[];
@@ -94,7 +96,11 @@ test('personal feature routes reject unsupported paths/methods/hosts and preserv
   ['GET','test-case-import/inspect'],['POST','test-case-import/admin'],['DELETE','impact/analyses/analysis_123'],
   ['POST','impact/analyses/analysis_123/delete'],['POST','impact/analyses/analysis_123/gaps/gap_123/delete'],
   ['PUT','impact/repositories/repo_123'],['GET','impact/admin'],['GET','impact-extra/analyses'],
-  ['GET','company/impact'],['GET','platform/execution-history'],['POST','auth/admin']];
+  ['GET','company/impact'],['GET','platform/execution-history'],['POST','auth/admin'],
+  ['GET','me'],['GET','me/sessions'],['GET','me/profile/admin'],['GET','me/profile/user_123'],
+  ['POST','me/profile'],['DELETE','me/profile'],['PUT','me/profile'],['PATCH','me/profile/avatar'],
+  ['GET','me/profile/banner'],['GET','me/profile/avatar'],['POST','me/profile/activity'],
+  ['DELETE','me/profile/activity'],['GET','me/profile/activity/export'],['GET','me/profiles']];
  for(const [method,path] of denied) assert.equal((await worker.fetch(new Request(`https://tms.saturnusgo.com/api/v1/${path}`,{
   method,headers:{origin:'https://tms.saturnusgo.com'}}),env)).status,404,`${method} ${path}`);
  assert.equal((await worker.fetch(new Request('https://evil.example/api/v1/execution-history'),env)).status,404);
@@ -106,4 +112,36 @@ test('personal feature routes reject unsupported paths/methods/hosts and preserv
  assert.equal(calls,0,'denied requests never reach the backend');
  const response=await worker.fetch(new Request('https://tms.saturnusgo.com/api/v1/execution-history'),env);
  assert.equal(response.status,403);assert.equal((await response.json()).error.code,'ACCESS_DENIED');assert.equal(calls,1);
+});
+
+test('self profile keeps signed private media grants and conditional update headers intact',async t=>{
+ const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});const calls=[];
+ const grant={url:'https://private.r2.cloudflarestorage.com/profiles/fixture/avatar/image.webp?X-Amz-Expires=60&X-Amz-Signature=fixture',
+  expiresAt:'2026-11-04T12:01:00.000Z'};
+ const payload={data:{id:'person_123',name:'QA',avatar:grant,banner:grant,version:7}};
+ globalThis.fetch=async request=>{calls.push(request);return Response.json(payload,{headers:{'cache-control':'public, max-age=3600',etag:'"7"'}});};
+ const response=await worker.fetch(new Request('https://tms.saturnusgo.com/api/v1/me/profile'),env);
+ assert.equal(response.status,200);assert.deepEqual(await response.json(),payload);
+ assert.equal(response.headers.get('cache-control'),'private, no-store, no-transform');
+ assert.equal(response.headers.get('etag'),'"7"');assert.equal(response.headers.get('x-robots-tag'),'noindex, nofollow');
+ assert.match(response.headers.get('content-security-policy'),/img-src [^;]*https:\/\/\*\.r2\.cloudflarestorage\.com/);
+ for(const kind of ['avatar','banner']){
+  const target=`https://tms.saturnusgo.com/api/v1/me/profile/${kind}`;
+  const result=await worker.fetch(new Request(target,{method:'POST',body:'{"imageBase64":"fixture"}',
+   headers:{origin:'https://tms.saturnusgo.com','content-type':'application/json','if-match':'"7"','idempotency-key':'image-123'}}),env);
+  assert.equal(result.status,200);const forwarded=calls.at(-1);
+  assert.equal(forwarded.headers.get('if-match'),'"7"');assert.equal(forwarded.headers.get('idempotency-key'),'image-123');
+ }
+});
+
+test('self profile preserves backend authentication failures without public caching or media fallback',async t=>{
+ const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});const calls=[];
+ globalThis.fetch=async request=>{calls.push(request);return Response.json({error:{code:'AUTHENTICATION_REQUIRED'}},{status:401});};
+ for(const path of ['me/profile','me/profile/activity?workspaceId=personal_123&days=90']){
+  const response=await worker.fetch(new Request(`https://tms.saturnusgo.com/api/v1/${path}`),env);
+  assert.equal(response.status,401,path);assert.equal((await response.json()).error.code,'AUTHENTICATION_REQUIRED');
+  assert.equal(response.headers.get('cache-control'),'private, no-store, no-transform');
+  assert.equal(calls.at(-1).url,`https://api.example.test/api/v1/${path}`);
+  assert.equal(calls.at(-1).headers.get('cookie'),null);
+ }
 });

@@ -7,6 +7,10 @@ const auth = new Map([
  ...['start','exchange','cancel'].map(name=>[`auth/desktop/${name}`,['POST']]), ['auth/desktop/authorize',['GET']],
  ['cloud-auth/session',['GET','HEAD']], ['cloud-auth/logout',['POST']],
 ]);
+const personalProfile = new Map([
+ ['me/profile',['GET','PATCH']], ['me/profile/activity',['GET']],
+ ['me/profile/avatar',['POST','DELETE']], ['me/profile/banner',['POST','DELETE']],
+]);
 const personalFeatures = new Map([
  ...['summary','test-cases','runs','run-items','defects'].map(name=>[`dashboard-analytics/${name}`,'GET']),
  ['execution-history','GET'], ['test-case-import/inspect','POST'], ['test-case-import/normalize','POST'],
@@ -21,7 +25,7 @@ export function publicAuthEnabled(hostname,env) {
 }
 export function publicApiAllowed(pathname,method) {
  if(!pathname.startsWith('/api/v1/')) return false;
- const path=pathname.slice('/api/v1/'.length); const methods=auth.get(path);
+ const path=pathname.slice('/api/v1/'.length); const methods=auth.get(path) ?? personalProfile.get(path);
  if(methods) return methods.includes(method);
  if(personalFeatures.get(path)===method || (method==='GET' && impactResource.test(path)) ||
   (method==='PATCH' && impactRepository.test(path)) || (method==='POST' && impactCommand.test(path))) return true;

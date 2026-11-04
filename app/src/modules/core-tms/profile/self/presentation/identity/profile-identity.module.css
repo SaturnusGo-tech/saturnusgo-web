@@ -1,32 +1,35 @@
-.identity { min-width:0; align-self:start; }
-.cover { position:relative; aspect-ratio:8/3; overflow:hidden; border-radius:13px; background:var(--falcon-panel); }
+.identity { min-width:0; align-self:start; padding:9px 9px 20px; border:1px solid var(--falcon-border); border-radius:16px; background:var(--falcon-panel); }
+.cover { position:relative; height:135px; overflow:hidden; border-radius:9px; background:var(--falcon-control); }
 .cover > img { width:100%; height:100%; object-fit:cover; display:block; }
-.coverActions { position:absolute; top:10px; right:10px; display:flex; gap:4px; opacity:0; transition:opacity 150ms ease; }
+.coverActions { position:absolute; top:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity 150ms ease; }
 .cover:hover .coverActions,.cover:focus-within .coverActions { opacity:1; }
-.coverActions button { display:grid; place-items:center; width:28px; height:28px; border:0; border-radius:8px; color:#fff; background:rgba(0,0,0,.56); cursor:pointer; }
-.avatarRow { display:flex; align-items:end; justify-content:space-between; margin:-25px 14px 0; position:relative; }
-.avatar { position:relative; width:68px; height:68px; padding:0; border:4px solid var(--falcon-surface); border-radius:50%; background:var(--falcon-control); color:var(--falcon-text); cursor:pointer; font:inherit; font-size:21px; font-weight:550; line-height:1; }
+.coverActions button { display:grid; place-items:center; width:28px; height:28px; padding:0; border:1px solid rgba(255,255,255,.18); border-radius:7px; color:#fff; background:rgba(0,0,0,.56); cursor:pointer; }
+.avatarRow { display:flex; align-items:end; justify-content:space-between; margin:-27px 12px 0; position:relative; }
+.avatar { position:relative; width:66px; height:66px; padding:0; border:4px solid var(--falcon-panel); border-radius:50%; background:var(--falcon-control); color:var(--falcon-text); cursor:pointer; font:inherit; font-size:21px; font-weight:550; line-height:1; }
 .avatar > img,.avatar > span:first-child { width:100%; height:100%; display:grid; place-items:center; object-fit:cover; border-radius:50%; overflow:hidden; }
-.camera { position:absolute; right:-1px; bottom:0; width:22px; height:22px; display:grid; place-items:center; border-radius:50%; background:var(--falcon-elevated); color:var(--falcon-text); border:2px solid var(--falcon-surface); }
-.remove { display:grid; place-items:center; width:28px; height:28px; padding:0; color:var(--falcon-text-muted); background:transparent; border:0; border-radius:8px; cursor:pointer; }
+.camera { position:absolute; right:-1px; bottom:0; width:21px; height:21px; display:grid; place-items:center; border-radius:50%; background:var(--falcon-control); color:var(--falcon-text); border:2px solid var(--falcon-panel); opacity:0; transition:opacity 150ms ease; }
+.avatar:hover .camera,.avatar:focus-visible .camera { opacity:1; }
+.remove { display:grid; place-items:center; width:28px; height:28px; padding:0; color:var(--falcon-text-muted); background:transparent; border:0; border-radius:7px; cursor:pointer; opacity:0; transition:opacity 150ms ease; }
+.avatarRow:hover .remove,.avatarRow:focus-within .remove { opacity:1; }
 .remove:hover { background:var(--falcon-hover); color:var(--falcon-text); }
-.person { margin:18px 0 23px; }
-.person h2 { margin:0; color:var(--falcon-text); font-size:20px; line-height:1.35; font-weight:550; letter-spacing:-.45px; overflow-wrap:anywhere; }
-.person p { margin:5px 0 0; font-size:12px; line-height:1.6; color:var(--falcon-text-muted); white-space:pre-wrap; overflow-wrap:anywhere; }
-.counts { display:grid; grid-template-columns:1fr 1fr; gap:18px 12px; margin:0; }
-.counts > div { display:flex; flex-direction:column-reverse; gap:4px; }
+.person { margin:15px 12px 20px; }
+.person h2 { margin:0; color:var(--falcon-text); font-size:17px; line-height:1.4; font-weight:550; letter-spacing:-.35px; overflow-wrap:anywhere; }
+.person p { margin:5px 0 0; font-size:12px; line-height:1.65; color:var(--falcon-text-muted); white-space:pre-wrap; overflow-wrap:anywhere; }
+.counts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0 12px; }
+.counts > div { display:flex; flex-direction:column; gap:5px; }
 .counts dt { color:var(--falcon-text-muted); font-size:11px; line-height:1.5; }
-.counts dd { margin:0; color:var(--falcon-text); font-weight:550; font-size:19px; font-variant-numeric:tabular-nums; letter-spacing:-.3px; }
-.period { color:var(--falcon-text-muted); font-size:11px; margin:12px 0 22px; }
-.about { border-top:1px solid var(--falcon-border); padding-top:20px; }
-.about h3 { font-size:12px; font-weight:500; margin:0 0 9px; }
+.counts dd { margin:0; color:var(--falcon-text); font-weight:550; font-size:16px; line-height:1.35; font-variant-numeric:tabular-nums; letter-spacing:-.2px; }
+.period { color:var(--falcon-text-muted); font-size:10px; margin:13px 12px 20px; }
+.about { border-top:1px solid var(--falcon-border); padding-top:18px; margin:0 12px; }
+.about h3 { font-size:12px; font-weight:500; margin:0 0 8px; }
 .about p { color:var(--falcon-text-secondary); font-size:12px; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; margin:0; }
-.contacts { display:grid; gap:10px; padding-top:20px; font-style:normal; font-size:12px; color:var(--falcon-text-muted); }
+.contacts { display:grid; gap:9px; margin:18px 12px 0; font-style:normal; font-size:11px; line-height:1.6; color:var(--falcon-text-muted); }
+.contacts:empty { display:none; }
 .contacts > span,.contacts a { display:flex; align-items:center; gap:8px; min-width:0; color:inherit; text-decoration:none; }
-.contacts svg { flex-shrink:0; }
+.contacts svg { flex-shrink:0; opacity:.75; }
 .contacts span { overflow-wrap:anywhere; }
 .contacts a:hover { color:var(--falcon-text); }
 .identity button:focus-visible,.identity a:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
 .identity button:disabled { cursor:wait; opacity:.55; }
-@media (hover:none) { .coverActions { opacity:1; } }
-@media (prefers-reduced-motion:reduce) { .coverActions { transition:none; } }
+@media (hover:none) { .coverActions,.camera,.remove { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .coverActions,.camera,.remove { transition:none; } }

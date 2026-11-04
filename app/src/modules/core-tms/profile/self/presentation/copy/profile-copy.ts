@@ -3,12 +3,17 @@ import type { ActivityMetric } from "../../domain/profile-model";
 export function profileCopy(ru: boolean) {
   return {
     title: ru ? "Мой профиль" : "My profile", details: ru ? "Данные профиля" : "Profile details",
+    tabs: { profile: ru ? "Профиль" : "Profile", activity: ru ? "Активность" : "Activity", account: ru ? "Аккаунт" : "Account" },
+    account: ru ? "Вход и безопасность" : "Sign-in and security",
+    accountHint: ru ? "Способы входа и устройства вашего аккаунта." : "Manage how you sign in and the devices you use.",
     name: ru ? "Имя" : "Name", introduction: ru ? "Знакомство" : "Introduction",
     introductionHint: ru ? "Коротко о вашей роли и специализации." : "A short introduction to your role and expertise.",
     bio: ru ? "О себе" : "About", bioHint: ru ? "Поделитесь опытом и тем, над чем любите работать." : "Share your experience and the work you care about.",
     location: ru ? "Город" : "Location", contact: ru ? "Контактная ссылка" : "Contact link",
     contactHint: ru ? "Сайт, профиль или ссылка mailto для связи." : "A website, profile or mailto link where people can reach you.",
     phone: ru ? "Телефон" : "Phone", email: ru ? "Почта аккаунта" : "Account email",
+    remaining: (count: number) => ru ? `Осталось символов: ${count}` : `${count} characters left`,
+    shortMetrics: { executedCases: ru ? "Проверки" : "Checks", authoredCases: ru ? "Кейсы" : "Cases", defects: ru ? "Дефекты" : "Defects" },
     save: ru ? "Сохранить изменения" : "Save changes", saving: ru ? "Сохраняем…" : "Saving…",
     saved: ru ? "Профиль обновлён" : "Profile updated", retry: ru ? "Повторить" : "Try again",
     loadError: ru ? "Не удалось загрузить профиль." : "Your profile could not be loaded.",

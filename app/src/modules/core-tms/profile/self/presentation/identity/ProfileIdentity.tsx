@@ -1,5 +1,5 @@
 "use client";
-import { Camera, Link2, Mail, MapPin, RotateCcw, Trash2 } from "lucide-react";
+import { Camera, Link2, Mail, RotateCcw, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ProfileMediaKind, SelfProfile, SelfProfileActivity } from "../../domain/profile-model";
 import { profileCopy } from "../copy/profile-copy";
@@ -31,16 +31,15 @@ export function ProfileIdentity({ profile, totals, days, ru, pending, onUpload, 
       </button>
       {profile.hasAvatar && <button type="button" className={styles.remove} disabled={pending} onClick={() => onRemove("avatar")} aria-label={copy.removeAvatar} title={copy.removeAvatar}><Trash2 size={14} /></button>}
     </div>
-    <div className={styles.person}><h2>{profile.name}</h2><p>{profile.introduction || (profile.accountKind === "personal" ? copy.personal : copy.company)}</p></div>
+    <div className={styles.person}><h2>{profile.name}</h2>{profile.introduction && <p>{profile.introduction}</p>}</div>
     <dl className={styles.counts} aria-label={copy.count(days)}>
-      {(["executedCases", "defects", "authoredCases", "runs"] as const).map(key => <div key={key}><dt>{copy.metrics[key]}</dt><dd>{totals ? number.format(totals[key]) : "—"}</dd></div>)}
+      {(["executedCases", "authoredCases", "defects"] as const).map(key => <div key={key}><dt>{copy.shortMetrics[key]}</dt><dd>{totals ? number.format(totals[key]) : "—"}</dd></div>)}
     </dl>
     <p className={styles.period}>{copy.count(days)}</p>
     {profile.bio && <section className={styles.about}><h3>{copy.bio}</h3><p>{profile.bio}</p></section>}
     <address className={styles.contacts}>
-      {profile.location && <span><MapPin size={14} />{profile.location}</span>}
       {contact && <a href={contact} target="_blank" rel="noreferrer"><Link2 size={14} /><span>{contact.replace(/^https:\/\//i, "").replace(/^mailto:/i, "")}</span></a>}
-      <span><Mail size={14} /><span>{profile.email}</span></span>
+      {profile.email && <span><Mail size={14} /><span>{profile.email}</span></span>}
     </address>
     {(["avatar", "banner"] as const).map(kind => <input key={kind} ref={kind === "avatar" ? avatarInput : bannerInput} type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={pending}
       onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; if (file) onUpload(kind, file); }} />)}
