@@ -4,6 +4,7 @@ import { AlertTriangle, LogIn } from "lucide-react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { TessiqLoader } from "../../../presentation/common/loading/TessiqLoader";
 import styles from "../../../tms.module.css";
+import authStyles from "./auth-state.module.css";
 
 type AuthStateKind = "configuration" | "error" | "loading";
 
@@ -22,7 +23,7 @@ export function TmsAuthState({
   const { t } = useTmsLocale();
   if (kind === "loading") {
     return (
-      <main className={`${styles.app} ${styles.authLoaderPage}`}>
+      <main className={authStyles.viewport}>
         <TessiqLoader label={t("auth.loadingTitle")} testId="auth-session-loading" />
       </main>
     );

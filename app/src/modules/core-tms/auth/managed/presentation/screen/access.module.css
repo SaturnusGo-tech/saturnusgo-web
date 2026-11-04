@@ -39,8 +39,10 @@
 .page .inputWrap input { height: 48px; font-size: 16px; }
 .page .inputWrap input::placeholder { color: var(--access-muted); opacity: 1; }
 .page .primary, .page .secondary { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; min-height: 48px; text-decoration: none; padding: 11px 18px; font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 999px; cursor: pointer; transition: background 150ms ease; }
-.page .primary, .page .secondary { background: #fff; color: #000; border-color: #fff; }
-.page .primary:hover, .page .secondary:hover { background: #e9e9e9; border-color: #e9e9e9; }
+.page .primary { background: #fff; color: #000; border-color: #fff; }
+.page .primary:hover { background: #e9e9e9; border-color: #e9e9e9; }
+.page .secondary { background: #1b1b20; color: #fff; border-color: #34343a; }
+.page .secondary:hover { background: #26262d; border-color: #45454d; }
 .page :is(.primary, .secondary):disabled { cursor: default; opacity: .5; }
 .primary svg { color: inherit; }
 .footer { margin-top: 28px; display: grid; justify-items: center; gap: 12px; color: var(--access-muted); font-size: 13px; }

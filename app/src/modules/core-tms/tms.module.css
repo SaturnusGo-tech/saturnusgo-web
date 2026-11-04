@@ -67,8 +67,6 @@
   color-scheme: dark;
 }
 
-.authLoaderPage { grid-template-rows: minmax(0, 1fr); background: #000; color: #fff; color-scheme: dark; }
-
 .authPanel {
   width: min(100%, 440px);
   display: grid;
@@ -2173,8 +2171,8 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  color: #fff;
-  background: #000;
+  color: var(--ink);
+  background: var(--canvas);
 }
 .tessiqLoaderPane {
   min-width: 0;
