@@ -3372,7 +3372,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5135,7 +5135,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -19408,7 +19408,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member\u2019s already-read inbox entries",
+        "summary": "Archive only this member’s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -19618,7 +19618,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -19737,7 +19737,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -20281,7 +20281,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company\u2019s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
+        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company’s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
@@ -20377,7 +20377,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company\u2019s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
+        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company’s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "not-applicable",
         "parameters": [
@@ -20789,6 +20789,1833 @@
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
+          }
+        }
+      }
+    },
+    "/auth/methods": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "getAuthMethods",
+        "operationId": "getAuthMethods",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthMethods"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/auth/email/start": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "startAuthEmail",
+        "operationId": "startAuthEmail",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthEmailChallenge"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthEmailStartRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/email/verify": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "verifyAuthEmail",
+        "operationId": "verifyAuthEmail",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthRedirect"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthEmailVerifyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/start": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "startAuthGoogle",
+        "operationId": "startAuthGoogle",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthAuthorizationRedirect"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthGoogleStartRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/saml/start": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "startAuthSaml",
+        "operationId": "startAuthSaml",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthAuthorizationRedirect"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthSamlStartRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/trial": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "getAuthTrial",
+        "operationId": "getAuthTrial",
+        "security": [],
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthTrial"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/company/sso": {
+      "get": {
+        "operationId": "getCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySso"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "saveCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySso"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySsoDraft"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "body-version",
+        "description": "Fresh administrator MFA is required. The required body version is null for creation or the current positive version for replacement; a stale version returns 409."
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/sso/test": {
+      "post": {
+        "operationId": "testCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySsoAuthorization"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/sso/enable": {
+      "post": {
+        "operationId": "enableCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySso"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySsoEnableRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/sso/enforce": {
+      "post": {
+        "operationId": "enforceCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySso"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySsoEnforceRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/sso/subjects": {
+      "get": {
+        "operationId": "getCompanySsoSubjects",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySsoSubjects"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "bindCompanySsoSubject",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanySsoSubjects"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySsoSubjectRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "managedTenant": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-concurrency": "serialized-command",
+        "description": "Fresh administrator MFA is required. This explicit audited subject-rebinding command executes atomically with the administrator proof locked and the unique subject mapping updated; it does not accept If-Match."
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "googleOidcCallback",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "303": {
+            "description": "Continue on trusted Falcon route",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        ],
+        "security": [],
+        "x-tms-auth-redirect": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/saml/{companyId}/acs": {
+      "post": {
+        "operationId": "companySamlAcs",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "303": {
+            "description": "Continue on trusted Falcon route",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "SAMLResponse",
+                  "RelayState"
+                ],
+                "properties": {
+                  "SAMLResponse": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 350000
+                  },
+                  "RelayState": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-auth-redirect": true,
+        "description": "Tenant-bound SP-initiated callback. Gateway accepts only this bounded cross-site form POST; browser binding, RelayState, signature, request ID, issuer, destination, audience and replay checks remain mandatory.",
+        "x-tms-body-limit-bytes": 400000
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/saml/{companyId}/metadata": {
+      "get": {
+        "operationId": "companySamlMetadata",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "SP metadata",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "security": []
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/google/finish": {
+      "get": {
+        "operationId": "finishCompanyGoogleSignIn",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Trusted company route with HttpOnly session cookie",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-tms-auth-redirect": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/federation/cancel": {
+      "post": {
+        "operationId": "cancelFederationSignIn",
+        "responses": {
+          "204": {
+            "description": "Browser-bound provider attempt cancelled",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/saml/launch": {
+      "get": {
+        "operationId": "launchCompanySaml",
+        "responses": {
+          "303": {
+            "description": "Company-host browser binding then redirect to configured HTTPS IdP",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-tms-auth-redirect": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/desktop/start": {
+      "post": {
+        "operationId": "startDesktopAuthentication",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthDesktopStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthDesktopStartResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/desktop/exchange": {
+      "post": {
+        "operationId": "exchangeDesktopAuthentication",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthDesktopExchangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Completed without a credential-bearing body",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/desktop/cancel": {
+      "post": {
+        "operationId": "cancelDesktopAuthentication",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthDesktopCancelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Completed without a credential-bearing body",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/desktop/authorize": {
+      "get": {
+        "operationId": "authorizeDesktopAuthentication",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "attempt",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Secure sign-in waiting page",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "303": {
+            "description": "Single-use loopback code and original state",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-auth-redirect": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/platform/companies/{workspaceId}/sso/recovery": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      ],
+      "post": {
+        "operationId": "recoverCompanySso",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Disable enforced SSO through the offline-reviewed operator recovery runbook",
+        "description": "Requires the active platform operator session on the configured platform hostname and recent MFA. The validated reason and SSO enforcement recovery commit in the same audit transaction. Company administrators cannot call this route.",
+        "security": [
+          {
+            "managedPlatform": []
+          }
+        ],
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySsoRecoveryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "SSO enforcement disabled and operator recovery audited.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -24602,11 +26429,11 @@
               "givenName": {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 100
+                "maxLength": 200
               },
               "familyName": {
                 "type": "string",
-                "minLength": 1,
+                "minLength": 0,
                 "maxLength": 100
               },
               "email": {
@@ -24616,15 +26443,28 @@
               },
               "phone": {
                 "type": "string",
-                "pattern": "^\\+[1-9][0-9]{7,14}$"
+                "anyOf": [
+                  {
+                    "pattern": "^\\+[1-9][0-9]{7,14}$"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
               },
               "emailVerificationStatus": {
                 "type": "string",
-                "const": "unverified"
+                "enum": [
+                  "verified",
+                  "unverified"
+                ]
               },
               "phoneVerificationStatus": {
                 "type": "string",
-                "const": "unverified"
+                "enum": [
+                  "verified",
+                  "unverified"
+                ]
               }
             }
           },
@@ -26596,6 +28436,7 @@
           "DELIVERY_NOT_RECONCILABLE",
           "DELIVERY_NOT_RETRYABLE",
           "DELIVERY_OUTCOME_UNKNOWN",
+          "DESKTOP_AUTH_INVALID",
           "DESTINATION_NOT_ACCESSIBLE",
           "DICTATION_EMPTY",
           "DICTATION_INVALID_AUDIO",
@@ -26607,6 +28448,10 @@
           "ENCRYPTION_KEY_REQUIRED",
           "ENVIRONMENT_NOT_FOUND",
           "EVENT_DISABLED",
+          "FEDERATION_INVALID",
+          "FEDERATION_LINK_REQUIRED",
+          "FEDERATION_SUBJECT_UNAVAILABLE",
+          "FEDERATION_UNAVAILABLE",
           "FORBIDDEN",
           "GAP_GENERATING",
           "GAP_NOT_FOUND",
@@ -26649,12 +28494,16 @@
           "NO_MATCHING_TESTS",
           "PATH_FILTER_REQUIRES_PR_OR_PUSH",
           "PAYLOAD_TOO_LARGE",
+          "PERSONAL_ACCESS_DENIED",
+          "PERSONAL_TRIAL_EXPIRED",
           "PRECONDITION_FAILED",
           "PRECONDITION_REQUIRED",
           "PROCESSING_FAILED",
           "PROJECT_NOT_FOUND",
+          "PROOF_INVALID",
           "QUOTA_EXCEEDED",
           "RATE_LIMITED",
+          "REAUTHENTICATION_REQUIRED",
           "REMOTE_ARCHIVED",
           "REMOTE_NOT_FOUND",
           "REMOTE_SCOPE_MISMATCH",
@@ -26672,6 +28521,10 @@
           "SCOPE_NOT_REVIEWABLE",
           "SERVICE_UNAVAILABLE",
           "SIGNING_SECRET_REQUIRED",
+          "SSO_CONFLICT",
+          "SSO_FORBIDDEN",
+          "SSO_REQUIRED",
+          "SSO_TEST_REQUIRED",
           "STALE_COMMENT",
           "STATUS_NOT_ACCESSIBLE",
           "SUITE_NOT_FOUND",
@@ -26685,6 +28538,7 @@
           "UPSTREAM_REJECTED",
           "UPSTREAM_UNAVAILABLE",
           "VALIDATION_ERROR",
+          "VALIDATION_FAILED",
           "WEBHOOK_UNAUTHORIZED",
           "WORKFLOW_ID_MISMATCH",
           "WORKFLOW_LIMIT_EXCEEDED",
@@ -37778,7 +39632,8 @@
             "type": "string",
             "enum": [
               "platform",
-              "tenant"
+              "tenant",
+              "personal"
             ]
           },
           "available": {
@@ -37830,7 +39685,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -38453,7 +40308,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -38554,7 +40409,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -42288,7 +44143,7 @@
           "locale",
           "messages"
         ],
-        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -44623,6 +46478,643 @@
             "type": "string",
             "maxLength": 4096,
             "pattern": "^https://klipy\\.com(:443)?/[^#\\s\\\\]+$"
+          }
+        }
+      },
+      "AuthMethods": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "google": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "boolean"
+          },
+          "saml": {
+            "type": "boolean"
+          },
+          "signup": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "google",
+          "email",
+          "saml",
+          "signup"
+        ]
+      },
+      "AuthEmailStartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          },
+          "intent": {
+            "type": "string",
+            "enum": [
+              "login",
+              "signup"
+            ]
+          }
+        },
+        "required": [
+          "email",
+          "intent"
+        ]
+      },
+      "AuthEmailVerifyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{6}$"
+          }
+        },
+        "required": [
+          "challengeId",
+          "code"
+        ]
+      },
+      "AuthEmailChallenge": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "challengeId",
+          "expiresAt",
+          "retryAfterSeconds"
+        ],
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "retryAfterSeconds": {
+            "type": "integer",
+            "const": 60
+          }
+        }
+      },
+      "AuthRedirect": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          }
+        },
+        "required": [
+          "redirectUrl"
+        ]
+      },
+      "AuthAuthorizationRedirect": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "authorizationUrl": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          }
+        },
+        "required": [
+          "authorizationUrl"
+        ]
+      },
+      "AuthGoogleStartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "intent": {
+            "type": "string",
+            "enum": [
+              "login",
+              "signup",
+              "link"
+            ]
+          }
+        },
+        "required": [
+          "intent"
+        ]
+      },
+      "AuthSamlStartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253
+          }
+        },
+        "required": [
+          "organization"
+        ]
+      },
+      "AuthTrial": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "company",
+              "personal"
+            ]
+          },
+          "startsAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "readOnly": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "startsAt",
+          "expiresAt",
+          "readOnly"
+        ]
+      },
+      "CompanySsoDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "idpIssuer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "entryPoint": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "subjectAttribute": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 16384,
+              "minLength": 1
+            },
+            "minItems": 1,
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "version",
+          "idpIssuer",
+          "entryPoint",
+          "subjectAttribute",
+          "certificates"
+        ]
+      },
+      "CompanySso": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "idpIssuer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entryPoint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subjectAttribute": {
+            "type": "string"
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 16384,
+              "minLength": 1
+            },
+            "minItems": 0,
+            "maxItems": 2
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "enforced": {
+            "type": "boolean"
+          },
+          "testedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "metadataUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "entityId": {
+            "type": "string",
+            "format": "uri"
+          },
+          "acsUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "configured",
+          "version",
+          "idpIssuer",
+          "entryPoint",
+          "subjectAttribute",
+          "certificates",
+          "enabled",
+          "enforced",
+          "testedAt",
+          "metadataUrl",
+          "entityId",
+          "acsUrl"
+        ]
+      },
+      "CompanySsoSubjectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "identityId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "subject",
+          "identityId"
+        ]
+      },
+      "CompanySsoSubjects": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "subject": {
+                  "type": "string"
+                },
+                "identityId": {
+                  "type": "string"
+                },
+                "identityName": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "subject",
+                "identityId",
+                "identityName",
+                "email"
+              ]
+            },
+            "maxItems": 500
+          }
+        },
+        "required": [
+          "subjects"
+        ]
+      },
+      "CompanySsoEnableRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "version",
+          "enabled"
+        ]
+      },
+      "CompanySsoEnforceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "enforced": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "version",
+          "enforced"
+        ]
+      },
+      "CompanySsoAuthorization": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "authorizationUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "authorizationUrl"
+        ]
+      },
+      "PersonalEmailChallenge": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "challengeId",
+          "expiresAt",
+          "retryAfterSeconds"
+        ],
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "retryAfterSeconds": {
+            "type": "integer",
+            "const": 60
+          }
+        }
+      },
+      "PersonalTrial": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "startsAt",
+          "expiresAt",
+          "readOnly"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "company",
+              "personal"
+            ]
+          },
+          "startsAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "readOnly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AuthDesktopStartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "type": "string",
+            "minLength": 22,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]{22,128}$"
+          },
+          "redirectUri": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^http://127\\.0\\.0\\.1:[0-9]{4,5}/falcon-auth/callback$",
+            "description": "Canonical IPv4 loopback callback; port must be 1024 through 65535."
+          },
+          "codeChallenge": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          }
+        },
+        "required": [
+          "state",
+          "redirectUri",
+          "codeChallenge"
+        ]
+      },
+      "AuthDesktopStartResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "authorizationUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "attemptId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          }
+        },
+        "required": [
+          "authorizationUrl",
+          "attemptId"
+        ]
+      },
+      "AuthDesktopExchangeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "type": "string",
+            "minLength": 22,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]{22,128}$"
+          },
+          "redirectUri": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^http://127\\.0\\.0\\.1:[0-9]{4,5}/falcon-auth/callback$",
+            "description": "Canonical IPv4 loopback callback; port must be 1024 through 65535."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "codeVerifier": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9._~-]{43,128}$"
+          }
+        },
+        "required": [
+          "state",
+          "redirectUri",
+          "code",
+          "codeVerifier"
+        ]
+      },
+      "AuthDesktopCancelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "type": "string",
+            "minLength": 22,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]{22,128}$"
+          },
+          "redirectUri": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^http://127\\.0\\.0\\.1:[0-9]{4,5}/falcon-auth/callback$",
+            "description": "Canonical IPv4 loopback callback; port must be 1024 through 65535."
+          },
+          "attemptId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "codeVerifier": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9._~-]{43,128}$"
+          }
+        },
+        "required": [
+          "state",
+          "redirectUri",
+          "attemptId",
+          "codeVerifier"
+        ]
+      },
+      "AuthEntrypoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "tenant",
+              "personal"
+            ]
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "accessContact": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email"
+          }
+        },
+        "required": [
+          "name",
+          "hostname",
+          "audience",
+          "available",
+          "accessContact"
+        ]
+      },
+      "CompanySsoRecoveryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 1000
           }
         }
       }
