@@ -9,6 +9,7 @@ export function AuthContinuation({ children, workspaceId }: { readonly children:
   useEffect(() => {
     if (checked.current) return;
     checked.current = true;
+    if (typeof window === "undefined") { setTarget(null); return; }
     const saved = takeBrowserContinuation(workspaceId);
     const current = continuationFromLocation(window.location);
     const explicit = current && hasContinuationContext(current, window.location.origin);
