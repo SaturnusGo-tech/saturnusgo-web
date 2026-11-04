@@ -34,3 +34,10 @@ void test("a login entry can preserve only its valid MCP interaction and storage
   const denied = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } };
   assert.doesNotThrow(() => rememberContinuation(denied, page)); assert.equal(takeContinuation(denied, origin), null);
 });
+void test("retrying sign-in from a provider's default return cannot replace the original deep target", () => {
+  for (const search of ["", "?workspaceId=alpha"]) {
+    const tab = storage(); rememberContinuation(tab, page, 1000);
+    rememberContinuation(tab, { ...page, search, hash: "" }, 1500);
+    assert.equal(takeContinuation(tab, origin, "alpha", 2000), "/testcases/umbrella-home/work/?caseId=case-7&workspaceId=alpha&falconMcpInteraction=consent_123#step-2");
+  }
+});
