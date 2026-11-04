@@ -3,8 +3,11 @@ import { PiCaretRight, PiPlus } from "react-icons/pi";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
 import type { RepositoryCreation } from "../../model/creation/repository-creation";
 import { buildFolderTree } from "../../model/tree";
+import { useFolderAppearanceContext } from "../../state/appearance/folder-appearance-context";
+import { useFolderAppearanceTip } from "../../state/appearance-onboarding/useFolderAppearanceTip";
 import { InlineFolderForm } from "../creation/InlineFolderForm";
 import { FolderStructureBranch } from "./FolderStructureBranch";
+import { FolderAppearanceTip } from "./onboarding/FolderAppearanceTip";
 import css from "./structure.module.css";
 
 const ROOT = "folder-structure-root";
@@ -16,6 +19,7 @@ export function FolderStructurePage({ resource, ru, onBack }: {
   const [confirmed, setConfirmed] = useState<RepositoryFolder[]>([]);
   const [saving, setSaving] = useState(false), [notice, setNotice] = useState("");
   const pending = useRef(false), mounted = useRef(false), rootDraft = useRef<HTMLDivElement>(null), newFolder = useRef<HTMLButtonElement>(null);
+  const tree = useRef<HTMLUListElement>(null);
   const titleId = useId(), busy = resource.busy || saving, disabled = busy || resource.loading || !resource.canManage;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
@@ -27,6 +31,12 @@ export function FolderStructurePage({ resource, ru, onBack }: {
   const folders = useMemo(() => [...new Map([...confirmed, ...resource.items].map(folder => [folder.id, folder])).values()]
     .filter(folder => !folder.archivedAt), [resource.items, confirmed]);
   const roots = useMemo(() => buildFolderTree(folders, []).roots, [folders]);
+  const appearance = useFolderAppearanceContext();
+  const appearanceTip = useFolderAppearanceTip(roots[0]?.folder, !disabled && !resource.error && Boolean(appearance.save));
+  function dismissTip() {
+    appearanceTip.dismiss();
+    requestAnimationFrame(() => tree.current?.querySelector<HTMLButtonElement>('button[aria-haspopup="dialog"]')?.focus({ preventScroll: true }));
+  }
   function begin(parentId: string | null) {
     if (disabled || pending.current) return;
     if (parentId) {
@@ -76,9 +86,10 @@ export function FolderStructurePage({ resource, ru, onBack }: {
         <InlineFolderForm parentId={null} parentName={ru ? "Репозиторий" : "Repository"} creation={creation} disabled={disabled} ru={ru}
           restoreFocus={() => requestAnimationFrame(() => newFolder.current?.focus({ preventScroll: true }))} />
       </div>}
-      <ul className={css.tree} aria-label={ru ? "Папки репозитория" : "Repository folders"}>
+      {appearanceTip.visible && <FolderAppearanceTip ru={ru} onDismiss={dismissTip} />}
+      <ul ref={tree} className={css.tree} aria-label={ru ? "Папки репозитория" : "Repository folders"}>
         {roots.map(node => <FolderStructureBranch key={node.folder.id} node={node} collapsed={collapsed} creation={creation}
-          disabled={disabled} busy={busy} ru={ru} onToggle={toggle} />)}
+          disabled={disabled} busy={busy} ru={ru} onToggle={toggle} onAppearanceOpen={appearanceTip.dismiss} />)}
       </ul>
       {!folders.length && <p className={css.empty} role="status">{resource.loading ? (ru ? "Загрузка папок…" : "Loading folders…")
         : (ru ? "Создайте первую папку, чтобы организовать репозиторий." : "Create the first folder to organize your repository.")}</p>}

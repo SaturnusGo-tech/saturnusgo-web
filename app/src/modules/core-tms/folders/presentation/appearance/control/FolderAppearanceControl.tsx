@@ -2,13 +2,14 @@ import { lazy, Suspense, useCallback, useId, useRef, useState } from "react";
 import type { RepositoryFolder } from "../../../model/folder";
 import { useFolderAppearanceContext } from "../../../state/appearance/folder-appearance-context";
 import { useFolderAppearanceEditor } from "../../../state/appearance-editor/useFolderAppearanceEditor";
+import { markFolderAppearanceTipSeen } from "../../../state/appearance-onboarding/appearance-tip-storage";
 import { useAnchoredPopup } from "../../../../presentation/common/popup/useAnchoredPopup";
 import { FolderVisual } from "../visual/FolderVisual";
 import css from "./appearance-control.module.css";
 const Picker = lazy(() => import("../picker/FolderAppearancePicker").then(module => ({ default: module.FolderAppearancePicker })));
 
-export function FolderAppearanceControl({ folder, open: expanded, editable, disabled, ru, labelled }: {
-  folder: RepositoryFolder; open?: boolean; editable?: boolean; disabled?: boolean; ru: boolean; labelled?: boolean;
+export function FolderAppearanceControl({ folder, open: expanded, editable, disabled, ru, labelled, onOpen }: {
+  folder: RepositoryFolder; open?: boolean; editable?: boolean; disabled?: boolean; ru: boolean; labelled?: boolean; onOpen?: () => void;
 }) {
   const context = useFolderAppearanceContext(); const editor = useFolderAppearanceEditor(folder);
   const [open, setOpen] = useState(false); const id = useId();
@@ -24,7 +25,11 @@ export function FolderAppearanceControl({ folder, open: expanded, editable, disa
     <button ref={trigger} type="button" className={css.trigger} disabled={disabled} data-failed={editor.failed || undefined}
       aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined}
       aria-label={`${ru ? "Оформление папки" : "Folder appearance"}: ${folder.name}`}
-      onPointerDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); setOpen(!open); }}>
+      onPointerDown={event => event.stopPropagation()} onClick={event => {
+        event.stopPropagation();
+        if (!open) { markFolderAppearanceTipSeen(folder); onOpen?.(); }
+        setOpen(!open);
+      }}>
       <FolderVisual appearance={appearance} open={expanded} />{labelled && <span>{ru ? "Оформление папки" : "Folder appearance"}</span>}
     </button>
     {open && <div ref={panel} id={id} popover="manual" role="dialog" aria-label={ru ? "Оформление папки" : "Folder appearance"} className={css.panel}>

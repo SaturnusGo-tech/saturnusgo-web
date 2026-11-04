@@ -70,6 +70,20 @@
 @media (prefers-reduced-motion: reduce) { .caseAddButton { transition: none; } }
 .emptyFolder { color: var(--falcon-text-muted); font-size: 11px; line-height: 16px; padding: 9px 0 9px 42px; }
 .empty { margin: 20px 10px; max-width: 220px; font-size: 12px; color: var(--falcon-text-muted); line-height: 1.7; }
+.emptyStart { max-width: 244px; margin: 10px auto 0; padding: 12px 12px 22px; color: var(--falcon-text); }
+.emptyStart strong { display: block; font-size: 13px; line-height: 1.5; font-weight: 550; }
+.emptyStart p { margin: 6px 0 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.6; text-wrap: pretty; }
+.emptyIllustration { width: 166px; margin: 0 auto 19px; padding: 3px 0; color: var(--falcon-folder); }
+.illustrationRoot, .illustrationChildren > div { display: flex; align-items: center; gap: 10px; height: 29px; }
+.emptyIllustration svg { flex-shrink: 0; }
+.emptyIllustration i { display: block; height: 5px; width: 74px; border-radius: 3px; background: color-mix(in srgb, var(--falcon-folder) 14%, var(--falcon-border-subtle)); }
+.illustrationRoot i { width: 88px; background: color-mix(in srgb, var(--falcon-folder) 20%, var(--falcon-border-subtle)); }
+.illustrationChildren { position: relative; margin-left: 11px; padding-left: 24px; }
+.illustrationChildren > div { position: relative; }
+.illustrationChildren > div::before { content: ""; position: absolute; top: -1px; left: -24px; width: 15px; height: 16px; border-left: 1px solid var(--falcon-border-strong); border-bottom: 1px solid var(--falcon-border-strong); border-bottom-left-radius: 6px; }
+.illustrationChildren > div:first-child::after { content: ""; position: absolute; left: -24px; top: 12px; bottom: 0; border-left: 1px solid var(--falcon-border-strong); }
+.illustrationChildren > div:last-child { color: var(--falcon-case-icon); }
+.illustrationChildren > div:last-child i { width: 56px; background: var(--falcon-border-subtle); }
 .hint { color: var(--falcon-text-muted); font-size: 10px; line-height: 1.6; margin: 12px 9px 0; }
 .treeHeading[data-drop], .folderRow[data-drop] { background: var(--falcon-selected) !important; outline: 1px solid var(--falcon-border-strong); outline-offset: -1px; }
 .loadError { display: grid; gap: 8px; padding: 12px; font-size: 11px; overflow-wrap: anywhere; }

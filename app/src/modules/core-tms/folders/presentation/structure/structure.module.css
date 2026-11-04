@@ -30,6 +30,15 @@
 .error button { padding: 4px 7px; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-text); font: inherit; cursor: pointer; }
 .error button:hover:not(:disabled) { background: var(--falcon-hover); }
 .empty, .notice { margin: 14px 0 0; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.6; }
+.appearanceTip { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) 24px; align-items: start; gap: 10px; max-width: 490px; margin: 0 0 14px 30px; padding: 12px 10px 9px 12px; border: 1px solid var(--falcon-border); border-radius: 12px; background: color-mix(in srgb, var(--falcon-folder) 4%, var(--falcon-surface)); }
+.appearanceTip::after { content: ""; position: absolute; bottom: -5px; left: 9px; width: 8px; height: 8px; border-right: 1px solid var(--falcon-border); border-bottom: 1px solid var(--falcon-border); background: color-mix(in srgb, var(--falcon-folder) 4%, var(--falcon-surface)); transform: rotate(45deg); }
+.tipPreview { display: grid; place-items: center; min-height: 24px; color: var(--falcon-folder); }
+.tipCopy { min-width: 0; padding-top: 2px; }
+.tipCopy strong { display: block; color: var(--falcon-text); font-size: 12px; line-height: 1.5; font-weight: 600; }
+.tipCopy p { margin: 4px 0 5px; color: var(--falcon-text-muted); font-size: 12px; line-height: 1.55; text-wrap: pretty; }
+.page .tipDone { min-height: 28px; margin-inline-start: -5px; padding: 3px 5px; border: 0; border-radius: 5px; background: transparent; color: var(--falcon-text); font: inherit; font-size: 11px; font-weight: 550; cursor: pointer; }
+.page .tipClose { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--falcon-text-muted); cursor: pointer; }
+.tipDone:hover, .tipClose:hover { background: var(--falcon-hover); }
 .page button:disabled { cursor: default; opacity: .45; }
 .page :is(button, input):focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 2px; }
-@media (max-width: 640px) { .page { padding: 18px 14px 28px; } .heading { gap: 10px; } .heading h1 { font-size: 20px; } .breadcrumb { margin-bottom: 18px; } .count { width: 20px; } }
+@media (max-width: 640px) { .page { padding: 18px 14px 28px; } .heading { gap: 10px; } .heading h1 { font-size: 20px; } .breadcrumb { margin-bottom: 18px; } .count { width: 20px; } .appearanceTip { margin-inline-start: 20px; gap: 7px; padding-inline-start: 10px; } }

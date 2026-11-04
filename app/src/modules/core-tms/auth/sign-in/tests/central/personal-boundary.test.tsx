@@ -14,8 +14,10 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
   const previousFetch = globalThis.fetch;
   const previousBase = process.env.NEXT_PUBLIC_TMS_API_BASE;
   process.env.NEXT_PUBLIC_TMS_API_BASE = "https://api.example.test/api/v1";
-  const location = { origin: "https://tms.example.test", pathname: "/testcases/umbrella-home/work/", search: "", hash: "" };
-  Object.assign(globalThis, { React, document: { title: "Falcon" }, window: { location, history: { replaceState() {} } } });
+  const location = { href: "https://tms.example.test/testcases/umbrella-home/work/", origin: "https://tms.example.test", pathname: "/testcases/umbrella-home/work/", search: "", hash: "" };
+  const events = new EventTarget();
+  Object.assign(globalThis, { React, document: { title: "Falcon" }, window: { location, history: { replaceState() {} },
+    addEventListener: events.addEventListener.bind(events), removeEventListener: events.removeEventListener.bind(events) } });
   t.after(() => {
     globalThis.fetch = previousFetch;
     if (previousBase !== undefined) process.env.NEXT_PUBLIC_TMS_API_BASE = previousBase; else delete process.env.NEXT_PUBLIC_TMS_API_BASE;

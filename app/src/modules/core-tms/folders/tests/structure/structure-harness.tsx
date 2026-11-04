@@ -3,15 +3,17 @@ import { after, before, type TestContext } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import type { FolderResource, RepositoryFolder } from "../../model/folder";
+import { FolderAppearanceContext } from "../../state/appearance/folder-appearance-context";
 
 const require = createRequire(import.meta.url), previousCss = require.extensions[".css"];
 const globals = ["React", "requestAnimationFrame", "cancelAnimationFrame"] as const;
 const previous = new Map(globals.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
 let Page: typeof import("../../presentation/structure/FolderStructurePage")["FolderStructurePage"];
-before(async () => {
+before(() => {
   require.extensions[".css"] = module => { module.exports = {}; };
   Object.assign(globalThis, { React, requestAnimationFrame: () => 1, cancelAnimationFrame() {} });
-  ({ FolderStructurePage: Page } = await import("../../presentation/structure/FolderStructurePage"));
+  // Keep the CSS-stubbed graph on CJS; tsx's Node 22 dynamic-import interop cannot parse this lazy-picker graph.
+  ({ FolderStructurePage: Page } = require("../../presentation/structure/FolderStructurePage") as typeof import("../../presentation/structure/FolderStructurePage"));
 });
 after(() => {
   if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
@@ -21,7 +23,7 @@ export function folder(id: string, name: string, parentId: string | null = null,
   return { id, name, parentId, path, appearance: null, workspaceId: "w", projectId: "p", archivedAt: null, rowVersion: 1,
     createdAt: "2026-11-04T00:00:00Z", updatedAt: "2026-11-04T00:00:00Z", etag: `folder:${id}:1` };
 }
-export function fixture(t: TestContext, overrides: Partial<FolderResource> = {}) {
+export function fixture(t: TestContext, overrides: Partial<FolderResource> = {}, ru = false) {
   const calls: { name: string; parentId: string | null }[] = [];
   let back = 0, reloads = 0;
   const resource: FolderResource = { items: [folder("api", "API"), folder("auth", "Auth", "api", "/API/Auth"),
@@ -31,7 +33,9 @@ export function fixture(t: TestContext, overrides: Partial<FolderResource> = {})
     async update() { return false; }, async archive() { return false; }, async restore() { return false; },
     async moveCases() { return { ok: false, message: "unused" }; }, async archiveCases() { return { ok: false, message: "unused" }; }, ...overrides };
   let root!: ReactTestRenderer;
-  const render = () => <Page resource={resource} ru={false} onBack={() => { back++; }} />;
+  const render = () => <FolderAppearanceContext.Provider value={{ folders: resource.items, save: resource.canManage ? resource.saveAppearance : undefined }}>
+    <Page resource={resource} ru={ru} onBack={() => { back++; }} />
+  </FolderAppearanceContext.Provider>;
   act(() => { root = create(render()); });
   t.after(() => act(() => root.unmount()));
   return { resource, calls, back: () => back, reloads: () => reloads, get root() { return root; },
