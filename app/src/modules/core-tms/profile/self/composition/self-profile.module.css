@@ -1,4 +1,21 @@
- .page { --profile-portrait-size:clamp(260px,23vw,360px); width:100%; min-width:0; margin:0 auto; padding:8px 0 48px; color:var(--falcon-text); }
+.page {
+  --profile-card:var(--falcon-selected);
+  --profile-card-outline:var(--falcon-border-subtle);
+  --profile-inset:color-mix(in srgb,var(--falcon-text) 8%,var(--falcon-surface));
+  --profile-selected:var(--falcon-surface);
+  --profile-calendar-empty:color-mix(in srgb,var(--falcon-text) 14%,var(--falcon-surface));
+  --profile-future-opacity:.5;
+  --profile-portrait-size:clamp(260px,23vw,360px);
+  width:100%; min-width:0; margin:0 auto; padding:8px 0 48px; color:var(--falcon-text);
+}
+:global(.dark) .page {
+  --profile-card:var(--falcon-elevated);
+  --profile-card-outline:transparent;
+  --profile-inset:var(--falcon-surface);
+  --profile-selected:var(--falcon-control);
+  --profile-calendar-empty:var(--falcon-control);
+  --profile-future-opacity:.24;
+}
 .heading { display:flex; align-items:center; justify-content:space-between; gap:20px; min-height:36px; margin-bottom:26px; }
 .heading h1 { margin:0; font-size:25px; font-weight:550; letter-spacing:-.7px; line-height:1.4; }
 .overview { display:grid; grid-template-columns:var(--profile-portrait-size) minmax(0,1fr); align-items:start; gap:24px; margin-bottom:36px; }
@@ -9,6 +26,6 @@
 .feedback button:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
 .saved { color:var(--falcon-success); font-size:11px; line-height:1.6; }
 .skeleton { display:grid; grid-template-columns:var(--profile-portrait-size) 1fr; gap:24px; min-height:600px; }
-.skeleton > div { height:var(--profile-portrait-size); border-radius:14px; background:var(--falcon-elevated); }
+.skeleton > div { height:var(--profile-portrait-size); border-radius:14px; background:var(--profile-card); box-shadow:inset 0 0 0 1px var(--profile-card-outline); }
 @media(max-width:1000px) { .page { --profile-portrait-size:260px; } .overview { gap:20px; } }
 @media(max-width:700px) { .page { padding:4px 0 28px; } .overview,.skeleton { grid-template-columns:1fr; gap:24px; } .person { max-width:400px; width:100%; margin:auto; } .heading h1 { font-size:23px; } .heading { margin-bottom:22px; } .skeleton > div { height:280px; } }

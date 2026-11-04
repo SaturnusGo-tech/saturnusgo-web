@@ -1,4 +1,4 @@
- .collection { padding:22px 18px 15px; border-radius:14px; background:var(--falcon-elevated); }
+ .collection { padding:22px 18px 15px; border-radius:14px; background:var(--profile-card); box-shadow:inset 0 0 0 1px var(--profile-card-outline); }
 .collection header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 3px; margin-bottom:16px; }
 .collection h2 { margin:0; font-size:13px; line-height:1.5; font-weight:550; }
 .collection header > span { font-size:12px; color:var(--falcon-text); font-variant-numeric:tabular-nums; }

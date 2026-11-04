@@ -60,7 +60,7 @@ void test("desktop login/signup survives Google and email, including explicit si
       await mount(`/signup/?challengeId=google-proof&email=private%40example.test&expiresAt=2030-01-01T00%3A00%3A00Z&retryAfterSeconds=60&intent=${signup ? "signup" : "login"}`, true);
       await submit("123456");
       if (rejectLogin) {
-        assert.ok(renderer!.root.findAllByType("a").some(link => link.props.href === "/signup/"));
+        assert.ok(renderer!.root.findAllByType("a").some(link => link.props.href === "/signup/?lang=en"));
         assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
         await mount("/signup/", true); await click("Continue with email"); await submit("private@example.test"); await submit("654321");
       }

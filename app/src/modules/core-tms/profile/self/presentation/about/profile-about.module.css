@@ -1,17 +1,25 @@
- .about { min-width:0; height:var(--profile-portrait-size); display:flex; flex-direction:column; padding:24px 28px; border-radius:14px; background:var(--falcon-elevated); }
-.about header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.about { min-width:0; min-height:var(--profile-portrait-size); display:flex; flex-direction:column; padding:24px 28px; border-radius:14px; background:var(--profile-card); box-shadow:inset 0 0 0 1px var(--profile-card-outline); }
+.about > header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
 .about h2 { margin:0; font-size:17px; line-height:1.5; font-weight:550; letter-spacing:-.3px; }
 .about header button { display:grid; place-items:center; flex:none; width:30px; height:30px; margin:-4px -8px -4px 0; padding:0; border:0; border-radius:8px; color:var(--falcon-icon-muted); background:transparent; cursor:pointer; }
 .about header button:hover { color:var(--falcon-text); background:var(--falcon-hover); }
-.prose { flex:1; min-height:0; overflow:auto; scrollbar-width:thin; font-size:13px; line-height:1.8; overflow-wrap:anywhere; }
-.prose :global(.wmde-markdown) { background:transparent; font-size:13px; line-height:1.8; color:var(--falcon-text-secondary); }
+.prose { flex:1; min-width:0; font-size:14px; line-height:1.8; overflow-wrap:anywhere; }
+.prose :global(.wmde-markdown) { background:transparent; font-size:14px; line-height:1.8; color:var(--falcon-text-secondary); }
 .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; min-height:0; text-align:center; }
 .empty img { display:block; width:76px; height:76px; object-fit:contain; margin:-5px 0 10px; }
 .empty h3 { margin:0 0 7px; font-size:15px; line-height:1.5; font-weight:500; }
 .empty p { max-width:44ch; margin:0; color:var(--falcon-text-muted); font-size:12px; line-height:1.8; }
-.empty button { border:0; padding:8px 12px; margin-top:10px; border-radius:999px; background:transparent; color:var(--falcon-text); font:inherit; font-size:12px; cursor:pointer; }
+.empty button { border:0; padding:8px 12px; margin-top:10px; border-radius:999px; background:var(--profile-inset); color:var(--falcon-text); font:inherit; font-size:12px; cursor:pointer; }
 .empty button:hover { background:var(--falcon-hover); }
-.editing { min-width:0; }
+.editing { min-width:0; --markdown-content-top:14px; --markdown-content-inline:16px; }
+.editing [data-editor-shell] { border-radius:12px; background:var(--falcon-surface); }
+.about .editing [data-editor-shell] > :global(.mdxeditor) { display:flex; flex-direction:column; height:auto; min-height:0; background:var(--falcon-surface); }
+.editing [data-editor-shell] :global(.mdxeditor-toolbar) { flex:none; min-height:40px; padding:6px 10px; }
+.editing [data-editor-shell] :global(.mdxeditor-root-contenteditable) { flex:none; height:auto; min-height:200px; max-height:420px; overflow:auto; background:var(--falcon-surface); scrollbar-width:thin; }
+.editing [data-editor-shell] :global(.mdxeditor-contenteditable-wrapper) { padding:0; }
+.editing [data-editor-shell] :global([contenteditable="true"]) { min-height:200px; padding:14px 16px; }
+.editing [data-editor-shell] :global([class*="_placeholder_"]) { min-height:0; padding:14px 16px; }
+.editing [data-editor-shell] > div:has(> textarea) { height:274px; min-height:274px; background:var(--falcon-surface); }
 .editing footer { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin-top:14px; }
 .editing footer > span { margin-right:auto; color:var(--falcon-text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
 .editing footer > span[data-invalid=true] { color:var(--falcon-danger); }
@@ -20,5 +28,3 @@
 .about button:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
 .about button:disabled { opacity:.45; cursor:default; }
 @media(max-width:700px) { .about { padding:20px; min-height:280px; } .empty { min-height:200px; } }
-
-.about[data-editing=true] { height:auto; min-height:var(--profile-portrait-size); }

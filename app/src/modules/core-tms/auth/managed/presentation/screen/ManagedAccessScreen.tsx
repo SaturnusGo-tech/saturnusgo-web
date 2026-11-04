@@ -31,6 +31,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
   const title = stage === "password_change" ? copy.firstTitle : stage === "mfa_enrollment" ? copy.enrollTitle
     : stage === "mfa_challenge" ? copy.mfaTitle : state.entrypoint?.audience === "platform" ? copy.sandbox : companyEmail ? methodCopy.emailTitle
       : step === "saml" ? methodCopy.ssoTitle : methodCopy.login;
+  useEffect(() => { if (typeof document !== "undefined") document.title = title; }, [title]);
   const lead = stage === "password_change" ? copy.firstBody : stage === "mfa_enrollment" ? copy.enrollBody
     : stage === "mfa_challenge" ? copy.mfaBody : null;
   const contact = state.entrypoint?.accessContact;
@@ -40,7 +41,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
       <button onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
     </div></header>
     <section className={styles.content} aria-busy={state.loading || state.pending || signIn?.state.pending}>
-      <a href="/" className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
+      <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
       {state.loading ? <div className={styles.loading} role="status" aria-label={copy.loading}><LoaderCircle size={24} className={styles.spinner} /></div>
         : state.recoveryCodes.length > 0 ? <RecoveryCodes copy={copy} codes={state.recoveryCodes} onContinue={access.acknowledgeCodes} />
         : !state.entrypoint?.available ? <>
@@ -62,7 +63,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
               <ArrowLeft size={16} aria-hidden="true" />{copy.cancel}</button>
               : companyEmail || step !== "methods" ? <button className={styles.linkButton} disabled={state.pending}
                 onClick={() => { setCompanyEmail(false); signIn?.back(); }}><ArrowLeft size={16} aria-hidden="true" />{methodCopy.back}</button>
-                : <a href="https://tms.saturnusgo.com/signup/">{methodCopy.signupLink}</a>}
+                : <a href={`https://tms.saturnusgo.com/signup/?lang=${locale}`}>{methodCopy.signupLink}</a>}
           </footer>}
         </>}
       {!state.loading && !state.recoveryCodes.length && stage === "anonymous" && companyEmail && state.entrypoint?.available && <footer className={styles.footer}>

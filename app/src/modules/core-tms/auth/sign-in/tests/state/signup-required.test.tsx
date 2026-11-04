@@ -48,8 +48,8 @@ void test("verified login without a profile offers explicit localized signup and
       ? "Аккаунт ещё не создан. Создайте личное пространство, чтобы начать 7 дней."
       : "Your account has not been created yet. Create a personal workspace to start your 7 days.");
     assert.equal(renderer!.root.findAllByType("form").length, 0, "the consumed login proof cannot be retried or resent");
-    const signupLink = renderer!.root.findAllByType("a").find(link => link.props.href === "/signup/");
-    assert.ok(signupLink, "signup uses a clean route without email or proof parameters");
+    const signupLink = renderer!.root.findAllByType("a").find(link => link.props.href === `/signup/?lang=${locale}`);
+    assert.ok(signupLink, "signup retains the active language without email or proof parameters");
     assert.deepEqual(calls.map(call => call.url), ["/api/v1/auth/methods", "/api/v1/auth/email/verify"]);
     await act(async () => renderer?.unmount()); renderer = null;
     await act(async () => { renderer = create(view(true)); });

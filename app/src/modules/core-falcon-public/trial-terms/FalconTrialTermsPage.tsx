@@ -17,7 +17,7 @@ export function FalconTrialTermsPage() {
       <a className={styles.contact} href="mailto:falcon@saturnusgo.com">falcon@saturnusgo.com ↗</a>
       {copy.sections.map(([title, ...paragraphs], index) => <section key={title} aria-labelledby={`trial-term-${index}`}><h2 id={`trial-term-${index}`}>{index + 1}. {title}</h2>
         {paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</section>)}
-      <footer><a href={`/privacy/?lang=${locale}`}>{copy.privacy} ↗</a><br /><br /><a href="/signup/">{copy.back} ↗</a></footer>
+      <footer><a href={`/privacy/?lang=${locale}`}>{copy.privacy} ↗</a><br /><br /><a href={`/signup/?lang=${locale}`}>{copy.back} ↗</a></footer>
     </main>
   </div>;
 }

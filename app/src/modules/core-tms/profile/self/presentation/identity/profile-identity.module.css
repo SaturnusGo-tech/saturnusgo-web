@@ -1,8 +1,8 @@
  .identity { min-width:0; }
-.portrait { aspect-ratio:1; position:relative; overflow:hidden; border-radius:14px; background:var(--falcon-elevated); }
+.portrait { aspect-ratio:1; position:relative; overflow:hidden; border-radius:14px; background:var(--profile-card); box-shadow:inset 0 0 0 1px var(--profile-card-outline); }
 .photo { display:block; width:100%; height:100%; padding:0; border:0; border-radius:inherit; background:transparent; color:var(--falcon-text-secondary); cursor:pointer; }
 .photo > img { display:block; width:100%; height:100%; object-fit:cover; }
-.initials { display:grid; place-items:center; width:100%; height:100%; font-size:clamp(56px,6vw,88px); font-weight:450; letter-spacing:-3px; background:radial-gradient(ellipse at 30% 10%,var(--falcon-control),var(--falcon-elevated) 70%); }
+.initials { display:grid; place-items:center; width:100%; height:100%; font-size:clamp(56px,6vw,88px); font-weight:450; letter-spacing:-3px; background:radial-gradient(ellipse at 30% 10%,var(--profile-calendar-empty),var(--profile-card) 70%); }
 .camera { position:absolute; left:12px; bottom:12px; display:flex; align-items:center; gap:7px; padding:8px 11px; border:1px solid #ffffff26; border-radius:999px; color:#fff; background:#181818d9; font-size:11px; opacity:0; transform:translateY(3px); transition:opacity 150ms ease,transform 150ms ease; }
 .portrait:hover .camera,.portrait:focus-within .camera { opacity:1; transform:translateY(0); }
 .remove { position:absolute; right:12px; bottom:12px; display:grid; place-items:center; width:32px; height:32px; padding:0; border:1px solid #ffffff26; border-radius:50%; color:#fff; background:#181818d9; opacity:0; cursor:pointer; transition:opacity 150ms ease; }

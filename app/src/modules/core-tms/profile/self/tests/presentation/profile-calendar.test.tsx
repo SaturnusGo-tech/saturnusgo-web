@@ -19,6 +19,9 @@ void test("QA calendar offers recent years only and labels recorded work in the 
   assert.equal(renderer.root.findByType("h2").children.join(""), "QA activity");
   assert.match(JSON.stringify(renderer.toJSON()), /1 recorded action/);
   assert.doesNotMatch(JSON.stringify(renderer.toJSON()), /contribut/i);
+  const weekdayLabels = () => renderer.root.findByProps({ "aria-hidden": "true" }).findAllByType("span");
+  assert.deepEqual(weekdayLabels().map(label => label.children.join("")), ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+  assert.deepEqual(weekdayLabels().map(label => label.props.style.gridRow), [1, 2, 3, 4, 5, 6, 7]);
   const years = renderer.root.findByProps({ "aria-label": "Activity year" }).findAllByType("button");
   assert.deepEqual(years.map(button => button.children.join("")), [String(year), String(year - 1)]);
   assert.deepEqual(years.map(button => button.props["aria-pressed"]), [true, false]);
@@ -27,5 +30,6 @@ void test("QA calendar offers recent years only and labels recorded work in the 
   await act(async () => renderer.update(<ProfileCalendar {...props} ru />));
   assert.equal(renderer.root.findByType("h2").children.join(""), "Активность QA");
   assert.match(JSON.stringify(renderer.toJSON()), /1 действие/);
+  assert.deepEqual(weekdayLabels().map(label => label.children.join("")), ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]);
   await act(async () => renderer.unmount());
 });

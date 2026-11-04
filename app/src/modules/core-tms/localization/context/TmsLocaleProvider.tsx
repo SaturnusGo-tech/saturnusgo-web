@@ -13,6 +13,7 @@ import { tmsMessages } from "../catalog/messages";
 import type { TmsMessageKey } from "../catalog/messages";
 import {
   TMS_LOCALE_STORAGE_KEY,
+  requestedTmsLocale,
   resolveTmsLocale,
   tmsLanguageTag,
 } from "../model/locale";
@@ -55,7 +56,7 @@ export function TmsLocaleProvider({
     }
     updateLocale(
       initialLocaleRef.current ??
-        resolveTmsLocale(savedLocale, window.navigator.language),
+        resolveTmsLocale(savedLocale, window.navigator.language, requestedTmsLocale(window.location.search)),
     );
     setResolved(true);
     return () => {
@@ -77,6 +78,15 @@ export function TmsLocaleProvider({
   const setLocale = useCallback((nextLocale: TmsLocale) => {
     updateLocale(nextLocale);
     setResolved(true);
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("lang")) {
+        url.searchParams.set("lang", nextLocale);
+        window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+    } catch {
+      // A restricted address bar must not prevent an in-memory language change.
+    }
   }, []);
   const t = useCallback(
     (key: TmsMessageKey, variables?: TmsMessageVariables) =>

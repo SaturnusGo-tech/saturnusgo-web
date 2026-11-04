@@ -35,7 +35,7 @@ export function ProfileCalendar({ value, loading, error, year, ru, onYear, retry
       : <><div className={styles.scroll}>
         <div className={styles.matrix} style={{ "--calendar-columns": calendar.columns } as CSSProperties}>
           <div className={styles.months}>{calendar.months.map(month => <span key={month.month} style={{ gridColumn: month.column }}>{new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(year, month.month, 1)))}</span>)}</div>
-          <div className={styles.weekdays} aria-hidden="true">{[1, 3, 5].map(day => <span key={day} style={{ gridRow: day + 1 }}>{new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, day)))}</span>)}</div>
+          <div className={styles.weekdays} aria-hidden="true">{[0, 1, 2, 3, 4, 5, 6].map(day => <span key={day} style={{ gridRow: day + 1 }}>{new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 7 + day)))}</span>)}</div>
           <div className={styles.cells} role="group" aria-label={ru ? "Действия по дням; используйте стрелки для навигации" : "Daily QA activity; use arrow keys to navigate"}>
             {calendar.cells.map((day, index) => day ? <button key={day.date} type="button" ref={element => { if (element) refs.current.set(day.date, element); else refs.current.delete(day.date); }} data-level={day.level} data-future={day.future || undefined}
               disabled={day.future} tabIndex={focusDate === day.date ? 0 : -1} aria-label={`${fullDate(day.date)}: ${actionCount(day.count)}`} aria-describedby={hover?.day.date === day.date ? tooltipId : undefined}
