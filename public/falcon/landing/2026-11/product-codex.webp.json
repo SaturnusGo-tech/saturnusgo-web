@@ -1,4 +1,4 @@
 {
-  "prompt": "Current Falcon UI captured via Codex browser on 2026-11-04 from a local isolated synthetic ui-preview workspace at http://127.0.0.1:4572/testcases/umbrella-home/ui-preview/. Screen: codex. No production or private company data. Converted to WebP with cwebp quality 88. Real product UI, not generated interface.",
+  "prompt": "Current Falcon UI captured via Codex browser on 2026-11-04 from a local isolated synthetic ui-preview workspace on the local preview origin, route /testcases/umbrella-home/ui-preview/. Screen: codex. No production or private company data. Converted to WebP with cwebp quality 88. Real product UI, not generated interface.",
   "createdAt": "2026-11-04T13:04:29.632Z"
 }
