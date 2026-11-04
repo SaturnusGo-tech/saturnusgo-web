@@ -1,26 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import type { ManagedAvatarGrant } from "../domain/managed-avatar";
 import type { SignedInCompanySession } from "../domain/managed-access";
 import { createAttachmentClient } from "../../../attachments/create-attachment-client";
 import { AttachmentClientProvider } from "../../../attachments/presentation/context/AttachmentClientProvider";
 import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticatedTmsHttpClient";
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
 import { TmsSessionProvider } from "../../presentation/session/TmsSessionContext";
+import { useSelfProfileIdentity } from "../../composition/session/profile/useSelfProfileIdentity";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
 
 export function ManagedWorkspaceGate({ children, session, logout }: {
   readonly children: ReactNode; readonly session: SignedInCompanySession; readonly logout: () => Promise<void>;
 }) {
-  const [profile, updateProfile] = useState({ name: session.identity.name, hasAvatar: session.identity.hasAvatar, version: 0 });
   const [ready, setReady] = useState(false);
   const apiBase = `${window.location.origin}/api/v1`;
   const http = useMemo(() => createAuthenticatedTmsHttpClient({ apiBase, credentials: "include" }), [apiBase]);
   const attachments = useMemo(() => createAttachmentClient({ apiBase, credentials: "include" }), [apiBase]);
-  const avatarLoader = useCallback(async (signal: AbortSignal) =>
-    (await http.getResource<ManagedAvatarGrant>("/profile/avatar", signal)).data, [http]);
+  const { profile, updateProfile, avatarLoader } = useSelfProfileIdentity(http, session.identity.id, {
+    name: session.identity.name, hasAvatar: session.identity.hasAvatar, version: 0,
+  }, session.audience === "tenant" && Boolean(session.workspaceId));
   useEffect(() => {
     if (session.audience !== "tenant" || !session.workspaceId) { window.location.replace("/sandbox/"); return; }
     const url = new URL(window.location.href);

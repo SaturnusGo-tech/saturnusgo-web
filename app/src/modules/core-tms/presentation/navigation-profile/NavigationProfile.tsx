@@ -23,7 +23,9 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const [pending, setPending] = useState(false), [failed, setFailed] = useState(false);
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const label = session?.label || t("auth.account");
-  const role = session?.workspaceRole ? roles[session.workspaceRole][ru ? 1 : 0]
+  const role = session?.workspaceKind === "personal" ? (ru ? "Личный аккаунт" : "Personal account")
+    : session?.kind === "cloud" && !session.workspaceKind ? (ru ? "Аккаунт Falcon" : "Falcon account")
+    : session?.workspaceRole ? roles[session.workspaceRole][ru ? 1 : 0]
     : session?.kind === "admin" ? (ru ? "Администратор" : "Administrator") : (ru ? "Аккаунт Falcon" : "Falcon account");
   const navigate = (action: () => void) => { popup.dismiss(); action(); };
   return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (!downloadsOpen && event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
@@ -44,7 +46,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
         <div><strong>{label}</strong><span>{role}</span></div>
       </div>
       <div className={css.separator} role="separator"/>
-      {session?.profilePath && <ProfileLink role="menuitem" className={css.action} onClick={popup.dismiss}>
+      {session && <ProfileLink role="menuitem" className={css.action} onClick={popup.dismiss}>
         <AvatarProfile width={20} height={20} aria-hidden="true"/><span>{ru ? "Мой профиль" : "My profile"}</span>
       </ProfileLink>}
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>

@@ -1,0 +1,32 @@
+{
+  "asset": "public/assets/profile/banner-default-v1.webp",
+  "generatedOn": "2026-11-04",
+  "generationTool": "image_gen.imagegen (built-in)",
+  "generationMode": "new original image",
+  "sourceImage": "/Users/mercuryrucks/.codex/generated_images/01a1a75e-72a4-7843-9895-1ec8de792625/exec-1415c1eb-6b59-4462-b873-c2cb466c5b56.png",
+  "reference": "User-supplied QA profile screenshot, 2026-11-04 at 8.44.27 PM; visual aesthetic reference only. No source screenshot pixels, text, branding or people included.",
+  "finalPrompt": "Use case: professional abstract texture. Asset type: a single original default cover banner for a premium dark-mode tester profile in Falcon QA software. Create a full-bleed wide horizontal iridescent satin-metal surface, with a landscape aspect ratio of 8:3, ideally 1600 by 600 pixels. Broad luminous diagonal silk-like folds and parallel softly refracted bands flow from upper left toward lower right. Polished liquid-silver base, pearl white highlights, restrained pastel cyan, pale sky blue, soft lilac-pink and warm pale yellow refractions. The form is tangible and sophisticated, like a macro photograph of prismatic brushed metal reflecting diffused studio light, not a synthetic neon gradient. A few broad silvery ribbons weave gently across the banner with nuanced translucent refraction, airy light and soft depth. Balanced tonal flow across the entire width; all areas visually useful when cropped as a short cover behind an avatar. Elegant, crisp, editorial, quiet luxury, no central focal symbol, no overly dramatic contrast. Only the abstract surface fills every pixel; no margins, no frame, no black background, no objects, no people, no words, no lettering, no logos, no branding, no UI, no watermark, no contact sheet. Pastel luminous rainbow-silver appearance suitable for a compact dark profile card; avoid saturated neon, stars, sparkles and excessive glow.",
+  "processing": {
+    "command": "cwebp -quiet -q 90 -m 6 -resize 1600 600 SOURCE.png -o public/assets/profile/banner-default-v1.webp",
+    "dimensions": [
+      1600,
+      600
+    ],
+    "bytes": 58326,
+    "sha256": "e976fc4415691ea7a5dc2bde8e66f3d4e0c8d384254a2f8356d03573df85b8d3"
+  },
+  "storage": {
+    "provider": "Cloudflare R2",
+    "bucket": "cdn-saturnusgo",
+    "key": "falcon/profile/banner-default-v1.webp",
+    "publicUrl": "https://saturnusgo.com/falcon/profile/banner-default-v1.webp",
+    "contentType": "image/webp",
+    "cacheControl": "public, max-age=31536000, immutable"
+  },
+  "verification": {
+    "visualInspection": "Generated PNG and optimized WebP inspected. Original full-bleed silver satin waves with restrained pastel cyan, pink and yellow refractions; no text, logos, borders, watermarks or extra objects.",
+    "publicHead": "HTTP 200, image/webp, Content-Length 58326, immutable one-year cache policy.",
+    "publicGetSha256Matches": true,
+    "r2ReadbackSha256Matches": true
+  }
+}

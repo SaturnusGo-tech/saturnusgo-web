@@ -20,6 +20,7 @@ import {
   tmsSignedOutDestination,
 } from "../../navigation/tms-auth-route";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
+import { useSelfProfileIdentity } from "../../composition/session/profile/useSelfProfileIdentity";
 import { TmsAuthState } from "../state/TmsAuthState";
 import { isFalconDesktop } from "../../sign-in/domain/desktop-mode";
 
@@ -47,10 +48,17 @@ export function TmsAuthGate({
     () => createAuthenticatedTmsHttpClient({ apiBase, accessToken }),
     [accessToken, apiBase],
   );
+  const { profile, updateProfile, avatarLoader } = useSelfProfileIdentity(httpClient, `admin:${auth.user?.sub ?? ""}`, {
+    name: auth.user?.name ?? auth.user?.email ?? "Falcon admin", hasAvatar: false, version: 0,
+  }, auth.isAuthenticated);
   const sessionIdentity = useMemo(() => ({
     kind: "admin" as const,
     subject: auth.user?.sub ? `admin:${auth.user.sub}` : null,
-    label: auth.user?.name ?? auth.user?.email ?? "Falcon admin",
+    label: profile.name,
+    hasAvatar: profile.hasAvatar,
+    avatarVersion: profile.version,
+    updateProfile,
+    avatarLoader,
     signOut: async () => {
       // Keep the explicit admin selector through the Auth0 round trip. Without it,
       // a simultaneous cloud cookie could capture the return before the logout
@@ -64,7 +72,7 @@ export function TmsAuthGate({
         throw error;
       }
     },
-  }), [auth.logout, auth.user?.email, auth.user?.name, auth.user?.sub]);
+  }), [auth.logout, auth.user?.sub, profile, updateProfile, avatarLoader]);
   const login = useCallback(() => {
     setActionFailed(false);
     loginStarted.current = true;

@@ -78,7 +78,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />
     : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
   if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
-  if (model.view === "profile") return session?.kind === "managed" ? <WorkspaceProfile />
+  if (model.view === "profile") return session ? <WorkspaceProfile workspaceId={model.data.workspace.id} />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
   if (model.view === "config" || model.view === "notifications") {

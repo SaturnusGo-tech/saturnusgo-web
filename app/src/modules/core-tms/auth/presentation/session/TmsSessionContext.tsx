@@ -10,6 +10,8 @@ export interface TmsSessionIdentity {
   readonly subject: string | null;
   /** Membership returned by the authenticated session, scoped to this workspace. */
   readonly workspaceId?: string | null;
+  /** Server-resolved account copy; does not control authorization. */
+  readonly workspaceKind?: "personal" | "company";
   readonly workspaceRole?: "workspace_admin" | "qa_manager" | "tester" | "reporter" | "viewer" | null;
   readonly profilePath?: string;
   readonly administrationPath?: string;

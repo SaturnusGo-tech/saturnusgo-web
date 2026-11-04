@@ -5599,6 +5599,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/profile": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read own profile
+         * @description Own active human identity only. Available to personal, company and platform accounts, including an expired personal trial. Email, roles and trial dates cannot be changed. Media grants expire in 60 seconds and must not be cached.
+         */
+        get: operations["getSelfProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update own profile details
+         * @description Own active human identity only. Available to personal, company and platform accounts, including an expired personal trial. Email, roles and trial dates cannot be changed. Media grants expire in 60 seconds and must not be cached.
+         */
+        patch: operations["updateSelfProfile"];
+        trace?: never;
+    };
+    "/me/profile/avatar": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change own avatar
+         * @description Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.
+         */
+        post: operations["changeSelfProfileAvatar"];
+        /**
+         * Remove own avatar
+         * @description Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.
+         */
+        delete: operations["removeSelfProfileAvatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/profile/banner": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change own banner
+         * @description Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.
+         */
+        post: operations["changeSelfProfileBanner"];
+        /**
+         * Remove own banner
+         * @description Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.
+         */
+        delete: operations["removeSelfProfileBanner"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/profile/activity": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read own recorded QA contributions
+         * @description Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days.
+         */
+        get: operations["getSelfProfileActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -10320,6 +10424,77 @@ export interface components {
         AuthEmailResendRequest: {
             /** Format: uuid */
             challengeId: string;
+        };
+        SelfProfileDetails: {
+            name: string;
+            introduction: string;
+            bio: string;
+            location: string;
+            phone: string;
+            /** @description An HTTPS or mailto contact link, without embedded URL credentials. */
+            contactUrl: string | null;
+        };
+        SelfProfile: {
+            name: string;
+            introduction: string;
+            bio: string;
+            location: string;
+            phone: string;
+            /** @description An HTTPS or mailto contact link, without embedded URL credentials. */
+            contactUrl: string | null;
+            id: string;
+            email: string | null;
+            emailVerified: boolean;
+            /** @enum {string} */
+            accountKind: "personal" | "company" | "platform";
+            hasAvatar: boolean;
+            hasBanner: boolean;
+            avatar: {
+                /** Format: uri */
+                url: string;
+                /** Format: date-time */
+                expiresAt: string;
+            } | null;
+            banner: {
+                /** Format: uri */
+                url: string;
+                /** Format: date-time */
+                expiresAt: string;
+            } | null;
+            version: number;
+        };
+        SelfProfileMediaVersion: {
+            version: number;
+        };
+        SelfProfileMediaUpload: {
+            /** @description Base64 JPEG, PNG or static WebP; decoded input is limited to 2 MiB. Server strips metadata and reencodes as WebP. */
+            imageBase64: string;
+        };
+        SelfProfileActivity: {
+            /** @enum {integer} */
+            days: 30 | 90 | 365;
+            /** Format: date-time */
+            from: string;
+            /** Format: date-time */
+            to: string;
+            /** @constant */
+            basis: "recorded_actor_events";
+            /** @constant */
+            timezone: "UTC";
+            totals: {
+                authoredCases: number;
+                executedCases: number;
+                defects: number;
+                runs: number;
+            };
+            series: {
+                /** Format: date */
+                date: string;
+                authoredCases: number;
+                executedCases: number;
+                defects: number;
+                runs: number;
+            }[];
         };
     };
     responses: {
@@ -22649,6 +22824,300 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSelfProfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfile"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateSelfProfile: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelfProfileDetails"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfile"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    changeSelfProfileAvatar: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelfProfileMediaUpload"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileMediaVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    removeSelfProfileAvatar: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileMediaVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    changeSelfProfileBanner: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Opaque key scoped to the authenticated principal, operation, and workspace. Reusing it with a different canonical request returns IDEMPOTENCY_KEY_REUSED. Completed responses are replayable for at least 24 hours. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelfProfileMediaUpload"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileMediaVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    removeSelfProfileBanner: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Exact strong ETag from the last authorized singleton read or mutation. Wildcard matching is not accepted. */
+                "If-Match": components["parameters"]["IfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag: components["headers"]["ETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileMediaVersion"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getSelfProfileActivity: {
+        parameters: {
+            query: {
+                /** @description Required tenant boundary for the query. */
+                workspaceId: components["parameters"]["WorkspaceIdQueryRequired"];
+                days?: 30 | 90 | 365;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SelfProfileActivity"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
         };

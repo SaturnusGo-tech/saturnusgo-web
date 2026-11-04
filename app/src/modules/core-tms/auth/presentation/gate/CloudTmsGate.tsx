@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { createAttachmentClient } from "../../../attachments/create-attachment-client";
 import { AttachmentClientProvider } from "../../../attachments/presentation/context/AttachmentClientProvider";
@@ -12,6 +12,7 @@ import { TrialFeature } from "../../sign-in/composition/TrialFeature";
 import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 import { signedOutPath } from "../../sign-in/domain/desktop-mode";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
+import { useSelfProfileIdentity } from "../../composition/session/profile/useSelfProfileIdentity";
 
 export function CloudTmsGate({
   apiBase,
@@ -22,6 +23,11 @@ export function CloudTmsGate({
   readonly children: ReactNode;
   readonly session: CloudSession;
 }) {
+  const [resolvedKind, setResolvedKind] = useState<{ workspaceId: string; kind: "personal" | "company" }>();
+  const workspaceKind = resolvedKind?.workspaceId === session.workspace.id ? resolvedKind.kind : undefined;
+  const onKindChange = useCallback((kind: "personal" | "company") => {
+    setResolvedKind({ workspaceId: session.workspace.id, kind });
+  }, [session.workspace.id]);
   const privateApiBase = new URL(apiBase, window.location.origin).href;
   const attachmentClient = useMemo(
     () => createAttachmentClient({ apiBase: privateApiBase, credentials: "include" }),
@@ -31,26 +37,34 @@ export function CloudTmsGate({
     () => createAuthenticatedTmsHttpClient({ apiBase: privateApiBase, credentials: "include" }),
     [privateApiBase],
   );
+  const { profile, updateProfile, avatarLoader } = useSelfProfileIdentity(httpClient, `cloud:${session.identity.id}`, {
+    name: `${session.identity.givenName} ${session.identity.familyName}`.trim() || session.identity.email,
+    hasAvatar: false, version: 0,
+  });
   const sessionIdentity = useMemo(() => ({
     kind: "cloud" as const,
     subject: `cloud:${session.identity.id}`,
     workspaceId: session.workspace.id,
+    workspaceKind,
     workspaceRole: session.membership.role,
-    label: `${session.identity.givenName} ${session.identity.familyName}`.trim()
-      || session.identity.email,
+    label: profile.name,
+    hasAvatar: profile.hasAvatar,
+    avatarVersion: profile.version,
+    updateProfile,
+    avatarLoader,
     signOut: async () => {
       clearBrowserDesktopAttempt();
       await logoutCloudSession();
       window.location.replace(signedOutPath());
     },
-  }), [session.identity, session.workspace.id, session.membership.role]);
+  }), [session.identity.id, session.workspace.id, session.membership.role, workspaceKind, profile, updateProfile, avatarLoader]);
 
   return (
     <TmsSessionProvider value={sessionIdentity}>
       <TmsHttpClientProvider client={httpClient}>
         <AttachmentClientProvider client={attachmentClient}>
           {children}
-          <TrialFeature key={session.workspace.id} />
+          <TrialFeature key={session.workspace.id} onKindChange={onKindChange} />
         </AttachmentClientProvider>
       </TmsHttpClientProvider>
     </TmsSessionProvider>

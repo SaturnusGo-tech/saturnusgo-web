@@ -20,4 +20,7 @@ test("the served document permits direct KLIPY images only from its three exact 
   assert.equal(sources.includes("https://klipy.com"), false, "the content page host is not an image CDN");
   assert.equal(sources.includes("https://static.klipy.com.evil.test"), false);
   assert.ok(sources.includes("https://*.r2.cloudflarestorage.com"), "existing private images retain access");
+  assert.ok(sources.includes("https://saturnusgo.com"), "published profile banners load from the owned R2 CDN");
+  assert.equal(sources.includes("https://*.saturnusgo.com"), false, "profile banners do not allow every company origin");
+  assert.equal(sources.includes("https://saturnusgo.com.evil.test"), false);
 });

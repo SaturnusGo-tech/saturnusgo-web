@@ -1,0 +1,16 @@
+.page { width:min(100%,1060px); margin:0 auto; min-width:0; padding:14px 8px 30px; color:var(--falcon-text); }
+.heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:34px; }
+.heading p { margin:0 0 7px; font-size:11px; color:var(--falcon-text-muted); }
+.heading h1 { margin:0; font-size:26px; font-weight:550; letter-spacing:-.8px; line-height:1.3; }
+.heading nav { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+.heading button,.feedback button { display:inline-flex; align-items:center; gap:7px; min-height:32px; padding:7px 10px; border:0; border-radius:8px; background:transparent; color:var(--falcon-text-muted); font:inherit; font-size:12px; cursor:pointer; }
+.heading button:hover,.feedback button:hover { color:var(--falcon-text); background:var(--falcon-hover); }
+.heading button:focus-visible,.feedback button:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
+.columns { display:grid; grid-template-columns:300px minmax(0,1fr); gap:clamp(36px,5.5vw,76px); align-items:start; }
+.feedback { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:10px 0 20px; color:var(--falcon-danger); font-size:12px; line-height:1.6; }
+.saved { color:var(--falcon-success); font-size:12px; margin:0 0 20px; }
+.skeleton { display:grid; grid-template-columns:300px 1fr; gap:70px; min-height:440px; }
+.skeleton > div { border-radius:12px; background:linear-gradient(var(--falcon-panel) 0 120px,transparent 120px 146px,var(--falcon-panel) 146px 182px,transparent 182px 210px,var(--falcon-panel) 210px 250px,transparent 250px); }
+.account { margin-top:22px; padding-top:18px; border-top:1px solid var(--falcon-border); }
+@media (max-width:900px) { .columns { grid-template-columns:250px minmax(0,1fr); gap:32px; } .heading { align-items:flex-start; } .heading nav { justify-content:flex-end; } }
+@media (max-width:700px) { .page { padding:6px 0 20px; } .columns,.skeleton { grid-template-columns:1fr; gap:32px; } .columns > aside { width:100%; max-width:400px; } .heading { flex-direction:column; margin-bottom:26px; } .heading nav { justify-content:flex-start; } .heading h1 { font-size:23px; } }

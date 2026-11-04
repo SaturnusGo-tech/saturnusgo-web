@@ -1,0 +1,23 @@
+.form { min-width:0; display:grid; gap:23px; }
+.form h2 { margin:0 0 1px; font-size:14px; line-height:1.5; font-weight:550; letter-spacing:-.15px; }
+.field { min-width:0; display:grid; gap:8px; font-size:12px; color:var(--falcon-text); }
+.field > span:first-child { font-weight:500; }
+.field small { display:block; font-size:11px; line-height:1.6; color:var(--falcon-text-muted); margin-top:-3px; }
+.field input,.field textarea { appearance:none; width:100%; min-width:0; border:1px solid var(--falcon-border); border-radius:10px; padding:10px 12px; margin:0; background:transparent; color:var(--falcon-text); font:inherit; font-size:13px; line-height:1.65; box-shadow:none; transition:border-color 150ms ease,background 150ms ease; }
+.field input { height:40px; }
+.field textarea { resize:vertical; min-height:76px; }
+.field .bio { min-height:135px; }
+.field input:hover,.field textarea:hover { border-color:var(--falcon-border-strong,var(--falcon-text-muted)); }
+.field input:focus,.field textarea:focus { outline:2px solid var(--falcon-focus); outline-offset:2px; border-color:var(--falcon-text-muted); }
+.field input::placeholder,.field textarea::placeholder { color:var(--falcon-text-muted); opacity:1; }
+.field input:disabled,.field textarea:disabled { opacity:.6; }
+.counter { text-align:right; font-size:10px; color:var(--falcon-text-muted); font-variant-numeric:tabular-nums; }
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.email { display:flex; align-items:baseline; justify-content:space-between; gap:20px; color:var(--falcon-text-muted); font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+.form footer { display:flex; justify-content:flex-end; }
+.form footer button { min-height:34px; border:0; border-radius:999px; padding:8px 15px; background:var(--falcon-action); color:var(--falcon-on-action); font:inherit; font-size:12px; font-weight:500; line-height:1.4; cursor:pointer; }
+.form footer button:hover { background:var(--falcon-action-hover); }
+.form footer button:disabled { opacity:.45; cursor:default; }
+.form footer button:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:3px; }
+@media (max-width:600px) { .pair { grid-template-columns:1fr; gap:23px; } .email { flex-direction:column; gap:6px; } }
+@media (prefers-reduced-motion:reduce) { .field input,.field textarea { transition:none; } }

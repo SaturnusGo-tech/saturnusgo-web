@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "TMS API",
-    "version": "1.0.0-checkpoint.11",
+    "version": "1.0.0-checkpoint.12",
     "description": "Versioned production contract for accepted TMS behavior. All timestamps are UTC RFC 3339 values, all identifiers are opaque, and all cursors and ETags must be treated as opaque strings."
   },
   "servers": [
@@ -3372,7 +3372,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5135,7 +5135,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -19408,7 +19408,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member’s already-read inbox entries",
+        "summary": "Archive only this member\u2019s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -19618,7 +19618,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -19737,7 +19737,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -20281,7 +20281,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company’s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
+        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company\u2019s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
@@ -20377,7 +20377,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company’s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
+        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company\u2019s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "not-applicable",
         "parameters": [
@@ -22930,6 +22930,607 @@
             }
           }
         }
+      }
+    },
+    "/me/profile": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getSelfProfile",
+        "summary": "Read own profile",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfile"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Own active human identity only. Available to personal, company and platform accounts, including an expired personal trial. Email, roles and trial dates cannot be changed. Media grants expire in 60 seconds and must not be cached."
+      },
+      "patch": {
+        "operationId": "updateSelfProfile",
+        "summary": "Update own profile details",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfile"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Own active human identity only. Available to personal, company and platform accounts, including an expired personal trial. Email, roles and trial dates cannot be changed. Media grants expire in 60 seconds and must not be cached.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfProfileDetails"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/me/profile/avatar": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "changeSelfProfileAvatar",
+        "summary": "Change own avatar",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileMediaVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfProfileMediaUpload"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required"
+      },
+      "delete": {
+        "operationId": "removeSelfProfileAvatar",
+        "summary": "Remove own avatar",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileMediaVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/me/profile/banner": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "changeSelfProfileBanner",
+        "summary": "Change own banner",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileMediaVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfProfileMediaUpload"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "required"
+      },
+      "delete": {
+        "operationId": "removeSelfProfileBanner",
+        "summary": "Remove own banner",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileMediaVersion"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Own identity only. Private normalized image. Successful mutations return only the new version; read /me/profile to refresh grants. Removal restores the default appearance.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "x-tms-concurrency": "required",
+        "x-tms-idempotency": "not-applicable"
+      }
+    },
+    "/me/profile/activity": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getSelfProfileActivity",
+        "summary": "Read own recorded QA contributions",
+        "tags": [
+          "Self profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SelfProfileActivity"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "description": "Current workspace membership required. Counts only immutable audit events attributed directly to the current human, never agent initiators. Distinct authored cases and created defects; terminal case attempts are deduplicated by project/run/item/attempt, and participating runs by project/run. Assignment, start and pause are excluded. UTC days are zero filled. Historical activity without recorded attribution is not inferred. Daily distinct run counts are not additive across days.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                30,
+                90,
+                365
+              ],
+              "default": 30
+            }
+          }
+        ]
       }
     }
   },
@@ -40012,7 +40613,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -40635,7 +41236,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -40736,7 +41337,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -44470,7 +45071,7 @@
           "locale",
           "messages"
         ],
-        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -47520,6 +48121,313 @@
             "format": "uuid"
           }
         }
+      },
+      "SelfProfileDetails": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "introduction": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "contactUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "description": "An HTTPS or mailto contact link, without embedded URL credentials."
+          }
+        },
+        "required": [
+          "name",
+          "introduction",
+          "bio",
+          "location",
+          "phone",
+          "contactUrl"
+        ]
+      },
+      "SelfProfile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "introduction": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "contactUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "description": "An HTTPS or mailto contact link, without embedded URL credentials."
+          },
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "accountKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company",
+              "platform"
+            ]
+          },
+          "hasAvatar": {
+            "type": "boolean"
+          },
+          "hasBanner": {
+            "type": "boolean"
+          },
+          "avatar": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "url",
+                  "expiresAt"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "banner": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "url",
+                  "expiresAt"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "name",
+          "introduction",
+          "bio",
+          "location",
+          "phone",
+          "contactUrl",
+          "id",
+          "email",
+          "emailVerified",
+          "accountKind",
+          "hasAvatar",
+          "hasBanner",
+          "avatar",
+          "banner",
+          "version"
+        ]
+      },
+      "SelfProfileMediaVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "SelfProfileMediaUpload": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "imageBase64": {
+            "type": "string",
+            "minLength": 16,
+            "maxLength": 2796204,
+            "description": "Base64 JPEG, PNG or static WebP; decoded input is limited to 2 MiB. Server strips metadata and reencodes as WebP."
+          }
+        },
+        "required": [
+          "imageBase64"
+        ]
+      },
+      "SelfProfileActivity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "type": "integer",
+            "enum": [
+              30,
+              90,
+              365
+            ]
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "basis": {
+            "type": "string",
+            "const": "recorded_actor_events"
+          },
+          "timezone": {
+            "type": "string",
+            "const": "UTC"
+          },
+          "totals": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "authoredCases": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "executedCases": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "defects": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "runs": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "authoredCases",
+              "executedCases",
+              "defects",
+              "runs"
+            ]
+          },
+          "series": {
+            "type": "array",
+            "maxItems": 365,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "authoredCases": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "executedCases": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "defects": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "runs": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "date",
+                "authoredCases",
+                "executedCases",
+                "defects",
+                "runs"
+              ]
+            }
+          }
+        },
+        "required": [
+          "days",
+          "from",
+          "to",
+          "basis",
+          "timezone",
+          "totals",
+          "series"
+        ]
       }
     }
   }

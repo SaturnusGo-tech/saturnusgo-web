@@ -33,12 +33,38 @@ test("account settings, help and sign out remain reachable without a profile rou
   assert.ok(all.some(node => node.props["data-testid"] === "account-logout"));
 });
 
+test("every signed-in account can reach its profile without a legacy profile route", () => {
+  for (const kind of ["cloud", "managed", "admin"] as const) {
+    const h = setup({ kind });
+    const link = h.all().find(node => node.type === "ProfileLink" && node.props.role === "menuitem");
+    assert.ok(link, `${kind} profile remains available`);
+    invoke(link, "onClick");
+    assert.equal(h.dismissed(), 1);
+  }
+  assert.equal(setup(null).all().some(node => node.type === "ProfileLink"), false);
+});
+
 test("managed account preserves profile and administration destinations inside the popup", () => {
   const h = setup({ kind: "managed", profilePath: "/profile/", administrationPath: "/company/", workspaceRole: "qa_manager" });
   const all = h.all();
   assert.ok(all.some(node => node.type === "ProfileLink" && node.props.role === "menuitem"));
   assert.ok(all.some(node => node.type === "a" && node.props.href === "/company/" && node.props.role === "menuitem"));
   assert.ok(all.some(node => node.props.children === "QA manager"));
+});
+
+test("personal accounts show a personal label while their authorization role stays unchanged", () => {
+  const session = { kind: "cloud" as const, workspaceKind: "personal" as const, workspaceRole: "workspace_admin" as const };
+  const all = setup(session).all();
+  assert.ok(all.some(node => node.props.children === "Personal account"));
+  assert.equal(all.some(node => node.props.children === "Workspace administrator"), false);
+  assert.equal(session.workspaceRole, "workspace_admin");
+});
+
+test("cloud role copy waits for the server workspace kind and preserves company administration", () => {
+  const unresolved = setup({ kind: "cloud", workspaceRole: "workspace_admin" }).all();
+  assert.ok(unresolved.some(node => node.props.children === "Falcon account"));
+  const company = setup({ kind: "cloud", workspaceKind: "company", workspaceRole: "workspace_admin" }).all();
+  assert.ok(company.some(node => node.props.children === "Workspace administrator"));
 });
 
 test("download app opens its own panel after closing the authenticated account menu", () => {
