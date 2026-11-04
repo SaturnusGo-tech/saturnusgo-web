@@ -34,3 +34,25 @@ test('only explicit email verification and resend forward the Google proof brows
   assert.equal((await worker.fetch(new Request(url,{method:'POST',body:'{}',headers:{origin:'https://evil.example',cookie:binding}}),env)).status,403);
  }
 });
+
+test('personal workspace bootstrap can load canonical links through the signed gateway', async t => {
+ const original=globalThis.fetch; t.after(()=>{globalThis.fetch=original;}); const calls=[];
+ globalThis.fetch=async request=>{calls.push(request);return Response.json({data:[],meta:{hasMore:false,nextCursor:null}});};
+ const projectId='project_95cb98ed-2d77-4588-84b6-77224b72c1a8';
+ const cookie=`__Host-falcon_cloud_session=${'p'.repeat(43)}`;
+ for(const path of [`/links?projectId=${projectId}&limit=100`,'/links/link_123']) {
+  const response=await worker.fetch(new Request(`https://tms.saturnusgo.com/api/v1${path}`,{
+   headers:{cookie:`${cookie}; __Host-falcon_tenant_session=${'t'.repeat(43)}`},
+  }),{...env,FALCON_LEGACY_HOST_MANAGED:'false'});
+  assert.equal(response.status,200,path);
+  const forwarded=calls.at(-1);
+  assert.equal(forwarded.url,`https://api.example.test/api/v1${path}`);
+  assert.equal(forwarded.headers.get('cookie'),cookie);
+  assert.equal(forwarded.headers.get('x-falcon-host'),'tms.saturnusgo.com');
+  assert.match(forwarded.headers.get('x-falcon-signature'),/^[a-f0-9]{64}$/);
+ }
+ assert.equal(calls.length,2);
+ for(const path of ['links-admin','company/links']) {
+  assert.equal((await worker.fetch(new Request(`https://tms.saturnusgo.com/api/v1/${path}`),env)).status,404);
+ }
+});

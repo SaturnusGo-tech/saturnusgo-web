@@ -7,7 +7,7 @@ const auth = new Map([
  ...['start','exchange','cancel'].map(name=>[`auth/desktop/${name}`,['POST']]), ['auth/desktop/authorize',['GET']],
  ['cloud-auth/session',['GET','HEAD']], ['cloud-auth/logout',['POST']],
 ]);
-const business = /^(?:bootstrap|workspaces|projects|portfolios|environments|test-cases|shared-steps|suites|runs|defects|attachments|external-links|activity|dashboards|reports|repository-folders|folders|custom-fields|organization|notifications|profile|integrations|support)(?:\/[A-Za-z0-9._:-]+)*$/;
+const business = /^(?:bootstrap|workspaces|projects|portfolios|environments|test-cases|shared-steps|suites|runs|defects|attachments|links|external-links|activity|dashboards|reports|repository-folders|folders|custom-fields|organization|notifications|profile|integrations|support)(?:\/[A-Za-z0-9._:-]+)*$/;
 export function publicAuthEnabled(hostname,env) {
  return hostname===TMS_HOST && env?.FALCON_PUBLIC_AUTH_ENABLED==='true' && env?.FALCON_LEGACY_HOST_MANAGED!=='true';
 }
