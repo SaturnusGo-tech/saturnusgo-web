@@ -4609,7 +4609,7 @@
 }
 
 .app ::selection { color: var(--falcon-selection-text); background: var(--falcon-selected); }
-.app :is(a, .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
+.app :is(a:not([data-documentation-reader] a), .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
 .app :is(button, input, select, textarea):focus-visible {
   outline: 2px solid var(--falcon-focus);
   outline-offset: 2px;
@@ -5029,7 +5029,7 @@
   color-scheme: dark;
 }
 
-:global(.dark) .app :is(a, .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
+:global(.dark) .app :is(a:not([data-documentation-reader] a), .compactAddButton, .drawerSelectionBar button, .repositoryEmptyFolder, .dashboardPanelLink) { color: var(--yt-link); }
 
 :global(.dark) .app :is(
   .stage,

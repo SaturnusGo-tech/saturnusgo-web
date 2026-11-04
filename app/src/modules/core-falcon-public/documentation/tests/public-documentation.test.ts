@@ -29,7 +29,7 @@ test("the public reader cannot mount workspace, authentication or AI clients", a
   const source = await readFile(new URL("../PublicDocumentation.tsx", import.meta.url), "utf8").catch(() => "");
   assert.ok(source, "The isolated public reader must exist");
   assert.doesNotMatch(source, /useDocumentation|TmsWorkspace|WorkspacePeople|TmsSession|HttpClient|fetch\s*\(|axios|FalconAI|DocumentationChat/);
-  assert.match(source, /href=\{`\/cloud-login\/\?lang=\$\{locale\}`\}/);
+  assert.match(source, /href=\{appHref \?\? `\/cloud-login\/\?lang=\$\{locale\}`\}/);
   for (const file of ["PublicDocumentation.tsx", "ArticleContent.tsx", "copy.ts"]) {
     const source = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
     assert.doesNotMatch(source, /from\s+["'][^"']*(?:content(?:-ru)?\/catalog|\.\/catalog|\/auth\/|\/chat\/)/);
@@ -42,4 +42,29 @@ test("public documentation has its own route language, independent of account pr
   assert.equal(htmlLanguageForPath("/ru/docs/", "en", "en"), "ru");
   assert.equal(isFalconPublicPath("/docs-private/"), false);
   assert.equal(isFalconPublicPath("/testcases/umbrella-home/work/"), false);
+});
+
+test("public article images come only from reviewed synthetic product captures", async () => {
+  const { publicDocumentationCatalog } = await import("../catalog");
+  const { documentationArticleImage } = await import("../../../core-tms/documentation/model/library");
+  const allowed = new Set(["repository", "run", "suites", "dashboard", "integrations", "codex"].map(name =>
+    `/falcon/landing/2026-11/product-${name}.webp`));
+  const used = new Set<string>();
+  for (const locale of ["en", "ru"] as const) {
+    for (const article of publicDocumentationCatalog(locale).articles) {
+      const image = documentationArticleImage(article.id, locale);
+      if (!image) continue;
+      assert.ok(allowed.has(image.src), `${article.id} contains an unreviewed image`);
+      assert.ok(image.alt);
+      assert.doesNotMatch(image.src, /\/falcon\/docs\/|production2026|workspace_|project_/i);
+      used.add(image.src);
+      const bytes = await readFile(new URL(`../../../../../../public${image.src}`, import.meta.url));
+      assert.equal(bytes.subarray(0, 4).toString(), "RIFF");
+      assert.equal(bytes.subarray(8, 12).toString(), "WEBP");
+      const provenance = JSON.parse(await readFile(new URL(`../../../../../../public${image.src}.json`, import.meta.url), "utf8"));
+      assert.match(provenance.prompt, /isolated synthetic ui-preview workspace/);
+      assert.match(provenance.prompt, /No production or private company data/);
+    }
+  }
+  assert.equal(used.size, 6);
 });

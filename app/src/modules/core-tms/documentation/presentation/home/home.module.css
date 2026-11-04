@@ -1,0 +1,54 @@
+.home.home { max-width: 1040px; padding: 48px 48px 56px; }
+.header { max-width: 720px; margin-bottom: 44px; }
+.header h1 { font-size: 36px; }
+.home .sectionTitle { margin: 0 0 19px; font-size: 20px; font-weight: 500; line-height: 1.4; letter-spacing: -.02em; }
+.popular { margin-bottom: 44px; }
+.popularGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.popularCard { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--docs-line); border-radius: 8px; background: var(--docs-bg); transition: border-color 150ms ease, background 150ms ease; }
+.popularCard:hover { border-color: var(--docs-muted); background: var(--docs-panel); }
+.cardVisual { display: flex; align-items: center; justify-content: center; height: 126px; flex-shrink: 0; border-bottom: 1px solid var(--docs-line); background: var(--docs-panel); color: var(--docs-copy); }
+.cardVisual > svg { stroke-width: 1.25; }
+.cardCopy { padding: 17px 16px 18px; }
+.home .cardCopy h3 { margin: 0 0 6px; font-size: 14px; font-weight: 500; line-height: 1.5; }
+.home .cardCopy p { margin: 0; color: var(--docs-muted); font-size: 13px; line-height: 1.65; }
+.basics { margin-bottom: 52px; }
+.basicsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.basicsCard { min-width: 0; padding: 21px 22px 18px; border: 1px solid var(--docs-line); border-radius: 8px; }
+.home .basicsCard h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 11px; font-size: 15px; font-weight: 500; line-height: 1.5; }
+.basicsCard h3 > svg { flex-shrink: 0; color: var(--docs-copy); }
+.basicsCard ul { margin: 0; padding: 0; list-style: none; }
+.basicsCard li { margin: 0; }
+.basicsCard a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; color: var(--docs-muted); font-size: 14px; line-height: 1.6; }
+.basicsCard a > svg { flex-shrink: 0; opacity: 0; }
+.basicsCard a:hover { color: var(--docs-ink); }
+.basicsCard a:hover > svg, .basicsCard a:focus-visible > svg { opacity: 1; }
+.guide { max-width: 720px; margin: 0 auto; padding-top: 40px; border-top: 1px solid var(--docs-line); }
+@container falcon-docs (max-width: 1180px) {
+  .popularGrid { gap: 12px; }
+  .cardCopy { padding: 15px 13px; }
+  .cardVisual { height: 110px; }
+}
+@container falcon-docs (max-width: 960px) {
+  .home.home { padding: 40px 32px 48px; }
+  .popularGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .cardVisual { height: 120px; }
+  .cardCopy { padding: 17px 18px; }
+  .basicsCard { padding: 18px; }
+}
+@container falcon-docs (max-width: 680px) {
+  .home.home { padding: 32px 24px 40px; }
+  .header { margin-bottom: 34px; }
+  .header h1 { font-size: 30px; }
+  .popular { margin-bottom: 36px; }
+  .cardVisual { height: 105px; }
+  .cardCopy { padding: 15px 13px; }
+  .basicsGrid { grid-template-columns: 1fr; gap: 12px; }
+  .basics { margin-bottom: 40px; }
+  .guide { padding-top: 32px; }
+}
+@container falcon-docs (max-width: 380px) {
+  .home.home { padding-inline: 18px; }
+  .popularGrid { grid-template-columns: 1fr; }
+  .cardVisual { height: 112px; }
+}
+@media (prefers-reduced-motion: reduce) { .popularCard { transition: none; } }

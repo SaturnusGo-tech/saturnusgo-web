@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "falcon public docs",
+        "createdAt": "2026-11-04T14:19:35.667Z",
+        "reason": "Implementation review: this is the existing self-hosted OpenAI Sans documentation face; the supplied Linear Docs reference and the shared-reader scope retain it. Root DESIGN.md governs marketing, outside this docs surface boundary."
+      }
+    ]
+  }
+}

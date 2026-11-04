@@ -50,6 +50,7 @@
   --docs-scrollbar: var(--falcon-border-strong);
   color-scheme: dark;
 }
+.root[data-chatting="false"] { grid-template-rows: minmax(0, 1fr); }
 .root * { box-sizing: border-box; }
 .root ::selection { color: var(--docs-bg); background: var(--docs-ink); }
 .root a { color: inherit; text-decoration: none; text-underline-offset: 4px; }
