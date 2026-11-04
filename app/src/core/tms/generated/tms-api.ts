@@ -5291,7 +5291,7 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getCompanySsoSubjects"];
-        /** @description Fresh administrator MFA is required. This explicit audited subject-rebinding command executes atomically with the administrator proof locked and the unique subject mapping updated; it does not accept If-Match. */
+        /** @description Fresh administrator MFA and the current company SSO version are required. The subject rebinding, version advance and audit commit atomically; a stale version returns 409. */
         put: operations["bindCompanySsoSubject"];
         post?: never;
         delete?: never;
@@ -10146,6 +10146,7 @@ export interface components {
         CompanySsoSubjectRequest: {
             subject: string;
             identityId: string;
+            version: number;
         };
         CompanySsoSubjects: {
             subjects: {

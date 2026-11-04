@@ -21771,8 +21771,8 @@
           }
         ],
         "x-tms-idempotency": "not-applicable",
-        "x-tms-concurrency": "serialized-command",
-        "description": "Fresh administrator MFA is required. This explicit audited subject-rebinding command executes atomically with the administrator proof locked and the unique subject mapping updated; it does not accept If-Match."
+        "x-tms-concurrency": "body-version",
+        "description": "Fresh administrator MFA and the current company SSO version are required. The subject rebinding, version advance and audit commit atomically; a stale version returns 409."
       },
       "parameters": [
         {
@@ -46801,11 +46801,16 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 128
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
           }
         },
         "required": [
           "subject",
-          "identityId"
+          "identityId",
+          "version"
         ]
       },
       "CompanySsoSubjects": {
