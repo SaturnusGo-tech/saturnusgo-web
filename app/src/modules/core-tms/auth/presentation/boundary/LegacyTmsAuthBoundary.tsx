@@ -15,6 +15,7 @@ import {
 } from "../../navigation/tms-auth-route";
 import { TmsAuthGate } from "../gate/TmsAuthGate";
 import { CloudTmsGate } from "../gate/CloudTmsGate";
+import { AuthContinuation } from "../../continuation/composition/AuthContinuation";
 import { SignInFeature } from "../../sign-in/composition/SignInFeature";
 import { TmsAuthState } from "../state/TmsAuthState";
 
@@ -100,7 +101,9 @@ export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNo
     );
   }
   if (probe.stage === "cloud") {
-    return <CloudTmsGate apiBase={apiBase} session={probe.session}>{children}</CloudTmsGate>;
+    return <AuthContinuation key={probe.session.workspace.id} workspaceId={probe.session.workspace.id}>
+      <CloudTmsGate apiBase={apiBase} session={probe.session}>{children}</CloudTmsGate>
+    </AuthContinuation>;
   }
   if (probe.stage === "signin") return <SignInFeature />;
   return <AdminAuthBoundary apiBase={apiBase}>{children}</AdminAuthBoundary>;

@@ -2,13 +2,13 @@
 import { useCallback, useState } from "react";
 import type { AdministrationPort } from "../../../application/ports/administration-port";
 import { useAdministrationList } from "../../../application/list/useAdministrationList";
-import type { CompanySsoSubjects, CompanySsoSubjectRequest } from "../../domain/company-sso";
+import type { CompanySsoSubjects, SubjectMappingDraft } from "../../domain/company-sso";
 import type { SsoCopy } from "../copy/sso-copy";
 import styles from "../screen/sso.module.css";
 
 export function SsoSubjects({ client, value, copy, pending, bind }: { readonly client: AdministrationPort;
   readonly value: CompanySsoSubjects; readonly copy: SsoCopy; readonly pending: boolean;
-  readonly bind: (request: CompanySsoSubjectRequest) => Promise<void> }) {
+  readonly bind: (request: SubjectMappingDraft) => Promise<void> }) {
   const members = useAdministrationList(useCallback((search, cursor, signal) => client.members(search, cursor, signal), [client]));
   const [subject, setSubject] = useState("");
   const [identityId, setIdentity] = useState("");

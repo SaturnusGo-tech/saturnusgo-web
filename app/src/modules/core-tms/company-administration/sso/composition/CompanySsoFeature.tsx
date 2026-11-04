@@ -1,4 +1,5 @@
 "use client";
+import { rememberBrowserContinuation } from "../../../auth/continuation/application/browser-continuation";
 import { useEffect, useMemo } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { createCompanySsoClient } from "../data/company-sso-client";
@@ -11,7 +12,7 @@ export function CompanySsoFeature({ client }: { readonly client: AdministrationP
   useEffect(() => {
     if (!model.destination) return;
     const destination = new URL(model.destination);
-    if (destination.protocol === "https:") window.location.assign(destination.href);
+    if (destination.protocol === "https:") { rememberBrowserContinuation(); window.location.assign(destination.href); }
   }, [model.destination]);
   return <CompanySsoScreen model={model} client={client} />;
 }

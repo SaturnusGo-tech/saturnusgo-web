@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import type { CompanySsoPort } from "./company-sso-port";
-import type { CompanySsoDraft, CompanySsoSubjectRequest } from "../domain/company-sso";
+import type { CompanySsoDraft, SubjectMappingDraft } from "../domain/company-sso";
 import { useAdministrationResource } from "../../application/state/useAdministrationResource";
 import { useAdministrationCommand } from "../../application/state/useAdministrationCommand";
 
@@ -21,9 +21,11 @@ export function useCompanySso(client: CompanySsoPort) {
       const result = await command.execute(JSON.stringify(draft), (_, signal) => client.save(draft, signal));
       if (result) resource.refresh();
     },
-    bind: async (subject: CompanySsoSubjectRequest) => {
-      const result = await command.execute(JSON.stringify(subject), (_, signal) => client.bind(subject, signal));
-      if (result) subjects.refresh();
+    bind: async (subject: SubjectMappingDraft) => {
+      const version = resource.value?.version;
+      if (version == null || resource.error || resource.refreshing) return;
+      const result = await command.execute(JSON.stringify([subject, version]), (_, signal) => client.bind({ ...subject, version }, signal));
+      if (result) { subjects.refresh(); resource.refresh(); }
     },
     test: async () => {
       const result = await command.execute("sso-test", (_, signal) => client.test(signal));

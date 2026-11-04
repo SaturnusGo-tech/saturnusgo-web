@@ -8,6 +8,7 @@ import { ManagedSignInScreen } from "./sign-in/ManagedSignInScreen";
 import { ManagedAccessScreen } from "../presentation/screen/ManagedAccessScreen";
 import type { SignedInCompanySession } from "../domain/managed-access";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
+import { AuthContinuation } from "../../continuation/composition/AuthContinuation";
 import { ManagedOAuthResume } from "../oauth/ManagedOAuthResume";
 
 export function ManagedAccessBoundary({ children }: {
@@ -20,5 +21,7 @@ export function ManagedAccessBoundary({ children }: {
     return access.state.session?.stage === "anonymous" ? <ManagedSignInScreen access={access} /> : <ManagedAccessScreen access={access} />;
   }
   const content = children(access.state.session, access.logout);
-  return access.state.session.audience === "tenant" ? <ManagedOAuthResume>{content}</ManagedOAuthResume> : content;
+  return access.state.session.audience === "tenant" ? <AuthContinuation key={access.state.session.workspaceId} workspaceId={access.state.session.workspaceId}>
+    <ManagedOAuthResume>{content}</ManagedOAuthResume>
+  </AuthContinuation> : content;
 }

@@ -1,4 +1,5 @@
 "use client";
+import { rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
 import { useEffect, useMemo } from "react";
 import { createSignInClient } from "../data/sign-in-client";
 import { useSignIn } from "../application/useSignIn";
@@ -19,7 +20,7 @@ export function SignInFeature({ signup = false }: { readonly signup?: boolean })
   useEffect(() => {
     if (!signIn.state.destination) return;
     const destination = new URL(signIn.state.destination);
-    if (destination.protocol === "https:") window.location.assign(destination.href);
+    if (destination.protocol === "https:") { rememberBrowserContinuation(); window.location.assign(destination.href); }
   }, [signIn.state.destination]);
   return <SignInScreen signIn={signIn} signup={intent === "signup"} />;
 }
