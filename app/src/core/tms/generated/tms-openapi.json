@@ -20949,7 +20949,7 @@
         "summary": "verifyAuthEmail",
         "operationId": "verifyAuthEmail",
         "security": [],
-        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context.",
+        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context. A login proof for an address without an existing personal profile returns SIGNUP_REQUIRED (403) only after the valid one-time code and, for Google linking, the original browser binding are verified. It creates no account, link, session or trial. The client may offer an explicit fresh signup at /signup/ without carrying proof credentials or email in the URL. Invalid, expired or incorrectly bound proofs remain PROOF_INVALID.",
         "responses": {
           "200": {
             "description": "Success",
@@ -28825,6 +28825,7 @@
           "SCOPE_NOT_REVIEWABLE",
           "SERVICE_UNAVAILABLE",
           "SIGNING_SECRET_REQUIRED",
+          "SIGNUP_REQUIRED",
           "SPACE_PROOF_INVALID",
           "SPACE_SELECTION_INVALID",
           "SSO_CONFLICT",
