@@ -36,6 +36,7 @@ async function readBody(request, maximumBytes) {
 export async function signedApiRequest(request, env, audience) {
   const incoming = new URL(request.url);
   const protocol = protocolRoutePolicy(incoming.pathname, audience);
+  if(protocol?.allowedMethods && !protocol.allowedMethods.includes(request.method)) throw new GatewayRequestError(405,"METHOD_NOT_ALLOWED");
   const dictation = request.method === "POST" &&
     /^\/api\/v1\/workspaces\/[A-Za-z0-9_-]{1,160}\/ai\/(?:dictation|documentation-dictation)$/.test(incoming.pathname);
   if (!HEX_KEY.test(env.FALCON_MANAGED_GATEWAY_KEY ?? "")) throw new GatewayRequestError(503, "GATEWAY_UNAVAILABLE");

@@ -1,3 +1,4 @@
+import { desktopRoutePolicy } from "../desktop/desktop-policy.mjs";
 import { federationRoutePolicy } from "../inbound/federation-policy.mjs";
 const issuer = "/api/v1/falcon-oauth";
 const publicPosts = new Set([`${issuer}/token`, `${issuer}/reg`, `${issuer}/token/revocation`]);
@@ -5,6 +6,8 @@ const cookieNames = Object.freeze(["falcon_mcp_session", "falcon_mcp_interaction
   .flatMap(name => [name, `${name}.sig`]));
 
 export function protocolRoutePolicy(pathname, audience) {
+  const desktop = desktopRoutePolicy(pathname,audience);
+  if(desktop) return desktop;
   const inbound = federationRoutePolicy(pathname,audience);
   if(inbound) return inbound;
   if (audience !== "tenant") return null;

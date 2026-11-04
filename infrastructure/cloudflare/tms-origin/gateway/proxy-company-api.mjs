@@ -1,3 +1,4 @@
+import { desktopResponsePolicy } from "./desktop/desktop-policy.mjs";
 import { federationResponsePolicy } from "./inbound/federation-policy.mjs";
 import { signedApiRequest, GatewayRequestError } from "./signed-api-request.mjs";
 import { gatewayError } from "./company-host.mjs";
@@ -9,7 +10,7 @@ const RESPONSE_HEADERS = ["content-type", "content-disposition", "content-length
 export async function proxyCompanyApi(request, env, audience, send = fetch) {
   try {
     const response = await send(await signedApiRequest(request, env, audience));
-    const protocol = federationResponsePolicy(request,response,audience,env) ?? protocolResponsePolicy(request, response, audience);
+    const protocol = desktopResponsePolicy(request,response,audience) ?? federationResponsePolicy(request,response,audience,env) ?? protocolResponsePolicy(request, response, audience);
     if (response.status >= 300 && response.status < 400 && !protocol.allowRedirect) return gatewayError(502, "INVALID_API_RESPONSE");
     const headers = new Headers({ "cache-control": "private, no-store, no-transform", "x-content-type-options": "nosniff" });
     for (const name of [...RESPONSE_HEADERS, ...protocol.headers]) {
