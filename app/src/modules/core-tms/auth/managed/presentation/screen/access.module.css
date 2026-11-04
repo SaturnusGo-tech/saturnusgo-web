@@ -38,7 +38,7 @@
 .page .inputWrap { border-radius: 999px; padding: 0 18px; }
 .page .inputWrap input { height: 48px; font-size: 16px; }
 .page .inputWrap input::placeholder { color: var(--access-muted); opacity: 1; }
-.page .primary, .page .secondary { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 11px 18px; font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 999px; cursor: pointer; transition: background 150ms ease; }
+.page .primary, .page .secondary { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; min-height: 48px; text-decoration: none; padding: 11px 18px; font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 999px; cursor: pointer; transition: background 150ms ease; }
 .page .primary { background: #6264bf; color: #fff; }
 .page .primary:hover { background: #6d6fcd; }
 .page .secondary { color: var(--access-text); background: #1b1b20; border-color: #34343a; }

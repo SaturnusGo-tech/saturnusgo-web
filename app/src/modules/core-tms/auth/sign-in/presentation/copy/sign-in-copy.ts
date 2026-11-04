@@ -1,6 +1,6 @@
 export function signInCopy(locale: "ru" | "en") {
   return locale === "ru" ? {
-    login: "Войти в Falcon", signup: "Создать личное пространство", google: "Продолжить с Google",
+    browser: "Продолжить в браузере", login: "Войти в Falcon", signup: "Создать личное пространство", google: "Продолжить с Google",
     email: "Продолжить с email", saml: "Продолжить с SAML SSO", signupLink: "Создать личное пространство",
     loginLink: "Уже есть аккаунт? Войти", emailTitle: "Войти с email", signupEmail: "Ваш email",
     emailLabel: "Email", send: "Отправить код", codeTitle: "Проверьте почту", codeLabel: "Код из письма",
@@ -13,7 +13,7 @@ export function signInCopy(locale: "ru" | "en") {
     payment: "Оплата пока недоступна", readonly: "Пробный период завершён. Просмотр и экспорт доступны.",
     retry: "Повторить", signupOff: "Создание личного пространства пока недоступно.",
   } : {
-    login: "Log in to Falcon", signup: "Create your personal workspace", google: "Continue with Google",
+    browser: "Continue in browser", login: "Log in to Falcon", signup: "Create your personal workspace", google: "Continue with Google",
     email: "Continue with email", saml: "Continue with SAML SSO", signupLink: "Create a personal workspace",
     loginLink: "Already have an account? Log in", emailTitle: "Log in with email", signupEmail: "Your email",
     emailLabel: "Email", send: "Send code", codeTitle: "Check your email", codeLabel: "Email verification code",

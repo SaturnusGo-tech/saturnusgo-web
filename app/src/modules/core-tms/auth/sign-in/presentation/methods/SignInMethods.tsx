@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Mail, Building2 } from "lucide-react";
 import type { useSignIn } from "../../application/useSignIn";
 import type { SignInCopy } from "../copy/sign-in-copy";
@@ -9,6 +10,9 @@ export function SignInMethods({ signIn, copy, signup, companyLogin }: {
   readonly companyLogin?: () => void;
 }) {
   const { state } = signIn;
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => { setDesktop(typeof navigator !== "undefined" && /(?:^|\s)FalconDesktop\/\d+\.\d+\.\d+(?:\s|$)/.test(navigator.userAgent)); }, []);
+  if (desktop) return <div className={styles.methodStack}><a href="/desktop-sign-in/" className={styles.primary}>{copy.browser}</a></div>;
   const signupBlocked = signup && !state.methods?.signup;
   return <div className={styles.methodStack}>
     <button className={`${styles.primary} ${styles.google}`} disabled={state.pending || state.loading || !state.methods?.google || signupBlocked}
