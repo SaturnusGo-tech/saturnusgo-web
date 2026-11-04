@@ -21,6 +21,7 @@ export function TessiqLoader({
       <span className={styles.srOnly}>{label}</span>
       <div className={styles.workspaceLoaderBrand} aria-hidden="true">
         <span className={styles.workspaceLoaderMark} />
+        <span className={styles.workspaceLoaderProgress} />
       </div>
     </section>
   );

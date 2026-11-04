@@ -1,10 +1,10 @@
 .page {
-  --access-bg: #101012;
+  --access-bg: #000;
   --access-text: #f4f4f5;
   --access-muted: #a6a6b0;
   --access-line: #39393e;
   --access-input: #19191d;
-  --falcon-focus: #a5a6f6;
+  --falcon-focus: #3b82f6;
   min-height: 100dvh;
   width: 100%;
   padding: max(110px, calc((100dvh - 480px) / 2)) 24px 64px;
@@ -20,7 +20,7 @@
 .header { position: absolute; top: 24px; right: 24px; }
 .content { width: min(100%, 390px); margin: 0 auto; }
 .brand { display: flex; justify-content: center; width: fit-content; margin: 0 auto 28px; }
-.brand img { width: 56px; height: 56px; object-fit: contain; content: url("/falcon/falcon-mark-light.png"); }
+.brandMark { display: block; width: 56px; height: 56px; background: #fff; -webkit-mask: url("../../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask: url("../../../../assets/falcon/falcon-line-mark.svg") center / contain no-repeat; mask-mode: alpha; }
 .language { display: flex; gap: 4px; }
 .language button, .linkButton { color: var(--access-muted); background: transparent; border: 0; border-radius: 8px; padding: 6px 8px; font: inherit; cursor: pointer; }
 .language button { font-size: 12px; }
@@ -39,18 +39,14 @@
 .page .inputWrap input { height: 48px; font-size: 16px; }
 .page .inputWrap input::placeholder { color: var(--access-muted); opacity: 1; }
 .page .primary, .page .secondary { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; min-height: 48px; text-decoration: none; padding: 11px 18px; font: inherit; font-weight: 550; border: 1px solid transparent; border-radius: 999px; cursor: pointer; transition: background 150ms ease; }
-.page .primary { background: #6264bf; color: #fff; }
-.page .primary:hover { background: #6d6fcd; }
-.page .secondary { color: var(--access-text); background: #1b1b20; border-color: #34343a; }
-.page .secondary:hover { background: #26262d; }
+.page .primary, .page .secondary { background: #fff; color: #000; border-color: #fff; }
+.page .primary:hover, .page .secondary:hover { background: #e9e9e9; border-color: #e9e9e9; }
 .page :is(.primary, .secondary):disabled { cursor: default; opacity: .5; }
-.page .google { background: #5d5fc1; }
-.page .google:hover { background: #6d6fcd; }
 .primary svg { color: inherit; }
 .footer { margin-top: 28px; display: grid; justify-items: center; gap: 12px; color: var(--access-muted); font-size: 13px; }
 .footer a { color: inherit; text-decoration: none; text-underline-offset: 4px; overflow-wrap: anywhere; }
 .footer a:hover { text-decoration: underline; color: var(--access-text); }
-.linkButton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.linkButton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #fff; }
 .linkButton:disabled { cursor: default; opacity: .6; }
 .error { color: #ffa4aa; margin: 0 0 18px; font-size: 13px; }
 .spinner { animation: spin 900ms linear infinite; }

@@ -21,6 +21,7 @@ import {
 } from "../../navigation/tms-auth-route";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 import { TmsAuthState } from "../state/TmsAuthState";
+import { isFalconDesktop } from "../../sign-in/domain/desktop-mode";
 
 export function TmsAuthGate({
   apiBase,
@@ -100,7 +101,7 @@ export function TmsAuthGate({
 
   useEffect(() => {
     if (stage === "exit") {
-      window.location.replace(tmsSignedOutDestination(window.location));
+      window.location.replace(isFalconDesktop() ? new URL("/cloud-login/", window.location.origin).href : tmsSignedOutDestination(window.location));
       return;
     }
     if (stage === "redirect" && claimTmsInteractiveLogin(loginStarted)) login();

@@ -20,7 +20,7 @@ export function SignInScreen({ signIn, signup = false }: { readonly signIn: Retu
       <button onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
     </div></header>
     <section className={styles.content} aria-busy={state.pending || state.loading} aria-labelledby="sign-in-title">
-      <a href="/" className={styles.brand} aria-label="Falcon"><img src="/falcon/falcon-mark-light.png" width={56} height={56} alt="" /></a>
+      <a href="/" className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
       <h1 id="sign-in-title">{title}</h1>
       {state.error && <p className={styles.error} role="alert">{signupRequired ? copy.signupRequired : state.error === "PROVIDER_UNAVAILABLE" ? copy.unavailable
         : /CODE|CHALLENGE|EXPIRED/.test(state.error) ? copy.expired : copy.error}</p>}

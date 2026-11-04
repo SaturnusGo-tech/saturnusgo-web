@@ -10,6 +10,7 @@ import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticated
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
 import { TrialFeature } from "../../sign-in/composition/TrialFeature";
 import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
+import { signedOutPath } from "../../sign-in/domain/desktop-mode";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 
 export function CloudTmsGate({
@@ -40,7 +41,7 @@ export function CloudTmsGate({
     signOut: async () => {
       clearBrowserDesktopAttempt();
       await logoutCloudSession();
-      window.location.replace("/");
+      window.location.replace(signedOutPath());
     },
   }), [session.identity, session.workspace.id, session.membership.role]);
 

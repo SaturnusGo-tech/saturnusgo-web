@@ -27,8 +27,7 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /assets\/falcon\/falcon-mark-on-dark\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-dark\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-light\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-loader-on-dark\.png/);
-  assert.match(activeSources, /assets\/falcon\/falcon-loader-on-light\.png/);
+  assert.match(activeSources, /assets\/falcon\/falcon-line-mark\.svg/);
   assert.match(activeSources, /prefers-color-scheme: light/);
   assert.match(activeSources, /prefers-color-scheme: dark/);
   assert.match(shellSource, /\.header\s*\{[\s\S]*?background: var\(--paper\)/);

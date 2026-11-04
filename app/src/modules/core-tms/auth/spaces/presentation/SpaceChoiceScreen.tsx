@@ -17,7 +17,7 @@ export function SpaceChoiceScreen({ model }: { readonly model: ReturnType<typeof
       <button onClick={() => setLocale("ru")} aria-pressed={locale === "ru"}>RU</button><button onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
     </div></header>
     <section className={access.content} aria-busy={state.loading || !!state.pending || state.cancelling}>
-      <a href="/" className={access.brand} aria-label="Falcon"><img src="/falcon/falcon-mark-light.png" alt="" width={56} height={56} /></a>
+      <a href="/" className={access.brand} aria-label="Falcon"><span className={access.brandMark} aria-hidden="true" /></a>
       <h1 ref={heading} tabIndex={-1}>{copy.title}</h1>
       {state.destination ? <p className={access.lead} role="status">{state.destination === "/cloud-login/" ? copy.returning : copy.opening}</p> : state.loading ? <div className={access.loading} role="status" aria-label={copy.loading}><LoaderCircle className={access.spinner} size={24} aria-hidden="true" /></div>
         : state.cancelling ? <p className={access.lead} role="status">{copy.returning}</p>
