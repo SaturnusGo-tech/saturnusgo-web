@@ -4,6 +4,7 @@ import {
   cloudWorkspacePath,
   cloudWorkspacePathFromLocation,
   loginCloudAccount,
+  logoutCloudSession,
   readCloudSession,
   registerCloudAccount,
   type CloudSession,
@@ -48,6 +49,7 @@ test("cloud account requests use the private session cookie and stable workspace
     }, "operation-1");
     await loginCloudAccount("anna@example.test", "длинная парольная фраза");
     await readCloudSession();
+    await logoutCloudSession();
 
     assert.equal(calls[0].url, "https://api.example.test/api/v1/cloud-auth/register");
     assert.equal(calls[0].init.credentials, "include");
@@ -60,7 +62,9 @@ test("cloud account requests use the private session cookie and stable workspace
       email: "anna@example.test",
       password: "длинная парольная фраза",
     });
-    assert.equal(calls[2].url, "https://api.example.test/api/v1/cloud-auth/session");
+    assert.equal(calls[2].url, "/api/v1/cloud-auth/session");
+    assert.equal(calls[3].url, "/api/v1/cloud-auth/logout");
+    assert.equal(calls[3].init.credentials, "include");
     assert.equal(calls[2].init.method, "GET");
     assert.equal(
       cloudWorkspacePath(session),

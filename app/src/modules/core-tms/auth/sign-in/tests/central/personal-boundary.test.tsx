@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
+import { useTmsHttpClient } from "../../../http/TmsHttpClientContext";
 import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
 
 void test("central workspace accepts a verified personal cookie and anonymous visitors receive method selection", async t => {
@@ -12,12 +13,12 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
   const globals = ["window", "document", "React"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
   const previousFetch = globalThis.fetch;
   const previousBase = process.env.NEXT_PUBLIC_TMS_API_BASE;
-  delete process.env.NEXT_PUBLIC_TMS_API_BASE;
+  process.env.NEXT_PUBLIC_TMS_API_BASE = "https://api.example.test/api/v1";
   const location = { origin: "https://tms.example.test", pathname: "/testcases/umbrella-home/work/", search: "", hash: "" };
   Object.assign(globalThis, { React, document: { title: "Falcon" }, window: { location, history: { replaceState() {} } } });
   t.after(() => {
     globalThis.fetch = previousFetch;
-    if (previousBase !== undefined) process.env.NEXT_PUBLIC_TMS_API_BASE = previousBase;
+    if (previousBase !== undefined) process.env.NEXT_PUBLIC_TMS_API_BASE = previousBase; else delete process.env.NEXT_PUBLIC_TMS_API_BASE;
     if (css) require.extensions[".css"] = css; else delete require.extensions[".css"];
     for (const [key, descriptor] of globals) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key); }
   });
@@ -35,7 +36,12 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
         : { authenticated: false };
     return Response.json({ data });
   };
-  const view = () => <TmsLocaleContext.Provider value={locale}><LegacyTmsAuthBoundary><div data-testid="personal-workspace" /></LegacyTmsAuthBoundary></TmsLocaleContext.Provider>;
+  function WorkspaceProbe() {
+    const http = useTmsHttpClient();
+    React.useEffect(() => { void http.get("/workspaces/personal-space"); }, [http]);
+    return <div data-testid="personal-workspace" />;
+  }
+  const view = () => <TmsLocaleContext.Provider value={locale}><LegacyTmsAuthBoundary><WorkspaceProbe /></LegacyTmsAuthBoundary></TmsLocaleContext.Provider>;
   let renderer!: ReactTestRenderer;
   await act(async () => { renderer = create(view()); });
   assert.ok(renderer.root.findAllByType("button").some(button => button.children.includes("Continue with email")));
@@ -45,6 +51,7 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
   await act(async () => { renderer = create(view()); });
   assert.equal(renderer.root.findAllByProps({ "data-testid": "personal-workspace" }).length, 1);
   assert.equal(renderer.root.findAllByType("aside").length, 1, "personal trial is visible after session restoration");
-  assert.ok(requests.every(url => url.startsWith("/api/v1/")));
+  assert.ok(requests.every(url => url.startsWith("/api/v1/") || url.startsWith(`${location.origin}/api/v1/`)));
+  assert.ok(requests.includes(`${location.origin}/api/v1/workspaces/personal-space`));
   await act(async () => renderer.unmount());
 });

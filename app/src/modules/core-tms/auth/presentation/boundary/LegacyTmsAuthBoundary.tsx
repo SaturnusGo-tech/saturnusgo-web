@@ -102,7 +102,7 @@ export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNo
   }
   if (probe.stage === "cloud") {
     return <AuthContinuation key={probe.session.workspace.id} workspaceId={probe.session.workspace.id}>
-      <CloudTmsGate apiBase={apiBase} session={probe.session}>{children}</CloudTmsGate>
+      <CloudTmsGate apiBase="/api/v1" session={probe.session}>{children}</CloudTmsGate>
     </AuthContinuation>;
   }
   if (probe.stage === "signin") return <SignInFeature />;

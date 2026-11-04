@@ -44,8 +44,8 @@ async function responseData(response: Response): Promise<CloudSessionState> {
   return data;
 }
 
-async function cloudRequest(path: string, init: RequestInit = {}): Promise<CloudSessionState> {
-  const response = await fetch(`${cloudApiBase()}${path}`, {
+async function cloudRequest(path: string, init: RequestInit = {}, apiBase = cloudApiBase()): Promise<CloudSessionState> {
+  const response = await fetch(`${apiBase}${path}`, {
     ...init, cache: "no-store", credentials: "include", redirect: "error",
   });
   return responseData(response);
@@ -71,11 +71,11 @@ export async function loginCloudAccount(email: string, password: string): Promis
 }
 
 export async function readCloudSession(signal?: AbortSignal): Promise<CloudSessionState> {
-  return cloudRequest("/cloud-auth/session", { method: "GET", signal });
+  return cloudRequest("/cloud-auth/session", { method: "GET", signal }, "/api/v1");
 }
 
 export async function logoutCloudSession(): Promise<void> {
-  const response = await fetch(`${cloudApiBase()}/cloud-auth/logout`, {
+  const response = await fetch("/api/v1/cloud-auth/logout", {
     method: "POST", cache: "no-store", credentials: "include", redirect: "error",
   });
   if (!response.ok && response.status !== 204) {
