@@ -9,6 +9,7 @@ import { logoutCloudSession } from "../../cloud/cloud-auth-client";
 import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticatedTmsHttpClient";
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
 import { TrialFeature } from "../../sign-in/composition/TrialFeature";
+import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 
 export function CloudTmsGate({
@@ -37,6 +38,7 @@ export function CloudTmsGate({
     label: `${session.identity.givenName} ${session.identity.familyName}`.trim()
       || session.identity.email,
     signOut: async () => {
+      clearBrowserDesktopAttempt();
       await logoutCloudSession();
       window.location.replace("/");
     },

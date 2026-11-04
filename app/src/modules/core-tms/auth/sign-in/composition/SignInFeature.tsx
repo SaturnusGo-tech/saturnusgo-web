@@ -5,6 +5,7 @@ import { createSignInClient } from "../data/sign-in-client";
 import { useSignIn } from "../application/useSignIn";
 import { googleEmailProof } from "./callback/google-email-proof";
 import { SpaceChoiceFeature } from "../../spaces/composition/SpaceChoiceFeature";
+import { DesktopAuthEntry } from "../../continuation/composition/DesktopAuthEntry";
 import { SignInScreen } from "../presentation/screen/SignInScreen";
 
 export function SignInFeature({ signup = false }: { readonly signup?: boolean }) {
@@ -13,7 +14,7 @@ export function SignInFeature({ signup = false }: { readonly signup?: boolean })
     const values = new URLSearchParams(window.location.search).getAll("chooseSpace");
     return values.length === 1 && values[0] === "1";
   }, []);
-  return choose ? <SpaceChoiceFeature /> : <MethodSignInFeature signup={signup} />;
+  return <DesktopAuthEntry>{choose ? <SpaceChoiceFeature /> : <MethodSignInFeature signup={signup} />}</DesktopAuthEntry>;
 }
 function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
   const client = useMemo(() => createSignInClient(), []);

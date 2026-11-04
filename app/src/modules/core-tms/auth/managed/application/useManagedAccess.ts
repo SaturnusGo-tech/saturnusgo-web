@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ManagedAccessPort } from "./managed-access-port";
+import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 import { CompanyAccessError, type CompanyEntrypoint, type CompanySession, type MfaEnrollment }
   from "../domain/managed-access";
 
@@ -113,7 +114,7 @@ export function useManagedAccess(client: ManagedAccessPort) {
     verify: (kind: "totp" | "recovery", code: string) => perform(async (signal) => {
       const result = await client.verifyMfa(kind, code, signal); return { recoveryCodes: result.recoveryCodes };
     }),
-    logout: () => perform((signal) => client.logout(signal), true),
+    logout: () => { clearBrowserDesktopAttempt(); return perform((signal) => client.logout(signal), true); },
     acknowledgeCodes: () => setState((value) => ({ ...value, recoveryCodes: [] })),
   };
 }

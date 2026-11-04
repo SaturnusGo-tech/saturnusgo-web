@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { SignInPort } from "./sign-in-port";
 import type { EmailChallenge, SignInIntent, SignInMethods, SignInStep } from "../domain/sign-in";
+import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 
 interface State {
   readonly step: SignInStep;
@@ -62,6 +63,7 @@ export function useSignIn(client: SignInPort, intent: SignInIntent, proof?: { re
     cancel(); setState(value => ({ ...value, step, pending: false, error: null, destination: null }));
   }
   function back() {
+    if (state.step === "methods" && pending.current) clearBrowserDesktopAttempt();
     cancel();
     setState(value => ({ ...value, step: value.step === "code" ? "email" : "methods", pending: false,
       challenge: null, error: null, destination: null }));
