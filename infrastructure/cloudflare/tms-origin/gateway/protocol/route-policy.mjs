@@ -6,6 +6,9 @@ const cookieNames = Object.freeze(["falcon_mcp_session", "falcon_mcp_interaction
   .flatMap(name => [name, `${name}.sig`]));
 
 export function protocolRoutePolicy(pathname, audience) {
+  if(audience==='personal' && pathname==='/api/v1/auth/email/verify') {
+    return {kind:'email-proof',allowServerPost:false,cookieNames:['__Host-falcon_federation']};
+  }
   const desktop = desktopRoutePolicy(pathname,audience);
   if(desktop) return desktop;
   const inbound = federationRoutePolicy(pathname,audience);

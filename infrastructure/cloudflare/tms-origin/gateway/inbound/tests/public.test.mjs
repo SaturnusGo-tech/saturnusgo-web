@@ -22,3 +22,11 @@ test('public API opt-in forwards only personal cookie and exact auth/business ro
  const cross=new Request('https://tms.saturnusgo.com/api/v1/auth/email/start',{method:'POST',body,headers:{origin:'https://evil.example','content-type':'application/json'}});
  assert.equal((await worker.fetch(cross,env)).status,403);
 });
+
+test('only explicit email verification forwards the Google proof browser binding',async t=>{
+ const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});let forwarded;
+ globalThis.fetch=async request=>{forwarded=request;return Response.json({data:{ok:true}});};
+ const binding=`__Host-falcon_federation=${'g'.repeat(43)}`;
+ const response=await worker.fetch(new Request('https://tms.saturnusgo.com/api/v1/auth/email/verify',{method:'POST',body:'{}',headers:{origin:'https://tms.saturnusgo.com',cookie:binding}}),env);
+ assert.equal(response.status,200);assert.equal(forwarded.headers.get('cookie'),binding);
+});
