@@ -29,7 +29,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
     if (!state.loading && (stage !== "anonymous" || companyEmail)) titleRef.current?.focus({ preventScroll: true });
   }, [stage, state.loading, companyEmail, step]);
   const title = stage === "password_change" ? copy.firstTitle : stage === "mfa_enrollment" ? copy.enrollTitle
-    : stage === "mfa_challenge" ? copy.mfaTitle : companyEmail ? methodCopy.emailTitle
+    : stage === "mfa_challenge" ? copy.mfaTitle : state.entrypoint?.audience === "platform" ? copy.sandbox : companyEmail ? methodCopy.emailTitle
       : step === "saml" ? methodCopy.ssoTitle : methodCopy.login;
   const lead = stage === "password_change" ? copy.firstBody : stage === "mfa_enrollment" ? copy.enrollBody
     : stage === "mfa_challenge" ? copy.mfaBody : null;
@@ -57,13 +57,13 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
           {stage === "password_change" && <FirstPasswordForm copy={copy} pending={state.pending} onSubmit={access.firstPassword} />}
           {(stage === "mfa_enrollment" || stage === "mfa_challenge") && <MfaForm copy={copy} enrollment={state.enrollment}
             enrolling={stage === "mfa_enrollment"} pending={state.pending} onPrepare={access.prepareMfa} onSubmit={access.verify} />}
-          <footer className={styles.footer}>
+          {(stage !== "anonymous" || signIn) && <footer className={styles.footer}>
             {stage !== "anonymous" ? <button className={styles.linkButton} disabled={state.pending} onClick={() => void access.logout()}>
               <ArrowLeft size={16} aria-hidden="true" />{copy.cancel}</button>
               : companyEmail || step !== "methods" ? <button className={styles.linkButton} disabled={state.pending}
                 onClick={() => { setCompanyEmail(false); signIn?.back(); }}><ArrowLeft size={16} aria-hidden="true" />{methodCopy.back}</button>
                 : <a href="https://tms.saturnusgo.com/signup/">{methodCopy.signupLink}</a>}
-          </footer>
+          </footer>}
         </>}
       {!state.loading && !state.recoveryCodes.length && stage === "anonymous" && companyEmail && state.entrypoint?.available && <footer className={styles.footer}>
         <details className={styles.help}><summary>{copy.forgotPassword}</summary>
