@@ -1,21 +1,7 @@
-export interface CloudIdentity {
-  readonly id: string;
-  readonly givenName: string;
-  readonly familyName: string;
-  readonly email: string;
-  readonly phone: string;
-}
-
-export interface CloudSession {
-  readonly authenticated: true;
-  readonly identity: CloudIdentity;
-  readonly workspace: { readonly id: string; readonly name: string; readonly slug: string };
-  readonly membership: { readonly role: "workspace_admin" };
-  readonly defaultProject: { readonly id: string; readonly name: string; readonly slug: string };
-  readonly defaultEnvironment: { readonly id: string; readonly name: string };
-}
-
-export type CloudSessionState = CloudSession | { readonly authenticated: false };
+import type { components } from "../../../../core/tms/generated/tms-api";
+export type CloudSession = components["schemas"]["CloudAuthenticatedSession"];
+export type CloudIdentity = CloudSession["identity"];
+export type CloudSessionState = components["schemas"]["CloudSessionEnvelope"]["data"];
 export type CloudRegisterInput = {
   readonly givenName: string;
   readonly familyName: string;
@@ -35,7 +21,7 @@ export class CloudAuthError extends Error {
 export function cloudApiBase(): string {
   const configured = process.env.NEXT_PUBLIC_TMS_API_BASE?.trim();
   if (configured) return configured.replace(/\/$/, "");
-  return process.env.NODE_ENV === "production" ? "/api/v1" : "http://localhost:4100/api/v1";
+  return "/api/v1";
 }
 
 async function responseData(response: Response): Promise<CloudSessionState> {

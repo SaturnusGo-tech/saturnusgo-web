@@ -1,0 +1,8 @@
+.notice { position: fixed; z-index: 90; right: 20px; bottom: 20px; width: min(328px, calc(100vw - 40px)); padding: 20px 40px 18px 20px; border-radius: 14px; background: var(--falcon-surface, #19191d); color: var(--falcon-text, #f4f4f5); box-shadow: 0 8px 32px #0004; font-size: 13px; line-height: 1.5; }
+.notice strong { display: block; font-size: 14px; font-weight: 550; }
+.notice p { color: var(--falcon-text-muted, #a6a6b0); margin: 6px 0 12px; }
+.close { position: absolute; top: 12px; right: 10px; padding: 5px; display: grid; border: 0; background: transparent; color: var(--falcon-text-muted, #a6a6b0); border-radius: 6px; cursor: pointer; }
+.team { padding: 5px 10px; border-radius: 999px; background: var(--falcon-control, #28282e); color: inherit; border: 1px solid var(--falcon-border, #414149); font: inherit; cursor: pointer; }
+.notice button:hover { color: var(--falcon-text, #f4f4f5); background: var(--falcon-control-hover, #303038); }
+.notice button:focus-visible { outline: 2px solid var(--falcon-focus, #a5a6f6); outline-offset: 3px; }
+.notice .payment { margin-bottom: 0; }

@@ -134,11 +134,19 @@ void test("managed session restoration shows only the shared loader until the se
     { authenticated: false, stage: "mfa_challenge", expiresAt: signedIn.expiresAt }];
   for (const restricted of restrictedSessions) {
     await act(async () => renderer.unmount());
-    globalThis.fetch = async path => Response.json({ data: path === "/api/v1/auth/entrypoint" ? entry : restricted });
+    globalThis.fetch = async path => Response.json({ data: path === "/api/v1/auth/entrypoint" ? entry
+      : path === "/api/v1/auth/methods" ? { google: false, email: true, saml: false, signup: true } : restricted });
     await act(async () => { renderer = create(<TmsLocaleContext.Provider value={locale}>
       <ManagedAccessBoundary>{() => <div data-testid="protected-workspace" />}</ManagedAccessBoundary>
     </TmsLocaleContext.Provider>); });
     assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 0);
+    if (restricted.stage === "anonymous") {
+      assert.equal(renderer.root.findAllByType("form").length, 0, "method selection must precede email input");
+      const email = renderer.root.findAllByType("button").find(button => button.children.includes("Continue with email"));
+      assert.ok(email);
+      assert.equal(email.props.disabled, false);
+      await act(async () => email.props.onClick());
+    }
     assert.equal(renderer.root.findAllByType("form").length, 1, `${restricted.stage} must still require authorization`);
     assert.equal(renderer.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 0);
   }

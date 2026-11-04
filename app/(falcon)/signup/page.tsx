@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { CompanyEntryScreen } from "../../src/modules/core-falcon-public";
 
 export const metadata: Metadata = {
-  title: { absolute: "Войти в компанию — Falcon" },
-  description: "Вход в Falcon по адресу вашей компании.",
+  title: { absolute: "Создать личное пространство — Falcon" },
+  description: "Личное пространство Falcon на семь дней.",
   robots: { index: false, follow: false },
 };
 
 export default function Page() {
-  return <CompanyEntryScreen redirectSignup />;
+  return <CompanyEntryScreen signup />;
 }

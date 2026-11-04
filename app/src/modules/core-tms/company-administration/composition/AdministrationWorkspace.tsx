@@ -4,6 +4,7 @@ import { createCodexEmployeeApi } from "../../codex-employee/data/http/codex-emp
 import { useCodexEmployee } from "../../codex-employee/application/state/useCodexEmployee";
 import { CompanyCodexAdminFeature } from "../../codex-employee/composition/admin/CompanyCodexAdminFeature";
 import { CodexEmployeeRow } from "../../codex-employee/presentation/directory/CodexEmployeeRow";
+import { CompanySsoFeature } from "../sso/composition/CompanySsoFeature";
 import { CompanyOverview } from "../presentation/company-overview/CompanyOverview";
 import { AdministrationJournal } from "../presentation/audit/AdministrationJournal";
 import { useCallback, useMemo, useEffect, useRef } from "react";
@@ -48,6 +49,7 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
   }, [codex.employee?.rowVersion, canReadCompany, company.refresh]);
   return <AdministrationShell companyName={company.value?.name} client={client} onNavigate={navigate} section={section} page={route.page} session={session} logout={logout}>
     {forbidden ? <p>{copy.noPermission}</p> : section === "profile" ? <ProfilePage client={client} />
+      : section === "admin" && route.page === "sso" ? <CompanySsoFeature client={client} />
       : section === "admin" && route.page === "codex" ? <CompanyCodexAdminFeature http={http} status={codex} locale={locale} allowed={canReadCompany} onChanged={company.refresh} />
       : route.page === "audit" ? <AdministrationJournal client={client} platform={session.audience === "platform"} />
       : section === "admin" && route.page === "company" ? <CompanyOverview resource={company} />

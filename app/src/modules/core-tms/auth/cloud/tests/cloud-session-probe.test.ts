@@ -5,7 +5,7 @@ import { resolveCloudSessionProbe } from "../cloud-session-probe";
 
 const cloudSession: CloudSession = {
   authenticated: true,
-  identity: { id: "identity-1", givenName: "Анна", familyName: "Соколова", email: "anna@example.test", phone: "+79990000000" },
+  identity: { id: "identity-1", givenName: "Анна", familyName: "Соколова", email: "anna@example.test", phone: "+79990000000", emailVerificationStatus: "unverified", phoneVerificationStatus: "unverified" },
   workspace: { id: "workspace-1", name: "Анна", slug: "anna" },
   membership: { role: "workspace_admin" },
   defaultProject: { id: "project-1", name: "Первый проект", slug: "first" },

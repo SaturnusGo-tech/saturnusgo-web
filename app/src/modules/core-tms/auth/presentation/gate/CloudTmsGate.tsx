@@ -8,6 +8,7 @@ import type { CloudSession } from "../../cloud/cloud-auth-client";
 import { logoutCloudSession } from "../../cloud/cloud-auth-client";
 import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticatedTmsHttpClient";
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
+import { TrialFeature } from "../../sign-in/composition/TrialFeature";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 
 export function CloudTmsGate({
@@ -19,13 +20,14 @@ export function CloudTmsGate({
   readonly children: ReactNode;
   readonly session: CloudSession;
 }) {
+  const privateApiBase = new URL(apiBase, window.location.origin).href;
   const attachmentClient = useMemo(
-    () => createAttachmentClient({ apiBase, credentials: "include" }),
-    [apiBase],
+    () => createAttachmentClient({ apiBase: privateApiBase, credentials: "include" }),
+    [privateApiBase],
   );
   const httpClient = useMemo(
-    () => createAuthenticatedTmsHttpClient({ apiBase, credentials: "include" }),
-    [apiBase],
+    () => createAuthenticatedTmsHttpClient({ apiBase: privateApiBase, credentials: "include" }),
+    [privateApiBase],
   );
   const sessionIdentity = useMemo(() => ({
     kind: "cloud" as const,
@@ -45,6 +47,7 @@ export function CloudTmsGate({
       <TmsHttpClientProvider client={httpClient}>
         <AttachmentClientProvider client={attachmentClient}>
           {children}
+          <TrialFeature key={session.workspace.id} />
         </AttachmentClientProvider>
       </TmsHttpClientProvider>
     </TmsSessionProvider>

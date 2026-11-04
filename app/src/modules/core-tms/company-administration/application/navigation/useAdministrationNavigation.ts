@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { transitionContent } from "../../../presentation/workspace/motion/transition/content-transition";
 
-export type AdministrationRoute = { readonly section?: "sandbox" | "admin" | "profile"; readonly id: string | null; readonly creating: boolean; readonly page?: "company" | "audit" | "codex" };
+export type AdministrationRoute = { readonly section?: "sandbox" | "admin" | "profile"; readonly id: string | null; readonly creating: boolean; readonly page?: "company" | "audit" | "codex" | "sso" };
 function currentRoute(): AdministrationRoute {
   const query = new URLSearchParams(window.location.search);
   const page = query.get("page");
   const section = window.location.pathname.split("/")[1];
-  return { ...(section === "sandbox" || section === "admin" || section === "profile" ? { section } : {}), id: query.get("id"), creating: query.get("create") === "true", ...(page === "company" || page === "audit" || page === "codex" ? { page } : {}) };
+  return { ...(section === "sandbox" || section === "admin" || section === "profile" ? { section } : {}), id: query.get("id"), creating: query.get("create") === "true", ...(page === "company" || page === "audit" || page === "codex" || page === "sso" ? { page } : {}) };
 }
 export function useAdministrationNavigation() {
   const [route, setRoute] = useState<AdministrationRoute>(() => typeof window === "undefined" ? { id: null, creating: false } : currentRoute());

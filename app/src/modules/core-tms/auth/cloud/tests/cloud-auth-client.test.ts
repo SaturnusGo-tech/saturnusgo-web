@@ -16,7 +16,7 @@ const session: CloudSession = {
     givenName: "Анна",
     familyName: "Соколова",
     email: "anna@example.test",
-    phone: "+79990000000",
+    phone: "+79990000000", emailVerificationStatus: "unverified", phoneVerificationStatus: "unverified",
   },
   workspace: { id: "workspace-1", name: "Пространство Анны", slug: "anna" },
   membership: { role: "workspace_admin" },

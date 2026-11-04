@@ -15,6 +15,7 @@ import {
 } from "../../navigation/tms-auth-route";
 import { TmsAuthGate } from "../gate/TmsAuthGate";
 import { CloudTmsGate } from "../gate/CloudTmsGate";
+import { SignInFeature } from "../../sign-in/composition/SignInFeature";
 import { TmsAuthState } from "../state/TmsAuthState";
 
 const configuration = readTmsAuth0Configuration({
@@ -56,14 +57,12 @@ function AdminAuthBoundary({ children, apiBase }: { readonly children: ReactNode
   );
 }
 
-type CloudProbe = { readonly stage: "checking" | "admin" }
+type CloudProbe = { readonly stage: "checking" | "admin" | "signin" }
   | { readonly stage: "cloud"; readonly session: CloudSession }
   | { readonly stage: "unavailable" };
 
 export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNode }) {
-  const apiBase = process.env.NEXT_PUBLIC_TMS_API_BASE ?? (
-    process.env.NODE_ENV === "production" ? "" : "http://localhost:4100/api/v1"
-  );
+  const apiBase = process.env.NEXT_PUBLIC_TMS_API_BASE ?? "/api/v1";
   const [probe, setProbe] = useState<CloudProbe>({ stage: "checking" });
   const [probeVersion, setProbeVersion] = useState(0);
 
@@ -83,7 +82,7 @@ export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNo
         setProbe(result);
         return;
       }
-      setProbe(result);
+      setProbe(result.stage === "admin" ? { stage: "signin" } : result);
     });
     return () => controller.abort();
   }, [probeVersion]);
@@ -103,5 +102,6 @@ export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNo
   if (probe.stage === "cloud") {
     return <CloudTmsGate apiBase={apiBase} session={probe.session}>{children}</CloudTmsGate>;
   }
+  if (probe.stage === "signin") return <SignInFeature />;
   return <AdminAuthBoundary apiBase={apiBase}>{children}</AdminAuthBoundary>;
 }
