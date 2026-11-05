@@ -4,7 +4,7 @@ export const directionCopy = {
     docs: 'Docs', open: 'Open app', skip: 'Skip to content', menu: 'Menu', closeMenu: 'Close menu',
     title: ['The quality workspace', 'for teams and agents.'],
     lead: 'Plan coverage. Run the checks. Understand what’s ready to ship. Your entire QA workflow, connected in Falcon.',
-    workflow: 'See Falcon in action', tools: 'Connected to your team’s workflow.', toolsNote: 'Explore available and upcoming integrations',
+    tools: 'Connected to your team’s workflow.', toolsNote: 'Explore available and upcoming integrations',
     statement: ['A clearer picture of quality.', 'Built around the way QA teams work, with everything from the first test case to the release decision in one place.'],
     principles: [
       { title: 'Designed for the details', body: 'Structure your knowledge. Reuse what works. Keep every expectation within reach.', image: 'coverage' },
@@ -19,7 +19,7 @@ export const directionCopy = {
     executionLink: 'How test runs work',
     aiTitle: 'Your tools.\nOne connected workflow.',
     aiBody: 'Connect your issue trackers, repositories and API specifications. Give Codex the project context to prepare coverage, organize tests and work through approved Web QA.',
-    aiLink: 'Connect Codex to Falcon', aiAction: 'Watch the AI workflow',
+    aiLink: 'Connect Codex to Falcon',
     details: [
       ['Organize with intent', 'Folders and reusable steps keep related checks together.'],
       ['Define the right scope', 'Use manual or rule-based suites to prepare your next run.'],
@@ -42,7 +42,7 @@ export const directionCopy = {
     docs: 'Документация', open: 'Открыть Falcon', skip: 'Перейти к содержимому', menu: 'Меню', closeMenu: 'Закрыть меню',
     title: ['Рабочее пространство QA', 'для команд и агентов.'],
     lead: 'Планируйте покрытие. Выполняйте проверки. Принимайте решения о релизе. Весь процесс тестирования связан в Falcon.',
-    workflow: 'Посмотреть Falcon в работе', tools: 'В привычном процессе вашей команды.', toolsNote: 'Доступные и будущие интеграции',
+    tools: 'В привычном процессе вашей команды.', toolsNote: 'Доступные и будущие интеграции',
     statement: ['Ясный взгляд на качество.', 'Всё, что нужно QA-команде: от первого тест-кейса до решения о готовности релиза. В одном месте.'],
     principles: [
       { title: 'Внимание к деталям', body: 'Структурируйте знания, используйте общие шаги и держите ожидаемый результат под рукой.', image: 'coverage' },
@@ -57,7 +57,7 @@ export const directionCopy = {
     executionLink: 'Как работают прогоны',
     aiTitle: 'Ваши инструменты.\nСвязанный процесс.',
     aiBody: 'Подключайте трекеры задач, репозитории и API-спецификации. Передавайте Codex контекст проекта для подготовки покрытия, организации тестов и согласованного Web QA.',
-    aiLink: 'Подключить Codex к Falcon', aiAction: 'Посмотреть процесс с AI',
+    aiLink: 'Подключить Codex к Falcon',
     details: [
       ['Порядок в покрытии', 'Папки и общие шаги связывают проверки между собой.'],
       ['Нужный объём проверок', 'Ручные и автоматические наборы помогают подготовить прогон.'],

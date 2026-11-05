@@ -9,9 +9,9 @@ function mockFetch(context, implementation) {
   globalThis.fetch = implementation;
 }
 
-test("streams landing video byte ranges without forwarding account credentials", async (context) => {
+test("streams public media byte ranges without forwarding account credentials", async (context) => {
   mockFetch(context, async (request) => {
-    assert.equal(request.url, "https://www.saturnusgo.com/falcon/landing/2026-09/cases.mp4");
+    assert.equal(request.url, "https://www.saturnusgo.com/falcon/media/fixtures/example.mp4");
     assert.equal(request.headers.get("range"), "bytes=0-3");
     assert.equal(request.headers.has("cookie"), false);
     assert.equal(request.headers.has("authorization"), false);
@@ -20,7 +20,7 @@ test("streams landing video byte ranges without forwarding account credentials",
       "accept-ranges": "bytes",
     } });
   });
-  const result = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.mp4", {
+  const result = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/media/fixtures/example.mp4", {
     headers: { range: "bytes=0-3", cookie: "private=1", authorization: "Bearer private" },
   }));
   assert.equal(result.status, 206);
@@ -32,10 +32,10 @@ test("serves timed captions and rejects HTML disguised as a video", async (conte
   mockFetch(context, async (request) => request.url.endsWith(".vtt")
     ? new Response("WEBVTT\n", { headers: { "content-type": "text/vtt; charset=utf-8" } })
     : new Response("<html>Not a video</html>", { headers: { "content-type": "text/html" } }));
-  const captions = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.vtt"));
+  const captions = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/media/fixtures/example.vtt"));
   assert.equal(captions.status, 200);
   assert.equal(await captions.text(), "WEBVTT\n");
-  const video = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/landing/2026-09/cases.mp4"));
+  const video = await worker.fetch(new Request("https://tms.saturnusgo.com/falcon/media/fixtures/example.mp4"));
   assert.equal(video.status, 404);
 });
 

@@ -3,8 +3,6 @@ import test from "node:test";
 import { runInNewContext } from "node:vm";
 import { landingLocaleBootstrap, resolveLandingLocale } from "../model/locale";
 import { englishCopy, russianCopy } from "../content/copy";
-import * as english from "../../content/demos.en";
-import * as russian from "../../content/demos";
 
 test("only a Russian browser language selects Russian automatically", () => {
   for (const language of ["ru", "ru-RU", "ru-KZ", "RU-ru", "ru_BY"]) assert.equal(resolveLandingLocale(null, language), "ru");
@@ -24,27 +22,7 @@ test("pre-paint bootstrap matches the application, including blocked storage", (
   runInNewContext(landingLocaleBootstrap, { document: { documentElement: html }, navigator: { language: "ru" }, localStorage: { getItem() { throw Error("Storage blocked"); } } });
   assert.equal(html.lang, "ru");
 });
-test("English copy is complete and each demo uses its own localized media", () => {
+test("landing locale metadata is complete in English and Russian", () => {
   assert.deepEqual(Object.keys(englishCopy), Object.keys(russianCopy));
   assert.doesNotMatch(JSON.stringify(englishCopy), /[А-Яа-яЁё]/);
-  assert.doesNotMatch(JSON.stringify(english), /[А-Яа-яЁё]/);
-  assert.equal(Object.keys(english.demos).length, 7);
-  for (const key of Object.keys(russian.demos) as (keyof typeof russian.demos)[]) {
-    assert.notEqual(english.demos[key].src, russian.demos[key].src);
-    assert.match(english.demos[key].captions, /2026-09-english-natural\/.+\.vtt$/);
-  }
-});
-
-test("each English demo ships a video, poster and English caption track", async () => {
-  const { readFile, stat } = await import("node:fs/promises");
-  const { resolve } = await import("node:path");
-  for (const demo of Object.values(english.demos)) {
-    for (const file of [demo.src, demo.poster, demo.captions]) {
-      assert.ok((await stat(resolve(process.cwd(), "public", file.slice(1)))).size > 0, file);
-    }
-    const captions = await readFile(resolve(process.cwd(), "public", demo.captions.slice(1)), "utf8");
-    assert.ok(captions.startsWith("WEBVTT\n"));
-    assert.match(captions, /\d{2}:\d{2}:\d{2}\.\d{3} --> /);
-    assert.doesNotMatch(captions, /[А-Яа-яЁё]/);
-  }
 });

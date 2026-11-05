@@ -14,7 +14,7 @@ Product illustration panels are unchanged PNG exports of those exact Figma nodes
 
 ## Navigation and intake
 
-The main page is `/`; `?view=workflow` opens the preserved video landing. See the workflow / Get back use viewport View Transitions with a reduced-motion fallback. Book a demo returns to `/#book-demo`; the main page stays mounted so form drafts survive switching views. Two integration tracks split the complete canonical catalog into balanced, non-overlapping rows (currently six and five services), loop in opposite directions and can be paused; reduced motion disables them. The closing release CTA repeats See the workflow next to Book a demo. Meet Falcon AI switches to the video landing, then smoothly scrolls to `?view=workflow#cases-video`; direct links and browser history restore that destination. Both public headers expose the language selector and omit company login actions; the workflow footer also omits company entry. Section eyebrows have no numeric prefixes. The direction footer has no duplicate language selector; language switching stays in the header. The demo consent privacy link remains underlined despite the landing link reset.
+The current main landing is `/` in English and `/ru/` in Russian. As of 5 November, the legacy “Take charge of testing” video screen and its “See Falcon in action” and “Watch the AI workflow” links are retired. Old `?view=workflow` URLs open the main landing and retain attribution parameters; old video hashes are cleared. Contact scrolls to `#book-demo` and focuses the email field, respecting reduced motion. Product sections, localized screenshots, achievement animation, integrations, public documentation and Open app remain on the main landing. Language switching stays in the header. The demo consent privacy link remains underlined despite the landing link reset.
 
 `/privacy/?lang=ru|en|es|pt` contains the Falcon-specific policy. Only Russian uses Меркурий Рукс; other versions use Mercury Rucks.
 
@@ -22,7 +22,7 @@ The form POSTs to `/api/falcon-demo/request`. The TMS Worker restricts the origi
 
 ## Release
 
-Run typecheck, test:tms-auth, test:tms-worker, architecture:tms and demo component/transport tests. Deploy reviewed source via scripts/deploy_pages.sh, then scripts/deploy_tms_worker.sh so company-domain bindings are retained. Verify privacy route, four product images, old videos and live demo intake on production.
+Run typecheck, test:tms-auth, test:tms-worker, architecture:tms and demo component/transport tests. Deploy reviewed source via scripts/deploy_pages.sh, then scripts/deploy_tms_worker.sh so company-domain bindings are retained. Verify localized landing and privacy routes, current product images, retired video-link fallback and live demo intake on production.
 
 
 ## Contact mailbox — 18 October 2026

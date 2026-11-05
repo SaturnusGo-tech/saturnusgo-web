@@ -23,8 +23,6 @@ function successfulFetch(requests) {
     }
     if (/\.(?:js|mjs)$/.test(url.pathname)) return response("asset", "application/javascript");
     if (/\.jpe?g$/.test(url.pathname)) return response("asset", "image/jpeg");
-    if (/\.mp4$/.test(url.pathname)) return response("asset", "video/mp4");
-    if (/\.vtt$/.test(url.pathname)) return response("WEBVTT\n", "text/vtt");
     if (/\.woff2$/.test(url.pathname)) return response("font", "font/woff2");
     return response("asset", "image/png");
   };
@@ -45,12 +43,11 @@ test("verifies reviewed Pages evidence, required routes and their runtime assets
     assert.ok(result.checkedAssets.includes(`/falcon/docs/fonts/OpenAISans-${weight}.woff2`));
   }
   for (const theme of ["light", "dark"]) assert.ok(result.checkedAssets.includes(`/assets/integrations/codex/codex-${theme}.png`));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.mp4"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/cases.vtt"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09/atmosphere.webp"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/youtrack-20260913.mp4"));
-  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-09-production/youtrack-20260913.vtt"));
-  assert.equal(result.checkedAssets.includes("/falcon/landing/2026-09/integrations.mp4"), false);
+  assert.ok(result.checkedAssets.includes("/falcon/landing/2026-11/falcon-line-mark.svg"));
+  for (const locale of ["en", "ru"]) {
+    assert.ok(result.checkedAssets.includes(`/falcon/landing/2026-11/${locale}/product-repository.webp`));
+  }
+  assert.equal(result.checkedAssets.some((path) => path.startsWith("/falcon/landing/2026-09")), false);
   assert.ok(requests.every(({ url }) => url.protocol === "https:"));
   assert.ok(requests.every(({ url }) => url.searchParams.get("falcon_release") === sourceSha));
   assert.ok(requests.every(({ options }) => options.redirect === "error"));

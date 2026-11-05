@@ -10,11 +10,11 @@ test('a shared language URL takes precedence over saved or browser language', ()
   assert.equal(resolveLandingLocale('ru','ru-RU','en'), 'en');
   assert.equal(resolveLandingLocale('ru','en-US','invalid'), 'ru');
 });
-test('language navigation retains workflow, attribution and the requested section', () => {
-  const url = landingLanguageURL('https://tms.saturnusgo.com/?view=workflow&utm_source=demo#cases-video','ru');
+test('language navigation retains attribution and the requested product section', () => {
+  const url = landingLanguageURL('https://tms.saturnusgo.com/?utm_source=demo#repository','ru');
   assert.equal(url.pathname,'/ru/');
-  assert.equal(url.search,'?view=workflow&utm_source=demo');
-  assert.equal(url.hash,'#cases-video');
+  assert.equal(url.search,'?utm_source=demo');
+  assert.equal(url.hash,'#repository');
   assert.equal(landingLanguageURL(url.href,'en').pathname,'/');
   assert.equal(requestedLandingLocale('/ru/',''),'ru');
   assert.equal(requestedLandingLocale('/',''),'en');

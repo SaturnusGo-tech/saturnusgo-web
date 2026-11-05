@@ -73,6 +73,7 @@ function createFixture(context) {
   write(join(pages, "tms-origin/login/index.html"), "stale login\n");
   write(join(pages, "falcon/old-brand.png"), "stale brand\n");
   write(join(pages, "falcon/landing/stale.webp"), "stale asset\n");
+  write(join(pages, "falcon/landing/2026-09/cases.mp4"), "retired landing recording\n");
   write(join(pages, "testcases/umbrella-home/work/index.html"), "old TMS\n");
   write(join(pages, ".nojekyll"), "");
   git(pages, "add", ".");
@@ -115,7 +116,7 @@ write("out/assets/integrations/codex/private.json", "private fixture");
 write("out/assets/private.txt", "private fixture");
 if (process.env.OMIT_FALCON_ASSET !== "1") write("out/falcon/falcon-mark-dark.png", "falcon mark\\n");
 for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage", "ai-stage"]) write("out/falcon/landing/2026-10/" + id + ".png", "Figma asset");
-write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
+if (process.env.OMIT_LINE_MARK !== "1") write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
 for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
 for (const id of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) write("out/falcon/landing/2026-11/product-" + id + ".webp", "Product screen");
@@ -123,23 +124,6 @@ for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => /^\/falc
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
 if (process.env.OMIT_IMPACT_BANNER !== "1") write("out/falcon/impact/ai-paused-20261018.webp", "ai paused asset");
-if (process.env.OMIT_CINEMATIC_ASSET !== "1") {
-  write("out/falcon/landing/2026-09/falcon-wing.webp", "falcon wing\\n");
-}
-if (process.env.OMIT_ATMOSPHERE !== "1") write("out/falcon/landing/2026-09/atmosphere.webp", "falcon atmosphere\\n");
-for (const id of ["projects", "cases", "runs", "suites", "defects", "dashboard", "youtrack"]) {
-  for (const extension of ["mp4", "webp", "vtt"]) {
-    if (process.env.OMIT_VIDEO === "1" && id === "runs" && extension === "mp4") continue;
-    if (process.env.OMIT_INTEGRATION_VIDEO === "1" && id === "youtrack" && extension === "mp4") continue;
-    if (!(process.env.OMIT_ENGLISH_CAPTIONS === "1" && id === "cases" && extension === "vtt")) {
-      write("out/falcon/landing/2026-09-english-final/" + id + "." + extension, "English demo asset\\n");
-    }
-    if (id === "youtrack") write("out/falcon/landing/2026-09-english-natural/youtrack-navigation." + extension, "YouTrack navigation asset\\n");
-    if (["dashboard", "youtrack"].includes(id)) write("out/falcon/landing/2026-09-english-natural/" + (id === "dashboard" ? "dashboard-direct" : "youtrack-cycle-direct") + "." + extension, "Direct recording asset\\n");
-    const mediaId = ["projects", "youtrack"].includes(id) ? id + "-20260913" : ["runs", "suites"].includes(id) ? id + "-20260917" : id;
-    write("out/falcon/landing/2026-09-production/" + mediaId + "." + extension, "demo asset\\n");
-  }
-}
 write("out/falcon/landing/hero.webp", "falcon hero\\n");
 `;
   write(join(bin, "npm"), npmStub);
@@ -201,18 +185,11 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
     "falcon mark\n",
   );
   assert.equal(readFileSync(join(fixture.pages, "falcon/landing/hero.webp"), "utf8"), "falcon hero\n");
-  assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09/falcon-wing.webp"), "utf8"),
-    "falcon wing\n",
-  );
-  assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09/atmosphere.webp"), "utf8"),
-    "falcon atmosphere\n",
-  );
-  assert.equal(
-    readFileSync(join(fixture.pages, "falcon/landing/2026-09-production/youtrack-20260913.mp4"), "utf8"),
-    "demo asset\n",
-  );
+  assert.equal(readFileSync(join(fixture.pages, "falcon/landing/2026-11/falcon-line-mark.svg"), "utf8"), "Falcon line mark");
+  for (const locale of ["en", "ru"]) {
+    assert.equal(readFileSync(join(fixture.pages, `falcon/landing/2026-11/${locale}/product-repository.webp`), "utf8"), "Localized product screen");
+  }
+  assert.equal(existsSync(join(fixture.pages, "falcon/landing/2026-09")), false);
   assert.equal(
     readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
     "CURRENT TMS\n",
@@ -281,41 +258,14 @@ test("fails closed before publishing when an approved achievement image is absen
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
-test("fails closed when the cinematic landing asset is absent", (context) => {
+test("fails closed when the current landing brand mark is absent", (context) => {
   const fixture = createFixture(context);
   const pagesHeadBefore = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
-  const result = deploy(fixture, "--publish", { OMIT_CINEMATIC_ASSET: "1" });
+  const result = deploy(fixture, "--publish", { OMIT_LINE_MARK: "1" });
 
   assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*falcon-wing\.webp/);
+  assert.match(result.stderr, /Required public asset is missing.*falcon-line-mark\.svg/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), pagesHeadBefore);
-});
-
-test("fails closed when a required video is missing", (context) => {
-  const fixture = createFixture(context);
-  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
-  const result = deploy(fixture, "--publish", { OMIT_VIDEO: "1" });
-  assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*runs-20260917\.mp4/);
-  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
-});
-
-test("fails closed when the continuous backdrop is missing", (context) => {
-  const fixture = createFixture(context);
-  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
-  const result = deploy(fixture, "--publish", { OMIT_ATMOSPHERE: "1" });
-  assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*atmosphere\.webp/);
-  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
-});
-
-test("fails closed when the current integration demonstration is missing", (context) => {
-  const fixture = createFixture(context);
-  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
-  const result = deploy(fixture, "--publish", { OMIT_INTEGRATION_VIDEO: "1" });
-  assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*youtrack-20260913\.mp4/);
-  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
 test("fails closed unless the Pages checkout is on main", (context) => {
@@ -348,15 +298,6 @@ test("fails closed when local Pages main is not exactly origin/main", (context) 
 
   assert.equal(result.status, 11);
   assert.match(result.stderr, /not exactly synchronized/);
-});
-
-test("fails closed when an English caption track is missing", (context) => {
-  const fixture = createFixture(context);
-  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
-  const result = deploy(fixture, "--publish", { OMIT_ENGLISH_CAPTIONS: "1" });
-  assert.equal(result.status, 15);
-  assert.match(result.stderr, /Required public asset is missing.*2026-09-english-final\/cases\.vtt/);
-  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
 });
 
 for (const theme of ["light", "dark"]) test(`fails closed when Codex ${theme} asset is absent`, (context) => {

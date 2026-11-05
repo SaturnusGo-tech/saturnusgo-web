@@ -3,7 +3,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
 
-import { demos } from "../../../../../core-falcon-public/landing/content/demos";
+import { falconProductImage } from "../../../../../core-falcon-public/shared/product-images";
 import { INTEGRATIONS } from "../../../../presentation/hooks/catalog/integration-definitions";
 
 import { htmlLanguageForPath, isFalconPublicPath } from "../../../../../../shared/_components/route-flags";
@@ -21,67 +21,44 @@ test("Falcon landing owns its language independently from company entry", () => 
   assert.equal(htmlLanguageForPath("/partners/", "es"), "es");
 });
 
-test("Falcon landing keeps company entry private and exposes accessible chapter navigation", () => {
-  const header = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconHeader.tsx"), "utf8");
+test("Falcon landing exposes accessible product navigation and a single public entry", () => {
+  const direction = readFileSync(resolve(root, "app/src/modules/core-falcon-public/direction/FalconDirection.tsx"), "utf8");
   const landing = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconLanding.tsx"), "utf8");
-  assert.doesNotMatch(header + landing, /href="\/cloud-login\/"/);
-  assert.doesNotMatch(header + landing, /href="\/signup\/"|Создать аккаунт/);
-  assert.match(header, /aria-label=\{copy.navigation\}/);
-  assert.match(landing, /href="#product">\s*\{copy.skip\}/);
-  assert.match(landing, /aria-labelledby="projects-title"/);
-  assert.match(landing, /aria-label=\{copy.chapters\}/);
-  assert.doesNotMatch(landing, /analytics-dashboard\.jpg|case-repository\.jpg|run-builder\.jpg/);
+  assert.match(direction, /href="#main-content"/);
+  assert.match(direction, /<main id="main-content">/);
+  assert.match(direction, /aria-labelledby="direction-title"/);
+  assert.match(direction, /aria-label=\{c.product\}/);
+  assert.match(direction, /aria-controls="landing-menu"/);
+  assert.match(direction, /aria-expanded=\{menu\}/);
+  assert.match(direction, /event.key === 'Escape'/);
+  assert.match(direction, /\/cloud-login\/\?lang=\$\{locale\}/);
+  assert.doesNotMatch(direction + landing, /<video\b|ProductStory|FalconHeroCinema|onWorkflow|onAI|view=workflow/);
 });
 
-test("every landing demonstration has a real MP4, poster and timed text", () => {
-  assert.equal(demos.integrations.src, "/falcon/landing/2026-09-production/youtrack-20260913.mp4");
-  assert.equal(Object.keys(demos).length, 7);
-  for (const { id, src, poster: posterPath, captions: captionsPath } of Object.values(demos)) {
-    const video = readFileSync(resolve(root, `public${src}`));
-    assert.equal(video.subarray(4, 8).toString(), "ftyp", `${id}: invalid MP4`);
-    assert.ok(video.length > 100_000, `${id}: empty recording`);
-    assert.ok(video.length < 20_000_000, `${id}: landing video exceeds budget`);
-    const poster = readFileSync(resolve(root, `public${posterPath}`));
-    assert.equal(poster.subarray(8, 12).toString(), "WEBP");
-    const captions = readFileSync(resolve(root, `public${captionsPath}`), "utf8");
-    assert.ok(captions.startsWith("WEBVTT\n"));
-    assert.match(captions, /\d\d:\d\d:\d\d\.\d{3} --> \d\d:\d\d:\d\d\.\d{3}/);
+test("current product scenes have valid localized captures", () => {
+  for (const locale of ["en", "ru"] as const) for (const name of ["repository", "suites", "dashboard", "run", "integrations", "codex"] as const) {
+    const capture = falconProductImage(name, locale);
+    assert.match(capture.src, new RegExp(`/2026-11/${locale}/product-${name}\\.webp$`));
+    const image = readFileSync(resolve(root, `public${capture.src}`));
+    assert.equal(image.subarray(8, 12).toString(), "WEBP", `${locale}/${name}: invalid capture`);
+    assert.ok(image.length > 1000, `${locale}/${name}: empty capture`);
   }
 });
 
 test("landing shows the complete canonical integration catalog with accessible motion controls", () => {
-  const section = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/FalconIntegrations.tsx"), "utf8");
-  const marquee = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/motion/IntegrationMarquee.tsx"), "utf8");
+  const marquee = readFileSync(resolve(root, "app/src/modules/core-falcon-public/direction/DirectionMarquee.tsx"), "utf8");
   assert.deepEqual(INTEGRATIONS.map(({ name }) => name).sort(), [
     "Codex", "Confluence", "GitHub", "GitLab", "Jenkins", "Jira", "Linear", "Slack", "Swagger", "TeamCity", "Trello", "YouTrack",
   ]);
-  assert.match(section, /<IntegrationMarquee\s*\/>/);
   assert.match(marquee, /import\s*\{\s*INTEGRATIONS\s*\}\s*from[^;]*integration-definitions/);
-  assert.match(marquee, /INTEGRATIONS\.map/);
-  assert.match(marquee, /aria-label=\{\s*duplicate\s*\?\s*undefined\s*:\s*copy\.catalog\s*\}/);
+  assert.match(marquee, /const rows = \[INTEGRATIONS\]/);
   assert.match(marquee, /aria-hidden=\{duplicate \|\| undefined\}/);
   assert.match(marquee, /aria-pressed=\{paused\}/);
-  assert.match(marquee, /copy.pauseMarquee/);
-  assert.match(marquee, /copy.resumeMarquee/);
+  assert.match(marquee, /aria-label=\{paused \? resume : pause\}/);
   assert.doesNotMatch(marquee, /Скоро/);
   const youTrackMark = resolve(root, "public/falcon/integrations/youtrack.svg");
   assert.equal(existsSync(youTrackMark), true);
   assert.ok(statSync(youTrackMark).size > 0);
-});
-
-test("video markup requires manual playback and exposes labeled player controls", () => {
-  const source = readFileSync(resolve(root, "app/src/modules/core-falcon-public/landing/media/ProductVideo.tsx"), "utf8");
-  const video = source.match(/<video\b[^>]*>/s)?.[0];
-  assert.ok(video, "Expected a native video element");
-  assert.doesNotMatch(video, /\bautoPlay\b|\bautoplay\b|\bloop\b/);
-  assert.match(video, /\bplaysInline\b/);
-  assert.match(video, /aria-label=\{demo\.title\}/);
-  assert.match(source, /\$\{copy\.play\}: \$\{demo\.title\}/);
-  assert.match(source, /\$\{copy\.pause\}: \$\{demo\.title\}/);
-  assert.match(source, /\$\{copy\.position\}: \$\{demo\.title\}/);
-  assert.match(source, /\$\{copy\.fullscreen\}: \$\{demo\.title\}/);
-  assert.match(source, /kind="captions"/);
-  assert.match(source, /<summary>\{copy.transcript\}<\/summary>/);
 });
 
 test("company entry uses one rounded input surface with neutral outer focus", () => {
@@ -92,18 +69,28 @@ test("company entry uses one rounded input surface with neutral outer focus", ()
   assert.match(styles, /prefers-reduced-motion/);
 });
 
-test("landing marquee renders Codex branding and retains the YouTrack mark", async () => {
-  const { componentHarness, nodes } = await import("../../../../portfolios/tests/support/component-harness");
+test("landing marquee retains canonical names, YouTrack artwork and working pause controls", async () => {
+  const { componentHarness, invoke, nodes } = await import("../../../../portfolios/tests/support/component-harness");
   const document = { hidden: false, addEventListener() {}, removeEventListener() {} };
   const h = componentHarness(undefined, { document });
-  const { IntegrationMarquee } = h.load<{ IntegrationMarquee: () => unknown }>(new URL("../../../../../core-falcon-public/landing/motion/IntegrationMarquee.tsx", import.meta.url), name => {
-    if (name.endsWith("LandingLocaleProvider")) return { useLandingLocale: () => ({ copy: {} }) };
+  const { DirectionMarquee } = h.load<{ DirectionMarquee: (props: { title: string; note: string; pause: string; resume: string }) => unknown }>(new URL("../../../../../core-falcon-public/direction/DirectionMarquee.tsx", import.meta.url), name => {
     if (name.endsWith("integration-definitions")) return { INTEGRATIONS };
   });
-  const items = nodes(h.render(() => IntegrationMarquee())).filter(node => node.type === "li");
-  const codex = items.find(node => nodes(node).some(child => child.type === "span" && child.props.children === "Codex"))!;
-  const youtrack = items.find(node => nodes(node).some(child => child.type === "span" && child.props.children === "YouTrack"))!;
-  assert.ok(nodes(codex).some(node => node.type === "CodexMark"));
+  const render = () => h.render(() => DirectionMarquee({ title: "Connected tools", note: "Integration catalog", pause: "Pause", resume: "Resume" }));
+  const tree = render();
+  const items = nodes(tree).filter(node => node.type === "li");
+  assert.equal(items.length, INTEGRATIONS.length * 2);
+  for (const { name } of INTEGRATIONS) assert.ok(items.some(node => (node.props.children as unknown[]).includes(name)), name);
+  const codex = items.find(node => (node.props.children as unknown[]).includes("Codex"))!;
+  const youtrack = items.find(node => (node.props.children as unknown[]).includes("YouTrack"))!;
   assert.equal(nodes(codex).some(node => node.props.src === "/falcon/integrations/youtrack.svg"), false);
   assert.ok(nodes(youtrack).some(node => node.props.src === "/falcon/integrations/youtrack.svg"));
+  const pause = nodes(tree).find(node => node.type === "button" && node.props["aria-label"] === "Pause")!;
+  assert.equal(pause.props["aria-pressed"], false);
+  invoke(pause, "onClick");
+  const paused = nodes(render()).find(node => node.type === "button")!;
+  assert.equal(paused.props["aria-label"], "Resume");
+  assert.equal(paused.props["aria-pressed"], true);
+  invoke(paused, "onClick");
+  assert.equal(nodes(render()).find(node => node.type === "button")!.props["aria-pressed"], false);
 });
