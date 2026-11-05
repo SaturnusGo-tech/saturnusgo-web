@@ -1,8 +1,12 @@
 .menu { position:fixed; z-index:180; width:254px; padding:8px; border-radius:16px; background:var(--falcon-elevated); color:var(--falcon-text); box-shadow:var(--falcon-shadow-popover); font:13px/1.5 var(--font-geist-sans),system-ui,sans-serif; animation:appear 140ms ease-out; }
 .name { padding:10px 12px 13px; color:var(--falcon-text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.name strong { display:block; overflow:hidden; text-overflow:ellipsis; color:var(--falcon-text); font-weight:500; }
 .menu a,.menu button { display:flex; width:100%; align-items:center; gap:10px; border:0; border-radius:9px; background:transparent; color:inherit; font:inherit; text-decoration:none; cursor:pointer; padding:10px 12px; margin:3px 0; text-align:left; }
 .menu a:hover,.menu button:hover,.menu :focus-visible { background:var(--falcon-hover); outline:none; }
 .menu button:disabled { opacity:.5; }
+.menu .plan { display:block; width:fit-content; max-width:100%; margin:2px 0 0; padding:0; border-radius:3px; overflow:hidden; text-overflow:ellipsis; font-size:12px; text-underline-offset:3px; }
+.menu .plan:hover { background:transparent; text-decoration:underline; }
+.menu .plan:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .error { color:var(--falcon-danger); font-size:12px; margin:10px 12px; }
 @keyframes appear { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
 @media(prefers-reduced-motion:reduce) { .menu { animation:none; } }

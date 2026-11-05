@@ -50,22 +50,36 @@ test("managed account preserves profile and administration destinations inside t
   const all = h.all();
   assert.ok(all.some(node => node.type === "ProfileLink" && node.props.role === "menuitem"));
   assert.ok(all.some(node => node.type === "a" && node.props.href === "/company/" && node.props.role === "menuitem"));
-  assert.ok(all.some(node => node.props.children === "QA manager"));
+  assert.ok(all.some(node => node.type === "BillingPlanLink" && node.props.workspaceId === "w"));
 });
 
-test("personal accounts show a personal label while their authorization role stays unchanged", () => {
+test("all membership roles can open billing while authorization stays unchanged", () => {
+  for (const workspaceRole of ["workspace_admin", "qa_manager", "tester", "reporter", "viewer"] as const) {
+    const h = setup({ workspaceRole });
+    const link = h.all().find(node => node.type === "BillingLink" && node.props.role === "menuitem");
+    assert.ok(link, `${workspaceRole} can view billing`);
+    assert.equal(link.props.workspaceId, "w");
+    invoke(link, "onClick"); assert.equal(h.dismissed(), 1);
+    const plan = h.all().find(node => node.type === "BillingPlanLink");
+    assert.ok(plan); invoke(plan, "onClick"); assert.equal(h.dismissed(), 2);
+  }
+  assert.equal(setup(null).all().some(node => node.type === "BillingLink" || node.type === "BillingPlanLink"), false);
+});
+
+test("personal accounts replace role copy with the authoritative plan link", () => {
   const session = { kind: "cloud" as const, workspaceKind: "personal" as const, workspaceRole: "workspace_admin" as const };
   const all = setup(session).all();
-  assert.ok(all.some(node => node.props.children === "Personal account"));
+  assert.ok(all.some(node => node.type === "BillingPlanLink"));
   assert.equal(all.some(node => node.props.children === "Workspace administrator"), false);
   assert.equal(session.workspaceRole, "workspace_admin");
 });
 
-test("cloud role copy waits for the server workspace kind and preserves company administration", () => {
+test("unresolved and company accounts never infer a plan from their role", () => {
   const unresolved = setup({ kind: "cloud", workspaceRole: "workspace_admin" }).all();
-  assert.ok(unresolved.some(node => node.props.children === "Falcon account"));
+  assert.ok(unresolved.some(node => node.type === "BillingPlanLink"));
   const company = setup({ kind: "cloud", workspaceKind: "company", workspaceRole: "workspace_admin" }).all();
-  assert.ok(company.some(node => node.props.children === "Workspace administrator"));
+  assert.ok(company.some(node => node.type === "BillingPlanLink"));
+  assert.equal(company.some(node => node.props.children === "Workspace administrator"), false);
 });
 
 test("download app opens its own panel after closing the authenticated account menu", () => {

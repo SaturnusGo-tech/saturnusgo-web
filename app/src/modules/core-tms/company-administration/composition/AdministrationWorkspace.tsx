@@ -57,7 +57,7 @@ export function AdministrationWorkspace({ session, logout, section: initialSecti
         : route.id ? <CompanyDetail key={route.id} id={route.id} client={client} onBack={onBack} />
           : <CompanyList client={client} onOpen={onOpen} onCreate={onCreate} />)
         : <MemberWorkspace employeeRow={<CodexEmployeeRow employee={codex.employee} locale={locale} href="/admin/?page=codex" loading={codex.loading} error={codex.error} retry={codex.refresh} />}
-            client={client} session={session} id={route.id} creating={route.creating}
+            client={client} actor={session.identity} id={route.id} creating={route.creating}
             onBack={onBack} onOpen={onOpen} onCreate={onCreate} />}
   </AdministrationShell>;
 }

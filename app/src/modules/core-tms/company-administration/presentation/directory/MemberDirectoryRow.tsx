@@ -8,10 +8,11 @@ import { memberRoleLabel } from "../permissions/member-role-label";
 import { MemberActions } from "../member-actions/MemberActions";
 import styles from "./directory.module.css";
 
-export function MemberDirectoryRow({ member, client, selected, disabled, canEdit, canManage, onAction, onOpen }: {
+export function MemberDirectoryRow({ member, client, selected, disabled, canEdit, canManage, onAction, onOpen, avatars = true }: {
   readonly member: CompanyMember; readonly client: AdministrationPort; readonly selected: boolean;
   readonly canEdit: boolean; readonly canManage: boolean; readonly onAction: (id: string, change: MemberChange | "edit") => void;
   readonly disabled: boolean; readonly onOpen: (id: string) => void;
+  readonly avatars?: boolean;
 }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
@@ -20,7 +21,7 @@ export function MemberDirectoryRow({ member, client, selected, disabled, canEdit
     ? (locale === "ru" ? "Ожидает входа" : "Awaiting sign-in") : copy[member.status];
   return <div className={styles.person} data-selected={selected || undefined}>
     <button className={styles.personLink} aria-current={selected ? "true" : undefined} disabled={disabled} onClick={() => onOpen(member.identityId)}>
-    <ManagedAvatarImage className={styles.avatar} name={member.name} hasAvatar={member.hasAvatar} version={member.version} load={load} />
+    <ManagedAvatarImage className={styles.avatar} name={member.name} hasAvatar={avatars && member.hasAvatar} version={member.version} load={load} />
     <span className={styles.identity}><strong>{member.name}</strong><small>{member.email}</small><small>{memberRoleLabel(member.role, locale)} · {status}</small></span>
     </button><MemberActions member={member} disabled={disabled || !canEdit} canManage={canManage}
       onEdit={() => onAction(member.identityId, "edit")} onChange={(change) => onAction(member.identityId, change)} />

@@ -1,8 +1,11 @@
 import { AvatarProfile, BuildingWorkspace, ChatTripleDots, Lifesaver, Logout, Settings } from "@openai/apps-sdk-ui/components/Icon";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { Download } from "lucide-react";
+import { CreditCard, Download } from "lucide-react";
 import { ProfileLink } from "../../profile/presentation/ProfileLink";
+import { BillingLink } from "../../billing/presentation/link/BillingLink";
+import { BillingPlanLink } from "../../billing/composition/menu/BillingPlanLink";
+import { CompanyAdministrationLink } from "../../company-administration/composition/menu/CompanyAdministrationLink";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { ManagedAvatarImage } from "../../auth/managed/presentation/avatar/ManagedAvatarImage";
 import { SupportContact } from "../../support/composition/SupportContact";
@@ -13,11 +16,6 @@ import { useRailPopup } from "../navigation/popup/useRailPopup";
 import css from "./navigation-profile.module.css";
 
 type Props = { collapsed: boolean; workspaceId: string; onOpenSettings(): void; onOpenHelp(): void };
-const roles = {
-  workspace_admin: ["Workspace administrator", "Администратор"], qa_manager: ["QA manager", "QA-менеджер"],
-  tester: ["Tester", "Тестировщик"], reporter: ["Reporter", "Автор обращений"], viewer: ["Viewer", "Наблюдатель"],
-} as const;
-
 export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOpenHelp }: Props) {
   const session = useOptionalTmsSession(), { locale, t } = useTmsLocale(), ru = locale === "ru";
   const popup = useRailPopup(), id = useId();
@@ -25,10 +23,6 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const downloadsAvailable = useDesktopDownloadsAvailable();
   const label = session?.label || t("auth.account");
-  const role = session?.workspaceKind === "personal" ? (ru ? "Личный аккаунт" : "Personal account")
-    : session?.kind === "cloud" && !session.workspaceKind ? (ru ? "Аккаунт Falcon" : "Falcon account")
-    : session?.workspaceRole ? roles[session.workspaceRole][ru ? 1 : 0]
-    : session?.kind === "admin" ? (ru ? "Администратор" : "Administrator") : (ru ? "Аккаунт Falcon" : "Falcon account");
   const navigate = (action: () => void) => { popup.dismiss(); action(); };
   return <div ref={popup.root} className={css.root} data-sidebar-independent data-collapsed={collapsed} onPointerEnter={event => { if (!downloadsOpen && event.pointerType !== "touch" && event.currentTarget.contains(event.target as Node)) popup.openHover(); }} onPointerLeave={popup.leave}>
     <button ref={popup.trigger} type="button" className={css.profile} data-collapsed={collapsed} data-active={popup.open}
@@ -45,7 +39,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       onBlur={event => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node) && !popup.root.current?.contains(event.relatedTarget as Node)) popup.dismiss(); }}>
       <div className={css.identity}>
         <ManagedAvatarImage className={css.avatar} name={label} hasAvatar={Boolean(session?.hasAvatar)} load={session?.avatarLoader} version={session?.avatarVersion} />
-        <div><strong>{label}</strong><span>{role}</span></div>
+        <div><strong>{label}</strong>{session && <BillingPlanLink role="menuitem" workspaceId={workspaceId} enabled={popup.open} className={css.plan} onClick={popup.dismiss} />}</div>
       </div>
       <div className={css.separator} role="separator"/>
       {session && <ProfileLink role="menuitem" className={css.action} onClick={popup.dismiss}>
@@ -54,12 +48,18 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>
         <Settings width={20} height={20} aria-hidden="true"/><span>{t("nav.config")}</span>
       </button>
+      {session && <BillingLink role="menuitem" workspaceId={workspaceId} className={css.action} data-testid="nav-billing" onClick={popup.dismiss}>
+        <CreditCard size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Тариф и оплата" : "Plan and billing"}</span>
+      </BillingLink>}
       {session && downloadsAvailable && <button role="menuitem" type="button" className={css.action} data-testid="account-download-app" onClick={() => { popup.close(true); setDownloadsOpen(true); }}>
         <Download size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Скачать приложение" : "Download app"}</span>
       </button>}
       {session?.administrationPath && <a role="menuitem" className={css.action} href={session.administrationPath} onClick={popup.dismiss}>
         <BuildingWorkspace width={20} height={20} aria-hidden="true"/><span>{ru ? "Управление компанией" : "Company administration"}</span>
       </a>}
+      {session && !session.administrationPath && <CompanyAdministrationLink role="menuitem" workspaceId={workspaceId} enabled={popup.open} className={css.action} onClick={popup.dismiss}>
+        <BuildingWorkspace width={20} height={20} aria-hidden="true"/><span>{ru ? "Управление компанией" : "Company administration"}</span>
+      </CompanyAdministrationLink>}
       <div className={css.separator} role="separator"/>
       <button role="menuitem" type="button" className={css.action} data-testid="nav-help-utility" onClick={() => navigate(onOpenHelp)}>
         <Lifesaver width={20} height={20} aria-hidden="true"/><span>{t("nav.help")}</span>

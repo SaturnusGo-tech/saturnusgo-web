@@ -14,10 +14,11 @@
 .identity { display: flex; align-items: center; gap: 10px; padding: 5px 6px 8px; }
 .identity .avatar { background: var(--tms-bg-hover, var(--falcon-surface)); color: inherit; }
 .identity > div:last-child { min-width: 0; }
-.identity > div:last-child > :is(strong, span) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.identity > div:last-child > :is(strong, a) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .identity > div:last-child > strong { font-size: 14px; font-weight: 500; }
-.identity > div:last-child > span { margin-top: 1px; color: var(--tms-text-muted, var(--falcon-text)); font-size: 12px; }
-:global(.dark) .identity > div:last-child > span { color: var(--falcon-text); }
+.plan { width: fit-content; max-width: 100%; margin-top: 1px; border-radius: 3px; color: var(--tms-text-muted, var(--falcon-text)); font-size: 12px; text-decoration: none; text-underline-offset: 3px; }
+.plan:hover { color: var(--falcon-text); text-decoration: underline; }
+:global(.dark) .plan { color: var(--falcon-text); }
 .separator { height: 1px; margin: 5px 5px; background: var(--falcon-border); }
 :global(.dark) .separator { background: var(--falcon-border); }
 .action, .supportButton { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 8px 6px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; text-decoration: none; text-align: left; cursor: pointer; }

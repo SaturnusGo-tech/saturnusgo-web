@@ -18,7 +18,7 @@ test("legacy notifications open personal Settings and canonicalize without losin
 });
 
 test("notification, security, account and environment deep links work without a project and clear unrelated screen selections", () => {
-  for (const section of ["notifications", "security", "account", "environments"] as const) {
+  for (const section of ["notifications", "security", "account", "environments", "billing"] as const) {
     const href = new URL(settingsSectionLink(`${origin}&runId=old&caseId=old#section`, section), origin).href;
     assert.equal(readSettingsSection(href), section);
     const query = new URL(href).searchParams;
@@ -43,7 +43,7 @@ function settingsHarness(locale: "en" | "ru" = "en", hasProject = true, initial 
     if (name.endsWith("useSettingsSection")) return { useSettingsSection: () => ({ section: selected, select: (next: string) => { selected = next; } }) };
   });
   const draw = () => nodes(h.render(() => render({ environments: [], project: hasProject ? { id: "p", name: "Falcon project" } : undefined,
-    exchange: { type: "ImportContent", props: {} }, plugins: { type: "PluginsContent", props: {} } } as never)));
+    exchange: { type: "ImportContent", props: {} }, plugins: { type: "PluginsContent", props: {} }, billing: { type: "BillingContent", props: {} } } as never)));
   return { draw, selected: () => selected };
 }
 
@@ -74,7 +74,17 @@ test("empty settings search can be cleared and personal settings never reveal pr
   assert.equal(all.filter(node => node.type === "button" && node.props["aria-controls"]).length, 0);
   invoke(all.find(node => node.type === "button" && node.props["aria-label"] === "Очистить поиск")!, "onClick");
   const targets = h.draw().filter(node => node.type === "button" && node.props["aria-controls"]).map(node => node.props["aria-controls"]);
-  assert.deepEqual(targets, ["settings-appearance", "settings-notifications", "settings-security", "settings-account", "settings-plugins"]);
+  assert.deepEqual(targets, ["settings-billing", "settings-appearance", "settings-notifications", "settings-security", "settings-account", "settings-plugins"]);
+});
+
+test("billing is workspace-wide and renders only while selected with one content heading", () => {
+  const all = settingsHarness("en", false, "billing").draw();
+  const active = all.filter(node => node.type === "section" && node.props.hidden === false);
+  assert.equal(active.length, 1); assert.equal(active[0].props.id, "settings-billing");
+  assert.equal(active[0].props["aria-label"], "Plan and billing");
+  assert.ok(all.some(node => node.type === "BillingContent"));
+  assert.equal(all.some(node => node.type === "h2" && node.props.id === "settings-billing-title"), false);
+  assert.equal(settingsHarness("en", false, "appearance").draw().some(node => node.type === "BillingContent"), false);
 });
 
 test("Plugins is project-independent and owns a single content heading", () => {

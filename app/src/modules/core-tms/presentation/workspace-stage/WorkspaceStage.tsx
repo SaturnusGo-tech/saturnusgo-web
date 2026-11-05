@@ -21,6 +21,7 @@ import { buildDefectDeepLink } from "../../defects/navigation/defect-deep-link";
 import { buildWorkspaceDeepLink } from "../../state/navigation/workspace-deep-link";
 import { ApiTestingView } from "../api-testing/ApiTestingView";
 import { ConfigView } from "../config/ConfigView";
+import { BillingFeature } from "../../billing/composition/BillingFeature";
 import { DashboardView } from "../dashboard/DashboardView";
 import { HooksView } from "../hooks/HooksView";
 import { ProjectOnboarding } from "../onboarding/ProjectOnboarding";
@@ -84,6 +85,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   if (model.view === "config" || model.view === "notifications") {
     return (
       <ConfigView key={model.data.workspace.id}
+        billing={session && <BillingFeature workspaceId={model.data.workspace.id} preview={process.env.NODE_ENV !== "production" && session.subject === "preview:mercury"} onClose={() => model.setView("cases")} />}
         notifications={<WorkspaceNotifications workspaceId={model.data.workspace.id} />}
         plugins={<CodexPluginsSettings workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""} canManage={model.canManageIntegrations} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />}
         environments={model.projectEnvironments}

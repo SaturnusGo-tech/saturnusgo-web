@@ -2869,7 +2869,7 @@ export interface paths {
         head?: never;
         /**
          * Update, block, revoke or reset an employee account
-         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.
+         * @description Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit. Personal team owners retain their original passwordless identity; ownership transfer by a personal actor returns 409 PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE. Managed-company ownership transfers retain existing behavior.
          */
         patch: operations["changeCompanyMember"];
         trace?: never;
@@ -3656,6 +3656,236 @@ export interface paths {
          * @description Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.
          */
         post: operations["renewSupportUploads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/plans": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the static monthly USD plan catalog
+         * @description Public safe catalog. Prices are base amounts in USD cents, exclusive of tax. Plans do not enroll workspaces or change access. No card details are accepted.
+         */
+        get: operations["getBillingPlans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read administrator billing status
+         * @description Requires an active administrator of the requested workspace. Includes server-owned occupied seats and current subscription. Existing trial dates remain unchanged. Includes the current unexpired open checkout so an administrator can resume after refreshing or reopening billing; expired and closed checkouts are null.
+         */
+        get: operations["readBilling"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/invoices": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read a bounded page of test invoices
+         * @description Requires an active workspace administrator. Returns at most limit invoices newest period first. Supply the oldest returned periodStart as before to read older invoices. Amounts remain immutable after refund.
+         */
+        get: operations["listBillingInvoices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/checkout": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a mock checkout without granting access
+         * @description Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales.
+         */
+        post: operations["createBillingCheckout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/confirm": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a mock checkout outcome
+         * @description Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice.
+         */
+        post: operations["confirmBillingCheckout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/subscription": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel, resume or schedule a plan change
+         * @description Cancels or resumes the subscription, or schedules an allowed plan change at the next renewal. Individual to Startup upgrades use paid checkout. Enterprise cannot be selected, including for old clients. Existing Enterprise subscriptions may downgrade to Startup when capacity fits.
+         */
+        post: operations["changeBillingSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/retry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry an outstanding mock collection
+         * @description Administrator recovery action for a failed mock collection. Successful recovery pays the outstanding period. A canceled subscription cannot collect another period.
+         */
+        post: operations["retryBillingCollection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/mock/outcome": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set the next deterministic mock collection outcome
+         * @description Active administrators only. Test-only control for success, decline and recovery. Never changes a live-provider subscription.
+         */
+        post: operations["setMockBillingOutcome"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/mock/refund": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refund a paid mock invoice with a recorded reason
+         * @description Active administrators only. Test-only action. Keeps original invoice amounts and records refund state, reason and audit event. Refunding the latest paid period removes that period entitlement; original trial history remains unchanged.
+         */
+        post: operations["refundMockBillingInvoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/mock/events": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify and apply a signed mock due-renewal event
+         * @description Available only when a mock webhook secret of at least 32 UTF-8 bytes is explicitly configured; otherwise the route is absent. The JSON body is limited to 32 KiB. Signature verification uses the exact raw bytes before JSON parsing. The signed event can only simulate a due mock renewal outcome; amounts, plan prices, access dates and callback URLs are server-owned. Workspace-scoped event IDs deduplicate retries; conflicting reuse fails. Older versions and unrelated or canceled subscriptions are ignored. Future versions or events before a due renewal fail. Mock events cannot affect a live-provider subscription.
+         */
+        post: operations["applyMockBillingEvent"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5749,6 +5979,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/billing/summary": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read safe workspace plan summary for active members
+         * @description Requires an active identity and active membership in the requested workspace. Returns only plan and provider metadata; invoices, financial amounts and subscription/customer/payment identifiers are excluded. A company with no subscription remains legacy, regardless of occupied seats; a personal workspace with no subscription is unsubscribed (this does not describe its separate trial entitlement). canManage is true only for workspace_admin. This route is absent with 404 when billing is disabled. It never enrolls, charges or changes access.
+         */
+        get: operations["readBillingSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6458,7 +6711,7 @@ export interface components {
             meta: components["schemas"]["AnalyticsPageMeta"];
         };
         /** @enum {string} */
-        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED";
+        ErrorCode: "ACTOR_UNAVAILABLE" | "AI_ANALYSIS_RETRY" | "AI_AUTHENTICATION_FAILED" | "AI_CONTEXT_BUDGET_EXCEEDED" | "AI_DISABLED" | "AI_DUPLICATE_CASE_ID" | "AI_GUIDE_ACCESS_CHANGED" | "AI_GUIDE_CHAT_CONFLICT" | "AI_GUIDE_CHAT_NOT_FOUND" | "AI_GUIDE_HISTORY_LIMIT" | "AI_GUIDE_IDEMPOTENCY_CONFLICT" | "AI_GUIDE_SHARED_ANSWER_NOT_FOUND" | "AI_GUIDE_TURN_CANCELLED" | "AI_GUIDE_TURN_FAILED" | "AI_GUIDE_TURN_PENDING" | "AI_INVALID_JSON" | "AI_NOT_CONFIGURED" | "AI_OUTPUT_TRUNCATED" | "AI_PAID_MODEL_DISABLED" | "AI_PROVIDER_QUOTA_EXHAUSTED" | "AI_PROVIDER_REQUEST_REJECTED" | "AI_PROVIDER_RESPONSE_INVALID" | "AI_PROVIDER_RESPONSE_TOO_LARGE" | "AI_PROVIDER_UNAVAILABLE" | "AI_RATE_LIMITED" | "AI_REQUEST_BUDGET_EXCEEDED" | "AI_SCHEMA_INVALID" | "AI_UNKNOWN_CASE_ID" | "AI_UNKNOWN_CHANGED_FILE" | "AI_WRITING_OUTPUT_INVALID" | "AI_WRITING_RATE_LIMITED" | "AI_WRITING_REFUSED" | "AI_WRITING_UNAVAILABLE" | "AMBIGUOUS_WORKFLOW_NAME" | "ANALYSIS_BUSY" | "ANALYSIS_NOT_FOUND" | "ANALYSIS_RUN_CONFLICT" | "ANALYTICS_SCOPE_TOO_LARGE" | "ANALYTICS_TEMPORARILY_UNAVAILABLE" | "ANALYTICS_WINDOW_TOO_LARGE" | "API_SOURCE_ACCESS_DENIED" | "API_SOURCE_CONTEXT_REQUIRED" | "API_SOURCE_MIGRATED" | "API_SOURCE_NAME_REQUIRED" | "API_SOURCE_NOT_FOUND" | "API_SOURCE_SCOPE_INVALID" | "ATTACHMENT_DIGEST_MISMATCH" | "AUTHENTICATION_REQUIRED" | "BAD_REQUEST" | "BOT_CHANNEL_MEMBERSHIP_REQUIRED" | "BUILD_CONTEXT_MISMATCH" | "BUILD_NOT_SUCCESSFUL" | "CATALOG_LIMIT_EXCEEDED" | "CHANGED_PATHS_LIMIT_EXCEEDED" | "CHANGE_CONTEXT_MISMATCH" | "CLOUD_AUTH_ACCOUNT_CONFLICT" | "CLOUD_AUTH_AUTHENTICATION_FAILED" | "CLOUD_AUTH_IDEMPOTENCY_CONFLICT" | "CLOUD_AUTH_ORIGIN_DENIED" | "CLOUD_AUTH_PERSISTENCE_FAILED" | "CLOUD_AUTH_RATE_LIMITED" | "CLOUD_AUTH_SESSION_INVALID" | "COMMAND_IN_PROGRESS" | "CONFLICT" | "CONNECTION_BINDING_IMMUTABLE" | "CONNECTION_BUSY" | "CONNECTION_DISABLED" | "CONNECTION_LIMIT_EXCEEDED" | "CONNECTION_NOT_FOUND" | "CREDENTIALS_REQUIRED" | "CREDENTIALS_UNAVAILABLE" | "DEFECT_ALREADY_ROUTED" | "DEFECT_NOT_FOUND" | "DELIVERY_NOT_RECONCILABLE" | "DELIVERY_NOT_RETRYABLE" | "DELIVERY_OUTCOME_UNKNOWN" | "DESKTOP_AUTH_INVALID" | "DESTINATION_NOT_ACCESSIBLE" | "DICTATION_EMPTY" | "DICTATION_INVALID_AUDIO" | "DICTATION_RATE_LIMITED" | "DICTATION_UNAVAILABLE" | "DISCOVERY_LIMIT_EXCEEDED" | "DUPLICATE_RULE" | "EMPTY_SCOPE" | "ENCRYPTION_KEY_REQUIRED" | "ENVIRONMENT_NOT_FOUND" | "EVENT_DISABLED" | "FEDERATION_INVALID" | "FEDERATION_LINK_REQUIRED" | "FEDERATION_SUBJECT_UNAVAILABLE" | "FEDERATION_UNAVAILABLE" | "FORBIDDEN" | "GAP_GENERATING" | "GAP_NOT_FOUND" | "GENERATION_FAILED" | "GITHUB_CONNECTION_REQUIRED" | "IDEMPOTENCY_KEY_REUSED" | "IMAGE_NORMALIZATION_BUSY" | "IMAGE_NORMALIZATION_CANCELLED" | "IMAGE_NORMALIZATION_TIMEOUT" | "IMPACT_PROCESSING_FAILED" | "IMPORT_AI_UNAVAILABLE" | "IMPORT_LIMIT_EXCEEDED" | "IMPORT_MAPPING_INVALID" | "IMPORT_SOURCE_INVALID" | "INTEGRATION_ACTOR_UNAVAILABLE" | "INTEGRATION_DISABLED" | "INTERNAL_ERROR" | "INVALID_CHANGED_FILE" | "INVALID_CHANNEL" | "INVALID_COMMIT" | "INVALID_EVENT" | "INVALID_GITHUB_EVENT" | "INVALID_MESSAGE_ID" | "INVALID_PATH_PREFIX" | "INVALID_PULL_REQUEST" | "INVALID_REPOSITORY" | "INVALID_SERVICE_URL" | "INVALID_TRANSITION" | "INVALID_WEBHOOK_PAYLOAD" | "INVALID_WORKFLOW_ID" | "LEASE_LOST" | "LINK_CONFLICT" | "NOTIFICATION_CONFLICT" | "NOTIFICATION_LIMIT_REACHED" | "NOTIFICATION_LINK_EXPIRED" | "NOTIFICATION_LINK_PENDING" | "NOTIFICATION_SUBSCRIPTION_INVALID" | "NOTIFICATION_UNAVAILABLE" | "NOT_FOUND" | "NO_MATCHING_TESTS" | "PATH_FILTER_REQUIRES_PR_OR_PUSH" | "PAYLOAD_TOO_LARGE" | "PERSONAL_ACCESS_DENIED" | "PERSONAL_TRIAL_EXPIRED" | "PRECONDITION_FAILED" | "PRECONDITION_REQUIRED" | "PROCESSING_FAILED" | "PROJECT_NOT_FOUND" | "PROOF_INVALID" | "QUOTA_EXCEEDED" | "RATE_LIMITED" | "REAUTHENTICATION_REQUIRED" | "REMOTE_ARCHIVED" | "REMOTE_NOT_FOUND" | "REMOTE_SCOPE_MISMATCH" | "REMOTE_TRANSITION_UNAVAILABLE" | "REPOSITORY_BINDING_IMMUTABLE" | "REPOSITORY_LIMIT_EXCEEDED" | "RETEST_CASE_MISMATCH" | "RETEST_EVIDENCE_REQUIRED" | "RETEST_STEP_MISMATCH" | "RULE_EVENT_DISABLED" | "RUN_ITEM_NOT_FOUND" | "RUN_NOT_COMPLETED" | "RUN_NOT_FOUND" | "RUN_RULE_REQUIRED" | "SCOPE_NOT_REVIEWABLE" | "SERVICE_UNAVAILABLE" | "SIGNING_SECRET_REQUIRED" | "SIGNUP_REQUIRED" | "SPACE_PROOF_INVALID" | "SPACE_SELECTION_INVALID" | "SSO_CONFLICT" | "SSO_FORBIDDEN" | "SSO_REQUIRED" | "SSO_TEST_REQUIRED" | "STALE_COMMENT" | "STATUS_NOT_ACCESSIBLE" | "SUITE_NOT_FOUND" | "UNLINKED_REMOTE_ISSUE" | "UNSUPPORTED_MEDIA_TYPE" | "UNSUPPORTED_OPERATION" | "UPLOAD_INTENT_EXPIRED" | "UPSTREAM_ACCESS_DENIED" | "UPSTREAM_INVALID_RESPONSE" | "UPSTREAM_RATE_LIMITED" | "UPSTREAM_REJECTED" | "UPSTREAM_UNAVAILABLE" | "VALIDATION_ERROR" | "VALIDATION_FAILED" | "WEBHOOK_UNAUTHORIZED" | "WORKFLOW_ID_MISMATCH" | "WORKFLOW_LIMIT_EXCEEDED" | "WORKFLOW_NOT_FOUND" | "YOUTRACK_CONFIGURATION_CHANGED" | "YOUTRACK_LINK_REQUIRED" | "YOUTRACK_NOT_READY_FOR_TEST" | "YOUTRACK_SYNC_CONFLICT" | "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE" | "YOUTRACK_WEBHOOK_UNAUTHORIZED" | "YOUTRACK_WORKFLOW_GUARD_REQUIRED" | "BILLING_FORBIDDEN" | "BILLING_DISABLED" | "BILLING_NOT_FOUND" | "BILLING_CONFLICT" | "BILLING_VERSION_CONFLICT" | "BILLING_PLAN_INCOMPATIBLE" | "BILLING_SEATS_OCCUPIED" | "BILLING_CHECKOUT_EXPIRED" | "BILLING_INVALID_STATE" | "BILLING_INVALID_EVENT" | "BILLING_SIGNATURE_INVALID" | "BILLING_READ_ONLY" | "BILLING_CONTACT_SALES" | "BILLING_TEAM_UNAVAILABLE" | "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE";
         ValidationIssue: {
             field: string;
             code: string;
@@ -10564,6 +10817,278 @@ export interface components {
             /** @description A registered workspace name, company hostname, HTTPS origin or company-label@domain shorthand. An employee email address does not grant company access. */
             organization: string;
         };
+        BillingPlan: {
+            /** @enum {string} */
+            id: "individual" | "startup";
+            /** @constant */
+            version: 1;
+            /** @constant */
+            currency: "USD";
+            /** @constant */
+            interval: "month";
+            /** @description Base price in USD cents, exclusive of test tax. */
+            amount: number;
+            seats: number;
+            /** @enum {string} */
+            workspaceKind: "personal" | "company";
+            /** @constant */
+            taxInclusive: false;
+        };
+        BillingSubscription: {
+            id: string;
+            workspaceId: string;
+            /**
+             * @description Only the mock provider is implemented; real collection is unavailable.
+             * @enum {string}
+             */
+            provider: "mock";
+            /** @constant */
+            testMode: true;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** @enum {string} */
+            status: "active" | "past_due" | "canceled";
+            seats: number;
+            amount: number;
+            /** @constant */
+            currency: "USD";
+            /** Format: date-time */
+            periodStart: string;
+            /** Format: date-time */
+            periodEnd: string;
+            /** Format: date-time */
+            paidThrough: string;
+            cancelAtPeriodEnd: boolean;
+            pendingPlanId: ("individual" | "startup" | "enterprise") | null;
+            /** Format: date-time */
+            graceUntil: string | null;
+            /** Format: date-time */
+            nextAttemptAt: string | null;
+            retryCount: number;
+            version: number;
+        };
+        BillingCheckout: {
+            id: string;
+            workspaceId: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /**
+             * @description Only the mock provider is implemented; real collection is unavailable.
+             * @enum {string}
+             */
+            provider: "mock";
+            /** @constant */
+            testMode: true;
+            /** @enum {string} */
+            status: "open" | "completed" | "expired" | "failed";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** @description Server quote in USD cents, before provider tax. Frozen when checkout is created. */
+            subtotal: number;
+            /** @constant */
+            currency: "USD";
+            /** @description Existing paid period end for prorated upgrades; null for a new full monthly period. */
+            periodEnd: string | null;
+            /** @description True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period. */
+            prorated: boolean;
+        };
+        BillingInvoice: {
+            id: string;
+            workspaceId: string;
+            subscriptionId: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+            /** Format: date-time */
+            periodStart: string;
+            /** Format: date-time */
+            periodEnd: string;
+            /** @description Immutable base amount in USD cents. */
+            subtotal: number;
+            /** @description Test tax in USD cents calculated from the server mock tax configuration; not VAT collected. */
+            tax: number;
+            total: number;
+            /** @constant */
+            currency: "USD";
+            /** @enum {string} */
+            status: "paid" | "failed" | "refunded";
+            attempts: number;
+            /** @constant */
+            testMode: true;
+            /** Format: date-time */
+            paidAt: string | null;
+            /** Format: date-time */
+            refundedAt: string | null;
+        };
+        BillingCatalogEnvelope: {
+            data: {
+                /** @description Self-serve catalog only. Enterprise is contact sales and publishes no price or capacity promise. */
+                plans: components["schemas"]["BillingPlan"][];
+                /**
+                 * @description Only the mock provider is implemented; real collection is unavailable.
+                 * @enum {string}
+                 */
+                provider: "mock";
+                /** @constant */
+                testMode: true;
+            };
+        };
+        BillingReadEnvelope: {
+            data: {
+                /** @description Self-serve catalog only. Enterprise is contact sales and publishes no price or capacity promise. */
+                plans: components["schemas"]["BillingPlan"][];
+                subscription: components["schemas"]["BillingSubscription"] | null;
+                /**
+                 * @description Only the mock provider is implemented; real collection is unavailable.
+                 * @enum {string}
+                 */
+                provider: "mock";
+                /** @constant */
+                testMode: true;
+                occupiedSeats: number;
+                /** @description Current open checkout before its expiry; null when absent, expired or closed. */
+                checkout: components["schemas"]["BillingCheckout"] | null;
+                /** @description Server-selected next offer. Enterprise is contact sales only; null while recovering overdue payment. */
+                suggestedPlanId: ("individual" | "startup" | "enterprise") | null;
+                /** @description Server-authorized paid checkout targets for the current workspace and subscription state. */
+                allowedCheckoutPlanIds: ("individual" | "startup")[];
+                /** @description Server-authorized next-renewal changes. Immediate Individual to Startup upgrades use checkout. */
+                allowedChangePlanIds: "startup"[];
+                /** @description Show the contact-sales route; Enterprise can never be selected by checkout or plan-change commands. */
+                contactSales: boolean;
+                /** @description Persisted company team capability backed by paid/grace team entitlement, including canceled subscriptions before paid-through. Legacy unbilled companies retain existing capability. */
+                teamAdministration: boolean;
+                /** @description Current server quotes for allowed checkout plans. Opening checkout freezes its amount for up to 30 minutes, bounded by existing paid-through. */
+                checkoutQuotes: components["schemas"]["BillingCheckoutQuote"][];
+            };
+        };
+        BillingMutationEnvelope: {
+            data: {
+                subscription: components["schemas"]["BillingSubscription"] | null;
+                checkout: components["schemas"]["BillingCheckout"] | null;
+                invoice: components["schemas"]["BillingInvoice"] | null;
+                /**
+                 * @description Only the mock provider is implemented; real collection is unavailable.
+                 * @enum {string}
+                 */
+                provider: "mock";
+                /** @constant */
+                testMode: true;
+            };
+        };
+        BillingInvoiceListEnvelope: {
+            data: components["schemas"]["BillingInvoice"][];
+            meta: {
+                limit: number;
+                /**
+                 * @description Only the mock provider is implemented; real collection is unavailable.
+                 * @enum {string}
+                 */
+                provider: "mock";
+                /** @constant */
+                testMode: true;
+            };
+        };
+        BillingScopeRequest: {
+            workspaceId: string;
+        };
+        BillingCheckoutRequest: {
+            workspaceId: string;
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+        };
+        BillingConfirmRequest: {
+            workspaceId: string;
+            checkoutId: string;
+            /** @enum {string} */
+            outcome: "success" | "declined";
+        };
+        BillingSubscriptionRequest: {
+            workspaceId: string;
+            /** @constant */
+            kind: "cancel";
+        } | {
+            workspaceId: string;
+            /** @constant */
+            kind: "resume";
+        } | {
+            workspaceId: string;
+            /** @constant */
+            kind: "plan";
+            /** @enum {string} */
+            planId: "individual" | "startup" | "enterprise";
+        };
+        BillingOutcomeRequest: {
+            workspaceId: string;
+            /** @enum {string} */
+            outcome: "success" | "declined";
+        };
+        BillingRefundRequest: {
+            workspaceId: string;
+            invoiceId: string;
+            /** @description Nonblank refund reason; trimmed before recording. */
+            reason: string;
+        };
+        MockBillingEventRequest: {
+            id: string;
+            workspaceId: string;
+            subscriptionId: string;
+            expectedVersion: number;
+            /** @enum {string} */
+            outcome: "success" | "declined";
+        };
+        MockBillingEventEnvelope: {
+            data: {
+                replayed: boolean;
+                ignored: boolean;
+                /** @constant */
+                testMode: true;
+            };
+        };
+        BillingSummaryEnvelope: {
+            data: {
+                /** @description Persisted subscription plan only; null for legacy or unsubscribed workspaces. Never inferred from seat count. */
+                planId: ("individual" | "startup" | "enterprise") | null;
+                /** @enum {string} */
+                status: "legacy" | "unsubscribed" | "active" | "past_due" | "canceled";
+                /** @enum {string} */
+                workspaceKind: "personal" | "company";
+                /** @description Whether this active member is a workspace_admin. Financial endpoints independently enforce administrator access. */
+                canManage: boolean;
+                /**
+                 * @description Persisted subscription provider, or configured provider when unsubscribed. Only the mock adapter is currently implemented.
+                 * @enum {string}
+                 */
+                provider: "mock" | "paddle" | "lemonsqueezy";
+                /** @description Persisted subscription mode, or configured provider mode when unsubscribed. */
+                testMode: boolean;
+                /** @constant */
+                enabled: true;
+                /** @description Server-selected next offer. Enterprise is contact sales only; null while recovering overdue payment. */
+                suggestedPlanId: ("individual" | "startup" | "enterprise") | null;
+                /** @description Server-authorized paid checkout targets for the current workspace and subscription state. */
+                allowedCheckoutPlanIds: ("individual" | "startup")[];
+                /** @description Server-authorized next-renewal changes. Immediate Individual to Startup upgrades use checkout. */
+                allowedChangePlanIds: "startup"[];
+                /** @description Show the contact-sales route; Enterprise can never be selected by checkout or plan-change commands. */
+                contactSales: boolean;
+                /** @description Persisted company team capability backed by paid/grace team entitlement, including canceled subscriptions before paid-through. Legacy unbilled companies retain existing capability. */
+                teamAdministration: boolean;
+            };
+        };
+        BillingCheckoutQuote: {
+            /** @enum {string} */
+            planId: "individual" | "startup";
+            /** @description Server quote in USD cents, before provider tax. Frozen when checkout is created. */
+            subtotal: number;
+            /** @constant */
+            currency: "USD";
+            /** @description Existing paid period end for prorated upgrades; null for a new full monthly period. */
+            periodEnd: string | null;
+            /** @description True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period. */
+            prorated: boolean;
+        };
     };
     responses: {
         /** @description Current authorized workbench facts and bounded matching records. */
@@ -11691,6 +12216,18 @@ export interface components {
         DashboardIdPath: components["schemas"]["Identifier"];
         EntityStatusQuery: components["schemas"]["EntityStatus"];
         PortfolioIdPath: components["schemas"]["Identifier"];
+        /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+        BillingIdempotencyKey: string;
+        /** @description Strong positive subscription version returned by the last authorized read or mutation. */
+        BillingIfMatch: string;
+        BillingWorkspaceQuery: string;
+        BillingInvoiceLimit: number;
+        /** @description Exclusive ISO timestamp cursor for invoice periodStart. Invoices are ordered by descending periodStart. */
+        BillingInvoiceBefore: string;
+        /** @description Canonical decimal Unix seconds, signed verbatim and within 300 seconds of the server clock in either direction. */
+        MockBillingTimestamp: string;
+        /** @description 64 hexadecimal characters: HMAC-SHA256 using the configured mock secret over timestamp + ASCII period + the exact raw UTF-8 request bytes. Verified before JSON parsing with a constant-time comparison. */
+        MockBillingSignature: string;
     };
     requestBodies: {
         ProjectCreate: {
@@ -18862,6 +19399,484 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    getBillingPlans: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingCatalogEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readBilling: {
+        parameters: {
+            query: {
+                workspaceId: components["parameters"]["BillingWorkspaceQuery"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingReadEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listBillingInvoices: {
+        parameters: {
+            query: {
+                workspaceId: components["parameters"]["BillingWorkspaceQuery"];
+                limit?: components["parameters"]["BillingInvoiceLimit"];
+                /** @description Exclusive ISO timestamp cursor for invoice periodStart. Invoices are ordered by descending periodStart. */
+                before?: components["parameters"]["BillingInvoiceBefore"];
+                /** @description Invoice ID from the last item, supplied with before, to page reliably when invoice period timestamps match. */
+                beforeId?: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingInvoiceListEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createBillingCheckout: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingCheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    confirmBillingCheckout: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description BILLING_CHECKOUT_EXPIRED: the checkout is expired and cannot grant paid access. */
+            410: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    changeBillingSubscription: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+                /** @description Strong positive subscription version returned by the last authorized read or mutation. */
+                "If-Match": components["parameters"]["BillingIfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingSubscriptionRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    retryBillingCollection: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+                /** @description Strong positive subscription version returned by the last authorized read or mutation. */
+                "If-Match": components["parameters"]["BillingIfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingScopeRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    setMockBillingOutcome: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingOutcomeRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    refundMockBillingInvoice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge. */
+                "Idempotency-Key": components["parameters"]["BillingIdempotencyKey"];
+                /** @description Strong positive subscription version returned by the last authorized read or mutation. */
+                "If-Match": components["parameters"]["BillingIfMatch"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingRefundRequest"];
+            };
+        };
+        responses: {
+            /** @description Success; mock financial data carries testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    /** @description Strong subscription version. Omitted when no subscription exists. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key. */
+            412: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    applyMockBillingEvent: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                /** @description Canonical decimal Unix seconds, signed verbatim and within 300 seconds of the server clock in either direction. */
+                "X-Billing-Timestamp": components["parameters"]["MockBillingTimestamp"];
+                /** @description 64 hexadecimal characters: HMAC-SHA256 using the configured mock secret over timestamp + ASCII period + the exact raw UTF-8 request bytes. Verified before JSON parsing with a constant-time comparison. */
+                "X-Billing-Signature": components["parameters"]["MockBillingSignature"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Exact raw UTF-8 JSON bytes are authenticated; maximum 32768 bytes. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MockBillingEventRequest"];
+            };
+        };
+        responses: {
+            /** @description Verified test event processed or ignored; replayed indicates duplicate event identity. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MockBillingEventEnvelope"];
+                };
+            };
+            /** @description BILLING_SIGNATURE_INVALID, BILLING_INVALID_EVENT or safe field validation failure. */
+            400: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description PAYLOAD_TOO_LARGE: event raw body exceeds 32 KiB. */
+            413: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description UNSUPPORTED_MEDIA_TYPE: application/json is required. */
+            415: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     submitSupportRequest: {
         parameters: {
             query: {
@@ -23267,6 +24282,40 @@ export interface operations {
             409: components["responses"]["Conflict"];
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    readBillingSummary: {
+        parameters: {
+            query: {
+                workspaceId: components["parameters"]["BillingWorkspaceQuery"];
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Safe member-readable plan summary. enabled=true means billing is configured; mock responses remain testMode=true. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingSummaryEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
 }

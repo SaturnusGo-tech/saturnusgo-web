@@ -12,6 +12,7 @@ for (const open of [false, true]) test(`support portal keyboard events pass the 
   const { NavigationProfile: render } = h.load<{ NavigationProfile: typeof NavigationProfile }>(new URL("../NavigationProfile.tsx", import.meta.url), name => {
     if (name === "react-dom") return { createPortal: (value: unknown) => value };
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+    if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => false };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => runtime.state() };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
   });
@@ -33,6 +34,7 @@ test("an open account menu still handles keyboard navigation from its own action
   const { NavigationProfile: render } = h.load<{ NavigationProfile: typeof NavigationProfile }>(new URL("../NavigationProfile.tsx", import.meta.url), name => {
     if (name === "react-dom") return { createPortal: (value: unknown) => value };
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+    if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => false };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => runtime.state() };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
   });
@@ -50,6 +52,7 @@ test("pointer-opened support captures the visible avatar as its focus return tar
   const { NavigationProfile: render } = h.load<{ NavigationProfile: typeof NavigationProfile }>(new URL("../NavigationProfile.tsx", import.meta.url), name => {
     if (name === "react-dom") return { createPortal: (value: unknown) => value };
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+    if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => false };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => runtime.state() };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
   });

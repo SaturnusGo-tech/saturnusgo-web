@@ -89,6 +89,9 @@
     },
     {
       "name": "Documentation assistant"
+    },
+    {
+      "name": "Billing"
     }
   ],
   "paths": {
@@ -3365,11 +3368,11 @@
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
@@ -8320,6 +8323,9 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -8340,9 +8346,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           }
         }
       }
@@ -8376,6 +8379,9 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -8396,9 +8402,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           }
         },
         "description": "Restores the portfolio and only projects archived by its latest cascade. Previously archived or subsequently detached projects remain unchanged."
@@ -10602,7 +10605,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit.",
+        "description": "Company scope comes from the verified hostname and current session. Platform accounts cannot use these tenant endpoints. Mutations verify administrator permissions again in the same transaction as the update and audit. Personal team owners retain their original passwordless identity; ownership transfer by a personal actor returns 409 PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE. Managed-company ownership transfers retain existing behavior.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "required",
         "parameters": [
@@ -13151,14 +13154,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "description": "Notification channel unavailable",
@@ -13589,18 +13592,6 @@
           }
         },
         "responses": {
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Success",
             "headers": {
@@ -13616,6 +13607,15 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
           "422": {
             "description": "Source or model mapping is invalid; no product records are created",
             "headers": {
@@ -13630,6 +13630,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "description": "AI provider unavailable or configured request budget exhausted",
@@ -13674,18 +13677,6 @@
           }
         },
         "responses": {
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Success",
             "headers": {
@@ -13701,6 +13692,15 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
           "422": {
             "description": "Source or model mapping is invalid; no product records are created",
             "headers": {
@@ -13715,6 +13715,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "description": "AI provider unavailable or configured request budget exhausted",
@@ -13847,11 +13850,11 @@
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -13919,11 +13922,11 @@
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -14150,11 +14153,11 @@
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "requestBody": {
@@ -14219,11 +14222,11 @@
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "requestBody": {
@@ -14304,9 +14307,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "410": {
             "description": "The unsubmitted support draft expired.",
             "headers": {
@@ -14336,6 +14336,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.",
@@ -14409,9 +14412,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "410": {
             "description": "The unsubmitted support draft expired.",
             "headers": {
@@ -14441,6 +14441,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.",
@@ -14504,9 +14507,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "410": {
             "description": "The unsubmitted support draft expired.",
             "headers": {
@@ -14536,6 +14536,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.",
@@ -14546,6 +14549,925 @@
           "$ref": "#/components/parameters/XRequestId"
         }
       ]
+    },
+    "/billing/plans": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getBillingPlans",
+        "summary": "Read the static monthly USD plan catalog",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Public safe catalog. Prices are base amounts in USD cents, exclusive of tax. Plans do not enroll workspaces or change access. No card details are accepted.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingCatalogEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": []
+      }
+    },
+    "/billing": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "readBilling",
+        "summary": "Read administrator billing status",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Requires an active administrator of the requested workspace. Includes server-owned occupied seats and current subscription. Existing trial dates remain unchanged. Includes the current unexpired open checkout so an administrator can resume after refreshing or reopening billing; expired and closed checkouts are null.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingWorkspaceQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingReadEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/billing/invoices": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "listBillingInvoices",
+        "summary": "Read a bounded page of test invoices",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Requires an active workspace administrator. Returns at most limit invoices newest period first. Supply the oldest returned periodStart as before to read older invoices. Amounts remain immutable after refund.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingWorkspaceQuery"
+          },
+          {
+            "$ref": "#/components/parameters/BillingInvoiceLimit"
+          },
+          {
+            "$ref": "#/components/parameters/BillingInvoiceBefore"
+          },
+          {
+            "name": "beforeId",
+            "in": "query",
+            "required": false,
+            "description": "Invoice ID from the last item, supplied with before, to page reliably when invoice period timestamps match.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingInvoiceListEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-pagination": "before-timestamp"
+      }
+    },
+    "/billing/checkout": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "createBillingCheckout",
+        "summary": "Create a mock checkout without granting access",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingCheckoutRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/confirm": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "confirmBillingCheckout",
+        "summary": "Confirm a mock checkout outcome",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "410": {
+            "description": "BILLING_CHECKOUT_EXPIRED: the checkout is expired and cannot grant paid access.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingConfirmRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/subscription": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "changeBillingSubscription",
+        "summary": "Cancel, resume or schedule a plan change",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Cancels or resumes the subscription, or schedules an allowed plan change at the next renewal. Individual to Startup upgrades use paid checkout. Enterprise cannot be selected, including for old clients. Existing Enterprise subscriptions may downgrade to Startup when capacity fits.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/BillingIfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "description": "BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/billing/retry": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "retryBillingCollection",
+        "summary": "Retry an outstanding mock collection",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Administrator recovery action for a failed mock collection. Successful recovery pays the outstanding period. A canceled subscription cannot collect another period.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/BillingIfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "description": "BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingScopeRequest"
+              }
+            }
+          }
+        },
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/billing/mock/outcome": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "setMockBillingOutcome",
+        "summary": "Set the next deterministic mock collection outcome",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Active administrators only. Test-only control for success, decline and recovery. Never changes a live-provider subscription.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingOutcomeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/mock/refund": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "refundMockBillingInvoice",
+        "summary": "Refund a paid mock invoice with a recorded reason",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Active administrators only. Test-only action. Keeps original invoice amounts and records refund state, reason and audit event. Refunding the latest paid period removes that period entitlement; original trial history remains unchanged.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingIdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/BillingIfMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; mock financial data carries testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "description": "Strong subscription version. Omitted when no subscription exists.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[1-9][0-9]{0,14}\"$"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "description": "BILLING_VERSION_CONFLICT: the subscription version changed. Refresh and retry with a new command key.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingRefundRequest"
+              }
+            }
+          }
+        },
+        "x-tms-concurrency": "required"
+      }
+    },
+    "/billing/mock/events": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "applyMockBillingEvent",
+        "summary": "Verify and apply a signed mock due-renewal event",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Available only when a mock webhook secret of at least 32 UTF-8 bytes is explicitly configured; otherwise the route is absent. The JSON body is limited to 32 KiB. Signature verification uses the exact raw bytes before JSON parsing. The signed event can only simulate a due mock renewal outcome; amounts, plan prices, access dates and callback URLs are server-owned. Workspace-scoped event IDs deduplicate retries; conflicting reuse fails. Older versions and unrelated or canceled subscriptions are ignored. Future versions or events before a due renewal fail. Mock events cannot affect a live-provider subscription.",
+        "security": [
+          {
+            "mockBillingSignature": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MockBillingTimestamp"
+          },
+          {
+            "$ref": "#/components/parameters/MockBillingSignature"
+          }
+        ],
+        "x-tms-idempotency": "not-applicable",
+        "x-tms-event-deduplication": "required",
+        "requestBody": {
+          "required": true,
+          "description": "Exact raw UTF-8 JSON bytes are authenticated; maximum 32768 bytes.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MockBillingEventRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified test event processed or ignored; replayed indicates duplicate event identity.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MockBillingEventEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BILLING_SIGNATURE_INVALID, BILLING_INVALID_EVENT or safe field validation failure.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "description": "PAYLOAD_TOO_LARGE: event raw body exceeds 32 KiB.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "UNSUPPORTED_MEDIA_TYPE: application/json is required.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
     },
     "/support/requests/{id}/submit": {
       "post": {
@@ -14599,9 +15521,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "410": {
             "description": "The unsubmitted support draft expired.",
             "headers": {
@@ -14631,6 +15550,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Tenant and author scoped. Drafts expire after 24 hours. Submission atomically records an audit event and durable delivery. All files must pass private object verification. A repeated request identifier with changed content returns 409.",
@@ -14835,6 +15757,24 @@
           }
         ],
         "responses": {
+          "201": {
+            "description": "Run summary; items are paginated separately.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchEnvelope"
+                }
+              }
+            }
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -14855,24 +15795,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "201": {
-            "description": "Run summary; items are paginated separately.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Idempotency-Replayed": {
-                "$ref": "#/components/headers/IdempotencyReplayed"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RunBatchEnvelope"
-                }
-              }
-            }
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -14992,6 +15914,24 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Run summary; items are paginated separately.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunBatchEnvelope"
+                }
+              }
+            }
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -15012,24 +15952,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Run summary; items are paginated separately.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Idempotency-Replayed": {
-                "$ref": "#/components/headers/IdempotencyReplayed"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RunBatchEnvelope"
-                }
-              }
-            }
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -15056,18 +15978,6 @@
         "operationId": "getRunBatch",
         "parameters": [],
         "responses": {
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Run summary; items are paginated separately.",
             "headers": {
@@ -15082,6 +15992,18 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         }
       },
@@ -15134,27 +16056,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Number of assignments changed",
             "headers": {
@@ -15175,6 +16076,27 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -15220,27 +16142,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Number of assignments changed",
             "headers": {
@@ -15261,6 +16162,27 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -15376,6 +16298,9 @@
               }
             }
           },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
           "503": {
             "description": "AI_WRITING_UNAVAILABLE; no content changes",
             "headers": {
@@ -15390,9 +16315,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -15440,6 +16362,9 @@
           }
         },
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -15455,17 +16380,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/OrganizationCommentResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal \"organization-comment-{revision}\". Stale revisions return 412; identical retries replay for 24 hours.",
@@ -15515,6 +16437,9 @@
           }
         },
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrganizationCommentResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -15530,17 +16455,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/OrganizationCommentResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "description": "Requires project:manage, original author and active target. Appends an immutable revision and audit event atomically. If-Match must equal \"organization-comment-{revision}\". Stale revisions return 412; identical retries replay for 24 hours.",
@@ -16157,6 +17079,9 @@
           "200": {
             "$ref": "#/components/responses/PortfolioResponse"
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -16177,9 +17102,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           }
         },
         "description": "Removes the portfolio from all catalogs. Any linked project, including archived projects, rejects removal with 409 PORTFOLIO_NOT_EMPTY. Historical audit and references are retained. Idempotent retries return the deletion receipt; subsequent reads return 404."
@@ -16282,6 +17204,9 @@
               }
             }
           },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
           "503": {
             "description": "DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged",
             "headers": {
@@ -16296,9 +17221,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -16550,18 +17472,6 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "400": {
             "description": "Invalid scope, folder or body",
             "content": {
@@ -16576,6 +17486,15 @@
                 "$ref": "#/components/headers/XRequestId"
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
             "description": "Immutable receipt conflict or file not ready",
@@ -16621,6 +17540,9 @@
                 "$ref": "#/components/headers/XRequestId"
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "requestBody": {
@@ -16697,6 +17619,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldListResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -16714,9 +17639,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldListResponse"
           }
         },
         "x-tms-pagination": "cursor"
@@ -16733,6 +17655,9 @@
           }
         ],
         "responses": {
+          "201": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -16750,9 +17675,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "201": {
-            "$ref": "#/components/responses/CustomFieldResponse"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -16809,6 +17731,9 @@
         "summary": "Get CustomField",
         "parameters": [],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -16826,9 +17751,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldResponse"
           }
         }
       },
@@ -16847,6 +17769,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -16862,17 +17787,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -16937,6 +17859,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -16952,17 +17877,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17017,6 +17939,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17032,17 +17957,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17130,6 +18052,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueListResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17147,9 +18072,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldValueListResponse"
           }
         },
         "x-tms-pagination": "cursor"
@@ -17166,6 +18088,9 @@
           }
         ],
         "responses": {
+          "201": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17183,9 +18108,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "201": {
-            "$ref": "#/components/responses/CustomFieldValueResponse"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17251,6 +18173,9 @@
         "summary": "Get CustomFieldValue",
         "parameters": [],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17268,9 +18193,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldValueResponse"
           }
         }
       },
@@ -17289,6 +18211,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17304,17 +18229,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldValueResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17388,6 +18310,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17403,17 +18328,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldValueResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17477,6 +18399,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomFieldValueResponse"
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17492,17 +18417,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "$ref": "#/components/responses/CustomFieldValueResponse"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -17610,6 +18532,9 @@
               }
             }
           },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
           "503": {
             "description": "AI_GUIDE_UNAVAILABLE; no workspace content changes",
             "headers": {
@@ -17624,9 +18549,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -17728,6 +18650,9 @@
               }
             }
           },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
           "503": {
             "description": "DICTATION_UNAVAILABLE; audio was not saved and the typed instruction remains unchanged",
             "headers": {
@@ -17742,9 +18667,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -17853,6 +18775,9 @@
               }
             }
           },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
           "503": {
             "description": "AI_GUIDE_UNAVAILABLE; no workspace content changes",
             "headers": {
@@ -17867,9 +18792,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -17896,6 +18818,27 @@
         ],
         "summary": "createDocumentationChat",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatSummaryResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -17931,27 +18874,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatSummaryResponse"
-                }
-              }
-            }
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -17974,6 +18896,27 @@
         ],
         "summary": "listDocumentationChats",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatSummaryListResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18009,27 +18952,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatSummaryListResponse"
-                }
-              }
-            }
           }
         },
         "parameters": [
@@ -18095,42 +19017,6 @@
         ],
         "summary": "getDocumentationChat",
         "responses": {
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "$ref": "#/components/responses/PayloadTooLarge"
-          },
-          "429": {
-            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
             "headers": {
@@ -18151,16 +19037,7 @@
                 }
               }
             }
-          }
-        }
-      },
-      "patch": {
-        "operationId": "renameDocumentationChat",
-        "tags": [
-          "Documentation assistant"
-        ],
-        "summary": "renameDocumentationChat",
-        "responses": {
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18196,7 +19073,16 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
+          }
+        }
+      },
+      "patch": {
+        "operationId": "renameDocumentationChat",
+        "tags": [
+          "Documentation assistant"
+        ],
+        "summary": "renameDocumentationChat",
+        "responses": {
           "200": {
             "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
             "headers": {
@@ -18223,6 +19109,21 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
           "412": {
             "description": "PRECONDITION_FAILED",
             "headers": {
@@ -18244,6 +19145,9 @@
               }
             }
           },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
           "428": {
             "description": "PRECONDITION_REQUIRED",
             "headers": {
@@ -18264,6 +19168,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -18322,6 +19244,27 @@
         ],
         "summary": "archiveDocumentationChat",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatSummaryResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18357,27 +19300,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatSummaryResponse"
-                }
-              }
-            }
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -18425,6 +19347,27 @@
         ],
         "summary": "listDocumentationChatTurns",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatTurnListResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18460,27 +19403,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatTurnListResponse"
-                }
-              }
-            }
           }
         },
         "parameters": [
@@ -18546,6 +19468,27 @@
         ],
         "summary": "getDocumentationChatTurn",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatTurnResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18581,27 +19524,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatTurnResponse"
-                }
-              }
-            }
           }
         }
       }
@@ -18637,42 +19559,6 @@
         ],
         "summary": "continueDocumentationChat",
         "responses": {
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "$ref": "#/components/responses/PayloadTooLarge"
-          },
-          "429": {
-            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "200": {
             "description": "SSE data JSON events conforming to DocumentationPersistentChatStreamEvent; complete or error terminates stream. Authorization/validation/conflicts before accepted remain normal JSON errors.",
             "headers": {
@@ -18695,6 +19581,24 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
           "422": {
             "description": "AI_GUIDE_OUTPUT_INVALID",
             "headers": {
@@ -18715,6 +19619,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "description": "AI_GUIDE_UNAVAILABLE",
@@ -18792,6 +19714,27 @@
         ],
         "summary": "cancelDocumentationChatTurn",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatTurnResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18827,27 +19770,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatTurnResponse"
-                }
-              }
-            }
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -18904,6 +19826,27 @@
         ],
         "summary": "shareDocumentationChatAnswer",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatShareResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -18939,27 +19882,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatShareResponse"
-                }
-              }
-            }
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -19007,6 +19929,27 @@
         ],
         "summary": "listDocumentationChatShares",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationChatShareListResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -19042,27 +19985,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationChatShareListResponse"
-                }
-              }
-            }
           }
         },
         "parameters": [
@@ -19128,6 +20050,25 @@
         ],
         "summary": "revokeDocumentationChatShare",
         "responses": {
+          "204": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -19142,27 +20083,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "413": {
-            "$ref": "#/components/responses/PayloadTooLarge"
-          },
-          "429": {
-            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
           },
           "412": {
             "description": "PRECONDITION_FAILED",
@@ -19185,6 +20105,9 @@
               }
             }
           },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
           "428": {
             "description": "PRECONDITION_REQUIRED",
             "headers": {
@@ -19206,24 +20129,23 @@
               }
             }
           },
-          "204": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+          "429": {
+            "description": "AI_GUIDE_HISTORY_LIMIT or AI_GUIDE_RATE_LIMITED. History/storage limits require administrative retention; archiving preserves records and does not reset storage. Request rate limits can be retried later.",
             "headers": {
               "X-Request-Id": {
                 "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
+              }
+            },
+            "content": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              },
-              "ETag": {
-                "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ErrorEnvelope"
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "x-tms-idempotency": "not-applicable",
@@ -19273,6 +20195,27 @@
         ],
         "summary": "getDocumentationSharedAnswer",
         "responses": {
+          "200": {
+            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "private, no-store, no-transform"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentationSharedAnswerResponse"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -19308,27 +20251,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "200": {
-            "description": "Private owner-scoped guide result. Only the shared-answer route is accessible to another authorized workspace member.",
-            "headers": {
-              "X-Request-Id": {
-                "$ref": "#/components/headers/XRequestId"
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "private, no-store, no-transform"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentationSharedAnswerResponse"
-                }
-              }
-            }
           }
         },
         "description": "Authenticated same-workspace recipient receives only one explicitly shared question and answer. Missing, revoked, archived, owner-disabled, source-removed or administrator-restricted snapshots are unavailable. Never returns private chatId, turnId, history, owner identity or share-management data."
@@ -19787,14 +20709,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
           }
         },
         "x-tms-idempotency": "required",
@@ -20146,11 +21068,11 @@
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -20222,14 +21144,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
           }
         },
         "x-tms-idempotency": "required",
@@ -20586,6 +21508,18 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "408": {
             "description": "Image processing deadline exceeded. Retry with a smaller image.",
             "headers": {
@@ -20600,18 +21534,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
@@ -20775,9 +21697,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
@@ -20786,6 +21705,9 @@
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           },
           "503": {
             "$ref": "#/components/responses/ReleaseWritePaused"
@@ -23696,6 +24618,67 @@
           }
         }
       }
+    },
+    "/billing/summary": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "readBillingSummary",
+        "summary": "Read safe workspace plan summary for active members",
+        "tags": [
+          "Billing"
+        ],
+        "description": "Requires an active identity and active membership in the requested workspace. Returns only plan and provider metadata; invoices, financial amounts and subscription/customer/payment identifiers are excluded. A company with no subscription remains legacy, regardless of occupied seats; a personal workspace with no subscription is unsubscribed (this does not describe its separate trial entitlement). canManage is true only for workspace_admin. This route is absent with 404 when billing is disabled. It never enrolls, charges or changes access.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BillingWorkspaceQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Safe member-readable plan summary. enabled=true means billing is configured; mock responses remain testMode=true.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingSummaryEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -23735,6 +24718,12 @@
         "in": "cookie",
         "name": "__Host-falcon_federation",
         "description": "Short-lived Google/SAML browser proof; no workspace access by itself."
+      },
+      "mockBillingSignature": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Billing-Signature",
+        "description": "Mock-only timestamped HMAC authentication; X-Billing-Timestamp is also required. No bearer session is used for this simulated provider event."
       }
     },
     "parameters": {
@@ -24035,6 +25024,87 @@
         "required": true,
         "schema": {
           "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "BillingIdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Required safe key, scoped to the authenticated actor, workspace and action. Reuse with different command input returns BILLING_CONFLICT. Completed results replay without another charge.",
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+        }
+      },
+      "BillingIfMatch": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "description": "Strong positive subscription version returned by the last authorized read or mutation.",
+        "schema": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 17,
+          "pattern": "^\"[1-9][0-9]{0,14}\"$"
+        }
+      },
+      "BillingWorkspaceQuery": {
+        "name": "workspaceId",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+        }
+      },
+      "BillingInvoiceLimit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 30
+        }
+      },
+      "BillingInvoiceBefore": {
+        "name": "before",
+        "in": "query",
+        "required": false,
+        "description": "Exclusive ISO timestamp cursor for invoice periodStart. Invoices are ordered by descending periodStart.",
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 40
+        }
+      },
+      "MockBillingTimestamp": {
+        "name": "X-Billing-Timestamp",
+        "in": "header",
+        "required": true,
+        "description": "Canonical decimal Unix seconds, signed verbatim and within 300 seconds of the server clock in either direction.",
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12,
+          "pattern": "^(0|[1-9][0-9]{0,11})$"
+        }
+      },
+      "MockBillingSignature": {
+        "name": "X-Billing-Signature",
+        "in": "header",
+        "required": true,
+        "description": "64 hexadecimal characters: HMAC-SHA256 using the configured mock secret over timestamp + ASCII period + the exact raw UTF-8 request bytes. Verified before JSON parsing with a constant-time comparison.",
+        "schema": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[A-Fa-f0-9]{64}$"
         }
       }
     },
@@ -29641,7 +30711,22 @@
           "YOUTRACK_SYNC_CONFLICT",
           "YOUTRACK_WEBHOOK_SETUP_UNAVAILABLE",
           "YOUTRACK_WEBHOOK_UNAUTHORIZED",
-          "YOUTRACK_WORKFLOW_GUARD_REQUIRED"
+          "YOUTRACK_WORKFLOW_GUARD_REQUIRED",
+          "BILLING_FORBIDDEN",
+          "BILLING_DISABLED",
+          "BILLING_NOT_FOUND",
+          "BILLING_CONFLICT",
+          "BILLING_VERSION_CONFLICT",
+          "BILLING_PLAN_INCOMPATIBLE",
+          "BILLING_SEATS_OCCUPIED",
+          "BILLING_CHECKOUT_EXPIRED",
+          "BILLING_INVALID_STATE",
+          "BILLING_INVALID_EVENT",
+          "BILLING_SIGNATURE_INVALID",
+          "BILLING_READ_ONLY",
+          "BILLING_CONTACT_SALES",
+          "BILLING_TEAM_UNAVAILABLE",
+          "PERSONAL_OWNERSHIP_TRANSFER_UNAVAILABLE"
         ]
       },
       "ValidationIssue": {
@@ -48688,6 +49773,1114 @@
         "required": [
           "organization"
         ]
+      },
+      "BillingPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "interval": {
+            "type": "string",
+            "const": "month"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Base price in USD cents, exclusive of test tax."
+          },
+          "seats": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "workspaceKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company"
+            ]
+          },
+          "taxInclusive": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "currency",
+          "interval",
+          "amount",
+          "seats",
+          "workspaceKind",
+          "taxInclusive"
+        ]
+      },
+      "BillingSubscription": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "mock"
+            ],
+            "description": "Only the mock provider is implemented; real collection is unavailable."
+          },
+          "testMode": {
+            "type": "boolean",
+            "const": true
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "past_due",
+              "canceled"
+            ]
+          },
+          "seats": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "periodEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paidThrough": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cancelAtPeriodEnd": {
+            "type": "boolean"
+          },
+          "pendingPlanId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "individual",
+                  "startup",
+                  "enterprise"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "graceUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "nextAttemptAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "retryCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "provider",
+          "testMode",
+          "planId",
+          "status",
+          "seats",
+          "amount",
+          "currency",
+          "periodStart",
+          "periodEnd",
+          "paidThrough",
+          "cancelAtPeriodEnd",
+          "pendingPlanId",
+          "graceUntil",
+          "nextAttemptAt",
+          "retryCount",
+          "version"
+        ]
+      },
+      "BillingCheckout": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "mock"
+            ],
+            "description": "Only the mock provider is implemented; real collection is unavailable."
+          },
+          "testMode": {
+            "type": "boolean",
+            "const": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "completed",
+              "expired",
+              "failed"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subtotal": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Server quote in USD cents, before provider tax. Frozen when checkout is created."
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "periodEnd": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Existing paid period end for prorated upgrades; null for a new full monthly period."
+          },
+          "prorated": {
+            "type": "boolean",
+            "description": "True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period."
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "planId",
+          "provider",
+          "testMode",
+          "status",
+          "createdAt",
+          "expiresAt",
+          "subtotal",
+          "currency",
+          "periodEnd",
+          "prorated"
+        ]
+      },
+      "BillingInvoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "periodEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subtotal": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Immutable base amount in USD cents."
+          },
+          "tax": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Test tax in USD cents calculated from the server mock tax configuration; not VAT collected."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "paid",
+              "failed",
+              "refunded"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "testMode": {
+            "type": "boolean",
+            "const": true
+          },
+          "paidAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "refundedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "subscriptionId",
+          "planId",
+          "periodStart",
+          "periodEnd",
+          "subtotal",
+          "tax",
+          "total",
+          "currency",
+          "status",
+          "attempts",
+          "testMode",
+          "paidAt",
+          "refundedAt"
+        ]
+      },
+      "BillingCatalogEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "plans": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "$ref": "#/components/schemas/BillingPlan"
+                },
+                "description": "Self-serve catalog only. Enterprise is contact sales and publishes no price or capacity promise."
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "mock"
+                ],
+                "description": "Only the mock provider is implemented; real collection is unavailable."
+              },
+              "testMode": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "plans",
+              "provider",
+              "testMode"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BillingReadEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "plans": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "$ref": "#/components/schemas/BillingPlan"
+                },
+                "description": "Self-serve catalog only. Enterprise is contact sales and publishes no price or capacity promise."
+              },
+              "subscription": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BillingSubscription"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "mock"
+                ],
+                "description": "Only the mock provider is implemented; real collection is unavailable."
+              },
+              "testMode": {
+                "type": "boolean",
+                "const": true
+              },
+              "occupiedSeats": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "checkout": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BillingCheckout"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Current open checkout before its expiry; null when absent, expired or closed."
+              },
+              "suggestedPlanId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "individual",
+                      "startup",
+                      "enterprise"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Server-selected next offer. Enterprise is contact sales only; null while recovering overdue payment."
+              },
+              "allowedCheckoutPlanIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 2,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "individual",
+                    "startup"
+                  ]
+                },
+                "description": "Server-authorized paid checkout targets for the current workspace and subscription state."
+              },
+              "allowedChangePlanIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "startup"
+                  ]
+                },
+                "description": "Server-authorized next-renewal changes. Immediate Individual to Startup upgrades use checkout."
+              },
+              "contactSales": {
+                "type": "boolean",
+                "description": "Show the contact-sales route; Enterprise can never be selected by checkout or plan-change commands."
+              },
+              "teamAdministration": {
+                "type": "boolean",
+                "description": "Persisted company team capability backed by paid/grace team entitlement, including canceled subscriptions before paid-through. Legacy unbilled companies retain existing capability."
+              },
+              "checkoutQuotes": {
+                "type": "array",
+                "maxItems": 2,
+                "items": {
+                  "$ref": "#/components/schemas/BillingCheckoutQuote"
+                },
+                "description": "Current server quotes for allowed checkout plans. Opening checkout freezes its amount for up to 30 minutes, bounded by existing paid-through."
+              }
+            },
+            "required": [
+              "plans",
+              "subscription",
+              "provider",
+              "testMode",
+              "occupiedSeats",
+              "checkout",
+              "suggestedPlanId",
+              "allowedCheckoutPlanIds",
+              "allowedChangePlanIds",
+              "contactSales",
+              "teamAdministration",
+              "checkoutQuotes"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BillingMutationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "subscription": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BillingSubscription"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "checkout": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BillingCheckout"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "invoice": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BillingInvoice"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "mock"
+                ],
+                "description": "Only the mock provider is implemented; real collection is unavailable."
+              },
+              "testMode": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "subscription",
+              "checkout",
+              "invoice",
+              "provider",
+              "testMode"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BillingInvoiceListEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BillingInvoice"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "mock"
+                ],
+                "description": "Only the mock provider is implemented; real collection is unavailable."
+              },
+              "testMode": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "limit",
+              "provider",
+              "testMode"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "BillingScopeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          }
+        },
+        "required": [
+          "workspaceId"
+        ]
+      },
+      "BillingCheckoutRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup",
+              "enterprise"
+            ]
+          }
+        },
+        "required": [
+          "workspaceId",
+          "planId"
+        ]
+      },
+      "BillingConfirmRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "checkoutId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "success",
+              "declined"
+            ]
+          }
+        },
+        "required": [
+          "workspaceId",
+          "checkoutId",
+          "outcome"
+        ]
+      },
+      "BillingSubscriptionRequest": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "workspaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              "kind": {
+                "type": "string",
+                "const": "cancel"
+              }
+            },
+            "required": [
+              "workspaceId",
+              "kind"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "workspaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              "kind": {
+                "type": "string",
+                "const": "resume"
+              }
+            },
+            "required": [
+              "workspaceId",
+              "kind"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "workspaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+              },
+              "kind": {
+                "type": "string",
+                "const": "plan"
+              },
+              "planId": {
+                "type": "string",
+                "enum": [
+                  "individual",
+                  "startup",
+                  "enterprise"
+                ]
+              }
+            },
+            "required": [
+              "workspaceId",
+              "kind",
+              "planId"
+            ]
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "BillingOutcomeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "success",
+              "declined"
+            ]
+          }
+        },
+        "required": [
+          "workspaceId",
+          "outcome"
+        ]
+      },
+      "BillingRefundRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "invoiceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "pattern": "\\S",
+            "description": "Nonblank refund reason; trimmed before recording."
+          }
+        },
+        "required": [
+          "workspaceId",
+          "invoiceId",
+          "reason"
+        ]
+      },
+      "MockBillingEventRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "success",
+              "declined"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "subscriptionId",
+          "expectedVersion",
+          "outcome"
+        ]
+      },
+      "MockBillingEventEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "replayed": {
+                "type": "boolean"
+              },
+              "ignored": {
+                "type": "boolean"
+              },
+              "testMode": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "replayed",
+              "ignored",
+              "testMode"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BillingSummaryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "planId",
+              "status",
+              "workspaceKind",
+              "canManage",
+              "provider",
+              "testMode",
+              "enabled",
+              "suggestedPlanId",
+              "allowedCheckoutPlanIds",
+              "allowedChangePlanIds",
+              "contactSales",
+              "teamAdministration"
+            ],
+            "properties": {
+              "planId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "individual",
+                      "startup",
+                      "enterprise"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Persisted subscription plan only; null for legacy or unsubscribed workspaces. Never inferred from seat count."
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "legacy",
+                  "unsubscribed",
+                  "active",
+                  "past_due",
+                  "canceled"
+                ]
+              },
+              "workspaceKind": {
+                "type": "string",
+                "enum": [
+                  "personal",
+                  "company"
+                ]
+              },
+              "canManage": {
+                "type": "boolean",
+                "description": "Whether this active member is a workspace_admin. Financial endpoints independently enforce administrator access."
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "mock",
+                  "paddle",
+                  "lemonsqueezy"
+                ],
+                "description": "Persisted subscription provider, or configured provider when unsubscribed. Only the mock adapter is currently implemented."
+              },
+              "testMode": {
+                "type": "boolean",
+                "description": "Persisted subscription mode, or configured provider mode when unsubscribed."
+              },
+              "enabled": {
+                "type": "boolean",
+                "const": true
+              },
+              "suggestedPlanId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "individual",
+                      "startup",
+                      "enterprise"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Server-selected next offer. Enterprise is contact sales only; null while recovering overdue payment."
+              },
+              "allowedCheckoutPlanIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 2,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "individual",
+                    "startup"
+                  ]
+                },
+                "description": "Server-authorized paid checkout targets for the current workspace and subscription state."
+              },
+              "allowedChangePlanIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "startup"
+                  ]
+                },
+                "description": "Server-authorized next-renewal changes. Immediate Individual to Startup upgrades use checkout."
+              },
+              "contactSales": {
+                "type": "boolean",
+                "description": "Show the contact-sales route; Enterprise can never be selected by checkout or plan-change commands."
+              },
+              "teamAdministration": {
+                "type": "boolean",
+                "description": "Persisted company team capability backed by paid/grace team entitlement, including canceled subscriptions before paid-through. Legacy unbilled companies retain existing capability."
+              }
+            }
+          }
+        }
+      },
+      "BillingCheckoutQuote": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "planId",
+          "subtotal",
+          "currency",
+          "periodEnd",
+          "prorated"
+        ],
+        "properties": {
+          "planId": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "startup"
+            ]
+          },
+          "subtotal": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Server quote in USD cents, before provider tax. Frozen when checkout is created."
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "periodEnd": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Existing paid period end for prorated upgrades; null for a new full monthly period."
+          },
+          "prorated": {
+            "type": "boolean",
+            "description": "True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period."
+          }
+        }
       }
     }
   }

@@ -29,6 +29,12 @@ void test("admin tabs use local history, discard detail state and restore the se
     assert.equal(url.search, "?page=codex"); assert.equal(current.route.page, "codex");
     await act(async () => current.navigate({ section: "profile", id: null, creating: false }));
     assert.equal(url.pathname, "/profile/"); assert.equal(current.route.section, "profile");
+    await act(async () => { url = new URL("https://falcon.test/admin/?account=personal&workspaceId=personal-space&projectId=project&id=old"); events.dispatchEvent(new Event("popstate")); });
+    await act(async () => current.navigate({ page: "audit", id: null, creating: false }));
+    assert.equal(url.pathname, "/admin/");
+    assert.equal(url.searchParams.get("account"), "personal"); assert.equal(url.searchParams.get("workspaceId"), "personal-space");
+    assert.equal(url.searchParams.get("projectId"), "project"); assert.equal(url.searchParams.get("page"), "audit");
+    assert.equal(url.searchParams.has("id"), false);
   } finally {
     await act(async () => renderer?.unmount());
     if (original) Object.defineProperty(globalThis, "window", original); else Reflect.deleteProperty(globalThis, "window");

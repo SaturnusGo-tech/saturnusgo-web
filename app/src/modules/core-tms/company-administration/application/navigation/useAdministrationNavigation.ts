@@ -20,6 +20,14 @@ export function useAdministrationNavigation() {
   }, []);
   const navigate = useCallback((next: AdministrationRoute) => {
     const query = new URLSearchParams();
+    const previousQuery = new URLSearchParams(window.location.search);
+    if (previousQuery.get("account") === "personal") {
+      query.set("account", "personal");
+      for (const key of ["workspaceId", "projectId"]) {
+        const value = previousQuery.get(key);
+        if (value && /^[A-Za-z0-9._:-]{1,128}$/.test(value)) query.set(key, value);
+      }
+    }
     if (next.id) query.set("id", next.id);
     if (next.page) query.set("page", next.page);
     if (next.creating) query.set("create", "true");

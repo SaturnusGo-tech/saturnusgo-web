@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import type { MemberChange, MemberMutation } from "../../domain/administration";
-import type { SignedInCompanySession } from "../../../auth/managed/domain/managed-access";
+import type { AdministrationActor } from "../../domain/administration-actor";
 import { useAdministrationResource } from "../../application/state/useAdministrationResource";
 import { useAdministrationCommand } from "../../application/state/useAdministrationCommand";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
@@ -20,9 +20,9 @@ import { SessionConfirmation } from "../reauthentication/SessionConfirmation";
 import styles from "../layout/administration.module.css";
 import editor from "../editor/editor.module.css";
 
-export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, requestedAction = null, onActionConsumed }: {
+export function MemberDetail({ id, client, actor, onBack, onSaved, onBusy, requestedAction = null, onActionConsumed }: {
   readonly requestedAction?: MemberChange | "edit" | null; readonly onActionConsumed?: () => void;
-  readonly id: string; readonly client: AdministrationPort; readonly session: SignedInCompanySession; readonly onBack: () => void; readonly onSaved: () => void; readonly onBusy: (value: boolean) => void;
+  readonly id: string; readonly client: AdministrationPort; readonly actor: AdministrationActor; readonly onBack: () => void; readonly onSaved: () => void; readonly onBusy: (value: boolean) => void;
 }) {
   const { locale } = useTmsLocale();
   const copy = administrationCopy(locale);
@@ -31,9 +31,10 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
   const [confirmation, setConfirmation] = useState<MemberChange | null>(null);
   useEffect(() => {
     if (!requestedAction) return;
+    if (requestedAction !== "edit" && requestedAction.kind === "ownership" && actor.canTransferOwnership === false) { onActionConsumed?.(); return; }
     if (requestedAction === "edit") setEditing(true); else setConfirmation(requestedAction);
     onActionConsumed?.();
-  }, [requestedAction, onActionConsumed]);
+  }, [requestedAction, onActionConsumed, actor.canTransferOwnership]);
   const [handoff, setHandoff] = useState<MemberMutation | null>(null);
   const [ownershipTransferred, setOwnershipTransferred] = useState(false);
   const command = useAdministrationCommand();
@@ -41,6 +42,7 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
   useEffect(() => { onBusy(command.pending || !!handoff); }, [command.pending, handoff, onBusy]);
   useEffect(() => () => onBusy(false), [onBusy]);
   async function change(value: MemberChange) {
+    if (value.kind === "ownership" && actor.canTransferOwnership === false) return false;
     if (!member || resource.refreshing || resource.error) return false;
     const result = await command.execute(JSON.stringify([id, member.version, value]), (key, signal) => client.changeMember(member, value, key, signal));
     if (!result) return false;
@@ -53,8 +55,8 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
   }
   if (handoff?.temporaryPassword) return <div className={editor.handoff}><CredentialHandoff login={handoff.member.login} password={handoff.temporaryPassword} hostname={window.location.hostname}
     onDone={() => { setHandoff(null); resource.refresh(); }} /></div>;
-  const cannotEdit = command.pending || resource.refreshing || !!resource.error || member?.status === "revoked" || (!session.identity.owner && member?.role === "workspace_admin");
-  const cannotManage = cannotEdit || member?.owner || session.identity.id === id;
+  const cannotEdit = command.pending || resource.refreshing || !!resource.error || member?.status === "revoked" || (!actor.owner && member?.role === "workspace_admin") || (actor.selfProfileOnly && actor.id === id);
+  const cannotManage = cannotEdit || member?.owner || actor.id === id;
   if (ownershipTransferred) return <section className={styles.section}>
     <h1>{locale === "ru" ? "Управление передано" : "Ownership transferred"}</h1>
     <p>{locale === "ru" ? "Главный администратор обновлён. Войдите снова, чтобы продолжить работу со своими текущими правами."
@@ -65,7 +67,7 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
     {resource.loading || !member ? <div className={editor.handoff}>
       <button className={styles.back} onClick={onBack}>{copy.back}</button>
       <ResourceState loading={resource.loading} error={resource.error} retry={resource.refresh} /></div> :
-      <MemberProfile member={member} client={client} disabled={cannotEdit} canManage={!cannotManage} editing={editing}
+      <MemberProfile member={member} client={client} disabled={Boolean(cannotEdit)} canManage={!cannotManage} editing={editing} avatars={actor.memberAvatars !== false}
         onEdit={() => setEditing(true)} onBack={onBack} onChange={setConfirmation} notice={<>
           {resource.error && <ResourceState loading={false} error={resource.error} retry={resource.refresh} />}
           {confirmation && <div className={styles.confirmation} role="alertdialog" aria-label={locale === "ru" ? "Подтверждение действия" : "Confirm action"}>
@@ -73,15 +75,16 @@ export function MemberDetail({ id, client, session, onBack, onSaved, onBusy, req
             <div className={styles.actions}><button className={styles.primary} disabled={!!cannotManage} onClick={() => void change(confirmation)}>{copy.confirm}</button>
               <button className={styles.button} disabled={command.pending} onClick={() => setConfirmation(null)}>{copy.cancel}</button></div>
           </div>}
-          {command.error === "REAUTHENTICATION_REQUIRED" ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
+          {command.error === "REAUTHENTICATION_REQUIRED" ? actor.managedReauthentication !== false ? <SessionConfirmation client={client} onConfirmed={command.clearError} />
+            : <p className={styles.error} role="alert">{locale === "ru" ? "Для этого действия нужно войти заново. Выйдите из аккаунта, войдите и повторите действие." : "This action needs a fresh sign-in. Sign out, sign in again and retry."}</p>
             : command.error && <p className={styles.error} role="alert">{administrationError(command.error, locale)}</p>}
         </>}>
-      <MemberDetailsForm key={member.version} member={member} disabled={cannotEdit} onChange={change} onBack={() => setEditing(false)}>
-        <MemberSecurity member={member} disabled={!!cannotManage} allowAdmin={session.identity.owner} onChange={change} />
-        <details className={editor.additional}><summary><ChevronRight size={16} />{locale === "ru" ? "Фотография" : "Photo"}</summary>
+      <MemberDetailsForm key={member.version} member={member} disabled={Boolean(cannotEdit)} onChange={change} onBack={() => setEditing(false)}>
+        <MemberSecurity member={member} disabled={!!cannotManage} allowAdmin={actor.owner} canTransferOwnership={actor.canTransferOwnership !== false} onChange={change} />
+        {actor.memberAvatars !== false && <details className={editor.additional}><summary><ChevronRight size={16} />{locale === "ru" ? "Фотография" : "Photo"}</summary>
           <ProfileAvatarEditor identityId={id} name={member.name} hasAvatar={member.hasAvatar} version={member.version} client={client}
-            disabled={cannotEdit} onSaved={() => { resource.refresh(); onSaved(); }} />
-        </details>
+            disabled={Boolean(cannotEdit)} onSaved={() => { resource.refresh(); onSaved(); }} />
+        </details>}
       </MemberDetailsForm></MemberProfile>}
   </>;
 }

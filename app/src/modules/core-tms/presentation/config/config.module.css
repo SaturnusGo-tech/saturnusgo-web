@@ -37,6 +37,7 @@
 .sidebar nav button[aria-current] { background: var(--settings-selected); font-weight: 500; }
 .searchEmpty { margin: 0 8px; color: var(--settings-muted); font-size: 12px; }
 .content { flex: 1; min-width: 0; overflow: auto; padding: 36px 40px 48px; scrollbar-width: thin; scrollbar-color: var(--settings-line) transparent; }
+.billingContent { display: flex; flex: 1 1 auto; flex-direction: column; width: 100%; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--settings-line) transparent; }
 .panel { width: 100%; min-width: 0; margin: 0; }
 .header { margin-bottom: 28px; }
 .header h2 { margin: 0; font-family: inherit; font-size: 28px; font-weight: 600; line-height: 1.25; letter-spacing: -.03em; }

@@ -35,6 +35,26 @@
         ],
         "createdAt": "2026-11-04T20:51:12.701Z",
         "reason": "The approved internal QA profile uses Falcon semantic product tokens and portrait overlays; root DESIGN.md describes public marketing."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/billing/presentation/plans/plans.module.css",
+          "app/src/modules/core-tms/billing/presentation/screen/billing.module.css"
+        ],
+        "createdAt": "2026-11-05T16:45:43.266Z",
+        "reason": "Agent: DESIGN.md explicitly governs public marketing only and excludes authenticated TMS; these two billing styles follow the approved Radiant reference and existing product tokens."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "app/src/modules/core-tms/billing/presentation/plans/plans.module.css",
+          "app/src/modules/core-tms/billing/presentation/screen/billing.module.css"
+        ],
+        "createdAt": "2026-11-05T16:45:43.366Z",
+        "reason": "Agent: DESIGN.md explicitly governs public marketing only and excludes authenticated TMS; these two billing styles follow the approved Radiant reference and existing product tokens."
       }
     ]
   }
