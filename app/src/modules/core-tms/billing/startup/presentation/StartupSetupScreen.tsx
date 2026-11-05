@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { useStartupSetup } from "../application/useStartupSetup";
 import type { BillingPlan, BillingAccount } from "../../domain/billing";
 import css from "./startup.module.css";
 type Props = { model: ReturnType<typeof useStartupSetup>; plan?: BillingPlan; quote?: BillingAccount["checkoutQuotes"][number];
-  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; onBack(): void; onCheckout(): Promise<void> };
-export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, onBack, onCheckout }: Props) {
+  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; checkoutNotice?: ReactNode; onBack(): void; onCheckout(): Promise<void> };
+export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, checkoutNotice, onBack, onCheckout }: Props) {
   const setup = model.setup;
   const [edit, setEdit] = useState<{ displayName: string; slug: string; legalName: string; countryCode: string; taxId: string; address: string } | null>(null);
   const [confirmed, setConfirmed] = useState<string | null>(null);
@@ -32,6 +32,7 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
     <p>{ru ? "Сохраните название и адрес. Личный доступ сохраняется до подтверждённой оплаты." : "Save a name and address. Your personal access stays available until payment is confirmed."}</p>
     {model.loading && <p role="status">{ru ? "Загружаем данные…" : "Loading setup…"}</p>}
     {error && <p role="alert">{slugError || nameError ? fieldError : ru ? "Действие не выполнено. Обновите данные или повторите попытку." : "The action could not be completed. Refresh or try again."}</p>}
+    {checkoutNotice}
     <form onSubmit={event => { event.preventDefault(); if (!locked) void save(); }}>
       <fieldset disabled={locked}>
         <label htmlFor="startup-name">{ru ? "Название команды или компании" : "Team or company name"}</label>

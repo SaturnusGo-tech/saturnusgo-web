@@ -4,13 +4,13 @@ import type { BillingPort } from "../domain/billing-port";
 import { useBillingSummary } from "./useBillingSummary";
 import { useBillingResource } from "./resources/useBillingResource";
 import { useBillingCommands } from "./commands/useBillingCommands";
-export interface BillingOptions { readonly port: BillingPort | null; readonly workspaceId: string | null; readonly canManage: boolean; readonly workspaceKind: "personal" | "company" }
-export function useBilling({ port, workspaceId, canManage, workspaceKind }: BillingOptions) {
+export interface BillingOptions { readonly port: BillingPort | null; readonly workspaceId: string | null; readonly canManage: boolean; readonly workspaceKind: "personal" | "company"; readonly reauthenticationScope?: string }
+export function useBilling({ port, workspaceId, canManage, workspaceKind, reauthenticationScope }: BillingOptions) {
   const summary = useBillingSummary({ port, workspaceId });
   const manageable = canManage && summary.summary?.canManage === true;
   const resource = useBillingResource(port, workspaceId, manageable);
   const reload = () => { summary.reload(); resource.reload(); };
-  const commands = useBillingCommands({ port, workspaceId, enabled: manageable, account: resource.account,
+  const commands = useBillingCommands({ port, workspaceId, enabled: manageable, account: resource.account, reauthenticationScope,
     onResult: (result, replay) => {
       if (replay) resource.reload(); else {
         resource.applyMutation(result);

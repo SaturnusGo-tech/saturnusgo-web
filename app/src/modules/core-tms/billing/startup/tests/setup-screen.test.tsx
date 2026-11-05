@@ -33,3 +33,12 @@ test("a failed save preserves the entered company name for correction", async ()
   all = h.draw(); await invoke(all.find(node => node.type === "form")!, "onSubmit", { preventDefault() {} });
   assert.equal(h.draw().find(node => node.props.id === "startup-name")!.props.value, "My draft team");
 });
+test("Startup setup keeps checkout identity-confirmation actions visible beside the saved draft", () => {
+  const h = fixture();
+  h.input.checkoutNotice = "Confirm your identity before checkout";
+  h.input.busy = true;
+  const all = h.draw();
+  assert.ok(all.some(node => Array.isArray(node.props.children) && node.props.children.includes(h.input.checkoutNotice)));
+  assert.equal(all.find(node => node.props.id === "startup-name")!.props.value, "Team");
+  assert.equal(all.find(node => node.type === "button" && node.props.children === "Continue to checkout")!.props.disabled, true);
+});

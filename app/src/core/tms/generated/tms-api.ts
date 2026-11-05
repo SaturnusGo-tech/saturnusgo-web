@@ -3745,7 +3745,7 @@ export interface paths {
         put?: never;
         /**
          * Create a mock checkout without granting access
-         * @description Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes.
+         * @description Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes. Startup checkout requires the current owner’s original authentication or required MFA confirmation within 10 minutes. Handoffs do not refresh that authentication time. Missing or stale proof returns HTTP403 REAUTHENTICATION_REQUIRED.
          */
         post: operations["createBillingCheckout"];
         delete?: never;
@@ -3768,7 +3768,7 @@ export interface paths {
         put?: never;
         /**
          * Confirm a mock checkout outcome
-         * @description Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice.
+         * @description Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice. Startup collection requires the same current recent-owner authentication check; stale proof returns403 REAUTHENTICATION_REQUIRED. Authenticated provider-confirmed payment fulfillment is processed independently and is not discarded for proof expiry.
          */
         post: operations["confirmBillingCheckout"];
         delete?: never;
