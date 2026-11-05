@@ -40,3 +40,12 @@ test('central managed MFA and handoff forward only host-bound session kinds whil
  }
  await worker.fetch(new Request(source+'/api/v1/auth/methods',{headers:{cookie:managed}}),env);assert.equal(forwarded.headers.has('cookie'),false);
 });
+test('common-host safe stop has one explicit POST route and never exposes resume or result writes',async t=>{
+ const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);let forwarded;
+ globalThis.fetch=async request=>{forwarded=request;return Response.json({data:{status:'paused'}});};
+ const body=JSON.stringify({workspaceId:'space',projectId:'project',kind:'pause',reason:'Stop safely',expectedRowVersion:2});
+ const make=(path,method='POST')=>new Request(source+'/api/v1/'+path,{method,headers:{origin:source,'content-type':'application/json','idempotency-key':'same-stop'},...(method==='POST'?{body}:{})});
+ assert.equal((await worker.fetch(make('qa-workflows/workflow_1/stop'),env)).status,200);assert.equal(await forwarded.text(),body);assert.equal(forwarded.headers.get('idempotency-key'),'same-stop');
+ for(const [path,method]of [['qa-workflows/workflow_1/stop','GET'],['qa-workflows/workflow_1/resume','POST'],['qa-workflows/workflow_1/results','POST'],['qa-workflows/workflow_1/pause','POST'],['qa-workflows/workflow_1/stop/extra','POST']])assert.equal((await worker.fetch(make(path,method),env)).status,404,path);
+ globalThis.fetch=async()=>Response.json({error:{code:'ACCESS_DENIED'}},{status:403});assert.equal((await worker.fetch(make('qa-workflows/workflow_1/stop'),env)).status,403);
+});

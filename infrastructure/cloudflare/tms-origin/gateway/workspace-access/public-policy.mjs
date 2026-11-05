@@ -11,6 +11,7 @@ const paths=new Map([
 ]);
 export function publicWorkspaceAccessAllowed(path,method) {
  const allowed=paths.get(path);if(allowed)return allowed.includes(method);
+ if(/^qa-workflows\/[A-Za-z0-9._:-]{1,128}\/stop$/.test(path))return method==='POST';
  if(/^company\/members\/[A-Za-z0-9._:-]{1,128}$/.test(path))return ['GET','PATCH'].includes(method);
  if(/^company\/agents\/codex\/connections\/[A-Za-z0-9._:-]{1,128}\/revoke$/.test(path))return method==='POST';
  if(/^auth\/saml\/[A-Za-z0-9._:-]{1,128}\/acs$/.test(path))return method==='POST';
