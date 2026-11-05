@@ -8,6 +8,7 @@ import { ManagedAvatarImage } from "../../auth/managed/presentation/avatar/Manag
 import { SupportContact } from "../../support/composition/SupportContact";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
 import { DesktopDownloadsPanel } from "../../desktop-downloads/presentation/DesktopDownloadsPanel";
+import { useDesktopDownloadsAvailable } from "../../desktop-downloads/presentation/useDesktopDownloadsAvailable";
 import { useRailPopup } from "../navigation/popup/useRailPopup";
 import css from "./navigation-profile.module.css";
 
@@ -22,6 +23,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
   const popup = useRailPopup(), id = useId();
   const [pending, setPending] = useState(false), [failed, setFailed] = useState(false);
   const [downloadsOpen, setDownloadsOpen] = useState(false);
+  const downloadsAvailable = useDesktopDownloadsAvailable();
   const label = session?.label || t("auth.account");
   const role = session?.workspaceKind === "personal" ? (ru ? "Личный аккаунт" : "Personal account")
     : session?.kind === "cloud" && !session.workspaceKind ? (ru ? "Аккаунт Falcon" : "Falcon account")
@@ -52,7 +54,7 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       <button role="menuitem" type="button" className={css.action} data-testid="nav-config" onClick={() => navigate(onOpenSettings)}>
         <Settings width={20} height={20} aria-hidden="true"/><span>{t("nav.config")}</span>
       </button>
-      {session && <button role="menuitem" type="button" className={css.action} data-testid="account-download-app" onClick={() => { popup.close(true); setDownloadsOpen(true); }}>
+      {session && downloadsAvailable && <button role="menuitem" type="button" className={css.action} data-testid="account-download-app" onClick={() => { popup.close(true); setDownloadsOpen(true); }}>
         <Download size={20} strokeWidth={1.7} aria-hidden="true"/><span>{ru ? "Скачать приложение" : "Download app"}</span>
       </button>}
       {session?.administrationPath && <a role="menuitem" className={css.action} href={session.administrationPath} onClick={popup.dismiss}>
@@ -75,6 +77,6 @@ export function NavigationProfile({ collapsed, workspaceId, onOpenSettings, onOp
       </>}
       {failed && <p className={css.error} role="alert">{t("auth.logoutError")}</p>}
     </div>, document.body)}
-    <DesktopDownloadsPanel open={downloadsOpen} anchor={popup.trigger} onClose={() => setDownloadsOpen(false)} />
+    {downloadsAvailable && <DesktopDownloadsPanel open={downloadsOpen} anchor={popup.trigger} onClose={() => setDownloadsOpen(false)} />}
   </div>;
 }

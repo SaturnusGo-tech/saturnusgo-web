@@ -7,6 +7,7 @@ import type { TmsSessionIdentity } from "../session/TmsSessionContext";
 import { ManagedAvatarImage } from "../../managed/presentation/avatar/ManagedAvatarImage";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { DesktopDownloadsPanel } from "../../../desktop-downloads/presentation/DesktopDownloadsPanel";
+import { useDesktopDownloadsAvailable } from "../../../desktop-downloads/presentation/useDesktopDownloadsAvailable";
 import shell from "../../../tms.module.css";
 import styles from "./profile-menu.module.css";
 
@@ -16,6 +17,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [downloadsOpen, setDownloadsOpen] = useState(false);
+  const downloadsAvailable = useDesktopDownloadsAvailable();
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const ru = locale === "ru";
@@ -54,7 +56,7 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
       <div className={styles.name}>{session.label}</div>
       <ProfileLink role="menuitem" onClick={() => setAnchor(null)}><UserRound size={17} />{ru ? "Мой профиль" : "My profile"}</ProfileLink>
       <ProfileLink role="menuitem" section="security" onClick={() => setAnchor(null)}><ShieldCheck size={17} />{ru ? "Безопасность" : "Security"}</ProfileLink>
-      <button role="menuitem" type="button" onClick={() => { setAnchor(null); trigger.current?.focus({ preventScroll: true }); setDownloadsOpen(true); }}><Download size={17} strokeWidth={1.7} />{ru ? "Скачать приложение" : "Download app"}</button>
+      {downloadsAvailable && <button role="menuitem" type="button" onClick={() => { setAnchor(null); trigger.current?.focus({ preventScroll: true }); setDownloadsOpen(true); }}><Download size={17} strokeWidth={1.7} />{ru ? "Скачать приложение" : "Download app"}</button>}
       {session.administrationPath && <a role="menuitem" href={session.administrationPath}><Building2 size={17} />{ru ? "Управление компанией" : "Company administration"}</a>}
       <button role="menuitem" type="button" disabled={pending} onClick={() => {
         setFailed(false); setPending(true);
@@ -62,6 +64,6 @@ export function ManagedProfileMenu({ session }: { readonly session: TmsSessionId
       }}><LogOut size={17} />{t("auth.signOut")}</button>
       {failed && <p className={styles.error} role="alert">{t("auth.logoutError")}</p>}
     </div>, document.body)}
-    <DesktopDownloadsPanel open={downloadsOpen} anchor={trigger} onClose={() => setDownloadsOpen(false)} />
+    {downloadsAvailable && <DesktopDownloadsPanel open={downloadsOpen} anchor={trigger} onClose={() => setDownloadsOpen(false)} />}
   </div>;
 }

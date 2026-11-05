@@ -4,7 +4,7 @@ import type { NavigationProfile } from "../NavigationProfile";
 import type { TmsSessionIdentity } from "../../../auth/presentation/session/TmsSessionContext";
 import { componentHarness, invoke, nodes } from "../../../portfolios/tests/support/component-harness";
 
-function setup(session: Partial<TmsSessionIdentity> | null = {}) {
+function setup(session: Partial<TmsSessionIdentity> | null = {}, downloadsAvailable = true) {
   let dismissed = 0, closed = 0, settings = 0, help = 0;
   const identity = session === null ? null : { label: "Mercury", kind: "cloud", subject: "u", signOut: async () => {}, ...session };
   const h = componentHarness(undefined, { document: { body: {} } });
@@ -15,6 +15,7 @@ function setup(session: Partial<TmsSessionIdentity> | null = {}) {
     if (name === "react-dom") return { createPortal: (value: unknown) => value };
     if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => identity };
     if (name.endsWith("useRailPopup")) return { useRailPopup: () => popup };
+    if (name.endsWith("useDesktopDownloadsAvailable")) return { useDesktopDownloadsAvailable: () => downloadsAvailable };
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en", t: (key: string) => key }) };
   });
   const props = { collapsed: true, workspaceId: "w", onOpenSettings() { settings++; }, onOpenHelp() { help++; } };
@@ -83,6 +84,14 @@ test("download app opens its own panel after closing the authenticated account m
 
 test("an unauthenticated profile does not offer desktop downloads", () => {
   assert.equal(setup(null).all().some(node => node.props["data-testid"] === "account-download-app"), false);
+});
+
+test("desktop accounts omit the download entry and panel while retaining settings and sign out", () => {
+  const all = setup({}, false).all();
+  assert.equal(all.some(node => node.props["data-testid"] === "account-download-app"), false);
+  assert.equal(all.some(node => node.type === "DesktopDownloadsPanel"), false);
+  assert.ok(all.some(node => node.props["data-testid"] === "nav-config"));
+  assert.ok(all.some(node => node.props["data-testid"] === "account-logout"));
 });
 
 test("logout prevents duplicate requests and reports a failure without dropping the menu", async () => {
