@@ -34,7 +34,7 @@ export const githubImpactWalkthrough = walkthrough("Review the change before app
   shot("github-impact-01-list", "Find the analysis that belongs to the change",
     "Open **GitHub → Connection setup → Impact Analysis**. Check the repository, branch, commit and build status. Search the loaded analyses, use the page controls or load more, then open the intended row.",
     "The actual company list contains existing analyses with review states, risks, case counts and gaps. An analysis state and a GitHub build result describe different things; neither is proof that the proposed tests were executed.",
-    "Actual GitHub Impact Analysis listing with repository identities, build and review states, risks, coverage counts and pagination."),
+    "English GitHub Impact Analysis list with existing change summaries, build and review states, risks, coverage counts and the AI availability notice."),
   shot("github-impact-02-changes", "Compare the proposed scope with source evidence",
     "Open **Changes** and review affected areas and changed files. Compare an incomplete list with the source diff before approving anything. In **Verification scope**, inspect each case’s Details and saved revision before including or excluding it.",
     "This existing iOS analysis shows seven changed files, zero selected cases and a warning that the change list is incomplete. AI impact analysis is paused; the screenshot is a manual review, not a new AI assessment or approval.",

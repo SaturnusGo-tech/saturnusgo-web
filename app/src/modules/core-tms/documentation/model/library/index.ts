@@ -1,3 +1,5 @@
+import { falconProductImage } from '../../../../core-falcon-public/shared/product-images';
+
 export type DocumentationFolder = {
   id: string;
   title: string;
@@ -76,30 +78,30 @@ export function buildDocumentationFolders(
 
 export type DocumentationArticleImage = { src: string; alt: string; width: number; height: number };
 
-// Reviewed synthetic UI captures, also used on the public product page. Keep
-// production guide screenshots and their company-specific captions out of here.
+// Reviewed product captures, also used on the public product page. Keep private
+// guide screenshots and their company-specific captions out of here.
 const illustrations = {
-  repository: { width: 1280, height: 720, alt: {
+  repository: { alt: {
     en: "Falcon test repository with folders, a test case scenario, and case properties.",
     ru: "Репозиторий Falcon: папки, сценарий тест-кейса и его свойства.",
   } },
-  run: { width: 1063, height: 804, alt: {
+  run: { alt: {
     en: "A Falcon test run with its case list, scenario steps, and execution results.",
     ru: "Тестовый прогон Falcon: список кейсов, шаги сценария и результаты выполнения.",
   } },
-  suites: { width: 1280, height: 720, alt: {
+  suites: { alt: {
     en: "Falcon test suites with manual and automatic case selections.",
     ru: "Тестовые наборы Falcon с ручным и автоматическим подбором кейсов.",
   } },
-  dashboard: { width: 1280, height: 720, alt: {
-    en: "The Falcon release quality dashboard with work awaiting testing and recent checks.",
-    ru: "Дашборд качества релиза Falcon: задачи для проверки и последние результаты.",
+  dashboard: { alt: {
+    en: "Falcon Guide Release quality dashboard, Defects section: status breakdown, two total defects and linked-defect metrics.",
+    ru: "Дашборд качества релиза Falcon, раздел Дефекты: статусы, общее число, связи с трекерами и метрики текущих дефектов.",
   } },
-  integrations: { width: 1063, height: 804, alt: {
+  integrations: { alt: {
     en: "The Falcon integrations catalog with issue trackers, development tools, and connected services.",
     ru: "Каталог интеграций Falcon: трекеры задач, инструменты разработки и подключённые сервисы.",
   } },
-  codex: { width: 1063, height: 804, alt: {
+  codex: { alt: {
     en: "The Falcon Codex integration with examples for preparing test cases and test runs.",
     ru: "Интеграция Falcon с Codex: примеры подготовки тест-кейсов и прогонов.",
   } },
@@ -117,5 +119,5 @@ export function documentationArticleImage(articleId: string, locale: "en" | "ru"
   const name = articleIllustrations.get(articleId);
   if (!name) return undefined;
   const image = illustrations[name];
-  return { src: `/falcon/landing/2026-11/product-${name}.webp`, alt: image.alt[locale], width: image.width, height: image.height };
+  return { ...falconProductImage(name, locale), alt: image.alt[locale] };
 }

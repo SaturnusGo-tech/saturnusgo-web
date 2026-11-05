@@ -4,7 +4,7 @@ export const settingsWalkthrough = walkthrough("Settings by task", [
   shot("settings-01-general-20260928-rows-inbox20260928-en-20260928", "Check the project",
     "Open the avatar menu → **Settings**. Under **General**, check the project name, key and status. Select **Edit** to open its properties.",
     "Review the selected project’s saved name, permanent key and status. The left navigation opens the other settings sections.",
-    "General settings for the selected Umbrella-Host project, with its properties and project actions."),
+    "General settings for Falcon Guide: permanent GUIDE key, no description, unassigned owner, no portfolio, Active status and project actions."),
   shot("settings-04-edit-project-20260928-inbox20260928-en-20260928", "Edit project properties",
     "In General, select **Edit**. Set the name, description, portfolio and owner. The permanent key appears separately and is used in case and run IDs. Select **Save changes** after editing.",
     "Opening the editor does not save a change. Check the current portfolio and responsible person; cancel to retain the saved values.",

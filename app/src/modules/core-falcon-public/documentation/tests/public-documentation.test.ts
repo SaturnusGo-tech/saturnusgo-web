@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { htmlLanguageForPath, isFalconPublicPath } from "../../../../shared/_components/route-flags";
 
@@ -44,27 +45,35 @@ test("public documentation has its own route language, independent of account pr
   assert.equal(isFalconPublicPath("/testcases/umbrella-home/work/"), false);
 });
 
-test("public article images come only from reviewed synthetic product captures", async () => {
+test("article images follow the reader language using authenticated production captures at their native dimensions", async () => {
   const { publicDocumentationCatalog } = await import("../catalog");
   const { documentationArticleImage } = await import("../../../core-tms/documentation/model/library");
-  const allowed = new Set(["repository", "run", "suites", "dashboard", "integrations", "codex"].map(name =>
-    `/falcon/landing/2026-11/product-${name}.webp`));
   const used = new Set<string>();
   for (const locale of ["en", "ru"] as const) {
+    const allowed = new Set(["repository", "run", "suites", "dashboard", "integrations", "codex"].map(name =>
+      `/falcon/landing/2026-11/${locale}/product-${name}.webp`));
     for (const article of publicDocumentationCatalog(locale).articles) {
       const image = documentationArticleImage(article.id, locale);
       if (!image) continue;
       assert.ok(allowed.has(image.src), `${article.id} contains an unreviewed image`);
       assert.ok(image.alt);
-      assert.doesNotMatch(image.src, /\/falcon\/docs\/|production2026|workspace_|project_/i);
+      assert.equal(image.width, 3456, `${article.id}: reserve the native capture width`);
+      assert.equal(image.height, 2234, `${article.id}: reserve the native capture height`);
+      assert.doesNotMatch(image.src, /\/falcon\/docs\/|workspace_|project_/i);
       used.add(image.src);
       const bytes = await readFile(new URL(`../../../../../../public${image.src}`, import.meta.url));
       assert.equal(bytes.subarray(0, 4).toString(), "RIFF");
       assert.equal(bytes.subarray(8, 12).toString(), "WEBP");
       const provenance = JSON.parse(await readFile(new URL(`../../../../../../public${image.src}.json`, import.meta.url), "utf8"));
-      assert.match(provenance.prompt, /isolated synthetic ui-preview workspace/);
-      assert.match(provenance.prompt, /No production or private company data/);
+      assert.equal(provenance.origin, "https://umbrella-falcon.saturnusgo.com");
+      assert.ok(Number.isFinite(Date.parse(provenance.capturedAt)));
+      assert.match(provenance.releaseSha, /^[a-f0-9]{40}$/);
+      assert.equal(provenance.locale, locale);
+      assert.equal(provenance.contentLanguage, locale);
+      assert.deepEqual(provenance.viewport, { width: 1728, height: 1117, deviceScaleFactor: 2 });
+      assert.match(provenance.rawSha256, /^[a-f0-9]{64}$/);
+      assert.equal(provenance.finalSha256, createHash("sha256").update(bytes).digest("hex"));
     }
   }
-  assert.equal(used.size, 6);
+  assert.equal(used.size, 12);
 });

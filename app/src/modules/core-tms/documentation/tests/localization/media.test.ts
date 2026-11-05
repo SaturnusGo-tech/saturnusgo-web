@@ -31,9 +31,11 @@ test("Russian guide uses its own complete screenshot inventory with valid dimens
   const previous = JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8")).files
     .filter((image: { file: string }) => image.file.startsWith("/falcon/docs/2026-11-ru/"))
     .map((image: { file: string }) => image.file.split("/").pop());
-  const captured = Object.values(production).map(image => (image as { src: string }).src);
-  const expected = [...previous, ...captured.map(src => src.split("/").pop())].sort();
-  assert.deepEqual(newAssets, expected, "only recorded legacy and registered production images may be published");
+  const captured = JSON.parse(readFileSync("public/falcon/docs/2026-11-ru/production-provenance.json", "utf8")).captures
+    .map((image: { file: string }) => image.file);
+  for (const image of Object.values(production)) assert.ok(captured.includes(image.src), image.src);
+  const expected = [...previous, ...captured.map((src: string) => src.split("/").pop())].sort();
+  assert.deepEqual(newAssets, expected, "retain recorded production replacements and reject unrecorded images");
   for (const src of used.keys()) if (src.startsWith("/falcon/docs/2026-11-ru/")) assert.ok(expected.includes(src.split("/").pop()), src);
   const retained = historicalGuideMedia.filter(item => item.locale === "ru").map(item => item.src.split("/").pop()!);
   assert.deepEqual(assets, [...legacy, ...retained].sort(), "retain legacy illustrations and explicit historical aliases for saved guide answers");

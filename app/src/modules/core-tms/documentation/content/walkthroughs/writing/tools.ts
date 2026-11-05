@@ -14,5 +14,5 @@ export const markerWalkthrough = walkthrough("Highlight text without an AI reque
     "Choose and review a highlight",
     "Select a passage in the Markdown editor and choose **Highlight** to open the palette. Select a color, then clear the text selection to review it. Apply and save only when you intend to update the case. To remove the color, select the passage again and choose **Remove highlight**.",
     "The palette is shown in an unsaved editor. Highlighting formats selected text without requesting an AI rewrite. No saved revision was changed for this capture; existing runs retain their snapshotted case revisions.",
-    "Highlight color palette in an unsaved test case Markdown editor."),
+    "Five-color Highlight palette with Remove highlight open over an unsaved English test-case description."),
 ]);

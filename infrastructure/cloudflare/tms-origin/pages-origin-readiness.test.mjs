@@ -114,3 +114,14 @@ test("readiness rejects a missing or HTML fallback documentation font", async ()
     }), /Required asset .*OpenAISans-Regular\.woff2 returned (?:404|unexpected content-type text\/html)/);
   }
 });
+
+test("readiness blocks a release missing any localized product capture, including deferred overlays", async () => {
+  for (const locale of ["en", "ru"]) for (const product of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) {
+    const path = `/falcon/landing/2026-11/${locale}/product-${product}.webp`;
+    await assert.rejects(verifyPagesOriginReadiness({
+      sourceOrigin: "https://origin.example", sourceSha,
+      fetchImpl: (input, options) => new URL(input).pathname === path
+        ? new Response("missing", { status: 404 }) : successfulFetch([])(input, options),
+    }), new RegExp(`Required asset ${path.replaceAll(".", "\\.")} returned 404`));
+  }
+});

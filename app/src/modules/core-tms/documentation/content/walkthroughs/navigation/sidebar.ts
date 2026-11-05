@@ -6,7 +6,7 @@ export const sidebarWalkthrough = walkthrough("Choose sidebar sections and width
     "Find the section you need",
     "Open **Test cases** in the expanded sidebar. Primary testing sections remain visible; additional tools are under **More sections**.",
     "The current section is highlighted and the repository stays beside navigation.",
-    "Expanded Falcon sidebar beside the test repository."),
+    "Expanded Falcon sidebar with labeled testing sections beside the English test repository and saved booking case."),
   shot("navigation-02-context-20260928-inbox20260928-en-20260928",
     "Pin a frequent destination",
     "Open **More sections** and use the pin beside a destination. Click the pin again to remove its shortcut. Right-click the sidebar and choose **All sections**, or use the Context Menu key or **Shift+F10** while navigation has focus, for the same destination list.",

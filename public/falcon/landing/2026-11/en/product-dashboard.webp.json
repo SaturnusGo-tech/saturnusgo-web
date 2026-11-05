@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "origin": "https://umbrella-falcon.saturnusgo.com",
+  "sourceUrl": "https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace_umbrella_home&projectId=project_19c1558998224c01a5826dbc6ff88c4a&view=dashboard",
+  "capturedAt": "2026-11-05T00:41:42.608Z",
+  "releaseSha": "f2448e292dbc7b2620154e5745a37781da0448e0",
+  "locale": "en",
+  "uiLocale": "en",
+  "contentLanguage": "en",
+  "viewport": {
+    "width": 1728,
+    "height": 1117,
+    "deviceScaleFactor": 2
+  },
+  "image": {
+    "width": 3456,
+    "height": 2234
+  },
+  "rawSha256": "710f630923c65cb929b7a5045e6de5a5f43d063935fd9ec20eda8185b3ecce40",
+  "finalSha256": "a94297c470719bfc54fc6326e392852a19808ba7560731add0dc92c798bfda12",
+  "encoding": {
+    "format": "webp",
+    "encoder": "cwebp",
+    "quality": 88,
+    "method": 6,
+    "resized": false,
+    "cropped": false
+  }
+}

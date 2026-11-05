@@ -82,7 +82,7 @@ test("new group identifiers do not inherit unrelated taxonomy definitions", asyn
   ], "en"), [{ id: "constructor", title: "New topic", articleIds: ["new-article"], children: [] }]);
 });
 
-test("article illustrations use the matching synthetic product capture and localized descriptions", async () => {
+test("article illustrations use the matching language product capture and localized descriptions", async () => {
   const module = await library();
   assert.equal(typeof module.documentationArticleImage, "function", "The safe article image selector must exist");
   const examples = [
@@ -95,8 +95,12 @@ test("article illustrations use the matching synthetic product capture and local
   for (const [articleId, asset] of examples) {
     const english = module.documentationArticleImage(articleId, "en");
     const russian = module.documentationArticleImage(articleId, "ru");
-    assert.equal(english?.src, `/falcon/landing/2026-11/product-${asset}.webp`);
-    assert.equal(russian?.src, english?.src);
+    assert.equal(english?.src, `/falcon/landing/2026-11/en/product-${asset}.webp`);
+    assert.equal(russian?.src, `/falcon/landing/2026-11/ru/product-${asset}.webp`);
+    for (const image of [english, russian]) {
+      assert.equal(image?.width, 3456);
+      assert.equal(image?.height, 2234);
+    }
     assert.ok(english?.alt && russian?.alt);
     assert.notEqual(english.alt, russian.alt);
   }

@@ -1,12 +1,13 @@
 export type CaptureRecord = {
   file: string; locale: "en" | "ru"; source: string; surface: "falcon" | "codex"; origin: string; workspace: string;
   sourceUrl: string; releaseSha: string;
+  uiLocale?: "en" | "ru"; contentLanguage?: "en" | "ru" | "mixed"; languageException?: string;
   capturedAt: string; viewport: { width: number; height: number; deviceScaleFactor: number }; rawSha256: string; sha256: string;
 };
 type CaptureInput = {
   publicDirectory: string; images: readonly { src: string; width: number; height: number; locale: "en" | "ru" }[];
   records: readonly CaptureRecord[]; media: readonly { src: string; locale: "en" | "ru" }[];
-  legacyDigests?: readonly string[]; complete?: boolean;
+  legacyDigests?: readonly string[]; complete?: boolean; requireLanguage?: boolean;
 };
 
 export function verifyProductionCaptures(input: CaptureInput) {
@@ -38,6 +39,16 @@ export function verifyProductionCaptures(input: CaptureInput) {
     if (records.length !== 1 || record.locale !== image.locale || record.source !== "authenticated-production-umbrella"
       || record.workspace !== "Umbrella Home" || !Number.isFinite(Date.parse(record.capturedAt))) {
       throw new Error(`Missing authenticated production Umbrella provenance: ${image.src}`);
+    }
+    if ((input.requireLanguage || record.uiLocale !== undefined || record.contentLanguage !== undefined || record.languageException !== undefined)
+      && (record.uiLocale !== image.locale || (record.contentLanguage !== image.locale && record.contentLanguage !== "mixed"))) {
+      throw new Error(`Capture UI and content language must match its locale: ${image.src}`);
+    }
+    if (record.contentLanguage === "mixed") {
+      if (input.requireLanguage) throw new Error(`Mixed content cannot pass full language verification: ${image.src}`);
+      if (typeof record.languageException !== "string" || !record.languageException.trim() || record.languageException.trim().startsWith("--")) {
+        throw new Error(`Mixed content language requires an explicit exception reason: ${image.src}`);
+      }
     }
     const origin = new URL(record.origin);
     const falconOrigin = origin.protocol === "https:" && origin.hostname.endsWith(".saturnusgo.com")
@@ -101,7 +112,7 @@ if (process.argv[1]?.endsWith("documentation-captures/verify.ts")) {
   legacyDigests.push(...codexLegacy.files.filter((file: { source?: string }) => file.source !== "user-supplied-codex-desktop")
     .flatMap((file: { sha256: string; sourcePngSha256: string }) => [file.sha256, file.sourcePngSha256]));
   verifyProductionCaptures({ publicDirectory, images, records, media: media.filter(image => !supplied.has(image.src)),
-    legacyDigests, complete: process.argv.includes("--complete") });
+    legacyDigests, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language") });
   console.log(JSON.stringify({ productionCaptures: images.length, suppliedCodexCaptures: supplied.size,
-    activeReferences: media.length, complete: process.argv.includes("--complete"), verified: true }));
+    activeReferences: media.length, complete: process.argv.includes("--complete"), requireLanguage: process.argv.includes("--require-language"), verified: true }));
 }

@@ -119,6 +119,7 @@ write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
 for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
 for (const id of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) write("out/falcon/landing/2026-11/product-" + id + ".webp", "Product screen");
+for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => /^\/falcon\/landing\/2026-11\/(en|ru)\/product-/.test(path)))}) if (process.env.OMIT_LOCALIZED_PRODUCT !== path) write("out" + path, "Localized product screen");
 write("out/falcon/falcon-mark-light.png", "falcon mark light\\n");
 write("out/falcon/auth/silver-wing.webp", "silver wing\\n");
 if (process.env.OMIT_IMPACT_BANNER !== "1") write("out/falcon/impact/ai-paused-20261018.webp", "ai paused asset");
@@ -363,4 +364,14 @@ for (const theme of ["light", "dark"]) test(`fails closed when Codex ${theme} as
   const result = deploy(fixture, "--publish", { OMIT_CODEX_ASSET: theme });
   assert.equal(result.status, 15); assert.match(result.stderr, new RegExp(`Required public asset is missing.*codex-${theme}\\.png`));
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+});
+
+test("a missing localized product overlay prevents publication before Pages is modified", (context) => {
+  const fixture = createFixture(context), before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const path = "/falcon/landing/2026-11/ru/product-codex.webp";
+  const result = deploy(fixture, "--publish", { OMIT_LOCALIZED_PRODUCT: path });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*ru\/product-codex\.webp/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
 });

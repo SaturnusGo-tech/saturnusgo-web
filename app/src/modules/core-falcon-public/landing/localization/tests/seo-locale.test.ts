@@ -3,6 +3,7 @@ import test from 'node:test';
 import { resolveLandingLocale, requestedLandingLocale, landingLanguageURL, landingLocaleBootstrap } from '../model/locale';
 import { englishCopy, russianCopy } from '../content/copy';
 import { runInNewContext } from 'node:vm';
+import { falconLandingMetadata, falconStructuredData } from '../../seo/metadata';
 
 test('a shared language URL takes precedence over saved or browser language', () => {
   assert.equal(resolveLandingLocale('en','en-US','ru'), 'ru');
@@ -36,4 +37,17 @@ test('both search titles identify the complete product and its testing purpose',
   assert.match(englishCopy.title, /Test Management/i);
   assert.match(russianCopy.title, /Falcon TMS/);
   assert.match(russianCopy.title, /тестирован/);
+});
+
+test('social previews and structured data use the landing language product capture', () => {
+  for (const locale of ['en', 'ru'] as const) {
+    const expected = `https://tms.saturnusgo.com/falcon/landing/2026-11/${locale}/product-repository.webp`;
+    const metadata = falconLandingMetadata(locale);
+    const images = metadata.openGraph?.images as { url: string; width: number; height: number }[];
+    assert.equal(images[0].url, expected);
+    assert.equal(images[0].width, 3456);
+    assert.equal(images[0].height, 2234);
+    assert.deepEqual(metadata.twitter?.images, [expected]);
+    assert.equal(falconStructuredData(locale)['@graph'][1].image, expected);
+  }
 });

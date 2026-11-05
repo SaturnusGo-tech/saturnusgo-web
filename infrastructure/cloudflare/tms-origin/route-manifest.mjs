@@ -71,6 +71,8 @@ export const requiredPublicAssets = Object.freeze([
   "/falcon/landing/2026-11/falcon-line-mark.svg",
   ...["coverage", "agents", "release"].map((id) => `/falcon/landing/2026-11/concept-${id}.webp`),
   ...["repository", "suites", "dashboard", "run", "integrations", "codex"].map((id) => `/falcon/landing/2026-11/product-${id}.webp`),
+  ...["en", "ru"].flatMap((locale) => ["repository", "suites", "dashboard", "run", "integrations", "codex"]
+    .map((id) => `/falcon/landing/2026-11/${locale}/product-${id}.webp`)),
   ...["Regular", "RegularItalic", "Medium", "Semibold", "Bold"].map((weight) => `/falcon/docs/fonts/OpenAISans-${weight}.woff2`),
   "/assets/integrations/codex/codex-light.png",
   "/assets/integrations/codex/codex-dark.png",

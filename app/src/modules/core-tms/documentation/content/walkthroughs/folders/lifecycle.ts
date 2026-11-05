@@ -12,6 +12,6 @@ export const importFoldersWalkthrough = walkthrough("Import and export test case
 export const archiveFoldersWalkthrough = walkthrough("Choose the right archive scope", [
   shot("organization-folder-01-tree-20260928-en-20260928", "Distinguish selected cases from a whole branch",
     "To archive individual cases, use **Select** and the selection bar’s **Archive** action. **Unfile** keeps cases active outside folders. For a whole obsolete branch, open its **…** menu and choose **Archive folder**; this includes its active subfolders and cases, independently of individual checkboxes.",
-    "The screenshot shows the current repository, not an archive operation. The archive control beside **Folders** opens archived branches. A folder’s **Restore folder** action restores records from that archive operation; cases archived separately beforehand remain archived.",
-    "Current folder tree and selected test case in the Umbrella-Host repository."),
+    "The screenshot shows the current **Product guide EN** repository tree and selected saved case; no archive operation is shown. A folder’s **Restore folder** action restores records from that archive operation; cases archived separately beforehand remain archived.",
+    "Current English Product guide EN folder hierarchy and selected saved GUIDE-TC-3 in Falcon Guide; no cases or branches archived."),
 ]);

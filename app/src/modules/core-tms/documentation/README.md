@@ -127,7 +127,7 @@ retaining an old file does not require displaying it in a current walkthrough.
 From the frontend checkout, import an actual capture after inspecting it:
 
 ```bash
-npx tsx scripts/documentation-captures/import.ts --locale en --key navigation-01-workspace-20260928-inbox20260928-en-20260928 --raw /absolute/path/to/raw-capture.jpg --origin https://umbrella-falcon.saturnusgo.com --source-url 'https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?view=cases' --release-sha 38c7171d380d7a08339e66628e6503cf195e520c --captured-at 2026-11-03T12:00:00Z
+npx tsx scripts/documentation-captures/import.ts --locale en --ui-locale en --content-language en --key navigation-01-workspace-20260928-inbox20260928-en-20260928 --raw /absolute/path/to/raw-capture.jpg --origin https://umbrella-falcon.saturnusgo.com --source-url 'https://umbrella-falcon.saturnusgo.com/testcases/umbrella-home/work/?view=cases' --release-sha 38c7171d380d7a08339e66628e6503cf195e520c --captured-at 2026-11-03T12:00:00Z
 npx tsx scripts/documentation-captures/verify.ts
 npx tsx scripts/documentation-captures/verify.ts --complete
 ```
@@ -138,8 +138,11 @@ such as OAuth state, codes or tokens are removed before public provenance is sav
 their values must never be written into guide assets or examples.
 For an actual Codex host screenshot add `--surface codex --origin codex://desktop`
 (or `https://chatgpt.com` for its web UI). The importer never captures the screen:
-it transcodes an existing source without resize/crop, records SHA-256 and the safe
-source-state URL, and rejects an existing key/file instead of overwriting it.
+it transcodes an existing source without resize/crop and records SHA-256, language
+and the safe source-state URL. For a reviewed replacement, use `--replace-existing`
+and a fresh date-versioned filename; previous files and exact aliases are retained.
+Mixed content requires `--content-language mixed` and an explicit
+`--language-exception` reason. It must not be reported as strict language coverage.
 The normal verifier checks registered captures; **`--complete` is the final refresh
 gate** and fails while any active EN/RU illustration still uses an old source.
 It checks provenance, locale, intrinsic size, digest, legacy reuse and budgets.

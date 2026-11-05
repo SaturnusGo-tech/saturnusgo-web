@@ -33,5 +33,22 @@ test("production capture registry verifies source, dimensions, integrity and com
     assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...record, sourceUrl: record.sourceUrl + "&token=private" }] }), /unsafe/i);
     assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...record, releaseSha: "unknown" }] }), /SHA/i);
     assert.throws(() => verifyProductionCaptures({ ...input, images: [{ ...image, locale: "ru" }] }), /locale/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, requireLanguage: true }), /language/i);
+    assert.doesNotThrow(() => verifyProductionCaptures({ ...input, requireLanguage: true,
+      records: [{ ...record, uiLocale: "en", contentLanguage: "en" }] }));
+    assert.throws(() => verifyProductionCaptures({ ...input,
+      records: [{ ...record, uiLocale: "en", contentLanguage: "ru" }] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input,
+      records: [{ ...record, uiLocale: "ru", contentLanguage: "en" }] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input,
+      records: [{ ...record, uiLocale: "en" }] }), /language/i);
+    const mixed = { ...record, uiLocale: "en" as const, contentLanguage: "mixed" as const,
+      languageException: "Immutable external English commit summaries." };
+    assert.doesNotThrow(() => verifyProductionCaptures({ ...input, records: [mixed] }));
+    assert.throws(() => verifyProductionCaptures({ ...input, requireLanguage: true, records: [mixed] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...mixed, languageException: undefined }] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...mixed, languageException: "  " }] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...mixed, uiLocale: "ru" }] }), /language/i);
+    assert.throws(() => verifyProductionCaptures({ ...input, records: [{ ...mixed, contentLanguage: "ru" }] }), /language/i);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });

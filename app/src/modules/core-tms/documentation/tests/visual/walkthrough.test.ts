@@ -66,8 +66,11 @@ test("every published screenshot has accurate dimensions and fits the asset budg
   const previous = JSON.parse(readFileSync("public/falcon/docs/2026-11/codex-provenance.json", "utf8")).files
     .filter((image: { file: string }) => image.file.startsWith("/falcon/docs/2026-11/"))
     .map((image: { file: string }) => image.file.split("/").pop());
-  const expected = [...previous, ...[...registered].map(src => src.split("/").pop())].sort();
-  assert.deepEqual(newAssets, expected, "only recorded legacy and registered production images may be published");
+  const captured = JSON.parse(readFileSync("public/falcon/docs/2026-11/production-provenance.json", "utf8")).captures
+    .map((image: { file: string }) => image.file);
+  for (const src of registered) assert.ok(captured.includes(src), src);
+  const expected = [...previous, ...captured.map((src: string) => src.split("/").pop())].sort();
+  assert.deepEqual(newAssets, expected, "retain recorded production replacements and reject unrecorded images");
   for (const src of used.keys()) if (src.startsWith("/falcon/docs/2026-11/")) assert.ok(expected.includes(src.split("/").pop()), src);
   const retained = historicalGuideMedia.filter(item => item.locale === "en").map(item => item.src.split("/").pop()!);
   assert.deepEqual(assets, [...legacy, ...retained].sort(), "retain legacy illustrations and explicit historical aliases for saved guide answers");
