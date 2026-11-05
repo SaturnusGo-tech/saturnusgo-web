@@ -8,9 +8,9 @@ import { IntegrationBrand } from "../shared/brand/IntegrationBrand";
 import surface from "../../../codex-employee/presentation/plugin-surface/plugin.module.css";
 import css from "./list.module.css";
 
-type Props = { entries: readonly CatalogEntry[]; codex: ReturnType<typeof useCodexEmployee>; ru: boolean; canManage: boolean; canAdminCodex?: boolean; pending: boolean; error: string | null;
+type Props = { entries: readonly CatalogEntry[]; codex: ReturnType<typeof useCodexEmployee>; ru: boolean; canManage: boolean; canAdminCodex?: boolean; codexAdminHref?: string; pending: boolean; error: string | null;
   onManage: (id: IntegrationId, connect?: boolean) => void; onBrowse: () => void; onToggle: (id: IntegrationId, next: boolean) => void };
-export function PluginsList({ entries, codex, ru, canManage, canAdminCodex = false, pending, error, onManage, onBrowse, onToggle }: Props) {
+export function PluginsList({ entries, codex, ru, canManage, canAdminCodex = false, codexAdminHref = "/admin/?page=codex", pending, error, onManage, onBrowse, onToggle }: Props) {
   const [query, setQuery] = useState("");
   const visible = entries.filter(({ integration }) => `${integration.name} ${integration.description.ru} ${integration.description.en}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return <div className={`${surface.surface} ${css.page}`}>
@@ -24,7 +24,7 @@ export function PluginsList({ entries, codex, ru, canManage, canAdminCodex = fal
       const disabled = pending || status === "checking" || planned || !canManage;
       return <div className={surface.row} key={id}>
         <button className={css.open} type="button" onClick={() => onManage(id)} disabled={planned}><span className={`${surface.icon} ${css.brand}`}><IntegrationBrand provider={id} /></span><span className={surface.rowCopy}><strong>{integration.name} <small>Falcon</small></strong><span>{integration.description[ru ? "ru" : "en"]}</span></span></button>
-        {planned ? <span className={css.hint}>{ru ? "Скоро" : "Coming soon"}</span> : id === "codex" ? (canAdminCodex && <a className={css.hint} href="/admin/?page=codex">{ru ? "Администрирование" : "Company admin"}</a>) : id === "swagger" ? <span className={css.hint}>{ru ? "API-источники" : "API sources"}</span> : <button type="button" className={surface.switch} role="switch" aria-checked={active} aria-label={`${ru ? "Интеграция" : "Integration"} ${integration.name}`} disabled={disabled} onClick={() => onToggle(id, !active)} />}
+        {planned ? <span className={css.hint}>{ru ? "Скоро" : "Coming soon"}</span> : id === "codex" ? (canAdminCodex && <a className={css.hint} href={codexAdminHref}>{ru ? "Администрирование" : "Company admin"}</a>) : id === "swagger" ? <span className={css.hint}>{ru ? "API-источники" : "API sources"}</span> : <button type="button" className={surface.switch} role="switch" aria-checked={active} aria-label={`${ru ? "Интеграция" : "Integration"} ${integration.name}`} disabled={disabled} onClick={() => onToggle(id, !active)} />}
         {!planned && <button type="button" className={css.chevron} aria-label={`${ru ? "Управлять" : "Manage"} ${integration.name}`} onClick={() => onManage(id)}><ChevronRight width={18} height={18} /></button>}
       </div>;
     })}</div> : <div className={css.empty}><h3>{ru ? "Плагины не найдены" : "No matching plugins"}</h3><p>{ru ? "Измените поисковый запрос." : "Try a different search."}</p></div>}

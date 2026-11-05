@@ -24,6 +24,7 @@ test("catalog, detail, browser back and refresh share one resource owner", async
   let statusCalls = 0; let grantCalls = 0;
   const client = createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
     const path = new URL(String(input)).pathname;
+    if (path.endsWith("/codex/setup")) return Response.json({ data: { workspaceId: "w", companyName: "Team", teamAdministrationAvailable: false, canConnect: true, readOnly: false, connectionKind: "company", status: "available", installation: { pluginUrl: null }, server: { name: "Falcon", url: status.setup.mcpUrl, issuer: status.setup.oauthIssuer, resource: status.setup.resource, connectionName: "falcon-team", scopes: status.setup.scopes, authentication: "oauth", version: "1" } } });
     if (path.endsWith("/company/agents/codex")) { statusCalls++; return Response.json({ data: status }, { headers: { etag: '"3"' } }); }
     if (path.endsWith("/profile/mcp-connections")) { grantCalls++; return Response.json({ data: [] }); }
     return new Response("{}", { status: 404 });
@@ -62,7 +63,8 @@ test("tester restored connector links cannot start connector requests or expose 
     const calls: string[] = [];
     const client = createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
       const path = new URL(String(input)).pathname; calls.push(path);
-      if (path.endsWith("/company/agents/codex")) return Response.json({ data: status }, { headers: { etag: '"3"' } });
+      if (path.endsWith("/codex/setup")) return Response.json({ data: { workspaceId: "w", companyName: "Team", teamAdministrationAvailable: false, canConnect: true, readOnly: false, connectionKind: "company", status: "available", installation: { pluginUrl: null }, server: { name: "Falcon", url: status.setup.mcpUrl, issuer: status.setup.oauthIssuer, resource: status.setup.resource, connectionName: "falcon-team", scopes: status.setup.scopes, authentication: "oauth", version: "1" } } });
+    if (path.endsWith("/company/agents/codex")) return Response.json({ data: status }, { headers: { etag: '"3"' } });
       if (path.endsWith("/profile/mcp-connections")) return Response.json({ data: [] });
       return new Response("{}", { status: 403 });
     } });
@@ -70,7 +72,7 @@ test("tester restored connector links cannot start connector requests or expose 
     const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "" };
     let view!: ReactTestRenderer;
     await act(async () => { view = create(<TmsHttpClientProvider client={client}><TmsSessionProvider value={session}><TmsLocaleContext.Provider value={locale}><HooksView workspaceId="w" projectId="p" canManage={false} capabilities={["integration:read"]} connected /></TmsLocaleContext.Provider></TmsSessionProvider></TmsHttpClientProvider>); });
-    assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")), calls.join(", "));
+    assert.ok(calls.every(path => path.endsWith("/codex/setup") || path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")), calls.join(", "));
     assert.equal(JSON.stringify(view.toJSON()).includes("Your QA workflow in Codex"), integration === "codex");
     await act(async () => view.unmount());
   }
@@ -82,7 +84,8 @@ test("profile connect URL reaches setup and a core-only denial stays actionable"
     const calls: string[] = [];
     const client = createTmsHttpClient({ apiBase: "https://company.test/api/v1", credentials: "include", fetch: async input => {
       const path = new URL(String(input)).pathname; calls.push(path);
-      if (path.endsWith("/company/agents/codex")) return entitled ? Response.json({ data: status }, { headers: { etag: '"3"' } }) : Response.json({ error: { code: "FORBIDDEN" } }, { status: 403 });
+      if (path.endsWith("/codex/setup")) return Response.json({ data: { workspaceId: "w", companyName: "Team", teamAdministrationAvailable: false, canConnect: true, readOnly: false, connectionKind: "company", status: "available", installation: { pluginUrl: null }, server: { name: "Falcon", url: status.setup.mcpUrl, issuer: status.setup.oauthIssuer, resource: status.setup.resource, connectionName: "falcon-team", scopes: status.setup.scopes, authentication: "oauth", version: "1" } } });
+    if (path.endsWith("/company/agents/codex")) return entitled ? Response.json({ data: status }, { headers: { etag: '"3"' } }) : Response.json({ error: { code: "FORBIDDEN" } }, { status: 403 });
       if (path.endsWith("/profile/mcp-connections")) return Response.json({ data: [] });
       return new Response("{}", { status: 403 });
     } });
@@ -93,7 +96,7 @@ test("profile connect URL reaches setup and a core-only denial stays actionable"
     const rendered = JSON.stringify(view.toJSON());
     if (entitled) assert.match(rendered, /Your QA workflow in Codex/);
     else { assert.match(rendered, /Refresh|Retry/); assert.doesNotMatch(rendered, /Company active/); }
-    assert.ok(calls.every(path => path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")));
+    assert.ok(calls.every(path => path.endsWith("/codex/setup") || path.endsWith("/company/agents/codex") || path.endsWith("/profile/mcp-connections")));
     await act(async () => view.unmount());
   }
 });

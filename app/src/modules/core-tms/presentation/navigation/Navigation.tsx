@@ -1,3 +1,4 @@
+import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
 import { useRef } from "react";
 import { workspaceViewAllowed } from "../../auth/managed/domain/features/workspace-view-access";
 import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
@@ -23,10 +24,12 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
 }) {
   const { t, locale } = useTmsLocale();
   const session = useOptionalTmsSession();
+  const metadata = useWorkspaceCapabilities(workspaceId, !!session);
+  const codexAvailable = !!metadata.value;
   const root = useRef<HTMLElement>(null);
   const reveal = useSidebarReveal(root, collapsed, onCollapsedChange);
   const compact = !reveal.revealed;
-  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, session?.kind === "managed") && workspaceViewAllowed(candidate, userCapabilities, session?.kind === "managed");
+  const available = (candidate: View) => companyViewAvailable(candidate, session?.companyCapabilities, codexAvailable) && workspaceViewAllowed(candidate, userCapabilities, codexAvailable);
   const state = useSidebarPreferences(workspaceId, session?.subject);
   const navigation = getSidebarNavigation({ availableIds: SIDEBAR_NAVIGATION_IDS.filter(available), activeView: view, preferences: state.preferences });
   const navigate = (next: View) => {
@@ -52,13 +55,13 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
       </button>
     </div>
     <div className={css.scroll} data-sidebar-scroll>
-      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={session?.kind === "managed"} activeRunCount={activeRunCount} onNavigate={navigate}/>
+      <NavigationGroups groups={navigation.groups} activeId={navigation.activeId} disabled={disabled} allowManagedHooks={codexAvailable} activeRunCount={activeRunCount} onNavigate={navigate}/>
       <RareNavigationMenu availableIds={navigation.availableIds} activeId={navigation.activeId} pinnedIds={navigation.pinnedIds}
-        disabled={disabled} allowManagedHooks={session?.kind === "managed"} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
+        disabled={disabled} allowManagedHooks={codexAvailable} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
     </div>
     <div className={css.footer}>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
-        preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={session?.kind === "managed"}/>
+        preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={codexAvailable}/>
       <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>
       <NavigationProfile collapsed={compact} workspaceId={workspaceId} onOpenSettings={() => onChange("config")} onOpenHelp={() => onChange("help")}/>
     </div>

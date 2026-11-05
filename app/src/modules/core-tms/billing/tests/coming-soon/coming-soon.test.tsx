@@ -22,37 +22,28 @@ function providers(locale: "ru" | "en", http: TmsHttpClient, child: React.ReactN
     </TmsSessionProvider>
   </TmsLocaleContext.Provider>;
 }
-for (const locale of ["en", "ru"] as const) test(`coming-soon ${locale} catalog never mounts billing services or enables any conversion action`, async () => {
-  let requests = 0, closed = 0, view!: ReactTestRenderer;
-  const fail = async () => { requests++; throw new Error("Disabled billing must not make requests"); };
-  const http = { get: fail, getResource: fail, mutate: fail, mutateResource: fail, binary: fail, stream: fail } as TmsHttpClient;
-  const previousFetch = globalThis.fetch;
-  globalThis.fetch = fail;
+for (const locale of ["en", "ru"] as const) test(`production ${locale} setup is usable while payment remains disabled`, async () => {
+  const environment = process.env.NODE_ENV; Reflect.set(process.env, "NODE_ENV", "production");
+  const calls: string[] = []; let mutations = 0, view!: ReactTestRenderer;
+  const draft = { id: "setup", version: 1, displayName: "Team", slug: "team", hostname: "team-falcon.saturnusgo.com", status: "ready", expiresAt: "2026-11-06T12:30:00Z" };
+  const http = { async getResource(path: string) { calls.push(path);
+    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial", planId: null }, etag: null };
+    if (path.startsWith("/billing/startup-setup")) return { data: { setup: draft }, etag: null };
+    return { data: { plans: [{ id: "startup", seats: 5, amount: 5900, currency: "USD" }], subscription: null, checkout: null, occupiedSeats: 1,
+      checkoutQuotes: [{ planId: "startup", subtotal: 5900, currency: "USD", periodEnd: "2026-12-06T00:00:00Z", prorated: false }], suggestedPlanId: "startup", allowedCheckoutPlanIds: ["startup"], allowedChangePlanIds: [], provider: "mock", testMode: true }, etag: null };
+  }, async get() { return { data: [], meta: { limit: 30 } }; }, async mutateResource() { mutations++; throw new Error("Payment must remain disabled"); } } as unknown as TmsHttpClient;
   try {
-    await act(async () => { view = create(providers(locale, http, <BillingFeature workspaceId="space" preview onClose={() => closed++} />)); });
-    const text = () => JSON.stringify(view.toJSON());
-    const subtitle = locale === "ru" ? "Оплата скоро станет доступна" : "Payments are coming soon";
-    for (const id of ["individual", "startup", "enterprise"]) {
-      if (id !== "individual") {
-        await act(async () => { view.root.findByProps({ "aria-controls": "billing-other-plans" }).props.onClick(); });
-        await act(async () => { view.root.findByProps({ "data-view-plan": id }).props.onClick(); });
-      }
-      const action = view.root.findByProps({ "data-plan": id });
-      assert.equal(action.type, "button"); assert.equal(action.props.disabled, true);
-      assert.equal(action.props.href, undefined); assert.equal(action.props.onClick, undefined);
-      assert.ok(text().includes(subtitle));
-      assert.equal(view.root.findAllByType("a").length, 0);
-      assert.equal(view.root.findAllByType("input").length, 0);
-      assert.equal(view.root.findAll(node => typeof node.type === "function" && ["ConnectedBillingFeature", "BillingScreen", "BillingConfirmation", "BillingCurrent"].includes(node.type.name)).length, 0);
-      if (id === "individual") assert.ok(text().includes("11"));
-      if (id === "startup") { assert.ok(text().includes("59")); assert.ok(text().includes(locale === "ru" ? "5 мест" : "5 seats")); }
-      if (id === "enterprise") { assert.ok(!text().includes("249")); assert.ok(!text().includes("25 seats")); }
-      assert.ok(!text().includes("Review and confirm your subscription"));
-      assert.equal(requests, 0);
-    }
-    await act(async () => { view.root.findByProps({ "aria-label": locale === "ru" ? "Закрыть тарифы" : "Close plans" }).props.onClick(); });
-    assert.equal(closed, 1);
-  } finally { await act(async () => view?.unmount()); globalThis.fetch = previousFetch; }
+    await act(async () => { view = create(providers(locale, http, <BillingFeature workspaceId="space" />)); });
+    const action = view.root.findByProps({ "data-plan": "startup" }); assert.equal(action.props.disabled, false);
+    await act(async () => action.props.onClick());
+    assert.ok(calls.includes("/billing/startup-setup?workspaceId=space"));
+    assert.equal(view.root.findByProps({ id: "startup-name" }).props.required, true);
+    assert.equal(view.root.findByProps({ id: "startup-slug" }).props.required, true);
+    await act(async () => view.root.findByProps({ type: "checkbox" }).props.onChange({ target: { checked: true } }));
+    const checkout = view.root.findAllByType("button").find(node => node.children.includes(locale === "ru" ? "Перейти к оплате" : "Continue to checkout"))!;
+    assert.equal(checkout.props.disabled, true);
+    await act(async () => checkout.props.onClick()); assert.equal(mutations, 0);
+  } finally { await act(async () => view?.unmount()); if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment); }
 });
 test("the disabled release account link stays neutral and makes no summary request", async () => {
   let requests = 0, view!: ReactTestRenderer;
@@ -68,16 +59,32 @@ test("the disabled release account link stays neutral and makes no summary reque
     } finally { await act(async () => view?.unmount()); }
   }
 });
-test("profile menu links make no billing reads and preserve the existing company administration destination", async () => {
-  let requests = 0, view!: ReactTestRenderer;
-  const fail = async () => { requests++; throw new Error("No billing reads from the disabled profile menu"); };
-  const http = { get: fail, getResource: fail, mutate: fail, mutateResource: fail } as TmsHttpClient;
-  for (const administrationPath of [undefined, "/admin/"]) {
-    try {
-      await act(async () => { view = create(providers("en", http, <><BillingPlanLink workspaceId="space" enabled /><CompanyAdministrationLink workspaceId="space" enabled>Company administration</CompanyAdministrationLink></>, administrationPath)); });
-      const admin = view.root.findAllByType("a").find(node => node.children.includes("Company administration"));
-      assert.equal(admin?.props.href, administrationPath);
-      assert.equal(requests, 0);
-    } finally { await act(async () => view?.unmount()); }
-  }
+test("administration uses server capabilities even while production payments are disabled", async () => {
+  let reads = 0, view!: ReactTestRenderer;
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { location: new URL("https://falcon.test/work/?workspaceId=space&lang=ru"), addEventListener() {}, removeEventListener() {} } });
+  let allowed = false;
+  const http = { async getResource() { reads++; return { data: { workspaceId: "space", teamAdministrationAvailable: allowed }, etag: null }; } } as unknown as TmsHttpClient;
+  try {
+    await act(async () => { view = create(providers("en", http, <CompanyAdministrationLink workspaceId="space">Company administration</CompanyAdministrationLink>)); });
+    assert.equal(view.root.findAllByType("a").length, 0); assert.equal(reads, 1);
+    await act(async () => view.unmount()); allowed = true;
+    await act(async () => { view = create(providers("en", http, <CompanyAdministrationLink workspaceId="space">Company administration</CompanyAdministrationLink>)); });
+    assert.match(view.root.findByType("a").props.href, /account=personal&workspaceId=space/);
+  } finally { await act(async () => view?.unmount()); if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow); else Reflect.deleteProperty(globalThis, "window"); }
+});
+
+test("development can exercise a server-authorized mock checkout", async () => {
+  const environment = process.env.NODE_ENV; Reflect.set(process.env, "NODE_ENV", "development");
+  let writes = 0, view!: ReactTestRenderer;
+  const http = { async getResource(path: string) {
+    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial" }, etag: null };
+    return { data: { plans: [{ id: "individual", seats: 1, amount: 1100, currency: "USD" }], subscription: null, checkout: null, occupiedSeats: 1,
+      checkoutQuotes: [], suggestedPlanId: "individual", allowedCheckoutPlanIds: ["individual"], allowedChangePlanIds: [], provider: "mock", testMode: true }, etag: null };
+  }, async get() { return { data: [], meta: { limit: 30 } }; }, async mutateResource(path: string) { assert.equal(path, "/billing/checkout"); writes++; return { data: { subscription: null, checkout: null, invoice: null, provider: "mock", testMode: true } }; } } as unknown as TmsHttpClient;
+  try {
+    await act(async () => { view = create(providers("en", http, <BillingFeature workspaceId="space" />)); });
+    const action = view.root.findByProps({ "data-plan": "individual" }); assert.equal(action.props.disabled, false);
+    await act(async () => action.props.onClick()); assert.equal(writes, 1);
+  } finally { await act(async () => view?.unmount()); if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment); }
 });

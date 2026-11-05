@@ -5,12 +5,17 @@ import { codexDesktopWalkthrough } from "./desktop/walkthrough";
 
 export const codexQaArticle: DocArticle = {
   id: "codex-web-qa", title: "Codex: connected web QA", group: "integrations",
-  description: "Connect Codex to your company, review a web QA plan, run observed checks, and resume with authoritative Falcon records.",
+  description: "Connect Codex to your workspace, review a web QA plan, run observed checks, and resume with authoritative Falcon records.",
   keywords: ["Codex", "QA", "virtual employee", "Figma", "PDF", "URL", "existing cases", "browser", "consent", "resume", "retest"],
   related: ["integration-overview", "falcon-ai-writing", "execute-run", "integration-troubleshooting"],
   sections: [
     section("purpose", "Choose the right assistant", paragraph("Avatar menu → Help → Falcon AI answers questions from this handbook. The editor's Falcon AI improves selected text. The connected Falcon plugin in Codex can perform authorized QA actions and save results in Falcon."),
       note("Availability", "Your company features, role, connection permissions, and the supported browser in your Codex host determine what you can do.")),
+    section("personal", "Trial and Individual personal workspaces", bullets(
+      "In Settings → Plugins → Codex, use the connection details returned by Falcon. The shared MCP endpoint is https://tms.saturnusgo.com/api/v1/mcp.",
+      "During OAuth choose one available personal workspace, projects and permissions. This connection acts as you and creates no company employee or additional seat.",
+      "The editable connection name does not control access. Different people have independent grants at the shared endpoint.",
+      "After conversion to Startup, reconnect to the company endpoint. An old personal grant never gains team access automatically; disabled and archived access follows server restrictions.")),
     section("company", "One Codex employee for the company", bullets(
       "A company has one stable Codex employee and occupies one company seat across projects, chats, clients, and personal connections.",
       "Company administrators manage Codex, seats and company connections in the company administration console → Codex (/admin/?page=codex). The Company admin link in Settings → Plugins opens this console for administrators.",
@@ -19,12 +24,12 @@ export const codexQaArticle: DocArticle = {
       "Assigning work to Codex does not start a browser or run checks. History identifies the Codex actor and the human who initiated the action separately.")),
     section("connect", "Connect your own account", steps(
       ["Open Codex in Falcon", "Choose Settings → Plugins → Codex. If Install plugin is shown, click it, wait for Installing to finish and choose Manage. Installation prepares the integration inside Falcon; it does not download a file or grant OAuth access."],
-      ["Copy the connection details", "In Uses, open Falcon MCP. Copy the Server name and Server URL from the compact connection instructions. Use a different server name for each company. Guide opens this article; About contains provider details."],
+      ["Copy the connection details", "In Uses, open Falcon MCP. Copy the Server name and Server URL from the compact connection instructions. Use a different server name for each workspace. Guide opens this article; About contains provider details."],
       ["Open the Codex app settings", "On your computer, open Codex → Settings → Plugins. Use Add → Add MCP server. This is the menu label; do not look for Add Custom MCP Server. The Falcon plugin’s Manage page contains its skills, not the server’s Authenticate button."],
-      ["Enter your company server", "In Name enter a unique server name, for example falcon-umbrella. Switch Type from the default STDIO to Streamable HTTP, then paste the exact Server URL copied from your company’s Falcon. Leave Bearer token, token environment variables and Headers empty for OAuth. No OpenAI API key or client secret is needed. Save; restart only if Codex prompts you."],
+      ["Enter your workspace server", "In Name enter a unique server name, for example falcon-umbrella. Switch Type from the default STDIO to Streamable HTTP, then paste the exact Server URL returned for your workspace. Leave Bearer token, token environment variables and Headers empty for OAuth. No OpenAI API key or client secret is needed. Save; restart only if Codex prompts you."],
       ["Find Authenticate on the server row", "Still in Codex, open Settings → Plugins and select the MCPs tab beside Plugins and Apps. Under Servers find the name you just saved. Click Authenticate on the right of that row. If the row is absent, check that the server was saved before continuing."],
-      ["Approve access in your company’s Falcon", "The browser opens Falcon. Sign in with your company Falcon account, select projects and review the requested permissions. Approve only the access needed for your work within your current role."],
-      ["Return to a new Codex chat", "Keep the Falcon skill plugin enabled, open a new chat and check the connected company and projects before asking for writes or execution. For this direct MCP setup, you do not need to create another plugin in ChatGPT or enter a ChatGPT app ID."]),
+      ["Approve access in Falcon", "The browser opens Falcon. Sign in to Falcon, choose your workspace and projects and review the requested permissions. Approve only the access needed for your work within your current role."],
+      ["Return to a new Codex chat", "Keep the Falcon skill plugin enabled, open a new chat and check the connected workspace and projects before asking for writes or execution. For this direct MCP setup, you do not need to create another plugin in ChatGPT or enter a ChatGPT app ID."]),
       paragraph("TOML, CLI, resource, issuer and explicit scopes are optional advanced setup. In Falcon, expand Manual configuration (TOML / CLI) when you need them; this section is collapsed initially. Copy icons are inside the code frames."),
       warning("Connection problems", "If access is denied, check your QA role, selected projects and granted permissions. If company Codex is unavailable, contact your company administrator. For an authentication error, check the company URL and sign in with your own account. Never share tokens, cookies or MFA codes in chat.")),
     section("visual-flow", "Connection settings in Falcon", codexWalkthrough),

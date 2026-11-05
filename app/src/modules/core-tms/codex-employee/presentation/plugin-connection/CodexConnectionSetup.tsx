@@ -5,10 +5,10 @@ import { defaultServerName, validServerName } from "../setup/setup-name";
 import surface from "../plugin-surface/plugin.module.css";
 import css from "./connection.module.css";
 
-export function CodexConnectionSetup({ employee, locale, open, onClose }: {
-  employee: CodexEmployee; locale: "en" | "ru"; open: boolean; onClose: () => void;
+export function CodexConnectionSetup({ employee, setup: connection, locale, open, onClose }: {
+  employee?: CodexEmployee; setup?: CodexEmployee["setup"]; locale: "en" | "ru"; open: boolean; onClose: () => void;
 }) {
-  const ru = locale === "ru", setup = employee.setup;
+  const ru = locale === "ru", setup = connection ?? employee!.setup;
   const panel = useRef<HTMLDivElement>(null), input = useRef<HTMLInputElement>(null);
   const [nameEdit, setNameEdit] = useState<{ url: string; value: string } | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
@@ -38,14 +38,14 @@ export function CodexConnectionSetup({ employee, locale, open, onClose }: {
           onChange={event => { setNameEdit({ url: setup.mcpUrl, value: event.target.value }); setCopied(null); }} />
         {copyButton("name", name, ru ? "Копировать имя сервера" : "Copy server name", !validName)}</span>
       </div>
-      <p id="codex-name-help" className={surface.notice}>{validName ? (ru ? "Используйте отдельное имя для каждой компании." : "Use a different name for each company.")
+      <p id="codex-name-help" className={surface.notice}>{validName ? (ru ? "Используйте отдельное имя для каждого пространства." : "Use a different name for each workspace.")
         : (ru ? "Используйте латинские буквы, цифры, _ и -; первым символом не может быть -." : "Use letters, numbers, _ and -; the first character cannot be -.")}</p>
       <div className={css.label}>{ru ? "URL сервера" : "Server URL"}</div>
       <div className={css.codeBlock}><code className={css.singleValue}>{setup.mcpUrl}</code>{copyButton("url", setup.mcpUrl, ru ? "Копировать URL сервера" : "Copy server URL")}</div>
       <ol className={css.steps}>
         <li><strong>{ru ? "Добавьте сервер в Codex" : "Add the server in Codex"}</strong><p>Settings → Plugins → Add → Add MCP server.</p><p>{ru ? "Вставьте имя и URL выше, выберите Streamable HTTP и сохраните. Bearer token и Headers оставьте пустыми." : "Paste the name and URL above, choose Streamable HTTP and save. Leave Bearer token and Headers empty."}</p></li>
-        <li><strong>{ru ? "Подтвердите доступ" : "Authenticate"}</strong><p>Plugins → MCPs → Servers → {name || "…"} → Authenticate.</p><p>{ru ? "В браузере войдите в Falcon своей компании, выберите проекты и разрешения." : "In your browser, sign in to your company’s Falcon and choose projects and permissions."}</p></li>
-        <li><strong>{ru ? "Откройте новый чат" : "Open a new chat"}</strong><p>{ru ? "Попросите Codex показать компанию и доступные проекты через этот сервер, ничего не изменяя." : "Ask Codex to show the company and available projects through this server without changing anything."}</p></li>
+        <li><strong>{ru ? "Подтвердите доступ" : "Authenticate"}</strong><p>Plugins → MCPs → Servers → {name || "…"} → Authenticate.</p><p>{ru ? "В браузере войдите в Falcon, выберите своё пространство, проекты и разрешения." : "In your browser, sign in to Falcon and choose your workspace, projects and permissions."}</p></li>
+        <li><strong>{ru ? "Откройте новый чат" : "Open a new chat"}</strong><p>{ru ? "Попросите Codex показать пространство и доступные проекты через этот сервер, ничего не изменяя." : "Ask Codex to show the workspace and available projects through this server without changing anything."}</p></li>
       </ol>
       <button type="button" className={css.manualToggle} aria-expanded={manualOpen} aria-controls="codex-manual-configuration" onClick={() => setManualOpen(value => !value)}>
         <ChevronRight width={14} height={14} aria-hidden="true" data-open={manualOpen || undefined} />{ru ? "Ручная настройка" : "Manual configuration"}<span>TOML / CLI</span>

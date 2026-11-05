@@ -2,7 +2,7 @@ import { resolveTmsApiBase } from "../config/api-base";
 import type { components } from "../generated/tms-api";
 type ApiError = components["schemas"]["Error"];
 export type TmsApiErrorCode = ApiError["code"] | "HTTP_ERROR";
-export type MutationMethod = "POST" | "PATCH" | "DELETE";
+export type MutationMethod = "POST" | "PUT" | "PATCH" | "DELETE";
 export type TmsAccessTokenProvider = (signal?: AbortSignal) => Promise<string>;
 export type TmsResource<T> = {
   readonly data: T;

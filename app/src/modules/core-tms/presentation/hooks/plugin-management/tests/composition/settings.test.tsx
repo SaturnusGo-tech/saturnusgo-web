@@ -1,3 +1,4 @@
+import { personalAdministrationUrl } from "../../../../../company-administration/navigation/personal-administration-route";
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { CodexPluginsSettings } from "../../../../../codex-employee/composition/settings/CodexPluginsSettings";
@@ -14,7 +15,7 @@ type Props = Parameters<typeof CodexPluginsSettings>[0];
 function fixture(query: string, changes: Partial<Props> = {}, features = ["core", "integrations", "api_testing"]) {
   const h = componentHarness(`https://company.test/work/?workspaceId=w&projectId=p&view=config&settings=plugins${query}`);
   const visits: string[] = [], toggled: unknown[][] = []; let refreshed = 0;
-  const codex = { loading: false, error: null, employee: { status: "active", canDeactivate: true, canConnect: true }, deactivate: () => toggled.push(["codex", false]) };
+  const codex = { available: true, loading: false, error: null, employee: { status: "active", canDeactivate: true, canConnect: true }, deactivate: () => toggled.push(["codex", false]) };
   const catalog = { configuration: null, status: null, statusFailed: false, connectorState: "ready", connections: [{ provider: "github", projectId: "p", enabled: true }], swaggerStatus: "available", refresh: () => refreshed++ };
   const props: Props = { workspaceId: "w", projectId: "p", canManage: true, capabilities: ["integrations:manage"], connected: true, ...changes };
   const { CodexPluginsSettings: View } = h.load<{ CodexPluginsSettings: typeof CodexPluginsSettings }>(new URL("../../../../../codex-employee/composition/settings/CodexPluginsSettings.tsx", import.meta.url), name => {
@@ -28,6 +29,7 @@ function fixture(query: string, changes: Partial<Props> = {}, features = ["core"
     if (name.endsWith("connector-types")) return { isProvider };
     if (name.endsWith("usePluginConnectionToggle")) return { usePluginConnectionToggle: () => ({ pending: null, error: null, toggle: (...args: unknown[]) => toggled.push(args) }) };
     if (name.endsWith("useYouTrackPluginToggle")) return { useYouTrackPluginToggle: () => ({ pending: false, error: null, toggle: (...args: unknown[]) => toggled.push(["youtrack", ...args]) }) };
+    if (name.endsWith("personal-administration-route")) return { personalAdministrationUrl };
     if (name.endsWith("useWorkspaceCodex")) return { useWorkspaceCodex: () => codex };
   });
   return { render: () => nodes(h.render(() => View(props))), visits, toggled, h, refreshed: () => refreshed, refresh: catalog.refresh };
@@ -100,7 +102,8 @@ test("legacy GitHub analysis-only and impact links route directly to the scoped 
       if (name.endsWith("company-features")) return { companyViewAvailable };
       if (name.endsWith("workspace-history")) return { visitWorkspace: (href: string) => visits.push(href) };
       if (name.endsWith("plugin-settings-route")) return { pluginSettingsLink };
-      if (name.endsWith("useWorkspaceCodex")) return { useWorkspaceCodex: () => ({ loading: false, employee: null, error: null }) };
+      if (name.endsWith("personal-administration-route")) return { personalAdministrationUrl };
+    if (name.endsWith("useWorkspaceCodex")) return { useWorkspaceCodex: () => ({ loading: false, employee: null, error: null }) };
       if (name.endsWith("usePluginCatalogState")) return { usePluginCatalogState: () => ({ configuration: null, status: null, statusFailed: false, connectorState: "ready", connections: [], swaggerStatus: "available" }) };
       if (name.endsWith("catalog-model")) return { catalogEntries };
       if (name.endsWith("hooks-navigation")) return { integrationScreen };

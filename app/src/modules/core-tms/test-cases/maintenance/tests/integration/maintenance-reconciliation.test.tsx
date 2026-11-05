@@ -63,7 +63,8 @@ test("project cases reached from portfolios inherit the live maintenance workspa
   const h = componentHarness();
   const { WorkspaceStage: Stage } = h.load<{ WorkspaceStage: typeof WorkspaceStage }>(new URL("../../../../presentation/workspace-stage/WorkspaceStage.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
-    if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
+    if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
+      if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => null };
     if (name.endsWith("company-features")) return { companyViewAvailable: () => true };
     if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed: () => true };
   });

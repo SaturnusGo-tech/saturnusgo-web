@@ -10,6 +10,7 @@ test("managed tester and core-only company reach restored Codex through the stag
     const h = componentHarness();
     const { WorkspaceStage: render } = h.load<{ WorkspaceStage: typeof WorkspaceStage }>(new URL("../WorkspaceStage.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+      if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ kind: "managed", companyCapabilities }) };
       if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed };
       if (name.endsWith("company-features")) return { companyViewAvailable };
@@ -28,9 +29,11 @@ test("outer navigation exposes Hooks to managed readers without exposing unrelat
     const h = componentHarness();
     const { Navigation } = h.load<{ Navigation: (props: never) => unknown }>(new URL("../../navigation/Navigation.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+      if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ kind: "managed", companyCapabilities }) };
       if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed };
       if (name.endsWith("company-features")) return { companyViewAvailable };
+      if (name.endsWith("useSidebarReveal")) return { useSidebarReveal: () => ({ revealed: false, setCollapsed() {} }) };
       if (name.endsWith("useSidebarPreferences")) return { useSidebarPreferences: () => ({ preferences: {} }) };
       if (name.endsWith("sidebar-navigation")) return { SIDEBAR_NAVIGATION_IDS: ["hooks", "api", "dashboard"], getSidebarNavigation: (input: { availableIds: string[] }) => ({ ...input, groups: [] }) };
     });
@@ -46,7 +49,7 @@ test("workspace permits shared connector catalog for readers only with a project
   ] as const) {
     const h = componentHarness(undefined, { process: { env: {} } });
     Object.assign(h.window, { localStorage: { getItem: () => null } });
-    const model = { view: "cases", project, connection: "connected", canManageIntegrations: false, activeProjectRuns: [],
+    const model = { view: "cases", project, repositoryScope: { key: "workspace" }, connection: "connected", canManageIntegrations: false, activeProjectRuns: [],
       data: { workspace: { id: "w" }, meta: { authorization: { capabilities: caps } } } };
     const { default: Workspace } = h.load<{ default: () => unknown }>(new URL("../../workspace/TmsWorkspace.tsx", import.meta.url), name => {
       if (name.endsWith("useWorkspaceModel")) return { useWorkspaceModel: () => model };
@@ -64,10 +67,12 @@ test("managed no-project navigation allows Hooks on both sidebar surfaces", () =
   const h = componentHarness();
   const { Navigation } = h.load<{ Navigation: (props: never) => unknown }>(new URL("../../navigation/Navigation.tsx", import.meta.url), name => {
     if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
-    if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ kind: "managed", companyCapabilities: ["core"] }) };
+    if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
+      if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ kind: "managed", companyCapabilities: ["core"] }) };
     if (name.endsWith("workspace-view-access")) return { workspaceViewAllowed };
     if (name.endsWith("company-features")) return { companyViewAvailable };
-    if (name.endsWith("useSidebarPreferences")) return { useSidebarPreferences: () => ({ preferences: {} }) };
+    if (name.endsWith("useSidebarReveal")) return { useSidebarReveal: () => ({ revealed: false, setCollapsed() {} }) };
+      if (name.endsWith("useSidebarPreferences")) return { useSidebarPreferences: () => ({ preferences: {} }) };
     if (name.endsWith("sidebar-navigation")) return { SIDEBAR_NAVIGATION_IDS: ["hooks"], getSidebarNavigation: (input: { availableIds: string[] }) => ({ ...input, groups: [] }) };
   });
   const all = nodes(h.render(() => Navigation({ view: "cases", disabled: true, userCapabilities: [] } as never)));

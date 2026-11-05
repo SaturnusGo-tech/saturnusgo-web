@@ -3375,7 +3375,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5138,7 +5138,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -14767,7 +14767,7 @@
         "tags": [
           "Billing"
         ],
-        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales.",
+        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes.",
         "parameters": [
           {
             "$ref": "#/components/parameters/BillingIdempotencyKey"
@@ -20330,7 +20330,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member\u2019s already-read inbox entries",
+        "summary": "Archive only this member’s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -20540,7 +20540,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -20659,7 +20659,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -21203,7 +21203,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company\u2019s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
+        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company’s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
@@ -21299,7 +21299,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company\u2019s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
+        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company’s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "not-applicable",
         "parameters": [
@@ -24676,6 +24676,264 @@
           },
           "503": {
             "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/billing/startup-setup": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "readStartupSetup",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current Startup setup. PUT and retry always return a setup; GET may return null.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupSetupEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs.",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "saveStartupSetup",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current Startup setup. PUT and retry always return a setup; GET may return null.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupSetupEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartupSetupRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/startup-setup/retry": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "retryStartupSetup",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current Startup setup. PUT and retry always return a setup; GET may return null.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupSetupEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "description": "Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartupSetupRetryRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/codex/setup": {
+      "get": {
+        "operationId": "getCodexSetup",
+        "summary": "Read permitted Codex installation and server capabilities",
+        "description": "Explicit workspace selection is authorized against the current human identity and membership. Central personal and archived-company connections use the common resource. Company connections use the current active host and generation. Expired workspaces retain read/export only.",
+        "tags": [
+          "Codex"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XRequestId"
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current installation metadata and permitted server capabilities.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodexSetupEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         }
       }
@@ -41862,7 +42120,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -42485,7 +42743,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -42586,7 +42844,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -46320,7 +46578,7 @@
           "locale",
           "messages"
         ],
-        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",
@@ -50034,6 +50292,19 @@
           "prorated": {
             "type": "boolean",
             "description": "True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period."
+          },
+          "startupSetupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "startupSetupVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
           }
         },
         "required": [
@@ -50466,6 +50737,20 @@
               "startup",
               "enterprise"
             ]
+          },
+          "startupSetupId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "startupSetupVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "confirmWorkspaceConversion": {
+            "type": "boolean",
+            "const": true
           }
         },
         "required": [
@@ -50879,6 +51164,334 @@
           "prorated": {
             "type": "boolean",
             "description": "True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period."
+          }
+        }
+      },
+      "StartupSetup": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 40,
+            "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$"
+          },
+          "legalName": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "countryCode": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "taxId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "hostname": {
+            "type": "string",
+            "maxLength": 253
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "provisioning",
+              "ready",
+              "failed",
+              "expired",
+              "activated"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "displayName",
+          "slug",
+          "hostname",
+          "status",
+          "expiresAt"
+        ]
+      },
+      "StartupSetupRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "expectedVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 40,
+            "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$"
+          },
+          "legalName": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "countryCode": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "taxId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "workspaceId",
+          "expectedVersion",
+          "idempotencyKey",
+          "displayName",
+          "slug"
+        ]
+      },
+      "StartupSetupRetryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "expectedVersion",
+          "idempotencyKey"
+        ]
+      },
+      "StartupSetupEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "setup": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/StartupSetup"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "setup"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CodexSetup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "companyName",
+          "teamAdministrationAvailable",
+          "canConnect",
+          "readOnly",
+          "connectionKind",
+          "server",
+          "installation",
+          "status"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "teamAdministrationAvailable": {
+            "type": "boolean"
+          },
+          "canConnect": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "connectionKind": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "company",
+              "archived_company"
+            ]
+          },
+          "server": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "url",
+              "resource",
+              "issuer",
+              "connectionName",
+              "scopes",
+              "authentication",
+              "version"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": [
+                  "Falcon"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "resource": {
+                "type": "string",
+                "format": "uri"
+              },
+              "issuer": {
+                "type": "string",
+                "format": "uri"
+              },
+              "connectionName": {
+                "type": "string"
+              },
+              "scopes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "falcon:read",
+                    "falcon:cases:create",
+                    "falcon:runs:create",
+                    "falcon:cases:write",
+                    "falcon:repository:write",
+                    "falcon:suites:write",
+                    "falcon:environments:write",
+                    "falcon:runs:manage",
+                    "falcon:execution:write",
+                    "falcon:defects:write",
+                    "falcon:attachments:write",
+                    "falcon:workflows:write",
+                    "offline_access"
+                  ]
+                },
+                "maxItems": 13
+              },
+              "authentication": {
+                "type": "string",
+                "enum": [
+                  "oauth"
+                ]
+              },
+              "version": {
+                "type": "string",
+                "enum": [
+                  "1"
+                ]
+              }
+            }
+          },
+          "installation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pluginUrl"
+            ],
+            "properties": {
+              "pluginUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uri"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "read_only",
+              "unavailable"
+            ]
+          }
+        }
+      },
+      "CodexSetupEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CodexSetup"
           }
         }
       }

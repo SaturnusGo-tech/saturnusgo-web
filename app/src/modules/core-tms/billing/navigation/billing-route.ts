@@ -11,6 +11,8 @@ export function workspaceBillingUrl(href: string, workspaceId?: string): string 
     const value = safeScope(key === "workspaceId" && workspaceId !== undefined ? workspaceId : source.searchParams.get(key));
     if (value) url.searchParams.set(key, value);
   }
+  const language = source.searchParams.get("lang");
+  if (language === "ru" || language === "en") url.searchParams.set("lang", language);
   return settingsSectionLink(url.href, "billing");
 }
 

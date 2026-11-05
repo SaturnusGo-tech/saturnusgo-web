@@ -26,7 +26,7 @@ test("a new personal account sees only its Individual offer and server price", (
   assert.equal(h.all.filter(node => node.props["data-plan"]).length, 1);
   assert.ok(h.all.some(node => node.props.children === "$11"));
   assert.ok(!h.all.some(node => node.props.children === "Startup" || node.props.children === "Enterprise"));
-  assert.ok(h.all.some(node => node.type === "img" && node.props.src === "/falcon/billing/individual.webp"));
+  assert.ok(h.all.some(node => node.type === "img" && String(node.props.src).startsWith("/falcon/billing/individual.webp")));
 });
 test("other plans opens a discreet path to a direct Startup checkout", () => {
   const h = setup();

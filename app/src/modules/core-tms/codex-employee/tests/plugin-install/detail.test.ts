@@ -24,7 +24,7 @@ test("Codex detail delegates installation states and Manage while company activa
   assert.equal(action().props.installed, false); assert.equal(action().props.canManage, false); assert.equal(account, "company-a:qa-one");
   await invoke(action(), "onInstall"); assert.equal(installCalls, 1); assert.equal(action().props.installing, true);
   phase = "ready"; installed = true; assert.equal(action().props.installed, true); invoke(action(), "onManage"); assert.equal(manageCalls, 1);
-  assert.match(text(render()), /Connect Codex to your company through OAuth in Manage/);
+  assert.match(text(render()), /Connect Codex to your workspace through OAuth in Manage/);
   assert.equal(resource.employee?.status, "not_activated");
   const layout = () => JSON.stringify(render(), (_key, value) => value?.type === "PluginInstallAction" ? null : value);
   const completedTree = layout(); installed = false; phase = "idle";

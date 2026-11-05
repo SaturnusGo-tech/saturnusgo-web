@@ -1,5 +1,5 @@
 "use client";
-import { ArrowLeft, Building2, History, UsersRound } from "lucide-react";
+import { ArrowLeft, Bot, Building2, History, UsersRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
@@ -10,7 +10,7 @@ import { administrationCopy } from "../copy/administration-copy";
 import styles from "../layout/administration.module.css";
 
 export function PersonalAdministrationShell({ workspaceId, companyName, page, onNavigate, children }: {
-  workspaceId: string; companyName?: string; page?: "company" | "audit";
+  workspaceId: string; companyName?: string; page?: "company" | "audit" | "codex";
   onNavigate(route: AdministrationRoute): void; children: ReactNode;
 }) {
   const session = useTmsSession(), { locale } = useTmsLocale(), copy = administrationCopy(locale);
@@ -25,10 +25,11 @@ export function PersonalAdministrationShell({ workspaceId, companyName, page, on
         if (!link) return;
         const url = new URL(link.href), next = url.searchParams.get("page");
         if (url.origin !== window.location.origin || url.pathname !== "/admin/") return;
-        event.preventDefault(); onNavigate({ id: null, creating: false, ...(next === "company" || next === "audit" ? { page: next } : {}) });
+        event.preventDefault(); onNavigate({ id: null, creating: false, ...(next === "company" || next === "audit" || next === "codex" ? { page: next } : {}) });
       }}>
         <a href={personalAdministrationUrl(window.location.href, workspaceId)} aria-current={!page ? "page" : undefined}><UsersRound size={17} />{copy.employees}</a>
         <a href={personalAdministrationUrl(window.location.href, workspaceId, "company")} aria-current={page === "company" ? "page" : undefined}><Building2 size={17} />{copy.companyDetails}</a>
+        <a href={personalAdministrationUrl(window.location.href, workspaceId, "codex")} aria-current={page === "codex" ? "page" : undefined}><Bot size={17} />Codex</a>
         <a href={personalAdministrationUrl(window.location.href, workspaceId, "audit")} aria-current={page === "audit" ? "page" : undefined}><History size={17} />{locale === "ru" ? "Журнал действий" : "Activity log"}</a>
       </nav>
       <div className={styles.sidebarBottom}><ManagedProfileMenu session={session} /><a className={styles.returnLink} href={back}><ArrowLeft size={18} />{locale === "ru" ? "В Falcon" : "Back to Falcon"}</a></div>

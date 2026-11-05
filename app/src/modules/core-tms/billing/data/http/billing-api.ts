@@ -6,7 +6,7 @@ import type { BillingCommandOptions, BillingPort } from "../../domain/billing-po
 type Schemas = components["schemas"];
 function command(workspaceId: string, intent: BillingIntent) {
   switch (intent.kind) {
-    case "checkout": return { path: "/billing/checkout", body: { workspaceId, planId: intent.planId } satisfies Schemas["BillingCheckoutRequest"] };
+    case "checkout": return { path: "/billing/checkout", body: { workspaceId, planId: intent.planId, ...(intent.startupSetupId ? { startupSetupId: intent.startupSetupId, startupSetupVersion: intent.startupSetupVersion, confirmWorkspaceConversion: intent.confirmWorkspaceConversion } : {}) } satisfies Schemas["BillingCheckoutRequest"] };
     case "confirm": return { path: "/billing/confirm", body: { workspaceId, checkoutId: intent.checkoutId, outcome: intent.outcome } satisfies Schemas["BillingConfirmRequest"] };
     case "retry": return { path: "/billing/retry", body: { workspaceId } satisfies Schemas["BillingScopeRequest"] };
     case "mockOutcome": return { path: "/billing/mock/outcome", body: { workspaceId, outcome: intent.outcome } satisfies Schemas["BillingOutcomeRequest"] };

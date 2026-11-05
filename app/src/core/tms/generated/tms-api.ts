@@ -3745,7 +3745,7 @@ export interface paths {
         put?: never;
         /**
          * Create a mock checkout without granting access
-         * @description Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales.
+         * @description Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes.
          */
         post: operations["createBillingCheckout"];
         delete?: never;
@@ -5994,6 +5994,67 @@ export interface paths {
          * @description Requires an active identity and active membership in the requested workspace. Returns only plan and provider metadata; invoices, financial amounts and subscription/customer/payment identifiers are excluded. A company with no subscription remains legacy, regardless of occupied seats; a personal workspace with no subscription is unsubscribed (this does not describe its separate trial entitlement). canManage is true only for workspace_admin. This route is absent with 404 when billing is disabled. It never enrolls, charges or changes access.
          */
         get: operations["readBillingSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/startup-setup": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. */
+        get: operations["readStartupSetup"];
+        /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. */
+        put: operations["saveStartupSetup"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/startup-setup/retry": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. */
+        post: operations["retryStartupSetup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/codex/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read permitted Codex installation and server capabilities
+         * @description Explicit workspace selection is authorized against the current human identity and membership. Central personal and archived-company connections use the common resource. Company connections use the current active host and generation. Expired workspaces retain read/export only.
+         */
+        get: operations["getCodexSetup"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10893,6 +10954,8 @@ export interface components {
             periodEnd: string | null;
             /** @description True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period. */
             prorated: boolean;
+            startupSetupId?: string | null;
+            startupSetupVersion?: number | null;
         };
         BillingInvoice: {
             id: string;
@@ -10997,6 +11060,10 @@ export interface components {
             workspaceId: string;
             /** @enum {string} */
             planId: "individual" | "startup" | "enterprise";
+            startupSetupId?: string;
+            startupSetupVersion?: number;
+            /** @constant */
+            confirmWorkspaceConversion?: true;
         };
         BillingConfirmRequest: {
             workspaceId: string;
@@ -11088,6 +11155,76 @@ export interface components {
             periodEnd: string | null;
             /** @description True for an immediate Individual to Startup upgrade, charging only the ceiling-rounded positive price difference for the remaining paid period. */
             prorated: boolean;
+        };
+        StartupSetup: {
+            id: string;
+            version: number;
+            displayName: string;
+            slug: string;
+            legalName?: string;
+            countryCode?: string;
+            taxId?: string;
+            address?: string;
+            hostname: string;
+            /** @enum {string} */
+            status: "reserved" | "provisioning" | "ready" | "failed" | "expired" | "activated";
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        StartupSetupRequest: {
+            workspaceId: string;
+            expectedVersion: number | null;
+            idempotencyKey: string;
+            displayName: string;
+            slug: string;
+            legalName?: string;
+            countryCode?: string;
+            taxId?: string;
+            address?: string;
+        };
+        StartupSetupRetryRequest: {
+            workspaceId: string;
+            expectedVersion: number;
+            idempotencyKey: string;
+        };
+        StartupSetupEnvelope: {
+            data: {
+                setup: components["schemas"]["StartupSetup"] | null;
+            };
+        };
+        CodexSetup: {
+            workspaceId: string;
+            companyName: string;
+            teamAdministrationAvailable: boolean;
+            canConnect: boolean;
+            readOnly: boolean;
+            /** @enum {string} */
+            connectionKind: "personal" | "company" | "archived_company";
+            server: {
+                /** @enum {string} */
+                name: "Falcon";
+                /** Format: uri */
+                url: string;
+                /** Format: uri */
+                resource: string;
+                /** Format: uri */
+                issuer: string;
+                connectionName: string;
+                scopes: ("falcon:read" | "falcon:cases:create" | "falcon:runs:create" | "falcon:cases:write" | "falcon:repository:write" | "falcon:suites:write" | "falcon:environments:write" | "falcon:runs:manage" | "falcon:execution:write" | "falcon:defects:write" | "falcon:attachments:write" | "falcon:workflows:write" | "offline_access")[];
+                /** @enum {string} */
+                authentication: "oauth";
+                /** @enum {string} */
+                version: "1";
+            };
+            installation: {
+                /** Format: uri */
+                pluginUrl: string | null;
+            };
+            /** @enum {string} */
+            status: "available" | "read_only" | "unavailable";
+        };
+        CodexSetupEnvelope: {
+            data: components["schemas"]["CodexSetup"];
         };
     };
     responses: {
@@ -24316,6 +24453,146 @@ export interface operations {
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readStartupSetup: {
+        parameters: {
+            query: {
+                workspaceId: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current Startup setup. PUT and retry always return a setup; GET may return null. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupSetupEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    saveStartupSetup: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartupSetupRequest"];
+            };
+        };
+        responses: {
+            /** @description Current Startup setup. PUT and retry always return a setup; GET may return null. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupSetupEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    retryStartupSetup: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartupSetupRetryRequest"];
+            };
+        };
+        responses: {
+            /** @description Current Startup setup. PUT and retry always return a setup; GET may return null. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupSetupEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getCodexSetup: {
+        parameters: {
+            query: {
+                workspaceId: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current installation metadata and permitted server capabilities. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodexSetupEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
         };
     };
 }

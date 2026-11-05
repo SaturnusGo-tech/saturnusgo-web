@@ -1,5 +1,5 @@
 "use client";
-import type { BillingOutcome, BillingPlanId } from "../domain/billing";
+import type { BillingOutcome, BillingPlanId, BillingIntent } from "../domain/billing";
 import type { BillingPort } from "../domain/billing-port";
 import { useBillingSummary } from "./useBillingSummary";
 import { useBillingResource } from "./resources/useBillingResource";
@@ -27,7 +27,7 @@ export function useBilling({ port, workspaceId, canManage, workspaceKind }: Bill
     error: commands.error ?? summary.error ?? resource.error, invoicesError: resource.invoicesError,
     canManage: manageable, canRetryCommand: commands.canRetryCommand, hasMoreInvoices: resource.hasMoreInvoices, loadingMoreInvoices: resource.loadingMore,
     reload, loadMoreInvoices: resource.loadMoreInvoices, retryCommand: commands.retryCommand,
-    startCheckout: async (planId: BillingPlanId) => { if (allowedCheckout(planId)) await commands.execute({ kind: "checkout", planId }); },
+    startCheckout: async (planId: BillingPlanId, conversion?: Pick<Extract<BillingIntent, { kind: "checkout" }>, "startupSetupId" | "startupSetupVersion" | "confirmWorkspaceConversion">) => { if (allowedCheckout(planId)) await commands.execute({ kind: "checkout", planId, ...conversion }); },
     confirmCheckout: async (outcome: BillingOutcome) => { if (checkout?.status === "open") await commands.execute({ kind: "confirm", checkoutId: checkout.id, outcome }); },
     changePlan: async (planId: BillingPlanId) => { if (allowedChange(planId)) await commands.execute({ kind: "plan", planId }); },
     cancel: async () => commands.execute({ kind: "cancel" }), resume: async () => commands.execute({ kind: "resume" }),

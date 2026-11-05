@@ -34,7 +34,7 @@ function providers(http: TmsHttpClient, children: React.ReactNode) {
 test("personal administration requires matching session scope and live paid-owner entitlement", async () => {
   const env = environment(), requests: string[] = [];
   let entitled = false, canManage = true, view!: ReactTestRenderer;
-  const http = { async getResource(path: string) { requests.push(path); return { data: path.startsWith("/billing/summary") ? { ...summary, workspaceKind: "personal", teamAdministration: entitled, canManage } : { workspaceId: "space", name: "Pat’s team" }, etag: null }; },
+  const http = { async getResource(path: string) { requests.push(path); return { data: path.startsWith("/codex/setup") ? { workspaceId: "space", teamAdministrationAvailable: entitled && canManage } : { workspaceId: "space", name: "Pat’s team" }, etag: null }; },
     async get(path: string) { requests.push(path); return { data: [], meta: { nextCursor: null } }; } } as unknown as TmsHttpClient;
   const draw = () => providers(http, <PersonalAdministrationFeature />);
   try {
@@ -44,7 +44,7 @@ test("personal administration requires matching session scope and live paid-owne
     await act(async () => view.unmount());
     env.setLocation("https://falcon.test/admin/?account=personal&workspaceId=space");
     await act(async () => { view = create(draw()); });
-    assert.ok(requests.some(path => path === "/billing/summary?workspaceId=space"));
+    assert.ok(requests.some(path => path === "/codex/setup?workspaceId=space"));
     assert.equal(requests.some(path => path.startsWith("/company")), false);
     entitled = true; canManage = false;
     await act(async () => { env.events.dispatchEvent(new CustomEvent("falcon:billing-changed", { detail: { workspaceId: "space" } })); });
@@ -61,7 +61,7 @@ test("personal administration requires matching session scope and live paid-owne
 test("the future connected personal company menu refreshes only after its own paid billing event", async () => {
   const env = environment();
   let entitled = false, reads = 0, view!: ReactTestRenderer;
-  const http = { async getResource() { reads++; return { data: { ...summary, teamAdministration: entitled }, etag: null }; } } as unknown as TmsHttpClient;
+  const http = { async getResource() { reads++; return { data: { workspaceId: "space", teamAdministrationAvailable: entitled }, etag: null }; } } as unknown as TmsHttpClient;
   try {
     await act(async () => { view = create(providers(http, <CompanyAdministrationLink workspaceId="space" role="menuitem">Company administration</CompanyAdministrationLink>)); });
     assert.equal(view.root.findAllByType("a").length, 0); assert.equal(reads, 1);

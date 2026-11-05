@@ -4,6 +4,7 @@ import type { BillingAccount, BillingCheckout, BillingFailure, BillingInvoice, B
 import { BillingCurrent } from "../current/BillingCurrent";
 import { BillingPlans } from "../plans/BillingPlans";
 import { BillingConfirmation, type BillingConfirmationIntent } from "../confirmation/BillingConfirmation";
+import { billingPaymentsAvailable } from "../../domain/catalog/billing-availability";
 import css from "./billing.module.css";
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
   reload(): void; loadMoreInvoices(): Promise<void>; retryCommand(): Promise<void>; startCheckout(id: BillingPlanId): Promise<void>;
   confirmCheckout(outcome: BillingOutcome): Promise<void>; changePlan(id: BillingPlanId): Promise<void>;
   cancel(): Promise<void>; resume(): Promise<void>; retryPayment(): Promise<void>;
-  onClose?(): void;
+  paymentsAvailable?: boolean; onStartupSetup?(): void; onClose?(): void;
 };
 function failureText(code: string, ru: boolean) {
   switch (code) {
@@ -62,11 +63,14 @@ export function BillingScreen(props: Props) {
     onCancel={() => requestConfirmation({ kind: "cancel" })} onResume={() => requestConfirmation({ kind: "resume" })} onRetry={() => requestConfirmation({ kind: "retry" })} />;
   async function choose(planId: BillingPlanId) {
     rememberFocus();
+    if (planId === "startup" && summary?.workspaceKind === "personal" && props.onStartupSetup) { props.onStartupSetup(); return; }
+    if (!(props.paymentsAvailable ?? billingPaymentsAvailable)) return;
     if (planId !== "enterprise" && account?.allowedCheckoutPlanIds?.includes(planId)) await props.startCheckout(planId);
     else if (account?.subscription && account.subscription.status !== "canceled") setIntent({ kind: "plan", planId });
     else await props.startCheckout(planId);
   }
   async function confirm(value: BillingConfirmationIntent) {
+    if (!(props.paymentsAvailable ?? billingPaymentsAvailable)) return;
     setIntent(null);
     if (value.kind === "plan") await props.changePlan(value.planId);
     else if (value.kind === "cancel") await props.cancel();
@@ -87,10 +91,10 @@ export function BillingScreen(props: Props) {
       {checkout?.status === "failed" && <p className={css.note} role="status">{ru ? "Тестовый платёж отклонён. Подписка не подключена; можно попробовать снова." : "The simulated payment was declined. No subscription was started; you can try again."}</p>}
       <div ref={confirmationStage} className={css.confirmationStage} hidden={!confirming} tabIndex={-1} role="group" aria-label={ru ? "Подтверждение подписки" : "Subscription confirmation"}>
         <BillingConfirmation key={openCheckout ? checkout.id : "subscription"} intent={intent} checkout={checkout} plans={account.plans} current={account.subscription}
-          testMode={account.testMode} busy={locked} ru={ru} onConfirm={value => void confirm(value)} onCheckout={outcome => void props.confirmCheckout(outcome)} onDismiss={() => setIntent(null)} />
+          testMode={account.testMode} busy={locked || !(props.paymentsAvailable ?? billingPaymentsAvailable)} ru={ru} onConfirm={value => void confirm(value)} onCheckout={outcome => { if (props.paymentsAvailable ?? billingPaymentsAvailable) void props.confirmCheckout(outcome); }} onDismiss={() => setIntent(null)} />
       </div>
       <div ref={offerStage} className={css.offerStage} hidden={confirming} tabIndex={-1} role="group" aria-label={ru ? "Тарифы Falcon" : "Falcon plans"}>
-        <BillingPlans plans={account.plans} current={account.subscription} occupiedSeats={account.occupiedSeats} workspaceKind={summary!.workspaceKind} canManage={canManage} offers={account} quotes={account.checkoutQuotes}
+        <BillingPlans plans={account.plans} current={account.subscription} occupiedSeats={account.occupiedSeats} workspaceKind={summary!.workspaceKind} canManage={canManage} paymentsAvailable={props.paymentsAvailable ?? billingPaymentsAvailable} setupAvailable={!!props.onStartupSetup && summary!.workspaceKind === "personal"} offers={account} quotes={account.checkoutQuotes}
           busy={locked || confirming} restriction={restriction} ru={ru} onChoose={id => void choose(id)} onClose={props.onClose}>
           {recovery && <button type="button" className={css.secondary} disabled={locked} onClick={() => requestConfirmation({ kind: recovery })}>{recovery === "retry" ? (ru ? "Повторить платёж" : "Retry payment") : (ru ? "Включить продление" : "Resume renewal")}</button>}
           {account.subscription && <details className={css.management}><summary>{ru ? "Моя подписка" : "Manage subscription"}</summary>{current}</details>}

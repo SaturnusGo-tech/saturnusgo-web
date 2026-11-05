@@ -9,6 +9,7 @@ test("every authenticated account can open its profile without a loaded project"
     const h = componentHarness();
     const { WorkspaceStage: render } = h.load<{ WorkspaceStage: typeof WorkspaceStage }>(new URL("../WorkspaceStage.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+      if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => kind ? { kind, companyCapabilities: [] } : null };
       if (name.endsWith("company-features")) return { companyViewAvailable };
     });

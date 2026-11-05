@@ -24,12 +24,12 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   const russian = locale === "ru";
   const [screen, setScreen] = useState<IntegrationScreen>(() => typeof window === "undefined" ? "catalog" : integrationScreen(window.location.search));
   const session = useOptionalTmsSession();
-  const codex = useWorkspaceCodex(session?.kind === "managed");
+  const codex = useWorkspaceCodex(!!session, workspaceId);
   const connectorAccess = canManage && companyViewAvailable("hooks", session?.companyCapabilities);
   const apiEnabled = canManage && !!projectId && companyViewAvailable("api", session?.companyCapabilities);
   const catalog = usePluginCatalogState(workspaceId, projectId, connectorAccess, apiEnabled);
   const codexStatus = codex.loading ? "checking" : codex.error ? "attention" : "available";
-  const entries = catalogEntries({ ...catalog, showOthers: connectorAccess, showSwagger: apiEnabled, showCodex: session?.kind === "managed", codexStatus, codexCompanyStatus: codex.employee?.status, projectId });
+  const entries = catalogEntries({ ...catalog, showOthers: connectorAccess, showSwagger: apiEnabled, showCodex: codex.available, codexStatus, codexCompanyStatus: codex.employee?.status, projectId });
   const manage = (id: Exclude<IntegrationScreen, "catalog">) => {
     const target = new URL(pluginSettingsLink(window.location.href, id, id === "github" && (new URL(window.location.href).searchParams.get("impact") === "1" || new URL(window.location.href).searchParams.has("analysisId"))), window.location.href);
     if (id === "github") for (const key of ["impact", "analysisId"]) { const value = new URL(window.location.href).searchParams.get(key); if (value) target.searchParams.set(key, value); }
@@ -52,7 +52,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
   useEffect(() => {
     if (screen === "github" && connectorAccess && (new URL(window.location.href).searchParams.get("impact") === "1" || new URL(window.location.href).searchParams.has("analysisId"))) manage("github");
   }, [screen, connectorAccess]);
-  if (screen === "codex" && session?.kind === "managed") return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} accountKey={session.subject ?? workspaceId} onManage={() => manage("codex")} />;
+  if (screen === "codex" && (codex.available || codex.loading || !!codex.error)) return <CodexDetail state={codex} locale={locale} onBack={() => open("catalog")} accountKey={session?.subject ?? workspaceId} onManage={() => manage("codex")} />;
   if (screen !== "catalog" && (screen === "swagger" ? !apiEnabled : !connectorAccess)) return <CompanyFeatureUnavailable onReturn={() => open("catalog")} />;
   if (screen !== "catalog") return <IntegrationPluginDetail key={`${workspaceId}:${projectId}:${screen}`} id={screen} ru={russian}
     status={entries.find(entry => entry.integration.id === screen)?.status ?? "available"} accountKey={session?.subject ?? workspaceId}
@@ -61,7 +61,7 @@ export function HooksView({ workspaceId, projectId, canManage, capabilities, con
     <div className={surface.root} data-testid="hooks-view" data-integration-workspace>
       <IntegrationCatalog
         showOthers={connectorAccess} showSwagger={apiEnabled} russian={russian}
-        showCodex={session?.kind === "managed"} onOpenCodex={() => open("codex")}
+        showCodex={codex.available} onOpenCodex={() => open("codex")}
         codexStatus={codexStatus} codexCompanyStatus={codex.employee?.status}
         copy={hooksCopy(russian)}
         configuration={catalog.configuration}

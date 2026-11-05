@@ -1,3 +1,4 @@
+import { useWorkspaceCapabilities } from "../../auth/spaces/capabilities/composition/useWorkspaceCapabilities";
 import type { ReactNode } from "react";
 import { WorkspaceMaintenanceProvider } from "../../test-cases/maintenance/composition/WorkspaceMaintenanceProvider";
 import { CodexPluginsSettings } from "../../codex-employee/composition/settings/CodexPluginsSettings";
@@ -35,6 +36,8 @@ import { WorkspaceCasesStage } from "./cases/WorkspaceCasesStage";
 export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
   const { t } = useTmsLocale();
   const session = useOptionalTmsSession();
+  const metadata = useWorkspaceCapabilities(model.data.workspace.id, !!session);
+  const codexAvailable = !!metadata.value;
   const maintenance = (content: ReactNode) => <WorkspaceMaintenanceProvider model={model}>{content}</WorkspaceMaintenanceProvider>;
   async function selectDrillProject(projectId?: string) {
     if (projectId && projectId !== model.project?.id) await model.chooseProject(projectId);
@@ -78,7 +81,7 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
     onBack={() => transitionContent(() => { navigateWorkspace(settingsSectionLink(window.location.href, "general")); model.setView("config"); })}
     onImported={async () => { model.folders.reload(); await model.loadProject(model.project!.id); }} />
     : <CompanyFeatureUnavailable onReturn={() => navigateWorkspace(settingsSectionLink(window.location.href, "general"))} />);
-  if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (!companyViewAvailable(model.view === "notifications" ? "config" : model.view, session?.companyCapabilities, codexAvailable)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "profile") return session ? <WorkspaceProfile workspaceId={model.data.workspace.id} />
     : <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "help") return <DocumentationEntry />;
@@ -112,12 +115,12 @@ export function WorkspaceStage({ model }: { model: WorkspaceModel }) {
       />
     );
   }
-  if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities, session?.kind === "managed")) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
+  if (!workspaceViewAllowed(model.view, model.data.meta.authorization.capabilities, codexAvailable)) return <CompanyFeatureUnavailable onReturn={() => model.setView("cases")} />;
   if (model.view === "portfolios") return maintenance(<WorkspacePortfoliosStage model={model} />);
   if (model.view === "cases" && model.repositoryScope.aggregate) return maintenance(<WorkspaceCasesStage model={model} />);
   if (model.view === "api") return <ApiTestingView key={model.data.workspace.id}
     scope={{ workspaceId: model.data.workspace.id, projectId: model.projectId }} canManage={model.canManageIntegrations} />;
-  if (model.view === "hooks" && (model.project || session?.kind === "managed")) return <HooksView workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""}
+  if (model.view === "hooks" && (model.project || codexAvailable)) return <HooksView workspaceId={model.data.workspace.id} projectId={model.project?.id ?? ""}
     canManage={model.canManageIntegrations && !!model.project} capabilities={model.data.meta.authorization.capabilities} connected={model.connection === "connected"} />;
   if (!model.project) {
     return (

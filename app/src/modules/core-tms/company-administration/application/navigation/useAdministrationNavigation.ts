@@ -28,6 +28,8 @@ export function useAdministrationNavigation() {
         if (value && /^[A-Za-z0-9._:-]{1,128}$/.test(value)) query.set(key, value);
       }
     }
+    const language = previousQuery.get("lang");
+    if (language === "ru" || language === "en") query.set("lang", language);
     if (next.id) query.set("id", next.id);
     if (next.page) query.set("page", next.page);
     if (next.creating) query.set("create", "true");

@@ -10,7 +10,7 @@ const noop = () => undefined;
 const asyncNoop = async () => undefined;
 type ScreenProps = Parameters<typeof BillingScreen>[0];
 const props = (): ScreenProps => ({ summary, account, checkout: null, invoices: [], loading: false, busy: false, error: null,
-  invoicesError: null, canManage: true, canRetryCommand: false, hasMoreInvoices: false, loadingMoreInvoices: false, ru: false,
+  invoicesError: null, paymentsAvailable: true, canManage: true, canRetryCommand: false, hasMoreInvoices: false, loadingMoreInvoices: false, ru: false,
   reload: noop, loadMoreInvoices: asyncNoop, retryCommand: asyncNoop, startCheckout: asyncNoop,
   confirmCheckout: asyncNoop, changePlan: asyncNoop, cancel: asyncNoop, resume: asyncNoop, retryPayment: asyncNoop });
 

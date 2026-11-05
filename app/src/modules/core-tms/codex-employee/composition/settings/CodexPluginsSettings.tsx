@@ -1,3 +1,4 @@
+import { personalAdministrationUrl } from "../../../company-administration/navigation/personal-administration-route";
 import { useEffect, useState } from "react";
 import { useOptionalTmsSession } from "../../../auth/presentation/session/TmsSessionContext";
 import { companyViewAvailable } from "../../../auth/managed/domain/features/company-features";
@@ -20,9 +21,9 @@ import { CodexPluginManager } from "../../presentation/plugin-management/CodexPl
 type Props = { workspaceId: string; projectId: string; canManage: boolean; capabilities: readonly string[]; connected: boolean };
 export function CodexPluginsSettings({ workspaceId, projectId, canManage, capabilities, connected }: Props) {
   const session = useOptionalTmsSession(), { locale } = useTmsLocale(), ru = locale === "ru";
-  const available = session?.kind === "managed", connectorAccess = canManage && !!projectId && companyViewAvailable("hooks", session?.companyCapabilities);
+  const codex = useWorkspaceCodex(!!session, workspaceId), available = codex.available, connectorAccess = canManage && !!projectId && companyViewAvailable("hooks", session?.companyCapabilities);
   const apiEnabled = canManage && !!projectId && companyViewAvailable("api", session?.companyCapabilities);
-  const codex = useWorkspaceCodex(available), catalog = usePluginCatalogState(workspaceId, projectId, connectorAccess, apiEnabled);
+  const catalog = usePluginCatalogState(workspaceId, projectId, connectorAccess, apiEnabled);
   const toggle = usePluginConnectionToggle({ workspaceId, projectId, enabled: connectorAccess && connected });
   const youtrack = useYouTrackPluginToggle({ workspaceId, enabled: connectorAccess && connected, onUpdated: catalog.refresh });
   const [detail, setDetail] = useState(() => typeof window === "undefined" ? null : readPluginSettingsRoute(window.location.href));
@@ -34,7 +35,8 @@ export function CodexPluginsSettings({ workspaceId, projectId, canManage, capabi
   }, []);
   const open = (id: IntegrationId | null, connect = false) => visitWorkspace(pluginSettingsLink(window.location.href, id, connect));
   const browse = (id?: IntegrationId) => {
-    const url = new URL(window.location.href); url.search = ""; url.hash = "";
+    const url = new URL(window.location.href), language = url.searchParams.get("lang"); url.search = ""; url.hash = "";
+    if (language === "ru" || language === "en") url.searchParams.set("lang", language);
     if (workspaceId) url.searchParams.set("workspaceId", workspaceId); if (projectId) url.searchParams.set("projectId", projectId);
     url.searchParams.set("view", "hooks"); if (id) url.searchParams.set("integration", id);
     visitWorkspace(url.toString());
@@ -49,11 +51,11 @@ export function CodexPluginsSettings({ workspaceId, projectId, canManage, capabi
       else void toggle.toggle(id, next);
     } else open(id, true);
   };
-  if (detail === "codex" && available) return <CodexPluginManager key={`${session.subject}:${workspaceId}`} requestSetup={requestSetup} state={codex} locale={locale} onBack={() => open(null)} onViewDetails={() => browse("codex")} />;
+  if (detail === "codex" && (available || codex.loading || !!codex.error)) return <CodexPluginManager key={`${session?.subject}:${workspaceId}`} requestSetup={requestSetup} state={codex} locale={locale} onBack={() => open(null)} onViewDetails={() => browse("codex")} />;
   const githubReview = detail === "github" && typeof window !== "undefined" && (new URL(window.location.href).searchParams.get("impact") === "1" || new URL(window.location.href).searchParams.has("analysisId"));
   if (detail) return (detail === "swagger" ? apiEnabled : connectorAccess) ? <IntegrationPluginManager key={`${workspaceId}:${projectId}:${detail}`} id={detail}
     workspaceId={workspaceId} projectId={projectId} canManage={canManage} capabilities={capabilities} connected={connected} ru={ru} onUpdated={catalog.refresh} requestSetup={requestSetup || githubReview} onBack={() => open(null)} onViewDetails={() => browse(detail)} />
     : <CompanyFeatureUnavailable onReturn={() => open(null)} />;
-  return <PluginsList entries={entries} codex={codex} ru={ru} canManage={connectorAccess && connected} canAdminCodex={session?.workspaceRole === "workspace_admin"} pending={!!toggle.pending || youtrack.pending}
+  return <PluginsList entries={entries} codex={codex} ru={ru} canManage={connectorAccess && connected} canAdminCodex={codex.employee?.canManage === true} codexAdminHref={session?.administrationPath ? "/admin/?page=codex" : personalAdministrationUrl(window.location.href, workspaceId, "codex")} pending={!!toggle.pending || youtrack.pending}
     error={toggle.error ?? youtrack.error} onManage={open} onBrowse={() => browse()} onToggle={change} />;
 }

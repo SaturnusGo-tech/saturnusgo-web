@@ -11,7 +11,8 @@ export type BillingMutation = Schemas["BillingMutationEnvelope"]["data"];
 export type BillingInvoicePage = Schemas["BillingInvoiceListEnvelope"];
 export type BillingOutcome = Schemas["BillingConfirmRequest"]["outcome"];
 export type BillingIntent =
-  | { readonly kind: "checkout" | "plan"; readonly planId: BillingPlanId }
+  | { readonly kind: "checkout"; readonly planId: BillingPlanId; readonly startupSetupId?: string; readonly startupSetupVersion?: number; readonly confirmWorkspaceConversion?: true }
+  | { readonly kind: "plan"; readonly planId: BillingPlanId }
   | { readonly kind: "confirm"; readonly checkoutId: string; readonly outcome: BillingOutcome }
   | { readonly kind: "cancel" | "resume" | "retry" }
   | { readonly kind: "mockOutcome"; readonly outcome: BillingOutcome };

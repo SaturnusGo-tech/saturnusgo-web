@@ -25,6 +25,7 @@ export function componentHarness(initialHref = "https://tms.example/work/", glob
         slots[index].value = typeof value === "function" ? (value as (current: T) => T)(slots[index].value as T) : value;
       }];
     },
+    useMemo<T>(factory: () => T, deps: readonly unknown[]) { const index = cursor++; if (!same(slots[index]?.deps, deps)) slots[index] = { value: factory(), deps }; return slots[index].value as T; },
     useCallback<T>(callback: T) { return callback; },
     useRef<T>(initial: T) { const index = cursor++; slots[index] ??= { value: { current: initial } }; return slots[index].value; },
     useEffect(fn: () => void | (() => void), deps: readonly unknown[]) {

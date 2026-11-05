@@ -47,6 +47,7 @@ test("billing screen receives explicit isolated preview mode and does not requir
     const h = componentHarness(undefined, { process: { env: { NODE_ENV: "development" } } });
     const { WorkspaceStage: render } = h.load<{ WorkspaceStage: typeof WorkspaceStage }>(new URL("../../../presentation/workspace-stage/WorkspaceStage.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ t: (key: string) => key }) };
+      if (name.endsWith("useWorkspaceCapabilities")) return { useWorkspaceCapabilities: () => ({ value: { canConnect: true } }) };
       if (name.endsWith("TmsSessionContext")) return { useOptionalTmsSession: () => ({ subject }) };
       if (name.endsWith("company-features")) return { companyViewAvailable: () => true };
     });

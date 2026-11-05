@@ -11,16 +11,16 @@ import surface from "../plugin-surface/plugin.module.css";
 import css from "./manager.module.css";
 
 export function CodexPluginManager({ state, locale, onBack, onViewDetails, requestSetup }: {
-  state: ReturnType<typeof useCodexEmployee>; locale: "en" | "ru"; onBack: () => void; onViewDetails: () => void; requestSetup?: boolean;
+  state: ReturnType<typeof useCodexEmployee> & { connection?: NonNullable<ReturnType<typeof useCodexEmployee>["employee"]>["setup"]; canConnect?: boolean; readOnly?: boolean }; locale: "en" | "ru"; onBack: () => void; onViewDetails: () => void; requestSetup?: boolean;
 }) {
-  const ru = locale === "ru", employee = state.employee;
+  const ru = locale === "ru", employee = state.employee, connection = state.connection ?? employee?.setup;
   const [setupOpen, setSetupOpen] = useState(Boolean(requestSetup));
   const setupRequested = useRef(Boolean(requestSetup));
   useEffect(() => { if (requestSetup && !setupRequested.current) setSetupOpen(true); setupRequested.current = Boolean(requestSetup); }, [requestSetup]);
   const title = useRef<HTMLHeadingElement>(null), setupButton = useRef<HTMLButtonElement>(null);
   useEffect(() => { title.current?.focus({ preventScroll: true }); }, []);
   const closeSetup = () => { setSetupOpen(false); setupButton.current?.focus(); };
-  const website = employee ? new URL(employee.setup.mcpUrl).origin : null;
+  const website = connection ? new URL(connection.mcpUrl).origin : null;
   return <main className={surface.surface}>
     <div className={surface.breadcrumb}><button type="button" onClick={onBack}>{ru ? "Настройки плагинов" : "Plugin settings"}</button><ChevronRight width={16} height={16} /><span>Codex</span></div>
     <div className={surface.main}>
@@ -29,7 +29,8 @@ export function CodexPluginManager({ state, locale, onBack, onViewDetails, reque
         <div className={surface.actions}><button type="button" className={surface.quiet} onClick={onViewDetails}>{ru ? "Открыть карточку" : "View details"}</button></div>
       </header>
       <div className={css.resource}><CodexResourceState loading={state.loading} error={state.error} locale={locale} retry={state.refresh} /></div>
-      {employee && <>
+      {state.readOnly && <p className={surface.notice}>{ru ? "Доступны только чтение и экспорт. Изменения и выполнение отключены." : "Read and export access only. Changes and execution are disabled."}</p>}
+      {connection && <>
         <section className={surface.section} aria-label={ru ? "Подключения" : "Uses"}>
           <h2 className={surface.sectionTitle}>{ru ? "Подключения" : "Uses"}</h2>
           <div className={surface.group}>
@@ -38,15 +39,15 @@ export function CodexPluginManager({ state, locale, onBack, onViewDetails, reque
               <span className={surface.icon}><CodexMark /></span><span className={surface.rowCopy}><span className={surface.rowTitle}><ConnectionTitle>Falcon MCP</ConnectionTitle></span>
                 <span className={surface.rowDescription}>{ru ? "Подключение к Codex, URL сервера и настройка OAuth" : "Codex connection, server URL and OAuth setup"}</span></span><ChevronRight width={18} height={18} className={css.chevron} data-open={setupOpen || undefined} />
             </button>
-            <CodexConnectionSetup employee={employee} locale={locale} open={setupOpen} onClose={closeSetup} />
+            <CodexConnectionSetup setup={connection} locale={locale} open={setupOpen} onClose={closeSetup} />
             <IntegrationGuideLink article="codex-web-qa" className={`${surface.row} ${css.rowLink}`}><span className={surface.icon}><BookOpen width={22} height={22} /></span>
               <span className={surface.rowCopy}><span className={surface.rowTitle}>{ru ? "Руководство" : "Guide"}</span><span className={surface.rowDescription}>{ru ? "Подключение, доступ к проектам и полный цикл Web QA" : "Connection setup, project access and the full web QA workflow"}</span></span><ChevronRight width={18} height={18} />
             </IntegrationGuideLink>
           </div>
-          {!employee.canConnect && <p className={surface.notice}>{ru ? "Для подключения обратитесь к администратору компании." : "Contact your company administrator to enable this connection."}</p>}
+          {!(state.canConnect ?? employee?.canConnect) && <p className={surface.notice}>{ru ? "Обратитесь к администратору компании или проверьте состояние личного пространства." : "Contact your company administrator or check your personal workspace status."}</p>}
         </section>
       </>}
-      {employee && <>
+      {connection && <>
         <section className={surface.section} aria-label={ru ? "О плагине" : "About"}>
           <h2 className={surface.sectionTitle}>{ru ? "О плагине" : "About"}</h2>
           <div className={surface.group}><dl className={surface.about}>
