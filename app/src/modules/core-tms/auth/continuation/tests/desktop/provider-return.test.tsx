@@ -55,6 +55,7 @@ void test("desktop login/signup survives Google and email, including explicit si
     values.set(CONTINUATION_KEY, mcp);
     await mount(`${signup ? "/signup/" : "/cloud-login/"}?desktopAttempt=${attempt}`, signup);
     assert.equal(browser.location.search, ""); assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
+    assert.ok(!renderer!.root.findAllByType("button").some(button => button.children.includes("Company workspace")), "desktop return must remain on its original company or personal origin");
     if (provider === "google") {
       await click("Continue with Google"); assert.equal(destinations[0], "https://accounts.google.com/authorize");
       await mount(`/signup/?challengeId=google-proof&email=private%40example.test&expiresAt=2030-01-01T00%3A00%3A00Z&retryAfterSeconds=60&intent=${signup ? "signup" : "login"}`, true);

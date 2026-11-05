@@ -7,6 +7,7 @@ export interface SignInPort {
   resendEmail(challengeId: string, signal?: AbortSignal): Promise<EmailChallenge>;
   verifyEmail(challengeId: string, code: string, signal?: AbortSignal): Promise<AuthRedirect>;
   startGoogle(intent: GoogleIntent, signal?: AbortSignal): Promise<AuthorizationRedirect>;
+  resolveCompany(organization: string, signal?: AbortSignal): Promise<AuthRedirect>;
   startSaml(organization: string, signal?: AbortSignal): Promise<AuthorizationRedirect>;
   trial(signal?: AbortSignal): Promise<TrialStatus>;
 }

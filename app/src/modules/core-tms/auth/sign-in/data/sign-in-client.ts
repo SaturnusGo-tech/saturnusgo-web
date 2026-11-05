@@ -20,6 +20,7 @@ export function createSignInClient(send: typeof fetch = fetch): SignInPort {
     resendEmail: (challengeId, signal) => request("/auth/email/resend", { challengeId }, signal),
     verifyEmail: (challengeId, code, signal) => request("/auth/email/verify", { challengeId, code }, signal),
     startGoogle: (intent, signal) => request("/auth/google/start", { intent }, signal),
+    resolveCompany: (organization, signal) => request("/auth/company/resolve", { organization }, signal),
     startSaml: (organization, signal) => request("/auth/saml/start", { organization }, signal),
     trial: signal => request("/auth/trial", undefined, signal),
   };

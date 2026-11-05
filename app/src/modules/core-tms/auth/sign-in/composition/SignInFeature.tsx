@@ -1,5 +1,6 @@
 "use client";
 import { rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { useEffect, useMemo } from "react";
 import { createSignInClient } from "../data/sign-in-client";
 import { useSignIn } from "../application/useSignIn";
@@ -17,6 +18,7 @@ export function SignInFeature({ signup = false }: { readonly signup?: boolean })
   return <DesktopAuthEntry>{choose ? <SpaceChoiceFeature /> : <MethodSignInFeature signup={signup} />}</DesktopAuthEntry>;
 }
 function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
+  const { locale } = useTmsLocale();
   const client = useMemo(() => createSignInClient(), []);
   const proof = useMemo(() => typeof window === "undefined" ? null : googleEmailProof(window.location.search), []);
   const intent = proof?.intent ?? (signup ? "signup" : "login");
@@ -30,7 +32,12 @@ function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
   useEffect(() => {
     if (!signIn.state.destination) return;
     const destination = new URL(signIn.state.destination);
-    if (destination.protocol === "https:") { rememberBrowserContinuation(); window.location.assign(destination.href); }
-  }, [signIn.state.destination]);
+    if (destination.protocol === "https:") {
+      if (signIn.state.step === "company") {
+        destination.searchParams.set("method", "company"); destination.searchParams.set("lang", locale);
+      }
+      rememberBrowserContinuation(); window.location.assign(destination.href);
+    }
+  }, [signIn.state.destination, signIn.state.step, locale]);
   return <SignInScreen signIn={signIn} signup={intent === "signup"} />;
 }

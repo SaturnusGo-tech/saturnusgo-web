@@ -11,6 +11,7 @@ const signIn: ReturnType<typeof useSignIn> = {
   state: { step: "methods", loading: false, pending: false, error: null, email: "", challenge: null,
     retryAt: 0, destination: null, methods: { google: true, email: true, saml: true, signup: true } },
   select() {}, back() {}, retryMethods() {}, startEmail: async () => {}, resend: async () => {},
+  company: async () => {},
   verify: async () => {}, google: async () => {}, saml: async () => {},
 };
 const access: ReturnType<typeof useManagedAccess> = {

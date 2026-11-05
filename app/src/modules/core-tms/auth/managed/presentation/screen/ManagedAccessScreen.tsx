@@ -3,6 +3,7 @@ import { ArrowLeft, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { useManagedAccess } from "../../application/useManagedAccess";
 import type { useSignIn } from "../../../sign-in/application/useSignIn";
+import { signInError } from "../../../sign-in/presentation/copy/sign-in-error";
 import { signInCopy } from "../../../sign-in/presentation/copy/sign-in-copy";
 import { SignInMethods } from "../../../sign-in/presentation/methods/SignInMethods";
 import { ProofForm } from "../../../sign-in/presentation/forms/ProofForm";
@@ -22,14 +23,15 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
   const methodCopy = signInCopy(locale);
   const { state } = access;
   const stage = state.session?.stage ?? "anonymous";
-  const [companyEmail, setCompanyEmail] = useState(false);
+  const [companyEmail, setCompanyEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("method") === "company");
+  const companyPassword = companyEmail && (!signIn || signIn.state.methods?.email === true);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const step = signIn?.state.step ?? "methods";
   useEffect(() => {
-    if (!state.loading && (stage !== "anonymous" || companyEmail)) titleRef.current?.focus({ preventScroll: true });
-  }, [stage, state.loading, companyEmail, step]);
+    if (!state.loading && (stage !== "anonymous" || companyPassword)) titleRef.current?.focus({ preventScroll: true });
+  }, [stage, state.loading, companyPassword, step]);
   const title = stage === "password_change" ? copy.firstTitle : stage === "mfa_enrollment" ? copy.enrollTitle
-    : stage === "mfa_challenge" ? copy.mfaTitle : state.entrypoint?.audience === "platform" ? copy.sandbox : companyEmail ? methodCopy.emailTitle
+    : stage === "mfa_challenge" ? copy.mfaTitle : state.entrypoint?.audience === "platform" ? copy.sandbox : companyPassword ? methodCopy.emailTitle
       : step === "saml" ? methodCopy.ssoTitle : methodCopy.login;
   useEffect(() => { if (typeof document !== "undefined") document.title = title; }, [title]);
   const lead = stage === "password_change" ? copy.firstBody : stage === "mfa_enrollment" ? copy.enrollBody
@@ -51,8 +53,8 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
         </> : <>
           <h1 ref={titleRef} tabIndex={-1}>{title}</h1>{lead && <p className={styles.lead}>{lead}</p>}
           {state.error && <p className={styles.error} role="alert">{accessError(state.error, locale)}</p>}
-          {signIn?.state.error && <p className={styles.error} role="alert">{signIn.state.error === "PROVIDER_UNAVAILABLE" ? methodCopy.unavailable : methodCopy.error}</p>}
-          {stage === "anonymous" && (companyEmail || !signIn ? <LoginForm copy={copy} pending={state.pending} onSubmit={access.login} />
+          {signIn?.state.error && <p className={styles.error} role="alert">{signInError(signIn.state.error, signIn.state.step, methodCopy)}</p>}
+          {stage === "anonymous" && (companyPassword || !signIn ? <LoginForm copy={copy} pending={state.pending} onSubmit={access.login} />
             : step === "methods" ? <SignInMethods signIn={signIn} copy={methodCopy} signup={false} companyLogin={() => setCompanyEmail(true)} />
               : <ProofForm signIn={signIn} copy={methodCopy} organization={state.entrypoint.hostname} />)}
           {stage === "password_change" && <FirstPasswordForm copy={copy} pending={state.pending} onSubmit={access.firstPassword} />}
@@ -61,12 +63,12 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
           {(stage !== "anonymous" || signIn) && <footer className={styles.footer}>
             {stage !== "anonymous" ? <button className={styles.linkButton} disabled={state.pending} onClick={() => void access.logout()}>
               <ArrowLeft size={16} aria-hidden="true" />{copy.cancel}</button>
-              : companyEmail || step !== "methods" ? <button className={styles.linkButton} disabled={state.pending}
+              : companyPassword || step !== "methods" ? <button className={styles.linkButton} disabled={state.pending}
                 onClick={() => { setCompanyEmail(false); signIn?.back(); }}><ArrowLeft size={16} aria-hidden="true" />{methodCopy.back}</button>
                 : <a href={`https://tms.saturnusgo.com/signup/?lang=${locale}`}>{methodCopy.signupLink}</a>}
           </footer>}
         </>}
-      {!state.loading && !state.recoveryCodes.length && stage === "anonymous" && companyEmail && state.entrypoint?.available && <footer className={styles.footer}>
+      {!state.loading && !state.recoveryCodes.length && stage === "anonymous" && companyPassword && state.entrypoint?.available && <footer className={styles.footer}>
         <details className={styles.help}><summary>{copy.forgotPassword}</summary>
           <div><p>{copy.accessHelp}</p>{contact && <a href={`mailto:${contact}`}>{contact}</a>}</div></details>
       </footer>}

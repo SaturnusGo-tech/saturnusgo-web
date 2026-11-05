@@ -23619,6 +23619,83 @@
           }
         ]
       }
+    },
+    "/auth/company/resolve": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sign-in"
+        ],
+        "summary": "Resolve company workspace sign-in",
+        "operationId": "resolveAuthCompany",
+        "security": [],
+        "description": "Resolve a registered active company from its workspace name, company hostname, HTTPS origin or company-address shorthand. Returns only the canonical company login URL; this does not sign in, issue a session, link email identities or bypass company MFA and SSO policy.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthRedirect"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthCompanyResolveRequest"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -48595,6 +48672,21 @@
         "required": [
           "catalogVersion",
           "items"
+        ]
+      },
+      "AuthCompanyResolveRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "description": "A registered workspace name, company hostname, HTTPS origin or company-label@domain shorthand. An employee email address does not grant company access."
+          }
+        },
+        "required": [
+          "organization"
         ]
       }
     }

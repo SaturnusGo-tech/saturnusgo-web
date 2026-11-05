@@ -145,3 +145,18 @@ test('self profile preserves backend authentication failures without public cach
   assert.equal(calls.at(-1).headers.get('cookie'),null);
  }
 });
+
+
+test('company discovery forwards only the exact POST route with CSRF and canonical host signing', async t => {
+ const original=globalThis.fetch; t.after(()=>{globalThis.fetch=original;}); let forwarded;
+ globalThis.fetch=async request=>{forwarded=request;return Response.json({data:{redirectUrl:'https://umbrella-falcon.saturnusgo.com/cloud-login/'}});};
+ const url='https://tms.saturnusgo.com/api/v1/auth/company/resolve';
+ const body=JSON.stringify({organization:'umbrella-falcon@saturnusgo.com'});
+ const response=await worker.fetch(new Request(url,{method:'POST',body,headers:{origin:'https://tms.saturnusgo.com','content-type':'application/json'}}),env);
+ assert.equal(response.status,200);
+ assert.equal(forwarded.headers.get('x-falcon-host'),'tms.saturnusgo.com');
+ assert.equal(await forwarded.text(),body);
+ assert.equal((await worker.fetch(new Request(url),env)).status,404);
+ assert.equal((await worker.fetch(new Request(url+'/extra',{method:'POST',body,headers:{origin:'https://tms.saturnusgo.com'}}),env)).status,404);
+ assert.equal((await worker.fetch(new Request(url,{method:'POST',body,headers:{origin:'https://evil.example'}}),env)).status,403);
+});

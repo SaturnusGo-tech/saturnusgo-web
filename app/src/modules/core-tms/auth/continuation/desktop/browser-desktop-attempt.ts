@@ -21,6 +21,9 @@ export function captureBrowserDesktopAttempt(managedWorkspace = false): DesktopA
     return { status: failedOrigin === window.location.origin ? "blocked" : "none" };
   }
 }
+export function hasBrowserDesktopAttempt(): boolean {
+  return typeof window !== "undefined" && (activeOrigin === window.location.origin || failedOrigin === window.location.origin);
+}
 export function takeBrowserDesktopAttempt(): DesktopAttemptTarget {
   if (typeof window === "undefined") return { status: "none" };
   if (failedOrigin === window.location.origin) return { status: "blocked" };

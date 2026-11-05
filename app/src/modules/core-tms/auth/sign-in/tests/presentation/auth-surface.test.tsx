@@ -40,9 +40,20 @@ void test("only corporate SAML is primary; Google and email stay secondary with 
   await act(async () => { view = create(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup={false} />); });
   t.after(async () => { await act(async () => view.unmount()); });
   const buttons = view.root.findAllByType("button");
-  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary"]);
+  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary", "linkButton"]);
   await act(async () => { for (const button of buttons) button.props.onClick(); });
-  assert.deepEqual(calls, ["google", "email", "saml"]);
+  assert.deepEqual(calls, ["google", "email", "saml", "company"]);
   await act(async () => { view.update(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup />); });
   assert.deepEqual(view.root.findAllByType("button").map(button => button.props.className), ["secondary", "secondary"]);
+});
+
+void test("SAML unavailable explains company setup instead of asking the user to retry indefinitely", async t => {
+  setup(t);
+  const { SignInScreen } = await import("../../presentation/screen/SignInScreen");
+  const signIn = { state: { step: "saml", error: "FEDERATION_UNAVAILABLE", methods: { saml: true }, email: "" } } as unknown as ReturnType<typeof useSignIn>;
+  let view!: ReturnType<typeof create>;
+  await act(async () => { view = create(<TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: () => "" }}>
+    <SignInScreen signIn={signIn} /></TmsLocaleContext.Provider>); });
+  t.after(async () => { await act(async () => view.unmount()); });
+  assert.match(view.root.findByProps({ role: "alert" }).children.join(""), /SAML SSO is not configured/);
 });

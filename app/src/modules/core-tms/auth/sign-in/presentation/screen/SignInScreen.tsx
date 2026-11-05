@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 import type { useSignIn } from "../../application/useSignIn";
 import { useTmsLocale } from "../../../../localization/context/useTmsLocale";
+import { signInError } from "../copy/sign-in-error";
 import { signInCopy } from "../copy/sign-in-copy";
 import { SignInMethods } from "../methods/SignInMethods";
 import { ProofForm } from "../forms/ProofForm";
@@ -14,7 +15,7 @@ export function SignInScreen({ signIn, signup = false }: { readonly signIn: Retu
   const { state } = signIn;
   const signupRequired = !signup && state.error === "SIGNUP_REQUIRED";
   const title = signupRequired ? copy.signup : state.step === "code" ? copy.codeTitle : state.step === "saml" ? copy.ssoTitle
-    : state.step === "email" ? (signup ? copy.signupEmail : copy.emailTitle) : signup ? copy.signup : copy.login;
+    : state.step === "company" ? copy.companyTitle : state.step === "email" ? (signup ? copy.signupEmail : copy.emailTitle) : signup ? copy.signup : copy.login;
   useEffect(() => { if (typeof document !== "undefined") document.title = title; }, [title]);
   return <main className={styles.page} lang={locale}>
     <header className={styles.header}><div className={styles.language} aria-label={locale === "ru" ? "Язык" : "Language"}>
@@ -24,8 +25,7 @@ export function SignInScreen({ signIn, signup = false }: { readonly signIn: Retu
     <section className={styles.content} aria-busy={state.pending || state.loading} aria-labelledby="sign-in-title">
       <a href={`/?lang=${locale}`} className={styles.brand} aria-label="Falcon"><span className={styles.brandMark} aria-hidden="true" /></a>
       <h1 id="sign-in-title">{title}</h1>
-      {state.error && <p className={styles.error} role="alert">{signupRequired ? copy.signupRequired : state.error === "PROVIDER_UNAVAILABLE" ? copy.unavailable
-        : /CODE|CHALLENGE|EXPIRED/.test(state.error) ? copy.expired : copy.error}</p>}
+      {state.error && <p className={styles.error} role="alert">{signupRequired ? copy.signupRequired : signInError(state.error, state.step, copy)}</p>}
       {state.loading && <span className={styles.srOnly} role="status">{copy.loading}</span>}
       {!state.loading && !state.methods && <button className={styles.secondary} onClick={signIn.retryMethods}>{copy.retry}</button>}
       {signupRequired ? <a href={`/signup/?lang=${locale}`} className={styles.primary}>{copy.signupLink}</a>

@@ -15,6 +15,7 @@ const fixture = (): SignInPort => ({
   startEmail: async () => ({ challengeId: "proof-1", expiresAt: "2030-01-01T00:00:00Z", retryAfterSeconds: 60 }),
   resendEmail: async challengeId => ({ challengeId, expiresAt: "2030-01-01T00:00:00Z", retryAfterSeconds: 60 }),
   verifyEmail: async () => ({ redirectUrl: "https://tms.example.test/welcome/" }),
+  resolveCompany: async () => ({ redirectUrl: "https://umbrella-falcon.saturnusgo.com/cloud-login/" }),
   startGoogle: async () => ({ authorizationUrl: "https://accounts.google.com/authorize" }),
   startSaml: async () => ({ authorizationUrl: "https://idp.example.test/authorize" }),
   cancelFederation: async () => {},
@@ -93,5 +94,31 @@ void test("capability service failure leaves a working retry instead of strandin
   await act(async () => current.retryMethods());
   assert.equal(current.state.error, null);
   assert.equal(current.state.methods?.email, true);
+  await act(async () => renderer.unmount());
+});
+
+void test("company entry resolves the tenant login without starting SAML or an email proof", async () => {
+  const calls: string[] = [];
+  const renderer = await mount({ ...fixture(), resolveCompany: async organization => {
+    calls.push(organization); return { redirectUrl: "https://umbrella-falcon.saturnusgo.com/cloud-login/" };
+  }, startSaml: async () => { throw new Error("company entry must not start SAML"); },
+  startEmail: async () => { throw new Error("company entry must not start personal proof"); } });
+  await act(async () => current.select("company"));
+  assert.equal(current.state.step, "company");
+  await act(async () => { await current.company(" umbrella-falcon@saturnusgo.com "); });
+  assert.deepEqual(calls, ["umbrella-falcon@saturnusgo.com"]);
+  assert.equal(current.state.destination, "https://umbrella-falcon.saturnusgo.com/cloud-login/");
+  await act(async () => renderer.unmount());
+});
+void test("an unavailable SAML connection keeps its error and never changes the authentication method", async () => {
+  let companyCalls = 0;
+  const renderer = await mount({ ...fixture(), startSaml: async () => { throw { code: "FEDERATION_UNAVAILABLE" }; },
+    resolveCompany: async () => { companyCalls++; return { redirectUrl: "https://umbrella-falcon.saturnusgo.com/cloud-login/" }; } });
+  await act(async () => current.select("saml"));
+  await act(async () => { await current.saml("umbrella-falcon"); });
+  assert.equal(current.state.step, "saml");
+  assert.equal(current.state.error, "FEDERATION_UNAVAILABLE");
+  assert.equal(current.state.destination, null);
+  assert.equal(companyCalls, 0);
   await act(async () => renderer.unmount());
 });

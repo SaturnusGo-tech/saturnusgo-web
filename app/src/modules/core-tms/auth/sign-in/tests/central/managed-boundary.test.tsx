@@ -11,6 +11,7 @@ void test("operator sign-in opens password and MFA directly without company fede
   require.extensions[".css"] = module => { module.exports = {}; };
   const prior = ["window", "document", "React", "fetch"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
   const requests: string[] = [];
+  let emailEnabled = true;
   let audience: "platform" | "tenant" = "platform";
   let session: CompanySession = { authenticated: false, stage: "anonymous" };
   const expiresAt = new Date(Date.now() + 600_000).toISOString();
@@ -25,7 +26,7 @@ void test("operator sign-in opens password and MFA directly without company fede
     if (path.endsWith("/entrypoint")) return Response.json({ data: { name: "Falcon Sandbox", hostname: location.hostname, audience, available: true, accessContact: null } });
     if (path.endsWith("/methods")) return audience === "platform"
       ? Response.json({ error: { code: "NOT_FOUND", message: "Not found", requestId: "fixture" } }, { status: 404 })
-      : Response.json({ data: { google: true, email: true, saml: true, signup: true } });
+      : Response.json({ data: { google: true, email: emailEnabled, saml: true, signup: true } });
     if (path.endsWith("/login")) {
       assert.equal(init?.method, "POST");
       assert.deepEqual(JSON.parse(String(init?.body)), { login: "operator-fixture", password: "fixture-password" });
@@ -64,4 +65,13 @@ void test("operator sign-in opens password and MFA directly without company fede
   assert.ok(view.root.findAllByType("button").some(button => button.children.includes("Continue with Google")));
   assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), false);
   assert.equal(requests.filter(path => path.endsWith("/methods")).length, 1);
+  await act(async () => view.unmount());
+  location.search = "?method=company&lang=en";
+  await act(async () => { view = create(content()); });
+  assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), true, "company discovery opens the existing invited-member form");
+  await act(async () => view.unmount());
+  emailEnabled = false;
+  await act(async () => { view = create(content()); });
+  assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), false, "the company entry hint must not expose password login when SAML is enforced");
+  assert.ok(view.root.findAllByType("button").some(button => button.children.includes("Continue with SAML SSO")));
 });

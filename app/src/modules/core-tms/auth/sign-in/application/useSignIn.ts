@@ -58,8 +58,8 @@ export function useSignIn(client: SignInPort, intent: SignInIntent, proof?: { re
     } finally { if (current.current === controller) { pending.current = false; providerPending.current = false; } }
   }
   function unavailable() { setState(value => ({ ...value, error: "PROVIDER_UNAVAILABLE" })); }
-  function select(step: "email" | "saml") {
-    if (!state.methods?.[step] || (step === "saml" && intent === "signup")) { unavailable(); return; }
+  function select(step: "email" | "saml" | "company") {
+    if (!state.methods || (step !== "company" && !state.methods[step]) || (step !== "email" && intent === "signup")) { unavailable(); return; }
     cancel(); setState(value => ({ ...value, step, pending: false, error: null, destination: null }));
   }
   function back() {
@@ -96,6 +96,10 @@ export function useSignIn(client: SignInPort, intent: SignInIntent, proof?: { re
         await invalidation.current; signal.throwIfAborted(); providerPending.current = true;
         return { destination: (await client.startGoogle(intent, signal)).authorizationUrl };
       });
+    },
+    company: async (organization: string) => {
+      if (!state.methods || intent !== "login") { unavailable(); return; }
+      await perform(async signal => ({ destination: (await client.resolveCompany(organization.trim(), signal)).redirectUrl }));
     },
     saml: async (organization: string) => {
       if (!state.methods?.saml || intent === "signup") { unavailable(); return; }

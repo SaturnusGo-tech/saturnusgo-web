@@ -15,6 +15,7 @@ void test("expired email proof cannot submit or extend its old challenge and can
     startEmail: async () => { starts++; return { challengeId: `challenge-${starts}`, expiresAt: "2020-01-01T00:00:00Z", retryAfterSeconds: 60 }; },
     resendEmail: async () => { throw {code:"PROOF_INVALID"}; },
     verifyEmail: async () => { verified++; return { redirectUrl: "https://tms.example.test/" }; },
+    resolveCompany: async () => ({ redirectUrl: "https://umbrella-falcon.saturnusgo.com/cloud-login/" }),
     startGoogle: async () => ({ authorizationUrl: "" }), startSaml: async () => ({ authorizationUrl: "" }),
     trial: async () => ({ kind: "company", startsAt: null, expiresAt: null, readOnly: false }),
   };

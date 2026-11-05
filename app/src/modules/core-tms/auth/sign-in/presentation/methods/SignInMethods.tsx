@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Mail, Building2 } from "lucide-react";
 import type { useSignIn } from "../../application/useSignIn";
 import type { SignInCopy } from "../copy/sign-in-copy";
+import { hasBrowserDesktopAttempt } from "../../../continuation/desktop/browser-desktop-attempt";
 import { isFalconDesktop } from "../../domain/desktop-mode";
 import styles from "../../../managed/presentation/screen/access.module.css";
 
@@ -11,8 +12,9 @@ export function SignInMethods({ signIn, copy, signup, companyLogin }: {
   readonly companyLogin?: () => void;
 }) {
   const { state } = signIn;
+  const [handoff, setHandoff] = useState(true);
   const [desktop, setDesktop] = useState(false);
-  useEffect(() => { setDesktop(isFalconDesktop()); }, []);
+  useEffect(() => { setDesktop(isFalconDesktop()); setHandoff(hasBrowserDesktopAttempt()); }, []);
   if (desktop) return <div className={styles.methodStack}><a href="/desktop-sign-in/" className={styles.secondary}>{copy.browser}</a></div>;
   const signupBlocked = signup && !state.methods?.signup;
   return <div className={styles.methodStack}>
@@ -24,6 +26,8 @@ export function SignInMethods({ signIn, copy, signup, companyLogin }: {
       onClick={() => companyLogin ? companyLogin() : signIn.select("email")}><Mail size={18} aria-hidden="true" />{copy.email}</button>
     {!signup && <button className={styles.primary} disabled={state.pending || state.loading || !state.methods?.saml}
       onClick={() => signIn.select("saml")}><Building2 size={18} aria-hidden="true" />{copy.saml}</button>}
+    {!signup && !companyLogin && !handoff && <button className={styles.linkButton} disabled={state.pending || state.loading || !state.methods}
+      onClick={() => signIn.select("company")}>{copy.companyWorkspace}</button>}
     {signupBlocked && !state.loading && <p className={styles.lead} role="status">{copy.signupOff}</p>}
     {state.pending && <button className={styles.linkButton} onClick={signIn.back}>{copy.cancel}</button>}
   </div>;

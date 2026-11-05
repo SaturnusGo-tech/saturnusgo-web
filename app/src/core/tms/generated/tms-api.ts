@@ -5726,6 +5726,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/company/resolve": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve company workspace sign-in
+         * @description Resolve a registered active company from its workspace name, company hostname, HTTPS origin or company-address shorthand. Returns only the canonical company login URL; this does not sign in, issue a session, link email identities or bypass company MFA and SSO policy.
+         */
+        post: operations["resolveAuthCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -10536,6 +10559,10 @@ export interface components {
             /** @constant */
             catalogVersion: 1;
             items: components["schemas"]["SelfProfileAchievement"][];
+        };
+        AuthCompanyResolveRequest: {
+            /** @description A registered workspace name, company hostname, HTTPS origin or company-label@domain shorthand. An employee email address does not grant company access. */
+            organization: string;
         };
     };
     responses: {
@@ -23200,6 +23227,44 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resolveAuthCompany: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthCompanyResolveRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthRedirect"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
         };
