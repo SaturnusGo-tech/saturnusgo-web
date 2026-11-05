@@ -25657,6 +25657,102 @@
           "$ref": "#/components/parameters/XRequestId"
         }
       ]
+    },
+    "/qa-workflows/{workflowId}/stop": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        },
+        {
+          "name": "workflowId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128
+          }
+        }
+      ],
+      "post": {
+        "operationId": "stopQaWorkflow",
+        "summary": "Pause or cancel an owned workflow after expiry",
+        "description": "Authenticated cancellation-only control. Requires current active membership/project access and original ownership, current assignment or an active held lease. expectedRowVersion must match; Idempotency-Key replays the same stop. Allowed after entitlement expiry on the shared host; retired auth-only hosts remain blocked. Cannot resume/create workflows or write test results. MCP uses the existing falcon_transition_workflow with a valid falcon:read grant for pause/cancel only; revoked grants remain invalid.",
+        "tags": [
+          "QA workflows"
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          }
+        ],
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "body-version",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QaWorkflowStopRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stopped safely; no test verdict or execution result is written.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QaWorkflowStopEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -52686,6 +52782,75 @@
             "format": "uri"
           }
         }
+      },
+      "QaWorkflowStopRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128
+          },
+          "projectId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "maxLength": 128
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pause",
+              "cancel"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "expectedRowVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "workspaceId",
+          "projectId",
+          "kind",
+          "reason",
+          "expectedRowVersion"
+        ]
+      },
+      "QaWorkflowStopEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "workflow": {
+                "$ref": "#/components/schemas/QaWorkflow"
+              },
+              "revokedLeaseIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "maxLength": 128
+                }
+              }
+            },
+            "required": [
+              "workflow",
+              "revokedLeaseIds"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
       }
     }
   }

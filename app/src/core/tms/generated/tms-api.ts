@@ -6251,6 +6251,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/qa-workflows/{workflowId}/stop": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                workflowId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause or cancel an owned workflow after expiry
+         * @description Authenticated cancellation-only control. Requires current active membership/project access and original ownership, current assignment or an active held lease. expectedRowVersion must match; Idempotency-Key replays the same stop. Allowed after entitlement expiry on the shared host; retired auth-only hosts remain blocked. Cannot resume/create workflows or write test results. MCP uses the existing falcon_transition_workflow with a valid falcon:read grant for pause/cancel only; revoked grants remain invalid.
+         */
+        post: operations["stopQaWorkflow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11522,6 +11547,20 @@ export interface components {
             origin: string;
             /** Format: uri */
             metadataUrl: string;
+        };
+        QaWorkflowStopRequest: {
+            workspaceId: string;
+            projectId: string;
+            /** @enum {string} */
+            kind: "pause" | "cancel";
+            reason: string;
+            expectedRowVersion: number;
+        };
+        QaWorkflowStopEnvelope: {
+            data: {
+                workflow: components["schemas"]["QaWorkflow"];
+                revokedLeaseIds: string[];
+            };
         };
     };
     responses: {
@@ -25232,6 +25271,46 @@ export interface operations {
             409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    stopQaWorkflow: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                "Idempotency-Key": string;
+            };
+            path: {
+                workflowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaWorkflowStopRequest"];
+            };
+        };
+        responses: {
+            /** @description Stopped safely; no test verdict or execution result is written. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaWorkflowStopEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
         };
     };
 }
