@@ -57,7 +57,7 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
       <p className={css.subtitle}>{enterprise ? (ru ? "Обсудим, как Falcon подойдёт вашей компании." : "Let’s find the right Falcon setup for your company.")
         : selectedId === "individual" ? (ru ? "Ваш рабочий процесс тестирования — в одном месте." : "Your testing workflow, together in one place.")
           : (ru ? "Общее пространство для тестирования всей командой." : "One testing workspace for your whole team.")}</p>
-      <div className={css.scene}><img className={css.artwork} src={`/falcon/billing/${selectedId}.webp`} alt="" width={2048} height={800} decoding="async" />
+      <div className={css.scene}><img className={css.artwork} src={`/falcon/billing/${selectedId}.webp?v=20261105`} alt="" width={2048} height={800} decoding="async" />
         <span className={css.artLabel}>{ru ? "Ваш рабочий процесс" : "Your workflow"}</span><span className={css.artLabel}>{selectedId === "individual" ? (ru ? "Ваш темп" : "Your own pace") : (ru ? "Ваша команда" : "Your team")}</span></div>
     </div>
     <ul className={css.features}>{features.map(({ icon: Icon, title, detail }) => <li key={title}><span className={css.featureIcon}><Icon size={17} strokeWidth={1.5} aria-hidden="true" /></span><div><strong>{title}</strong><span>{detail}</span></div></li>)}</ul>
