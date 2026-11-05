@@ -15,7 +15,7 @@ function deferred<T>() {
   const promise = new Promise<T>((done) => { resolve = done; });
   return { promise, resolve };
 }
-const entry: CompanyEntrypoint = { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, accessContact: "admin@example.test" };
+const entry: CompanyEntrypoint = { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, authOnly: false, accessContact: "admin@example.test" };
 const anonymous: CompanySession = { authenticated: false, stage: "anonymous" };
 const clientFixture = (): ManagedAccessPort => ({
   entrypoint: async () => entry, session: async () => anonymous, login: async () => {}, firstPassword: async () => {},

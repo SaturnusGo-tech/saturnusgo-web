@@ -1,3 +1,4 @@
+import {workspaceHandoffOriginAllowed} from "./workspace-handoff/relay-policy.mjs";
 import { protocolRoutePolicy } from "./protocol/route-policy.mjs";
 
 const MAXIMUM_BODY_BYTES = 2 * 1024 * 1024;
@@ -49,12 +50,13 @@ export async function signedApiRequest(request, env, audience) {
   const origin = request.headers.get("origin") ?? "";
   if (!["GET", "HEAD"].includes(request.method) && origin !== incoming.origin &&
     !(origin === "" && request.method === "POST" && protocol?.allowServerPost) &&
-    !(request.method === "POST" && protocol?.allowCrossSitePost)) {
+    !(request.method === "POST" && protocol?.allowCrossSitePost && (protocol.kind !== "workspace-handoff" || workspaceHandoffOriginAllowed(origin,env)))) {
     throw new GatewayRequestError(403, "ORIGIN_DENIED");
   }
   const cookieName = audience === "personal" ? "__Host-falcon_cloud_session" : audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
   const cookie = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim())
-    .filter((part) => part.startsWith(`${cookieName}=`) ||
+    .filter((part) => part.startsWith(`${cookieName}=`) || (audience === "tenant" && part.startsWith("__Host-falcon_cloud_session=")) ||
+      (audience === "personal" && !incoming.pathname.startsWith("/api/v1/auth/") && !incoming.pathname.startsWith("/api/v1/cloud-auth/") && part.startsWith("__Host-falcon_tenant_session=")) ||
       protocol?.cookieNames.includes(part.slice(0, part.indexOf("=")))).join("; ");
   const headers = new Headers();
   for (const name of ["accept", "content-type", "user-agent", "if-match", "idempotency-key", "range"]) {

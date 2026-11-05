@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useWorkspaceAuthMode } from "../../composition/session/useWorkspaceAuthMode";
 import type { ReactNode } from "react";
 import { LegacyTmsAuthBoundary } from "./LegacyTmsAuthBoundary";
 import { ManagedWorkspaceBoundary } from "../../managed/composition/ManagedWorkspaceBoundary";
 import { TmsAuthState } from "../state/TmsAuthState";
 
 export function TmsAuthBoundary({ children }: { readonly children: ReactNode }) {
-  const [managed, setManaged] = useState<boolean | null>(null);
-  useEffect(() => {
-    setManaged(document.querySelector('meta[name="falcon-access"]')?.getAttribute("content") === "managed"
-      || (process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_FALCON_MANAGED_AUTH === "true"));
-  }, []);
-  if (managed === null) return <TmsAuthState kind="loading" />;
-  return managed ? <ManagedWorkspaceBoundary>{children}</ManagedWorkspaceBoundary>
-    : <LegacyTmsAuthBoundary>{children}</LegacyTmsAuthBoundary>;
+  const state=useWorkspaceAuthMode();
+  if(state.mode==="checking")return <TmsAuthState kind="loading"/>;
+  if(state.mode==="denied"||state.mode==="error")return <TmsAuthState kind="error" onAction={state.retry}/>;
+  return state.mode==="managed" ? <ManagedWorkspaceBoundary>{children}</ManagedWorkspaceBoundary>
+    : <LegacyTmsAuthBoundary verifiedSession={state.cloudSession}>{children}</LegacyTmsAuthBoundary>;
 }

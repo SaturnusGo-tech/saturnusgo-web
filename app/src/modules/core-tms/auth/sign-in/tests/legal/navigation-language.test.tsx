@@ -16,7 +16,7 @@ const signIn: ReturnType<typeof useSignIn> = {
 };
 const access: ReturnType<typeof useManagedAccess> = {
   state: { loading: false, pending: false, session: { authenticated: false, stage: "anonymous" },
-    entrypoint: { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, accessContact: null },
+    entrypoint: { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, authOnly: false, accessContact: null },
     error: null, enrollment: null, recoveryCodes: [] },
   refresh: async () => {}, prepareMfa: async () => {}, login: async () => {}, firstPassword: async () => {},
   verify: async () => {}, logout: async () => {}, acknowledgeCodes() {},

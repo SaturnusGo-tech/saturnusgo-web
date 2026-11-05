@@ -1,7 +1,7 @@
 import { CompanyAccessError } from "../../managed/domain/managed-access";
 import type { SignInPort } from "../application/sign-in-port";
 
-export function createSignInClient(send: typeof fetch = fetch): SignInPort {
+export function createSignInClient(send: typeof fetch = fetch, locale?: () => "en" | "ru"): SignInPort {
   async function request<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
     const response = await send(`/api/v1${path}`, { method: body === undefined ? "GET" : "POST",
       credentials: "include", cache: "no-store", redirect: "error", signal,
@@ -21,7 +21,7 @@ export function createSignInClient(send: typeof fetch = fetch): SignInPort {
     verifyEmail: (challengeId, code, signal) => request("/auth/email/verify", { challengeId, code }, signal),
     startGoogle: (intent, signal) => request("/auth/google/start", { intent }, signal),
     resolveCompany: (organization, signal) => request("/auth/company/resolve", { organization }, signal),
-    startSaml: (organization, signal) => request("/auth/saml/start", { organization }, signal),
+    startSaml: (organization, signal) => request("/auth/saml/start", { organization, ...(locale ? { locale: locale() } : {}) }, signal),
     trial: signal => request("/auth/trial", undefined, signal),
   };
 }

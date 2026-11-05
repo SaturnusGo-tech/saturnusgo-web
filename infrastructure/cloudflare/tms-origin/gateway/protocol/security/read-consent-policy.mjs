@@ -1,6 +1,6 @@
 /** Preserve only the backend's restrictive, interaction-specific document policy. */
 export function readConsentPolicy(request, response, audience) {
-  if (audience !== "tenant" || request.method !== "GET" || response.status !== 200 ||
+  if (!["tenant","personal"].includes(audience) || request.method !== "GET" || response.status !== 200 ||
     !/^\/api\/v1\/falcon-oauth\/interaction\/[A-Za-z0-9_-]{1,128}$/.test(new URL(request.url).pathname) ||
     !/^text\/html(?:;|$)/i.test(response.headers.get("content-type") ?? "")) return null;
   const policy = response.headers.get("content-security-policy") ?? "";

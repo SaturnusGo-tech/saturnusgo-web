@@ -1,3 +1,5 @@
+import {centralProtocolMethods} from '../common-protocol/policy.mjs';
+import {publicWorkspaceAccessAllowed} from "../workspace-access/public-policy.mjs";
 import { TMS_HOST } from '../../route-manifest.mjs';
 
 const auth = new Map([
@@ -25,7 +27,8 @@ export function publicAuthEnabled(hostname,env) {
 }
 export function publicApiAllowed(pathname,method) {
  if(!pathname.startsWith('/api/v1/')) return false;
- const path=pathname.slice('/api/v1/'.length); const methods=auth.get(path) ?? personalProfile.get(path);
+ if(centralProtocolMethods(pathname)?.includes(method))return true;
+ const path=pathname.slice('/api/v1/'.length); if(publicWorkspaceAccessAllowed(path,method))return true; const methods=auth.get(path) ?? personalProfile.get(path);
  if(methods) return methods.includes(method);
  if(personalFeatures.get(path)===method || (method==='GET' && impactResource.test(path)) ||
   (method==='PATCH' && impactRepository.test(path)) || (method==='POST' && impactCommand.test(path))) return true;

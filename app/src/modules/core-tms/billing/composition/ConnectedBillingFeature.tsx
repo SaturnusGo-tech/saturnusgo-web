@@ -10,6 +10,8 @@ import { useStartupSetup } from "../startup/application/useStartupSetup";
 import { createStartupSetupApi } from "../startup/data/startup-setup-api";
 import { StartupSetupScreen } from "../startup/presentation/StartupSetupScreen";
 import { billingPaymentsAvailable } from "../domain/catalog/billing-availability";
+import { useStartupWorkspaceTransition } from "../startup/composition/useStartupWorkspaceTransition";
+import { StartupHandoffStatus } from "../startup/presentation/StartupHandoffStatus";
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 
 export function ConnectedBillingFeature({ workspaceId, preview = false, onClose }: { workspaceId: string; preview?: boolean; onClose?(): void }) {
@@ -22,6 +24,7 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     [http, isolatedPreview, workspaceId, workspaceKind]);
   const billing = useBilling({ port, workspaceId: session ? workspaceId : null, workspaceKind,
     canManage: isolatedPreview || session?.workspaceRole === "workspace_admin" });
+  const handoff = useStartupWorkspaceTransition(billing.lastMutation, billing.summary, workspaceId, locale, isolatedPreview);
   const [setupOpen, setSetupOpen] = useState(false);
   const setupApi = useMemo(() => http ? createStartupSetupApi(http) : null, [http]);
   const setup = useStartupSetup(setupApi, workspaceId, setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
@@ -32,5 +35,5 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     onBack={() => setSetupOpen(false)} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;
-  return <BillingScreen key={workspaceId} {...billing} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} />;
+  return <><StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} /></>;
 }

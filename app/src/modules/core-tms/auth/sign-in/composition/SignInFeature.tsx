@@ -1,12 +1,13 @@
 "use client";
 import { rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { createSignInClient } from "../data/sign-in-client";
 import { useSignIn } from "../application/useSignIn";
 import { googleEmailProof } from "./callback/google-email-proof";
 import { SpaceChoiceFeature } from "../../spaces/composition/SpaceChoiceFeature";
 import { DesktopAuthEntry } from "../../continuation/composition/DesktopAuthEntry";
+import { WorkspaceMfaHandoff } from "../../workspace-handoff/composition/WorkspaceMfaHandoff";
 import { SignInScreen } from "../presentation/screen/SignInScreen";
 
 export function SignInFeature({ signup = false }: { readonly signup?: boolean }) {
@@ -15,11 +16,17 @@ export function SignInFeature({ signup = false }: { readonly signup?: boolean })
     const values = new URLSearchParams(window.location.search).getAll("chooseSpace");
     return values.length === 1 && values[0] === "1";
   }, []);
-  return <DesktopAuthEntry>{choose ? <SpaceChoiceFeature /> : <MethodSignInFeature signup={signup} />}</DesktopAuthEntry>;
+  const handoff=useMemo(()=>{
+    if(typeof window==="undefined")return null;
+    const query=new URLSearchParams(window.location.search),ids=query.getAll("workspaceId");
+    return query.getAll("workspaceHandoff").length===1&&query.get("workspaceHandoff")==="1"&&ids.length===1&&/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(ids[0])?ids[0]:null;
+  },[]);
+  return <DesktopAuthEntry>{handoff ? <WorkspaceMfaHandoff workspaceId={handoff}/> : choose ? <SpaceChoiceFeature /> : <MethodSignInFeature signup={signup} />}</DesktopAuthEntry>;
 }
 function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
   const { locale } = useTmsLocale();
-  const client = useMemo(() => createSignInClient(), []);
+  const currentLocale=useRef(locale);currentLocale.current=locale;
+  const client = useMemo(() => createSignInClient(fetch,()=>currentLocale.current), []);
   const proof = useMemo(() => typeof window === "undefined" ? null : googleEmailProof(window.location.search), []);
   const intent = proof?.intent ?? (signup ? "signup" : "login");
   const signIn = useSignIn(client, intent, proof);

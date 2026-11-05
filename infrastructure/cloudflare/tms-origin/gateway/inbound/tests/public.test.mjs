@@ -16,7 +16,7 @@ test('public API opt-in forwards only personal cookie and exact auth/business ro
  assert.equal(forwarded.headers.get('cookie'),`__Host-falcon_cloud_session=${'a'.repeat(43)}`);
  assert.equal(forwarded.headers.get('x-falcon-host'),'tms.saturnusgo.com');
  assert.match(forwarded.headers.get('x-falcon-signature'),/^[a-f0-9]{64}$/);
- for(const path of ['company/members','company/sso','cloud-auth/register','cloud-auth/login','falcon-oauth/token','mcp','unknown']){
+ for(const path of ['company/members-unknown','company/sso','cloud-auth/register','cloud-auth/login','falcon-oauth/token','mcp-other','unknown']){
   assert.equal((await worker.fetch(new Request(`https://tms.saturnusgo.com/api/v1/${path}`),env)).status,404,path);
  }
  assert.equal((await worker.fetch(new Request('https://tms.saturnusgo.com/api/v1/projects'),env)).status,200);
@@ -48,7 +48,7 @@ test('personal workspace bootstrap can load canonical links through the signed g
   assert.equal(response.status,200,path);
   const forwarded=calls.at(-1);
   assert.equal(forwarded.url,`https://api.example.test/api/v1${path}`);
-  assert.equal(forwarded.headers.get('cookie'),cookie);
+  assert.equal(forwarded.headers.get('cookie'),`${cookie}; __Host-falcon_tenant_session=${'t'.repeat(43)}`);
   assert.equal(forwarded.headers.get('x-falcon-host'),'tms.saturnusgo.com');
   assert.match(forwarded.headers.get('x-falcon-signature'),/^[a-f0-9]{64}$/);
  }
@@ -80,10 +80,10 @@ test('personal feature requests retain exact query/body, session isolation and v
     authorization:'Bearer spoofed','content-type':'application/json','x-falcon-host':'other.example'},...(body?{body}:{})}),env);
   assert.equal(response.status,200,`${method} ${path}`);
   const forwarded=calls.at(-1);assert.equal(forwarded.url,`https://api.example.test${target}`);
-  assert.equal(forwarded.headers.get('cookie'),cookie);assert.equal(forwarded.headers.get('authorization'),null);
+  assert.equal(forwarded.headers.get('cookie'),`${cookie}; __Host-falcon_tenant_session=${'t'.repeat(43)}`);assert.equal(forwarded.headers.get('authorization'),null);
   assert.equal(forwarded.headers.get('x-falcon-host'),'tms.saturnusgo.com');assert.equal(await forwarded.text(),body);
   const canonical=JSON.stringify(['falcon-gateway-v1',method,target,'tms.saturnusgo.com',
-   forwarded.headers.get('x-falcon-time'),'','https://tms.saturnusgo.com',digest(cookie),digest(body)]);
+   forwarded.headers.get('x-falcon-time'),'','https://tms.saturnusgo.com',digest(`${cookie}; __Host-falcon_tenant_session=${'t'.repeat(43)}`),digest(body)]);
   assert.equal(forwarded.headers.get('x-falcon-signature'),createHmac('sha256',Buffer.from(env.FALCON_MANAGED_GATEWAY_KEY,'hex')).update(canonical).digest('hex'));
  }
  assert.equal(calls.length,personalFeatureRoutes.length);

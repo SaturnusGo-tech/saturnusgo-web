@@ -1,3 +1,4 @@
+import {readWorkspaceHandoffPolicy} from "./gateway/workspace-handoff/relay-policy.mjs";
 import { publicAuthEnabled, publicApiAllowed } from "./gateway/inbound/public-policy.mjs";
 import { proxyDemo } from "./demo/proxy.mjs";
 import { discoveryResponse } from './seo.mjs';
@@ -257,9 +258,9 @@ export default {
       ? "/api/v1/falcon-oauth/.well-known/openid-configuration"
       : incoming.pathname === "/.well-known/oauth-protected-resource/api/v1/mcp" ? "/api/v1/mcp/resource-metadata" : null;
     if (metadataPath) {
-      if (audience !== "tenant" || !["GET", "HEAD"].includes(request.method)) return notFoundResponse();
+      if (!(audience === "tenant" || publicPersonal) || !["GET", "HEAD"].includes(request.method)) return notFoundResponse();
       const target = new URL(request.url); target.pathname = metadataPath;
-      return secureResponse(await proxyCompanyApi(new Request(target, request), env, audience), true);
+      return secureResponse(await proxyCompanyApi(new Request(target, request), env, audience ?? "personal"), true);
     }
     if (incoming.pathname === "/api/falcon-demo/request") {
       return incoming.hostname === TMS_HOST ? secureResponse(await proxyDemo(request, env)) : notFoundResponse();
@@ -267,7 +268,10 @@ export default {
     if (incoming.pathname.startsWith("/api/v1/")) {
       if (!audience && !(publicPersonal && publicApiAllowed(incoming.pathname,request.method))) return notFoundResponse();
       const response = await proxyCompanyApi(request, env, audience ?? "personal");
-      return secureResponse(response, true, readConsentPolicy(request, response, audience));
+      const relayPolicy=readWorkspaceHandoffPolicy(request,response,audience ?? "personal",env);
+      const secured=secureResponse(response,true,relayPolicy ?? readConsentPolicy(request,response,audience ?? "personal"));
+      if(relayPolicy)secured.headers.set("referrer-policy","no-referrer");
+      return secured;
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {
       return secureResponse(await serveDocsAudio(request, env?.DOCS_AUDIO));
@@ -282,7 +286,7 @@ export default {
     if (audience && documentRequest) {
       const verified = await verifyCompanyDocument(request, env, audience);
       if (!verified.ok) return secureResponse(unavailableCompanyDocument(verified.status, request.method === "HEAD"), true);
-      if (incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
+      if (!verified.authOnly && incoming.hostname !== TMS_HOST && ["/", "/login/", "/login", "/signup/", "/signup", "/cloud-login/", "/cloud-login"].includes(incoming.pathname)) {
         return redirectToCanonicalPath(incoming, audience === "platform" ? "/sandbox/" : APP_PATH);
       }
     }

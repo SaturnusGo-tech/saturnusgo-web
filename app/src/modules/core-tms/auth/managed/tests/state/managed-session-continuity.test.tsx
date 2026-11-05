@@ -33,7 +33,7 @@ void test("long sessions renew quietly, recover after offline and sleep, and sti
   let response: CompanySession = session;
   let offline = false; let calls = 0;
   const client: ManagedAccessPort = {
-    entrypoint: async () => ({ name: "Alpha", hostname: "alpha.example.test", audience: "tenant", available: true, accessContact: "" }),
+    entrypoint: async () => ({ name: "Alpha", hostname: "alpha.example.test", audience: "tenant", available: true, authOnly: false, accessContact: "" }),
     session: async () => { calls++; if (offline) throw new CompanyAccessError("SERVICE_UNAVAILABLE"); return response; },
     login: async () => {}, firstPassword: async () => {}, logout: async () => {},
     prepareMfa: async () => ({ secret: "", uri: "", issuer: "", account: "" }),

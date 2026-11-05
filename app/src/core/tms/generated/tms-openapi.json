@@ -24799,7 +24799,7 @@
             "$ref": "#/components/responses/ServiceUnavailable"
           }
         },
-        "description": "Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs.",
+        "description": "Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. Invalid displayName returns STARTUP_DISPLAY_NAME_INVALID; invalid slug STARTUP_SLUG_INVALID; occupied slug STARTUP_SLUG_UNAVAILABLE. Safe error.details.field identifies displayName or slug. Optional legal validation uses STARTUP_LEGAL_FIELD_INVALID.",
         "requestBody": {
           "required": true,
           "content": {
@@ -24809,7 +24809,9 @@
               }
             }
           }
-        }
+        },
+        "x-tms-idempotency": "body-key",
+        "x-tms-concurrency": "body-version"
       }
     },
     "/billing/startup-setup/retry": {
@@ -24877,7 +24879,9 @@
               }
             }
           }
-        }
+        },
+        "x-tms-idempotency": "body-key",
+        "x-tms-concurrency": "body-version"
       }
     },
     "/codex/setup": {
@@ -24937,6 +24941,722 @@
           }
         }
       }
+    },
+    "/auth/workspace-target": {
+      "get": {
+        "operationId": "getWorkspaceTransitionTarget",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Read the currently permitted origin for an explicit workspace",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verified server result. All responses are no-store.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceTransitionTargetEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/workspace-handoffs": {
+      "post": {
+        "operationId": "startWorkspaceHandoff",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Issue one-use workspace transition consent bound to current source identity and target generation",
+        "description": "Requires the current authenticated source-origin session and same Origin. Random code expires within 60 seconds. Codes and long-lived credentials are never placed in a URL. Destination must match the current server projection.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceHandoffStart"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceHandoffStart"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified server result. All responses are no-store.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceHandoffStartedEnvelope"
+                }
+              },
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Accept: text/html returns an ephemeral no-store relay form. Its nonce CSP permits only the exact verified destination. The short-lived code appears only as a hidden POST field."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/workspace-handoffs/consume": {
+      "post": {
+        "operationId": "consumeWorkspaceHandoff",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Consume on the exact target host and issue a fresh host-only session",
+        "description": "Revalidates current source session, membership, SAML/MFA policy, workspace, target host and generation. The request Origin must equal the stored source or target origin. The operation is one-use, transactional and audited. Desktop sends JSON from its target partition; browser may top-level POST a form.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceHandoffConsume"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceHandoffConsume"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified server result. All responses are no-store.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "description": "A fresh target-origin HttpOnly Secure host-only session cookie; never copied from the source origin.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceHandoffConsumedEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "303": {
+            "description": "Top-level browser form with Accept: text/html consumes the code and redirects to the permitted local app route.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            }
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/domain": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "readCompanyDomainLifecycle",
+        "tags": [
+          "Company domains"
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain lifecycle result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDomainLifecycleEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/platform/company-domains": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "get": {
+        "operationId": "readOperatorCompanyDomainLifecycle",
+        "tags": [
+          "Company domains"
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain lifecycle result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDomainLifecycleEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/company/domain/restore": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "restoreCompanyDomain",
+        "tags": [
+          "Company domains"
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain lifecycle result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDomainLifecycleMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,14}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyDomainLifecycleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/company-domains/release": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ],
+      "post": {
+        "operationId": "releaseCompanyDomain",
+        "tags": [
+          "Company domains"
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain lifecycle result.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDomainLifecycleMutationEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        },
+        "x-tms-idempotency": "required",
+        "x-tms-concurrency": "required",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]{0,14}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyDomainLifecycleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/companies/{companyId}/saml-origin/migrate": {
+      "post": {
+        "operationId": "prepareCompanySamlOriginMigration",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Prepare central SAML metadata migration as a recently authenticated platform operator",
+        "description": "Existing SAML origin and enforced SSO/MFA remain in effect until the operator prepares a migration and an administrator completes an actual signed assertion on central ACS. The test endpoint must run on the central origin. No application-host entitlement is extended.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "No-store migration result; testing additionally issues a host-only secure federation browser binding cookie.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SamlOriginMigrationPrepared"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/company/sso/origin/test": {
+      "post": {
+        "operationId": "testCompanySamlOriginMigration",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify pending central metadata through a real SAML assertion from the existing company administrator",
+        "description": "Existing SAML origin and enforced SSO/MFA remain in effect until the operator prepares a migration and an administrator completes an actual signed assertion on central ACS. The test endpoint must run on the central origin. No application-host entitlement is extended.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [],
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "No-store migration result; testing additionally issues a host-only secure federation browser binding cookie.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "authorizationUrl"
+                      ],
+                      "properties": {
+                        "authorizationUrl": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "x-tms-idempotency": "not-applicable"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
     }
   },
   "components": {
@@ -42080,6 +42800,10 @@
               "null"
             ],
             "format": "email"
+          },
+          "authOnly": {
+            "type": "boolean",
+            "description": "True when this host supports existing SAML authentication recovery only. Business routes, company OAuth and MCP consent remain unavailable; after authentication continue on the shared host."
           }
         },
         "required": [
@@ -42087,7 +42811,8 @@
           "hostname",
           "audience",
           "available",
-          "accessContact"
+          "accessContact",
+          "authOnly"
         ]
       },
       "ManagedLoginRequest": {
@@ -42513,7 +43238,7 @@
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "legal": {
-            "$ref": "#/components/schemas/CompanyLegal"
+            "$ref": "#/components/schemas/CompanyStoredLegal"
           },
           "accessContactEmail": {
             "type": "string",
@@ -42931,7 +43656,7 @@
                 "maxLength": 200
               },
               "legal": {
-                "$ref": "#/components/schemas/CompanyLegal"
+                "$ref": "#/components/schemas/CompanyStoredLegal"
               },
               "accessContactEmail": {
                 "type": "string",
@@ -50305,6 +51030,20 @@
               "null"
             ],
             "minimum": 1
+          },
+          "domainHostname": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 253
+          },
+          "domainGeneration": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
           }
         },
         "required": [
@@ -51492,6 +52231,459 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/CodexSetup"
+          }
+        }
+      },
+      "CompanyStoredLegal": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "legalName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "countryCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z]{2}$"
+          },
+          "legalForm": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "taxId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "registrationId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "taxBranchId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "legalAddress": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "legalName",
+          "countryCode",
+          "legalForm",
+          "taxId",
+          "registrationId",
+          "taxBranchId",
+          "legalAddress"
+        ]
+      },
+      "WorkspaceTransitionTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "destinationOrigin",
+          "generation"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "destinationOrigin": {
+            "type": "string",
+            "format": "uri"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "WorkspaceHandoffStart": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "destinationOrigin",
+          "route",
+          "locale"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "destinationOrigin": {
+            "type": "string",
+            "format": "uri"
+          },
+          "route": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          }
+        }
+      },
+      "WorkspaceHandoffStarted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "destinationOrigin",
+          "generation",
+          "code",
+          "expiresAt",
+          "consumeUrl"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "destinationOrigin": {
+            "type": "string",
+            "format": "uri"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "consumeUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "WorkspaceHandoffConsume": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "generation",
+          "code"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          }
+        }
+      },
+      "WorkspaceHandoffConsumed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "redirectUrl",
+          "locale"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
+          }
+        }
+      },
+      "WorkspaceTransitionTargetEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WorkspaceTransitionTarget"
+          }
+        }
+      },
+      "WorkspaceHandoffStartedEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WorkspaceHandoffStarted"
+          }
+        }
+      },
+      "WorkspaceHandoffConsumedEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WorkspaceHandoffConsumed"
+          }
+        }
+      },
+      "CompanyDomainLifecycle": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "hostname": {
+            "type": "string",
+            "maxLength": 253,
+            "pattern": "^[a-z0-9][a-z0-9.-]+[a-z0-9]$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "provisioning",
+              "verifying",
+              "active",
+              "failed",
+              "retired"
+            ]
+          },
+          "quarantineUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "restoreExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "authRecoveryHold": {
+            "type": "boolean"
+          },
+          "cleanupComplete": {
+            "type": "boolean"
+          },
+          "cleanupStatus": {
+            "type": "string",
+            "enum": [
+              "not_required",
+              "pending",
+              "held",
+              "failed",
+              "done",
+              "superseded"
+            ]
+          },
+          "cleanupErrorCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cleanupAttempts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nextCleanupAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "hostname",
+          "generation",
+          "status",
+          "quarantineUntil",
+          "restoreExpiresAt",
+          "authRecoveryHold",
+          "cleanupComplete",
+          "cleanupStatus",
+          "cleanupErrorCode",
+          "cleanupAttempts",
+          "nextCleanupAt"
+        ]
+      },
+      "CompanyDomainLifecycleRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "hostname": {
+            "type": "string",
+            "maxLength": 253,
+            "pattern": "^[a-z0-9][a-z0-9.-]+[a-z0-9]$"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "hostname"
+        ]
+      },
+      "CompanyDomainLifecycleEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "domain": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CompanyDomainLifecycle"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "domain"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "CompanyDomainLifecycleMutationEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allocation": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "workspaceId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "hostname": {
+                    "type": "string",
+                    "maxLength": 253,
+                    "pattern": "^[a-z0-9][a-z0-9.-]+[a-z0-9]$"
+                  },
+                  "generation": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "operation": {
+                    "type": "string",
+                    "enum": [
+                      "restore",
+                      "release"
+                    ]
+                  },
+                  "replayed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "workspaceId",
+                  "hostname",
+                  "generation",
+                  "operation",
+                  "replayed"
+                ]
+              }
+            },
+            "required": [
+              "allocation"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "SamlOriginMigrationPrepared": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "origin",
+          "metadataUrl"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "origin": {
+            "type": "string",
+            "format": "uri",
+            "description": "The fixed trusted central authentication origin."
+          },
+          "metadataUrl": {
+            "type": "string",
+            "format": "uri"
           }
         }
       }

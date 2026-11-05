@@ -56,3 +56,16 @@ test("company root directs to its workspace; the operator root directs to Sandbo
   const asset = await worker.fetch(new Request(`https://${host}/_next/static/app.js`), env);
   assert.equal(asset.status, 200); assert.match(asset.headers.get("cache-control"), /public/);
 });
+
+test('unpaid or disabled domains never receive an application document',async t=>{
+ let calls=0;replaceFetch(t,async()=>{calls++;return Response.json({data:{hostname:host,audience:'tenant',available:false,authOnly:false}});});
+ for(const path of ['/','/cloud-login/','/testcases/umbrella-home/work/','/admin/']) {
+  const response=await worker.fetch(new Request(`https://${host}${path}`),env);assert.equal(response.status,404,path);
+ }
+ assert.equal(calls,4);
+});
+test('an explicit authentication-only hold admits only the sign-in document and keeps business shells unavailable',async t=>{
+ replaceFetch(t,async request=>new URL(request.url).hostname==='api.example.test'?Response.json({data:{hostname:host,audience:'tenant',available:true,authOnly:true}}):new Response('<html><head></head><body>auth</body></html>',{headers:{'content-type':'text/html'}}));
+ assert.equal((await worker.fetch(new Request(`https://${host}/cloud-login/`),env)).status,200);
+ for(const path of ['/','/testcases/umbrella-home/work/','/admin/','/profile/'])assert.equal((await worker.fetch(new Request(`https://${host}${path}`),env)).status,404,path);
+});

@@ -62,12 +62,17 @@ type CloudProbe = { readonly stage: "checking" | "admin" | "signin" }
   | { readonly stage: "cloud"; readonly session: CloudSession }
   | { readonly stage: "unavailable" };
 
-export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNode }) {
+export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { readonly children: ReactNode; readonly verifiedSession?: CloudSession | null }) {
   const apiBase = process.env.NEXT_PUBLIC_TMS_API_BASE ?? "/api/v1";
   const [probe, setProbe] = useState<CloudProbe>({ stage: "checking" });
   const [probeVersion, setProbeVersion] = useState(0);
 
   useEffect(() => {
+    if (verifiedSession) {
+      const path=cloudWorkspacePathFromLocation(window.location,verifiedSession);
+      if(`${window.location.pathname}${window.location.search}${window.location.hash}`!==path)window.history.replaceState({},document.title,path);
+      setProbe({stage:"cloud",session:verifiedSession});return;
+    }
     if (shouldUseAdminAuth(window.location.search)) {
       setProbe({ stage: "admin" });
       return;
@@ -86,7 +91,7 @@ export function LegacyTmsAuthBoundary({ children }: { readonly children: ReactNo
       setProbe(result.stage === "admin" ? { stage: "signin" } : result);
     });
     return () => controller.abort();
-  }, [probeVersion]);
+  }, [probeVersion, verifiedSession]);
 
   if (probe.stage === "checking") return <TmsAuthState kind="loading" />;
   if (probe.stage === "unavailable") {

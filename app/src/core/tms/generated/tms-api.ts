@@ -6014,7 +6014,7 @@ export interface paths {
         };
         /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. */
         get: operations["readStartupSetup"];
-        /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. */
+        /** @description Owner-only Startup draft. A draft grants no company rights. Reservations expire after 30 minutes; setup/version and explicit workspace conversion confirmation are required at checkout. Provisioning requires verified TLS and route. Errors use stable billing codes and safe request IDs. Invalid displayName returns STARTUP_DISPLAY_NAME_INVALID; invalid slug STARTUP_SLUG_INVALID; occupied slug STARTUP_SLUG_UNAVAILABLE. Safe error.details.field identifies displayName or slug. Optional legal validation uses STARTUP_LEGAL_FIELD_INVALID. */
         put: operations["saveStartupSetup"];
         post?: never;
         delete?: never;
@@ -6057,6 +6057,194 @@ export interface paths {
         get: operations["getCodexSetup"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/workspace-target": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** Read the currently permitted origin for an explicit workspace */
+        get: operations["getWorkspaceTransitionTarget"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/workspace-handoffs": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue one-use workspace transition consent bound to current source identity and target generation
+         * @description Requires the current authenticated source-origin session and same Origin. Random code expires within 60 seconds. Codes and long-lived credentials are never placed in a URL. Destination must match the current server projection.
+         */
+        post: operations["startWorkspaceHandoff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/workspace-handoffs/consume": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Consume on the exact target host and issue a fresh host-only session
+         * @description Revalidates current source session, membership, SAML/MFA policy, workspace, target host and generation. The request Origin must equal the stored source or target origin. The operation is one-use, transactional and audited. Desktop sends JSON from its target partition; browser may top-level POST a form.
+         */
+        post: operations["consumeWorkspaceHandoff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/company/domain": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["readCompanyDomainLifecycle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/company-domains": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["readOperatorCompanyDomainLifecycle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/company/domain/restore": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restoreCompanyDomain"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/company-domains/release": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["releaseCompanyDomain"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/companies/{companyId}/saml-origin/migrate": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Prepare central SAML metadata migration as a recently authenticated platform operator
+         * @description Existing SAML origin and enforced SSO/MFA remain in effect until the operator prepares a migration and an administrator completes an actual signed assertion on central ACS. The test endpoint must run on the central origin. No application-host entitlement is extended.
+         */
+        post: operations["prepareCompanySamlOriginMigration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/company/sso/origin/test": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify pending central metadata through a real SAML assertion from the existing company administrator
+         * @description Existing SAML origin and enforced SSO/MFA remain in effect until the operator prepares a migration and an administrator completes an actual signed assertion on central ACS. The test endpoint must run on the central origin. No application-host entitlement is extended.
+         */
+        post: operations["testCompanySamlOriginMigration"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9123,6 +9311,8 @@ export interface components {
             available: boolean;
             /** Format: email */
             accessContact: string | null;
+            /** @description True when this host supports existing SAML authentication recovery only. Business routes, company OAuth and MCP consent remain unavailable; after authentication continue on the shared host. */
+            authOnly: boolean;
         };
         ManagedLoginRequest: {
             login: string;
@@ -9221,7 +9411,7 @@ export interface components {
         Company: {
             name: string;
             slug: string;
-            legal: components["schemas"]["CompanyLegal"];
+            legal: components["schemas"]["CompanyStoredLegal"];
             /** Format: email */
             accessContactEmail: string;
             maxMembers: number;
@@ -9317,7 +9507,7 @@ export interface components {
             /** @constant */
             kind: "details";
             name: string;
-            legal: components["schemas"]["CompanyLegal"];
+            legal: components["schemas"]["CompanyStoredLegal"];
             /** Format: email */
             accessContactEmail: string;
         } | {
@@ -10956,6 +11146,8 @@ export interface components {
             prorated: boolean;
             startupSetupId?: string | null;
             startupSetupVersion?: number | null;
+            domainHostname?: string | null;
+            domainGeneration?: number | null;
         };
         BillingInvoice: {
             id: string;
@@ -11225,6 +11417,111 @@ export interface components {
         };
         CodexSetupEnvelope: {
             data: components["schemas"]["CodexSetup"];
+        };
+        CompanyStoredLegal: {
+            legalName: string | null;
+            countryCode: string | null;
+            legalForm: string;
+            taxId: string;
+            registrationId: string;
+            taxBranchId: string;
+            legalAddress: string;
+        };
+        WorkspaceTransitionTarget: {
+            workspaceId: string;
+            /** Format: uri */
+            destinationOrigin: string;
+            generation: number;
+        };
+        WorkspaceHandoffStart: {
+            workspaceId: string;
+            /** Format: uri */
+            destinationOrigin: string;
+            route: string;
+            /** @enum {string} */
+            locale: "en" | "ru";
+        };
+        WorkspaceHandoffStarted: {
+            workspaceId: string;
+            /** Format: uri */
+            destinationOrigin: string;
+            generation: number;
+            code: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: uri */
+            consumeUrl: string;
+        };
+        WorkspaceHandoffConsume: {
+            workspaceId: string;
+            generation: number;
+            code: string;
+        };
+        WorkspaceHandoffConsumed: {
+            workspaceId: string;
+            /** Format: uri */
+            redirectUrl: string;
+            /** @enum {string} */
+            locale: "en" | "ru";
+        };
+        WorkspaceTransitionTargetEnvelope: {
+            data: components["schemas"]["WorkspaceTransitionTarget"];
+        };
+        WorkspaceHandoffStartedEnvelope: {
+            data: components["schemas"]["WorkspaceHandoffStarted"];
+        };
+        WorkspaceHandoffConsumedEnvelope: {
+            data: components["schemas"]["WorkspaceHandoffConsumed"];
+        };
+        CompanyDomainLifecycle: {
+            workspaceId: string;
+            hostname: string;
+            generation: number;
+            /** @enum {string} */
+            status: "reserved" | "provisioning" | "verifying" | "active" | "failed" | "retired";
+            /** Format: date-time */
+            quarantineUntil: string | null;
+            /** Format: date-time */
+            restoreExpiresAt: string | null;
+            authRecoveryHold: boolean;
+            cleanupComplete: boolean;
+            /** @enum {string} */
+            cleanupStatus: "not_required" | "pending" | "held" | "failed" | "done" | "superseded";
+            cleanupErrorCode: string | null;
+            cleanupAttempts: number;
+            /** Format: date-time */
+            nextCleanupAt: string | null;
+        };
+        CompanyDomainLifecycleRequest: {
+            workspaceId: string;
+            hostname: string;
+        };
+        CompanyDomainLifecycleEnvelope: {
+            data: {
+                domain: components["schemas"]["CompanyDomainLifecycle"] | null;
+            };
+        };
+        CompanyDomainLifecycleMutationEnvelope: {
+            data: {
+                allocation: {
+                    workspaceId: string;
+                    hostname: string;
+                    generation: number;
+                    /** @enum {string} */
+                    operation: "restore" | "release";
+                    replayed: boolean;
+                };
+            };
+        };
+        SamlOriginMigrationPrepared: {
+            version: number;
+            /**
+             * Format: uri
+             * @description The fixed trusted central authentication origin.
+             */
+            origin: string;
+            /** Format: uri */
+            metadataUrl: string;
         };
     };
     responses: {
@@ -24593,6 +24890,348 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    getWorkspaceTransitionTarget: {
+        parameters: {
+            query: {
+                workspaceId: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verified server result. All responses are no-store. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceTransitionTargetEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    startWorkspaceHandoff: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceHandoffStart"];
+                "application/x-www-form-urlencoded": components["schemas"]["WorkspaceHandoffStart"];
+            };
+        };
+        responses: {
+            /** @description Verified server result. All responses are no-store. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceHandoffStartedEnvelope"];
+                    /** @description Accept: text/html returns an ephemeral no-store relay form. Its nonce CSP permits only the exact verified destination. The short-lived code appears only as a hidden POST field. */
+                    "text/html": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    consumeWorkspaceHandoff: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceHandoffConsume"];
+                "application/x-www-form-urlencoded": components["schemas"]["WorkspaceHandoffConsume"];
+            };
+        };
+        responses: {
+            /** @description Verified server result. All responses are no-store. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description A fresh target-origin HttpOnly Secure host-only session cookie; never copied from the source origin. */
+                    "Set-Cookie"?: string;
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceHandoffConsumedEnvelope"];
+                };
+            };
+            /** @description Top-level browser form with Accept: text/html consumes the code and redirects to the permitted local app route. */
+            303: {
+                headers: {
+                    Location?: string;
+                    "Set-Cookie"?: string;
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    readCompanyDomainLifecycle: {
+        parameters: {
+            query: {
+                workspaceId: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain lifecycle result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyDomainLifecycleEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    readOperatorCompanyDomainLifecycle: {
+        parameters: {
+            query: {
+                workspaceId: string;
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain lifecycle result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyDomainLifecycleEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreCompanyDomain: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                "Idempotency-Key": string;
+                "If-Match": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyDomainLifecycleRequest"];
+            };
+        };
+        responses: {
+            /** @description Domain lifecycle result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag?: string;
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyDomainLifecycleMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    releaseCompanyDomain: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+                "Idempotency-Key": string;
+                "If-Match": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyDomainLifecycleRequest"];
+            };
+        };
+        responses: {
+            /** @description Domain lifecycle result. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    ETag?: string;
+                    "Idempotency-Replayed": components["headers"]["IdempotencyReplayed"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyDomainLifecycleMutationEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    prepareCompanySamlOriginMigration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                companyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    expectedVersion: number;
+                };
+            };
+        };
+        responses: {
+            /** @description No-store migration result; testing additionally issues a host-only secure federation browser binding cookie. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SamlOriginMigrationPrepared"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    testCompanySamlOriginMigration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description No-store migration result; testing additionally issues a host-only secure federation browser binding cookie. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** Format: uri */
+                            authorizationUrl: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
 }

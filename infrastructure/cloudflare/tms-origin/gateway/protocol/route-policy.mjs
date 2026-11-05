@@ -1,3 +1,6 @@
+import {centralProtocolMethods} from '../common-protocol/policy.mjs';
+import {workspaceSessionRoutePolicy} from '../workspace-access/public-policy.mjs';
+import {workspaceHandoffRoutePolicy} from "../workspace-handoff/policy.mjs";
 import { desktopRoutePolicy } from "../desktop/desktop-policy.mjs";
 import { federationRoutePolicy } from "../inbound/federation-policy.mjs";
 const issuer = "/api/v1/falcon-oauth";
@@ -6,6 +9,8 @@ const cookieNames = Object.freeze(["falcon_mcp_session", "falcon_mcp_interaction
   .flatMap(name => [name, `${name}.sig`]));
 
 export function protocolRoutePolicy(pathname, audience) {
+  const session=workspaceSessionRoutePolicy(pathname,audience);if(session)return session;
+  const handoff=workspaceHandoffRoutePolicy(pathname,audience);if(handoff)return handoff;
   if(audience==='personal' && ['/api/v1/auth/spaces','/api/v1/auth/spaces/select'].includes(pathname)) {
     return {kind:'account-spaces',allowServerPost:false,cookieNames:['__Host-falcon_spaces','__Host-falcon_federation']};
   }
@@ -16,12 +21,14 @@ export function protocolRoutePolicy(pathname, audience) {
   if(desktop) return desktop;
   const inbound = federationRoutePolicy(pathname,audience);
   if(inbound) return inbound;
-  if (audience !== "tenant") return null;
+  if (!["tenant","personal"].includes(audience)) return null;
+  const central=audience==="personal"?centralProtocolMethods(pathname):null;
+  if(audience==="personal"&&!central)return null;
   if (pathname === "/api/v1/mcp" || pathname === "/api/v1/mcp/resource-metadata") {
-    return { kind: "mcp", allowServerPost: true, cookieNames: [] };
+    return { kind: "mcp", allowServerPost: true, cookieNames: [],...(central?{allowedMethods:central}:{}) };
   }
   if (pathname === issuer || pathname.startsWith(`${issuer}/`)) {
-    return { kind: "oauth", allowServerPost: publicPosts.has(pathname), cookieNames };
+    return { kind: "oauth", allowServerPost: publicPosts.has(pathname), cookieNames,...(central?{allowedMethods:central,maximumBodyBytes:16384}:{}) };
   }
   return null;
 }

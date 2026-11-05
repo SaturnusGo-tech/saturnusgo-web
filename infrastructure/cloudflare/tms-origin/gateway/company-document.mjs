@@ -10,8 +10,9 @@ export async function verifyCompanyDocument(request, env, audience, send = fetch
   try {
     const payload = await response.json();
     if (payload?.data?.hostname !== incoming.hostname || payload?.data?.audience !== audience
-      || typeof payload.data.available !== "boolean") return { ok: false, status: 503 };
-    return { ok: true };
+      || typeof payload.data.available !== "boolean" || (payload.data.authOnly !== undefined && typeof payload.data.authOnly !== "boolean")) return { ok: false, status: 503 };
+    if(payload.data.available!==true || (payload.data.authOnly===true && incoming.pathname!=="/cloud-login/"))return {ok:false,status:404};
+    return { ok: true,authOnly:payload.data.authOnly===true };
   } catch { return { ok: false, status: 503 }; }
 }
 

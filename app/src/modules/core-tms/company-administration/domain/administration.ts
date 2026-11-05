@@ -23,3 +23,5 @@ export class AdministrationError extends Error {
 }
 
 export type JournalFilter = Pick<NonNullable<operations["getCompanyAudit"]["parameters"]["query"]>, "search" | "category" | "memberId">;
+
+export type CompanyStoredLegal = Company["legal"];

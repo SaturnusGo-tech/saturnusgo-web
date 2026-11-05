@@ -19,7 +19,7 @@ export function CompanyDetailsForm({ company, pending, onChange }: {
       <AccessField label={copy.name} required maxLength={200} value={draft.name} disabled={pending} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
       <AccessField label={copy.contact} hint={copy.contactHelp} type="email" required value={draft.accessContactEmail} disabled={pending} onChange={(event) => setDraft({ ...draft, accessContactEmail: event.target.value })} />
     </div></section>
-    <section className={styles.section}><h2>{copy.legalDetails}</h2><LegalFields legal={draft.legal} copy={copy} disabled={pending} onChange={(legal) => setDraft({ ...draft, legal })} /></section>
+    <section className={styles.section}><h2>{copy.legalDetails}</h2><LegalFields optional legal={draft.legal} copy={copy} disabled={pending} onChange={(legal) => setDraft({ ...draft, legal })} /></section>
     <div className={styles.formFooter}><button className={styles.primary} disabled={pending} type="submit">{copy.save}</button></div>
   </form>;
 }

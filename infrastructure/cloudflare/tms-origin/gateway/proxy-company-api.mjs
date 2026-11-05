@@ -1,3 +1,4 @@
+import {workspaceHandoffResponsePolicy} from "./workspace-handoff/policy.mjs";
 import { accountSpaceCookieAllowed } from "./account-spaces/cookie-policy.mjs";
 import { desktopResponsePolicy } from "./desktop/desktop-policy.mjs";
 import { federationResponsePolicy } from "./inbound/federation-policy.mjs";
@@ -11,7 +12,9 @@ const RESPONSE_HEADERS = ["content-type", "content-disposition", "content-length
 export async function proxyCompanyApi(request, env, audience, send = fetch) {
   try {
     const response = await send(await signedApiRequest(request, env, audience));
-    const protocol = desktopResponsePolicy(request,response,audience) ?? federationResponsePolicy(request,response,audience,env) ?? protocolResponsePolicy(request, response, audience);
+    const base=desktopResponsePolicy(request,response,audience) ?? federationResponsePolicy(request,response,audience,env) ?? protocolResponsePolicy(request,response,audience);
+    const handoff=workspaceHandoffResponsePolicy(request,response,audience,env);
+    const protocol=handoff?{...handoff,allowRedirect:handoff.allowRedirect||base.allowRedirect,headers:[...new Set([...base.headers,...handoff.headers])],permitsCookie:cookie=>handoff.permitsCookie(cookie)||base.permitsCookie(cookie)}:base;
     if (response.status >= 300 && response.status < 400 && !protocol.allowRedirect) return gatewayError(502, "INVALID_API_RESPONSE");
     const headers = new Headers({ "cache-control": "private, no-store, no-transform", "x-content-type-options": "nosniff" });
     for (const name of [...RESPONSE_HEADERS, ...protocol.headers]) {
