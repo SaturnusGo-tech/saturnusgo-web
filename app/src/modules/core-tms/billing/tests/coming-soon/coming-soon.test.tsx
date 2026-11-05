@@ -78,9 +78,9 @@ test("development can exercise a server-authorized mock checkout", async () => {
   const environment = process.env.NODE_ENV; Reflect.set(process.env, "NODE_ENV", "development");
   let writes = 0, view!: ReactTestRenderer;
   const http = { async getResource(path: string) {
-    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial" }, etag: null };
+    if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial", enabled: true, checkoutMode: "local_test" }, etag: null };
     return { data: { plans: [{ id: "individual", seats: 1, amount: 1100, currency: "USD" }], subscription: null, checkout: null, occupiedSeats: 1,
-      checkoutQuotes: [], suggestedPlanId: "individual", allowedCheckoutPlanIds: ["individual"], allowedChangePlanIds: [], provider: "mock", testMode: true }, etag: null };
+      checkoutQuotes: [], suggestedPlanId: "individual", allowedCheckoutPlanIds: ["individual"], allowedChangePlanIds: [], provider: "mock", testMode: true, enabled: true, checkoutMode: "local_test" }, etag: null };
   }, async get() { return { data: [], meta: { limit: 30 } }; }, async mutateResource(path: string) { assert.equal(path, "/billing/checkout"); writes++; return { data: { subscription: null, checkout: null, invoice: null, provider: "mock", testMode: true } }; } } as unknown as TmsHttpClient;
   try {
     await act(async () => { view = create(providers("en", http, <BillingFeature workspaceId="space" />)); });

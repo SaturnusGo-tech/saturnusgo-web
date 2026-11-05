@@ -7,6 +7,7 @@ export type BillingCheckout = Schemas["BillingCheckout"];
 export type BillingInvoice = Schemas["BillingInvoice"];
 export type BillingAccount = Schemas["BillingReadEnvelope"]["data"];
 export type BillingSummary = Schemas["BillingSummaryEnvelope"]["data"];
+export type BillingCheckoutMode = NonNullable<BillingSummary["checkoutMode"]>;
 export type BillingMutation = Schemas["BillingMutationEnvelope"]["data"];
 export type BillingInvoicePage = Schemas["BillingInvoiceListEnvelope"];
 export type BillingOutcome = Schemas["BillingConfirmRequest"]["outcome"];

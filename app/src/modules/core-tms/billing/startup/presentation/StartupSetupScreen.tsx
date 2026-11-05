@@ -3,8 +3,8 @@ import type { useStartupSetup } from "../application/useStartupSetup";
 import type { BillingPlan, BillingAccount } from "../../domain/billing";
 import css from "./startup.module.css";
 type Props = { model: ReturnType<typeof useStartupSetup>; plan?: BillingPlan; quote?: BillingAccount["checkoutQuotes"][number];
-  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; checkoutNotice?: ReactNode; onBack(): void; onCheckout(): Promise<void> };
-export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, checkoutNotice, onBack, onCheckout }: Props) {
+  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; controlledTest?: boolean; checkoutNotice?: ReactNode; onBack(): void; onCheckout(): Promise<void> };
+export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, controlledTest = false, checkoutNotice, onBack, onCheckout }: Props) {
   const setup = model.setup;
   const [edit, setEdit] = useState<{ displayName: string; slug: string; legalName: string; countryCode: string; taxId: string; address: string } | null>(null);
   const [confirmed, setConfirmed] = useState<string | null>(null);
@@ -29,7 +29,9 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
   return <section className={css.screen} aria-busy={locked} aria-labelledby="startup-title">
     <button type="button" disabled={locked} onClick={onBack}>{ru ? "К тарифам" : "Back to plans"}</button>
     <h2 id="startup-title">{ru ? "Подготовьте компанию" : "Set up your company"}</h2>
-    <p>{ru ? "Сохраните название и адрес. Личный доступ сохраняется до подтверждённой оплаты." : "Save a name and address. Your personal access stays available until payment is confirmed."}</p>
+    {controlledTest && <p className={css.testNotice} role="status">{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}
+    <p>{controlledTest ? (ru ? "Сохраните название и адрес. Переход на Startup проверяется без карты и реальных платежей." : "Save a name and address. This tests the Startup upgrade without a card or real payments.")
+      : (ru ? "Сохраните название и адрес. Личный доступ сохраняется до подтверждённой оплаты." : "Save a name and address. Your personal access stays available until payment is confirmed.")}</p>
     {model.loading && <p role="status">{ru ? "Загружаем данные…" : "Loading setup…"}</p>}
     {error && <p role="alert">{slugError || nameError ? fieldError : ru ? "Действие не выполнено. Обновите данные или повторите попытку." : "The action could not be completed. Refresh or try again."}</p>}
     {checkoutNotice}

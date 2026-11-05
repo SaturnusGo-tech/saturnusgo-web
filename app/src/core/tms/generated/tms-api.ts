@@ -3674,7 +3674,7 @@ export interface paths {
         };
         /**
          * Read the static monthly USD plan catalog
-         * @description Public safe catalog. Prices are base amounts in USD cents, exclusive of tax. Plans do not enroll workspaces or change access. No card details are accepted.
+         * @description Local mock catalog is public. Controlled production testing requires an authenticated operator-granted owner; only Startup is offered. Public real collection remains disabled.
          */
         get: operations["getBillingPlans"];
         put?: never;
@@ -11212,6 +11212,11 @@ export interface components {
                 provider: "mock";
                 /** @constant */
                 testMode: true;
+                /**
+                 * @description Server-issued checkout capability. Controlled tests charge no money and are restricted to an operator-granted owner/workspace. Never infer this capability from provider or testMode.
+                 * @enum {string}
+                 */
+                checkoutMode?: "disabled" | "controlled_test" | "local_test";
             };
         };
         BillingReadEnvelope: {
@@ -11219,13 +11224,8 @@ export interface components {
                 /** @description Self-serve catalog only. Enterprise is contact sales and publishes no price or capacity promise. */
                 plans: components["schemas"]["BillingPlan"][];
                 subscription: components["schemas"]["BillingSubscription"] | null;
-                /**
-                 * @description Only the mock provider is implemented; real collection is unavailable.
-                 * @enum {string}
-                 */
-                provider: "mock";
-                /** @constant */
-                testMode: true;
+                provider: "mock" | null;
+                testMode: boolean;
                 occupiedSeats: number;
                 /** @description Current open checkout before its expiry; null when absent, expired or closed. */
                 checkout: components["schemas"]["BillingCheckout"] | null;
@@ -11241,6 +11241,13 @@ export interface components {
                 teamAdministration: boolean;
                 /** @description Current server quotes for allowed checkout plans. Opening checkout freezes its amount for up to 30 minutes, bounded by existing paid-through. */
                 checkoutQuotes: components["schemas"]["BillingCheckoutQuote"][];
+                /**
+                 * @description Server-issued checkout capability. Controlled tests charge no money and are restricted to an operator-granted owner/workspace. Never infer this capability from provider or testMode.
+                 * @enum {string}
+                 */
+                checkoutMode?: "disabled" | "controlled_test" | "local_test";
+                /** @description Whether this exact owner/workspace currently has checkout capability. */
+                enabled?: boolean;
             };
         };
         BillingMutationEnvelope: {
@@ -11255,6 +11262,11 @@ export interface components {
                 provider: "mock";
                 /** @constant */
                 testMode: true;
+                /**
+                 * @description Server-issued checkout capability. Controlled tests charge no money and are restricted to an operator-granted owner/workspace. Never infer this capability from provider or testMode.
+                 * @enum {string}
+                 */
+                checkoutMode?: "disabled" | "controlled_test" | "local_test";
             };
         };
         BillingInvoiceListEnvelope: {
@@ -11340,15 +11352,11 @@ export interface components {
                 workspaceKind: "personal" | "company";
                 /** @description Whether this active member is a workspace_admin. Financial endpoints independently enforce administrator access. */
                 canManage: boolean;
-                /**
-                 * @description Persisted subscription provider, or configured provider when unsubscribed. Only the mock adapter is currently implemented.
-                 * @enum {string}
-                 */
-                provider: "mock" | "paddle" | "lemonsqueezy";
+                provider: ("mock" | "paddle" | "lemonsqueezy") | null;
                 /** @description Persisted subscription mode, or configured provider mode when unsubscribed. */
                 testMode: boolean;
-                /** @constant */
-                enabled: true;
+                /** @description Whether this exact owner/workspace currently has checkout capability. */
+                enabled: boolean;
                 /** @description Server-selected next offer. Enterprise is contact sales only; null while recovering overdue payment. */
                 suggestedPlanId: ("individual" | "startup" | "enterprise") | null;
                 /** @description Server-authorized paid checkout targets for the current workspace and subscription state. */
@@ -11359,6 +11367,11 @@ export interface components {
                 contactSales: boolean;
                 /** @description Persisted company team capability backed by paid/grace team entitlement, including canceled subscriptions before paid-through. Legacy unbilled companies retain existing capability. */
                 teamAdministration: boolean;
+                /**
+                 * @description Server-issued checkout capability. Controlled tests charge no money and are restricted to an operator-granted owner/workspace. Never infer this capability from provider or testMode.
+                 * @enum {string}
+                 */
+                checkoutMode?: "disabled" | "controlled_test" | "local_test";
             };
         };
         BillingCheckoutQuote: {

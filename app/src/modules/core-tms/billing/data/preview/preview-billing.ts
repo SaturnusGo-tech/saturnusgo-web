@@ -13,13 +13,13 @@ export function createPreviewBillingPort(workspaceKind: "personal" | "company", 
   let kind = workspaceKind;
   let invoices: BillingInvoice[] = []; const receipts = new Map<string, { intent: string; result: BillingMutation }>();
   const check = (id: string, signal?: AbortSignal) => { signal?.throwIfAborted(); if (id !== workspaceId) fail("BILLING_FORBIDDEN", 403); };
-  const result = (): BillingMutation => copy({ subscription, checkout, invoice: null, provider: "mock", testMode: true });
+  const result = (): BillingMutation => copy({ subscription, checkout, invoice: null, provider: "mock", testMode: true, checkoutMode: "local_test" });
   const planFor = (id: BillingPlanId) => { if (id === "enterprise") return fail("BILLING_CONTACT_SALES"); return plans.find(row => row.id === id) ?? fail("BILLING_PLAN_INCOMPATIBLE"); };
   const policy = () => previewBillingPolicy(kind, subscription);
   const port: BillingPort = {
     summary: async (id, signal) => { check(id, signal); return { planId: subscription?.planId ?? null,
-      status: subscription?.status ?? (kind === "company" ? "legacy" : "unsubscribed"), workspaceKind: kind, canManage: true, provider: "mock", testMode: true, enabled: true, ...policy() }; },
-    read: async (id, signal) => { check(id, signal); return copy({ plans, subscription, checkout: checkout?.status === "open" && Date.parse(checkout.expiresAt) > Date.now() ? checkout : null, provider: "mock", testMode: true, occupiedSeats: 1, ...policy(),
+      status: subscription?.status ?? (kind === "company" ? "legacy" : "unsubscribed"), workspaceKind: kind, canManage: true, provider: "mock", testMode: true, enabled: true, checkoutMode: "local_test", ...policy() }; },
+    read: async (id, signal) => { check(id, signal); return copy({ plans, subscription, checkout: checkout?.status === "open" && Date.parse(checkout.expiresAt) > Date.now() ? checkout : null, provider: "mock", testMode: true, enabled: true, checkoutMode: "local_test", occupiedSeats: 1, ...policy(),
       checkoutQuotes: policy().allowedCheckoutPlanIds.map(id => previewCheckoutQuote(planFor(id), subscription)) }); },
     invoices: async (id, options = {}, signal) => { check(id, signal); const limit = options.limit ?? 30; return copy({ data: invoices.filter(row => !options.before || row.periodStart < options.before || (row.periodStart === options.before && Boolean(options.beforeId) && row.id < options.beforeId!)).sort((left, right) => right.periodStart.localeCompare(left.periodStart) || right.id.localeCompare(left.id)).slice(0, limit), meta: { limit, provider: "mock", testMode: true } }); },
     execute: async (id, intent, options) => {

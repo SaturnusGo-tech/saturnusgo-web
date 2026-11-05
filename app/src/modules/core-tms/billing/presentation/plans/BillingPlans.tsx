@@ -13,18 +13,18 @@ type Props = {
   plans: readonly BillingPlan[]; current: BillingSubscription | null; occupiedSeats: number;
   workspaceKind: "personal" | "company"; canManage: boolean; busy: boolean; ru: boolean;
   offers?: BillingOffers; quotes?: readonly { planId: BillingPlanId; subtotal: number; currency: "USD"; periodEnd: string | null; prorated: boolean }[];
-  children?: ReactNode; restriction?: string | null; paymentsAvailable?: boolean; setupAvailable?: boolean; onClose?(): void;
+  children?: ReactNode; restriction?: string | null; paymentsAvailable?: boolean; setupAvailable?: boolean; controlledTest?: boolean; onClose?(): void;
   onChoose(planId: BillingPlanId): void;
 };
 const names = { individual: "Individual", startup: "Startup", enterprise: "Enterprise" };
 const order: BillingPlanId[] = ["individual", "startup", "enterprise"];
-export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, quotes, children, restriction, paymentsAvailable = true, setupAvailable = false, onClose, onChoose }: Props) {
+export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, quotes, children, restriction, paymentsAvailable = true, setupAvailable = false, controlledTest = false, onClose, onChoose }: Props) {
   const [selection, setSelection] = useState<{ id: BillingPlanId; context: string } | null>(null);
   const [showOptions, setShowOptions] = useState(false);
   const active = current && current.status !== "canceled" ? current : null;
   const fallback = !active && workspaceKind === "personal" ? "individual" : active?.planId === "individual" ? "startup" : "enterprise";
   const context = `${current?.planId}:${current?.status}:${offers?.suggestedPlanId}`;
-  const selectedId = selection?.context === context ? selection.id : offers?.suggestedPlanId ?? fallback;
+  const selectedId = controlledTest ? "startup" : selection?.context === context ? selection.id : offers?.suggestedPlanId ?? fallback;
   const plan = plans.find(item => item.id === selectedId);
   const enterprise = selectedId === "enterprise";
   const quote = quotes?.find(item => item.planId === selectedId);
@@ -66,13 +66,13 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
       <div className={css.summary}>
       {enterprise ? <div className={css.contactPrice}><strong>{ru ? "Индивидуальные условия" : "Let’s talk about your team"}</strong><span>{ru ? "Места и условия обсудим вместе." : "We’ll discuss capacity and terms together."}</span></div>
         : <div className={css.price}><strong>{quote?.prorated ? money(quote.subtotal, quote.currency) : plan ? money(plan.amount, plan.currency) : "—"}</strong><div><span>{quote?.prorated ? (ru ? "к оплате сейчас" : "due now") : (ru ? "в месяц" : "per month")}</span><small>{quote?.prorated && plan ? (ru ? `Затем ${money(plan.amount, plan.currency)} в месяц · без налогов` : `Then ${money(plan.amount, plan.currency)} / month · excluding tax`) : (ru ? "USD · без налогов" : "USD · excluding tax")}</small></div></div>}
-      <div className={css.controls}><div className={css.otherPlans}><button type="button" className={css.disclosure} aria-expanded={showOptions} aria-controls="billing-other-plans" onClick={() => setShowOptions(value => !value)}>{ru ? "Другие тарифы" : "Other plans"}<ChevronDown size={16} aria-hidden="true" data-open={showOptions} /></button>
+      <div className={css.controls}>{!controlledTest && <div className={css.otherPlans}><button type="button" className={css.disclosure} aria-expanded={showOptions} aria-controls="billing-other-plans" onClick={() => setShowOptions(value => !value)}>{ru ? "Другие тарифы" : "Other plans"}<ChevronDown size={16} aria-hidden="true" data-open={showOptions} /></button>
         {showOptions && <div id="billing-other-plans" className={css.options} role="group" aria-label={ru ? "Выбрать тариф для просмотра" : "Choose a plan to view"}>{order.map(id => <button type="button" key={id} data-view-plan={id} aria-pressed={id === selectedId} onClick={() => select(id)}>{names[id]}{id === selectedId && <Check size={14} aria-hidden="true" />}</button>)}</div>}
-      </div>{children}</div></div>
+      </div>}{children}</div></div>
       {reason && <p className={css.reason} role="status">{reason}</p>}
       {(canManage || !paymentsAvailable) && (enterprise && paymentsAvailable ? <a className={css.action} href="mailto:falcon@saturnusgo.com">{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></a>
         : <button type="button" data-plan={selectedId} className={css.action} disabled={disabled} onClick={paymentsAvailable || preparing ? () => onChoose(selectedId) : undefined}>{enterprise ? <>{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></> : isCurrent ? <><Check size={16} aria-hidden="true" />{ru ? "Текущий тариф" : "Current plan"}</> : scheduled ? (ru ? "Переход запланирован" : "Change scheduled") : busy ? (ru ? "Подождите…" : "Please wait…") : restriction ? (ru ? "Сначала восстановите подписку" : "Resolve subscription first") : preparing ? (ru ? "Подготовить компанию" : "Set up company") : <>{ru ? `Выбрать ${names[selectedId]}` : `Choose ${names[selectedId]}`}<ArrowRight size={16} aria-hidden="true" /></>}</button>)}
-      {!paymentsAvailable ? <p className={css.terms} role="status">{ru ? "Оплата скоро станет доступна" : "Payments are coming soon"}</p>
+      {controlledTest ? <p className={css.terms} role="status">{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p> : !paymentsAvailable ? <p className={css.terms} role="status">{ru ? "Оплата скоро станет доступна" : "Payments are coming soon"}</p>
         : !enterprise && <p className={css.terms}>{quote?.prorated ? (ru ? "Доплата за остаток периода. Дата продления не изменится." : "Prorated for the remaining period. Your renewal date stays the same.") : active && !checkoutAllowed ? (ru ? "Изменение вступит в силу при следующем продлении." : "Changes take effect at your next renewal.") : (ru ? "Проверьте и подтвердите подключение на следующем шаге." : "Review and confirm your subscription in the next step.")}</p>}
     </footer>
   </section>;

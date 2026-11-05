@@ -4,10 +4,10 @@ import css from "../screen/billing.module.css";
 
 export type BillingConfirmationIntent = { kind: "plan"; planId: BillingPlanId } | { kind: "cancel" | "resume" | "retry" };
 type Props = { intent: BillingConfirmationIntent | null; checkout: BillingCheckout | null; plans: readonly BillingPlan[];
-  current: BillingSubscription | null; testMode: boolean; busy: boolean; ru: boolean;
+  current: BillingSubscription | null; testMode: boolean; busy: boolean; ru: boolean; controlledTest?: boolean;
   onConfirm(intent: BillingConfirmationIntent): void; onCheckout(outcome: BillingOutcome): void; onDismiss(): void };
 const names = { individual: "Individual", startup: "Startup", enterprise: "Enterprise" };
-export function BillingConfirmation({ intent, checkout, plans, current, testMode, busy, ru, onConfirm, onCheckout, onDismiss }: Props) {
+export function BillingConfirmation({ intent, checkout, plans, current, testMode, busy, ru, controlledTest = false, onConfirm, onCheckout, onDismiss }: Props) {
   const [outcome, setOutcome] = useState<BillingOutcome>("success");
   const open = checkout?.status === "open";
   if (!intent && !open) return null;
@@ -20,6 +20,7 @@ export function BillingConfirmation({ intent, checkout, plans, current, testMode
     : intent?.kind === "resume" ? (ru ? "Включить автопродление?" : "Resume automatic renewal?") : intent?.kind === "retry" ? (ru ? "Повторить платёж?" : "Retry payment?") : (ru ? "Изменить тариф?" : "Change plan?");
   return <section className={css.confirmation} role="region" aria-labelledby="billing-confirm-title">
     <h3 id="billing-confirm-title">{title}</h3>
+    {controlledTest && <p className={css.testNotice} role="status">{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}
     {open ? <>
       <p>{names[checkout.planId]}</p>
       {quoteAvailable ? <dl className={css.facts}>

@@ -68,6 +68,14 @@ test("an uncertain command only retries the original command instead of sending 
   assert.equal(replays, 1); assert.equal(refreshes, 0);
   assert.equal(all.find(node => node.type === "BillingPlans")!.props.busy, true);
 });
+test("a revoked checkout capability blocks a retained retry even when its handler is invoked", () => {
+  const h = componentHarness(); let replays = 0;
+  const { BillingScreen: view } = h.load<{ BillingScreen: typeof BillingScreen }>(new URL("../../presentation/screen/BillingScreen.tsx", import.meta.url));
+  const all = nodes(h.render(() => view({ ...props(), paymentsAvailable: false, canRetryCommand: true,
+    error: { code: "SERVICE_UNAVAILABLE", retryable: true, requestId: null }, retryCommand: async () => { replays++; } })));
+  const retry = nodes(all.find(node => node.props.role === "alert")!).find(node => node.type === "button")!;
+  assert.equal(retry.props.disabled, true); invoke(retry, "onClick"); assert.equal(replays, 0);
+});
 
 test("an unsubscribed company sees one offer without redundant billing scaffolding", () => {
   const h = componentHarness();
