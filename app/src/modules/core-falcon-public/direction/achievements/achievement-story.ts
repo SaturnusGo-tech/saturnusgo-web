@@ -7,6 +7,8 @@ export const achievementStory = {
     action: 'Start your collection',
     collection: 'A few of Falcon’s 40 QA achievements',
     note: 'Earned through your work. Part of your profile.',
+    pause: 'Pause achievement animation',
+    resume: 'Resume achievement animation',
     badgeNames: ['Boundary Patrol', 'Common Language', 'One Hundred Checks', 'First Signal', 'Closed Loop', 'Team Support', 'Full QA Cycle'],
   },
   ru: {
@@ -15,10 +17,12 @@ export const achievementStory = {
     action: 'Начать свою коллекцию',
     collection: 'Несколько из 40 достижений QA в Falcon',
     note: 'За вашу работу. В вашем профиле.',
+    pause: 'Приостановить анимацию достижений',
+    resume: 'Продолжить анимацию достижений',
     badgeNames: ['Дозор границ', 'Общий язык', 'Сто проверок', 'Первый сигнал', 'Замкнутый цикл', 'Опора команды', 'Полный цикл QA'],
   },
 } satisfies Record<LandingLocale, {
-  title: string; body: string; action: string; collection: string; note: string; badgeNames: string[];
+  title: string; body: string; action: string; collection: string; note: string; pause: string; resume: string; badgeNames: string[];
 }>;
 
 export const featuredAchievementArt = [
