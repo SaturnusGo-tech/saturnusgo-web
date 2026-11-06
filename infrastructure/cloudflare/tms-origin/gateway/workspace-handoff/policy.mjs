@@ -1,5 +1,6 @@
 import {workspaceSessionRoutePolicy} from '../workspace-access/public-policy.mjs';
 import {readWorkspaceHandoffPolicy} from './relay-policy.mjs';
+import {TMS_HOST} from '../../route-manifest.mjs';
 const root='/api/v1/auth/';
 const methods=new Map([['workspace-target',['GET']],['workspace-handoffs',['POST']],['workspace-handoffs/consume',['POST']]]);
 export function workspaceHandoffRoutePolicy(pathname,audience) {
@@ -15,6 +16,13 @@ function companyAdministrationRedirect(url) {
   keys.every(key=>['account','workspaceId','page','projectId','lang'].includes(key)&&url.searchParams.getAll(key).length===1)&&
   (projectId===null||/^[A-Za-z0-9._:-]{1,128}$/.test(projectId))&&(lang===null||['en','ru'].includes(lang));
 }
+function companyPreparationRedirect(request,response,url) {
+ const keys=[...url.searchParams.keys()];
+ return request.headers.get('accept')?.includes('text/html')&&!response.headers.has('set-cookie')&&
+  url.origin===`https://${TMS_HOST}`&&url.pathname==='/cloud-login/'&&keys.length===2&&
+  keys.every(key=>['workspaceId','workspaceHandoff'].includes(key)&&url.searchParams.getAll(key).length===1)&&
+  /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(url.searchParams.get('workspaceId')??'')&&url.searchParams.get('workspaceHandoff')==='1';
+}
 export function workspaceHandoffResponsePolicy(request,response,audience,env) {
  if(!["personal","tenant"].includes(audience))return null;
  const path=new URL(request.url).pathname;
@@ -22,11 +30,12 @@ export function workspaceHandoffResponsePolicy(request,response,audience,env) {
  const relay=readWorkspaceHandoffPolicy(request,response,audience,env),session=workspaceSessionRoutePolicy(path,audience);
  if(!workspaceHandoffRoutePolicy(path,audience)&&!relay&&!session&&!callback)return null;
  let allowRedirect=false;
- if(request.method==='POST'&&path===root+'workspace-handoffs/consume'&&response.status===303) {
+ if(request.method==='POST'&&[root+'workspace-handoffs',root+'workspace-handoffs/consume'].includes(path)&&response.status===303) {
   try {const location=response.headers.get('location'),url=new URL(location);
-   allowRedirect=location.length<=2400&&url.origin===new URL(request.url).origin&&!url.username&&!url.password&&!url.hash&&
-    (url.pathname==='/testcases/umbrella-home/work/'||companyAdministrationRedirect(url))&&!/[\\\x00-\x20\x7f]/.test(location)&&!/%0[ad]/i.test(location)&&
+   const safe=location.length<=2400&&!url.username&&!url.password&&!url.hash&&!/[\\\x00-\x20\x7f]/.test(location)&&!/%0[ad]/i.test(location)&&
     ![...url.searchParams.keys()].some(key=>/token|code|secret|password|credential|authorization/i.test(key));
+   allowRedirect=safe&&(companyPreparationRedirect(request,response,url)||(path===root+'workspace-handoffs/consume'&&
+    url.origin===new URL(request.url).origin&&(url.pathname==='/testcases/umbrella-home/work/'||companyAdministrationRedirect(url))));
   }catch{}
  }
  return {allowRedirect,headers:[...(allowRedirect?['location']:[]),...(relay?['content-security-policy']:[])],permitsCookie(cookie) {

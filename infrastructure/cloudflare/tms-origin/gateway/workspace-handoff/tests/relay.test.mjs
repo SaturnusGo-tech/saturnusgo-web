@@ -61,6 +61,40 @@ test('consume allows only same-target application redirect and sets/clears host-
   globalThis.fetch=async()=>new Response(null,{status:303,headers:{location}});assert.equal((await worker.fetch(request(),env)).status,502);
  }
 });
+test('HTML handoff start and consume permit only the fixed central preparation continuation without cookies',async t=>{
+ const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
+ const location=source+'/cloud-login/?workspaceId=personal_314b9ea2-2888-4d23-9757-95d88260ab7d&workspaceHandoff=1';
+ globalThis.fetch=async()=>new Response(null,{status:303,headers:{location}});
+ for(const [host,path,origin]of [[source,'workspace-handoffs',source],[target,'workspace-handoffs',target],[target,'workspace-handoffs/consume',source]]){
+  const response=await worker.fetch(new Request(host+'/api/v1/auth/'+path,{method:'POST',body:'workspaceId=space',headers:{origin,accept:'text/html','content-type':'application/x-www-form-urlencoded'}}),env);
+  assert.equal(response.status,303,path);assert.equal(response.headers.get('location'),location);
+  assert.equal(response.headers.get('cache-control'),'private, no-store, no-transform');assert.equal(response.headers.has('set-cookie'),false);
+ }
+});
+test('preparation redirect allowance rejects foreign paths, malformed scopes, non-HTML requests and cookie issuance',async t=>{
+ const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
+ const exact=source+'/cloud-login/?workspaceId=space&workspaceHandoff=1';
+ const request=(path='auth/workspace-handoffs/consume',accept='text/html',origin=source)=>new Request(target+'/api/v1/'+path,{method:'POST',body:'workspaceId=space',headers:{origin,accept}});
+ const locations=['https://foreign.example/cloud-login/?workspaceId=space&workspaceHandoff=1',target+'/cloud-login/?workspaceId=space&workspaceHandoff=1',
+  source+'/cloud-login?workspaceId=space&workspaceHandoff=1',source+'/testcases/umbrella-home/work/?workspaceId=space&workspaceHandoff=1',
+  source+'/cloud-login/?workspaceHandoff=1',source+'/cloud-login/?workspaceId=../space&workspaceHandoff=1',
+  source+'/cloud-login/?workspaceId=space&workspaceHandoff=0',exact+'&workspaceId=other',exact+'&workspaceHandoff=1',exact+'&returnTo=/admin/',
+  exact+'&code=secret',exact+'#secret',source.replace('https:','http:')+'/cloud-login/?workspaceId=space&workspaceHandoff=1',
+  source.replace('https://','https://user@')+'/cloud-login/?workspaceId=space&workspaceHandoff=1',exact+'%0a',exact+'&lang=ru'];
+ for(const location of locations){
+  globalThis.fetch=async()=>new Response(null,{status:303,headers:{location}});
+  assert.equal((await worker.fetch(request(),env)).status,502,location);
+ }
+ globalThis.fetch=async()=>new Response(null,{status:303,headers:{location:exact}});
+ assert.equal((await worker.fetch(request('billing/checkout','text/html',target),env)).status,502);
+ assert.equal((await worker.fetch(request('auth/workspace-handoffs/consume','application/json'),env)).status,502);
+ for(const origin of ['','null','https://foreign.example'])assert.equal((await worker.fetch(request(undefined,undefined,origin),env)).status,403);
+ for(const cookie of [`__Host-falcon_cloud_session=${'a'.repeat(43)}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+  '__Host-falcon_tenant_session=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax']){
+  globalThis.fetch=async()=>new Response(null,{status:303,headers:{location:exact,'set-cookie':cookie}});
+  assert.equal((await worker.fetch(request(),env)).status,502);
+ }
+});
 test('the same exact relay policy survives verified SAML and Google callback documents only',async t=>{
  const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
  globalThis.fetch=async()=>new Response('<form></form>',{headers:{'content-type':'text/html','content-security-policy':policy}});
