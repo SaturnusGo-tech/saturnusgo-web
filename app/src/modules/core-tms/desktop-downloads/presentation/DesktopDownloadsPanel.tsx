@@ -74,6 +74,7 @@ export function DesktopDownloadsPanel({ open, anchor, onClose }: Props) {
       })}
     </div>
     <footer className={css.footer}>
+      <a className={css.installGuide} href="/falcon/desktop/install/macos.html" target="_blank" rel="noopener noreferrer">Install and open on macOS ↗</a>
       <p>{ru ? "macOS: локальная подпись, без нотариализации. Windows: без цифровой подписи." : "macOS: ad-hoc signed, not notarized. Windows: unsigned."}</p>
       <a href={`${release.baseUrl}${release.checksums}`} download={release.checksums}>{ru ? "Контрольные суммы SHA-256" : "SHA-256 checksums"}</a>
     </footer>
