@@ -10,7 +10,7 @@ require.extensions[".css"] = module => { module.exports = {}; };
 const { WorkspaceMfaHandoff } = require("../../composition/WorkspaceMfaHandoff") as typeof import("../../composition/WorkspaceMfaHandoff");
 if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
 
-for (const mode of ["owner", "foreign", "unavailable", "anonymous"] as const) test(`company handoff marker verifies the cloud owner before transfer: ${mode}`, async () => {
+for (const mode of ["owner", "foreign", "unavailable", "anonymous", "preparing"] as const) test(`company handoff marker verifies the cloud owner before transfer: ${mode}`, async () => {
   const previousFetch = globalThis.fetch, previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   const calls: string[] = [], destinations: string[] = [];
   Object.defineProperty(globalThis, "window", { configurable: true, value: {
@@ -19,7 +19,7 @@ for (const mode of ["owner", "foreign", "unavailable", "anonymous"] as const) te
   globalThis.fetch = async input => {
     const path = String(input); calls.push(path);
     if (path.endsWith("/cloud-auth/session")) return mode === "unavailable" ? Response.json({ error: {} }, { status: 503 }) : Response.json({ data: mode === "anonymous" ? { authenticated: false } : { authenticated: true, workspace: { id: mode === "foreign" ? "other" : "space" } } });
-    if (path.includes("/auth/workspace-target?")) return Response.json({ data: { workspaceId: "space", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" } });
+    if (path.includes("/auth/workspace-target?")) return mode === "preparing" ? Response.json({error:{code:"HANDOFF_TARGET_PREPARING"}},{status:409}) : Response.json({ data: { workspaceId: "space", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" } });
     return Response.json({ data: { available: false } });
   };
   let view!: ReactTestRenderer;
@@ -27,9 +27,13 @@ for (const mode of ["owner", "foreign", "unavailable", "anonymous"] as const) te
     await act(async () => { view = create(<TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: key => key }}><WorkspaceMfaHandoff workspaceId="space" /></TmsLocaleContext.Provider>); });
     assert.equal(calls[0], "/api/v1/cloud-auth/session");
     assert.equal(calls.some(path => path.endsWith("/auth/entrypoint")), mode === "anonymous", "only anonymous cloud proof may fall back to managed access");
-    assert.equal(calls.filter(path => path.includes("/auth/workspace-target?")).length, mode === "owner" ? 1 : 0);
+    assert.equal(calls.filter(path => path.includes("/auth/workspace-target?")).length, mode === "owner" || mode === "preparing" ? 1 : 0);
     assert.deepEqual(destinations, mode === "owner" ? ["/testcases/umbrella-home/work/?workspaceId=space&lang=en"] : []);
-    if (mode !== "owner") assert.equal(view.root.findAllByProps({ role: "alert" }).length > 0, true);
+    if (mode === "preparing") {
+      assert.equal(view.root.findByProps({"data-company-wizard":true}).props["data-stage"],"preparing");
+      assert.match(JSON.stringify(view.toJSON()),/Preparing your company|email/);
+      assert.equal(view.root.findAllByProps({role:"alert"}).length,0);
+    } else if (mode !== "owner") assert.equal(view.root.findAllByProps({ role: "alert" }).length > 0, true);
   } finally {
     await act(async () => view?.unmount()); globalThis.fetch = previousFetch;
     if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow); else Reflect.deleteProperty(globalThis, "window");

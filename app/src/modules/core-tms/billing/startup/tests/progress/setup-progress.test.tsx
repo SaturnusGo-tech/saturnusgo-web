@@ -54,4 +54,12 @@ test("preparation never offers address editing between polls, and terminal failu
     }
   } finally { await act(async () => view.unmount()); }
 });
+test("controlled Startup keeps its preparation screen while the server finishes checkout, without a mock confirmation",async()=>{
+ const h=fixture();h.input.controlledTest=true;
+ h.input.checkout={id:"checkout",workspaceId:"workspace",planId:"startup",status:"open",provider:"mock",testMode:true,subtotal:5900,currency:"USD",createdAt:"2026-11-06T12:00:00Z",expiresAt:"2027-11-06T12:30:00Z",periodEnd:null,prorated:false};
+ const view=await h.mount();
+ try {assert.equal(view.root.findByProps({"data-company-wizard":true}).props["data-stage"],"finishing");assert.equal(view.root.findAllByProps({name:"billing-outcome"}).length,0);
+  assert.equal(view.root.findAllByType("button").some(node=>node.children.includes("Confirm")),false);
+ } finally {await act(async()=>view.unmount());}
+});
 

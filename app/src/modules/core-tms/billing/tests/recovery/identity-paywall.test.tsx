@@ -19,7 +19,7 @@ const { BillingScreen } = require("../../presentation/screen/BillingScreen") as 
 if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
 
 function ancestors(node: ReactTestInstance) { const parents = []; for (let parent = node.parent; parent; parent = parent.parent) parents.push(parent); return parents; }
-test("personal and managed checkout recovery stays within the paywall action area, including an open checkout", async () => {
+test("restored Startup checkout owns its identity stage rather than returning to subscription confirmation", async () => {
   const previousStorage = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
   const storage = new Map<string, string>();
   Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value), removeItem: (key: string) => storage.delete(key) } });
@@ -36,7 +36,7 @@ test("personal and managed checkout recovery stays within the paywall action are
         assert.equal(view.root.findAllByType(BillingIdentityConfirmation).length, 0, "a saved action alone must not claim the current sign-in expired");
         await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Continue checkout"))!.props.onClick());
         const recovery = view.root.findByType(BillingIdentityConfirmation), parents = ancestors(recovery);
-        assert.equal(parents.some(node => open ? node.props["aria-label"] === "Subscription confirmation" : node.type === "footer"), true, "identity recovery must replace the relevant checkout action, never precede the paywall");
+        assert.equal(parents.some(node => node.props["data-company-wizard"] === true), true, "restored Startup identity recovery must own the full company flow");
         assert.equal(view.root.findAllByType(BillingIdentityConfirmation).length, 1);
         if (open) assert.equal(view.root.findAllByType(BillingConfirmation).length, 0, "identity confirmation owns the active confirmation stage until sign-in is refreshed");
         if (!open) assert.equal(view.root.findAllByProps({ "data-plan": "startup" }).length, 0, "do not show a competing disabled checkout action");

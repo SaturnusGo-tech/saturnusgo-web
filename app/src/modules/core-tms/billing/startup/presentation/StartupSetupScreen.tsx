@@ -10,21 +10,22 @@ import { CompanyCheckoutStep } from "./wizard/checkout/CompanyCheckoutStep";
 import { CompanyProgressStep } from "./wizard/progress/CompanyProgressStep";
 import css from "./startup.module.css";
 type Props = { model: ReturnType<typeof useStartupSetup>; plan?: BillingPlan; quote?: BillingAccount["checkoutQuotes"][number];
-  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; controlledTest?: boolean; checkoutNotice?: ReactNode; identityConfirmation?: ReactNode;
-  checkout?: BillingCheckout | null; activated?: boolean; activationPending?: boolean; transitionPending?: boolean; onConfirmCheckout?(outcome: BillingOutcome): Promise<void>;
+  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; controlledTest?: boolean; localTest?: boolean; checkoutNotice?: ReactNode; identityConfirmation?: ReactNode;
+  checkout?: BillingCheckout | null; activated?: boolean; activationPending?: boolean; transitionPending?: boolean; recoveryPending?: boolean; onConfirmCheckout?(outcome: BillingOutcome): Promise<void>;
   onContinue?(): void; onRefreshBilling?(): void; onBack(): void; onCheckout(): Promise<void> };
-export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, controlledTest = false, checkoutNotice, identityConfirmation,
-  checkout, activated = false, activationPending = false, transitionPending = false, onConfirmCheckout, onContinue, onRefreshBilling, onBack, onCheckout }: Props) {
+export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, controlledTest = false, localTest = false, checkoutNotice, identityConfirmation,
+  checkout, activated = false, activationPending = false, transitionPending = false, recoveryPending = false, onConfirmCheckout, onContinue, onRefreshBilling, onBack, onCheckout }: Props) {
   const wizard = useCompanyWizard(model);
   const locked = busy || wizard.locked;
   const setup = model.setup;
   const ready = setup?.status === "ready" && !wizard.changed;
-  const stage = identityConfirmation ? "identity" : transitionPending ? "opening" : activated ? "success" : activationPending || (busy && checkout?.status === "open") ? "finishing" : checkout?.status === "open" ? "checkout" : model.loading && !wizard.snapshot ? "loading" : wizard.stage;
+  const awaitingCheckout = controlledTest && checkout?.status === "open";
+  const stage = identityConfirmation ? "identity" : transitionPending ? "opening" : activated ? "success" : recoveryPending || activationPending || awaitingCheckout || (busy && checkout?.status === "open") ? "finishing" : checkout?.status === "open" ? "checkout" : model.loading && !wizard.snapshot ? "loading" : wizard.stage;
   useEffect(() => {
-    if (!activationPending || busy || checkoutNotice || !onRefreshBilling) return;
+    if ((!activationPending && !awaitingCheckout) || busy || checkoutNotice || !onRefreshBilling) return;
     const timer = setTimeout(onRefreshBilling, 2500);
     return () => clearTimeout(timer);
-  }, [activationPending, busy, checkoutNotice, onRefreshBilling]);
+  }, [activationPending, awaitingCheckout, busy, checkoutNotice, onRefreshBilling]);
   const error = model.error?.code;
   const fieldError = error && /SLUG|ADDRESS|HOSTNAME|DISPLAY_NAME/.test(error) ? (ru ? "Проверьте значение или выберите другой вариант." : "Check this value or choose another one.") : undefined;
   function checkoutAction() {
@@ -41,8 +42,8 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
     {stage === "consent" && <CompanyConsentStep ru={ru} name={wizard.values.displayName} hostname={setup?.hostname ?? `${wizard.values.slug}-falcon.saturnusgo.com`}
       plan={plan} quote={quote} consented={wizard.consented} locked={locked} paymentsAvailable={paymentsAvailable} canCheckout={canCheckout}
       onConsent={wizard.confirm} onBack={() => wizard.go("address")} onCheckout={checkoutAction} />}
-    {stage === "checkout" && checkout && <CompanyCheckoutStep checkout={checkout} plan={plan} ru={ru} busy={locked} available={paymentsAvailable} controlledTest={controlledTest} onConfirm={outcome => {
-      if (!locked && paymentsAvailable && checkout.testMode && controlledTest) void onConfirmCheckout?.(outcome);
+    {stage === "checkout" && checkout && <CompanyCheckoutStep checkout={checkout} plan={plan} ru={ru} busy={locked} available={paymentsAvailable} controlledTest={controlledTest || localTest} onConfirm={outcome => {
+      if (!locked && paymentsAvailable && checkout.testMode && (controlledTest || localTest)) void onConfirmCheckout?.(outcome);
     }} />}
     {stage === "loading" && <CompanyProgressStep name="" ru={ru} kind="loading" busy />}
     {stage === "preparing" && <CompanyProgressStep name={wizard.values.displayName} ru={ru} kind={setup?.status === "failed" || setup?.status === "expired" ? "failed" : "preparing"} busy={locked}

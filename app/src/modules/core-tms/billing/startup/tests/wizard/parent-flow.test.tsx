@@ -21,8 +21,8 @@ function fixture(enabled = true, failActivationSummaryOnce = false) {
   const refreshedSummary = deferred<BillingSummary>();
   const writes: { path: string; input: unknown }[] = [];
   const personalSummary: BillingSummary = { ...summary, workspaceKind: "personal", status: "unsubscribed", planId: null,
-    teamAdministration: false, suggestedPlanId: "startup", allowedCheckoutPlanIds: ["startup"], checkoutMode: "controlled_test", enabled };
-  const companySummary: BillingSummary = { ...summary, checkoutMode: "controlled_test", enabled };
+    teamAdministration: false, suggestedPlanId: "startup", allowedCheckoutPlanIds: ["startup"], checkoutMode: "local_test", enabled };
+  const companySummary: BillingSummary = { ...summary, checkoutMode: "local_test", enabled };
   const plan = { id: "startup", seats: 5, amount: 5900, currency: "USD", workspaceKind: "company" };
   const quote = { planId: "startup", subtotal: 5900, currency: "USD", periodEnd: "2027-12-06T00:00:00Z", prorated: false };
   const http = {
@@ -36,7 +36,7 @@ function fixture(enabled = true, failActivationSummaryOnce = false) {
       if (path.startsWith("/auth/workspace-target")) { targetReads++; return { data: { workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" }, etag: null }; }
       return { data: { ...account, plans: [plan], subscription: completed ? subscription : null, checkout: completed ? null : checkout,
         checkoutQuotes: [quote], suggestedPlanId: "startup", allowedCheckoutPlanIds: completed ? [] : ["startup"],
-        teamAdministration: completed, checkoutMode: "controlled_test", enabled }, etag: null };
+        teamAdministration: completed, checkoutMode: "local_test", enabled }, etag: null };
     },
     async get() { return { data: [], meta: { limit: 30 } }; },
     async mutateResource(path: string, _method: string, input: unknown) {
@@ -45,7 +45,7 @@ function fixture(enabled = true, failActivationSummaryOnce = false) {
         status: path === "/billing/confirm" ? "completed" : "open", createdAt: "2026-11-06T12:00:00Z", expiresAt: "2027-11-06T12:30:00Z" };
       completed = checkout.status === "completed";
       return { data: { subscription: completed ? subscription : null, checkout, invoice: null, provider: "mock", testMode: true,
-        checkoutMode: "controlled_test" } satisfies BillingMutation };
+        checkoutMode: "local_test" } satisfies BillingMutation };
     },
   } as unknown as TmsHttpClient;
   const tree = <TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: key => key }}>
@@ -56,7 +56,7 @@ function fixture(enabled = true, failActivationSummaryOnce = false) {
   return { tree, writes, targetReads: () => targetReads, activate: () => refreshedSummary.resolve(companySummary) };
 }
 
-test("Startup wizard survives checkout and activation, then explicitly opens scoped company administration", async () => {
+test("local-test Startup retains explicit mock confirmation and Continue before company administration", async () => {
   const environment = process.env.NODE_ENV;
   const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   const destinations: string[] = [];
@@ -64,7 +64,7 @@ test("Startup wizard survives checkout and activation, then explicitly opens sco
     location: { href: "https://tms.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace&projectId=project&lang=en", assign: (href: string) => destinations.push(href) },
     addEventListener() {}, removeEventListener() {}, dispatchEvent() {},
   } });
-  Reflect.set(process.env, "NODE_ENV", "production");
+  Reflect.set(process.env, "NODE_ENV", "development");
   const h = fixture(); let view!: ReactTestRenderer;
   try {
     await act(async () => { view = create(h.tree); });

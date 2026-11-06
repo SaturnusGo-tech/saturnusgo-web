@@ -30,3 +30,13 @@ test("repair or permission failure leaves the current paid workspace and exposes
  await act(async()=>{view=create(<Probe port={port}/>);});assert.equal(state.phase,"error");
  await act(async()=>state.retry());assert.equal(reads,2);assert.equal(state.phase,"opening");await act(async()=>view.unmount());
 });
+test("an authoritative preparing target polls until the verified company address is ready without asking for checkout",async()=>{
+ let reads=0,view!:ReactTestRenderer,finish!:(value:WorkspaceTransitionTarget)=>void;const before=navigations.length;
+ const port={target:async()=>{if(++reads===1)throw {code:"HANDOFF_TARGET_PREPARING",status:409};return new Promise<WorkspaceTransitionTarget>(resolve=>{finish=resolve;});}};
+ try {
+  await act(async()=>{view=create(<Probe port={port}/>);});assert.equal(state.phase,"preparing");assert.equal(navigations.length,before);
+  await act(async()=>{await new Promise(resolve=>setTimeout(resolve,2600));});
+  assert.equal(reads,2);assert.equal(state.phase,"preparing","background polling must retain the preparing screen and email notice");
+  await act(async()=>finish(target));assert.equal(state.phase,"opening");assert.equal(navigations.length,before+1);
+ } finally {await act(async()=>view?.unmount());}
+});

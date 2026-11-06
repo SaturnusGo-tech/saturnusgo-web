@@ -6073,7 +6073,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Read the currently permitted origin for an explicit workspace */
+        /**
+         * Read the currently permitted origin for an explicit workspace
+         * @description HANDOFF_TARGET_PREPARING (409) means an entitled, activated Startup company is waiting for an active verified alias; retry workspace-target without repeating checkout or authentication.
+         */
         get: operations["getWorkspaceTransitionTarget"];
         put?: never;
         post?: never;
@@ -6097,7 +6100,7 @@ export interface paths {
         put?: never;
         /**
          * Issue one-use workspace transition consent bound to current source identity and target generation
-         * @description Requires the current authenticated source-origin session and same Origin. Random code expires within 60 seconds. Codes and long-lived credentials are never placed in a URL. Destination must match the current server projection.
+         * @description Requires the current authenticated source-origin session and same Origin. Random code expires within 60 seconds. Codes and long-lived credentials are never placed in a URL. Destination must match the current server projection. HANDOFF_TARGET_PREPARING (409) means an entitled, activated Startup company is waiting for an active verified alias; retry workspace-target without repeating checkout or authentication.
          */
         post: operations["startWorkspaceHandoff"];
         delete?: never;
@@ -6120,7 +6123,7 @@ export interface paths {
         put?: never;
         /**
          * Consume on the exact target host and issue a fresh host-only session
-         * @description Revalidates current source session, membership, SAML/MFA policy, workspace, target host and generation. The request Origin must equal the stored source or target origin. The operation is one-use, transactional and audited. Desktop sends JSON from its target partition; browser may top-level POST a form.
+         * @description Revalidates current source session, membership, SAML/MFA policy, workspace, target host and generation. The request Origin must equal the stored source or target origin. The operation is one-use, transactional and audited. Desktop sends JSON from its target partition; browser may top-level POST a form. HANDOFF_TARGET_PREPARING (409) means an entitled, activated Startup company is waiting for an active verified alias; retry workspace-target without repeating checkout or authentication.
          */
         post: operations["consumeWorkspaceHandoff"];
         delete?: never;
@@ -11411,6 +11414,11 @@ export interface components {
             countryCode?: string;
             taxId?: string;
             address?: string;
+            /**
+             * @description Falcon language selected when company setup starts. Captured on the first successful reservation and retained through edits, reload, retry and mail delivery. Older clients default to English.
+             * @enum {string}
+             */
+            locale?: "ru" | "en";
         };
         StartupSetupRetryRequest: {
             workspaceId: string;
@@ -24990,6 +24998,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -25026,6 +25035,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -25072,6 +25082,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             500: components["responses"]["InternalError"];
         };
     };

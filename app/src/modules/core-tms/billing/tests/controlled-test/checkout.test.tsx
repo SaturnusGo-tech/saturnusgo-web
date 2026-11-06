@@ -59,8 +59,8 @@ for (const locale of ["en", "ru"] as const) test(`production ${locale} controlle
     assert.equal(h.writes.length, 1); assert.equal(h.writes[0].path, "/billing/checkout");
     assert.deepEqual(h.writes[0].input, { workspaceId: "space", planId: "startup", startupSetupId: "ready-setup", startupSetupVersion: 4, confirmWorkspaceConversion: true });
     assert.ok(view.root.findAllByType("p").some(node => node.children.includes(label)));
-    assert.equal(view.root.findAllByProps({ name: "billing-outcome" }).length, 2);
-    assert.equal(view.root.findAllByType("button").find(node => node.children.includes(locale === "ru" ? "Подтвердить" : "Confirm"))!.props.disabled, false);
+    assert.equal(view.root.findAllByProps({ name: "billing-outcome" }).length, 0);
+    assert.equal(view.root.findAllByType("button").some(node => node.children.includes(locale === "ru" ? "Подтвердить" : "Confirm")), false);
   } finally { await act(async () => view?.unmount()); if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment); }
 });
 for (const [mode, accountMode, enabled] of [["disabled", "disabled", false], ["local_test", "local_test", true], ["disabled", "controlled_test", false], ["controlled_test", "controlled_test", false], ["controlled_test", "disabled", true]] as const) {

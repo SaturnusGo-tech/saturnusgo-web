@@ -16,3 +16,11 @@ test("setup saves use PUT with explicit scope, version and retry identity; check
   await createBillingApi(http).execute("space", { kind: "checkout", planId: "startup", startupSetupId: "setup", startupSetupVersion: 3, confirmWorkspaceConversion: true }, { idempotencyKey: "checkout" });
   assert.deepEqual(calls[1].body, { workspaceId: "space", planId: "startup", startupSetupId: "setup", startupSetupVersion: 3, confirmWorkspaceConversion: true });
 });
+test("company setup explicitly sends the Falcon language captured when its flow began",async()=>{
+ let body:Record<string,unknown>|undefined;
+ const http=createTmsHttpClient({apiBase:"https://tms.test/api/v1",credentials:"include",fetch:async(_input,init)=>{
+  body=JSON.parse(String(init?.body));return Response.json({data:{setup:{id:"setup",version:1,status:"reserved"}}});
+ }});
+ await createStartupSetupApi(http,"ru").save("space",{displayName:"Team",slug:"team"},null,"save",new AbortController().signal);
+ assert.equal(body?.locale,"ru");
+});

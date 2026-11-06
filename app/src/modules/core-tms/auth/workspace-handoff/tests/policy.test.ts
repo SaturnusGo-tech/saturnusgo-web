@@ -28,3 +28,8 @@ test("company setup handoff opens scoped company administration through the same
   assert.equal(fields.destinationOrigin,"https://team-falcon.saturnusgo.com");
  }
 });
+test("purchased company reentry opens its home without restoring subscription settings",()=>{
+ const result=workspaceHandoffNavigation(target,"space",href,"ru",false,"company_home")!;
+ assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
+ assert.equal(result.fields.route,"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&lang=ru");
+});
