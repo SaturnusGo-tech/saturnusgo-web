@@ -16,6 +16,7 @@ test("pending MFA never starts a workspace handoff or renders business content",
 test("the exact authenticated workspace retains desktop PKCE continuation priority before transfer",()=>{
  const all=draw({authenticated:true,stage:"authenticated",audience:"tenant",workspaceId:"space"});
  const continuation=all.find(node=>node.type==="AuthContinuation")!;assert.ok(continuation);assert.equal(continuation.props.workspaceId,"space");assert.equal(continuation.props.managedWorkspace,true);
+ assert.equal(continuation.props.workspaceHandoff,true,"verified managed transfer must bypass stale billing continuation after MFA");
  assert.ok(all.some(node=>node.type==="AuthenticatedWorkspaceHandoff"));
 });
 test("foreign workspace hints and unacknowledged recovery codes never trigger transfer",()=>{

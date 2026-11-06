@@ -23,7 +23,7 @@ export function WorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   if(phase==="checking")return <TmsAuthState kind="loading"/>;
   if(phase==="error")return <TmsAuthState kind="error" onAction={()=>retry(value=>value+1)}/>;
   if(phase==="denied")return <p role="alert">{locale==="ru"?"Пространство не соответствует подтверждённому входу.":"This workspace does not match your verified sign-in."}</p>;
-  if(phase==="verified")return <AuthContinuation workspaceId={workspaceId}><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
+  if(phase==="verified")return <AuthContinuation workspaceId={workspaceId} workspaceHandoff><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
   return <ManagedWorkspaceMfaHandoff workspaceId={workspaceId}/>;
 }
 export function ManagedWorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
@@ -33,5 +33,5 @@ export function ManagedWorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   if(!session||session.stage==="anonymous")return <div role="alert"><p>{ru?"Войдите снова, чтобы открыть это пространство.":"Sign in again to open this workspace."}</p><a href={`/cloud-login/?lang=${locale}`}>{ru?"Войти":"Sign in"}</a></div>;
   if(!session.authenticated||access.state.recoveryCodes.length>0)return <ManagedAccessScreen access={access}/>;
   if(session.audience!=="tenant"||session.workspaceId!==workspaceId)return <p role="alert">{ru?"Пространство не соответствует подтверждённому входу.":"This workspace does not match your verified sign-in."}</p>;
-  return <AuthContinuation workspaceId={workspaceId} managedWorkspace><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
+  return <AuthContinuation workspaceId={workspaceId} managedWorkspace workspaceHandoff><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
 }

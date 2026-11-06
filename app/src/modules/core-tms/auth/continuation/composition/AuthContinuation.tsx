@@ -5,7 +5,7 @@ import { takeBrowserContinuation } from "../application/browser-continuation";
 import { TmsAuthState } from "../../presentation/state/TmsAuthState";
 import { captureBrowserDesktopAttempt, takeBrowserDesktopAttempt } from "../desktop/browser-desktop-attempt";
 import { DesktopRestartScreen } from "./DesktopAuthEntry";
-export function AuthContinuation({ children, workspaceId, managedWorkspace = false }: { readonly children: ReactNode; readonly workspaceId?: string | null; readonly managedWorkspace?: boolean }) {
+export function AuthContinuation({ children, workspaceId, managedWorkspace = false, workspaceHandoff = false }: { readonly children: ReactNode; readonly workspaceId?: string | null; readonly managedWorkspace?: boolean; readonly workspaceHandoff?: boolean }) {
   const [target, setTarget] = useState<string | null | undefined>(undefined);
   const [blocked, setBlocked] = useState(false);
   const checked = useRef(false);
@@ -20,9 +20,9 @@ export function AuthContinuation({ children, workspaceId, managedWorkspace = fal
     const saved = takeBrowserContinuation(workspaceId);
     const current = continuationFromLocation(window.location);
     const explicit = current && hasContinuationContext(current, window.location.origin);
-    const destination = saved && !explicit && saved !== `${window.location.pathname}${window.location.search}${window.location.hash}` ? saved : null;
+    const destination = !workspaceHandoff && saved && !explicit && saved !== `${window.location.pathname}${window.location.search}${window.location.hash}` ? saved : null;
     setTarget(destination);
     if (destination) window.location.replace(destination);
-  }, [workspaceId, managedWorkspace]);
+  }, [workspaceId, managedWorkspace, workspaceHandoff]);
   return blocked ? <DesktopRestartScreen /> : target === null ? children : <TmsAuthState kind="loading" />;
 }

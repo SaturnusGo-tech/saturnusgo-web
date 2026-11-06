@@ -3,6 +3,7 @@ import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
+import { CONTINUATION_KEY } from "../../../continuation/application/continuation-storage";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
 const previousCss = require.extensions[".css"];
@@ -13,8 +14,11 @@ if (previousCss) require.extensions[".css"] = previousCss; else delete require.e
 for (const mode of ["owner", "foreign", "unavailable", "anonymous", "preparing"] as const) test(`company handoff marker verifies the cloud owner before transfer: ${mode}`, async () => {
   const previousFetch = globalThis.fetch, previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   const calls: string[] = [], destinations: string[] = [];
+  const values = new Map([[CONTINUATION_KEY, JSON.stringify({ version: 1, origin: "https://tms.saturnusgo.com", createdAt: Date.now(),
+    path: "/testcases/umbrella-home/work/?workspaceId=space&view=config&settings=billing" })]]);
   Object.defineProperty(globalThis, "window", { configurable: true, value: {
     location: { href: "https://tms.saturnusgo.com/cloud-login/?workspaceId=space&workspaceHandoff=1", origin: "https://tms.saturnusgo.com", pathname: "/cloud-login/", search: "?workspaceId=space&workspaceHandoff=1", hash: "", replace: (url: string) => destinations.push(url) },
+    sessionStorage: { getItem: (key: string) => values.get(key) ?? null, removeItem: (key: string) => values.delete(key) },
   } });
   globalThis.fetch = async input => {
     const path = String(input); calls.push(path);
@@ -29,6 +33,7 @@ for (const mode of ["owner", "foreign", "unavailable", "anonymous", "preparing"]
     assert.equal(calls.some(path => path.endsWith("/auth/entrypoint")), mode === "anonymous", "only anonymous cloud proof may fall back to managed access");
     assert.equal(calls.filter(path => path.includes("/auth/workspace-target?")).length, mode === "owner" || mode === "preparing" ? 1 : 0);
     assert.deepEqual(destinations, mode === "owner" ? ["/testcases/umbrella-home/work/?workspaceId=space&lang=en"] : []);
+    assert.equal(values.has(CONTINUATION_KEY), mode !== "owner" && mode !== "preparing", "only verified handoff discards the stale billing continuation");
     if (mode === "preparing") {
       assert.equal(view.root.findByProps({"data-company-wizard":true}).props["data-stage"],"preparing");
       assert.match(JSON.stringify(view.toJSON()),/Preparing your company|email/);
