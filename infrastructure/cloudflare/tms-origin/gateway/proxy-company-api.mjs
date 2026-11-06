@@ -32,7 +32,7 @@ export async function proxyCompanyApi(request, env, audience, send = fetch) {
         /;\s*httponly(?:;|$)/i.test(cookie) && /;\s*samesite=lax(?:;|$)/i.test(cookie);
       const ordinary=cookie.startsWith(`${name}=`)&&hostSession;
       const desktopTarget=desktopCompletion&&hostSession&&/^__Host-falcon_(?:cloud|tenant)_session=[A-Za-z0-9_-]{43}(?:;|$)/.test(cookie);
-      if (!ordinary && !desktopTarget && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie)) {
+      if (!ordinary && !desktopTarget && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie,response.status)) {
         return gatewayError(502, "INVALID_SESSION_COOKIE");
       }
       headers.append("set-cookie", cookie);
