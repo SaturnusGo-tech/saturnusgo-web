@@ -13,12 +13,12 @@ type Props = {
   plans: readonly BillingPlan[]; current: BillingSubscription | null; occupiedSeats: number;
   workspaceKind: "personal" | "company"; canManage: boolean; busy: boolean; ru: boolean;
   offers?: BillingOffers; quotes?: readonly { planId: BillingPlanId; subtotal: number; currency: "USD"; periodEnd: string | null; prorated: boolean }[];
-  children?: ReactNode; restriction?: string | null; paymentsAvailable?: boolean; setupAvailable?: boolean; controlledTest?: boolean; onClose?(): void;
+  children?: ReactNode; checkoutRecovery?: ReactNode; restriction?: string | null; paymentsAvailable?: boolean; setupAvailable?: boolean; controlledTest?: boolean; onClose?(): void;
   onChoose(planId: BillingPlanId): void;
 };
 const names = { individual: "Individual", startup: "Startup", enterprise: "Enterprise" };
 const order: BillingPlanId[] = ["individual", "startup", "enterprise"];
-export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, quotes, children, restriction, paymentsAvailable = true, setupAvailable = false, controlledTest = false, onClose, onChoose }: Props) {
+export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, canManage, busy, ru, offers, quotes, children, checkoutRecovery, restriction, paymentsAvailable = true, setupAvailable = false, controlledTest = false, onClose, onChoose }: Props) {
   const [selection, setSelection] = useState<{ id: BillingPlanId; context: string } | null>(null);
   const [showOptions, setShowOptions] = useState(false);
   const active = current && current.status !== "canceled" ? current : null;
@@ -70,10 +70,10 @@ export function BillingPlans({ plans, current, occupiedSeats, workspaceKind, can
         {showOptions && <div id="billing-other-plans" className={css.options} role="group" aria-label={ru ? "Выбрать тариф для просмотра" : "Choose a plan to view"}>{order.map(id => <button type="button" key={id} data-view-plan={id} aria-pressed={id === selectedId} onClick={() => select(id)}>{names[id]}{id === selectedId && <Check size={14} aria-hidden="true" />}</button>)}</div>}
       </div>}{children}</div></div>
       {reason && <p className={css.reason} role="status">{reason}</p>}
-      {(canManage || !paymentsAvailable) && (enterprise && paymentsAvailable ? <a className={css.action} href="mailto:falcon@saturnusgo.com">{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></a>
+      {checkoutRecovery || <>{(canManage || !paymentsAvailable) && (enterprise && paymentsAvailable ? <a className={css.action} href="mailto:falcon@saturnusgo.com">{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></a>
         : <button type="button" data-plan={selectedId} className={css.action} disabled={disabled} onClick={paymentsAvailable || preparing ? () => onChoose(selectedId) : undefined}>{enterprise ? <>{ru ? "Связаться с нами" : "Contact us"}<ArrowRight size={16} aria-hidden="true" /></> : isCurrent ? <><Check size={16} aria-hidden="true" />{ru ? "Текущий тариф" : "Current plan"}</> : scheduled ? (ru ? "Переход запланирован" : "Change scheduled") : busy ? (ru ? "Подождите…" : "Please wait…") : restriction ? (ru ? "Сначала восстановите подписку" : "Resolve subscription first") : preparing ? (ru ? "Подготовить компанию" : "Set up company") : <>{ru ? `Выбрать ${names[selectedId]}` : `Choose ${names[selectedId]}`}<ArrowRight size={16} aria-hidden="true" /></>}</button>)}
       {controlledTest ? <p className={css.terms} role="status">{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p> : !paymentsAvailable ? <p className={css.terms} role="status">{ru ? "Оплата скоро станет доступна" : "Payments are coming soon"}</p>
-        : !enterprise && <p className={css.terms}>{quote?.prorated ? (ru ? "Доплата за остаток периода. Дата продления не изменится." : "Prorated for the remaining period. Your renewal date stays the same.") : active && !checkoutAllowed ? (ru ? "Изменение вступит в силу при следующем продлении." : "Changes take effect at your next renewal.") : (ru ? "Проверьте и подтвердите подключение на следующем шаге." : "Review and confirm your subscription in the next step.")}</p>}
+        : !enterprise && <p className={css.terms}>{quote?.prorated ? (ru ? "Доплата за остаток периода. Дата продления не изменится." : "Prorated for the remaining period. Your renewal date stays the same.") : active && !checkoutAllowed ? (ru ? "Изменение вступит в силу при следующем продлении." : "Changes take effect at your next renewal.") : (ru ? "Проверьте и подтвердите подключение на следующем шаге." : "Review and confirm your subscription in the next step.")}</p>}</>}
     </footer>
   </section>;
 }

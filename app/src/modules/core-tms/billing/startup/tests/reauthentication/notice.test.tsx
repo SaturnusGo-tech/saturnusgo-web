@@ -9,13 +9,13 @@ test("cloud checkout offers actual sign-out and explicit retry; managed checkout
     const { BillingIdentityConfirmation: View } = h.load<{ BillingIdentityConfirmation: typeof BillingIdentityConfirmation }>(new URL("../../presentation/confirmation/BillingIdentityConfirmation.tsx", import.meta.url));
     const props = { managed, client: {} as never, ru: false, busy: false, signOut: async () => { signouts++; }, retry: async () => { retries++; } };
     const all = nodes(h.render(() => View(props)));
-    assert.ok(all.some(node => String(node.props.children).includes("saved company setup")));
+    if (!managed) assert.ok(all.some(node => String(node.props.children).includes("saved company setup")));
     assert.equal(all.some(node => node.type === "SessionConfirmation"), managed);
     if (managed) await invoke(all.find(node => node.type === "SessionConfirmation")!, "onConfirmed");
     else {
-      await invoke(all.find(node => node.type === "button" && node.props.children === "Sign out and sign in again")!, "onClick");
+      await invoke(all.find(node => node.type === "button" && node.props.children === "Sign in again")!, "onClick");
       assert.equal(signouts, 1); assert.equal(retries, 0);
-      await invoke(all.find(node => node.type === "button" && node.props.children === "Retry checkout after signing in")!, "onClick");
+      await invoke(all.find(node => node.type === "button" && node.props.children === "Already signed in? Retry checkout")!, "onClick");
     }
     assert.equal(retries, 1);
   }

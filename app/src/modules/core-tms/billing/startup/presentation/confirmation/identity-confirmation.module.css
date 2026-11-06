@@ -1,0 +1,37 @@
+.identity {
+  --admin-surface: var(--falcon-panel);
+  --admin-text: var(--falcon-text);
+  --admin-muted: var(--falcon-text-muted);
+  --admin-line: var(--falcon-border);
+  --access-text: var(--falcon-text);
+  --access-muted: var(--falcon-text-muted);
+  --access-line: var(--falcon-border);
+  --access-input: var(--falcon-control);
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  color: var(--falcon-text);
+}
+.copy { display: grid; gap: 8px; }
+.identity h3 { margin: 0; font-size: 16px; font-weight: 550; line-height: 1.4; }
+.identity p { margin: 0; color: var(--falcon-text-muted); font-size: 13px; line-height: 1.6; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.identity :is(.primary, form button[type="submit"]) {
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 20px;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+.secondary { min-height: 44px; border: 0; border-radius: 12px; padding: 12px 16px; background: transparent; color: var(--falcon-text-muted); font: inherit; font-size: 13px; }
+.secondary:hover:not(:disabled) { background: var(--falcon-hover); color: var(--falcon-text); }
+.identity button { cursor: pointer; }
+.identity button:disabled { cursor: default; opacity: .5; }
+.identity button:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+.identity form { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; max-width: 580px; }
+.identity .error { color: var(--falcon-danger); }
+@media (max-width: 600px) { .actions { align-items: stretch; flex-direction: column; } }

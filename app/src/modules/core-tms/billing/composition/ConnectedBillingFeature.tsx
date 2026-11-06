@@ -63,5 +63,5 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     onBack={() => setSetupOpen(false)} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;
-  return <>{identityConfirmation}<StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} error={identityConfirmation ? null : billing.error} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} /></>;
+  return <><StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} error={identityConfirmation ? null : billing.error} identityConfirmation={identityConfirmation} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} /></>;
 }

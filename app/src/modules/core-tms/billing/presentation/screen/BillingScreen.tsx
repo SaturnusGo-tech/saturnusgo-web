@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { CreditCard } from "lucide-react";
 import type { BillingAccount, BillingCheckout, BillingCheckoutMode, BillingFailure, BillingInvoice, BillingOutcome, BillingPlanId, BillingSummary } from "../../domain/billing";
 import { BillingCurrent } from "../current/BillingCurrent";
@@ -14,7 +14,7 @@ type Props = {
   reload(): void; loadMoreInvoices(): Promise<void>; retryCommand(): Promise<void>; startCheckout(id: BillingPlanId): Promise<void>;
   confirmCheckout(outcome: BillingOutcome): Promise<void>; changePlan(id: BillingPlanId): Promise<void>;
   cancel(): Promise<void>; resume(): Promise<void>; retryPayment(): Promise<void>;
-  paymentsAvailable?: boolean; checkoutMode?: BillingCheckoutMode; onStartupSetup?(): void; onClose?(): void;
+  paymentsAvailable?: boolean; checkoutMode?: BillingCheckoutMode; identityConfirmation?: ReactNode; onStartupSetup?(): void; onClose?(): void;
 };
 function failureText(code: string, ru: boolean) {
   switch (code) {
@@ -40,6 +40,7 @@ export function BillingScreen(props: Props) {
   const controlledTest = props.checkoutMode === "controlled_test";
   const openCheckout = checkout?.status === "open";
   const confirming = Boolean(intent) || openCheckout;
+  const identityRequired = Boolean(props.identityConfirmation);
   const subscription = account?.subscription;
   const recovery = subscription && subscription.status !== "canceled" ? subscription.status === "past_due" ? "retry" : subscription.cancelAtPeriodEnd ? "resume" : null : null;
   const restriction = recovery === "retry" ? (ru ? "Повторите просроченный платёж, прежде чем менять тариф." : "Retry the overdue payment before changing plans.")
@@ -51,6 +52,7 @@ export function BillingScreen(props: Props) {
   function requestConfirmation(value: BillingConfirmationIntent) { rememberFocus(); setIntent(value); }
   useEffect(() => {
     if (confirming) confirmationStage.current?.focus({ preventScroll: true });
+    else if (identityRequired) offerStage.current?.focus({ preventScroll: true });
     else if (wasConfirming.current) {
       const source = origin.current;
       const available = source?.isConnected && !source.closest("[hidden]") && !("disabled" in source && source.disabled);
@@ -59,7 +61,7 @@ export function BillingScreen(props: Props) {
       origin.current = null;
     }
     wasConfirming.current = confirming;
-  }, [confirming]);
+  }, [confirming, identityRequired]);
   const current = summary && <BillingCurrent summary={summary} account={account} ru={ru} busy={locked} canManage={canManage}
     onCancel={() => requestConfirmation({ kind: "cancel" })} onResume={() => requestConfirmation({ kind: "resume" })} onRetry={() => requestConfirmation({ kind: "retry" })} />;
   async function choose(planId: BillingPlanId) {
@@ -94,12 +96,12 @@ export function BillingScreen(props: Props) {
     {canManage && account && <>
       {checkout?.status === "failed" && <p className={css.note} role="status">{ru ? "Тестовый платёж отклонён. Подписка не подключена; можно попробовать снова." : "The simulated payment was declined. No subscription was started; you can try again."}</p>}
       <div ref={confirmationStage} className={css.confirmationStage} hidden={!confirming} tabIndex={-1} role="group" aria-label={ru ? "Подтверждение подписки" : "Subscription confirmation"}>
-        <BillingConfirmation key={openCheckout ? checkout.id : "subscription"} intent={intent} checkout={checkout} plans={account.plans} current={account.subscription}
-          testMode={props.checkoutMode === "local_test" || controlledTest} controlledTest={controlledTest} busy={locked || !(props.paymentsAvailable ?? billingPaymentsAvailable)} ru={ru} onConfirm={value => void confirm(value)} onCheckout={outcome => { if (props.paymentsAvailable ?? billingPaymentsAvailable) void props.confirmCheckout(outcome); }} onDismiss={() => setIntent(null)} />
+        {confirming && props.identityConfirmation || <BillingConfirmation key={openCheckout ? checkout.id : "subscription"} intent={intent} checkout={checkout} plans={account.plans} current={account.subscription}
+          testMode={props.checkoutMode === "local_test" || controlledTest} controlledTest={controlledTest} busy={locked || !(props.paymentsAvailable ?? billingPaymentsAvailable)} ru={ru} onConfirm={value => void confirm(value)} onCheckout={outcome => { if (props.paymentsAvailable ?? billingPaymentsAvailable) void props.confirmCheckout(outcome); }} onDismiss={() => setIntent(null)} />}
       </div>
       <div ref={offerStage} className={css.offerStage} hidden={confirming} tabIndex={-1} role="group" aria-label={ru ? "Тарифы Falcon" : "Falcon plans"}>
         <BillingPlans plans={account.plans} current={account.subscription} occupiedSeats={account.occupiedSeats} workspaceKind={summary!.workspaceKind} canManage={canManage} paymentsAvailable={props.paymentsAvailable ?? billingPaymentsAvailable} setupAvailable={!!props.onStartupSetup && summary!.workspaceKind === "personal"} offers={account} quotes={account.checkoutQuotes}
-          controlledTest={controlledTest} busy={locked || confirming} restriction={restriction} ru={ru} onChoose={id => void choose(id)} onClose={props.onClose}>
+          controlledTest={controlledTest} busy={locked || confirming} restriction={restriction} checkoutRecovery={!confirming ? props.identityConfirmation : null} ru={ru} onChoose={id => void choose(id)} onClose={props.onClose}>
           {recovery && <button type="button" className={css.secondary} disabled={locked} onClick={() => requestConfirmation({ kind: recovery })}>{recovery === "retry" ? (ru ? "Повторить платёж" : "Retry payment") : (ru ? "Включить продление" : "Resume renewal")}</button>}
           {account.subscription && <details className={css.management}><summary>{ru ? "Моя подписка" : "Manage subscription"}</summary>{current}</details>}
         </BillingPlans>
