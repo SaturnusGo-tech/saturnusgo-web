@@ -29,7 +29,7 @@ test('localized public landing maps to its isolated artifact and workspace stays
   assert.equal(ru.status, 200);
   assert.equal(ru.headers.has('x-robots-tag'), false);
   assert.equal(paths[0], '/tms-origin/ru/index.html');
-  const app = await worker.fetch(new Request('https://tms.saturnusgo.com/testcases/umbrella-home/work/'));
+  const app = await worker.fetch(new Request('https://tms.saturnusgo.com/work/'));
   assert.match(app.headers.get('x-robots-tag'), /noindex/);
 });
 

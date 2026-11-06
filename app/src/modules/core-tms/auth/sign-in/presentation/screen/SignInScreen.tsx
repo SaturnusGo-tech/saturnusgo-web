@@ -29,7 +29,7 @@ export function SignInScreen({ signIn, signup = false }: { readonly signIn: Retu
       {state.loading && <span className={styles.srOnly} role="status">{copy.loading}</span>}
       {!state.loading && !state.methods && <button className={styles.secondary} onClick={signIn.retryMethods}>{copy.retry}</button>}
       {signupRequired ? <a href={`/signup/?lang=${locale}`} className={styles.primary}>{copy.signupLink}</a>
-        : state.step === "methods" ? <SignInMethods signIn={signIn} copy={copy} signup={signup} />
+        : state.step === "methods" ? <SignInMethods signIn={signIn} copy={copy} signup={signup} locale={locale} />
         : <ProofForm signIn={signIn} copy={copy} />}
       <footer className={styles.footer}>
         {state.step !== "methods" ? <button className={styles.linkButton} onClick={signIn.back}><ArrowLeft size={16} aria-hidden="true" />{copy.back}</button>

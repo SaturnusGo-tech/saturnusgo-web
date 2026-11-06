@@ -1,3 +1,4 @@
+import { canonicalWorkspacePathname } from "../../navigation/workspace-route";
 import type { components } from "../../../../core/tms/generated/tms-api";
 export type CloudSession = components["schemas"]["CloudAuthenticatedSession"];
 export type CloudIdentity = CloudSession["identity"];
@@ -89,7 +90,7 @@ export function cloudWorkspacePath(session: CloudSession): string {
     workspaceId: session.workspace.id,
     projectId: session.defaultProject.id,
   });
-  return `/testcases/umbrella-home/work/?${search.toString()}`;
+  return `/work/?${search.toString()}`;
 }
 
 export function cloudWorkspacePathFromLocation(
@@ -99,5 +100,5 @@ export function cloudWorkspacePathFromLocation(
   const search = new URLSearchParams(location.search);
   if (!search.has("workspaceId")) search.set("workspaceId", session.workspace.id);
   if (!search.has("projectId")) search.set("projectId", session.defaultProject.id);
-  return `${location.pathname}?${search.toString()}${location.hash}`;
+  return `${canonicalWorkspacePathname(location.pathname)}?${search.toString()}${location.hash}`;
 }

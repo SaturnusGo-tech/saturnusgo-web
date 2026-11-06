@@ -9,6 +9,7 @@ import { SpaceChoiceFeature } from "../../spaces/composition/SpaceChoiceFeature"
 import { DesktopAuthEntry } from "../../continuation/composition/DesktopAuthEntry";
 import { WorkspaceMfaHandoff } from "../../workspace-handoff/composition/WorkspaceMfaHandoff";
 import { SignInScreen } from "../presentation/screen/SignInScreen";
+import { useBrowserSignInMethod } from "./browser-method/useBrowserSignInMethod";
 
 export function SignInFeature({ signup = false }: { readonly signup?: boolean }) {
   const choose = useMemo(() => {
@@ -30,6 +31,7 @@ function MethodSignInFeature({ signup }: { readonly signup: boolean }) {
   const proof = useMemo(() => typeof window === "undefined" ? null : googleEmailProof(window.location.search), []);
   const intent = proof?.intent ?? (signup ? "signup" : "login");
   const signIn = useSignIn(client, intent, proof);
+  useBrowserSignInMethod(signIn, { proof: Boolean(proof) });
   useEffect(() => {
     if (!proof) return;
     const url = new URL(window.location.href);

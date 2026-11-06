@@ -122,3 +122,14 @@ void test("an unavailable SAML connection keeps its error and never changes the 
   assert.equal(companyCalls, 0);
   await act(async () => renderer.unmount());
 });
+void test("explicit company discovery within failed SSO routes to company login without starting personal proof", async () => {
+  const renderer = await mount({ ...fixture(), startSaml: async () => { throw { code: "FEDERATION_UNAVAILABLE" }; },
+    startEmail: async () => { throw new Error("Company discovery must not create a personal proof"); } });
+  await act(async () => current.select("saml"));
+  await act(async () => { await current.saml("umbrella-falcon"); });
+  await act(async () => { await current.company("umbrella-falcon"); });
+  assert.equal(current.state.step, "company");
+  assert.equal(current.state.destination, "https://umbrella-falcon.saturnusgo.com/cloud-login/");
+  assert.equal(current.state.error, null);
+  await act(async () => renderer.unmount());
+});

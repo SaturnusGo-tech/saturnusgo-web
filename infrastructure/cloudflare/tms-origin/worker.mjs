@@ -4,6 +4,7 @@ import { proxyDemo } from "./demo/proxy.mjs";
 import { discoveryResponse } from './seo.mjs';
 import {
   APP_PATH,
+  LEGACY_APP_PATH,
   ORIGIN_NAMESPACE,
   publicAssetPrefixes,
   publicMetadataFiles,
@@ -145,6 +146,7 @@ function hasExpectedContentType(pathname, response) {
 
 function canonicalPublicPath(pathname) {
   if (pathname === APP_PATH_NO_SLASH) return APP_PATH;
+  if (pathname === LEGACY_APP_PATH || pathname === LEGACY_APP_PATH.slice(0, -1)) return APP_PATH;
   const route = publicRoutes.find(({ publicPath }) => (
     publicPath !== "/" && pathname === publicPath.slice(0, -1)
   ));
@@ -158,7 +160,7 @@ function originPathFor(pathname) {
     const directory = route.artifactPath.slice(0, -"index.html".length);
     return `${ORIGIN_NAMESPACE}/${directory}${suffix}`;
   }
-  if (pathname.startsWith(APP_PATH)) return pathname;
+  if (pathname === APP_PATH || pathname === `${APP_PATH}index.txt`) return pathname;
   if (publicAssetPrefixes.some((prefix) => pathname.startsWith(prefix))) {
     return pathname;
   }

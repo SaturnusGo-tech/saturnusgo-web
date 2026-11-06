@@ -2,7 +2,8 @@ export const TMS_HOST = "tms.saturnusgo.com";
 export const SOURCE_ORIGIN = "https://www.saturnusgo.com";
 export const ORIGIN_NAMESPACE = "/tms-origin";
 export const RELEASE_EVIDENCE_PATH = `${ORIGIN_NAMESPACE}/release.json`;
-export const APP_PATH = "/testcases/umbrella-home/work/";
+export const APP_PATH = "/work/";
+export const LEGACY_APP_PATH = "/testcases/umbrella-home/work/";
 
 export const publicRoutes = Object.freeze([
   Object.freeze({ publicPath: "/privacy/", artifactPath: "privacy/index.html", required: true }),

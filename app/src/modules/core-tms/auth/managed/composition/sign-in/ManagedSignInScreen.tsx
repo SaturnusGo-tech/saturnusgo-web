@@ -6,11 +6,13 @@ import { createSignInClient } from "../../../sign-in/data/sign-in-client";
 import { useSignIn } from "../../../sign-in/application/useSignIn";
 import type { useManagedAccess } from "../../application/useManagedAccess";
 import { ManagedAccessScreen } from "../../presentation/screen/ManagedAccessScreen";
+import { useBrowserSignInMethod } from "../../../sign-in/composition/browser-method/useBrowserSignInMethod";
 
 export function ManagedSignInScreen({ access }: { readonly access: ReturnType<typeof useManagedAccess> }) {
   const {locale}=useTmsLocale(),currentLocale=useRef(locale);currentLocale.current=locale;
   const client = useMemo(() => createSignInClient(fetch,()=>currentLocale.current), []);
   const signIn = useSignIn(client, "login");
+  useBrowserSignInMethod(signIn, { managed: true });
   useEffect(() => {
     if (!signIn.state.destination) return;
     const destination = new URL(signIn.state.destination);

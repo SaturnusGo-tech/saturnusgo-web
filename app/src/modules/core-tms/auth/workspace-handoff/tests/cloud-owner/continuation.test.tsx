@@ -30,9 +30,9 @@ for (const mode of ["owner", "foreign", "unavailable", "anonymous", "preparing"]
   try {
     await act(async () => { view = create(<TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: key => key }}><WorkspaceMfaHandoff workspaceId="space" /></TmsLocaleContext.Provider>); });
     assert.equal(calls[0], "/api/v1/cloud-auth/session");
-    assert.equal(calls.some(path => path.endsWith("/auth/entrypoint")), mode === "anonymous", "only anonymous cloud proof may fall back to managed access");
+    assert.equal(calls.some(path => new URL(path,"https://tms.saturnusgo.com").pathname.endsWith("/auth/entrypoint")), mode === "anonymous", "only anonymous cloud proof may fall back to managed access");
     assert.equal(calls.filter(path => path.includes("/auth/workspace-target?")).length, mode === "owner" || mode === "preparing" ? 1 : 0);
-    assert.deepEqual(destinations, mode === "owner" ? ["/testcases/umbrella-home/work/?workspaceId=space&lang=en"] : []);
+    assert.deepEqual(destinations, mode === "owner" ? ["/work/?workspaceId=space&lang=en"] : []);
     assert.equal(values.has(CONTINUATION_KEY), mode !== "owner" && mode !== "preparing", "only verified handoff discards the stale billing continuation");
     if (mode === "preparing") {
       assert.equal(view.root.findByProps({"data-company-wizard":true}).props["data-stage"],"preparing");

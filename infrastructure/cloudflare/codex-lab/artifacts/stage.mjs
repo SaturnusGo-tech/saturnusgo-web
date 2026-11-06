@@ -4,7 +4,7 @@ import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const MAXIMUM_ASSET_BYTES = 25 * 1024 * 1024;
-const ROUTES = ["admin", "profile", "sandbox", "privacy", "testcases/umbrella-home/work"];
+const ROUTES = ["admin", "profile", "sandbox", "privacy", "work", "testcases/umbrella-home/work"];
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 async function collect(directory, prefix = "") {
@@ -28,7 +28,7 @@ export async function stageAssets(sourceDirectory, releaseDirectory, sourceSha) 
       const path = `${route}/index.${extension}`;
       const info = await lstat(join(sourceDirectory, path));
       if (!info.isFile() || info.isSymbolicLink()) throw new Error(`Required route is not a regular file: ${path}`);
-      mapping.set(path, route.startsWith("testcases/") ? path : `tms-origin/${path}`);
+      mapping.set(path, route === "work" || route.startsWith("testcases/") ? path : `tms-origin/${path}`);
     }
   }
   for (const prefix of ["_next", "falcon"]) {

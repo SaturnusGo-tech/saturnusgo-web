@@ -21,6 +21,7 @@ import { BillingIdentityConfirmation } from "../startup/presentation/confirmatio
 import { BillingCheckoutRecovery } from "../startup/presentation/confirmation/BillingCheckoutRecovery";
 import { activeStartupWorkspace, completedStartupCheckout } from "../startup/domain/completed-startup";
 import { personalAdministrationUrl } from "../../company-administration/navigation/personal-administration-route";
+import { TmsAuthState } from "../../auth/presentation/state/TmsAuthState";
 
 export function ConnectedBillingFeature({ workspaceId, preview = false, onClose }: { workspaceId: string; preview?: boolean; onClose?(): void }) {
   const http = useOptionalTmsHttpClient();
@@ -86,8 +87,9 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
       if (billing.canRetryCommand) { if (paymentsAvailable) void billing.retryCommand(); } else billing.reload();
     }}>{billing.canRetryCommand ? (locale === "ru" ? "Повторить то же действие" : "Retry the same action") : (locale === "ru" ? "Обновить данные" : "Refresh details")}</button>
   </div>);
-  if (handoff.phase === "preparing" || handoff.phase === "loading" || handoff.phase === "opening") return <CompanyPreparationScreen ru={locale === "ru"} preparing={handoff.phase === "preparing"} name={setup.setup?.displayName} />;
-  if (setupFlowOpen) return <StartupSetupScreen key={`${workspaceId}:${setupRevision}`} model={setup} ru={locale === "ru"}
+  if (handoff.phase === "loading" || !setupOpen && setupFlowOpen && billing.loading) return <TmsAuthState kind="loading" />;
+  if (handoff.phase === "preparing" || handoff.phase === "opening") return <CompanyPreparationScreen ru={locale === "ru"} preparing={handoff.phase === "preparing"} name={setup.setup?.displayName} />;
+  if (setupFlowOpen && !settledReentry) return <StartupSetupScreen key={`${workspaceId}:${setupRevision}`} model={setup} ru={locale === "ru"}
     plan={billing.account?.plans.find(plan => plan.id === "startup")} quote={billing.account?.checkoutQuotes.find(quote => quote.planId === "startup")}
     canCheckout={!!billing.account?.allowedCheckoutPlanIds.includes("startup")} paymentsAvailable={paymentsAvailable} busy={billing.busy || billing.canRetryCommand}
     checkoutNotice={transitionRequested ? handoff.phase === "error" && <StartupHandoffStatus state={handoff} ru={locale === "ru"} /> : checkoutNotice}

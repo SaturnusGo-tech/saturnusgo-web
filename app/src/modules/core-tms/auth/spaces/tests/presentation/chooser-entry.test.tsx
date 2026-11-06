@@ -4,19 +4,22 @@ import { test } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
+import { DESKTOP_ATTEMPT_KEY } from "../../../continuation/desktop/attempt-storage";
+import { clearBrowserDesktopAttempt } from "../../../continuation/desktop/browser-desktop-attempt";
 void test("the chooser flag probes only verified spaces, is removed from the URL, and selects an explicit company", async t => {
   const require = createRequire(import.meta.url), css = require.extensions[".css"];
   require.extensions[".css"] = module => { module.exports = {}; };
   const prior = ["window", "React", "fetch"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
   const calls: Array<{ path: string; init?: RequestInit }> = [], destinations: string[] = [];
   const origin = "https://tms.saturnusgo.com";
+  let selectedRedirect = "https://alpha-falcon.saturnusgo.com/api/v1/auth/google/launch";
   const browser = { location: Object.assign(new URL("/cloud-login/?chooseSpace=1", origin), { assign: (target: string) => destinations.push(target) }),
     history: { state: {}, replaceState: (_state: unknown, _title: string, path: string) => { browser.location = Object.assign(new URL(path, origin), { assign: (target: string) => destinations.push(target) }); } } };
   Object.defineProperty(globalThis, "window", { configurable: true, value: browser });
   Object.defineProperty(globalThis, "React", { configurable: true, value: React });
   globalThis.fetch = async (url, init) => {
     const path = String(url); calls.push({ path, init });
-    return Response.json({ data: path.endsWith("/select") ? { redirectUrl: "https://alpha-falcon.saturnusgo.com/api/v1/auth/google/launch" }
+    return Response.json({ data: path.endsWith("/select") ? { redirectUrl: selectedRedirect }
       : { spaces: [{ id: "company-1", name: "Alpha", kind: "company" }, { id: "personal-1", name: "My workspace", kind: "personal" }] } });
   };
   t.after(() => {
@@ -36,4 +39,26 @@ void test("the chooser flag probes only verified spaces, is removed from the URL
   assert.equal(calls[1].init?.credentials, "include"); assert.equal(calls[1].init?.redirect, "error"); assert.equal(calls[1].init?.cache, "no-store");
   assert.deepEqual(destinations, ["https://alpha-falcon.saturnusgo.com/api/v1/auth/google/launch"]);
   await act(async () => view.unmount());
+  selectedRedirect = `https://alpha-falcon.saturnusgo.com/cloud-login/?workspaceId=company-1&desktopAttempt=${"a".repeat(43)}`;
+  browser.location.search = "?chooseSpace=1"; destinations.length = 0;
+  await act(async () => { view = create(<TmsLocaleContext.Provider value={locale}><SignInFeature /></TmsLocaleContext.Provider>); });
+  const passwordCompany = view.root.findAllByType("button").find(button => button.findAllByType("strong").some(label => label.children.includes("Alpha")));
+  await act(async () => passwordCompany!.props.onClick());
+  assert.deepEqual(destinations, [`${selectedRedirect}&method=company&lang=en`], "choosing an invited company must open its credential form with its scoped desktop return");
+  await act(async () => view.unmount());
+});
+void test("space selection sends only an unexpired current-origin desktop attempt to the server", async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, "window"), origin = "https://tms.saturnusgo.com", attempt = "a".repeat(43);
+  const values = new Map<string, string>(), bodies: unknown[] = [];
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { location: new URL(`${origin}/cloud-login/`),
+    sessionStorage: { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value), removeItem: (key: string) => values.delete(key) } } });
+  t.after(() => { clearBrowserDesktopAttempt(); if (prior) Object.defineProperty(globalThis, "window", prior); else Reflect.deleteProperty(globalThis, "window"); });
+  const { createSpaceChoiceClient } = await import("../../data/space-choice-client");
+  const client = createSpaceChoiceClient(async (_url, init) => { bodies.push(JSON.parse(String(init?.body))); return Response.json({ data: { redirectUrl: `${origin}/work/` } }); });
+  for (const record of [
+    { version: 1, origin, attempt, createdAt: Date.now() },
+    { version: 1, origin: "https://other.example", attempt, createdAt: Date.now() },
+    { version: 1, origin, attempt, createdAt: Date.now() - 300_001 },
+  ]) { clearBrowserDesktopAttempt(); values.set(DESKTOP_ATTEMPT_KEY, JSON.stringify(record)); await client.select("workspace-1"); }
+  assert.deepEqual(bodies, [{ spaceId: "workspace-1", desktopAttempt: attempt }, { spaceId: "workspace-1" }, { spaceId: "workspace-1" }]);
 });

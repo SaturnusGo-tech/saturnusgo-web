@@ -11,7 +11,9 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source_repo=$(cd "$script_dir/.." && pwd)
 pages_repo=${TMS_PAGES_REPO:-"$(dirname "$source_repo")/saturnusgo-web.github.io"}
 expected_sha=${TMS_SOURCE_SHA:-}
-route_path="testcases/umbrella-home/work"
+route_path="work"
+legacy_route_path="testcases/umbrella-home/work"
+route_paths=("$route_path" "$legacy_route_path")
 manifest_file="$source_repo/infrastructure/cloudflare/tms-origin/route-manifest.mjs"
 origin_namespace="tms-origin"
 falcon_asset_path="falcon"
@@ -83,7 +85,7 @@ restore_api
 trap - EXIT
 
 out_dir="$source_repo/out"
-test -f "$out_dir/$route_path/index.html"
+for application_route in "${route_paths[@]}"; do test -f "$out_dir/$application_route/index.html"; done
 if find "$out_dir/testcases" -type d | grep -Eq 'UmbrellaHome|/Work$'; then
   echo "Mixed-case TMS route was emitted." >&2
   exit 12
@@ -102,8 +104,8 @@ const routes = manifest.publicRoutes;
 if (manifest.ORIGIN_NAMESPACE !== "/tms-origin") {
   throw new Error("The route manifest must use the isolated /tms-origin namespace.");
 }
-if (manifest.APP_PATH !== "/testcases/umbrella-home/work/") {
-  throw new Error("The route manifest must preserve the stable TMS/Auth0 callback route.");
+if (manifest.APP_PATH !== "/work/") {
+  throw new Error("The route manifest must use the canonical /work/ workspace document.");
 }
 if (!Array.isArray(routes) || routes.length === 0) {
   throw new Error("The route manifest must declare public routes.");
@@ -217,7 +219,7 @@ done <<< "$(required_asset_rows)"
 
 echo "Scoped Pages changes:"
 rsync -ani "$out_dir/_next/" "$pages_repo/_next/"
-rsync -ani --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
+for application_route in "${route_paths[@]}"; do rsync -ani --delete "$out_dir/$application_route/" "$pages_repo/$application_route/"; done
 rsync -ani --delete "$origin_stage/" "$pages_repo/$origin_namespace/"
 rsync -ani --delete "$out_dir/$falcon_asset_path/" "$pages_repo/$falcon_asset_path/"
 for asset in "${codex_assets[@]}"; do
@@ -237,18 +239,19 @@ fi
 mkdir -p \
   "$pages_repo/_next" \
   "$pages_repo/$route_path" \
+  "$pages_repo/$legacy_route_path" \
   "$pages_repo/$origin_namespace" \
   "$pages_repo/$falcon_asset_path" \
   "$pages_repo/$codex_asset_path"
 rsync -a "$out_dir/_next/" "$pages_repo/_next/"
-rsync -a --delete "$out_dir/$route_path/" "$pages_repo/$route_path/"
+for application_route in "${route_paths[@]}"; do rsync -a --delete "$out_dir/$application_route/" "$pages_repo/$application_route/"; done
 rsync -a --delete "$origin_stage/" "$pages_repo/$origin_namespace/"
 rsync -a --delete "$out_dir/$falcon_asset_path/" "$pages_repo/$falcon_asset_path/"
 for asset in "${codex_assets[@]}"; do rsync -a "$out_dir/$asset" "$pages_repo/$asset"; done
 touch "$pages_repo/.nojekyll"
 git -C "$pages_repo" add \
   _next \
-  "$route_path" \
+  "${route_paths[@]}" \
   "$origin_namespace" \
   "$falcon_asset_path" \
   "${codex_assets[@]}" \

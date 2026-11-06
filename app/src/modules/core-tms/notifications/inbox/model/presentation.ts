@@ -1,3 +1,4 @@
+import { isWorkspacePath } from "../../../navigation/workspace-route";
 /** Only workspace-owned application links can enter client-side navigation. */
 export function notificationHref(value: string, current: string, workspaceId: string): string | null {
   try {
@@ -7,7 +8,7 @@ export function notificationHref(value: string, current: string, workspaceId: st
       && /^[a-z0-9]+(?:-[a-z0-9]+)*-falcon\.saturnusgo\.com$/.test(target.hostname);
     if (!workspaceId || !['http:', 'https:'].includes(base.protocol) || !['http:', 'https:'].includes(target.protocol) || target.username || target.password
       || target.searchParams.getAll('workspaceId').length !== 1
-      || target.pathname !== '/testcases/umbrella-home/work/'
+      || !isWorkspacePath(target.pathname)
       || target.searchParams.get('workspaceId') !== workspaceId
       || (target.origin !== base.origin && target.origin !== 'https://tms.saturnusgo.com' && !managedOrigin)) return null;
     target.protocol = base.protocol; target.host = base.host; target.pathname = base.pathname;

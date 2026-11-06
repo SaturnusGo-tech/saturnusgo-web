@@ -1,39 +1,39 @@
 {
-  "version": "0.2.3",
+  "version": "0.2.4",
   "channel": "beta",
-  "baseUrl": "https://saturnusgo.com/falcon/desktop/beta/0.2.3/",
+  "baseUrl": "https://saturnusgo.com/falcon/desktop/beta/0.2.4/",
   "bucket": "cdn-saturnusgo",
-  "prefix": "falcon/desktop/beta/0.2.3/",
+  "prefix": "falcon/desktop/beta/0.2.4/",
   "checksums": "SHA256SUMS.txt",
   "artifacts": [
     {
       "id": "mac-arm64",
       "platform": "mac",
-      "label": "Mac \u00b7 Apple Silicon",
+      "label": "Mac · Apple Silicon",
       "minimum": "macOS 13+",
-      "file": "Falcon-0.2.3-mac-arm64-beta.dmg",
-      "bytes": 109709189,
-      "sha256": "bfa49db288256fe9127f3171e92db911d6756c39334abea20716c862a5f6257d",
+      "file": "Falcon-0.2.4-mac-arm64-beta.dmg",
+      "bytes": 109691277,
+      "sha256": "7e6d009667982c617d3e768951ca0804265f79427e43e02f4a472e9c3a7529e1",
       "contentType": "application/x-apple-diskimage"
     },
     {
       "id": "mac-x64",
       "platform": "mac",
-      "label": "Mac \u00b7 Intel",
+      "label": "Mac · Intel",
       "minimum": "macOS 13+",
-      "file": "Falcon-0.2.3-mac-x64-beta.dmg",
-      "bytes": 115644335,
-      "sha256": "3fcf16f6a609bd566d98013bba74f187d0a7f0aec8e9f3478726e90c5eb3dc85",
+      "file": "Falcon-0.2.4-mac-x64-beta.dmg",
+      "bytes": 115660994,
+      "sha256": "fa366671a7f13adb9da13119c4187289f0d2b22526a78c63930ddcee948b49e2",
       "contentType": "application/x-apple-diskimage"
     },
     {
       "id": "win-x64",
       "platform": "windows",
-      "label": "Windows \u00b7 x64",
+      "label": "Windows · x64",
       "minimum": "Windows 10 / 11",
-      "file": "Falcon-0.2.3-win-x64-beta-setup.exe",
-      "bytes": 121167362,
-      "sha256": "db7e9529206a6c1ea3f2ee78c130e3901d265c30831950560123ad04b1820cb8",
+      "file": "Falcon-0.2.4-win-x64-beta-setup.exe",
+      "bytes": 121171112,
+      "sha256": "e9e82ac165c2ff3e77d8cbc63315f6b5d675421ae091a6f88f041b75787d117b",
       "contentType": "application/vnd.microsoft.portable-executable"
     }
   ]

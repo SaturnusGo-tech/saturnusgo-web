@@ -40,9 +40,9 @@ void test("only corporate SAML is primary; Google and email stay secondary with 
   await act(async () => { view = create(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup={false} />); });
   t.after(async () => { await act(async () => view.unmount()); });
   const buttons = view.root.findAllByType("button");
-  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary", "linkButton"]);
+  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary"]);
   await act(async () => { for (const button of buttons) button.props.onClick(); });
-  assert.deepEqual(calls, ["google", "email", "saml", "company"]);
+  assert.deepEqual(calls, ["google", "email", "saml"]);
   await act(async () => { view.update(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup />); });
   assert.deepEqual(view.root.findAllByType("button").map(button => button.props.className), ["secondary", "secondary"]);
 });
@@ -50,10 +50,17 @@ void test("only corporate SAML is primary; Google and email stay secondary with 
 void test("SAML unavailable explains company setup instead of asking the user to retry indefinitely", async t => {
   setup(t);
   const { SignInScreen } = await import("../../presentation/screen/SignInScreen");
-  const signIn = { state: { step: "saml", error: "FEDERATION_UNAVAILABLE", methods: { saml: true }, email: "" } } as unknown as ReturnType<typeof useSignIn>;
+  const discovered: string[] = [];
+  const signIn = { state: { step: "saml", error: "FEDERATION_UNAVAILABLE", methods: { saml: true }, email: "" },
+    company: async (organization: string) => { discovered.push(organization); } } as unknown as ReturnType<typeof useSignIn>;
   let view!: ReturnType<typeof create>;
   await act(async () => { view = create(<TmsLocaleContext.Provider value={{ locale: "en", languageTag: "en-US", setLocale() {}, t: () => "" }}>
     <SignInScreen signIn={signIn} /></TmsLocaleContext.Provider>); });
   t.after(async () => { await act(async () => view.unmount()); });
   assert.match(view.root.findByProps({ role: "alert" }).children.join(""), /SAML SSO is not configured/);
+  await act(async () => view.root.findByType("input").props.onChange({ target: { value: "fixture-company" } }));
+  const fallback = view.root.findAllByType("button").find(button => button.children.includes("Continue to company workspace"));
+  assert.ok(fallback, "the SSO form itself must offer company discovery after unavailable SAML");
+  await act(async () => fallback.props.onClick());
+  assert.deepEqual(discovered, ["fixture-company"]);
 });

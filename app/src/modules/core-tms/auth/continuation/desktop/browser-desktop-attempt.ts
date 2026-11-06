@@ -24,12 +24,18 @@ export function captureBrowserDesktopAttempt(managedWorkspace = false): DesktopA
 export function hasBrowserDesktopAttempt(): boolean {
   return typeof window !== "undefined" && (activeOrigin === window.location.origin || failedOrigin === window.location.origin);
 }
-export function takeBrowserDesktopAttempt(): DesktopAttemptTarget {
+export function browserDesktopAttempt(): string | undefined {
+  const state = captureBrowserDesktopAttempt(true);
+  return state.status === "active" ? state.record.attempt : undefined;
+}
+export function takeBrowserDesktopAttempt(workspaceId?: string | null): DesktopAttemptTarget {
   if (typeof window === "undefined") return { status: "none" };
   if (failedOrigin === window.location.origin) return { status: "blocked" };
   try {
     const target = window.sessionStorage ? takeDesktopAttempt(window.sessionStorage, window.location.origin) : { status: "none" as const };
-    activeOrigin = null; return target;
+    activeOrigin = null;
+    return target.status === "redirect" && typeof workspaceId === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(workspaceId)
+      ? { status: "redirect", path: `${target.path}&workspaceId=${encodeURIComponent(workspaceId)}` } : target;
   } catch { return { status: activeOrigin === window.location.origin ? "blocked" : "none" }; }
 }
 export function clearBrowserDesktopAttempt(): void {

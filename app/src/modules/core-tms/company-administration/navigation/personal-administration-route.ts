@@ -21,5 +21,5 @@ export function personalAdministrationReturnUrl(href: string, workspaceId: strin
   if (language === "ru" || language === "en") query.set("lang", language);
   const projectId = source.searchParams.get("projectId");
   if (validScope(projectId)) query.set("projectId", projectId);
-  return `/testcases/umbrella-home/work/?${query}`;
+  return `/work/?${query}`;
 }

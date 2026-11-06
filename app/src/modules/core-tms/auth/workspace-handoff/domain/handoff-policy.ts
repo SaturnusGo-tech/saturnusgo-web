@@ -1,10 +1,10 @@
 import type { WorkspaceHandoffNavigation, WorkspaceHandoffStart, WorkspaceTransitionTarget } from "./handoff-port";
-const path = "/testcases/umbrella-home/work/";
+const path = "/work/";
 const keys = ["projectId", "view", "settings", "integration", "plugin", "pluginSetup", "caseId", "folderId", "suiteId", "runId", "runItemId", "attemptId", "defectId", "environmentId", "portfolioId", "catalogProjectId", "article", "tab", "page"];
 const presentationKeys = new Set(["article", "tab", "page"]);
 const identifier = (value: unknown): value is string => typeof value === "string" && /^[A-Za-z0-9._:-]{1,128}$/.test(value);
 export type WorkspaceHandoffRoute = "workspace" | "company_admin" | "company_home";
-export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, workspaceId: string, href: string, locale: "en" | "ru", desktop: boolean, routeTarget: WorkspaceHandoffRoute = "workspace"): WorkspaceHandoffNavigation | null {
+export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, workspaceId: string, href: string, locale: "en" | "ru", desktop: boolean, routeTarget: WorkspaceHandoffRoute = "workspace", desktopAttempt?: string): WorkspaceHandoffNavigation | null {
   const source = new URL(href), destination = new URL(target.destinationOrigin);
   const suffix = "-falcon.saturnusgo.com", slug = destination.hostname.endsWith(suffix) ? destination.hostname.slice(0, -suffix.length) : "";
   if (target.workspaceId !== workspaceId || !identifier(workspaceId) || !Number.isSafeInteger(target.generation) || target.generation < 1
@@ -21,7 +21,9 @@ export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, wo
     if (value !== null && safe && source.searchParams.getAll(key).length === 1) route.searchParams.set(key, value);
   }
   route.searchParams.set("lang", locale);
-  const fields: WorkspaceHandoffStart = { workspaceId, destinationOrigin: destination.origin, route: route.pathname + route.search, locale };
+  const continuation = !desktop && typeof desktopAttempt === "string" && /^[A-Za-z0-9_-]{43}$/.test(desktopAttempt)
+    ? `/api/v1/auth/desktop/authorize?${new URLSearchParams({attempt:desktopAttempt,workspaceId})}` : route.pathname + route.search;
+  const fields: WorkspaceHandoffStart = { workspaceId, destinationOrigin: destination.origin, route: continuation, locale };
   if (desktop) return { kind: "desktop", url: `${source.origin}/desktop-workspace-transition/?${new URLSearchParams(fields)}` };
   return { kind: "browser", action: `${source.origin}/api/v1/auth/workspace-handoffs`, fields };
 }

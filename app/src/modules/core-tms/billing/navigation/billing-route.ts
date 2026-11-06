@@ -1,6 +1,6 @@
 import { settingsSectionLink } from "../../presentation/config/navigation/settings-section-route";
 
-const workspacePath = "/testcases/umbrella-home/work/";
+const workspacePath = "/work/";
 const previewPath = "/testcases/umbrella-home/ui-preview/";
 const safeScope = (value: string | null | undefined) => value && /^[A-Za-z0-9._:-]{1,128}$/.test(value) ? value : null;
 

@@ -8,7 +8,7 @@ test("personal administration carries context and never treats a URL as membersh
   assert.equal(hasPersonalAdministrationScope(`https://falcon.test${path}`, "actual-space"), true);
   assert.equal(hasPersonalAdministrationScope(`https://falcon.test${path}`, "foreign"), false);
   assert.equal(hasPersonalAdministrationScope("https://falcon.test/admin/?workspaceId=actual-space", "actual-space"), false);
-  assert.equal(personalAdministrationReturnUrl(`https://falcon.test${path}`, "actual-space"), "/testcases/umbrella-home/work/?workspaceId=actual-space&projectId=project");
+  assert.equal(personalAdministrationReturnUrl(`https://falcon.test${path}`, "actual-space"), "/work/?workspaceId=actual-space&projectId=project");
 });
 
 test("administration and return preserve the selected language", () => {

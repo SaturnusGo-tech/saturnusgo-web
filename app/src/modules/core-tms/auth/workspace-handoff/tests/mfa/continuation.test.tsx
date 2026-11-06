@@ -13,7 +13,7 @@ function draw(session:unknown,recoveryCodes:string[]=[]) {
 test("pending MFA never starts a workspace handoff or renders business content",()=>{
  const all=draw({authenticated:false,stage:"mfa_challenge"});assert.ok(all.some(node=>node.type==="ManagedAccessScreen"));assert.equal(all.some(node=>node.type==="AuthContinuation"),false);
 });
-test("the exact authenticated workspace retains desktop PKCE continuation priority before transfer",()=>{
+test("the exact authenticated workspace retains scoped desktop continuation behind target readiness",()=>{
  const all=draw({authenticated:true,stage:"authenticated",audience:"tenant",workspaceId:"space"});
  const continuation=all.find(node=>node.type==="AuthContinuation")!;assert.ok(continuation);assert.equal(continuation.props.workspaceId,"space");assert.equal(continuation.props.managedWorkspace,true);
  assert.equal(continuation.props.workspaceHandoff,true,"verified managed transfer must bypass stale billing continuation after MFA");

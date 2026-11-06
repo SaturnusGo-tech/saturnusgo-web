@@ -49,7 +49,7 @@ test("company root directs to its workspace; the operator root directs to Sandbo
     assert.equal(url.hostname, "www.saturnusgo.com");
     return new Response("asset", { headers: { "content-type": "application/javascript", "cache-control": "public, max-age=3600" } });
   });
-  for (const [hostname, path] of [[host, "/testcases/umbrella-home/work/"], [env.FALCON_PLATFORM_HOSTNAME, "/sandbox/"]]) {
+  for (const [hostname, path] of [[host, "/work/"], [env.FALCON_PLATFORM_HOSTNAME, "/sandbox/"]]) {
     const result = await worker.fetch(new Request(`https://${hostname}/`), env);
     assert.equal(result.headers.get("location"), `https://${hostname}${path}`);
   }

@@ -1,6 +1,7 @@
 import { CompanyAccessError } from "../../managed/domain/managed-access";
 import { createSignInClient } from "../../sign-in/data/sign-in-client";
 import type { SpaceChoicePort } from "../application/space-choice-port";
+import { browserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
 export function createSpaceChoiceClient(send: typeof fetch = fetch): SpaceChoicePort {
   async function request<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
     const response = await send(`/api/v1/auth/spaces${path}`, { method: body === undefined ? "GET" : "POST", credentials: "include", cache: "no-store", redirect: "error", signal,
@@ -11,5 +12,8 @@ export function createSpaceChoiceClient(send: typeof fetch = fetch): SpaceChoice
     return envelope.data as T;
   }
   const signIn = createSignInClient(send);
-  return { list: signal => request("", undefined, signal), select: (spaceId, signal) => request("/select", { spaceId }, signal), cancel: signIn.cancelFederation };
+  return { list: signal => request("", undefined, signal), select: (spaceId, signal) => {
+    const desktopAttempt = browserDesktopAttempt();
+    return request("/select", { spaceId, ...(desktopAttempt ? { desktopAttempt } : {}) }, signal);
+  }, cancel: signIn.cancelFederation };
 }

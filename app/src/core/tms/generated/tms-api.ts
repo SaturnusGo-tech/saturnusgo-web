@@ -5354,8 +5354,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * verifyAuthEmail
-         * @description Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context. A login proof for an address without an existing personal profile returns SIGNUP_REQUIRED (403) only after the valid one-time code and, for Google linking, the original browser binding are verified. It creates no account, link, session or trial. The client may offer an explicit fresh signup at /signup/ without carrying proof credentials or email in the URL. Invalid, expired or incorrectly bound proofs remain PROOF_INVALID.
+         * Atomically consume an email proof for personal sign-in or company discovery
+         * @description After a valid ordinary login code, an existing personal profile receives its personal session and applicable company choices. A company-only mailbox receives a five-minute, browser-bound, one-use company chooser proof without creating a personal identity, workspace, trial or session. Company access still requires its password/activation/MFA or enforced SAML. An unknown login address returns SIGNUP_REQUIRED only after code verification; signup remains explicit. Google linking retains its original browser binding and never links through email matching.
          */
         post: operations["verifyAuthEmail"];
         delete?: never;
@@ -5756,7 +5756,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. */
+        /** @description Requires the signed public hostname and an unexpired browser-bound chooser proof. Verified mailbox ownership may discover active memberships and unexpired company invitations matching that email; it never links identities or grants company access. Company selection rechecks account, membership and company status and requires canonical company password/activation/MFA or enforced SAML. */
         get: operations["listAuthAccountSpaces"];
         put?: never;
         post?: never;
@@ -5778,7 +5778,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. Selection consumes the proof atomically. A company result starts a fresh canonical company Google authorization and retains local MFA; no company cookie is issued centrally. */
+        /** @description Requires the signed public hostname and an unexpired browser-bound chooser proof. Verified mailbox ownership may discover active memberships and unexpired company invitations matching that email; it never links identities or grants company access. Company selection rechecks account, membership and company status and requires canonical company password/activation/MFA or enforced SAML. */
         post: operations["selectAuthAccountSpace"];
         delete?: never;
         options?: never;
@@ -6273,6 +6273,46 @@ export interface paths {
          * @description Authenticated cancellation-only control. Requires current active membership/project access and original ownership, current assignment or an active held lease. expectedRowVersion must match; Idempotency-Key replays the same stop. Allowed after entitlement expiry on the shared host; retired auth-only hosts remain blocked. Cannot resume/create workflows or write test results. MCP uses the existing falcon_transition_workflow with a valid falcon:read grant for pause/cancel only; revoked grants remain invalid.
          */
         post: operations["stopQaWorkflow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/saml/{companyId}/launch": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** Launch the selected company SAML request */
+        get: operations["launchCompanySamlFederation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/desktop/redeem": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Redeems a one-use transfer proof in the verified target company scope after the original-origin PKCE exchange. Rechecks the authenticated source session and target binding before issuing a target-scoped cookie. */
+        post: operations["redeemDesktopAuthentication"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10871,9 +10911,15 @@ export interface components {
         AuthGoogleStartRequest: {
             /** @enum {string} */
             intent: "login" | "signup" | "link";
+            /** @description An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access. Supported for login and signup, not account linking. */
+            desktopAttempt?: string;
         };
         AuthSamlStartRequest: {
             organization: string;
+            /** @description An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access. */
+            desktopAttempt?: string;
+            /** @enum {string} */
+            locale?: "en" | "ru";
         };
         AuthTrial: {
             /** @enum {string} */
@@ -11000,6 +11046,8 @@ export interface components {
         };
         AuthSpaceSelectionRequest: {
             spaceId: string;
+            /** @description Optional existing native browser sign-in attempt, retained only on the trusted selected destination. */
+            desktopAttempt?: string;
         };
         AuthEmailResendRequest: {
             /** Format: uuid */
@@ -11097,6 +11145,8 @@ export interface components {
         AuthCompanyResolveRequest: {
             /** @description A registered workspace name, company hostname, HTTPS origin or company-label@domain shorthand. An employee email address does not grant company access. */
             organization: string;
+            /** @description An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access. */
+            desktopAttempt?: string;
         };
         BillingPlan: {
             /** @enum {string} */
@@ -11584,6 +11634,24 @@ export interface components {
                 workflow: components["schemas"]["QaWorkflow"];
                 revokedLeaseIds: string[];
             };
+        };
+        AuthDesktopTransferResponse: {
+            /**
+             * Format: uri
+             * @description Server-attested canonical HTTPS target origin, without credentials, port, path, query or fragment. The native client verifies the target before redemption.
+             */
+            targetOrigin: string;
+            /** @description Short-lived one-use target redemption proof bound to the original PKCE verifier, state, loopback callback, authenticated source session and selected company. */
+            transferCode: string;
+            workspaceId: string;
+        };
+        AuthDesktopRedeemRequest: {
+            transferCode: string;
+            workspaceId: string;
+            codeVerifier: string;
+            state: string;
+            /** @description Canonical IPv4 loopback callback; port must be 1024 through 65535. */
+            redirectUri: string;
         };
     };
     responses: {
@@ -23973,6 +24041,7 @@ export interface operations {
         parameters: {
             query: {
                 code: string;
+                workspaceId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -24046,7 +24115,11 @@ export interface operations {
     };
     launchCompanySaml: {
         parameters: {
-            query?: never;
+            query?: {
+                workspaceId?: string;
+                desktopAttempt?: string;
+                locale?: "en" | "ru";
+            };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];
@@ -24141,11 +24214,26 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Completed without a credential-bearing body */
+            /** @description The original authorization code and PKCE binding were consumed. Redeem this one-use proof in the server-attested target company scope; no session cookie or session credential is copied from the original origin. */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthDesktopTransferResponse"];
+                    };
+                };
+            };
+            /** @description Original origin and company scope match. Authentication completed by setting its host-only session cookie with no response body. */
             204: {
                 headers: {
                     "X-Request-Id": components["headers"]["XRequestId"];
                     "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body. */
+                    "Set-Cookie": string;
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -24197,6 +24285,8 @@ export interface operations {
         parameters: {
             query: {
                 attempt: string;
+                /** @description Selected company workspace hint. The server must validate it against the authenticated request context; the hint grants no access. */
+                workspaceId?: string;
             };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
@@ -24358,7 +24448,10 @@ export interface operations {
     };
     launchCompanyGoogle: {
         parameters: {
-            query?: never;
+            query?: {
+                workspaceId?: string;
+                desktopAttempt?: string;
+            };
             header?: {
                 /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
                 "X-Request-Id"?: components["parameters"]["XRequestId"];
@@ -25364,6 +25457,91 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    launchCompanySamlFederation: {
+        parameters: {
+            query?: {
+                workspaceId?: string;
+                desktopAttempt?: string;
+                locale?: "en" | "ru";
+            };
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path: {
+                companyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Company-host browser binding then redirect to configured HTTPS IdP */
+            303: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP. */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+            /** @description The configured identity provider is unavailable. */
+            503: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    redeemDesktopAuthentication: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional caller correlation ID. The server validates its safe character/length policy or generates a new value, and always returns the effective ID. */
+                "X-Request-Id"?: components["parameters"]["XRequestId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthDesktopRedeemRequest"];
+            };
+        };
+        responses: {
+            /** @description Target-scoped host-only session cookie issued. The response body is empty. */
+            204: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    /** @description Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body. */
+                    "Set-Cookie": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["InternalError"];
         };
     };

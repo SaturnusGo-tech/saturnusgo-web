@@ -1,4 +1,4 @@
-const workspacePath = "/testcases/umbrella-home/work/";
+const workspacePath = "/work/";
 
 /** Only workspace/project context crosses into the personal profile. */
 export function workspaceProfileUrl(href: string, section?: "security"): string {

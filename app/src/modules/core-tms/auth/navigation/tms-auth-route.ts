@@ -1,4 +1,5 @@
-export const TMS_AUTH_ROUTE_PATH = "/testcases/umbrella-home/work/";
+import { isWorkspacePath, WORKSPACE_PATH } from "../../navigation/workspace-route";
+export const TMS_AUTH_ROUTE_PATH = WORKSPACE_PATH;
 export const TMS_ADMIN_LOGIN_PATH = `${TMS_AUTH_ROUTE_PATH}?auth=admin`;
 export const TMS_AUTH_LOGOUT_INTENT_KEY = "tms.auth.explicit-logout.v1";
 export const TMS_AUTH_PRODUCTION_SIGNED_OUT_URL = "https://tms.saturnusgo.com/cloud-login/";
@@ -113,9 +114,9 @@ export function safeTmsReturnPath(candidate: unknown): string {
     const parsed = new URL(candidate, "https://tms.saturnusgo.com");
     if (
       parsed.origin === "https://tms.saturnusgo.com"
-      && parsed.pathname === TMS_AUTH_ROUTE_PATH
+      && isWorkspacePath(parsed.pathname)
       && candidate.startsWith("/")
-    ) return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    ) return `${TMS_AUTH_ROUTE_PATH}${parsed.search}${parsed.hash}`;
   } catch { /* Invalid return paths use the default workspace route. */ }
   return TMS_AUTH_ROUTE_PATH;
 }

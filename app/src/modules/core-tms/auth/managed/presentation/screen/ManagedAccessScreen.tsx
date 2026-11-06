@@ -23,7 +23,11 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
   const methodCopy = signInCopy(locale);
   const { state } = access;
   const stage = state.session?.stage ?? "anonymous";
-  const [companyEmail, setCompanyEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("method") === "company");
+  const [companyEmail, setCompanyEmail] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const methods = new URLSearchParams(window.location.search).getAll("method");
+    return methods.length === 1 && ["company", "email"].includes(methods[0]);
+  });
   const companyPassword = companyEmail && (!signIn || signIn.state.methods?.email === true);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const step = signIn?.state.step ?? "methods";
@@ -55,7 +59,7 @@ export function ManagedAccessScreen({ access, signIn }: { readonly access: Retur
           {state.error && <p className={styles.error} role="alert">{accessError(state.error, locale)}</p>}
           {signIn?.state.error && <p className={styles.error} role="alert">{signInError(signIn.state.error, signIn.state.step, methodCopy)}</p>}
           {stage === "anonymous" && (companyPassword || !signIn ? <LoginForm copy={copy} pending={state.pending} onSubmit={access.login} />
-            : step === "methods" ? <SignInMethods signIn={signIn} copy={methodCopy} signup={false} companyLogin={() => setCompanyEmail(true)} />
+            : step === "methods" ? <SignInMethods signIn={signIn} copy={methodCopy} signup={false} locale={locale} companyLogin={() => setCompanyEmail(true)} />
               : <ProofForm signIn={signIn} copy={methodCopy} organization={state.entrypoint.hostname} />)}
           {stage === "password_change" && <FirstPasswordForm copy={copy} pending={state.pending} onSubmit={access.firstPassword} />}
           {(stage === "mfa_enrollment" || stage === "mfa_challenge") && <MfaForm copy={copy} enrollment={state.enrollment}

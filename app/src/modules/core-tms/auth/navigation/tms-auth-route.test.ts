@@ -132,7 +132,7 @@ test("keeps a dual-session Auth0 logout on the admin gate until its intent is co
   const returnTo = tmsAdminLogoutReturnTo("https://tms.saturnusgo.com");
   assert.equal(
     returnTo,
-    "https://tms.saturnusgo.com/testcases/umbrella-home/work/?auth=admin",
+    "https://tms.saturnusgo.com/work/?auth=admin",
   );
   assert.equal(shouldUseAdminAuth(new URL(returnTo).search), true);
 });

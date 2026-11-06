@@ -21892,10 +21892,10 @@
         "tags": [
           "Sign-in"
         ],
-        "summary": "verifyAuthEmail",
+        "summary": "Atomically consume an email proof for personal sign-in or company discovery",
         "operationId": "verifyAuthEmail",
         "security": [],
-        "description": "Server-resolved access context. No provider credential is returned; mutations require the verified same-origin gateway context. A login proof for an address without an existing personal profile returns SIGNUP_REQUIRED (403) only after the valid one-time code and, for Google linking, the original browser binding are verified. It creates no account, link, session or trial. The client may offer an explicit fresh signup at /signup/ without carrying proof credentials or email in the URL. Invalid, expired or incorrectly bound proofs remain PROOF_INVALID.",
+        "description": "After a valid ordinary login code, an existing personal profile receives its personal session and applicable company choices. A company-only mailbox receives a five-minute, browser-bound, one-use company chooser proof without creating a personal identity, workspace, trial or session. Company access still requires its password/activation/MFA or enforced SAML. An unknown login address returns SIGNUP_REQUIRED only after code verification; signup remains explicit. Google linking retains its original browser binding and never links through email matching.",
         "responses": {
           "200": {
             "description": "Success",
@@ -23029,6 +23029,15 @@
               "minLength": 1,
               "maxLength": 128
             }
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
           }
         ],
         "responses": {
@@ -23208,7 +23217,40 @@
           }
         },
         "security": [],
-        "x-tms-auth-redirect": true
+        "x-tms-auth-redirect": true,
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "name": "desktopAttempt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$",
+              "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access."
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ]
+            }
+          }
+        ]
       },
       "parameters": [
         {
@@ -23309,13 +23351,20 @@
         },
         "responses": {
           "204": {
-            "description": "Completed without a credential-bearing body",
+            "description": "Original origin and company scope match. Authentication completed by setting its host-only session cookie with no response body.",
             "headers": {
               "X-Request-Id": {
                 "$ref": "#/components/headers/XRequestId"
               },
               "Cache-Control": {
                 "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "required": true,
+                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           },
@@ -23339,6 +23388,33 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "200": {
+            "description": "The original authorization code and PKCE binding were consumed. Redeem this one-use proof in the server-attested target company scope; no session cookie or session credential is copied from the original origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AuthDesktopTransferResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            }
           }
         },
         "security": [],
@@ -23423,6 +23499,16 @@
             "schema": {
               "type": "string",
               "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "workspaceId",
+            "required": false,
+            "description": "Selected company workspace hint. The server must validate it against the authenticated request context; the hint grants no access.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
             }
           }
         ],
@@ -23605,9 +23691,13 @@
           {
             "accountSpaces": [],
             "federationBrowser": []
+          },
+          {
+            "accountSpaces": [],
+            "verifiedEmailBrowser": []
           }
         ],
-        "description": "Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching.",
+        "description": "Requires the signed public hostname and an unexpired browser-bound chooser proof. Verified mailbox ownership may discover active memberships and unexpired company invitations matching that email; it never links identities or grants company access. Company selection rechecks account, membership and company status and requires canonical company password/activation/MFA or enforced SAML.",
         "responses": {
           "200": {
             "description": "Authorized account space result.",
@@ -23679,9 +23769,13 @@
           {
             "accountSpaces": [],
             "federationBrowser": []
+          },
+          {
+            "accountSpaces": [],
+            "verifiedEmailBrowser": []
           }
         ],
-        "description": "Requires the signed public hostname, unexpired browser-bound chooser cookie and its initiating session/provider proof. Company access is disclosed only through explicit identity links, never email matching. Selection consumes the proof atomically. A company result starts a fresh canonical company Google authorization and retains local MFA; no company cookie is issued centrally.",
+        "description": "Requires the signed public hostname and an unexpired browser-bound chooser proof. Verified mailbox ownership may discover active memberships and unexpired company invitations matching that email; it never links identities or grants company access. Company selection rechecks account, membership and company status and requires canonical company password/activation/MFA or enforced SAML.",
         "responses": {
           "200": {
             "description": "Authorized account space result.",
@@ -23798,7 +23892,28 @@
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "name": "desktopAttempt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$",
+              "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access."
+            }
+          }
+        ]
       }
     },
     "/auth/email/resend": {
@@ -25804,6 +25919,188 @@
           }
         }
       }
+    },
+    "/auth/saml/{companyId}/launch": {
+      "get": {
+        "operationId": "launchCompanySamlFederation",
+        "responses": {
+          "303": {
+            "description": "Company-host browser binding then redirect to configured HTTPS IdP",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Location": {
+                "description": "Trusted completion destination. Desktop authorization redirects only to its registered IPv4 loopback callback; provider initiations use the server-validated HTTPS IdP.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The configured identity provider is unavailable.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-tms-auth-redirect": true,
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          {
+            "name": "desktopAttempt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$",
+              "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access."
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ]
+            }
+          }
+        ],
+        "summary": "Launch the selected company SAML request"
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
+    },
+    "/auth/desktop/redeem": {
+      "post": {
+        "operationId": "redeemDesktopAuthentication",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthDesktopRedeemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Target-scoped host-only session cookie issued. The response body is empty.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControlNoStore"
+              },
+              "Set-Cookie": {
+                "required": true,
+                "description": "Host-only Secure HttpOnly session cookie scoped to the verified target origin. No session token is returned in the response body.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [],
+        "x-tms-idempotency": "not-applicable",
+        "description": "Redeems a one-use transfer proof in the verified target company scope after the original-origin PKCE exchange. Rechecks the authenticated source session and target binding before issuing a target-scoped cookie."
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XRequestId"
+        }
+      ]
     }
   },
   "components": {
@@ -25836,7 +26133,7 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "__Host-falcon_spaces",
-        "description": "Five-minute, one-use chooser proof bound to the initiating Google browser or active verified personal session."
+        "description": "Five-minute, one-use chooser proof bound to its initiating Google browser, active verified personal session, or independent verified-email browser proof."
       },
       "federationBrowser": {
         "type": "apiKey",
@@ -25849,6 +26146,12 @@
         "in": "header",
         "name": "X-Billing-Signature",
         "description": "Mock-only timestamped HMAC authentication; X-Billing-Timestamp is also required. No bearer session is used for this simulated provider event."
+      },
+      "verifiedEmailBrowser": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-falcon_space_email",
+        "description": "Five-minute host-only browser binding for a verified mailbox company discovery proof. Grants no workspace access."
       }
     },
     "parameters": {
@@ -49919,6 +50222,11 @@
               "signup",
               "link"
             ]
+          },
+          "desktopAttempt": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access. Supported for login and signup, not account linking."
           }
         },
         "required": [
@@ -49933,6 +50241,18 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 253
+          },
+          "desktopAttempt": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access."
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "en",
+              "ru"
+            ]
           }
         },
         "required": [
@@ -50490,6 +50810,11 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 128
+          },
+          "desktopAttempt": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Optional existing native browser sign-in attempt, retained only on the trusted selected destination."
           }
         }
       },
@@ -50903,6 +51228,11 @@
             "minLength": 1,
             "maxLength": 253,
             "description": "A registered workspace name, company hostname, HTTPS origin or company-label@domain shorthand. An employee email address does not grant company access."
+          },
+          "desktopAttempt": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "An existing browser-bound native sign-in attempt. This continuation hint does not authenticate a user or grant company access."
           }
         },
         "required": [
@@ -52967,6 +53297,73 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "AuthDesktopTransferResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "targetOrigin": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 261,
+            "pattern": "^https://[^/?#@:]+$",
+            "description": "Server-attested canonical HTTPS target origin, without credentials, port, path, query or fragment. The native client verifies the target before redemption."
+          },
+          "transferCode": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "Short-lived one-use target redemption proof bound to the original PKCE verifier, state, loopback callback, authenticated source session and selected company."
+          },
+          "workspaceId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          }
+        },
+        "required": [
+          "targetOrigin",
+          "transferCode",
+          "workspaceId"
+        ]
+      },
+      "AuthDesktopRedeemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "transferCode": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$"
+          },
+          "workspaceId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "codeVerifier": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9._~-]{43,128}$"
+          },
+          "state": {
+            "type": "string",
+            "minLength": 22,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]{22,128}$"
+          },
+          "redirectUri": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^http://127\\.0\\.0\\.1:[0-9]{4,5}/falcon-auth/callback$",
+            "description": "Canonical IPv4 loopback callback; port must be 1024 through 65535."
+          }
+        },
+        "required": [
+          "transferCode",
+          "workspaceId",
+          "codeVerifier",
+          "state",
+          "redirectUri"
         ]
       }
     }

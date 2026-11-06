@@ -12,6 +12,7 @@ async function fixture(context) {
   const source = join(directory, "out");
   const files = ["admin/index.html", "admin/index.txt", "profile/index.html", "profile/index.txt",
     "sandbox/index.html", "sandbox/index.txt", "privacy/index.html", "privacy/index.txt",
+    "work/index.html", "work/index.txt",
     "testcases/umbrella-home/work/index.html", "testcases/umbrella-home/work/index.txt",
     "assets/integrations/codex/codex-light.png", "assets/integrations/codex/codex-dark.png",
     "assets/private/no.png", "assets/integrations/codex/unreviewed.png", "_next/static/app.js", "falcon/auth/wing.webp", "falcon/landing/movie.mp4", "favicon.ico"];
@@ -28,6 +29,7 @@ test("staging isolates managed pages and excludes marketing media from the uploa
   assert.equal(await readFile(join(release, "assets/tms-origin/admin/index.html"), "utf8"), "artifact:admin/index.html");
   assert.equal(await readFile(join(release, "assets/testcases/umbrella-home/work/index.html"), "utf8"),
     "artifact:testcases/umbrella-home/work/index.html");
+  assert.equal(await readFile(join(release, "assets/work/index.html"), "utf8"), "artifact:work/index.html");
   assert.equal(manifest.entries.some((entry) => entry.path.startsWith("falcon/landing/")), false);
   for (const theme of ["light", "dark"]) {
     const path = `assets/integrations/codex/codex-${theme}.png`;
@@ -36,7 +38,7 @@ test("staging isolates managed pages and excludes marketing media from the uploa
   }
   assert.equal(manifest.entries.some((entry) => entry.path.endsWith("unreviewed.png") || entry.path.includes("private")), false);
   assert.equal(manifest.frontendSourceSha, SHA);
-  assert.equal(manifest.fileCount, 15);
+  assert.equal(manifest.fileCount, 17);
   assert.equal((await stageAssets(source, release, SHA)).assetSha256, manifest.assetSha256);
 });
 

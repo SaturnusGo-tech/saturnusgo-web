@@ -9,6 +9,7 @@ import { restoreIdentityCheckout, storeIdentityCheckout } from "../../../applica
 import { account, deferred, summary, subscription } from "../../../tests/fixtures/billing-fixtures";
 import { takeContinuation } from "../../../../auth/continuation/application/continuation-storage";
 import type { BillingCheckout, BillingIntent } from "../../../domain/billing";
+import type { WorkspaceTransitionTarget } from "../../../../auth/workspace-handoff/domain/handoff-port";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
 const previousCss = require.extensions[".css"];
@@ -21,7 +22,7 @@ const setup = { id: "saved-setup", version: 4, displayName: "Mercury AI", slug: 
 const checkout: BillingCheckout = { id: "saved-checkout", workspaceId: "workspace", planId: "startup", status: "open", provider: "mock", testMode: true,
   subtotal: 5900, currency: "USD", createdAt: "2026-11-06T00:00:00Z", expiresAt: "2027-11-06T00:00:00Z", periodEnd: null, prorated: false };
 const start = { kind: "checkout", planId: "startup", startupSetupId: setup.id, startupSetupVersion: 4, confirmWorkspaceConversion: true } as const;
-function fixture({ active = false, pending = null, open = false, ready = true, wrongWorkspace = false, checkoutAllowed = true }: { active?: boolean; pending?: BillingIntent | null; open?: boolean; ready?: boolean; wrongWorkspace?: boolean; checkoutAllowed?: boolean } = {}) {
+function fixture({ active = false, pending = null, open = false, ready = true, wrongWorkspace = false, checkoutAllowed = true, discover = null, readAccount = null }: { active?: boolean; pending?: BillingIntent | null; open?: boolean; ready?: boolean; wrongWorkspace?: boolean; checkoutAllowed?: boolean; discover?: Promise<WorkspaceTransitionTarget> | null; readAccount?: Promise<void> | null } = {}) {
   const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window"), previousStorage = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
   const storage = new Map<string, string>();
   const browserStorage = { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value), removeItem: (key: string) => storage.delete(key) };
@@ -37,7 +38,8 @@ function fixture({ active = false, pending = null, open = false, ready = true, w
     async getResource(path: string) {
       if (path.startsWith("/billing/summary")) return { data: active ? { ...summary, checkoutMode: "controlled_test" } : { ...summary, ...policy, workspaceKind: "personal", planId: null, status: "unsubscribed" } };
       if (path.startsWith("/billing/startup-setup")) { setupReads++; return { data: { setup: { ...setup, status: ready ? "ready" : "expired" } } }; }
-      if (path.startsWith("/auth/workspace-target")) { targets++; return { data: { workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" } }; }
+      if (path.startsWith("/auth/workspace-target")) { targets++; return { data: discover ? await discover : { workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" } }; }
+      if (readAccount) await readAccount;
       return { data: { ...account, ...(active ? {} : policy), checkoutMode: "controlled_test", enabled: true,
         subscription: active ? { ...subscription, workspaceId: wrongWorkspace ? "other" : "workspace" } : null, checkout: open ? checkout : null } };
     },
@@ -62,6 +64,73 @@ for (const pending of [null, start]) test(`settled Startup reentry discovers the
     assert.equal(h.writes.length, 0, "settled access must never replay a checkout");
     assert.doesNotMatch(JSON.stringify(view.toJSON()), /Continue checkout/);
   } finally { await act(async () => view?.unmount()); h.restore(); }
+});
+for (const pending of [null, start]) test(`settled billing reentry stays neutral until its same-host target is verified${pending ? " with stale checkout recovery" : ""}`, async () => {
+  const target = deferred<WorkspaceTransitionTarget>(), h = fixture({ active: true, pending, discover: target.promise }); let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    assert.equal(h.targets(), 1);
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0, "ready billing reentry must not announce company creation while checking its target");
+    assert.equal(view.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 1);
+    assert.equal(view.root.findAllByProps({ "aria-label": "Falcon plans" }).length, 0);
+    assert.equal(h.writes.length, 0);
+    await act(async () => target.resolve({ workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" }));
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0);
+    assert.equal(view.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 0);
+    assert.equal(view.root.findAllByProps({ "aria-label": "Falcon plans" }).length, 1);
+  } finally { await act(async () => view?.unmount()); h.restore(); }
+});
+test("saved checkout metadata stays neutral while current company billing is still loading", async () => {
+  const accountRead = deferred<void>(), target = deferred<WorkspaceTransitionTarget>(), h = fixture({ active: true, pending: start, readAccount: accountRead.promise, discover: target.promise }); let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    assert.equal(h.targets(), 0, "company target discovery must wait for current activation");
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0, "saved browser recovery cannot decide whether the current company needs setup");
+    assert.equal(view.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 1);
+    assert.equal(h.writes.length, 0);
+    await act(async () => accountRead.resolve());
+    assert.equal(h.targets(), 1);
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0);
+    await act(async () => target.resolve({ workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" }));
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0);
+    assert.equal(view.root.findAllByProps({ "aria-label": "Falcon plans" }).length, 1);
+  } finally { await act(async () => view?.unmount()); h.restore(); }
+});
+test("settled billing reentry shows company preparation only after an authoritative pending target", async () => {
+  const target = deferred<WorkspaceTransitionTarget>(), h = fixture({ active: true, discover: target.promise }); let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0);
+    await act(async () => target.reject({ code: "HANDOFF_TARGET_PREPARING", status: 409 }));
+    assert.equal(view.root.findByProps({ "data-company-wizard": true }).props["data-stage"], "preparing");
+    assert.match(JSON.stringify(view.toJSON()), /email/);
+    assert.equal(view.root.findAllByProps({ "aria-label": "Falcon plans" }).length, 0);
+    assert.equal(h.writes.length, 0);
+  } finally { await act(async () => view?.unmount()); h.restore(); }
+});
+test("settled billing reentry opens company handoff only after a verified different-host target", async () => {
+  const target = deferred<WorkspaceTransitionTarget>(), h = fixture({ active: true, discover: target.promise }); let view!: ReactTestRenderer;
+  const previousDocument = Object.getOwnPropertyDescriptor(globalThis, "document"), reactDom = require("react-dom"), portal = Object.getOwnPropertyDescriptor(reactDom, "createPortal")!;
+  const forms: { action: string; destinationOrigin: string | undefined }[] = [];
+  Object.defineProperty(reactDom, "createPortal", { configurable: true, value: (content: React.ReactNode) => content });
+  Object.defineProperty(globalThis, "document", { configurable: true, value: { body: { style: { overflow: "" }, append() {} }, createElement(tag: string) {
+    if (tag === "input") return { type: "", name: "", value: "" };
+    const fields: Record<string, string> = {};
+    return { action: "", method: "", hidden: false, append(input: { name: string; value: string }) { fields[input.name] = input.value; }, remove() {}, submit() { forms.push({ action: this.action, destinationOrigin: fields.destinationOrigin }); } };
+  } } });
+  try {
+    await act(async () => { view = create(h.tree); });
+    assert.equal(view.root.findAllByProps({ "data-company-wizard": true }).length, 0);
+    assert.deepEqual(forms, []);
+    await act(async () => target.resolve({ workspaceId: "workspace", generation: 1, destinationOrigin: "https://jev-falcon.saturnusgo.com" }));
+    assert.equal(view.root.findByProps({ "data-company-wizard": true }).props["data-stage"], "opening");
+    assert.equal(view.root.findAllByProps({ "aria-label": "Falcon plans" }).length, 0);
+    assert.deepEqual(forms, [{ action: "https://tms.saturnusgo.com/api/v1/auth/workspace-handoffs", destinationOrigin: "https://jev-falcon.saturnusgo.com" }]);
+    assert.equal(h.writes.length, 0);
+  } finally {
+    await act(async () => view?.unmount()); h.restore(); Object.defineProperty(reactDom, "createPortal", portal);
+    if (previousDocument) Object.defineProperty(globalThis, "document", previousDocument); else Reflect.deleteProperty(globalThis, "document");
+  }
 });
 test("same-owner recovery resumes the saved checkout only after server preparation is ready, preserving consent and its key", async () => {
   const h = fixture({ pending: start }); let view!: ReactTestRenderer;
@@ -90,7 +159,7 @@ test("identity OK saves the billing return before sign-out, retains the command,
     assert.equal(signouts, 1);
     assert.equal(view.root.findByType("button").props.disabled, true);
     assert.equal(restoreIdentityCheckout("cloud:owner", "workspace")?.options.idempotencyKey, "original-key");
-    assert.equal(takeContinuation(window.sessionStorage, window.location.origin, "workspace"), "/testcases/umbrella-home/work/?workspaceId=workspace&view=config&settings=billing&lang=ru");
+    assert.equal(takeContinuation(window.sessionStorage, window.location.origin, "workspace"), "/work/?workspaceId=workspace&view=config&settings=billing&lang=ru");
     await act(async () => { logout.resolve(); await leaving; });
     assert.equal(retries, 0);
   } finally { await act(async () => view?.unmount()); h.restore(); }

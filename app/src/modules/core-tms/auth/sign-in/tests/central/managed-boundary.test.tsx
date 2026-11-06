@@ -70,8 +70,30 @@ void test("operator sign-in opens password and MFA directly without company fede
   await act(async () => { view = create(content()); });
   assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), true, "company discovery opens the existing invited-member form");
   await act(async () => view.unmount());
+  location.search = "?method=email&lang=en";
+  await act(async () => { view = create(content()); });
+  assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), true, "the desktop email choice opens the invited-member form on a company host");
+  await act(async () => view.unmount());
   emailEnabled = false;
   await act(async () => { view = create(content()); });
   assert.equal(view.root.findAllByType("input").some(input => input.props.name === "password"), false, "the company entry hint must not expose password login when SAML is enforced");
   assert.ok(view.root.findAllByType("button").some(button => button.children.includes("Continue with SAML SSO")));
+});
+void test("managed and provider requests carry only one valid page workspace scope", async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, "window"), location = new URL("https://tms.saturnusgo.com/cloud-login/"), calls: Array<{ path: string; init?: RequestInit }> = [];
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { location } });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, "window", prior); else Reflect.deleteProperty(globalThis, "window"); });
+  const send: typeof fetch = async (input, init) => { calls.push({ path: String(input), init }); return Response.json({ data: {} }); };
+  const { createManagedAccessClient } = await import("../../../managed/data/managed-access-client");
+  const { createSignInClient } = await import("../../data/sign-in-client");
+  const managed = createManagedAccessClient(send), providers = createSignInClient(send);
+  for (const [search, scope] of [
+    ["?workspaceId=company-space&lang=ru&returnTo=evil", "?workspaceId=company-space"],
+    ["?workspaceId=one&workspaceId=two", ""], ["?workspaceId=bad%2Fid", ""], ["?workspaceId=https%3A%2F%2Fevil.test", ""],
+  ]) {
+    location.search = search; calls.length = 0;
+    await managed.entrypoint(); await managed.session(); await managed.login({ login: "member", password: "fixture-password" }); await providers.methods();
+    assert.deepEqual(calls.map(call => call.path), [`/api/v1/auth/entrypoint${scope}`, `/api/v1/auth/session${scope}`, `/api/v1/auth/login${scope}`, `/api/v1/auth/methods${scope}`]);
+    assert.deepEqual(JSON.parse(String(calls[2].init?.body)), { login: "member", password: "fixture-password" });
+  }
 });

@@ -1,6 +1,6 @@
 export const DESKTOP_ATTEMPT_KEY = "falcon.auth.desktop-attempt.v1";
+import { isWorkspacePath } from "../../../navigation/workspace-route";
 const token = /^[A-Za-z0-9_-]{43}$/;
-const work = "/testcases/umbrella-home/work/";
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type Location = { readonly origin: string; readonly pathname: string; readonly search: string };
 type Record = { readonly version: 1; readonly origin: string; readonly attempt: string; readonly createdAt: number };
@@ -9,7 +9,7 @@ export type DesktopAttemptState = { readonly status: "none" | "blocked" }
 export type DesktopAttemptTarget = { readonly status: "none" | "blocked" }
   | { readonly status: "redirect"; readonly path: string };
 export function isDesktopEntry(path: string, managedWorkspace = false): boolean {
-  return /^\/(?:login|cloud-login|signup)\/?$/.test(path) || (managedWorkspace && path === work);
+  return /^\/(?:login|cloud-login|signup)\/?$/.test(path) || (managedWorkspace && isWorkspacePath(path));
 }
 function inspect(storage: Store, origin: string, now: number): DesktopAttemptState & { readonly previousAttempt?: string } {
   const raw = storage.getItem(DESKTOP_ATTEMPT_KEY);

@@ -10,16 +10,17 @@ const work = `${origin}/testcases/umbrella-home/work/`;
 test("personal profile keeps tenant/project context without opening an admin route or selected case", () => {
   const link = workspaceProfileUrl(`${work}?workspaceId=w&projectId=p&caseId=c&view=cases&folderId=f&runId=r`);
   const url = new URL(link, origin);
-  assert.equal(url.pathname, "/testcases/umbrella-home/work/");
+  assert.equal(url.pathname, "/work/");
   assert.deepEqual(Object.fromEntries(url.searchParams), {workspaceId:"w",projectId:"p",view:"profile"});
   assert.deepEqual(readWorkspaceDeepLink(url.href), {view:"profile",runId:null});
 });
 
 test("old profile bookmarks resolve inside TMS even before the first project exists", () => {
-  assert.equal(workspaceProfileUrl(`${origin}/profile/`), "/testcases/umbrella-home/work/?view=profile");
-  assert.equal(workspaceProfileUrl(`${origin}/profile/#security`), "/testcases/umbrella-home/work/?view=config&settings=security");
+  assert.equal(workspaceProfileUrl(`${origin}/profile/`), "/work/?view=profile");
+  assert.equal(workspaceProfileUrl(`${origin}/profile/#security`), "/work/?view=config&settings=security");
   assert.equal(isWorkspaceProfileNavigation(`${origin}/profile/`), false);
-  assert.equal(isWorkspaceProfileNavigation(`${work}?view=cases`), true);
+  assert.equal(isWorkspaceProfileNavigation(`${work}?view=cases`), false);
+  assert.equal(isWorkspaceProfileNavigation(`${origin}/work/?view=cases`), true);
   assert.equal(companyViewAvailable("profile", []), true);
 });
 

@@ -11,8 +11,8 @@ test("Falcon is the active user-facing TMS brand", () => {
     "app/src/modules/core-tms/presentation/workspace/tms-shell.module.css",
   );
   const activeSources = [
-    source("app/(falcon)/testcases/umbrella-home/work/page.tsx"),
-    source("app/(falcon)/testcases/umbrella-home/work/TmsFavicon.tsx"),
+    source("app/(falcon)/work/page.tsx"),
+    source("app/(falcon)/work/TmsFavicon.tsx"),
     source("app/src/modules/core-tms/presentation/navigation/Navigation.tsx"),
     shellSource,
     source("app/src/modules/core-tms/tms.module.css"),
@@ -23,7 +23,7 @@ test("Falcon is the active user-facing TMS brand", () => {
   assert.match(activeSources, /FALCON/);
   assert.match(activeSources, /Falcon test management workspace/);
   assert.match(activeSources, /siteName: "Falcon"/);
-  assert.match(activeSources, /https:\/\/tms\.saturnusgo\.com\/testcases\/umbrella-home\/work\//);
+  assert.match(activeSources, /https:\/\/tms\.saturnusgo\.com\/work\//);
   assert.match(activeSources, /assets\/falcon\/falcon-mark-on-dark\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-dark\.png/);
   assert.match(activeSources, /assets\/falcon\/falcon-favicon-on-light\.png/);

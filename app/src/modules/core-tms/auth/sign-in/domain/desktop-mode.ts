@@ -5,3 +5,10 @@ export function isFalconDesktop(userAgent = typeof navigator === "undefined" ? "
 export function signedOutPath(): "/cloud-login/" {
   return "/cloud-login/";
 }
+export function desktopSignInCommand(method: "google" | "email" | "saml", locale: "en" | "ru", workspaceId?: string,
+  userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent): string {
+  const version = /(?:^|\s)FalconDesktop\/(\d+)\.(\d+)\.(\d+)(?:\s|$)/.exec(userAgent);
+  if (!version || (Number(version[1]) === 0 && (Number(version[2]) < 2 || (Number(version[2]) === 2 && Number(version[3]) < 4)))) return "/desktop-sign-in/";
+  const scope = typeof workspaceId === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(workspaceId) ? `&workspaceId=${encodeURIComponent(workspaceId)}` : "";
+  return `/desktop-sign-in/?method=${method}&lang=${locale}${scope}`;
+}

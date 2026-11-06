@@ -61,6 +61,19 @@ test('consume allows only same-target application redirect and sets/clears host-
   globalThis.fetch=async()=>new Response(null,{status:303,headers:{location}});assert.equal((await worker.fetch(request(),env)).status,502);
  }
 });
+test('consume admits only the same-target scoped desktop authorization with a bounded attempt',async t=>{
+ const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
+ const attempt='d'.repeat(43),exact=target+`/api/v1/auth/desktop/authorize?attempt=${attempt}&workspaceId=space`;
+ const request=(path='workspace-handoffs/consume')=>new Request(target+'/api/v1/auth/'+path,{method:'POST',body:'code=once',headers:{origin:path==='workspace-handoffs/consume'?source:target,accept:'text/html'}});
+ globalThis.fetch=async()=>new Response(null,{status:303,headers:{location:exact}});
+ const response=await worker.fetch(request(),env);assert.equal(response.status,303);assert.equal(response.headers.get('location'),exact);
+ assert.equal((await worker.fetch(request('workspace-handoffs'),env)).status,502);
+ for(const location of [exact.replace(target,source),exact.replace(target,'https://other-falcon.saturnusgo.com'),
+  exact.replace('/authorize?','/authorize/child?'),exact.replace(attempt,'bad'),exact+'&workspaceId=other',exact+'&attempt='+attempt,
+  exact+'&lang=en',exact+'&returnTo=/admin/',exact.replace('workspaceId=space','workspaceId=..%2Fspace'),exact+'#secret']){
+  globalThis.fetch=async()=>new Response(null,{status:303,headers:{location}});assert.equal((await worker.fetch(request(),env)).status,502,location);
+ }
+});
 test('HTML handoff start and consume permit only the fixed central preparation continuation without cookies',async t=>{
  const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
  const location=source+'/cloud-login/?workspaceId=personal_314b9ea2-2888-4d23-9757-95d88260ab7d&workspaceHandoff=1';

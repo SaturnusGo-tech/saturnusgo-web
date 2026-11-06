@@ -8,7 +8,7 @@ test("shared comment targets its own case and project on the company domain with
     workspaceId: "workspace-a", projectId: "project-a", caseId: "case-a", id: "comment:a",
   }));
   assert.equal(link.origin, "https://umbrella-falcon.saturnusgo.com");
-  assert.equal(link.pathname, "/testcases/umbrella-home/work/");
+  assert.equal(link.pathname, "/work/");
   assert.equal(link.hash, "");
   assert.deepEqual(Object.fromEntries(link.searchParams), {
     workspaceId: "workspace-a", projectId: "project-a", caseId: "case-a", view: "cases", commentId: "comment:a",

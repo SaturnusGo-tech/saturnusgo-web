@@ -68,7 +68,7 @@ test("cloud account requests use the private session cookie and stable workspace
     assert.equal(calls[2].init.method, "GET");
     assert.equal(
       cloudWorkspacePath(session),
-      "/testcases/umbrella-home/work/?workspaceId=workspace-1&projectId=project-1",
+      "/work/?workspaceId=workspace-1&projectId=project-1",
     );
     assert.equal(
       cloudWorkspacePathFromLocation({
@@ -76,7 +76,7 @@ test("cloud account requests use the private session cookie and stable workspace
         search: "?caseId=case-1",
         hash: "#overview",
       } as Location, session),
-      "/testcases/umbrella-home/work/?caseId=case-1&workspaceId=workspace-1&projectId=project-1#overview",
+      "/work/?caseId=case-1&workspaceId=workspace-1&projectId=project-1#overview",
     );
   } finally {
     globalThis.fetch = originalFetch;

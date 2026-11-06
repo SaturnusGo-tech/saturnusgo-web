@@ -50,7 +50,7 @@ void test("ordinary sign-in still restores the same-workspace checkout continuat
   const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale() {}, t: () => "Loading" };
   let view!: ReturnType<typeof create>;
   await act(async () => { view = create(<TmsLocaleContext.Provider value={locale}><AuthContinuation workspaceId="space"><div data-company-content /></AuthContinuation></TmsLocaleContext.Provider>); });
-  assert.deepEqual(destinations, [path]);
+  assert.deepEqual(destinations, ["/work/?workspaceId=space&view=config&settings=billing"]);
   assert.equal(values.has(CONTINUATION_KEY), false);
   assert.equal(view.root.findAllByProps({ "data-company-content": true }).length, 0);
   await act(async () => view.unmount());

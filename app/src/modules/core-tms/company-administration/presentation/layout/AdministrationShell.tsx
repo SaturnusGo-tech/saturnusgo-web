@@ -21,7 +21,7 @@ export function AdministrationShell({ children, section, page, session, logout, 
   const copy = administrationCopy(locale);
   return <div className={styles.page} data-section={section} data-directory={section === "admin" && !page}>
     <aside className={styles.sidebar}>
-      <a className={styles.brand} href={session.audience === "platform" ? "/sandbox/" : "/testcases/umbrella-home/work/"}>
+      <a className={styles.brand} href={session.audience === "platform" ? "/sandbox/" : "/work/"}>
         <img src="/falcon/falcon-mark-light.png" alt="" />Falcon
       </a>
       {companyName && <div className={styles.companyName}>{companyName}</div>}
@@ -47,7 +47,7 @@ export function AdministrationShell({ children, section, page, session, logout, 
       </nav>
       <div className={styles.sidebarBottom}>
         <AdministrationAccount session={session} client={client} logout={logout} onNavigate={onNavigate} />
-        {session.audience === "tenant" && <a className={styles.returnLink} href="/testcases/umbrella-home/work/">
+        {session.audience === "tenant" && <a className={styles.returnLink} href="/work/">
           <ArrowLeft size={18} />{locale === "ru" ? "В Falcon" : "Back to Falcon"}</a>}
       </div>
     </aside>

@@ -6,7 +6,7 @@ import { isWorkspaceProfileNavigation, workspaceProfileUrl } from "../navigation
 type Props = Omit<ComponentProps<"a">, "href"> & { section?: "security" };
 
 export function ProfileLink({ section, children, onClick, ...props }: Props) {
-  const href = typeof window === "undefined" ? "/testcases/umbrella-home/work/?view=profile" : workspaceProfileUrl(window.location.href, section);
+  const href = typeof window === "undefined" ? "/work/?view=profile" : workspaceProfileUrl(window.location.href, section);
   return <a {...props} href={href} onClick={(event) => {
     onClick?.(event);
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey

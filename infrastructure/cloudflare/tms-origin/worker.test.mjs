@@ -148,7 +148,7 @@ test("keeps the existing TMS deep link and OAuth callback on its canonical route
   mockFetch(context, async (request) => {
     assert.equal(
       request.url,
-      "https://www.saturnusgo.com/testcases/umbrella-home/work/?projectId=project-1",
+      "https://www.saturnusgo.com/work/?projectId=project-1",
     );
     assert.equal(request.headers.has("authorization"), false);
     assert.equal(request.headers.has("cookie"), false);
@@ -163,11 +163,11 @@ test("keeps the existing TMS deep link and OAuth callback on its canonical route
   assert.equal(canonical.status, 302);
   assert.equal(
     canonical.headers.get("location"),
-    "https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project-1",
+    "https://tms.saturnusgo.com/work/?projectId=project-1",
   );
 
   const response = await worker.fetch(new Request(
-    "https://tms.saturnusgo.com/testcases/umbrella-home/work/?projectId=project-1&code=opaque&state=opaque",
+    "https://tms.saturnusgo.com/work/?projectId=project-1&code=opaque&state=opaque",
     { headers: {
       "accept-language": "ru",
       authorization: "Bearer private",

@@ -1,4 +1,5 @@
 import type { ManagedAccessPort } from "../application/managed-access-port";
+import { scopedAuthRequestPath } from "../../navigation/request-scope/auth-request-path";
 import { CompanyAccessError, type CompanyEntrypoint, type CompanySession, type MfaEnrollment, type MfaResult }
   from "../domain/managed-access";
 
@@ -6,7 +7,7 @@ export function createManagedAccessClient(send: typeof fetch = fetch): ManagedAc
   async function request<T>(path: string, method = "GET", body?: unknown, signal?: AbortSignal): Promise<T> {
     let response: Response;
     try {
-      response = await send(`/api/v1${path}`, { method, credentials: "include", cache: "no-store", redirect: "error", signal,
+      response = await send(scopedAuthRequestPath(`/api/v1${path}`), { method, credentials: "include", cache: "no-store", redirect: "error", signal,
         headers: { accept: "application/json", ...(body === undefined ? {} : { "content-type": "application/json" }) },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
     } catch (error) {

@@ -42,6 +42,8 @@ export function ProofForm({ signIn, copy, organization }: { readonly signIn: Ret
       </span>{companyEntry && <span className={styles.fieldHint}>{copy.organizationHint}</span>}
     </label>}
     <button type="submit" className={styles.primary} disabled={state.pending}>{state.step === "email" ? copy.send : copy.continue}</button>
+    {state.step === "saml" && state.error === "FEDERATION_UNAVAILABLE" && <button type="button" className={styles.secondary}
+      disabled={state.pending || !company.trim()} onClick={() => void signIn.company(company)}>{copy.companyContinue}</button>}
     {state.step === "code" && <button type="button" className={styles.linkButton} disabled={state.pending || seconds > 0}
       onClick={() => void signIn.resend()}>{seconds > 0 ? `${copy.wait} ${seconds} ${copy.seconds}` : copy.resend}</button>}
   </form>;

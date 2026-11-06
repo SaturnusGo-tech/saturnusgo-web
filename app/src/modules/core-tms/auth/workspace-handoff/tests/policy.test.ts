@@ -7,7 +7,7 @@ test("browser handoff starts with a same-origin form and preserves only scoped r
  const result=workspaceHandoffNavigation(target,"space",href,"ru",false)!;
  assert.equal(result.kind,"browser"); if(result.kind!=="browser")return;
  assert.equal(result.action,"https://tms.saturnusgo.com/api/v1/auth/workspace-handoffs");
- assert.deepEqual(result.fields,{workspaceId:"space",destinationOrigin:target.destinationOrigin,locale:"ru",route:"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&view=config&settings=billing&lang=ru"});
+ assert.deepEqual(result.fields,{workspaceId:"space",destinationOrigin:target.destinationOrigin,locale:"ru",route:"/work/?workspaceId=space&projectId=project&view=config&settings=billing&lang=ru"});
  assert.equal(JSON.stringify(result).includes("secret"),false); assert.equal(JSON.stringify(result).includes("code"),false);
 });
 test("desktop hands only the exact scoped request to its same-origin native navigation bridge",()=>{
@@ -31,7 +31,7 @@ test("company setup handoff opens scoped company administration through the same
 test("purchased company reentry opens its home without restoring subscription settings",()=>{
  const result=workspaceHandoffNavigation(target,"space",href,"ru",false,"company_home")!;
  assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
- assert.equal(result.fields.route,"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&lang=ru");
+ assert.equal(result.fields.route,"/work/?workspaceId=space&projectId=project&lang=ru");
 });
 test("explicit help navigation preserves safe article, tab and page in browser and desktop handoffs",()=>{
  for(const desktop of [false,true]){
@@ -46,4 +46,14 @@ test("navigation handoff omits duplicate and unsafe presentation routes without 
  assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
  const query=new URL(result.fields.route,"https://tms.saturnusgo.com").searchParams;
  for(const key of ["article","tab","page","authorization"])assert.equal(query.has(key),false);
+});
+test("a validated desktop attempt follows only the verified target through its exact scoped authorize route",()=>{
+ const attempt="a".repeat(43);
+ const result=workspaceHandoffNavigation(target,"space","https://tms.saturnusgo.com/cloud-login/?workspaceId=space&workspaceHandoff=1", "en",false,"company_home",attempt)!;
+ assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
+ assert.equal(result.fields.route,`/api/v1/auth/desktop/authorize?attempt=${attempt}&workspaceId=space`);
+ for(const invalid of ["bad","a".repeat(44),"a".repeat(42)+"/"]){
+  const ignored=workspaceHandoffNavigation(target,"space",href,"en",false,"company_home",invalid)!;
+  assert.equal(ignored.kind,"browser");if(ignored.kind==="browser")assert.equal(ignored.fields.route,"/work/?workspaceId=space&projectId=project&lang=en");
+ }
 });

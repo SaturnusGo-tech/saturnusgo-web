@@ -15,9 +15,9 @@ async function page(t:TestContext,mode:"company"|"preparing"|"personal"|"denied"
  const reactDom=require("react-dom"),portal=Object.getOwnPropertyDescriptor(reactDom,"createPortal")!;
  Object.defineProperty(reactDom,"createPortal",{configurable:true,value:(content:React.ReactNode)=>content});
  const previous=["window","document","React","fetch"].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)] as const);
- const origin="https://tms.saturnusgo.com",billing="/testcases/umbrella-home/work/?workspaceId=space&view=config&settings=billing";
+ const origin="https://tms.saturnusgo.com",billing="/work/?workspaceId=space&view=config&settings=billing";
  const destinations:string[]=[],requests:string[]=[],forms:{action:string;method:string;fields:Record<string,string>}[]=[],values=new Map<string,string>();
- if(saved)values.set(CONTINUATION_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),path:billing}));
+ if(saved)values.set(CONTINUATION_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),path:"/testcases/umbrella-home/work/?workspaceId=space&view=config&settings=billing"}));
  if(desktop)values.set(DESKTOP_ATTEMPT_KEY,JSON.stringify({version:1,origin,createdAt:Date.now(),attempt:"a".repeat(43)}));
  const location=(path:string)=>Object.assign(new URL(path,origin),{replace:(path:string)=>destinations.push(path),assign:(path:string)=>destinations.push(path)});
  const browser=Object.assign(new EventTarget(),{location:location(entryPath),
@@ -61,7 +61,7 @@ test("an existing central cloud session discovers its purchased company before r
  const h=await page(t,"company");
  assert.equal(h.targets(),1);assert.equal(h.mounted(),0);assert.deepEqual(h.destinations,[]);
  assert.deepEqual(h.forms,[{action:"https://tms.saturnusgo.com/api/v1/auth/workspace-handoffs",method:"post",
-  fields:{workspaceId:"space",destinationOrigin:"https://jev-falcon.saturnusgo.com",route:"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&lang=en",locale:"en"}}]);
+  fields:{workspaceId:"space",destinationOrigin:"https://jev-falcon.saturnusgo.com",route:"/work/?workspaceId=space&projectId=project&lang=en",locale:"en"}}]);
  assert.equal(h.values.has(CONTINUATION_KEY),false);
 });
 test("an existing cloud session with a preparing company opens the loader and email notice before the personal shell",async t=>{
@@ -86,7 +86,7 @@ test("an explicit current case keeps priority over a saved checkout after root d
 test("an explicit company case follows its verified alias without restoring the previous billing page",async t=>{
  const h=await page(t,"company",{entryPath:"/testcases/umbrella-home/work/?caseId=current-case"});
  assert.equal(h.targets(),1);assert.equal(h.mounted(),0);assert.deepEqual(h.destinations,[]);
- assert.equal(h.forms[0]?.fields.route,"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&caseId=current-case&lang=en");
+ assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&caseId=current-case&lang=en");
  assert.equal(h.values.has(CONTINUATION_KEY),false);
 });
 test("desktop proof returns before root workspace discovery and preserves the browser continuation",async t=>{
@@ -103,5 +103,5 @@ test("a handoff-capable personal session never falls through after authoritative
 });
 test("an explicit help article follows the purchased company instead of becoming a generic help page",async t=>{
  const h=await page(t,"company",{entryPath:"/testcases/umbrella-home/work/?view=help&article=falcon-ai-chat"});
- assert.equal(h.forms[0]?.fields.route,"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&view=help&article=falcon-ai-chat&lang=en");
+ assert.equal(h.forms[0]?.fields.route,"/work/?workspaceId=space&projectId=project&view=help&article=falcon-ai-chat&lang=en");
 });

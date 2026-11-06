@@ -4,7 +4,9 @@ import { createSpaceChoiceClient } from "../data/space-choice-client";
 import { useSpaceChoice } from "../application/useSpaceChoice";
 import { SpaceChoiceScreen } from "../presentation/SpaceChoiceScreen";
 import { rememberBrowserContinuation } from "../../continuation/application/browser-continuation";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 export function SpaceChoiceFeature() {
+  const { locale } = useTmsLocale();
   const port = useMemo(() => createSpaceChoiceClient(), []);
   const origin = typeof window === "undefined" ? "" : window.location.origin;
   const model = useSpaceChoice(port, origin, process.env.NEXT_PUBLIC_FALCON_COMPANY_DOMAIN_SUFFIX ?? "saturnusgo.com");
@@ -14,7 +16,11 @@ export function SpaceChoiceFeature() {
   }, []);
   useEffect(() => {
     if (!model.state.destination) return;
-    rememberBrowserContinuation(); window.location.assign(model.state.destination);
-  }, [model.state.destination]);
+    const destination = new URL(model.state.destination, window.location.origin);
+    if (destination.pathname === "/cloud-login/" && destination.searchParams.has("workspaceId")) {
+      destination.searchParams.set("method", "company"); destination.searchParams.set("lang", locale);
+      rememberBrowserContinuation(); window.location.assign(destination.href);
+    } else { rememberBrowserContinuation(); window.location.assign(model.state.destination); }
+  }, [model.state.destination, locale]);
   return <SpaceChoiceScreen model={model} />;
 }

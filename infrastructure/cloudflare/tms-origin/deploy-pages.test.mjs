@@ -105,10 +105,12 @@ if (process.env.OMIT_SIGNUP !== "1") {
   write("out/signup/index.html", "FALCON SIGNUP\\n");
   write("out/signup/index.txt", "FALCON SIGNUP DATA\\n");
 }
+write("out/testcases/umbrella-home/work/index.html", "LEGACY WORKSPACE REDIRECT");
+write("out/testcases/umbrella-home/work/index.txt", "LEGACY REDIRECT DATA");
 write("out/cloud-login/index.html", "FALCON CLOUD LOGIN\\n");
 if (process.env.INCLUDE_LOGIN === "1") write("out/login/index.html", "FALCON LOGIN\\n");
-write("out/testcases/umbrella-home/work/index.html", "CURRENT TMS\\n");
-write("out/testcases/umbrella-home/work/index.txt", "CURRENT TMS DATA\\n");
+write("out/work/index.html", "CURRENT TMS\\n");
+write("out/work/index.txt", "CURRENT TMS DATA\\n");
 write("out/_next/static/chunks/app.js", "static chunk\\n");
 for (const weight of ["Regular", "RegularItalic", "Medium", "Semibold", "Bold"]) if (process.env.OMIT_DOCS_FONT !== weight) write("out/falcon/docs/fonts/OpenAISans-" + weight + ".woff2", "font asset");
 for (const theme of ["light", "dark"]) if (process.env.OMIT_CODEX_ASSET !== theme) write("out/assets/integrations/codex/codex-" + theme + ".png", "reviewed " + theme);
@@ -194,7 +196,7 @@ test("publishes Falcon routes into an isolated namespace without replacing Pages
   }
   assert.equal(existsSync(join(fixture.pages, "falcon/landing/2026-09")), false);
   assert.equal(
-    readFileSync(join(fixture.pages, "testcases/umbrella-home/work/index.html"), "utf8"),
+    readFileSync(join(fixture.pages, "work/index.html"), "utf8"),
     "CURRENT TMS\n",
   );
   for (const theme of ["light", "dark"]) {

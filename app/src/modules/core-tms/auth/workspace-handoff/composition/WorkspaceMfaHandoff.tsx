@@ -8,6 +8,7 @@ import {AuthContinuation} from "../../continuation/composition/AuthContinuation"
 import {AuthenticatedWorkspaceHandoff} from "./AuthenticatedWorkspaceHandoff";
 import {readCloudSession} from "../../cloud/cloud-auth-client";
 import {TmsAuthState} from "../../presentation/state/TmsAuthState";
+import {WorkspaceHandoffReturn} from "./entry/WorkspaceHandoffReturn";
 export function WorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   const {locale}=useTmsLocale();
   const [proof,setProof]=useState<{workspaceId:string;phase:"checking"|"anonymous"|"verified"|"denied"|"error"}>({workspaceId,phase:"checking"});
@@ -23,7 +24,9 @@ export function WorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   if(phase==="checking")return <TmsAuthState kind="loading"/>;
   if(phase==="error")return <TmsAuthState kind="error" onAction={()=>retry(value=>value+1)}/>;
   if(phase==="denied")return <p role="alert">{locale==="ru"?"Пространство не соответствует подтверждённому входу.":"This workspace does not match your verified sign-in."}</p>;
-  if(phase==="verified")return <AuthContinuation workspaceId={workspaceId} workspaceHandoff><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
+  if(phase==="verified")return <AuthenticatedWorkspaceHandoff workspaceId={workspaceId}>
+    <AuthContinuation workspaceId={workspaceId} workspaceHandoff><WorkspaceHandoffReturn workspaceId={workspaceId}/></AuthContinuation>
+  </AuthenticatedWorkspaceHandoff>;
   return <ManagedWorkspaceMfaHandoff workspaceId={workspaceId}/>;
 }
 export function ManagedWorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
@@ -33,5 +36,7 @@ export function ManagedWorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   if(!session||session.stage==="anonymous")return <div role="alert"><p>{ru?"Войдите снова, чтобы открыть это пространство.":"Sign in again to open this workspace."}</p><a href={`/cloud-login/?lang=${locale}`}>{ru?"Войти":"Sign in"}</a></div>;
   if(!session.authenticated||access.state.recoveryCodes.length>0)return <ManagedAccessScreen access={access}/>;
   if(session.audience!=="tenant"||session.workspaceId!==workspaceId)return <p role="alert">{ru?"Пространство не соответствует подтверждённому входу.":"This workspace does not match your verified sign-in."}</p>;
-  return <AuthContinuation workspaceId={workspaceId} managedWorkspace workspaceHandoff><AuthenticatedWorkspaceHandoff workspaceId={workspaceId}/></AuthContinuation>;
+  return <AuthenticatedWorkspaceHandoff workspaceId={workspaceId}>
+    <AuthContinuation workspaceId={workspaceId} managedWorkspace workspaceHandoff><WorkspaceHandoffReturn workspaceId={workspaceId}/></AuthContinuation>
+  </AuthenticatedWorkspaceHandoff>;
 }

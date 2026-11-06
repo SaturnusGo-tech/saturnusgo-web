@@ -1,5 +1,6 @@
-const workspace = "/testcases/umbrella-home/work/";
-const pages = new Set([workspace, "/admin/", "/profile/"]);
+import { canonicalWorkspacePathname, LEGACY_WORKSPACE_PATH, WORKSPACE_PATH } from "../../../navigation/workspace-route";
+const workspace = WORKSPACE_PATH;
+const pages = new Set([workspace, LEGACY_WORKSPACE_PATH, "/admin/", "/profile/"]);
 const identifiers = new Set(["workspaceId", "projectId", "catalogProjectId", "portfolioId", "folderId", "caseId", "runId", "runItemId", "suiteId", "stepId", "attachmentId", "falconMcpInteraction"]);
 const routes = new Set(["view", "settings", "page", "tab", "article"]);
 export function safeContinuationPath(candidate: unknown, origin: string): string | null {
@@ -18,7 +19,7 @@ export function safeContinuationPath(candidate: unknown, origin: string): string
       else if (key === "lang" && (value === "ru" || value === "en")) query.set(key, value);
     }
     const hash = /^#[A-Za-z0-9_-]{1,128}$/.test(url.hash) ? url.hash : "";
-    return `${url.pathname}${query.size ? `?${query}` : ""}${hash}`;
+    return `${canonicalWorkspacePathname(url.pathname)}${query.size ? `?${query}` : ""}${hash}`;
   } catch { return null; }
 }
 export function continuationFromLocation(location: Pick<Location, "origin" | "pathname" | "search" | "hash">): string | null {
@@ -35,6 +36,6 @@ export function continuationFromLocation(location: Pick<Location, "origin" | "pa
 export function hasContinuationContext(path: string, origin: string): boolean {
   try {
     const target = new URL(path, origin);
-    return target.pathname !== workspace || !!target.hash || [...target.searchParams.keys()].some(key => key !== "workspaceId");
+    return canonicalWorkspacePathname(target.pathname) !== workspace || !!target.hash || [...target.searchParams.keys()].some(key => key !== "workspaceId");
   } catch { return false; }
 }

@@ -16,7 +16,7 @@ export function AuthContinuation({ children, workspaceId, managedWorkspace = fal
     checked.current = true;
     if (typeof window === "undefined") { setTarget(null); return; }
     if (managedWorkspace) captureBrowserDesktopAttempt(true);
-    const desktop = takeBrowserDesktopAttempt();
+    const desktop = takeBrowserDesktopAttempt(managedWorkspace ? workspaceId : undefined);
     if (desktop.status === "blocked") { setBlocked(true); return; }
     if (desktop.status === "redirect") { setTarget(desktop.path); window.location.replace(desktop.path); return; }
     const saved = deferBrowserContinuation ? null : takeBrowserContinuation(workspaceId);

@@ -24,7 +24,7 @@ void test("provider return retains the deep case through MFA and recovery acknow
     identity: { id: "qa", name: "QA", login: "qa", email: "qa@example.test", emailVerified: true, phone: "", role: "tester", owner: false, hasAvatar: false, version: 1 } };
   let session: CompanySession = { authenticated: false, stage: "anonymous" };
   globalThis.fetch = async input => {
-    const path = String(input); requests.push(path);
+    requests.push(String(input)); const path = new URL(String(input), origin).pathname;
     if (path.endsWith("/entrypoint")) return Response.json({ data: { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, accessContact: "" } });
     if (path.endsWith("/methods")) return Response.json({ data: { google: true, email: true, saml: true, signup: true } });
     if (path.endsWith("/google/start")) return Response.json({ data: { authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=fixture" } });
@@ -55,7 +55,7 @@ void test("provider return retains the deep case through MFA and recovery acknow
   await act(async () => { await view.root.findByType(MfaForm).props.onSubmit("totp", "123456"); });
   assert.deepEqual(destinations, []); assert.ok(values.has(CONTINUATION_KEY));
   await act(async () => view.root.findByType(RecoveryCodes).props.onContinue());
-  assert.deepEqual(destinations, [deepPath]); assert.equal(values.has(CONTINUATION_KEY), false);
+  assert.deepEqual(destinations, ["/work/?workspaceId=alpha&caseId=case-7&falconMcpInteraction=consent_123#step-2"]); assert.equal(values.has(CONTINUATION_KEY), false);
   assert.equal(view.root.findAllByProps({ "data-testid": "protected" }).length, 0);
   await act(async () => view.unmount());
   destinations.length = 0; browser.location = location(deepPath);
@@ -83,7 +83,7 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
     identity: { id: "qa", name: "QA", login: "qa", email: "qa@example.test", emailVerified: true, phone: "", role: "tester", owner: false, hasAvatar: false, version: 1 } };
   let session: CompanySession = { authenticated: false, stage: "anonymous" };
   globalThis.fetch = async input => {
-    const path = String(input instanceof Request ? input.url : input);
+    const path = new URL(String(input instanceof Request ? input.url : input), origin).pathname;
     if (path.endsWith("/entrypoint")) return Response.json({ data: { name: "Alpha", hostname: "alpha-falcon.example.test", audience: "tenant", available: true, accessContact: "" } });
     if (path.endsWith("/methods")) return Response.json({ data: { google: true, email: true, saml: true, signup: true } });
     if (path.endsWith("/google/start")) return Response.json({ data: { authorizationUrl: "https://accounts.google.com/authorize" } });
@@ -96,7 +96,7 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
     FALCON_MANAGED_GATEWAY_KEY: "07".repeat(32), FALCON_API_ORIGIN: "https://api.example.test",
   });
   assert.equal(response.status, 302);
-  assert.equal(response.headers.get("location"), `${origin}/testcases/umbrella-home/work/?desktopAttempt=${attempt}`);
+  assert.equal(response.headers.get("location"), `${origin}/work/?desktopAttempt=${attempt}`);
   browser.location = location(response.headers.get("location")!);
   const { ManagedAccessBoundary } = await import("../../../managed/composition/ManagedAccessBoundary");
   const { MfaForm } = await import("../../../managed/presentation/mfa/MfaForm");
@@ -119,13 +119,13 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
   await act(async () => { await view.root.findByType(MfaForm).props.onSubmit("totp", "123456"); });
   assert.deepEqual(destinations, []); assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
   await act(async () => view.root.findByType(RecoveryCodes).props.onContinue());
-  assert.deepEqual(destinations, [`/api/v1/auth/desktop/authorize?attempt=${attempt}`]);
+  assert.deepEqual(destinations, [`/api/v1/auth/desktop/authorize?attempt=${attempt}&workspaceId=alpha`]);
   assert.equal(values.has(DESKTOP_ATTEMPT_KEY), false); assert.equal(values.get(CONTINUATION_KEY), mcp);
   assert.equal(view.root.findAllByProps({ "data-testid": "protected" }).length, 0);
   await act(async () => view.unmount()); destinations.length = 0;
   const fresh = "e".repeat(43); browser.location = location(`/testcases/umbrella-home/work/?desktopAttempt=${fresh}`);
   await act(async () => { view = create(content()); });
-  assert.deepEqual(destinations, [`/api/v1/auth/desktop/authorize?attempt=${fresh}`], "an existing authenticated company browser also returns to the app");
+  assert.deepEqual(destinations, [`/api/v1/auth/desktop/authorize?attempt=${fresh}&workspaceId=alpha`], "an existing authenticated company browser also returns to the app");
   await act(async () => view.unmount()); destinations.length = 0;
   browser.location = location(`/testcases/umbrella-home/work/?desktopAttempt=${"f".repeat(43)}`);
   session = { authenticated: false, stage: "mfa_challenge", expiresAt: signedIn.expiresAt };

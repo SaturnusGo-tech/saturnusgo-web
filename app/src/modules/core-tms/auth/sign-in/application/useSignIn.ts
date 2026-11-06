@@ -99,7 +99,7 @@ export function useSignIn(client: SignInPort, intent: SignInIntent, proof?: { re
     },
     company: async (organization: string) => {
       if (!state.methods || intent !== "login") { unavailable(); return; }
-      await perform(async signal => ({ destination: (await client.resolveCompany(organization.trim(), signal)).redirectUrl }));
+      await perform(async signal => ({ step: "company", destination: (await client.resolveCompany(organization.trim(), signal)).redirectUrl }));
     },
     saml: async (organization: string) => {
       if (!state.methods?.saml || intent === "signup") { unavailable(); return; }
