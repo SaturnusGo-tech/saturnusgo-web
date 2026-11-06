@@ -16,7 +16,7 @@ const { ConnectedBillingFeature } = require("../../../composition/ConnectedBilli
 const { StartupSetupScreen } = require("../../presentation/StartupSetupScreen") as typeof import("../../presentation/StartupSetupScreen");
 if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
 
-function fixture(enabled = true) {
+function fixture(enabled = true, failActivationSummaryOnce = false) {
   let completed = false, checkout: BillingCheckout | null = null, targetReads = 0;
   const refreshedSummary = deferred<BillingSummary>();
   const writes: { path: string; input: unknown }[] = [];
@@ -27,7 +27,10 @@ function fixture(enabled = true) {
   const quote = { planId: "startup", subtotal: 5900, currency: "USD", periodEnd: "2027-12-06T00:00:00Z", prorated: false };
   const http = {
     async getResource(path: string) {
-      if (path.startsWith("/billing/summary")) return { data: completed ? await refreshedSummary.promise : personalSummary, etag: null };
+      if (path.startsWith("/billing/summary")) {
+        if (completed && failActivationSummaryOnce) { failActivationSummaryOnce = false; throw new TypeError("Summary refresh interrupted"); }
+        return { data: completed ? await refreshedSummary.promise : personalSummary, etag: null };
+      }
       if (path.startsWith("/billing/startup-setup")) return { data: { setup: { id: "saved-setup", version: 4, displayName: "Team", slug: "team",
         hostname: "team-falcon.saturnusgo.com", status: "ready", expiresAt: "2027-11-06T12:30:00Z" } }, etag: null };
       if (path.startsWith("/auth/workspace-target")) { targetReads++; return { data: { workspaceId: "workspace", generation: 1, destinationOrigin: "https://tms.saturnusgo.com" }, etag: null }; }
@@ -111,5 +114,39 @@ test("Startup wizard callbacks cannot bypass a disabled production capability", 
   } finally {
     await act(async () => view?.unmount());
     if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment);
+  }
+});
+
+test("Startup success recovers after a temporary summary failure without authorizing navigation during the failure", async () => {
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const destinations: string[] = [];
+  Object.defineProperty(globalThis, "window", { configurable: true, value: {
+    location: { href: "https://tms.saturnusgo.com/testcases/umbrella-home/work/?workspaceId=workspace&projectId=project&lang=en", assign: (href: string) => destinations.push(href) },
+    addEventListener() {}, removeEventListener() {}, dispatchEvent() {},
+  } });
+  const h = fixture(true, true); let view!: ReactTestRenderer;
+  try {
+    await act(async () => { view = create(h.tree); });
+    await act(async () => view.root.findByProps({ "data-plan": "startup" }).props.onClick());
+    const wizard = view.root.findByType(StartupSetupScreen);
+    await act(async () => view.root.findByProps({ "data-wizard-next": "name" }).props.onClick());
+    await act(async () => view.root.findByProps({ "data-wizard-next": "address" }).props.onClick());
+    await act(async () => view.root.findByProps({ id: "startup-consent" }).props.onChange({ target: { checked: true } }));
+    await act(async () => view.root.findByProps({ "data-wizard-checkout": true }).props.onClick());
+    await act(async () => wizard.props.onConfirmCheckout("success"));
+    assert.equal(wizard.props.activated, false);
+    assert.equal(wizard.props.activationPending, true, "receipt metadata must keep the wizard in activation recovery");
+    const writesBeforeRetry = h.writes.length;
+    await act(async () => { await wizard.props.onContinue(); await wizard.props.onCheckout(); await wizard.props.onConfirmCheckout("success"); });
+    assert.deepEqual(destinations, []);
+    assert.equal(h.writes.length, writesBeforeRetry, "missing current authorization must block further commands");
+    await act(async () => { h.activate(); wizard.props.onRefreshBilling(); });
+    assert.equal(wizard.props.activated, true, "the completed receipt must survive temporary capability unavailability");
+    assert.equal(wizard.props.checkout?.status, "completed");
+    await act(async () => wizard.props.onContinue());
+    assert.deepEqual(destinations, ["/admin/?account=personal&workspaceId=workspace&lang=en&projectId=project&page=company"]);
+  } finally {
+    await act(async () => view?.unmount());
+    if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow); else Reflect.deleteProperty(globalThis, "window");
   }
 });

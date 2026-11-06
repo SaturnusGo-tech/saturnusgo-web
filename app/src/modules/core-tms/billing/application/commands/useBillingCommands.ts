@@ -12,7 +12,8 @@ export function useBillingCommands(options: Options) {
   const owns = () => owner.current.port === port && owner.current.workspaceId === workspaceId && owner.current.enabled === enabled && owner.current.reauthenticationScope === reauthenticationScope;
   useEffect(() => {
     retry.current = enabled && workspaceId ? restoreIdentityCheckout(reauthenticationScope, workspaceId) : null;
-    setState({ port, workspaceId, reauthenticationScope, busy: false, error: retry.current ? { code: "REAUTHENTICATION_REQUIRED", requestId: null, retryable: true } : null, canRetryCommand: !!retry.current, result: null });
+    setState(value => ({ port, workspaceId, reauthenticationScope, busy: false, error: retry.current ? { code: "REAUTHENTICATION_REQUIRED", requestId: null, retryable: true } : null, canRetryCommand: !!retry.current,
+      result: value.port === port && value.workspaceId === workspaceId && value.reauthenticationScope === reauthenticationScope && value.result?.checkout?.status === "completed" ? value.result : null }));
     return () => { active.current?.abort(); active.current = null; retry.current = null; };
   }, [port, workspaceId, enabled, reauthenticationScope]);
   async function execute(intent: BillingIntent, replay = false) {
@@ -37,6 +38,9 @@ export function useBillingCommands(options: Options) {
       if (failure.code === "BILLING_VERSION_CONFLICT" || failure.code === "PRECONDITION_REQUIRED" || failure.code === "BILLING_CHECKOUT_EXPIRED") callbacks.current.onConflict();
     } finally { if (active.current === controller) active.current = null; }
   }
-  const current = state.port === port && state.workspaceId === workspaceId && state.reauthenticationScope === reauthenticationScope && enabled ? state : { busy: false, error: null, canRetryCommand: false, result: null };
+  const sameOwner = state.port === port && state.workspaceId === workspaceId && state.reauthenticationScope === reauthenticationScope;
+  // A completed receipt is recovery metadata, never authorization for another command.
+  const current = sameOwner && enabled ? state : { busy: false, error: null, canRetryCommand: false,
+    result: sameOwner && state.result?.checkout?.status === "completed" ? state.result : null };
   return { ...current, execute, retryCommand: async () => { if (retry.current) await execute(retry.current.intent, true); } };
 }
