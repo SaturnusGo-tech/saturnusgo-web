@@ -119,6 +119,7 @@ for (const id of ["hero-preview", "hero-velvet", "repository-stage", "run-stage"
 if (process.env.OMIT_LINE_MARK !== "1") write("out/falcon/landing/2026-11/falcon-line-mark.svg", "Falcon line mark");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/achievements/")))}) if (process.env.OMIT_ACHIEVEMENT !== path) write("out" + path, "Approved achievement");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/billing/")))}) if (process.env.OMIT_BILLING !== path) write("out" + path, "Billing artwork");
+for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => path.startsWith("/falcon/startup/")))}) if (process.env.OMIT_STARTUP !== path) write("out" + path, "Company setup artwork");
 for (const id of ["coverage", "agents", "release"]) write("out/falcon/landing/2026-11/concept-" + id + ".webp", "Concept asset");
 for (const id of ["repository", "suites", "dashboard", "run", "integrations", "codex"]) write("out/falcon/landing/2026-11/product-" + id + ".webp", "Product screen");
 for (const path of ${JSON.stringify(requiredPublicAssets.filter(path => /^\/falcon\/landing\/2026-11\/(en|ru)\/product-/.test(path)))}) if (process.env.OMIT_LOCALIZED_PRODUCT !== path) write("out" + path, "Localized product screen");
@@ -266,6 +267,16 @@ test("fails closed before publishing when billing artwork is absent", (context) 
   const result = deploy(fixture, "--publish", { OMIT_BILLING: "/falcon/billing/startup.webp" });
   assert.equal(result.status, 15);
   assert.match(result.stderr, /Required public asset is missing.*billing\/startup\.webp/);
+  assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
+  assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
+});
+
+test("fails closed before publishing when company setup artwork is absent", (context) => {
+  const fixture = createFixture(context);
+  const before = git(fixture.pages, "rev-parse", "HEAD").stdout.trim();
+  const result = deploy(fixture, "--publish", { OMIT_STARTUP: "/falcon/startup/company-setup-tiles-20261106.webp" });
+  assert.equal(result.status, 15);
+  assert.match(result.stderr, /Required public asset is missing.*startup\/company-setup-tiles-20261106\.webp/);
   assert.equal(git(fixture.pages, "rev-parse", "HEAD").stdout.trim(), before);
   assert.equal(git(fixture.pages, "status", "--porcelain").stdout, "");
 });
