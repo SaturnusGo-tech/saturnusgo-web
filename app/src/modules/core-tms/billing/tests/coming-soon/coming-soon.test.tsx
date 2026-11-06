@@ -25,7 +25,7 @@ function providers(locale: "ru" | "en", http: TmsHttpClient, child: React.ReactN
 for (const locale of ["en", "ru"] as const) test(`production ${locale} setup is usable while payment remains disabled`, async () => {
   const environment = process.env.NODE_ENV; Reflect.set(process.env, "NODE_ENV", "production");
   const calls: string[] = []; let mutations = 0, view!: ReactTestRenderer;
-  const draft = { id: "setup", version: 1, displayName: "Team", slug: "team", hostname: "team-falcon.saturnusgo.com", status: "ready", expiresAt: "2026-11-06T12:30:00Z" };
+  const draft = { id: "setup", version: 1, displayName: "Team", slug: "team", hostname: "team-falcon.saturnusgo.com", status: "ready", expiresAt: "2027-11-06T12:30:00Z" };
   const http = { async getResource(path: string) { calls.push(path);
     if (path.startsWith("/billing/summary")) return { data: { workspaceKind: "personal", canManage: true, status: "trial", planId: null }, etag: null };
     if (path.startsWith("/billing/startup-setup")) return { data: { setup: draft }, etag: null };
@@ -38,9 +38,11 @@ for (const locale of ["en", "ru"] as const) test(`production ${locale} setup is 
     await act(async () => action.props.onClick());
     assert.ok(calls.includes("/billing/startup-setup?workspaceId=space"));
     assert.equal(view.root.findByProps({ id: "startup-name" }).props.required, true);
+    await act(async () => view.root.findByProps({ "data-wizard-next": "name" }).props.onClick());
     assert.equal(view.root.findByProps({ id: "startup-slug" }).props.required, true);
-    await act(async () => view.root.findByProps({ type: "checkbox" }).props.onChange({ target: { checked: true } }));
-    const checkout = view.root.findAllByType("button").find(node => node.children.includes(locale === "ru" ? "Перейти к оплате" : "Continue to checkout"))!;
+    await act(async () => view.root.findByProps({ "data-wizard-next": "address" }).props.onClick());
+    await act(async () => view.root.findByProps({ id: "startup-consent" }).props.onChange({ target: { checked: true } }));
+    const checkout = view.root.findByProps({ "data-wizard-checkout": true });
     assert.equal(checkout.props.disabled, true);
     await act(async () => checkout.props.onClick()); assert.equal(mutations, 0);
   } finally { await act(async () => view?.unmount()); if (environment === undefined) Reflect.deleteProperty(process.env, "NODE_ENV"); else Reflect.set(process.env, "NODE_ENV", environment); }

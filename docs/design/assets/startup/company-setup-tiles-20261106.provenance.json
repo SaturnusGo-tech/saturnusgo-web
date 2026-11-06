@@ -1,0 +1,22 @@
+{
+  "created": "2026-11-06",
+  "purpose": "Falcon company setup wizard decorative artwork",
+  "generator": "Built-in image_gen",
+  "asset": "company-setup-tiles-20261106.webp",
+  "original": "company-setup-tiles-20261106.png",
+  "dimensions": {
+    "width": 1024,
+    "height": 1536
+  },
+  "alpha": true,
+  "fullyTransparentPixels": 783542,
+  "totalPixels": 1572864,
+  "originalGeneration": "/Users/mercuryrucks/.codex/generated_images/01a1ae0d-c279-7e81-b878-94a2b076c3ad/exec-d46250f6-f9d1-4ddf-b7b0-e244ac3c674a.png",
+  "selectedGeneration": "/Users/mercuryrucks/.codex/generated_images/01a1ae0d-c279-7e81-b878-94a2b076c3ad/exec-7fa30a6d-4023-4c7b-9847-958b72005e8a.png",
+  "prompts": [
+    "Use case: stylized-concept\nAsset type: transparent decorative illustration for the right side of a fullscreen enterprise QA company-creation wizard.\nPrimary request: A refined, restrained 3D vector-style composition of four floating dark charcoal rounded-square tiles, viewed with subtle perspective and tilted at different angles, arranged in a tall airy staggered column. The tiles are independent objects with genuine transparent space between them. Top rear tile small with an abstract connected-three-nodes symbol; front upper-mid tile medium with a thick simple check mark inside a shield; lower-right tile large with an elegant abstract loop/ribbon; bottom-left tile small with a four-point sparkle. All symbols feel professional, geometric, bold and legible.\nComposition: portrait 2:3 format; stagger the tiles asymmetrically, avoid grid layout, maintain open transparent margins. Upper tiles overlap slightly, largest tile lower-right. Use flat dark faces (#181818), very thin blue/violet rim along top/right edges and a small white-lilac bevel along lower-left edges. Strong crisp silhouettes, shallow 3D thickness. This must be clean premium product illustration, similar sophistication to Firebase's illustrated onboarding tiles, but original QA imagery.\nColor palette: cool Falcon azure #339cff, periwinkle #7272ff, violet #815bea, pale lavender, charcoal. No orange/yellow, no busy glow, no stars scattered in background.\nLighting: crisp studio edge lighting, matte black surfaces, no ground plane, no background shadows beyond object edges.\nConstraints: genuinely transparent background; no text, letters, numbers, logos, Google or Firebase marks; no characters, no childish style, no photographs, no UI mockups, no background, no frame around composition.",
+    "Edit only the transparent space and outer lighting around these four tiles. Remove ALL broad blue, white and violet atmospheric glows/halos and background haze, leaving crisp hard-edged independent tiles against truly transparent background. Keep the four exact tile shapes, positions, proportions, perspective, charcoal faces and blue/violet symbols unchanged. Preserve subtle thin bevel edge lighting directly on tile edges but absolutely no light spilling into the surrounding transparent space. No background or ground plane. No new objects or text."
+  ],
+  "optimization": "cwebp -q 88 -alpha_q 100 -m 6; lossless alpha",
+  "notes": "Original QA symbols, no logos or text. No existing Falcon logo modified. Selected output retains subtle soft edge lighting beyond tile silhouettes."
+}

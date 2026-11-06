@@ -36,8 +36,13 @@ function fixture(locale: "ru" | "en", mode = "controlled_test", accountMode = mo
 }
 async function setup(view: ReactTestRenderer, locale: "ru" | "en") {
   await act(async () => view.root.findByProps({ "data-plan": "startup" }).props.onClick());
-  await act(async () => view.root.findByProps({ type: "checkbox" }).props.onChange({ target: { checked: true } }));
-  return view.root.findAllByType("button").find(node => node.children.includes(locale === "ru" ? "Перейти к оплате" : "Continue to checkout"))!;
+  await act(async () => view.root.findByProps({ "data-wizard-next": "name" }).props.onClick());
+  await act(async () => view.root.findByProps({ "data-wizard-next": "address" }).props.onClick());
+  assert.equal(view.root.findByProps({ "data-wizard-checkout": true }).props.disabled, true);
+  await act(async () => view.root.findByProps({ id: "startup-consent" }).props.onChange({ target: { checked: true } }));
+  const checkout = view.root.findByProps({ "data-wizard-checkout": true });
+  assert.ok(checkout.children.includes(locale === "ru" ? "Перейти к оплате" : "Continue to checkout"));
+  return checkout;
 }
 for (const locale of ["en", "ru"] as const) test(`production ${locale} controlled checkout uses the saved Startup setup and discloses no charge`, async () => {
   const environment = process.env.NODE_ENV; Reflect.set(process.env, "NODE_ENV", "production");

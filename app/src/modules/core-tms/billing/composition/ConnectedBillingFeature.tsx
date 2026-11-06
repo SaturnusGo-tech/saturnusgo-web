@@ -16,6 +16,8 @@ import { StartupHandoffStatus } from "../startup/presentation/StartupHandoffStat
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 import { createAdministrationClient } from "../../company-administration/data/administration-client";
 import { BillingIdentityConfirmation } from "../startup/presentation/confirmation/BillingIdentityConfirmation";
+import { completedStartupCheckout } from "../startup/domain/completed-startup";
+import { personalAdministrationUrl } from "../../company-administration/navigation/personal-administration-route";
 
 export function ConnectedBillingFeature({ workspaceId, preview = false, onClose }: { workspaceId: string; preview?: boolean; onClose?(): void }) {
   const http = useOptionalTmsHttpClient();
@@ -29,12 +31,14 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     reauthenticationScope: session?.subject ?? undefined,
     canManage: isolatedPreview || session?.workspaceRole === "workspace_admin" });
   const confirmationClient = useMemo(() => http ? createAdministrationClient(http) : null, [http]);
-  const handoff = useStartupWorkspaceTransition(billing.lastMutation, billing.summary, workspaceId, locale, isolatedPreview);
   const [setupOpen, setSetupOpen] = useState(false);
+  const handoff = useStartupWorkspaceTransition(billing.lastMutation, billing.summary, workspaceId, locale, isolatedPreview, !setupOpen);
   const setupApi = useMemo(() => http ? createStartupSetupApi(http) : null, [http]);
   const setup = useStartupSetup(setupApi, workspaceId, setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
   const checkoutMode = billingCheckoutMode(billing.summary, billing.account, process.env.NODE_ENV !== "production");
   const paymentsAvailable = billingPaymentsAvailable || checkoutMode !== "disabled";
+  const activated = completedStartupCheckout(billing.lastMutation, billing.summary, workspaceId) !== null;
+  const activationPending = !activated && billing.checkout?.status === "completed" && billing.checkout.planId === "startup" && billing.checkout.workspaceId === workspaceId;
   const identityConfirmation = billing.error?.code === "REAUTHENTICATION_REQUIRED" && session && <BillingIdentityConfirmation
     managed={session.kind === "managed"} client={confirmationClient} signOut={session.signOut}
     retry={async () => { if (paymentsAvailable) await billing.retryCommand(); }} busy={billing.busy || !paymentsAvailable} ru={locale === "ru"} />;
@@ -44,10 +48,18 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
       if (billing.canRetryCommand) { if (paymentsAvailable) void billing.retryCommand(); } else billing.reload();
     }}>{billing.canRetryCommand ? (locale === "ru" ? "Повторить то же действие" : "Retry the same action") : (locale === "ru" ? "Обновить данные" : "Refresh details")}</button>
   </div>);
-  if (setupOpen && billing.summary?.workspaceKind === "personal" && billing.checkout?.status !== "open") return <StartupSetupScreen key={workspaceId} model={setup} ru={locale === "ru"}
+  if (setupOpen) return <StartupSetupScreen key={workspaceId} model={setup} ru={locale === "ru"}
     plan={billing.account?.plans.find(plan => plan.id === "startup")} quote={billing.account?.checkoutQuotes.find(quote => quote.planId === "startup")}
     canCheckout={!!billing.account?.allowedCheckoutPlanIds.includes("startup")} paymentsAvailable={paymentsAvailable} busy={billing.busy || billing.canRetryCommand}
     checkoutNotice={checkoutNotice} controlledTest={checkoutMode === "controlled_test"}
+    checkout={billing.checkout?.planId === "startup" ? billing.checkout : null} activated={activated} activationPending={activationPending}
+    onRefreshBilling={billing.reload} onConfirmCheckout={async outcome => {
+      if (paymentsAvailable && billing.checkout?.planId === "startup") await billing.confirmCheckout(outcome);
+    }} onContinue={() => {
+      if (activated && billing.canManage && billing.summary?.teamAdministration && !billing.busy && !billing.canRetryCommand && typeof window !== "undefined") {
+        window.location.assign(session?.administrationPath ?? personalAdministrationUrl(window.location.href, workspaceId, "company"));
+      }
+    }}
     onBack={() => setSetupOpen(false)} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;

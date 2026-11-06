@@ -28,6 +28,7 @@ export const publicAssetPrefixes = Object.freeze([
 ]);
 
 export const requiredPublicAssets = Object.freeze([
+  "/falcon/startup/company-setup-tiles-20261106.webp",
   ...["individual", "startup", "enterprise"].map(id => `/falcon/billing/${id}.webp`),
   "/falcon/achievements/01-first-scenario.webp",
   "/falcon/achievements/02-product-map.webp",

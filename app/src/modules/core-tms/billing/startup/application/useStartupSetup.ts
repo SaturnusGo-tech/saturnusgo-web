@@ -38,6 +38,6 @@ export function useStartupSetup(port: StartupSetupPort | null, workspaceId: stri
   const { owner: _owner, ...visible } = current;
   return { ...visible, reload: () => refresh(value => value + 1),
     save: async (input: StartupSetupInput) => execute({ kind: "save", input, version: current.setup?.version ?? null, key: crypto.randomUUID() }),
-    retry: async () => { if (current.setup?.status === "failed") await execute({ kind: "retry", version: current.setup.version, key: crypto.randomUUID() }); },
-    retryCommand: async () => { if (uncertain.current) await execute(uncertain.current, true); } };
+    retry: async () => { if (current.setup?.status === "failed") return execute({ kind: "retry", version: current.setup.version, key: crypto.randomUUID() }); return false; },
+    retryCommand: async () => uncertain.current ? execute(uncertain.current, true) : false };
 }
