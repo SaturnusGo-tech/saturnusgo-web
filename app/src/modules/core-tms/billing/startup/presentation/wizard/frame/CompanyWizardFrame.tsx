@@ -2,7 +2,7 @@ import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import css from "../../startup.module.css";
-export function CompanyWizardFrame({ children, stage, ru, locked, onClose }: { children: ReactNode; stage: string; ru: boolean; locked: boolean; onClose(): void }) {
+export function CompanyWizardFrame({ children, footer, stage, ru, locked, onClose }: { children: ReactNode; footer?: ReactNode; stage: string; ru: boolean; locked: boolean; onClose(): void }) {
   const panel = useRef<HTMLElement>(null);
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -23,6 +23,7 @@ export function CompanyWizardFrame({ children, stage, ru, locked, onClose }: { c
     <div className={css.art} aria-hidden="true"><img src="/falcon/startup/company-setup-tiles-20261106.webp" width="1024" height="1536" alt="" /></div>
     <header className={css.header}><button type="button" disabled={locked} onClick={onClose} className={css.close} aria-label={ru ? "Закрыть создание компании" : "Close company setup"}><X size={24} /></button><span>{ru ? "Создать компанию" : "Create company"}</span></header>
     <div className={css.body} key={stage}>{children}</div>
+    {footer && <footer className={css.footer}>{footer}</footer>}
   </section>;
   return typeof document !== "undefined" ? createPortal(content, document.body) : content;
 }

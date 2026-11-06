@@ -38,7 +38,8 @@ async function responseData(response: Response): Promise<CloudSessionState> {
   const data = body && typeof body === "object" && "data" in body
     ? (body as { data: CloudSessionState }).data
     : null;
-  if (!data || typeof data.authenticated !== "boolean") {
+  if (!data || typeof data.authenticated !== "boolean" || data.authenticated
+    && Object.prototype.hasOwnProperty.call(data, "workspaceHandoff") && typeof data.workspaceHandoff !== "boolean") {
     throw new CloudAuthError(502, "Сервис авторизации вернул некорректный ответ.");
   }
   return data;

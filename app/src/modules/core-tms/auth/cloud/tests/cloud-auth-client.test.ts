@@ -84,3 +84,17 @@ test("cloud account requests use the private session cookie and stable workspace
     else process.env.NEXT_PUBLIC_TMS_API_BASE = originalBase;
   }
 });
+test("cloud session accepts boolean or absent handoff capability and rejects a malformed discriminator",async()=>{
+ const previous=globalThis.fetch;
+ try{
+  for(const capability of [undefined,false,true]){
+   globalThis.fetch=async()=>Response.json({data:{...session,...(capability===undefined?{}:{workspaceHandoff:capability})}});
+   const result=await readCloudSession();assert.equal(result.authenticated,true);
+   if(result.authenticated)assert.equal(result.workspaceHandoff,capability);
+  }
+  for(const capability of ["true",null,{},1]){
+   globalThis.fetch=async()=>Response.json({data:{...session,workspaceHandoff:capability}});
+   await assert.rejects(readCloudSession(),{status:502});
+  }
+ }finally{globalThis.fetch=previous;}
+});

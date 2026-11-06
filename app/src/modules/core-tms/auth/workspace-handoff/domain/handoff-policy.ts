@@ -1,6 +1,7 @@
 import type { WorkspaceHandoffNavigation, WorkspaceHandoffStart, WorkspaceTransitionTarget } from "./handoff-port";
 const path = "/testcases/umbrella-home/work/";
-const keys = ["projectId", "view", "settings", "integration", "plugin", "pluginSetup", "caseId", "folderId", "suiteId", "runId", "runItemId", "attemptId", "defectId", "environmentId", "portfolioId", "catalogProjectId"];
+const keys = ["projectId", "view", "settings", "integration", "plugin", "pluginSetup", "caseId", "folderId", "suiteId", "runId", "runItemId", "attemptId", "defectId", "environmentId", "portfolioId", "catalogProjectId", "article", "tab", "page"];
+const presentationKeys = new Set(["article", "tab", "page"]);
 const identifier = (value: unknown): value is string => typeof value === "string" && /^[A-Za-z0-9._:-]{1,128}$/.test(value);
 export type WorkspaceHandoffRoute = "workspace" | "company_admin" | "company_home";
 export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, workspaceId: string, href: string, locale: "en" | "ru", desktop: boolean, routeTarget: WorkspaceHandoffRoute = "workspace"): WorkspaceHandoffNavigation | null {
@@ -14,7 +15,11 @@ export function workspaceHandoffNavigation(target: WorkspaceTransitionTarget, wo
   if (routeTarget === "company_admin") route.searchParams.set("account", "personal");
   route.searchParams.set("workspaceId", workspaceId);
   if (routeTarget === "company_admin") route.searchParams.set("page", "company");
-  for (const key of routeTarget === "workspace" ? keys : ["projectId"]) { const value = source.searchParams.get(key); if (identifier(value) && source.searchParams.getAll(key).length === 1) route.searchParams.set(key, value); }
+  for (const key of routeTarget === "workspace" ? keys : ["projectId"]) {
+    const value = source.searchParams.get(key);
+    const safe = presentationKeys.has(key) ? typeof value === "string" && /^[A-Za-z][A-Za-z0-9_-]{0,64}$/.test(value) : identifier(value);
+    if (value !== null && safe && source.searchParams.getAll(key).length === 1) route.searchParams.set(key, value);
+  }
   route.searchParams.set("lang", locale);
   const fields: WorkspaceHandoffStart = { workspaceId, destinationOrigin: destination.origin, route: route.pathname + route.search, locale };
   if (desktop) return { kind: "desktop", url: `${source.origin}/desktop-workspace-transition/?${new URLSearchParams(fields)}` };

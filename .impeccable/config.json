@@ -64,6 +64,24 @@
         ],
         "createdAt": "2026-11-05T23:04:06.801Z",
         "reason": "Agent: DESIGN.md scopes its type ramp to public marketing; authenticated company setup follows the established Falcon settings UI scale."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "falcon shared sans",
+        "createdAt": "2026-11-06T11:41:18.163Z",
+        "reason": "Agent: Existing authenticated Shared Steps font; DESIGN.md explicitly governs public marketing only."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "falcon suites sans",
+        "createdAt": "2026-11-06T11:41:18.204Z",
+        "reason": "Agent: Existing authenticated Suites font; DESIGN.md explicitly governs public marketing only."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "falcon store sans",
+        "createdAt": "2026-11-06T11:41:18.246Z",
+        "reason": "Agent: Existing authenticated Integration catalog font; DESIGN.md explicitly governs public marketing only."
       }
     ]
   }

@@ -15,7 +15,7 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
   const previousFetch = globalThis.fetch;
   const previousBase = process.env.NEXT_PUBLIC_TMS_API_BASE;
   process.env.NEXT_PUBLIC_TMS_API_BASE = "https://api.example.test/api/v1";
-  const location = { href: "https://tms.example.test/testcases/umbrella-home/work/", origin: "https://tms.example.test", pathname: "/testcases/umbrella-home/work/", search: "", hash: "" };
+  const location = { href: "https://tms.saturnusgo.com/testcases/umbrella-home/work/", origin: "https://tms.saturnusgo.com", pathname: "/testcases/umbrella-home/work/", search: "", hash: "" };
   const events = new EventTarget();
   Object.assign(globalThis, { React, document: { title: "Falcon" }, window: { location, history: { replaceState() {} },
     addEventListener: events.addEventListener.bind(events), removeEventListener: events.removeEventListener.bind(events) } });
@@ -32,13 +32,14 @@ void test("central workspace accepts a verified personal cookie and anonymous vi
   const requests: string[] = [];
   globalThis.fetch = async url => {
     requests.push(String(url));
+    if (String(url).includes("/auth/workspace-target?")) return Response.json({ data: { workspaceId: "personal-space", generation: 1, destinationOrigin: location.origin } });
     if (String(url).endsWith("/auth/trial")) return new Promise<Response>(resolve => { resolveTrial = resolve; });
     if (String(url).endsWith("/me/profile")) return Response.json({ data: {
       id: "personal", name: "Pat QA", hasAvatar: true, version: 2, accountKind: "personal",
       avatar: { url: "https://media.example.test/avatar", expiresAt: "2099-01-01T00:00:00Z" },
     } });
     const data = String(url).endsWith("/auth/methods") ? { google: false, email: true, saml: false, signup: true }
-      : authenticated ? { authenticated: true, identity: { id: "personal", givenName: "Pat", familyName: "", email: "pat@example.test", phone: "", emailVerificationStatus: "verified", phoneVerificationStatus: "unverified" },
+      : authenticated ? { authenticated: true, workspaceHandoff: true, identity: { id: "personal", givenName: "Pat", familyName: "", email: "pat@example.test", phone: "", emailVerificationStatus: "verified", phoneVerificationStatus: "unverified" },
         workspace: { id: "personal-space", name: "Pat", slug: "pat" }, membership: { role: "workspace_admin" },
         defaultProject: { id: "project", name: "First", slug: "first" }, defaultEnvironment: { id: "environment", name: "Default" } }
         : { authenticated: false };

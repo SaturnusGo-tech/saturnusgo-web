@@ -10,6 +10,6 @@ export function readWorkspaceHandoffPolicy(request,response,audience,env) {
  if(!['tenant','personal'].includes(audience)||!route||response.status!==200||
   !/^text\/html(?:;|$)/i.test(response.headers.get('content-type')??''))return null;
  const policy=response.headers.get('content-security-policy')??'';
- const match=/^default-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' (https:\/\/[^\s;,<>"'\\*]+); script-src 'nonce-([A-Za-z0-9_-]{32})'$/.exec(policy);
+ const match=/^default-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' (https:\/\/[^\s;,<>"'\\*]+); script-src 'nonce-([A-Za-z0-9_-]{32})'(?:; style-src 'nonce-\2')?$/.exec(policy);
  return match&&workspaceHandoffOriginAllowed(match[1],env)?policy:null;
 }

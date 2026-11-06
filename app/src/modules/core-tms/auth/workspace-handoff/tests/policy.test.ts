@@ -33,3 +33,17 @@ test("purchased company reentry opens its home without restoring subscription se
  assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
  assert.equal(result.fields.route,"/testcases/umbrella-home/work/?workspaceId=space&projectId=project&lang=ru");
 });
+test("explicit help navigation preserves safe article, tab and page in browser and desktop handoffs",()=>{
+ for(const desktop of [false,true]){
+  const result=workspaceHandoffNavigation(target,"space","https://tms.saturnusgo.com/testcases/umbrella-home/work/?view=help&article=falcon-ai-chat&tab=guide&page=overview", "en",desktop)!;
+  const fields=result.kind==="browser"?result.fields:Object.fromEntries(new URL(result.url).searchParams);
+  const query=new URL(String(fields.route),"https://tms.saturnusgo.com").searchParams;
+  assert.equal(query.get("article"),"falcon-ai-chat");assert.equal(query.get("tab"),"guide");assert.equal(query.get("page"),"overview");
+ }
+});
+test("navigation handoff omits duplicate and unsafe presentation routes without carrying credentials",()=>{
+ const result=workspaceHandoffNavigation(target,"space","https://tms.saturnusgo.com/testcases/umbrella-home/work/?article=first&article=second&tab=https%3A%2F%2Fevil.test&page=..%2Fadmin&authorization=secret","en",false)!;
+ assert.equal(result.kind,"browser");if(result.kind!=="browser")return;
+ const query=new URL(result.fields.route,"https://tms.saturnusgo.com").searchParams;
+ for(const key of ["article","tab","page","authorization"])assert.equal(query.has(key),false);
+});

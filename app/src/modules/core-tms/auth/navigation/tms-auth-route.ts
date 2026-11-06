@@ -1,7 +1,7 @@
 export const TMS_AUTH_ROUTE_PATH = "/testcases/umbrella-home/work/";
 export const TMS_ADMIN_LOGIN_PATH = `${TMS_AUTH_ROUTE_PATH}?auth=admin`;
 export const TMS_AUTH_LOGOUT_INTENT_KEY = "tms.auth.explicit-logout.v1";
-export const TMS_AUTH_PRODUCTION_SIGNED_OUT_URL = "https://tms.saturnusgo.com/";
+export const TMS_AUTH_PRODUCTION_SIGNED_OUT_URL = "https://tms.saturnusgo.com/cloud-login/";
 
 const authCallbackParameters = [
   "code",
@@ -81,7 +81,7 @@ export function tmsSignedOutDestination(location: {
 }): string {
   return location.hostname === "tms.saturnusgo.com"
     ? TMS_AUTH_PRODUCTION_SIGNED_OUT_URL
-    : new URL("/", location.origin).href;
+    : new URL("/cloud-login/", location.origin).href;
 }
 
 export function rememberTmsLogoutIntent(
@@ -116,6 +116,6 @@ export function safeTmsReturnPath(candidate: unknown): string {
       && parsed.pathname === TMS_AUTH_ROUTE_PATH
       && candidate.startsWith("/")
     ) return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {}
+  } catch { /* Invalid return paths use the default workspace route. */ }
   return TMS_AUTH_ROUTE_PATH;
 }

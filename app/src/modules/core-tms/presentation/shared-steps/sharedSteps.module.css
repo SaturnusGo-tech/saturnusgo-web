@@ -37,7 +37,7 @@
 .view, .editor { font: 400 14px/1.45 "Falcon Shared Sans", system-ui, sans-serif; }
 .view *, .editor * { box-sizing: border-box; }
 .view { display: block; overflow: auto; padding: 26px 30px 56px; container: shared-steps / inline-size; scrollbar-color: var(--falcon-border-subtle) transparent; }
-.page { width: min(100%, 1050px); margin-inline: auto; }
+.page { width: 100%; }
 .header { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 44px; margin-bottom: 28px; }
 .header h1 { margin: 0; font-size: 24px; font-weight: 500; line-height: 34px; letter-spacing: -.025em; }
 .header h1 span { margin-left: 9px; color: var(--falcon-text-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }

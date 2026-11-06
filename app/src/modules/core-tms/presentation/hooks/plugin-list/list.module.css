@@ -1,4 +1,4 @@
-.page { width: min(100%, 940px); margin-inline: auto; }
+.page { width: 100%; }
 .header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 38px; }
 .header h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 36px; letter-spacing: -.025em; }
 .header p { margin: 6px 0 0; color: var(--plugin-muted); font-size: 14px; }

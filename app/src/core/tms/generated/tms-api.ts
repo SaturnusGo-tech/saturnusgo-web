@@ -6547,6 +6547,8 @@ export interface components {
         CloudAuthenticatedSession: {
             /** @constant */
             authenticated: true;
+            /** @description True only for an authenticated profile-backed personal session. Resolve the authoritative workspace-target before rendering the workspace. Legacy cloud sessions omit this optional capability; false or absence does not enable handoff. This flag grants no workspace or domain permission. */
+            workspaceHandoff?: boolean;
             identity: {
                 id: components["schemas"]["Identifier"];
                 givenName: string;
@@ -25032,6 +25034,16 @@ export interface operations {
                     "text/html": string;
                 };
             };
+            /** @description Accept: text/html returns to the fixed trusted central cloud-login workspace preparation continuation when the verified company alias is still preparing. No session cookie is issued. JSON clients retain HANDOFF_TARGET_PREPARING (409). */
+            303: {
+                headers: {
+                    Location?: string;
+                    "Cache-Control": components["headers"]["CacheControlNoStore"];
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
@@ -25069,7 +25081,7 @@ export interface operations {
                     "application/json": components["schemas"]["WorkspaceHandoffConsumedEnvelope"];
                 };
             };
-            /** @description Top-level browser form with Accept: text/html consumes the code and redirects to the permitted local app route. */
+            /** @description Top-level browser form with Accept: text/html consumes the code and redirects to the permitted local app route. If the alias is preparing, the source session and stored workspace/host/generation/Origin binding are revalidated before redirecting to the fixed trusted central cloud-login workspace preparation continuation; no session cookie is issued or code consumed in that case. JSON clients retain HANDOFF_TARGET_PREPARING (409). */
             303: {
                 headers: {
                     Location?: string;

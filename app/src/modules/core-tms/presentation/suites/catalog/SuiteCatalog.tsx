@@ -19,7 +19,7 @@ export function SuiteCatalog(props: Props) {
   const { locale, t } = useTmsLocale(); const ru = locale === "ru";
   const rows = filterSuiteCatalog(props.suites, props.query, props.filter, props.sort, locale);
   const date = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
-  return <div className={shared.page}>
+  return <div className={shared.catalogPage}>
     <header className={shared.header}>
       <div><h1>{t("suite.title")} <span>{props.suites.length}</span></h1></div>
       <div className={css.toolbar}>

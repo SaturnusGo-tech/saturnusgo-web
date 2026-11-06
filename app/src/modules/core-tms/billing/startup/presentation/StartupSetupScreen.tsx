@@ -35,7 +35,8 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
   }
   async function retryPreparation() { if (await model.retry()) wizard.go("consent"); }
   async function retryCommand() { if (await model.retryCommand() && stage === "preparing") wizard.go("consent"); }
-  return <CompanyWizardFrame stage={stage} ru={ru} locked={locked || activationPending || transitionPending} onClose={onBack}>
+  return <CompanyWizardFrame stage={stage} ru={ru} locked={locked || activationPending || transitionPending} onClose={onBack}
+    footer={controlledTest && stage !== "identity" && stage !== "checkout" && stage !== "success" && <p className={css.testNotice}>{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}>
     {stage === "identity" && identityConfirmation}
     {(stage === "name" || stage === "address") && <CompanyIdentityStep wizard={wizard} ru={ru} busy={locked} error={fieldError} onClose={onBack} />}
     {stage === "legal" && <CompanyLegalStep wizard={wizard} ru={ru} busy={locked} />}
@@ -58,6 +59,5 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
     {stage !== "identity" && error && !fieldError && <div className={css.recovery} role="alert"><p>{ru ? "Не удалось продолжить. Ваши данные сохранены." : "Could not continue. Your details are saved."}</p></div>}
     {model.canRetryCommand ? <div className={css.recovery}><button type="button" disabled={busy || model.busy} onClick={() => void retryCommand()}>{ru ? "Повторить то же действие" : "Retry the same action"}</button></div> : error && <div className={css.recovery}><button type="button" disabled={locked} onClick={model.reload}>{ru ? "Обновить данные" : "Refresh details"}</button></div>}
     {stage !== "identity" && checkoutNotice && <div className={css.checkoutNotice}>{checkoutNotice}</div>}
-    {controlledTest && stage !== "identity" && stage !== "checkout" && stage !== "success" && <p className={css.testNotice}>{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}
   </CompanyWizardFrame>;
 }

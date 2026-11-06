@@ -111,20 +111,20 @@ test("consumes an explicit logout intent and exits instead of auto-login", () =>
   );
 });
 
-test("leaves the protected production host after an explicit logout", () => {
+test("returns directly to sign-in after an explicit logout", () => {
   assert.equal(
     tmsSignedOutDestination({
       hostname: "tms.saturnusgo.com",
       origin: "https://tms.saturnusgo.com",
     }),
-    "https://tms.saturnusgo.com/",
+    "https://tms.saturnusgo.com/cloud-login/",
   );
   assert.equal(
     tmsSignedOutDestination({
       hostname: "localhost",
       origin: "http://localhost:3000",
     }),
-    "http://localhost:3000/",
+    "http://localhost:3000/cloud-login/",
   );
 });
 

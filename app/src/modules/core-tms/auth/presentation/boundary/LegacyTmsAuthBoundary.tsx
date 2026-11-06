@@ -18,6 +18,8 @@ import { CloudTmsGate } from "../gate/CloudTmsGate";
 import { AuthContinuation } from "../../continuation/composition/AuthContinuation";
 import { SignInFeature } from "../../sign-in/composition/SignInFeature";
 import { TmsAuthState } from "../state/TmsAuthState";
+import { AuthenticatedWorkspaceHandoff } from "../../workspace-handoff/composition/AuthenticatedWorkspaceHandoff";
+import { continuationFromLocation, hasContinuationContext } from "../../continuation/domain/continuation-path";
 
 const configuration = readTmsAuth0Configuration({
   NEXT_PUBLIC_AUTH0_DOMAIN: process.env.NEXT_PUBLIC_AUTH0_DOMAIN,
@@ -59,7 +61,7 @@ function AdminAuthBoundary({ children, apiBase }: { readonly children: ReactNode
 }
 
 type CloudProbe = { readonly stage: "checking" | "admin" | "signin" }
-  | { readonly stage: "cloud"; readonly session: CloudSession }
+  | { readonly stage: "cloud"; readonly session: CloudSession; readonly explicitContext: boolean }
   | { readonly stage: "unavailable" };
 
 export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { readonly children: ReactNode; readonly verifiedSession?: CloudSession | null }) {
@@ -68,10 +70,15 @@ export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { re
   const [probeVersion, setProbeVersion] = useState(0);
 
   useEffect(() => {
+    const openCloud = (session: CloudSession) => {
+      const original = continuationFromLocation(window.location);
+      const explicitContext = original !== null && hasContinuationContext(original, window.location.origin);
+      const path = cloudWorkspacePathFromLocation(window.location, session);
+      if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== path) window.history.replaceState({}, document.title, path);
+      setProbe({ stage: "cloud", session, explicitContext });
+    };
     if (verifiedSession) {
-      const path=cloudWorkspacePathFromLocation(window.location,verifiedSession);
-      if(`${window.location.pathname}${window.location.search}${window.location.hash}`!==path)window.history.replaceState({},document.title,path);
-      setProbe({stage:"cloud",session:verifiedSession});return;
+      openCloud(verifiedSession);return;
     }
     if (shouldUseAdminAuth(window.location.search)) {
       setProbe({ stage: "admin" });
@@ -81,11 +88,7 @@ export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { re
     resolveCloudSessionProbe(() => readCloudSession(controller.signal)).then((result) => {
       if (controller.signal.aborted) return;
       if (result.stage === "cloud") {
-        const contextualPath = cloudWorkspacePathFromLocation(window.location, result.session);
-        if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== contextualPath) {
-          window.history.replaceState({}, document.title, contextualPath);
-        }
-        setProbe(result);
+        openCloud(result.session);
         return;
       }
       setProbe(result.stage === "admin" ? { stage: "signin" } : result);
@@ -106,8 +109,13 @@ export function LegacyTmsAuthBoundary({ children, verifiedSession = null }: { re
     );
   }
   if (probe.stage === "cloud") {
-    return <AuthContinuation key={probe.session.workspace.id} workspaceId={probe.session.workspace.id}>
+    const content = <AuthContinuation workspaceId={probe.session.workspace.id} explicitContext={probe.explicitContext}>
       <CloudTmsGate apiBase="/api/v1" session={probe.session}>{children}</CloudTmsGate>
+    </AuthContinuation>;
+    return <AuthContinuation key={probe.session.workspace.id} workspaceId={probe.session.workspace.id} deferBrowserContinuation>
+      {probe.session.workspaceHandoff === true ? <AuthenticatedWorkspaceHandoff workspaceId={probe.session.workspace.id} routeTarget={probe.explicitContext ? "workspace" : "company_home"}>
+        {content}
+      </AuthenticatedWorkspaceHandoff> : content}
     </AuthContinuation>;
   }
   if (probe.stage === "signin") return <SignInFeature />;

@@ -4,7 +4,7 @@ import test from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useTmsSession } from "../../../presentation/session/TmsSessionContext";
-void test("personal logout returns native Falcon to sign-in while ordinary browser logout keeps its destination", async t => {
+void test("personal logout returns native Falcon and ordinary browsers directly to sign-in", async t => {
   const require = createRequire(import.meta.url), css = require.extensions[".css"];
   require.extensions[".css"] = module => { module.exports = {}; };
   const prior = ["window", "navigator", "React", "fetch"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
@@ -22,7 +22,7 @@ void test("personal logout returns native Falcon to sign-in while ordinary brows
   const session = { authenticated: true, identity: { id: "person", givenName: "Pat", familyName: "", email: "pat@example.test" },
     workspace: { id: "personal-space" }, membership: { role: "workspace_admin" } } as Session;
   function Probe() { signOut = useTmsSession().signOut; return <div />; }
-  for (const [userAgent, destination] of [["Electron/45 FalconDesktop/0.2.1", "/cloud-login/"], ["Chrome/150", "/"]]) {
+  for (const [userAgent, destination] of [["Electron/45 FalconDesktop/0.2.1", "/cloud-login/"], ["Chrome/150", "/cloud-login/"]]) {
     Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent } });
     await act(async () => { view = create(<CloudTmsGate apiBase="/api/v1" session={session}><Probe /></CloudTmsGate>); });
     await act(async () => { await signOut(); });
