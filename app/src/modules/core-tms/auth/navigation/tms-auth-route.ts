@@ -20,8 +20,10 @@ export function shouldUseAdminAuth(search: string): boolean {
     || parameters.has("error");
 }
 
-export function tmsAdminLogoutReturnTo(origin: string): string {
-  return new URL(TMS_ADMIN_LOGIN_PATH, origin).href;
+export function tmsAdminLogoutReturnTo(origin: string, locale?: "en" | "ru"): string {
+  const destination = new URL(TMS_ADMIN_LOGIN_PATH, origin);
+  if (locale) destination.searchParams.set("lang", locale);
+  return destination.href;
 }
 
 export type TmsLogoutIntentStatus = "checking" | "absent" | "present";
@@ -79,10 +81,11 @@ export function tmsReturnPathFromLocation(location: {
 export function tmsSignedOutDestination(location: {
   readonly hostname: string;
   readonly origin: string;
-}): string {
-  return location.hostname === "tms.saturnusgo.com"
-    ? TMS_AUTH_PRODUCTION_SIGNED_OUT_URL
-    : new URL("/cloud-login/", location.origin).href;
+}, locale: "en" | "ru" = "en"): string {
+  const production = location.hostname === "saturnusgo.com" || location.hostname.endsWith(".saturnusgo.com");
+  const destination = new URL(production ? TMS_AUTH_PRODUCTION_SIGNED_OUT_URL : "/cloud-login/", location.origin);
+  destination.searchParams.set("lang", locale);
+  return destination.href;
 }
 
 export function rememberTmsLogoutIntent(

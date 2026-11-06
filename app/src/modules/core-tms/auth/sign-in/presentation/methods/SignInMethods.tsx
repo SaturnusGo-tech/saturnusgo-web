@@ -15,10 +15,17 @@ export function SignInMethods({ signIn, copy, signup, companyLogin, locale = "en
   const { state } = signIn;
   const [desktop, setDesktop] = useState(false);
   useEffect(() => { setDesktop(isFalconDesktop()); }, []);
-  const handoff = (method: "google" | "email" | "saml") => {
+  const handoff = (method: "google" | "email" | "saml" | "company") => {
     if (!desktop) return false;
     const ids = new URLSearchParams(window.location.search).getAll("workspaceId");
     window.location.assign(desktopSignInCommand(method, locale, ids.length === 1 ? ids[0] : undefined)); return true;
+  };
+  const chooseCompany = () => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("workspaceId")) {
+      const destination = new URL(window.location.href);destination.searchParams.delete("workspaceId");
+      window.history.replaceState(window.history.state, "", `${destination.pathname}${destination.search}${destination.hash}`);
+    }
+    if (!handoff("company")) signIn.select("company");
   };
   const signupBlocked = signup && !state.methods?.signup;
   return <div className={styles.methodStack}>
@@ -30,6 +37,8 @@ export function SignInMethods({ signIn, copy, signup, companyLogin, locale = "en
       onClick={() => { if (!handoff("email")) { if (companyLogin) companyLogin(); else signIn.select("email"); } }}><Mail size={18} aria-hidden="true" />{copy.email}</button>
     {!signup && <button className={styles.primary} disabled={state.pending || state.loading || !state.methods?.saml}
       onClick={() => { if (!handoff("saml")) signIn.select("saml"); }}><Building2 size={18} aria-hidden="true" />{copy.saml}</button>}
+    {!signup && !companyLogin && <button className={styles.secondary} disabled={state.pending || state.loading}
+      onClick={chooseCompany}><Building2 size={18} aria-hidden="true" />{copy.companyWorkspace}</button>}
     {signupBlocked && !state.loading && <p className={styles.lead} role="status">{copy.signupOff}</p>}
     {state.pending && <button className={styles.linkButton} onClick={signIn.back}>{copy.cancel}</button>}
   </div>;

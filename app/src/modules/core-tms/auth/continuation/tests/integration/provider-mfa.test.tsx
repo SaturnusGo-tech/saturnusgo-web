@@ -133,5 +133,5 @@ void test("company auth Worker redirect preserves the desktop entry through MFA 
   assert.ok(values.has(DESKTOP_ATTEMPT_KEY));
   await act(async () => view.root.findAllByType("button").find(button => button.children.includes("Back to sign-in"))!.props.onClick());
   assert.equal(values.has(DESKTOP_ATTEMPT_KEY), false, "explicit company sign-in cancellation clears app continuation");
-  assert.deepEqual(destinations, []);
+  assert.deepEqual(destinations, [`${origin}/cloud-login/?lang=en`], "successful cancellation leaves the company sign-in flow");
 });

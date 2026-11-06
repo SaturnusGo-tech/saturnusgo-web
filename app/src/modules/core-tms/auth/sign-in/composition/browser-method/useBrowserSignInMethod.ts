@@ -8,7 +8,7 @@ export function useBrowserSignInMethod(signIn: ReturnType<typeof useSignIn>, { m
  const [requested] = useState(() => {
   if (typeof window === "undefined") return null;
   const values = new URLSearchParams(window.location.search).getAll("method");
-  return values.length === 1 && ["google", "email", "saml"].includes(values[0]) ? values[0] : null;
+  return values.length === 1 && ["google", "email", "saml", "company"].includes(values[0]) ? values[0] : null;
  });
  const consumed = useRef(false);
  useEffect(() => {
@@ -19,6 +19,6 @@ export function useBrowserSignInMethod(signIn: ReturnType<typeof useSignIn>, { m
   window.history?.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
   if (requested === "google") void signIn.google();
   else if (requested === "saml") signIn.select("saml");
-  else if (!managed) signIn.select("email");
+  else if (!managed) signIn.select(requested === "company" ? "company" : "email");
  }, [requested, signIn, managed, proof]);
 }

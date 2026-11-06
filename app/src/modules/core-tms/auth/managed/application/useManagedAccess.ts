@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ManagedAccessPort } from "./managed-access-port";
 import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
+import { tmsSignedOutDestination } from "../../navigation/tms-auth-route";
 import { CompanyAccessError, type CompanyEntrypoint, type CompanySession, type MfaEnrollment }
   from "../domain/managed-access";
 
@@ -18,7 +19,7 @@ export interface ManagedAccessState {
 const initial: ManagedAccessState = { loading: true, pending: false, entrypoint: null,
   session: null, error: null, enrollment: null, recoveryCodes: [] };
 
-export function useManagedAccess(client: ManagedAccessPort) {
+export function useManagedAccess(client: ManagedAccessPort, locale: "en" | "ru" = "en") {
   const [state, setState] = useState(initial);
   const current = useRef<AbortController | null>(null);
   const pending = useRef(false);
@@ -108,13 +109,34 @@ export function useManagedAccess(client: ManagedAccessPort) {
     } finally { pending.current = false; }
   };
 
+  const logout = async () => {
+    if (pending.current) return;
+    pending.current = true;
+    current.current?.abort();
+    const controller = new AbortController(); current.current = controller;
+    setState(value => ({ ...value, pending: true, error: null }));
+    try {
+      await client.logout(controller.signal);
+      if (controller.signal.aborted) return;
+      clearBrowserDesktopAttempt();
+      setState(value => ({ ...value, loading: false, pending: false, error: null,
+        session: { authenticated: false, stage: "anonymous" }, enrollment: null, recoveryCodes: [] }));
+      if (typeof window !== "undefined") window.location.assign(tmsSignedOutDestination(window.location, locale));
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      setState(value => ({ ...value, pending: false,
+        error: error instanceof CompanyAccessError ? error.code : "SERVICE_UNAVAILABLE" }));
+      throw error;
+    } finally { if (current.current === controller) pending.current = false; }
+  };
+
   return { state, refresh, prepareMfa,
     login: (login: string, password: string) => perform((signal) => client.login({ login, password }, signal)),
     firstPassword: (password: string) => perform((signal) => client.firstPassword(password, signal)),
     verify: (kind: "totp" | "recovery", code: string) => perform(async (signal) => {
       const result = await client.verifyMfa(kind, code, signal); return { recoveryCodes: result.recoveryCodes };
     }),
-    logout: () => { clearBrowserDesktopAttempt(); return perform((signal) => client.logout(signal), true); },
+    logout,
     acknowledgeCodes: () => setState((value) => ({ ...value, recoveryCodes: [] })),
   };
 }

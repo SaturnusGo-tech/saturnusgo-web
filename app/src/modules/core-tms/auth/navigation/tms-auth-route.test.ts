@@ -117,15 +117,27 @@ test("returns directly to sign-in after an explicit logout", () => {
       hostname: "tms.saturnusgo.com",
       origin: "https://tms.saturnusgo.com",
     }),
-    "https://tms.saturnusgo.com/cloud-login/",
+    "https://tms.saturnusgo.com/cloud-login/?lang=en",
   );
   assert.equal(
     tmsSignedOutDestination({
       hostname: "localhost",
       origin: "http://localhost:3000",
     }),
-    "http://localhost:3000/cloud-login/",
+    "http://localhost:3000/cloud-login/?lang=en",
   );
+});
+
+test("production company logout returns to the canonical login and preserves the chosen language", () => {
+  for (const hostname of ["tms.saturnusgo.com", "umbrella-falcon.saturnusgo.com", "custom.saturnusgo.com"]) {
+    for (const locale of ["en", "ru"] as const) {
+      assert.equal(tmsSignedOutDestination({ hostname, origin: `https://${hostname}` }, locale),
+        `https://tms.saturnusgo.com/cloud-login/?lang=${locale}`);
+    }
+  }
+  for (const origin of ["http://localhost:3000", "https://preview.example.test", "https://tms.saturnusgo.com.evil.test"]) {
+    assert.equal(tmsSignedOutDestination(new URL(origin), "ru"), `${origin}/cloud-login/?lang=ru`);
+  }
 });
 
 test("keeps a dual-session Auth0 logout on the admin gate until its intent is consumed", () => {
@@ -135,6 +147,13 @@ test("keeps a dual-session Auth0 logout on the admin gate until its intent is co
     "https://tms.saturnusgo.com/work/?auth=admin",
   );
   assert.equal(shouldUseAdminAuth(new URL(returnTo).search), true);
+});
+
+test("preserves admin selection and language through the Auth0 logout round trip", () => {
+  const returnTo = tmsAdminLogoutReturnTo("https://umbrella-falcon.saturnusgo.com", "ru");
+  assert.equal(returnTo, "https://umbrella-falcon.saturnusgo.com/work/?auth=admin&lang=ru");
+  assert.equal(shouldUseAdminAuth(new URL(returnTo).search), true);
+  assert.equal(tmsSignedOutDestination(new URL(returnTo), "ru"), "https://tms.saturnusgo.com/cloud-login/?lang=ru");
 });
 
 test("keeps Auth0 redirects inside the stable lowercase TMS route", () => {

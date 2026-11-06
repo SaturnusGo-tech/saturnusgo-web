@@ -40,9 +40,9 @@ void test("only corporate SAML is primary; Google and email stay secondary with 
   await act(async () => { view = create(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup={false} />); });
   t.after(async () => { await act(async () => view.unmount()); });
   const buttons = view.root.findAllByType("button");
-  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary"]);
+  assert.deepEqual(buttons.map(button => button.props.className), ["secondary", "secondary", "primary", "secondary"]);
   await act(async () => { for (const button of buttons) button.props.onClick(); });
-  assert.deepEqual(calls, ["google", "email", "saml"]);
+  assert.deepEqual(calls, ["google", "email", "saml", "company"]);
   await act(async () => { view.update(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup />); });
   assert.deepEqual(view.root.findAllByType("button").map(button => button.props.className), ["secondary", "secondary"]);
 });
@@ -63,4 +63,22 @@ void test("SAML unavailable explains company setup instead of asking the user to
   assert.ok(fallback, "the SSO form itself must offer company discovery after unavailable SAML");
   await act(async () => fallback.props.onClick());
   assert.deepEqual(discovered, ["fixture-company"]);
+});
+
+void test("Company workspace remains available without SAML and is absent after choosing a company", async t => {
+  setup(t);
+  const { SignInMethods } = await import("../../presentation/methods/SignInMethods");
+  const calls: string[] = [];
+  const signIn = { state: { methods: { google: true, email: true, saml: false, signup: true }, pending: false, loading: false },
+    select: (method: string) => calls.push(method) } as unknown as ReturnType<typeof useSignIn>;
+  let view!: ReturnType<typeof create>;
+  await act(async () => { view = create(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup={false} />); });
+  t.after(async () => { await act(async () => view.unmount()); });
+  const company = view.root.findAllByType("button").find(button => button.children.includes("Company workspace"));
+  assert.ok(company, "company discovery is independent from configured SAML");
+  assert.equal(company.props.disabled, false);
+  await act(async () => company.props.onClick());
+  assert.deepEqual(calls, ["company"]);
+  await act(async () => view.update(<SignInMethods signIn={signIn} copy={signInCopy("en")} signup={false} companyLogin={() => {}} />));
+  assert.equal(view.root.findAllByType("button").some(button => button.children.includes("Company workspace")), false);
 });

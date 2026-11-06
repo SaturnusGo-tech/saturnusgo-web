@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { createAttachmentClient } from "../../../attachments/create-attachment-client";
 import { AttachmentClientProvider } from "../../../attachments/presentation/context/AttachmentClientProvider";
@@ -10,7 +10,8 @@ import { createAuthenticatedTmsHttpClient } from "../../http/createAuthenticated
 import { TmsHttpClientProvider } from "../../http/TmsHttpClientContext";
 import { TrialFeature } from "../../sign-in/composition/TrialFeature";
 import { clearBrowserDesktopAttempt } from "../../continuation/desktop/browser-desktop-attempt";
-import { signedOutPath } from "../../sign-in/domain/desktop-mode";
+import { tmsSignedOutDestination } from "../../navigation/tms-auth-route";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 import { useSelfProfileIdentity } from "../../composition/session/profile/useSelfProfileIdentity";
 
@@ -23,6 +24,8 @@ export function CloudTmsGate({
   readonly children: ReactNode;
   readonly session: CloudSession;
 }) {
+  const { locale } = useTmsLocale();
+  const signingOut = useRef(false);
   const [resolvedKind, setResolvedKind] = useState<{ workspaceId: string; kind: "personal" | "company" }>();
   const workspaceKind = resolvedKind?.workspaceId === session.workspace.id ? resolvedKind.kind : undefined;
   const onKindChange = useCallback((kind: "personal" | "company") => {
@@ -53,11 +56,15 @@ export function CloudTmsGate({
     updateProfile,
     avatarLoader,
     signOut: async () => {
-      clearBrowserDesktopAttempt();
-      await logoutCloudSession();
-      window.location.replace(signedOutPath());
+      if (signingOut.current) return;
+      signingOut.current = true;
+      try {
+        await logoutCloudSession();
+        clearBrowserDesktopAttempt();
+        window.location.replace(tmsSignedOutDestination(window.location, locale));
+      } finally { signingOut.current = false; }
     },
-  }), [session.identity.id, session.workspace.id, session.membership.role, workspaceKind, profile, updateProfile, avatarLoader]);
+  }), [session.identity.id, session.workspace.id, session.membership.role, workspaceKind, profile, updateProfile, avatarLoader, locale]);
 
   return (
     <TmsSessionProvider value={sessionIdentity}>

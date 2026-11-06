@@ -30,7 +30,7 @@ export function WorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
   return <ManagedWorkspaceMfaHandoff workspaceId={workspaceId}/>;
 }
 export function ManagedWorkspaceMfaHandoff({workspaceId}:{workspaceId:string}) {
-  const {locale}=useTmsLocale(),client=useMemo(()=>createManagedAccessClient(),[]),access=useManagedAccess(client);
+  const {locale}=useTmsLocale(),client=useMemo(()=>createManagedAccessClient(),[]),access=useManagedAccess(client,locale);
   const session=access.state.session,ru=locale==="ru";
   if(access.state.loading)return <ManagedAccessScreen access={access}/>;
   if(!session||session.stage==="anonymous")return <div role="alert"><p>{ru?"Войдите снова, чтобы открыть это пространство.":"Sign in again to open this workspace."}</p><a href={`/cloud-login/?lang=${locale}`}>{ru?"Войти":"Sign in"}</a></div>;

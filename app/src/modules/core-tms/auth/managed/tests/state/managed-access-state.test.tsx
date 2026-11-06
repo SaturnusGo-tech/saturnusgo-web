@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { test } from "node:test";
+import { test, type TestContext } from "node:test";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { useManagedAccess } from "../../application/useManagedAccess";
@@ -9,7 +9,7 @@ import { CompanyAccessError, type CompanyEntrypoint, type CompanySession } from 
 import { TmsLocaleContext } from "../../../../localization/context/TmsLocaleProvider";
 
 let current: ReturnType<typeof useManagedAccess>;
-function Probe({ client }: { client: ManagedAccessPort }) { current = useManagedAccess(client); return null; }
+function Probe({ client, locale = "en" }: { client: ManagedAccessPort; locale?: "en" | "ru" }) { current = useManagedAccess(client, locale); return null; }
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((done) => { resolve = done; });
@@ -22,6 +22,21 @@ const clientFixture = (): ManagedAccessPort => ({
   prepareMfa: async () => ({ secret: "fixture-secret", uri: "otpauth://totp/fixture", issuer: "Falcon", account: "fixture" }),
   verifyMfa: async () => ({ stage: "authenticated", expiresAt: new Date().toISOString(), recoveryCodes: [] }), logout: async () => {},
 });
+
+async function mountLogout(t: TestContext, client: ManagedAccessPort, locale: "en" | "ru" = "en", href = "https://umbrella-falcon.saturnusgo.com/work/?workspaceId=alpha") {
+  const prior = ["window", "document"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
+  const destinations: string[] = [];
+  Object.defineProperty(globalThis, "window", { configurable: true, value: Object.assign(new EventTarget(), {
+    location: Object.assign(new URL(href), { assign: (path: string) => destinations.push(path) }), setTimeout: () => 1, clearTimeout() {}, setInterval: () => 2, clearInterval() {},
+  }) });
+  Object.defineProperty(globalThis, "document", { configurable: true, value: Object.assign(new EventTarget(), { visibilityState: "visible" }) });
+  let renderer!: ReactTestRenderer;
+  t.after(async () => { await act(async () => renderer?.unmount());
+    for (const [key, descriptor] of prior) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key); }
+  });
+  await act(async () => { renderer = create(<Probe client={client} locale={locale} />); });
+  return { destinations, renderer };
+}
 
 void test("a late entrypoint response cannot replace a newer tenant after cancellation", async () => {
   const slow = deferred<CompanyEntrypoint>();
@@ -38,20 +53,58 @@ void test("a late entrypoint response cannot replace a newer tenant after cancel
   await act(async () => renderer.unmount());
 });
 
-void test("login is single-flight and logout failures reach the authenticated shell", async () => {
+void test("login is single-flight and logout failures reach the authenticated shell", async t => {
   const gate = deferred<void>(); let logins = 0;
   const client = { ...clientFixture(), login: async () => { logins += 1; await gate.promise; },
     logout: async () => { throw new CompanyAccessError("SERVICE_UNAVAILABLE"); } };
-  let renderer!: ReactTestRenderer;
-  await act(async () => { renderer = create(<Probe client={client} />); });
+  const browser = await mountLogout(t, client);
   let login!: Promise<void>;
   await act(async () => { login = current.login("tester", "secret"); void current.login("tester", "secret"); });
   assert.equal(logins, 1); assert.equal(current.state.pending, true);
+  await act(async () => { await current.logout(); });assert.equal(current.state.pending, true);assert.deepEqual(browser.destinations, []);
   await act(async () => { gate.resolve(); await login; });
   assert.equal(current.state.pending, false);
   await act(async () => { await assert.rejects(current.logout(), { code: "SERVICE_UNAVAILABLE" }); });
   assert.equal(current.state.error, "SERVICE_UNAVAILABLE");
-  await act(async () => renderer.unmount());
+  assert.deepEqual(browser.destinations, []);
+});
+
+void test("successful managed logout clears MFA state and opens general login without another session request", async t => {
+  let reads = 0, loggedOut = false;
+  const client = { ...clientFixture(), session: async (): Promise<CompanySession> => {
+    reads++; if (loggedOut) throw new CompanyAccessError("SESSION_REQUIRED");
+    return { authenticated: false, stage: "mfa_enrollment", expiresAt: new Date(Date.now() + 60000).toISOString() };
+  }, logout: async () => { loggedOut = true; } };
+  const browser = await mountLogout(t, client, "ru");
+  await act(async () => { await current.prepareMfa(); });
+  assert.ok(current.state.enrollment);
+  await act(async () => { await current.logout(); });
+  assert.equal(reads, 1);assert.deepEqual(current.state.session, anonymous);
+  assert.equal(current.state.enrollment, null);assert.deepEqual(current.state.recoveryCodes, []);
+  assert.equal(current.state.pending, false);assert.equal(current.state.error, null);
+  assert.deepEqual(browser.destinations, ["https://tms.saturnusgo.com/cloud-login/?lang=ru"]);
+  await act(async () => { window.dispatchEvent(new Event("focus")); });
+  assert.equal(reads, 1);
+});
+
+void test("managed logout is single-flight and navigates only after its successful response", async t => {
+  const gate = deferred<void>();let logouts = 0;
+  const client = { ...clientFixture(), logout: async () => { logouts++;await gate.promise; } };
+  const browser = await mountLogout(t, client, "en", "http://localhost:3000/work/");let completion!: Promise<void>;
+  await act(async () => { completion = current.logout();void current.logout(); });
+  assert.equal(logouts, 1);assert.equal(current.state.pending, true);assert.deepEqual(browser.destinations, []);
+  await act(async () => { gate.resolve();await completion; });
+  assert.deepEqual(browser.destinations, ["http://localhost:3000/cloud-login/?lang=en"]);
+});
+
+void test("a cancelled managed logout cannot fetch or navigate after its late response", async t => {
+  const gate = deferred<void>();let reads = 0;
+  const client = { ...clientFixture(), session: async () => { reads++;return anonymous; }, logout: async () => gate.promise };
+  const browser = await mountLogout(t, client);let completion!: Promise<void>;
+  await act(async () => { completion = current.logout(); });
+  await act(async () => browser.renderer.unmount());
+  await act(async () => { gate.resolve();await completion; });
+  assert.equal(reads, 1);assert.deepEqual(browser.destinations, []);
 });
 
 void test("recovery codes are discarded after acknowledgement and a new mounted session", async () => {
@@ -85,25 +138,20 @@ void test("an expired MFA challenge clears its secret and returns to company log
 });
 
 void test("managed session restoration shows only the shared loader until the session is verified", async (t) => {
-  const require = createRequire(import.meta.url);
-  const previousCss = require.extensions[".css"];
+  const require = createRequire(import.meta.url), previousCss = require.extensions[".css"];
   require.extensions[".css"] = module => { module.exports = {}; };
-  const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React");
+  const previousReact = Object.getOwnPropertyDescriptor(globalThis, "React"), previousFetch = globalThis.fetch;
   Object.assign(globalThis, { React });
-  const previousFetch = globalThis.fetch;
   t.after(() => {
     globalThis.fetch = previousFetch;
     if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
     if (previousReact) Object.defineProperty(globalThis, "React", previousReact); else Reflect.deleteProperty(globalThis, "React");
   });
   const { ManagedAccessBoundary } = await import("../../composition/ManagedAccessBoundary");
-  const entrypoint = deferred<Response>();
-  const session = deferred<Response>();
+  const entrypoint = deferred<Response>(), session = deferred<Response>();
   const paths: string[] = [];
-  globalThis.fetch = async (path) => {
-    paths.push(String(path));
-    return path === "/api/v1/auth/entrypoint" ? entrypoint.promise : session.promise;
-  };
+  globalThis.fetch = async path => { paths.push(String(path));
+    return path === "/api/v1/auth/entrypoint" ? entrypoint.promise : session.promise; };
   const locale = { locale: "en" as const, languageTag: "en-US" as const, setLocale: () => {}, t: () => "Loading session" };
   const signedIn: CompanySession = { authenticated: true, stage: "authenticated", audience: "tenant",
     workspaceId: "alpha", capabilities: [], expiresAt: new Date(Date.now() + 60000).toISOString(),
@@ -111,9 +159,10 @@ void test("managed session restoration shows only the shared loader until the se
       phone: "", role: "tester", owner: false, hasAvatar: false, version: 1 } };
   let renderer!: ReactTestRenderer;
   t.after(() => act(() => renderer.unmount()));
-  await act(async () => { renderer = create(<TmsLocaleContext.Provider value={locale}>
+  const content = () => <TmsLocaleContext.Provider value={locale}>
     <ManagedAccessBoundary>{() => <div data-testid="protected-workspace" />}</ManagedAccessBoundary>
-  </TmsLocaleContext.Provider>); });
+  </TmsLocaleContext.Provider>;
+  await act(async () => { renderer = create(content()); });
   const assertRestoring = () => {
     assert.equal(renderer.root.findAllByProps({ "data-testid": "auth-session-loading" }).length, 1);
     assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 0);
@@ -136,9 +185,7 @@ void test("managed session restoration shows only the shared loader until the se
     await act(async () => renderer.unmount());
     globalThis.fetch = async path => Response.json({ data: path === "/api/v1/auth/entrypoint" ? entry
       : path === "/api/v1/auth/methods" ? { google: false, email: true, saml: false, signup: true } : restricted });
-    await act(async () => { renderer = create(<TmsLocaleContext.Provider value={locale}>
-      <ManagedAccessBoundary>{() => <div data-testid="protected-workspace" />}</ManagedAccessBoundary>
-    </TmsLocaleContext.Provider>); });
+    await act(async () => { renderer = create(content()); });
     assert.equal(renderer.root.findAllByProps({ "data-testid": "protected-workspace" }).length, 0);
     if (restricted.stage === "anonymous") {
       assert.equal(renderer.root.findAllByType("form").length, 0, "method selection must precede email input");

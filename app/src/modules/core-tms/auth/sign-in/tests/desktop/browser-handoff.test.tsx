@@ -15,8 +15,10 @@ void test("desktop shows each login method and sends its provider and language t
   require.extensions[".css"] = module => { module.exports = {}; };
   const prior = ["React", "navigator", "window"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
   const destinations: string[] = [];
-  Object.defineProperty(globalThis, "window", { configurable: true, value: { location: { origin: "https://tms.example.test", assign: (path: string) => destinations.push(path) } } });
-  Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent: "Electron/45 FalconDesktop/0.2.4" } });
+  const location = (path: string) => Object.assign(new URL(path, "https://tms.example.test"), { assign: (path: string) => destinations.push(path) });
+  const browser = { location: location("/cloud-login/"), history: { state: {}, replaceState(_state: unknown, _title: string, path: string) { browser.location = location(path); } } };
+  Object.defineProperty(globalThis, "window", { configurable: true, value: browser });
+  Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent: "Electron/45 FalconDesktop/0.2.5" } });
   Object.assign(globalThis, { React });
   t.after(() => {
     if (css) require.extensions[".css"] = css; else delete require.extensions[".css"];
@@ -28,16 +30,16 @@ void test("desktop shows each login method and sends its provider and language t
   let renderer!: ReactTestRenderer;
   await act(async () => { renderer = create(<SignInMethods signIn={signIn} copy={signInCopy("ru")} signup={false} locale="ru" />); });
   const buttons = renderer.root.findAllByType("button");
-  assert.equal(buttons.length, 3);
-  for (const label of ["Продолжить с Google", "Продолжить с email", "Продолжить с SAML SSO"]) assert.ok(buttons.some(button => button.children.includes(label)));
+  assert.equal(buttons.length, 4);
+  for (const label of ["Продолжить с Google", "Продолжить с email", "Продолжить с SAML SSO", "Рабочее пространство компании"]) assert.ok(buttons.some(button => button.children.includes(label)));
   await act(async () => { for (const button of buttons) button.props.onClick(); });
-  assert.deepEqual(destinations, ["/desktop-sign-in/?method=google&lang=ru", "/desktop-sign-in/?method=email&lang=ru", "/desktop-sign-in/?method=saml&lang=ru"]);
+  assert.deepEqual(destinations, ["/desktop-sign-in/?method=google&lang=ru", "/desktop-sign-in/?method=email&lang=ru", "/desktop-sign-in/?method=saml&lang=ru", "/desktop-sign-in/?method=company&lang=ru"]);
   Object.assign(window.location,{search:"?workspaceId=company-space"});
   await act(async () => buttons[1].props.onClick());
   assert.equal(destinations.pop(),"/desktop-sign-in/?method=email&lang=ru&workspaceId=company-space");
   Object.defineProperty(globalThis, "navigator", { configurable: true, value: { userAgent: "Electron/45 FalconDesktop/0.2.3" } });
   await act(async () => { for (const button of buttons) button.props.onClick(); });
-  assert.deepEqual(destinations.slice(3), ["/desktop-sign-in/", "/desktop-sign-in/", "/desktop-sign-in/"], "existing installers must retain their supported browser command");
+  assert.deepEqual(destinations.slice(4), ["/desktop-sign-in/", "/desktop-sign-in/", "/desktop-sign-in/", "/desktop-sign-in/"], "existing installers must retain their supported browser command");
   await act(async () => renderer.unmount());
 });
 
@@ -63,7 +65,7 @@ void test("browser handoff opens the selected method once after loading without 
  });
  const {SignInFeature}=await import("../../composition/SignInFeature");
  const context={locale:"en" as const,languageTag:"en-US" as const,setLocale(){},t:()=>"Loading"};
- for(const method of ["google","email","saml","unknown","email&method=saml"]){
+ for(const method of ["google","email","saml","company","unknown","email&method=saml"]){
   await act(async()=>view?.unmount());clearBrowserDesktopAttempt();values.clear();requests.length=0;destinations.length=0;
   browser.location=location(`/cloud-login/?desktopAttempt=${attempt}&method=${method}&lang=en`);
   await act(async()=>{view=create(<TmsLocaleContext.Provider value={context}><SignInFeature/></TmsLocaleContext.Provider>);});
@@ -74,7 +76,7 @@ void test("browser handoff opens the selected method once after loading without 
    assert.equal(requests.filter(path=>path.endsWith("/google/start")).length,1);
   }else if(method==="email"){
    assert.equal(view!.root.findByType("input").props.type,"email");assert.equal(requests.length,1);
-  }else if(method==="saml"){
+  }else if(method==="saml"||method==="company"){
    assert.equal(view!.root.findByType("input").props.autoComplete,"organization");assert.equal(requests.length,1);
   }else{assert.equal(view!.root.findAllByType("input").length,0);assert.equal(requests.length,1);}
  }

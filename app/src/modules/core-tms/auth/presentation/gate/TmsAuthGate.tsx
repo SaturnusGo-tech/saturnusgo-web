@@ -22,7 +22,7 @@ import {
 import { TmsSessionProvider } from "../session/TmsSessionContext";
 import { useSelfProfileIdentity } from "../../composition/session/profile/useSelfProfileIdentity";
 import { TmsAuthState } from "../state/TmsAuthState";
-import { isFalconDesktop } from "../../sign-in/domain/desktop-mode";
+import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 
 export function TmsAuthGate({
   apiBase,
@@ -32,6 +32,7 @@ export function TmsAuthGate({
   readonly children: ReactNode;
 }) {
   const auth = useAuth0();
+  const { locale } = useTmsLocale();
   const [actionFailed, setActionFailed] = useState(false);
   const [logoutIntent, setLogoutIntent] = useState<"checking" | "absent" | "present">("checking");
   const logoutIntentChecked = useRef(false);
@@ -63,7 +64,7 @@ export function TmsAuthGate({
       // Keep the explicit admin selector through the Auth0 round trip. Without it,
       // a simultaneous cloud cookie could capture the return before the logout
       // intent is consumed by this gate.
-      const returnTo = tmsAdminLogoutReturnTo(window.location.origin);
+      const returnTo = tmsAdminLogoutReturnTo(window.location.origin, locale);
       try { rememberTmsLogoutIntent(window.sessionStorage); } catch {}
       try {
         await auth.logout({ logoutParams: { returnTo } });
@@ -72,7 +73,7 @@ export function TmsAuthGate({
         throw error;
       }
     },
-  }), [auth.logout, auth.user?.sub, profile, updateProfile, avatarLoader]);
+  }), [auth.logout, auth.user?.sub, profile, updateProfile, avatarLoader, locale]);
   const login = useCallback(() => {
     setActionFailed(false);
     loginStarted.current = true;
@@ -109,11 +110,11 @@ export function TmsAuthGate({
 
   useEffect(() => {
     if (stage === "exit") {
-      window.location.replace(isFalconDesktop() ? new URL("/cloud-login/", window.location.origin).href : tmsSignedOutDestination(window.location));
+      window.location.replace(tmsSignedOutDestination(window.location, locale));
       return;
     }
     if (stage === "redirect" && claimTmsInteractiveLogin(loginStarted)) login();
-  }, [login, stage]);
+  }, [login, stage, locale]);
 
   if (stage === "checking" || stage === "redirect" || stage === "exit") {
     return <TmsAuthState kind="loading" />;
