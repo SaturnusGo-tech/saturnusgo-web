@@ -24,11 +24,15 @@ export async function proxyCompanyApi(request, env, audience, send = fetch) {
       typeof response.headers.getAll === "function" ? response.headers.getAll("set-cookie") :
         response.headers.has("set-cookie") ? [response.headers.get("set-cookie")] : [];
     const name = audience === "personal" ? "__Host-falcon_cloud_session" : audience === "platform" ? "__Host-falcon_platform_session" : "__Host-falcon_tenant_session";
+    const desktopCompletion=request.method==='POST'&&response.status===204&&['personal','tenant'].includes(audience)&&
+      ['/api/v1/auth/desktop/exchange','/api/v1/auth/desktop/redeem'].includes(new URL(request.url).pathname);
     for (const cookie of cookies) {
-      const ordinary = cookie.startsWith(`${name}=`) && !/;\s*domain\s*=/i.test(cookie) &&
+      const hostSession=!/;\s*domain\s*=/i.test(cookie) &&
         /;\s*path=\/(?:;|$)/i.test(cookie) && /;\s*secure(?:;|$)/i.test(cookie) &&
         /;\s*httponly(?:;|$)/i.test(cookie) && /;\s*samesite=lax(?:;|$)/i.test(cookie);
-      if (!ordinary && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie)) {
+      const ordinary=cookie.startsWith(`${name}=`)&&hostSession;
+      const desktopTarget=desktopCompletion&&hostSession&&/^__Host-falcon_(?:cloud|tenant)_session=[A-Za-z0-9_-]{43}(?:;|$)/.test(cookie);
+      if (!ordinary && !desktopTarget && !protocol.permitsCookie(cookie) && !accountSpaceCookieAllowed(request,audience,cookie)) {
         return gatewayError(502, "INVALID_SESSION_COOKIE");
       }
       headers.append("set-cookie", cookie);

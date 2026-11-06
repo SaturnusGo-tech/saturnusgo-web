@@ -46,6 +46,20 @@ void test("the chooser flag probes only verified spaces, is removed from the URL
   await act(async () => passwordCompany!.props.onClick());
   assert.deepEqual(destinations, [`${selectedRedirect}&method=company&lang=en`], "choosing an invited company must open its credential form with its scoped desktop return");
   await act(async () => view.unmount());
+  for (const [redirect, label, expected] of [
+    [`${origin}/cloud-login/?workspaceId=owned&workspaceHandoff=1`, "Alpha", `${origin}/cloud-login/?workspaceId=owned&workspaceHandoff=1&lang=en`],
+    [`${origin}/cloud-login/?workspaceId=owned&workspaceHandoff=1&desktopAttempt=${"a".repeat(43)}`, "Alpha", `${origin}/cloud-login/?workspaceId=owned&workspaceHandoff=1&desktopAttempt=${"a".repeat(43)}&lang=en`],
+    [`${origin}/work/?desktopAttempt=${"a".repeat(43)}`, "My workspace", `${origin}/work/?desktopAttempt=${"a".repeat(43)}`],
+  ]) {
+    selectedRedirect = redirect; browser.location.search = "?chooseSpace=1"; destinations.length = 0;
+    await act(async () => { view = create(<TmsLocaleContext.Provider value={locale}><SignInFeature /></TmsLocaleContext.Provider>); });
+    const choice = view.root.findAllByType("button").find(button => button.findAllByType("strong").some(value => value.children.includes(label)));
+    assert.ok(choice);
+    await act(async () => choice.props.onClick());
+    assert.deepEqual(destinations, [expected], "an owned cloud company must retain its handoff gate, and a personal desktop choice must retain its scoped attempt");
+    assert.equal(new URL(destinations[0]).searchParams.has("method"), false, "personal authentication must not be recast as managed password login");
+    await act(async () => view.unmount());
+  }
 });
 void test("space selection sends only an unexpired current-origin desktop attempt to the server", async t => {
   const prior = Object.getOwnPropertyDescriptor(globalThis, "window"), origin = "https://tms.saturnusgo.com", attempt = "a".repeat(43);

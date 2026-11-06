@@ -18,7 +18,8 @@ export function SpaceChoiceFeature() {
     if (!model.state.destination) return;
     const destination = new URL(model.state.destination, window.location.origin);
     if (destination.pathname === "/cloud-login/" && destination.searchParams.has("workspaceId")) {
-      destination.searchParams.set("method", "company"); destination.searchParams.set("lang", locale);
+      if (destination.searchParams.get("workspaceHandoff") !== "1") destination.searchParams.set("method", "company");
+      destination.searchParams.set("lang", locale);
       rememberBrowserContinuation(); window.location.assign(destination.href);
     } else { rememberBrowserContinuation(); window.location.assign(model.state.destination); }
   }, [model.state.destination, locale]);

@@ -6,7 +6,7 @@ const auth = new Map([
  ['auth/entrypoint',['GET','HEAD']], ['auth/methods',['GET','HEAD']], ['auth/email/start',['POST']], ['auth/email/verify',['POST']], ['auth/email/resend',['POST']],
  ['auth/spaces',['GET']], ['auth/spaces/select',['POST']], ['auth/trial',['GET','HEAD']], ['auth/google/start',['POST']], ['auth/google/callback',['GET']],
  ['auth/google/finish',['GET']], ['auth/saml/start',['POST']], ['auth/company/resolve',['POST']], ['auth/federation/cancel',['POST']],
- ...['start','exchange','cancel'].map(name=>[`auth/desktop/${name}`,['POST']]), ['auth/desktop/authorize',['GET']],
+ ...['start','exchange','redeem','cancel'].map(name=>[`auth/desktop/${name}`,['POST']]), ['auth/desktop/authorize',['GET']],
  ['cloud-auth/session',['GET','HEAD']], ['cloud-auth/logout',['POST']],
 ]);
 const personalProfile = new Map([

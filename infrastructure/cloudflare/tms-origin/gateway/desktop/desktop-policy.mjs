@@ -1,9 +1,10 @@
 const root='/api/v1/auth/desktop/';
-const methods=new Map([['start',['POST']],['authorize',['GET']],['exchange',['POST']],['cancel',['POST']]]);
+const methods=new Map([['start',['POST']],['authorize',['GET']],['exchange',['POST']],['redeem',['POST']],['cancel',['POST']]]);
 export function desktopRoutePolicy(pathname,audience) {
  if(!['personal','tenant'].includes(audience)||!pathname.startsWith(root))return null;
  const allowedMethods=methods.get(pathname.slice(root.length));
- return allowedMethods?{kind:'desktop',cookieNames:[],allowServerPost:false,allowedMethods}:null;
+ const cookieNames=audience==='personal'&&pathname===root+'authorize'?['__Host-falcon_tenant_session']:[];
+ return allowedMethods?{kind:'desktop',cookieNames,allowServerPost:false,allowedMethods}:null;
 }
 export function desktopResponsePolicy(request,response,audience) {
  const path=new URL(request.url).pathname;
