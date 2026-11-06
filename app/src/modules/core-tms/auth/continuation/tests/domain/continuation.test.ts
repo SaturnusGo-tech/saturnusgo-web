@@ -41,6 +41,11 @@ void test("retrying sign-in from a provider's default return cannot replace the 
     assert.equal(takeContinuation(tab, origin, "alpha", 2000), "/testcases/umbrella-home/work/?caseId=case-7&workspaceId=alpha&falconMcpInteraction=consent_123#step-2");
   }
 });
+void test("Startup identity refresh returns to the same workspace billing settings and language", () => {
+  const tab = storage();
+  rememberContinuation(tab, { ...page, search: "?workspaceId=alpha&view=config&settings=billing&lang=ru&token=secret", hash: "" }, 1000);
+  assert.equal(takeContinuation(tab, origin, "alpha", 2000), "/testcases/umbrella-home/work/?workspaceId=alpha&view=config&settings=billing&lang=ru");
+});
 void test("the public guide AI entry resumes inside the authenticated chat without accepting arbitrary redirects", () => {
   for (const pathname of ["/login/", "/cloud-login/", "/signup/"]) {
     const tab = storage();

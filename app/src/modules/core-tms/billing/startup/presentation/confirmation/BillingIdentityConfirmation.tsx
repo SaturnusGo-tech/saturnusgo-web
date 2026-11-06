@@ -1,22 +1,28 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { AdministrationPort } from "../../../../company-administration/application/ports/administration-port";
 import { SessionConfirmation } from "../../../../company-administration/presentation/reauthentication/SessionConfirmation";
+import { rememberBrowserContinuation } from "../../../../auth/continuation/application/browser-continuation";
+import { CompanyProgressOrb } from "../wizard/progress/CompanyProgressStep";
+import wizardCss from "../startup.module.css";
 import css from "./identity-confirmation.module.css";
-export function BillingIdentityConfirmation({ managed, client, signOut, retry, busy, ru }: {
-  managed: boolean; client: AdministrationPort | null; signOut(): Promise<void>; retry(): Promise<void>; busy: boolean; ru: boolean;
+export function BillingIdentityConfirmation({ managed, client, signOut, retry, busy, ru, fullscreen = false }: {
+  managed: boolean; client: AdministrationPort | null; signOut(): Promise<void>; retry(): Promise<void>; busy: boolean; ru: boolean; fullscreen?: boolean;
 }) {
   const [pending, setPending] = useState(false), [failed, setFailed] = useState(false);
-  return <section className={css.identity} role="alert" aria-busy={busy || pending}>
-    {managed && client ? <SessionConfirmation client={client} onConfirmed={retry} /> : <>
-      <div className={css.copy}><h3>{ru ? "Войдите снова, чтобы продолжить" : "Sign in again to continue"}</h3>
-        <p>{ru ? "Подтвердите вход в тот же аккаунт, затем вернитесь к оплате. Данные компании сохранены."
-          : "Confirm the same account, then return to checkout. Your saved company setup is retained."}</p></div>
-      <div className={css.actions}><button className={css.primary} type="button" disabled={busy || pending} onClick={async () => {
-        if (busy || pending) return; setPending(true); setFailed(false);
-        try { await signOut(); } catch { setFailed(true); } finally { setPending(false); }
-      }}>{ru ? "Войти снова" : "Sign in again"}</button>
-      <button className={css.secondary} type="button" disabled={busy || pending} onClick={() => { if (!busy && !pending) return retry(); }}>{ru ? "Уже вошли? Продолжить оплату" : "Already signed in? Retry checkout"}</button></div>
-      {failed && <p className={css.error} role="alert">{ru ? "Не удалось выйти. Повторите попытку." : "Could not sign out. Please try again."}</p>}
-    </>}
+  const signingOut = useRef(false);
+  if (managed && client) return <section className={css.identity}><SessionConfirmation client={client} onConfirmed={retry} /></section>;
+  const Heading = fullscreen ? "h1" : "h3";
+  return <section className={fullscreen ? wizardCss.progress : css.identity} role="status" aria-live="polite" aria-busy={busy || pending}>
+    {fullscreen && <CompanyProgressOrb ready={!pending} />}
+    <Heading>{pending ? (ru ? "Выходим из аккаунта…" : "Signing out…") : (ru ? "Войдите снова, чтобы продолжить" : "Sign in again to continue")}</Heading>
+    <p className={fullscreen ? wizardCss.companyName : undefined}>{ru ? "Данные компании сохранены. После входа в тот же аккаунт продолжим настройку Startup."
+      : "Your company details are saved. Sign in to the same account to continue setting up Startup."}</p>
+    <button className={fullscreen ? wizardCss.primary : css.primary} type="button" disabled={busy || pending} onClick={async () => {
+      if (busy || signingOut.current) return;
+      signingOut.current = true; setPending(true); setFailed(false);
+      try { rememberBrowserContinuation(); await signOut(); } catch { setFailed(true); }
+      finally { signingOut.current = false; setPending(false); }
+    }}>{pending ? (ru ? "Выходим…" : "Signing out…") : "OK"}</button>
+    {failed && <p className={css.error} role="alert">{ru ? "Не удалось выйти. Нажмите OK, чтобы повторить." : "Could not sign out. Select OK to try again."}</p>}
   </section>;
 }

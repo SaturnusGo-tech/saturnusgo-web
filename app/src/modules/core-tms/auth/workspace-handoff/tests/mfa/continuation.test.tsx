@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
 import {componentHarness,nodes} from "../../../../portfolios/tests/support/component-harness";
-import type {WorkspaceMfaHandoff} from "../../composition/WorkspaceMfaHandoff";
+import type {ManagedWorkspaceMfaHandoff} from "../../composition/WorkspaceMfaHandoff";
 function draw(session:unknown,recoveryCodes:string[]=[]) {
  const h=componentHarness("https://tms.saturnusgo.com/cloud-login/?workspaceId=space&workspaceHandoff=1");
- const {WorkspaceMfaHandoff:View}=h.load<{WorkspaceMfaHandoff:typeof WorkspaceMfaHandoff}>(new URL("../../composition/WorkspaceMfaHandoff.tsx",import.meta.url),name=>{
+ const {ManagedWorkspaceMfaHandoff:View}=h.load<{ManagedWorkspaceMfaHandoff:typeof ManagedWorkspaceMfaHandoff}>(new URL("../../composition/WorkspaceMfaHandoff.tsx",import.meta.url),name=>{
   if(name.endsWith("useTmsLocale"))return{useTmsLocale:()=>({locale:"ru"})};
   if(name.endsWith("managed-access-client"))return{createManagedAccessClient:()=>({})};
   if(name.endsWith("useManagedAccess"))return{useManagedAccess:()=>({state:{session,loading:false,recoveryCodes}})};

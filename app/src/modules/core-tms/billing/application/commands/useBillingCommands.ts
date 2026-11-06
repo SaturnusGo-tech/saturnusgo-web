@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { billingFailure, versionedBillingIntent, type BillingAccount, type BillingFailure, type BillingIntent, type BillingMutation } from "../../domain/billing";
+import { billingFailure, versionedBillingIntent, type BillingAccount, type BillingFailure, type BillingIntent, type BillingMutation, type BillingSummary } from "../../domain/billing";
 import type { BillingPort } from "../../domain/billing-port";
 import { restoreIdentityCheckout, storeIdentityCheckout, type BillingCommand } from "./reauthentication-checkout";
-interface Options { port: BillingPort | null; workspaceId: string | null; enabled: boolean; account: BillingAccount | null; reauthenticationScope?: string; onResult(result: BillingMutation, replay: boolean): void; onConflict(): void }
+import { activeStartupWorkspace } from "../../startup/domain/completed-startup";
+interface Options { port: BillingPort | null; workspaceId: string | null; enabled: boolean; account: BillingAccount | null; summary?: BillingSummary | null; reauthenticationScope?: string; onResult(result: BillingMutation, replay: boolean): void; onConflict(): void }
 export function useBillingCommands(options: Options) {
   const { port, workspaceId, enabled, account, reauthenticationScope } = options;
   const [state, setState] = useState<{ port: BillingPort | null; workspaceId: string | null; reauthenticationScope?: string; busy: boolean; error: BillingFailure | null; canRetryCommand: boolean; result: BillingMutation | null }>({ port, workspaceId, reauthenticationScope, busy: false, error: null, canRetryCommand: false, result: null });
@@ -42,6 +43,13 @@ export function useBillingCommands(options: Options) {
   // A completed receipt is recovery metadata, never authorization for another command.
   const current = sameOwner && enabled ? state : { busy: false, error: null, canRetryCommand: false,
     result: sameOwner && state.result?.checkout?.status === "completed" ? state.result : null };
-  return { ...current, execute, dismissError: () => { if (owns() && !active.current && !retry.current) setState(value => ({ ...value, error: null })); },
+  const pendingCommand = current.error?.code === "BILLING_ACTION_PENDING" ? retry.current : null;
+  useEffect(() => {
+    if (!workspaceId || !enabled || !owns() || active.current || !pendingCommand || !activeStartupWorkspace(options.summary ?? null, account, workspaceId)) return;
+    // A settled server subscription wins over optional, stale browser recovery metadata.
+    retry.current = null; storeIdentityCheckout(reauthenticationScope, workspaceId, null);
+    setState(value => ({ ...value, error: null, canRetryCommand: false }));
+  }, [pendingCommand, account, options.summary, workspaceId, enabled, reauthenticationScope]);
+  return { ...current, pendingCommand, execute, dismissError: () => { if (owns() && !active.current && !retry.current) setState(value => ({ ...value, error: null })); },
     retryCommand: async () => { if (retry.current) await execute(retry.current.intent, true); } };
 }

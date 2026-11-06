@@ -20,3 +20,11 @@ test("foreign workspace, forged origin and invalid generations fail closed; the 
  for(const change of [{workspaceId:"other"},{generation:0},{generation:1.5},{destinationOrigin:"https://evil.test"},{destinationOrigin:"https://team-falcon.saturnusgo.com/path"},{destinationOrigin:"https://user@team-falcon.saturnusgo.com"}]) assert.throws(()=>workspaceHandoffNavigation({...target,...change},"space",href,"en",false));
  assert.equal(workspaceHandoffNavigation({...target,destinationOrigin:"https://tms.saturnusgo.com"},"space",href,"en",false),null);
 });
+test("company setup handoff opens scoped company administration through the same verified browser and desktop transfer",()=>{
+ for(const desktop of [false,true]) {
+  const result=workspaceHandoffNavigation(target,"space",href,"ru",desktop,"company_admin")!;
+  const fields=result.kind==="browser"?result.fields:Object.fromEntries(new URL(result.url).searchParams);
+  assert.equal(fields.route,"/admin/?account=personal&workspaceId=space&page=company&projectId=project&lang=ru");
+  assert.equal(fields.destinationOrigin,"https://team-falcon.saturnusgo.com");
+ }
+});

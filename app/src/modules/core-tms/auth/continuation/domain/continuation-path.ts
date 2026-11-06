@@ -1,7 +1,7 @@
 const workspace = "/testcases/umbrella-home/work/";
 const pages = new Set([workspace, "/admin/", "/profile/"]);
 const identifiers = new Set(["workspaceId", "projectId", "catalogProjectId", "portfolioId", "folderId", "caseId", "runId", "runItemId", "suiteId", "stepId", "attachmentId", "falconMcpInteraction"]);
-const routes = new Set(["view", "page", "tab", "article"]);
+const routes = new Set(["view", "settings", "page", "tab", "article"]);
 export function safeContinuationPath(candidate: unknown, origin: string): string | null {
   if (typeof candidate !== "string" || candidate.length > 4096 || !candidate.startsWith("/") || candidate.startsWith("//")
     || /[\\\x00-\x1f\x7f]/.test(candidate)) return null;
@@ -15,6 +15,7 @@ export function safeContinuationPath(candidate: unknown, origin: string): string
       const value = values[0];
       if (identifiers.has(key) && /^[A-Za-z0-9_-]{1,128}$/.test(value)) query.set(key, value);
       else if (routes.has(key) && /^[A-Za-z][A-Za-z0-9_-]{0,64}$/.test(value)) query.set(key, value);
+      else if (key === "lang" && (value === "ru" || value === "en")) query.set(key, value);
     }
     const hash = /^#[A-Za-z0-9_-]{1,128}$/.test(url.hash) ? url.hash : "";
     return `${url.pathname}${query.size ? `?${query}` : ""}${hash}`;

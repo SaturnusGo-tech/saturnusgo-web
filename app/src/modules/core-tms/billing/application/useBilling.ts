@@ -11,6 +11,7 @@ export function useBilling({ port, workspaceId, canManage, workspaceKind, reauth
   const resource = useBillingResource(port, workspaceId, manageable);
   const reload = () => { summary.reload(); resource.reload(); };
   const commands = useBillingCommands({ port, workspaceId, enabled: manageable, account: resource.account, reauthenticationScope,
+    summary: summary.loading || resource.loading ? null : summary.summary,
     onResult: (result, replay) => {
       if (replay) resource.reload(); else {
         resource.applyMutation(result);
@@ -25,7 +26,7 @@ export function useBilling({ port, workspaceId, canManage, workspaceKind, reauth
   return { summary: summary.summary, account: resource.account, invoices: resource.invoices, checkout,
     lastMutation: commands.result, loading: summary.loading || resource.loading, busy: commands.busy,
     error: commands.error ?? summary.error ?? resource.error, invoicesError: resource.invoicesError,
-    canManage: manageable, canRetryCommand: commands.canRetryCommand, hasMoreInvoices: resource.hasMoreInvoices, loadingMoreInvoices: resource.loadingMore,
+    canManage: manageable, canRetryCommand: commands.canRetryCommand, pendingCommand: commands.pendingCommand, hasMoreInvoices: resource.hasMoreInvoices, loadingMoreInvoices: resource.loadingMore,
     reload, loadMoreInvoices: resource.loadMoreInvoices, retryCommand: commands.retryCommand, dismissError: commands.dismissError,
     startCheckout: async (planId: BillingPlanId, conversion?: Pick<Extract<BillingIntent, { kind: "checkout" }>, "startupSetupId" | "startupSetupVersion" | "confirmWorkspaceConversion">) => { if (allowedCheckout(planId)) await commands.execute({ kind: "checkout", planId, ...conversion }); },
     confirmCheckout: async (outcome: BillingOutcome) => { if (checkout?.status === "open") await commands.execute({ kind: "confirm", checkoutId: checkout.id, outcome }); },

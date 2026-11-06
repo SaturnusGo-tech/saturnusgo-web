@@ -1,9 +1,10 @@
 import css from "./identity-confirmation.module.css";
 
-export function BillingCheckoutRecovery({ preparationRequired, busy, ru, onContinue }: {
-  preparationRequired: boolean; busy: boolean; ru: boolean; onContinue(): void | Promise<void>;
+export function BillingCheckoutRecovery({ preparationRequired, checking = false, busy, ru, onContinue }: {
+  preparationRequired: boolean; checking?: boolean; busy: boolean; ru: boolean; onContinue(): void | Promise<void>;
 }) {
-  return <section className={css.identity} role="alert" aria-busy={busy}>
+  if (checking) return <section className={css.identity} role="status" aria-live="polite" aria-busy="true"><p>{ru ? "Продолжаем настройку Startup…" : "Resuming your Startup setup…"}</p></section>;
+  return <section className={css.identity} role="status" aria-busy={busy}>
     <div className={css.copy}>
       <h3>{preparationRequired ? (ru ? "Подготовьте компанию заново" : "Prepare your company again") : (ru ? "Продолжите подключение Startup" : "Continue your Startup checkout")}</h3>
       <p>{preparationRequired

@@ -10,16 +10,16 @@ import { CompanyCheckoutStep } from "./wizard/checkout/CompanyCheckoutStep";
 import { CompanyProgressStep } from "./wizard/progress/CompanyProgressStep";
 import css from "./startup.module.css";
 type Props = { model: ReturnType<typeof useStartupSetup>; plan?: BillingPlan; quote?: BillingAccount["checkoutQuotes"][number];
-  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; controlledTest?: boolean; checkoutNotice?: ReactNode;
-  checkout?: BillingCheckout | null; activated?: boolean; activationPending?: boolean; onConfirmCheckout?(outcome: BillingOutcome): Promise<void>;
+  canCheckout: boolean; paymentsAvailable: boolean; busy: boolean; ru: boolean; controlledTest?: boolean; checkoutNotice?: ReactNode; identityConfirmation?: ReactNode;
+  checkout?: BillingCheckout | null; activated?: boolean; activationPending?: boolean; transitionPending?: boolean; onConfirmCheckout?(outcome: BillingOutcome): Promise<void>;
   onContinue?(): void; onRefreshBilling?(): void; onBack(): void; onCheckout(): Promise<void> };
-export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, controlledTest = false, checkoutNotice,
-  checkout, activated = false, activationPending = false, onConfirmCheckout, onContinue, onRefreshBilling, onBack, onCheckout }: Props) {
+export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAvailable, busy, ru, controlledTest = false, checkoutNotice, identityConfirmation,
+  checkout, activated = false, activationPending = false, transitionPending = false, onConfirmCheckout, onContinue, onRefreshBilling, onBack, onCheckout }: Props) {
   const wizard = useCompanyWizard(model);
   const locked = busy || wizard.locked;
   const setup = model.setup;
   const ready = setup?.status === "ready" && !wizard.changed;
-  const stage = activated ? "success" : activationPending || (busy && checkout?.status === "open") ? "finishing" : checkout?.status === "open" ? "checkout" : model.loading && !wizard.snapshot ? "loading" : wizard.stage;
+  const stage = identityConfirmation ? "identity" : transitionPending ? "opening" : activated ? "success" : activationPending || (busy && checkout?.status === "open") ? "finishing" : checkout?.status === "open" ? "checkout" : model.loading && !wizard.snapshot ? "loading" : wizard.stage;
   useEffect(() => {
     if (!activationPending || busy || checkoutNotice || !onRefreshBilling) return;
     const timer = setTimeout(onRefreshBilling, 2500);
@@ -34,7 +34,8 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
   }
   async function retryPreparation() { if (await model.retry()) wizard.go("consent"); }
   async function retryCommand() { if (await model.retryCommand() && stage === "preparing") wizard.go("consent"); }
-  return <CompanyWizardFrame stage={stage} ru={ru} locked={locked || activationPending} onClose={onBack}>
+  return <CompanyWizardFrame stage={stage} ru={ru} locked={locked || activationPending || transitionPending} onClose={onBack}>
+    {stage === "identity" && identityConfirmation}
     {(stage === "name" || stage === "address") && <CompanyIdentityStep wizard={wizard} ru={ru} busy={locked} error={fieldError} onClose={onBack} />}
     {stage === "legal" && <CompanyLegalStep wizard={wizard} ru={ru} busy={locked} />}
     {stage === "consent" && <CompanyConsentStep ru={ru} name={wizard.values.displayName} hostname={setup?.hostname ?? `${wizard.values.slug}-falcon.saturnusgo.com`}
@@ -47,14 +48,15 @@ export function StartupSetupScreen({ model, plan, quote, canCheckout, paymentsAv
     {stage === "preparing" && <CompanyProgressStep name={wizard.values.displayName} ru={ru} kind={setup?.status === "failed" || setup?.status === "expired" ? "failed" : "preparing"} busy={locked}
       canContinue={ready && wizard.consented && paymentsAvailable && canCheckout} onContinue={checkoutAction} />}
     {stage === "finishing" && <CompanyProgressStep name={wizard.values.displayName} ru={ru} kind="finishing" busy={busy} onRefresh={onRefreshBilling} />}
+    {stage === "opening" && <CompanyProgressStep name={wizard.values.displayName} ru={ru} kind="opening" busy />}
     {stage === "success" && <CompanyProgressStep name={wizard.values.displayName} ru={ru} kind="success" busy={busy} onContinue={onContinue} />}
-    {stage === "preparing" && !locked && !ready && <div className={css.recovery}>
+    {stage === "preparing" && !locked && (setup?.status === "failed" || setup?.status === "expired") && <div className={css.recovery}>
       {setup?.status === "failed" && <button type="button" onClick={() => void retryPreparation()}>{ru ? "Повторить подготовку" : "Retry preparation"}</button>}
       <button type="button" onClick={() => wizard.go("address")}>{ru ? "Изменить адрес" : "Edit address"}</button>
     </div>}
-    {error && !fieldError && <div className={css.recovery} role="alert"><p>{ru ? "Не удалось продолжить. Ваши данные сохранены." : "Could not continue. Your details are saved."}</p></div>}
+    {stage !== "identity" && error && !fieldError && <div className={css.recovery} role="alert"><p>{ru ? "Не удалось продолжить. Ваши данные сохранены." : "Could not continue. Your details are saved."}</p></div>}
     {model.canRetryCommand ? <div className={css.recovery}><button type="button" disabled={busy || model.busy} onClick={() => void retryCommand()}>{ru ? "Повторить то же действие" : "Retry the same action"}</button></div> : error && <div className={css.recovery}><button type="button" disabled={locked} onClick={model.reload}>{ru ? "Обновить данные" : "Refresh details"}</button></div>}
-    {checkoutNotice && <div className={css.checkoutNotice}>{checkoutNotice}</div>}
-    {controlledTest && stage !== "checkout" && stage !== "success" && <p className={css.testNotice}>{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}
+    {stage !== "identity" && checkoutNotice && <div className={css.checkoutNotice}>{checkoutNotice}</div>}
+    {controlledTest && stage !== "identity" && stage !== "checkout" && stage !== "success" && <p className={css.testNotice}>{ru ? "Тестовый режим · без списаний" : "Test mode · no charge"}</p>}
   </CompanyWizardFrame>;
 }

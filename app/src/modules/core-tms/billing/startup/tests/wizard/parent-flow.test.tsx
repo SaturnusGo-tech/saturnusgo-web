@@ -94,6 +94,7 @@ test("Startup wizard survives checkout and activation, then explicitly opens sco
     assert.equal(h.targetReads(), 0, "activation must not trigger an automatic domain handoff inside the wizard");
     assert.deepEqual(destinations, []);
     await act(async () => wizard.props.onContinue());
+    assert.equal(h.targetReads(), 1, "success Continue must discover the server target before company administration");
     assert.deepEqual(destinations, ["/admin/?account=personal&workspaceId=workspace&lang=en&projectId=project&page=company"]);
   } finally {
     await act(async () => view?.unmount());
