@@ -16,6 +16,7 @@ import { StartupHandoffStatus } from "../startup/presentation/StartupHandoffStat
 import { BillingScreen } from "../presentation/screen/BillingScreen";
 import { createAdministrationClient } from "../../company-administration/data/administration-client";
 import { BillingIdentityConfirmation } from "../startup/presentation/confirmation/BillingIdentityConfirmation";
+import { BillingCheckoutRecovery } from "../startup/presentation/confirmation/BillingCheckoutRecovery";
 import { completedStartupCheckout } from "../startup/domain/completed-startup";
 import { personalAdministrationUrl } from "../../company-administration/navigation/personal-administration-route";
 
@@ -32,6 +33,8 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     canManage: isolatedPreview || session?.workspaceRole === "workspace_admin" });
   const confirmationClient = useMemo(() => http ? createAdministrationClient(http) : null, [http]);
   const [setupOpen, setSetupOpen] = useState(false);
+  const [setupRevision, setSetupRevision] = useState(0);
+  const [supersededCheckoutId, setSupersededCheckoutId] = useState<string | null>(null);
   const handoff = useStartupWorkspaceTransition(billing.lastMutation, billing.summary, workspaceId, locale, isolatedPreview, !setupOpen);
   const setupApi = useMemo(() => http ? createStartupSetupApi(http) : null, [http]);
   const setup = useStartupSetup(setupApi, workspaceId, setupOpen && billing.canManage && billing.summary?.workspaceKind === "personal");
@@ -42,17 +45,31 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
   const identityConfirmation = billing.error?.code === "REAUTHENTICATION_REQUIRED" && session && <BillingIdentityConfirmation
     managed={session.kind === "managed"} client={confirmationClient} signOut={session.signOut}
     retry={async () => { if (paymentsAvailable) await billing.retryCommand(); }} busy={billing.busy || !paymentsAvailable} ru={locale === "ru"} />;
-  const checkoutNotice = identityConfirmation || (billing.error && <div role="alert">
+  const preparationRequired = billing.error?.code === "BILLING_STARTUP_SETUP_REQUIRED";
+  const pendingAction = billing.error?.code === "BILLING_ACTION_PENDING";
+  function prepareCompanyAgain() {
+    if (!billing.canManage || billing.summary?.workspaceKind !== "personal" || billing.busy || billing.canRetryCommand || setup.busy || setup.canRetryCommand) return;
+    billing.dismissError();
+    setSupersededCheckoutId(billing.checkout?.id ?? null);
+    setup.reload();
+    setSetupRevision(value => value + 1);
+    setSetupOpen(true);
+  }
+  const checkoutRecovery = identityConfirmation || ((preparationRequired || pendingAction) && <BillingCheckoutRecovery
+    preparationRequired={preparationRequired} ru={locale === "ru"}
+    busy={billing.busy || !billing.canManage || (preparationRequired ? billing.canRetryCommand || setup.busy || setup.canRetryCommand || billing.summary?.workspaceKind !== "personal" : !paymentsAvailable || !billing.canRetryCommand)}
+    onContinue={preparationRequired ? prepareCompanyAgain : async () => { if (paymentsAvailable) await billing.retryCommand(); }} />);
+  const checkoutNotice = checkoutRecovery || (billing.error && <div role="alert">
     <p>{locale === "ru" ? "Не удалось начать или подтвердить оплату. Данные компании сохранены." : "Could not start or confirm checkout. Your company setup is saved."}</p>
     <button type="button" disabled={billing.busy || (billing.canRetryCommand && !paymentsAvailable)} onClick={() => {
       if (billing.canRetryCommand) { if (paymentsAvailable) void billing.retryCommand(); } else billing.reload();
     }}>{billing.canRetryCommand ? (locale === "ru" ? "Повторить то же действие" : "Retry the same action") : (locale === "ru" ? "Обновить данные" : "Refresh details")}</button>
   </div>);
-  if (setupOpen) return <StartupSetupScreen key={workspaceId} model={setup} ru={locale === "ru"}
+  if (setupOpen) return <StartupSetupScreen key={`${workspaceId}:${setupRevision}`} model={setup} ru={locale === "ru"}
     plan={billing.account?.plans.find(plan => plan.id === "startup")} quote={billing.account?.checkoutQuotes.find(quote => quote.planId === "startup")}
     canCheckout={!!billing.account?.allowedCheckoutPlanIds.includes("startup")} paymentsAvailable={paymentsAvailable} busy={billing.busy || billing.canRetryCommand}
     checkoutNotice={checkoutNotice} controlledTest={checkoutMode === "controlled_test"}
-    checkout={billing.checkout?.planId === "startup" ? billing.checkout : null} activated={activated} activationPending={activationPending}
+    checkout={billing.checkout?.planId === "startup" && billing.checkout.id !== supersededCheckoutId ? billing.checkout : null} activated={activated} activationPending={activationPending}
     onRefreshBilling={billing.reload} onConfirmCheckout={async outcome => {
       if (paymentsAvailable && billing.checkout?.planId === "startup") await billing.confirmCheckout(outcome);
     }} onContinue={() => {
@@ -63,5 +80,5 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     onBack={() => setSetupOpen(false)} onCheckout={async () => {
       if (paymentsAvailable && setup.setup?.status === "ready") await billing.startCheckout("startup", { startupSetupId: setup.setup.id, startupSetupVersion: setup.setup.version, confirmWorkspaceConversion: true });
     }} />;
-  return <><StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} error={identityConfirmation ? null : billing.error} identityConfirmation={identityConfirmation} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} /></>;
+  return <><StartupHandoffStatus state={handoff} ru={locale === "ru"} /><BillingScreen key={workspaceId} {...billing} error={checkoutRecovery ? null : billing.error} identityConfirmation={checkoutRecovery} ru={locale === "ru"} paymentsAvailable={paymentsAvailable} checkoutMode={checkoutMode} onStartupSetup={() => setSetupOpen(true)} onClose={onClose} /></>;
 }

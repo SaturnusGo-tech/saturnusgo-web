@@ -3375,7 +3375,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian \u0451/\u0435 normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
+        "description": "Lists nonarchived defects in the authorized project. q is a literal, case-insensitive substring of key, title, description, component, labels, assignee identity ID or active workspace member name/email, with Unicode NFKC and Russian ё/е normalization. component is the exact stored label, including empty string for unclassified records. Default order is updatedAt descending, ID descending. severitySort orders low to critical (asc) or critical to low (desc), then updatedAt/ID descending. Cursors are bound to project, status, run, component, q and severitySort and reject changed filters. scope defaults to all for compatibility; active excludes verified/closed, closed selects those statuses. It intersects other filters before pagination, totals and grouping. Cursors bind scope; legacy cursors are accepted only for all."
       },
       "post": {
         "tags": [
@@ -5138,7 +5138,7 @@
           "Dashboards"
         ],
         "summary": "List bounded dashboard summaries newest first",
-        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project\u2019s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
+        "description": "When projectId is supplied, returns workspace-level dashboards and dashboards for that project by default. With projectOnly=true, projectId is required and only that project’s dashboards are returned. Widget definitions are hydrated only through the singleton resource.",
         "operationId": "listDashboards",
         "x-tms-pagination": "cursor",
         "parameters": [
@@ -14767,7 +14767,7 @@
         "tags": [
           "Billing"
         ],
-        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes. Startup checkout requires the current owner\u2019s original authentication or required MFA confirmation within 10 minutes. Handoffs do not refresh that authentication time. Missing or stale proof returns HTTP403 REAUTHENTICATION_REQUIRED.",
+        "description": "Starts an eligible Individual or Startup test checkout. Personal workspaces may choose Startup directly. Active paid Individual upgrades charge only the ceiling-rounded positive price difference for the remaining paid period and preserve the original renewal anniversary; the next monthly renewal uses the full Startup catalog price. The checkout freezes its subtotal before tax for up to 30 minutes, ending no later than paid-through, and binds the subscription version. Hosting readiness is checked before checkout and confirmation. Opening or declining checkout grants no new access. Enterprise and unbilled legacy company enrollment require contact sales. First personal Startup checkout requires a ready Startup setup and startupSetupId, startupSetupVersion and confirmWorkspaceConversion=true. Setup changes invalidate open quotes. Startup checkout requires the current owner’s original authentication or required MFA confirmation within 10 minutes. Handoffs do not refresh that authentication time. Missing or stale proof returns HTTP403 REAUTHENTICATION_REQUIRED. Missing, changed, unready or expired personal Startup setup returns HTTP 409 BILLING_STARTUP_SETUP_REQUIRED; reopen company setup and create a new checkout command after preparation. Temporary hosting unavailability returns HTTP 503 BILLING_TEAM_UNAVAILABLE and may retry the unchanged command.",
         "parameters": [
           {
             "$ref": "#/components/parameters/BillingIdempotencyKey"
@@ -14808,7 +14808,19 @@
             "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "$ref": "#/components/responses/Conflict"
+            "description": "BILLING_STARTUP_SETUP_REQUIRED: the referenced company setup is missing, changed, unready or expired. Reopen company setup before creating a new checkout command. Other transition or idempotency conflicts use BILLING_CONFLICT.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -14842,7 +14854,7 @@
         "tags": [
           "Billing"
         ],
-        "description": "Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice. Startup collection requires the same current recent-owner authentication check; stale proof returns403 REAUTHENTICATION_REQUIRED. Authenticated provider-confirmed payment fulfillment is processed independently and is not discarded for proof expiry.",
+        "description": "Authenticated mock-only confirmation; a redirect is never payment evidence. Success creates one subscription and paid test invoice; decline grants no paid access. Idempotent replay never charges twice. Startup collection requires the same current recent-owner authentication check; stale proof returns403 REAUTHENTICATION_REQUIRED. Authenticated provider-confirmed payment fulfillment is processed independently and is not discarded for proof expiry. Missing, changed, unready or expired personal Startup setup returns HTTP 409 BILLING_STARTUP_SETUP_REQUIRED; reopen company setup and create a new checkout command after preparation. Temporary hosting unavailability returns HTTP 503 BILLING_TEAM_UNAVAILABLE and may retry the unchanged command.",
         "parameters": [
           {
             "$ref": "#/components/parameters/BillingIdempotencyKey"
@@ -14890,7 +14902,19 @@
             "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "$ref": "#/components/responses/Conflict"
+            "description": "BILLING_STARTUP_SETUP_REQUIRED: the referenced company setup is missing, changed, unready or expired. Reopen company setup before creating a new checkout command. Other transition or idempotency conflicts use BILLING_CONFLICT.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           },
           "410": {
             "description": "BILLING_CHECKOUT_EXPIRED: the checkout is expired and cannot grant paid access.",
@@ -20330,7 +20354,7 @@
           "Notifications"
         ],
         "operationId": "archiveReadNotifications",
-        "summary": "Archive only this member\u2019s already-read inbox entries",
+        "summary": "Archive only this member’s already-read inbox entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/WorkspaceIdQueryRequired"
@@ -20540,7 +20564,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity\u2019s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity\u2019s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
+        "description": "Requires a current fully authenticated managed company session. Revokes only the current identity’s grant in the verified company and writes one append-only audit event atomically. Replays are idempotent. Unknown, foreign and already revoked IDs return the same empty 204 to avoid disclosing another identity’s connections. Revocation immediately blocks current Falcon requests and future refreshes. The request has no body and cannot transfer or edit a grant.",
         "x-tms-idempotency": "not-applicable",
         "responses": {
           "204": {
@@ -20659,7 +20683,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee\u2019s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
+        "description": "Available only when employee mode is enabled. Scope comes from the verified company hostname and current human managed session. Ordinary REST does not accept MCP bearer credentials. Requires current workspace_admin role and integrations entitlement, revalidated in the transaction. If-Match is the quoted rowVersion; stale values fail VERSION_CONFLICT. Repeated command IDs replay, changed versions conflict. Deactivation releases the occupied seat, advances securityVersion and atomically revokes this employee’s grants plus legacy unbound grants for the current verified company Codex MCP resource. Human sessions and unrelated integrations remain intact.",
         "responses": {
           "200": {
             "description": "Success",
@@ -21203,7 +21227,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company\u2019s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
+        "description": "Requires a current tenant workspace_admin, revalidated against the stored managed session. Scope derives from the verified company hostname. Lists only that company’s Codex employee grants and legacy Codex MCP grants across human owners. Includes human and project names; never returns tokens, OAuth payloads or session/security versions. Missing historical project names are null. Stable descending createdAt/id cursor is company- and status-bound; expired classification uses a cursor-stable as-of time. Listing remains available after employee disable or entitlement loss to permit access review.",
         "x-tms-pagination": "cursor",
         "parameters": [
           {
@@ -21299,7 +21323,7 @@
             "managedTenant": []
           }
         ],
-        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company\u2019s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
+        "description": "Requires a current tenant workspace_admin and same-company Origin, revalidated under the company administration lock. Only this company’s Codex grants can be revoked; foreign or unrelated grants return NOT_FOUND. Grant revocation, audit actor attribution and command receipt commit atomically. Idempotency-Key replay returns the original revocation time, and reusing the key for another grant conflicts. Repeated revocation never adds another audit event. Existing identity-owner OAuth disconnect endpoints retain their own authorization.",
         "x-tms-idempotency": "required",
         "x-tms-concurrency": "not-applicable",
         "parameters": [
@@ -25117,18 +25141,6 @@
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "303": {
             "description": "Top-level browser form with Accept: text/html consumes the code and redirects to the permitted local app route.",
             "headers": {
@@ -25147,6 +25159,18 @@
                 "$ref": "#/components/headers/XRequestId"
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "x-tms-idempotency": "not-applicable"
@@ -25336,14 +25360,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "x-tms-idempotency": "required",
@@ -25433,14 +25457,14 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           },
           "428": {
             "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "x-tms-idempotency": "required",
@@ -31794,6 +31818,7 @@
           "BILLING_PLAN_INCOMPATIBLE",
           "BILLING_SEATS_OCCUPIED",
           "BILLING_CHECKOUT_EXPIRED",
+          "BILLING_STARTUP_SETUP_REQUIRED",
           "BILLING_INVALID_STATE",
           "BILLING_INVALID_EVENT",
           "BILLING_SIGNATURE_INVALID",
@@ -42941,7 +42966,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
+            "description": "12–128 Unicode code points, at most 512 UTF-8 bytes. Must differ from the temporary password."
           }
         },
         "required": [
@@ -43564,7 +43589,7 @@
             "minLength": 12,
             "maxLength": 256,
             "writeOnly": true,
-            "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+            "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
           }
         },
         "required": [
@@ -43665,7 +43690,7 @@
                 "minLength": 12,
                 "maxLength": 256,
                 "writeOnly": true,
-                "description": "12\u2013128 Unicode code points; maximum 512 UTF-8 bytes."
+                "description": "12–128 Unicode code points; maximum 512 UTF-8 bytes."
               },
               "resetMfa": {
                 "type": "boolean",
@@ -47399,7 +47424,7 @@
           "locale",
           "messages"
         ],
-        "description": "1\u201320 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
+        "description": "1–20 messages with at most 32000 content characters total. Last message must be user. Assistant history is untrusted conversational context, never knowledge.",
         "properties": {
           "locale": {
             "type": "string",

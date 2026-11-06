@@ -33,6 +33,24 @@ async function consentStep(view: ReactTestRenderer) {
 }
 const checkout = (view: ReactTestRenderer) => view.root.findByProps({ "data-wizard-checkout": true });
 
+test("company name and unique address have separate steps and preserve an edited address", async () => {
+  const h = fixture(); const view = await h.mount();
+  try {
+    await act(async () => view.root.findByProps({ id: "startup-name" }).props.onChange({ target: { value: "Umbrella Host" } }));
+    assert.doesNotMatch(JSON.stringify(view.toJSON()), /-falcon\.saturnusgo\.com/);
+    await click(view, { "data-wizard-next": "name" });
+    assert.equal(view.root.findAllByProps({ id: "startup-name" }).length, 0);
+    assert.equal(view.root.findByProps({ id: "startup-slug" }).props.value, "umbrella-host");
+    assert.match(JSON.stringify(view.toJSON()), /Choose your company address/);
+    assert.match(JSON.stringify(view.toJSON()), /-falcon\.saturnusgo\.com/);
+    await act(async () => view.root.findByProps({ id: "startup-slug" }).props.onChange({ target: { value: "umbrella-qa" } }));
+    await act(async () => view.root.findAllByType("button").find(node => node.children.includes("Previous"))!.props.onClick());
+    await act(async () => view.root.findByProps({ id: "startup-name" }).props.onChange({ target: { value: "Umbrella QA" } }));
+    await click(view, { "data-wizard-next": "name" });
+    assert.equal(view.root.findByProps({ id: "startup-slug" }).props.value, "umbrella-qa");
+  } finally { await act(async () => view.unmount()); }
+});
+
 test("saved setup requires explicit whole-workspace consent again after its version changes", async () => {
   const h = fixture(); const view = await h.mount();
   try {

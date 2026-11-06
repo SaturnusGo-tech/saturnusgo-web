@@ -26,7 +26,7 @@ export function useBilling({ port, workspaceId, canManage, workspaceKind, reauth
     lastMutation: commands.result, loading: summary.loading || resource.loading, busy: commands.busy,
     error: commands.error ?? summary.error ?? resource.error, invoicesError: resource.invoicesError,
     canManage: manageable, canRetryCommand: commands.canRetryCommand, hasMoreInvoices: resource.hasMoreInvoices, loadingMoreInvoices: resource.loadingMore,
-    reload, loadMoreInvoices: resource.loadMoreInvoices, retryCommand: commands.retryCommand,
+    reload, loadMoreInvoices: resource.loadMoreInvoices, retryCommand: commands.retryCommand, dismissError: commands.dismissError,
     startCheckout: async (planId: BillingPlanId, conversion?: Pick<Extract<BillingIntent, { kind: "checkout" }>, "startupSetupId" | "startupSetupVersion" | "confirmWorkspaceConversion">) => { if (allowedCheckout(planId)) await commands.execute({ kind: "checkout", planId, ...conversion }); },
     confirmCheckout: async (outcome: BillingOutcome) => { if (checkout?.status === "open") await commands.execute({ kind: "confirm", checkoutId: checkout.id, outcome }); },
     changePlan: async (planId: BillingPlanId) => { if (allowedChange(planId)) await commands.execute({ kind: "plan", planId }); },

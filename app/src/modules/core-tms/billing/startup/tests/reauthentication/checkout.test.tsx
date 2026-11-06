@@ -25,7 +25,7 @@ test("recent-confirmation rejection preserves the exact Startup draft and key ac
     await act(async () => { view.unmount(); view = create(<Probe workspaceId="other" />); });
     assert.equal(current.canRetryCommand, false);
     await act(async () => { view.unmount(); view = create(<Probe />); });
-    assert.equal(current.canRetryCommand, true); assert.equal(calls.length, 1);
+    assert.equal(current.canRetryCommand, true); assert.equal(current.error?.code, "BILLING_ACTION_PENDING"); assert.equal(calls.length, 1);
     await act(async () => { await current.retryCommand(); });
     assert.deepEqual(calls[1].intent, intent); assert.equal(calls[1].options.idempotencyKey, calls[0].options.idempotencyKey); assert.equal(calls[1].options.version, calls[0].options.version);
     assert.equal(current.canRetryCommand, false); assert.equal(items.size, 0);
@@ -44,4 +44,45 @@ test("a paused Startup collection preserves its exact checkout identity and outc
     items.set(key, JSON.stringify({ ...value, expiresAt: undefined }));
     assert.equal(restoreIdentityCheckout("cloud:owner", "workspace"), null);
   } finally { Reflect.deleteProperty(globalThis, "sessionStorage"); }
+});
+
+test("a saved checkout resumes manually, releases a terminal stale setup, and allows a newly prepared company", async () => {
+  const items = new Map<string, string>();
+  Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: { getItem: (key: string) => items.get(key) ?? null, setItem: (key: string, value: string) => items.set(key, value), removeItem: (key: string) => items.delete(key) } });
+  const intent = { kind: "checkout", planId: "startup", startupSetupId: "draft", startupSetupVersion: 3, confirmWorkspaceConversion: true } as const;
+  storeIdentityCheckout("cloud:owner", "workspace", { intent, options: { idempotencyKey: "original-key" } });
+  const calls: { intent: BillingIntent; options: BillingCommandOptions }[] = []; let conflicts = 0;
+  const port = { execute: async (_id, command, options) => { calls.push({ intent: command, options }); if (calls.length === 1) throw { status: 409, code: "BILLING_STARTUP_SETUP_REQUIRED" }; return result(); } } as BillingPort;
+  let current!: ReturnType<typeof useBillingCommands>; let view!: ReturnType<typeof create>;
+  function Probe() { current = useBillingCommands({ port, workspaceId: "workspace", enabled: true, account, reauthenticationScope: "cloud:owner", onResult() {}, onConflict() { conflicts += 1; } }); return null; }
+  try {
+    await act(async () => { view = create(<Probe />); });
+    assert.equal(current.error?.code, "BILLING_ACTION_PENDING"); assert.equal(calls.length, 0);
+    await act(async () => { current.dismissError(); await current.execute({ ...intent, startupSetupVersion: 5 }); });
+    assert.equal(current.error?.code, "BILLING_ACTION_PENDING"); assert.equal(calls.length, 0);
+    await act(async () => { await current.retryCommand(); });
+    assert.equal(calls[0].options.idempotencyKey, "original-key"); assert.equal(current.error?.code, "BILLING_STARTUP_SETUP_REQUIRED");
+    assert.equal(current.canRetryCommand, false); assert.equal(items.size, 0); assert.equal(conflicts, 1);
+    await act(async () => { current.dismissError(); });
+    assert.equal(current.error, null);
+    await act(async () => { await current.execute({ ...intent, startupSetupVersion: 5 }); });
+    assert.equal(calls.length, 2); assert.notEqual(calls[1].options.idempotencyKey, "original-key");
+    assert.equal(calls[1].intent.kind === "checkout" && calls[1].intent.startupSetupVersion, 5);
+  } finally { await act(async () => view?.unmount()); Reflect.deleteProperty(globalThis, "sessionStorage"); }
+});
+
+test("an uncertain hosting failure preserves the command and cannot be dismissed into a second checkout", async () => {
+  const calls: BillingCommandOptions[] = [];
+  const port = { execute: async (_id, _intent, options) => { calls.push(options); if (calls.length === 1) throw { status: 503, code: "BILLING_TEAM_UNAVAILABLE" }; return result(); } } as BillingPort;
+  let current!: ReturnType<typeof useBillingCommands>; let view!: ReturnType<typeof create>;
+  function Probe() { current = useBillingCommands({ port, workspaceId: "workspace", enabled: true, account, onResult() {}, onConflict() {} }); return null; }
+  const intent = { kind: "checkout", planId: "startup", startupSetupId: "draft", startupSetupVersion: 5, confirmWorkspaceConversion: true } as const;
+  try {
+    await act(async () => { view = create(<Probe />); });
+    await act(async () => { await current.execute(intent); });
+    await act(async () => { current.dismissError(); await current.execute(intent); });
+    assert.equal(current.error?.code, "BILLING_TEAM_UNAVAILABLE"); assert.equal(calls.length, 1);
+    await act(async () => { await current.retryCommand(); });
+    assert.equal(calls.length, 2); assert.equal(calls[1].idempotencyKey, calls[0].idempotencyKey);
+  } finally { await act(async () => view?.unmount()); }
 });

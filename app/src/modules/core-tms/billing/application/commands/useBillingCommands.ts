@@ -12,7 +12,7 @@ export function useBillingCommands(options: Options) {
   const owns = () => owner.current.port === port && owner.current.workspaceId === workspaceId && owner.current.enabled === enabled && owner.current.reauthenticationScope === reauthenticationScope;
   useEffect(() => {
     retry.current = enabled && workspaceId ? restoreIdentityCheckout(reauthenticationScope, workspaceId) : null;
-    setState(value => ({ port, workspaceId, reauthenticationScope, busy: false, error: retry.current ? { code: "REAUTHENTICATION_REQUIRED", requestId: null, retryable: true } : null, canRetryCommand: !!retry.current,
+    setState(value => ({ port, workspaceId, reauthenticationScope, busy: false, error: retry.current ? { code: "BILLING_ACTION_PENDING", requestId: null, retryable: true } : null, canRetryCommand: !!retry.current,
       result: value.port === port && value.workspaceId === workspaceId && value.reauthenticationScope === reauthenticationScope && value.result?.checkout?.status === "completed" ? value.result : null }));
     return () => { active.current?.abort(); active.current = null; retry.current = null; };
   }, [port, workspaceId, enabled, reauthenticationScope]);
@@ -35,12 +35,13 @@ export function useBillingCommands(options: Options) {
         needsIdentity && (command.intent.kind !== "confirm" || account?.checkout?.planId === "startup") ? command : null);
       setState(value => ({ ...value, busy: false, error: failure, canRetryCommand: !!retry.current,
         result: failure.code === "BILLING_CHECKOUT_EXPIRED" && value.result?.checkout ? { ...value.result, checkout: { ...value.result.checkout, status: "expired" } } : value.result }));
-      if (failure.code === "BILLING_VERSION_CONFLICT" || failure.code === "PRECONDITION_REQUIRED" || failure.code === "BILLING_CHECKOUT_EXPIRED") callbacks.current.onConflict();
+      if (["BILLING_VERSION_CONFLICT", "PRECONDITION_REQUIRED", "BILLING_CHECKOUT_EXPIRED", "BILLING_STARTUP_SETUP_REQUIRED"].includes(failure.code)) callbacks.current.onConflict();
     } finally { if (active.current === controller) active.current = null; }
   }
   const sameOwner = state.port === port && state.workspaceId === workspaceId && state.reauthenticationScope === reauthenticationScope;
   // A completed receipt is recovery metadata, never authorization for another command.
   const current = sameOwner && enabled ? state : { busy: false, error: null, canRetryCommand: false,
     result: sameOwner && state.result?.checkout?.status === "completed" ? state.result : null };
-  return { ...current, execute, retryCommand: async () => { if (retry.current) await execute(retry.current.intent, true); } };
+  return { ...current, execute, dismissError: () => { if (owns() && !active.current && !retry.current) setState(value => ({ ...value, error: null })); },
+    retryCommand: async () => { if (retry.current) await execute(retry.current.intent, true); } };
 }
