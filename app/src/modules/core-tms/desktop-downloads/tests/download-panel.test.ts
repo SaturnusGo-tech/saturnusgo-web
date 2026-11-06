@@ -27,7 +27,7 @@ test("download panel exposes the verified beta platforms and signing facts witho
   assert.deepEqual(downloads.map(node => node.props.href), release.artifacts.map(build => `${release.baseUrl}${build.file}`));
   assert.ok(all.some(node => node.props.children === "macOS: ad-hoc signed, not notarized. Windows: unsigned."));
   assert.ok(all.some(node => node.type === "div" && node.props.role === "dialog" && node.props["aria-modal"] === "false"));
-  const guide = all.find(node => node.type === "a" && node.props.href === "/falcon/desktop/install/macos.html");
+  const guide = all.find(node => node.type === "a" && node.props.href === "https://www.saturnusgo.com/falcon/desktop/install/macos.html");
   assert.ok(guide, "First-launch instructions must be available before opening the downloaded app");
   assert.equal(guide.props.target, "_blank");
   assert.equal(guide.props.rel, "noopener noreferrer");
