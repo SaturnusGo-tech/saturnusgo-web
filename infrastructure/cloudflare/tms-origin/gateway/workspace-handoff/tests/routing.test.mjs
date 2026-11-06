@@ -20,7 +20,9 @@ test('cross-origin form consumption is limited to known Falcon sources and the e
  globalThis.fetch=async request=>{forwarded=request;return Response.json({data:{ok:true}});};
  const make=(origin,path='consume')=>new Request(`${target}/api/v1/auth/workspace-handoffs${path?'/'+path:''}`,{method:'POST',body:'code=once',headers:{origin,'content-type':'application/x-www-form-urlencoded'}});
  assert.equal((await worker.fetch(make(source),env)).status,200);assert.equal(forwarded.headers.get('origin'),source);
- for(const origin of ['https://evil.test','https://tms.saturnusgo.com.evil.test','https://sandbox-falcon.saturnusgo.com'])assert.equal((await worker.fetch(make(origin),env)).status,403);
+ for(const origin of ['', 'null','https://evil.test','https://tms.saturnusgo.com.evil.test','https://sandbox-falcon.saturnusgo.com'])assert.equal((await worker.fetch(make(origin),env)).status,403);
+ const missing=new Request(target+'/api/v1/auth/workspace-handoffs/consume',{method:'POST',body:'code=once'});
+ assert.equal((await worker.fetch(missing,env)).status,403);
  assert.equal((await worker.fetch(make(source,''),env)).status,403);
 });
 test('company host forwards its own cloud-owner cookie without selecting another origin or credential type',async t=>{

@@ -270,7 +270,7 @@ export default {
       const response = await proxyCompanyApi(request, env, audience ?? "personal");
       const relayPolicy=readWorkspaceHandoffPolicy(request,response,audience ?? "personal",env);
       const secured=secureResponse(response,true,relayPolicy ?? readConsentPolicy(request,response,audience ?? "personal"));
-      if(relayPolicy)secured.headers.set("referrer-policy","no-referrer");
+      if(relayPolicy)secured.headers.set("referrer-policy","strict-origin");
       return secured;
     }
     if (incoming.pathname.startsWith("/falcon/docs/audio/")) {

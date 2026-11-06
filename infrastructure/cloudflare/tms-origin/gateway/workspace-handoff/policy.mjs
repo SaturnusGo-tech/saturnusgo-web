@@ -8,6 +8,13 @@ export function workspaceHandoffRoutePolicy(pathname,audience) {
  return allowedMethods?{kind:'workspace-handoff',cookieNames:audience==='personal'?['__Host-falcon_tenant_session']:[],allowedMethods,allowServerPost:false,
   allowCrossSitePost:pathname===root+'workspace-handoffs/consume',maximumBodyBytes:8192}:null;
 }
+function companyAdministrationRedirect(url) {
+ const keys=[...url.searchParams.keys()],workspaceId=url.searchParams.get('workspaceId'),projectId=url.searchParams.get('projectId'),lang=url.searchParams.get('lang');
+ return url.pathname==='/admin/'&&url.searchParams.get('account')==='personal'&&url.searchParams.get('page')==='company'&&
+  /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(workspaceId??'')&&
+  keys.every(key=>['account','workspaceId','page','projectId','lang'].includes(key)&&url.searchParams.getAll(key).length===1)&&
+  (projectId===null||/^[A-Za-z0-9._:-]{1,128}$/.test(projectId))&&(lang===null||['en','ru'].includes(lang));
+}
 export function workspaceHandoffResponsePolicy(request,response,audience,env) {
  if(!["personal","tenant"].includes(audience))return null;
  const path=new URL(request.url).pathname;
@@ -18,7 +25,7 @@ export function workspaceHandoffResponsePolicy(request,response,audience,env) {
  if(request.method==='POST'&&path===root+'workspace-handoffs/consume'&&response.status===303) {
   try {const location=response.headers.get('location'),url=new URL(location);
    allowRedirect=location.length<=2400&&url.origin===new URL(request.url).origin&&!url.username&&!url.password&&!url.hash&&
-    url.pathname==='/testcases/umbrella-home/work/'&&!/[\\\x00-\x20\x7f]/.test(location)&&!/%0[ad]/i.test(location)&&
+    (url.pathname==='/testcases/umbrella-home/work/'||companyAdministrationRedirect(url))&&!/[\\\x00-\x20\x7f]/.test(location)&&!/%0[ad]/i.test(location)&&
     ![...url.searchParams.keys()].some(key=>/token|code|secret|password|credential|authorization/i.test(key));
   }catch{}
  }
