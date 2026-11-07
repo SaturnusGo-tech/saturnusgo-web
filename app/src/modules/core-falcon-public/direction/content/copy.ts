@@ -4,7 +4,7 @@ export const directionCopy = {
     docs: 'Docs', open: 'Open app', skip: 'Skip to content', menu: 'Menu', closeMenu: 'Close menu',
     title: ['The quality workspace', 'for teams and agents.'],
     lead: 'Plan coverage. Run the checks. Understand what’s ready to ship. Your entire QA workflow, connected in Falcon.',
-    tools: 'Connected to your team’s workflow.', toolsNote: 'Explore available and upcoming integrations',
+    tools: 'Connected to your team’s workflow.', toolsNote: 'Explore available integrations',
     statement: ['A clearer picture of quality.', 'Built around the way QA teams work, with everything from the first test case to the release decision in one place.'],
     principles: [
       { title: 'Designed for the details', body: 'Structure your knowledge. Reuse what works. Keep every expectation within reach.', image: 'coverage' },
@@ -56,7 +56,7 @@ export const directionCopy = {
     docs: 'Документация', open: 'Открыть Falcon', skip: 'Перейти к содержимому', menu: 'Меню', closeMenu: 'Закрыть меню',
     title: ['Рабочее пространство QA', 'для команд и агентов.'],
     lead: 'Планируйте покрытие. Выполняйте проверки. Принимайте решения о релизе. Весь процесс тестирования связан в Falcon.',
-    tools: 'В привычном процессе вашей команды.', toolsNote: 'Доступные и будущие интеграции',
+    tools: 'В привычном процессе вашей команды.', toolsNote: 'Доступные интеграции',
     statement: ['Ясный взгляд на качество.', 'Всё, что нужно QA-команде: от первого тест-кейса до решения о готовности релиза. В одном месте.'],
     principles: [
       { title: 'Внимание к деталям', body: 'Структурируйте знания, используйте общие шаги и держите ожидаемый результат под рукой.', image: 'coverage' },
