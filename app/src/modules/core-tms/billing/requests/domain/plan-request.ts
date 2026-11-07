@@ -1,5 +1,4 @@
 import type { BillingPlanId } from "../../domain/billing";
-import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 
 export type PlanRequestStatus = "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
 export type PlanRequest = {
