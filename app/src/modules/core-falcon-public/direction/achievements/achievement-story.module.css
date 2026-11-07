@@ -9,6 +9,7 @@
   border-top: 1px solid var(--landing-line);
 }
 .copy { position: relative; z-index: 2; padding-block: 24px; }
+.compactCopy { display: none; }
 .copy h2 {
   font-size: clamp(34px, 4vw, 54px);
   font-weight: 500;
@@ -110,13 +111,37 @@
   .copy h2 { font-size: 34px; }
 }
 @media (max-width: 760px) {
-  .chapter { grid-template-columns: 1fr; gap: 38px; padding: 66px 20px 76px; }
+  .chapter {
+    gap: clamp(12px, 3.4vw, 28px);
+    padding: clamp(42px, 8vw, 66px) clamp(14px, 4.4vw, 32px);
+  }
   .copy { padding: 0; }
-  .copy h2 { font-size: 34px; }
-  .copy p { max-width: 52ch; margin-top: 22px !important; }
-  .collection { width: 100%; max-width: 520px; justify-self: center; }
-  .collection figcaption { margin-top: 24px; }
-  .badge { filter: drop-shadow(0 12px 10px #0009); }
+  .fullCopy { display: none; }
+  .compactCopy { display: inline; }
+  .copy h2 { font-size: clamp(20px, 4.7vw, 34px); }
+  .copy p {
+    margin-top: clamp(10px, 2.8vw, 22px) !important;
+    font-size: clamp(12px, 2.4vw, 15px);
+    line-height: 1.55;
+  }
+  .action {
+    gap: 7px;
+    max-width: 100%;
+    min-height: 44px;
+    margin-top: clamp(12px, 3.5vw, 24px);
+    padding: 6px clamp(9px, 2.2vw, 16px);
+    border-radius: 10px;
+    font-size: clamp(12px, 2.3vw, 14px);
+    line-height: 1.25;
+  }
+  .action svg { flex: none; width: 13px; }
+  .collection figcaption {
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+  .motionControl { position: relative; }
+  .motionControl::after { position: absolute; inset: -9px; content: ""; }
+  .badge { filter: drop-shadow(0 6px 6px #0009); }
 }
 @media (prefers-reduced-motion: reduce) {
   .motionControl { display: none; }

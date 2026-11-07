@@ -8,7 +8,7 @@ const rows = [INTEGRATIONS];
 export function DirectionMarquee({ title, note, pause, resume }: { title: string; note: string; pause: string; resume: string }) {
   const [paused, setPaused] = useState(false);
   return <section className={styles.integrations} id="connected-tools" aria-labelledby="tools-title">
-    <h2 id="tools-title">{title}</h2>
+    <h2 id="tools-title"><span className={styles.desktopCopy}>{title}</span><span className={styles.phoneCopy}>{note}</span></h2>
     <div className={styles.marqueeWindow} data-paused={paused}>
       {rows.map((row, i) => <div className={styles.marqueeTrack} data-reverse={i === 1} key={i}>
         {[false, true].map(duplicate => <ul className={styles.logoRow} aria-hidden={duplicate || undefined} key={String(duplicate)}>

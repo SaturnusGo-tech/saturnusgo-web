@@ -1,0 +1,326 @@
+.pricing {
+  background: var(--landing-bg);
+  padding-block: 36px 88px;
+}
+
+.pricing[id] { scroll-margin-top: 12px; }
+
+.stage {
+  position: relative;
+  isolation: isolate;
+  max-width: 1298px;
+  margin-inline: auto;
+  padding: 62px clamp(20px, 3.95vw, 51px) 36px;
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.light::before {
+  content: '';
+  position: absolute;
+  inset: -90px 0 0;
+  background:
+    radial-gradient(ellipse 15% 32% at 68% 33%, #0baddeb8, #0a63b685 45%, #102dbb3b 72%, transparent 100%),
+    radial-gradient(ellipse 13% 15% at 31% 84%, #054cde71, transparent 100%);
+}
+
+.light svg {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  mask-image: linear-gradient(transparent, #000 23% 93%, transparent);
+}
+
+.blueHalo, .halo, .edge { fill: none; }
+.halo, .edge { stroke: url(#pricing-light-color); }
+.blueHalo { stroke: #155bff; stroke-width: 106px; filter: url(#pricing-light-halo); opacity: .62; }
+.halo { stroke-width: 54px; filter: url(#pricing-light-halo); opacity: .8; }
+.edge { stroke-width: 12px; filter: url(#pricing-light-edge); opacity: .94; }
+
+.masthead {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: 12px;
+}
+
+.wordmark {
+  position: absolute;
+  inset-block-start: -12px;
+  inset-inline-end: 8px;
+  color: #99e5f6;
+  font-size: clamp(27px, 4.5vw, 58px);
+  font-weight: 550;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.title {
+  padding-bottom: .16em;
+  color: #4089b9;
+  font-size: clamp(94px, 20vw, 252px);
+  font-weight: 650;
+  letter-spacing: -.065em;
+  line-height: .86;
+  background: radial-gradient(ellipse 58% 115% at 66% 47%, #a2ebf5 0%, #338dc2 36%, #183650 75%, #101d2e 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transform: translateX(-3%) scaleX(1.1);
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2.15vw, 28px);
+  margin-top: clamp(-118px, -9.15vw, -78px);
+}
+
+.card {
+  display: flex;
+  min-width: 0;
+  min-height: 510px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(24px, 3.08vw, 40px);
+  padding-block: clamp(24px, 2.8vw, 36px);
+  border: 1px solid #c3e7ff4a;
+  border-radius: clamp(26px, 3.35vw, 44px);
+  background: linear-gradient(155deg, #101115f2 5%, #0a0b0ef2 70%, #11161bf0);
+  box-shadow: inset 0 1px 1px #ecf7ff29, 0 18px 48px #0006;
+}
+
+.card[data-plan="enterprise"] {
+  border-color: #abeaff8c;
+  box-shadow:
+    inset 0 0 9px #9feaff70,
+    inset 0 0 23px #49b7d760,
+    inset 0 -4px 14px #c3f7ff36,
+    0 18px 48px #0007;
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card {
+    background: linear-gradient(152deg, #0c0c0fce 10%, #0b0c0ddc 68%, #0c11169e);
+    -webkit-backdrop-filter: blur(26px);
+    backdrop-filter: blur(26px);
+  }
+
+  .card[data-plan="startup"] {
+    background: linear-gradient(155deg, #0d10168f, #08090aa6 57%, #0b0b0dbd 90%);
+  }
+
+  .card[data-plan="enterprise"] {
+    background: radial-gradient(ellipse 58% 72% at 0% 22%, #2681a169, transparent 76%), #0b0c0ecc;
+  }
+}
+
+.card h3 {
+  font-size: clamp(24px, 2.46vw, 32px);
+  font-weight: 450;
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+
+.price {
+  color: var(--landing-text);
+  font-size: clamp(32px, 3.72vw, 48px);
+  font-weight: 450;
+  letter-spacing: -.052em;
+  line-height: 1.12;
+  white-space: nowrap;
+}
+
+.card .description {
+  margin-block: 20px 18px;
+  min-height: 2.8em;
+  color: #c0c4cb;
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 29ch;
+}
+
+.features {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.35;
+  color: #d9dce1;
+}
+
+.features li {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.check {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: #323438;
+  color: var(--landing-text);
+}
+
+.card .action {
+  display: inline-grid;
+  place-items: center;
+  align-self: center;
+  min-width: 180px;
+  max-width: 100%;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 8px 17px;
+  border-radius: 999px;
+  background: var(--falcon-action);
+  color: var(--falcon-on-action);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.25;
+  transition: background-color .18s ease;
+}
+
+.card .action:hover { background-color: #dcebf3; }
+
+.notes {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-inline: 20px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--landing-muted);
+}
+
+.notes a { color: var(--landing-text); text-decoration: underline; text-underline-offset: .25em; }
+
+.pager { display: none; }
+
+@media (max-width: 960px) {
+  .card { min-height: 460px; }
+  .price { white-space: normal; }
+  .features li { gap: 9px; }
+  .check { width: 26px; height: 26px; }
+}
+
+@media (max-width: 800px) {
+  .pricing { padding-block: 12px clamp(36px, 8vw, 64px); }
+
+  .stage {
+    max-width: 560px;
+    padding: clamp(30px, 6vw, 48px) clamp(14px, 4.5vw, 24px) 14px;
+  }
+
+  .light svg {
+    height: auto;
+    transform: scaleY(1.8);
+    transform-origin: top;
+  }
+
+  .light { overflow: hidden; mask-image: linear-gradient(#000 85%, transparent); }
+  .wordmark { inset-block-start: -.5em; font-size: clamp(17px, 4.5vw, 35px); }
+  .title { font-size: clamp(64px, 19vw, 104px); }
+
+  .grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: 12px;
+    margin-top: clamp(-44px, -7vw, -23px);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-behavior: smooth;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+  }
+
+  .grid::-webkit-scrollbar { display: none; }
+
+  .card {
+    min-height: 0;
+    padding: clamp(20px, 5.5vw, 32px);
+    border-radius: 16px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .card h3 { font-size: clamp(1.375rem, 5.8vw, 1.75rem); }
+  .price { font-size: clamp(2rem, 8.5vw, 2.5rem); }
+  .card .description { margin-block: 14px 16px; }
+  .features { gap: 10px; margin-bottom: 20px; }
+  .check { width: 24px; height: 24px; }
+
+  .card .action { width: 100%; min-width: 0; border-radius: 10px; }
+
+  .pager { display: flex; justify-content: center; }
+
+  .pager button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #838b95;
+    cursor: pointer;
+    transition: color .16s ease-out;
+  }
+
+  .pager button::before {
+    content: '';
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: currentColor;
+    transition: width .18s ease-out;
+  }
+
+  .pager button:first-child::before { inset-inline-start: 13px; }
+  .pager button:last-child::before { inset-inline-start: -13px; }
+  .pager button[aria-current="true"] { color: var(--landing-text); }
+  .pager button[aria-current="true"]::before { width: 18px; }
+
+  .notes { gap: 6px 14px; margin-inline: 12px; font-size: .75rem; }
+}
+
+@media (max-width: 800px) and (hover: hover) {
+  .pager button:not([aria-current]):hover { color: #c3cad3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid { scroll-behavior: auto; }
+  .pager button, .pager button::before { transition: none; }
+}
+
+@media (prefers-contrast: more) {
+  .title { background: none; color: var(--landing-text); -webkit-text-fill-color: currentColor; }
+}
+
+@media (forced-colors: active) {
+  .title { background: none; color: CanvasText; -webkit-text-fill-color: CanvasText; }
+  .light { display: none; }
+  .card .action { border: 1px solid ButtonText; }
+  .pager button::before { forced-color-adjust: none; background: ButtonText; }
+  .pager button[aria-current="true"]::before { background: Highlight; }
+}

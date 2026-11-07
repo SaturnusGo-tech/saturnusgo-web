@@ -12,8 +12,14 @@ export function ProductScene({ kind, locale }: { kind: SceneKind; locale: Landin
   const overlayAlt = kind === 'execution' ? c.runAlt : kind === 'integrations' ? c.integrationsAlt : c.suitesAlt;
   return <figure className={styles.productScene} data-scene={kind} aria-label={kind === 'hero' ? c.heroAlt : undefined}>
     <div className={styles.scenePlane}>
-      <div className={styles.sceneMain}><img src={main.src} width={main.width} height={main.height} alt={mainAlt} loading={kind === 'hero' ? 'eager' : 'lazy'} fetchPriority={kind === 'hero' ? 'high' : 'auto'} /></div>
-      <div className={styles.sceneOverlay}><img src={overlay.src} width={overlay.width} height={overlay.height} alt={overlayAlt} loading="lazy" /></div>
+      <picture className={styles.sceneMain}>
+        <source media="(max-width: 760px)" srcSet={main.compactSrc} />
+        <img src={main.src} width={main.width} height={main.height} alt={mainAlt} loading={kind === 'hero' ? 'eager' : 'lazy'} fetchPriority={kind === 'hero' ? 'high' : 'auto'} />
+      </picture>
+      <picture className={styles.sceneOverlay}>
+        <source media="(max-width: 760px)" srcSet={overlay.compactSrc} />
+        <img src={overlay.src} width={overlay.width} height={overlay.height} alt={overlayAlt} loading={kind === 'hero' ? 'eager' : 'lazy'} />
+      </picture>
     </div>
   </figure>;
 }

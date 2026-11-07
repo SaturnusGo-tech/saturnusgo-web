@@ -43,7 +43,7 @@ export function FalconPrivacyPage() {
         {paragraphs.map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}
       </section>)}
       <p><a href="https://www.argentina.gob.ar/aaip/datospersonales/derechos" target="_blank" rel="noopener noreferrer">{copy.rightsLink} ↗</a></p>
-      <footer><a href={`/trial-terms/?lang=${locale === "ru" ? "ru" : "en"}`}>{locale === "ru" ? "Условия личного пробного доступа" : "Personal trial terms"}</a><br /><br /><a href={`/?lang=${locale}#book-demo`}>{copy.back} ↗</a></footer>
+      <footer><a href={`/trial-terms/?lang=${locale === "ru" ? "ru" : "en"}`}>{locale === "ru" ? "Условия личного пробного доступа" : "Personal trial terms"}</a><br /><br /><a href={`/?lang=${locale}`}>{copy.back} ↗</a></footer>
     </main>
   </div>;
 }

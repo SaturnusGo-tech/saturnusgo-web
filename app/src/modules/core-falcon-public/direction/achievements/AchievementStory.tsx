@@ -25,10 +25,18 @@ export function AchievementStory({ locale }: { locale: LandingLocale }) {
   return (
     <section className={styles.chapter} id="achievements" aria-labelledby="achievements-title">
       <div className={styles.copy}>
-        <h2 id="achievements-title">{copy.title}</h2>
-        <p>{copy.body}</p>
+        <h2 id="achievements-title">
+          <span className={styles.fullCopy}>{copy.title}</span>
+          <span className={styles.compactCopy}>{copy.compact.title}</span>
+        </h2>
+        <p>
+          <span className={styles.fullCopy}>{copy.body}</span>
+          <span className={styles.compactCopy}>{copy.compact.body}</span>
+        </p>
         <a className={styles.action} href={`/cloud-login/?lang=${locale}`}>
-          {copy.action}<ArrowRight size={16} aria-hidden="true" />
+          <span className={styles.fullCopy}>{copy.action}</span>
+          <span className={styles.compactCopy}>{copy.compact.action}</span>
+          <ArrowRight size={16} aria-hidden="true" />
         </a>
       </div>
       <figure className={styles.collection} aria-label={copy.collection}>
@@ -50,7 +58,7 @@ export function AchievementStory({ locale }: { locale: LandingLocale }) {
           })}
         </div>
         <figcaption>
-          <span>{copy.note}</span>
+          <span className={styles.fullCopy}>{copy.note}</span>
           <button
             className={styles.motionControl}
             type="button"

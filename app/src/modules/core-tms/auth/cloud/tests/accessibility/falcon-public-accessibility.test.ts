@@ -42,6 +42,10 @@ test("current product scenes have valid localized captures", () => {
     const image = readFileSync(resolve(root, `public${capture.src}`));
     assert.equal(image.subarray(8, 12).toString(), "WEBP", `${locale}/${name}: invalid capture`);
     assert.ok(image.length > 1000, `${locale}/${name}: empty capture`);
+    assert.match(capture.compactSrc, new RegExp(`/2026-11/${locale}/product-${name}-1152\\.webp$`));
+    const compact = readFileSync(resolve(root, `public${capture.compactSrc}`));
+    assert.equal(compact.subarray(8, 12).toString(), "WEBP", `${locale}/${name}: invalid compact capture`);
+    assert.ok(compact.length > 1000 && compact.length < image.length, `${locale}/${name}: compact capture size`);
   }
 });
 

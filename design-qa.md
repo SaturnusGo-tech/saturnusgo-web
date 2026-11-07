@@ -515,3 +515,13 @@ User requested a lighter neutral surface and slightly squarer corners. Scoped to
 - Documentation: English/Russian text and walkthrough instructions now describe the direct import page and header export. Existing walkthrough screenshots predate this visual iteration.
 - No actionable P0/P1/P2 visual findings remain. End-to-end local upload completion remains unverified because of the local certificate limitation stated above.
 - final result: passed
+
+## Falcon landing pricing
+
+- Source is the supplied Forma AI pricing screenshot. The Falcon version uses the landing background token, an oversized localized heading behind three glass cards, and a shared SVG light curve. The upper glow fades into the page and the descending curve is visible between cards.
+- Desktop retains three cards on one row at 1298px. At 390px and 320px the track shows one card at a time, in Individual, Startup, Enterprise order. All five feature rows remain visible in each card. Horizontal scrolling updates the active indicator in both directions. No horizontal page overflow.
+- Each card has five plan-specific rows. The two self-serve prices, Enterprise request link, and seven-day trial use localized destinations. The card treatment has a solid fallback for browsers without backdrop blur.
+- The phone layout keeps the three principle illustrations together and preserves the desktop layering of the four product scenes. Both languages serve 1152px versions of the same captures on phones. The desktop keeps the 3456px originals. The previous screenshot notice and decorative section-heading glyphs have been removed.
+- The mobile header CTA measures 30px visually, with an extended hit area. The menu reveals downwards, respects reduced motion, and closes on navigation. The three illustrations have concrete captions explaining how to prepare a suite, run approved web checks with Codex, and review failures.
+- Removed the landing demo and the standalone documentation CTA. Grouped footer links by Product and Resources, with policies on a separate lower row. Legacy demo bookmarks point to the footer.
+- Compared screenshots for each section at 390px in RU, checked narrow width at 320px, and checked desktop pricing at 1298px in EN. Browser verification used responsive Chromium emulation and horizontal wheel input.
