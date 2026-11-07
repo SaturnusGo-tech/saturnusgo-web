@@ -1,4 +1,5 @@
 import type { BillingPlanId } from "../../domain/billing";
+import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 
 export type PlanRequestStatus = "requested" | "contacted" | "approved" | "activating" | "active" | "declined" | "withdrawn" | "expired" | "revoked";
 export type PlanRequest = {
@@ -56,20 +57,16 @@ export function withoutPlanRequestIntent(href: string) {
   return url;
 }
 
-type DraftFields = Pick<PlanRequest, "planId" | "reference" | "applicantName" | "applicantEmail" | "workspaceId" | "workspaceName" | "workspaceKind" | "companyHostname">;
-export function planRequestDraft(request: DraftFields, ru: boolean) {
-  const plan = planNames[request.planId];
-  const subject = ru ? `Falcon · Заявка на ${plan} · ${request.reference}` : `Falcon · ${plan} access request · ${request.reference}`;
-  const body = [
-    ru ? "Здравствуйте! Хочу обсудить подключение Falcon." : "Hi Falcon team, I’d like to discuss access to Falcon.",
-    "",
-    `${ru ? "План" : "Plan"}: ${plan}`,
-    `${ru ? "Номер заявки" : "Request reference"}: ${request.reference}`,
-    `${ru ? "Имя" : "Name"}: ${request.applicantName}`,
-    `Email: ${request.applicantEmail}`,
-    `${ru ? "Пространство" : "Workspace"}: ${request.workspaceName}`,
-    `${request.workspaceKind === "company" ? (ru ? "ID компании" : "Company ID") : (ru ? "ID пространства" : "Workspace ID")}: ${request.workspaceId}`,
-    ...(request.companyHostname ? [`${ru ? "Домен компании" : "Company domain"}: ${request.companyHostname}`] : []),
-  ].join("\r\n");
-  return { href: `mailto:${planSupportEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, subject, body };
+export function planRequestGmailUrl(planId: BillingPlanId, ru: boolean, reference?: string) {
+  const plan = planNames[planId];
+  const subject = ru ? `Falcon · Доступ к ${plan}` : `Falcon · ${plan} access`;
+  const url = new URL("https://mail.google.com/mail/");
+  url.search = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: planSupportEmail,
+    su: reference ? `${subject} · ${reference}` : subject,
+    body: ru ? `Здравствуйте! Хочу обсудить подключение Falcon ${plan}.` : `Hi Falcon team, I’d like to discuss access to Falcon ${plan}.`,
+  }).toString();
+  return url.href;
 }

@@ -20,7 +20,7 @@ void test("the chooser flag probes only verified spaces, is removed from the URL
   globalThis.fetch = async (url, init) => {
     const path = String(url); calls.push({ path, init });
     return Response.json({ data: path.endsWith("/select") ? { redirectUrl: selectedRedirect }
-      : { spaces: [{ id: "company-1", name: "Alpha", kind: "company" }, { id: "personal-1", name: "My workspace", kind: "personal" }] } });
+      : { spaces: [{ id: "company-1", name: "Alpha", kind: "company" }, { id: "personal-1", name: "Моё пространство", kind: "personal" }] } });
   };
   t.after(() => {
     if (css) require.extensions[".css"] = css; else delete require.extensions[".css"];

@@ -5,6 +5,7 @@ import { act, create, type ReactTestInstance, type ReactTestRenderer } from "rea
 import { TmsApiError, type TmsHttpClient } from "../../../../../core/tms/transport/http";
 import { TmsHttpClientProvider } from "../../../auth/http/TmsHttpClientContext";
 import { TmsSessionProvider } from "../../../auth/presentation/session/TmsSessionContext";
+import type { PlanRequest } from "../../requests/domain/plan-request";
 import { TmsLocaleContext } from "../../../localization/context/TmsLocaleProvider";
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
@@ -19,8 +20,8 @@ function button(root: ReactTestInstance, label: string) {
 }
 
 async function withBilling(check: (root: ReactTestInstance) => Promise<void>, {
-  workspaceKind = "personal", failFirstRequest = false, denyRequests = false,
-}: { workspaceKind?: "company" | "personal"; failFirstRequest?: boolean; denyRequests?: boolean } = {}) {
+  workspaceKind = "personal", failFirstRequest = false, denyRequests = false, request,
+}: { workspaceKind?: "company" | "personal"; failFirstRequest?: boolean; denyRequests?: boolean; request?: PlanRequest } = {}) {
   const previousEnvironment = process.env.NODE_ENV;
   Reflect.set(process.env, "NODE_ENV", "production");
   const requestPath = "/workspaces/space/plan-requests";
@@ -47,8 +48,8 @@ async function withBilling(check: (root: ReactTestInstance) => Promise<void>, {
       }
       return {
         data: {
-          requests: [], applicant: { displayName: "QA", email: "qa@example.com" },
-          workspace: { id: "space", kind: workspaceKind, name: "My workspace" },
+          requests: request ? [request] : [], applicant: { displayName: "QA", email: "qa@example.com" },
+          workspace: { id: "space", kind: workspaceKind, name: "Моё пространство" },
           access: null, eligiblePlanIds: workspaceKind === "company" ? ["enterprise"] : ["individual", "startup", "enterprise"],
         },
         etag: null,
@@ -104,7 +105,8 @@ test("a production workspace admin can request Individual or Startup when checko
     assert.ok(root.findAllByType("strong").some(node => node.children.includes("$59")));
     await act(async () => startupAction.props.onClick());
     const dialog = root.findByType("dialog");
-    assert.ok(dialog.findAllByType("p").some(node => node.children.includes("Access to Falcon Startup")));
+    assert.ok(dialog.findAllByType("span").some(node => node.children.includes("Startup")));
+    assert.ok(dialog.findAllByType("dd").some(node => node.children.includes("My workspace")));
   });
 });
 
@@ -130,8 +132,8 @@ test("a company admin denied plan requests can contact Falcon about Enterprise w
     assert.ok(contact);
     await act(async () => contact.props.onClick());
     const dialog = root.findByType("dialog");
-    assert.ok(button(dialog, "Copy email address"));
-    assert.ok(dialog.findAllByType("a").some(link => link.props.href === "mailto:falcon@saturnusgo.com"));
+    assert.equal(dialog.findAllByProps({ "aria-label": "Copy email address" }).length, 1);
+    assert.ok(dialog.findAllByType("a").some(link => new URL(link.props.href).hostname === "mail.google.com"));
     assert.equal(button(dialog, "Send request"), undefined);
   }, { workspaceKind: "company", denyRequests: true });
 });
@@ -141,8 +143,38 @@ test("an eligible company admin can still open the Enterprise request form", asy
     const contact = button(root, "Contact us");
     assert.ok(contact);
     await act(async () => contact.props.onClick());
-    const send = button(root.findByType("dialog"), "Send request");
+    const dialog = root.findByType("dialog");
+    const send = button(dialog, "Send request");
     assert.ok(send);
     assert.equal(send.props.disabled, false);
+    assert.ok(dialog.findAllByType("dd").some(node => node.children.includes("Моё пространство")));
   }, { workspaceKind: "company" });
+});
+
+test("the request status keeps withdrawal behind explicit management and confirmation", async () => {
+  const request: PlanRequest = {
+    id: "request_internal_id", reference: "FR-private", planId: "individual", status: "requested",
+    locale: "en", workspaceId: "space", workspaceName: "Моё пространство", workspaceKind: "personal",
+    applicantName: "QA", applicantEmail: "qa@example.com", note: null,
+    createdAt: "2026-10-01T00:00:00Z", updatedAt: "2026-10-01T00:00:00Z", version: 1,
+    activationExpiresAt: null, accessEndsAt: null, setupId: null, companyHostname: null, preparationError: null,
+    actions: ["withdraw"],
+  };
+  await withBilling(async root => {
+    const open = button(root, "View Individual request");
+    assert.ok(open);
+    await act(async () => open.props.onClick());
+    const dialog = root.findByType("dialog");
+    assert.ok(button(dialog, "Done"));
+    assert.ok(!dialog.findAll(node => node.children.some(child => typeof child === "string" && /FR-private|request_internal_id/.test(child))).length);
+    assert.equal(button(dialog, "Withdraw request"), undefined);
+    const manage = button(dialog, "Manage request");
+    assert.ok(manage);
+    await act(async () => manage.props.onClick());
+    assert.ok(button(dialog, "Withdraw request"));
+    const keep = button(dialog, "Keep request");
+    assert.ok(keep);
+    await act(async () => keep.props.onClick());
+    assert.equal(button(dialog, "Withdraw request"), undefined);
+  }, { request });
 });

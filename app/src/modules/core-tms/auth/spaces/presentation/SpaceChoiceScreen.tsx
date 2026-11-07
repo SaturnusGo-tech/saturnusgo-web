@@ -3,6 +3,7 @@ import { ChevronRight, LoaderCircle } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { useSpaceChoice } from "../application/useSpaceChoice";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
+import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 import { spaceChoiceCopy } from "./space-choice-copy";
 import access from "../../managed/presentation/screen/access.module.css";
 import styles from "./spaces.module.css";
@@ -25,7 +26,7 @@ export function SpaceChoiceScreen({ model }: { readonly model: ReturnType<typeof
             {!expired && !denied && <button className={access.secondary} onClick={model.retry}>{copy.retry}</button>}</>
             : state.spaces?.length ? <div className={styles.choices}>{state.spaces.map(space => <button key={space.id} className={styles.choice}
               disabled={!!state.pending} aria-busy={state.pending === space.id} onClick={() => void model.select(space.id)}>
-              <span><strong>{space.name}</strong><small>{space.kind === "company" ? copy.company : copy.personal}</small></span>
+              <span><strong>{workspaceDisplayName(space, locale)}</strong><small>{space.kind === "company" ? copy.company : copy.personal}</small></span>
               {state.pending === space.id ? <LoaderCircle className={access.spinner} size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}
             </button>)}</div> : <p className={access.lead} role="status">{copy.empty}</p>}
       <footer className={access.footer}><button className={access.linkButton} disabled={state.cancelling} onClick={() => void model.cancel()}>{copy.back}</button></footer>

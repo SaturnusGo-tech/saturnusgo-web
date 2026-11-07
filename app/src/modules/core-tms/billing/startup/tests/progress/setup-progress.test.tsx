@@ -7,6 +7,7 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 const previousCss = require.extensions[".css"];
 require.extensions[".css"] = module => { module.exports = {}; };
 const { StartupSetupScreen } = require("../../presentation/StartupSetupScreen") as typeof import("../../presentation/StartupSetupScreen");
+const { CompanyPreparationScreen } = require("../../presentation/wizard/progress/CompanyPreparationScreen") as typeof import("../../presentation/wizard/progress/CompanyPreparationScreen");
 if (previousCss) require.extensions[".css"] = previousCss; else delete require.extensions[".css"];
 type Props = Parameters<typeof StartupSetupScreen>[0];
 function fixture() {
@@ -61,5 +62,21 @@ test("controlled Startup keeps its preparation screen while the server finishes 
  try {assert.equal(view.root.findByProps({"data-company-wizard":true}).props["data-stage"],"finishing");assert.equal(view.root.findAllByProps({name:"billing-outcome"}).length,0);
   assert.equal(view.root.findAllByType("button").some(node=>node.children.includes("Confirm")),false);
  } finally {await act(async()=>view.unmount());}
+});
+
+test("company preparation localizes the default fallback while keeping custom and setup names", async () => {
+  const cases = [
+    { ru: false, workspace: { kind: "personal", name: "Моё пространство" }, expected: "My workspace" },
+    { ru: true, workspace: { kind: "personal", name: "My workspace" }, expected: "Моё пространство" },
+    { ru: false, workspace: { kind: "personal", name: "Лаборатория QA" }, expected: "Лаборатория QA" },
+    { ru: false, workspace: { kind: "personal", name: "Моё пространство" }, name: "Команда Falcon", expected: "Команда Falcon" },
+  ] as const;
+  for (const { expected, ...props } of cases) {
+    let view!: ReactTestRenderer;
+    await act(async () => { view = create(<CompanyPreparationScreen preparing {...props} />); });
+    try {
+      assert.ok(view.root.findAllByType("p").some(node => node.children.includes(expected)));
+    } finally { await act(async () => view.unmount()); }
+  }
 });
 

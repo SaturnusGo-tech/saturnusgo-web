@@ -8,9 +8,10 @@ import styles from "../plan-requests.module.css";
 
 type Copy = ReturnType<typeof planRequestCopy>;
 
-export function PlanRequestActionForm({ action, request, copy, error, canRefresh, pending, submit, onRefresh, onCancel }: {
+export function PlanRequestActionForm({ action, request, workspaceName, copy, error, canRefresh, pending, submit, onRefresh, onCancel }: {
   readonly action: PlanRequestAction;
   readonly request: PlanRequestDetail;
+  readonly workspaceName: string;
   readonly copy: Copy;
   readonly error: string | null;
   readonly canRefresh: boolean;
@@ -40,7 +41,7 @@ export function PlanRequestActionForm({ action, request, copy, error, canRefresh
   return <form className={styles.actionForm} onSubmit={onSubmit}>
     <h2>{actionLabel(action)}</h2>
     {approval && <>
-      <p><strong>{request.applicantEmail}</strong> · {request.workspaceName}</p>
+      <p><strong>{request.applicantEmail}</strong> · {workspaceName}</p>
       <p>{t("Pilot access starts at activation. The invitation is valid for seven days.", "Пилотный доступ начинается с активации. Приглашение действует семь дней.")}</p>
       <label>{t("Pilot duration in days", "Длительность пилота в днях")}
         <input type="number" min={1} max={90} step={1} required value={duration} onChange={(event) => setDuration(event.target.value)} disabled={pending} />

@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ChevronRight, Mail } from "lucide-react";
 import { useCallback, useState } from "react";
+import { workspaceDisplayName } from "../../../../localization/format/workspace/display-name";
 import type { AdministrationPort } from "../../../application/ports/administration-port";
 import { useAdministrationCommand } from "../../../application/state/useAdministrationCommand";
 import { useAdministrationResource } from "../../../application/state/useAdministrationResource";
@@ -47,6 +48,7 @@ function RequestBody({ client, request, refreshing, refresh, locale, copy, onOpe
   readonly onOpenCompany: (id: string) => void;
 }) {
   const { t, date, status, event, mail, action: actionLabel } = copy;
+  const workspaceName = workspaceDisplayName({ name: request.workspaceName, kind: request.workspaceKind }, locale);
   const [operation, setOperation] = useState<PlanRequestAction | null>(null);
   const command = useAdministrationCommand();
   const allowed = operatorActions.filter((action) => request.actions.includes(action));
@@ -89,7 +91,7 @@ function RequestBody({ client, request, refreshing, refresh, locale, copy, onOpe
           setOperation(currentOperation === action ? null : action);
         }}>{actionLabel(action)}</button>)}
     </div>
-    {currentOperation && <PlanRequestActionForm key={currentOperation} action={currentOperation} request={request} copy={copy}
+    {currentOperation && <PlanRequestActionForm key={currentOperation} action={currentOperation} request={request} workspaceName={workspaceName} copy={copy}
       error={command.error ? errors[command.error] ?? administrationError(command.error, locale) : null}
       canRefresh={command.error === "PLAN_REQUEST_CONFLICT" || command.error === "PLAN_REQUEST_NOT_AVAILABLE"}
       pending={command.pending || refreshing} submit={submit} onRefresh={() => { command.clearError(); refresh(); }}
@@ -109,7 +111,7 @@ function RequestBody({ client, request, refreshing, refresh, locale, copy, onOpe
       <section className={styles.detail}>
         <h2>{t("Workspace", "Рабочее пространство")}</h2>
         <dl>
-          <dt>{t("Name", "Название")}</dt><dd>{request.workspaceName}</dd>
+          <dt>{t("Name", "Название")}</dt><dd>{workspaceName}</dd>
           <dt>{t("Type at submission", "Тип при подаче")}</dt><dd>{request.workspaceKind === "personal" ? t("Personal", "Личное") : t("Company", "Компания")}</dd>
           <dt>{t("Workspace ID", "ID пространства")}</dt><dd><code>{request.workspaceId}</code></dd>
           {request.access && <><dt>{t("Current plan", "Текущий план")}</dt>

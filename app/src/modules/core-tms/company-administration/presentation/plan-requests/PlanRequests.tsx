@@ -2,6 +2,7 @@
 
 import { ChevronDown, ChevronRight, Inbox } from "lucide-react";
 import { useCallback, useState } from "react";
+import { workspaceDisplayName } from "../../../localization/format/workspace/display-name";
 import { useAdministrationList } from "../../application/list/useAdministrationList";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { planRequestStatuses, type PlanRequestStatus } from "../../domain/plan-requests/plan-request";
@@ -63,7 +64,7 @@ function PlanRequestList({ client, status, setStatus, locale, onOpen }: {
             onOpen(request.id);
           }}>
             <span className={styles.identity}><strong>{request.applicantName || request.applicantEmail}</strong><small>{request.applicantEmail}</small></span>
-            <span className={styles.identity}><strong>{planRequestNames[request.planId]}</strong><small>{request.workspaceName}</small></span>
+            <span className={styles.identity}><strong>{planRequestNames[request.planId]}</strong><small>{workspaceDisplayName({ name: request.workspaceName, kind: request.workspaceKind }, locale)}</small></span>
             <span className={shared.badge} data-state={request.status === "activating" ? "pending" : request.status}>{statusLabel(request.status)}</span>
             <time dateTime={request.createdAt}>{date(request.createdAt)}</time>
             <ChevronRight size={15} aria-hidden="true" />

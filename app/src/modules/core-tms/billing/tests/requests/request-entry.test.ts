@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { continuationFromLocation, safeContinuationPath } from "../../../auth/continuation/domain/continuation-path";
-import { planRequestDraft, readPlanRequestIntent } from "../../requests/domain/plan-request";
+import { planRequestGmailUrl, readPlanRequestIntent } from "../../requests/domain/plan-request";
 
 const origin = "https://tms.saturnusgo.com";
 const login = (search: string) => continuationFromLocation({ origin, pathname: "/cloud-login/", search, hash: "" });
@@ -21,13 +21,12 @@ test("billing deep links reject duplicates, invalid IDs and unsupported plans", 
   assert.equal(readPlanRequestIntent("?planRequest=req_123&workspaceId=personal_123&requestPlan=enterprise")?.kind, "request");
 });
 
-test("draft uses a single recipient and includes only visible request details", () => {
-  const draft = planRequestDraft({ planId: "startup", reference: "FR-7", applicantName: "Alex & Co", applicantEmail: "alex@example.com",
-    workspaceId: "ws_7", workspaceName: "Falcon Test", workspaceKind: "company", companyHostname: "test-falcon.saturnusgo.com" }, true);
-  assert.match(draft.href, /^mailto:falcon@saturnusgo\.com\?subject=/);
-  const params = new URLSearchParams(draft.href.split("?")[1]);
-  assert.match(params.get("subject")!, /FR-7/);
-  assert.match(params.get("body")!, /Alex & Co/);
-  assert.match(params.get("body")!, /test-falcon\.saturnusgo\.com/);
-  assert.match(params.get("body")!, /ws_7/);
+test("Gmail draft includes the support address, plan and optional reference", () => {
+  const draft = new URL(planRequestGmailUrl("startup", true, "FR-7"));
+  assert.equal(draft.origin, "https://mail.google.com");
+  assert.equal(draft.searchParams.get("view"), "cm");
+  assert.equal(draft.searchParams.get("to"), "falcon@saturnusgo.com");
+  assert.match(draft.searchParams.get("su")!, /Startup.*FR-7/);
+  assert.match(draft.searchParams.get("body")!, /обсудить подключение/);
+  assert.doesNotMatch(planRequestGmailUrl("enterprise", false), /undefined|null/);
 });

@@ -1,7 +1,9 @@
 import { ApiScopeSelector } from "../../api-sources/scope/selector/ApiScopeSelector";
 import { RepositoryScopeSelector } from "../../repository-scope/presentation/selector/RepositoryScopeSelector";
 import { FolderOpen, PlusSquareAdd, SidebarMenuMobile } from "@openai/apps-sdk-ui/components/Icon";
+import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessionContext";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { workspaceDisplayName } from "../../localization/format/workspace/display-name";
 import type { WorkspaceModel } from "../../state/model/useWorkspaceModel";
 import { HistoryControls } from "./history/HistoryControls";
 import { ProjectSelector } from "./project-selector/ProjectSelector";
@@ -19,7 +21,13 @@ export function WorkspaceHeader({
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 }) {
-  const { languageTag, t } = useTmsLocale();
+  const { languageTag, locale, t } = useTmsLocale();
+  const session = useOptionalTmsSession();
+  const workspace = model.data.workspace;
+  const workspaceName = workspaceDisplayName({
+    name: workspace.name,
+    kind: session?.workspaceId === workspace.id ? session.workspaceKind : undefined,
+  }, locale);
   const workspaceReady =
     model.connection === "connected" || model.connection === "demo";
   function editEnvironment() {
@@ -46,7 +54,7 @@ export function WorkspaceHeader({
 
       <HistoryControls />
       <FolderOpen className={shellStyles.contextIcon} width={22} height={22} aria-hidden="true" />
-      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || (!model.project && model.view !== "cases" && model.view !== "api") ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{model.data.workspace.name}</span></div> : <div className={shellStyles.projectContext}>
+      {(model.view === "portfolios" || model.view === "profile" || model.view === "notifications") || (!model.project && model.view !== "cases" && model.view !== "api") ? <div className={shellStyles.projectContext}><span className={shellStyles.workspaceName}>{workspaceName}</span></div> : <div className={shellStyles.projectContext}>
         <span className={shellStyles.projectEyebrow} aria-hidden="true">
           {model.view === "api" ? (languageTag.startsWith("ru") ? "Область" : "Scope") : model.view === "cases" && model.repositoryScope.portfolioId ? (languageTag.startsWith("ru") ? "Портфель" : "Portfolio") : t("header.project")}
         </span>

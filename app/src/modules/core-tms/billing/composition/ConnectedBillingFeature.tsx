@@ -147,7 +147,7 @@ export function ConnectedBillingFeature({ workspaceId, preview = false, onClose 
     }}>{billing.canRetryCommand ? (locale === "ru" ? "Повторить то же действие" : "Retry the same action") : (locale === "ru" ? "Обновить данные" : "Refresh details")}</button>
   </div>);
   if (manualAvailable && !manualSetupId && (transitioningRequest?.status === "activating" && !transitioningRequest.preparationError || handoff.phase === "loading" && manualHandoff)) {
-    return <CompanyPreparationScreen ru={ru} preparing name={setup.setup?.displayName ?? transitioningRequest?.workspaceName} />;
+    return <CompanyPreparationScreen ru={ru} preparing name={setup.setup?.displayName} workspace={transitioningRequest ? { name: transitioningRequest.workspaceName, kind: transitioningRequest.workspaceKind } : undefined} />;
   }
   if (manualStartupSetup && activationRequest) {
     return <StartupSetupScreen key={manualSetupId} model={setup} ru={ru} manualAccess canCheckout paymentsAvailable={false} busy={manual.busy}
