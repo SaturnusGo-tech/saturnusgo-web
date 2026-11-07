@@ -45,4 +45,16 @@ test("the Mac update chooser offers only Mac installers", () => {
   const all = nodes(render({ open: true, anchor: { current: null }, onClose() {}, installerFiles: macFiles }));
   const downloads = all.filter(node => node.type === "a" && typeof node.props.download === "string" && node.props.download !== release.checksums);
   assert.deepEqual(downloads.map(node => node.props.download), macFiles);
+
+  const actions: string[] = [];
+  const chooser = nodes(render({
+    open: true, anchor: { current: null }, installerFiles: macFiles,
+    onClose() { actions.push("close"); },
+    onDownload(href) { actions.push(href); },
+  }));
+  const installer = chooser.find(node => node.props.href === `${release.baseUrl}${macFiles[0]}`);
+  assert.equal(installer?.props.download, undefined);
+  const click = installer?.props.onClick as (event: { preventDefault: () => void }) => void;
+  click({ preventDefault() { actions.push("prevent-default"); } });
+  assert.deepEqual(actions, ["prevent-default", "close", `${release.baseUrl}${macFiles[0]}`]);
 });

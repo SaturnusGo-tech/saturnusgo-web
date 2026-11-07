@@ -13,9 +13,10 @@ type Props = {
   readonly anchor: RefObject<HTMLButtonElement | null>;
   readonly onClose: () => void;
   readonly installerFiles?: readonly string[];
+  readonly onDownload?: (href: string) => void;
 };
 
-export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles }: Props) {
+export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles, onDownload }: Props) {
   const { locale } = useTmsLocale(), ru = locale === "ru", id = useId();
   const panel = useRef<HTMLDivElement>(null), closeCallback = useRef(onClose);
   const [position, setPosition] = useState<ReturnType<typeof desktopDownloadsPosition> | null>(null);
@@ -51,7 +52,7 @@ export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles }:
 
   const visible = open && position !== null;
   useEffect(() => {
-    if (visible) panel.current?.querySelector<HTMLElement>("a[download]")?.focus({ preventScroll: true });
+    if (visible) panel.current?.querySelector<HTMLElement>("[data-desktop-installer]")?.focus({ preventScroll: true });
   }, [visible]);
 
   if (!open || typeof document === "undefined") return null;
@@ -67,7 +68,9 @@ export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles }:
     <div className={css.builds}>
       {release.artifacts.filter(build => !installerFiles || installerFiles.includes(build.file)).map(build => {
         const Platform = build.platform === "mac" ? Laptop : Monitor;
-        return <a key={build.id} className={css.build} href={`${release.baseUrl}${build.file}`} download={build.file}>
+        const href = `${release.baseUrl}${build.file}`;
+        return <a key={build.id} className={css.build} href={href} data-desktop-installer download={onDownload ? undefined : build.file}
+          onClick={onDownload ? event => { event.preventDefault(); close(); onDownload(href); } : undefined}>
           <Platform className={css.platform} size={22} strokeWidth={1.6} aria-hidden="true" />
           <span className={css.description}><strong>{build.label}</strong><span>{build.minimum} · {Math.round(build.bytes / 1024 / 1024)} MB</span></span>
           <Download className={css.download} size={18} strokeWidth={1.6} aria-hidden="true" />

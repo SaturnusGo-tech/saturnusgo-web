@@ -5,13 +5,37 @@ import { getDesktopUpdate } from "../../model/update";
 import release from "../../model/release.json";
 
 function setup(userAgent: string, locale = "en") {
-  const h = componentHarness(undefined, { navigator: { userAgent } });
+  const timers = new Set<() => void>();
+  const h = componentHarness(undefined, {
+    navigator: { userAgent },
+    setTimeout: (callback: () => void) => { timers.add(callback); return callback; },
+    clearTimeout: (callback: () => void) => { timers.delete(callback); },
+  });
   const { DesktopUpdateControl } = h.load<{ DesktopUpdateControl: () => unknown }>(
     new URL("../../presentation/update/DesktopUpdateControl.tsx", import.meta.url), name => {
       if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale }) };
       if (name.endsWith("/update")) return { getDesktopUpdate };
     });
-  return { render: () => nodes(h.render(DesktopUpdateControl)), dispose: h.dispose };
+  const opened: string[] = [];
+  const window = h.window as typeof h.window & { open: (href: string, target: string, options: string) => null };
+  const handoffListeners = new Set<(event: { detail: { requestId: string; opened: boolean } }) => void>();
+  window.addEventListener = (name: string, callback: () => void) => {
+    if (name === "falcon:desktop-update-handoff") handoffListeners.add(callback);
+  };
+  window.removeEventListener = (name: string, callback: () => void) => {
+    if (name === "falcon:desktop-update-handoff") handoffListeners.delete(callback);
+  };
+  window.open = (href, target, options) => {
+    assert.equal(target, "_blank");
+    assert.equal(options, "noopener,noreferrer");
+    opened.push(href);
+    return null;
+  };
+  return {
+    render: () => nodes(h.render(DesktopUpdateControl)), dispose: h.dispose, window, opened,
+    acknowledge: (detail: { requestId: string; opened: boolean }) => handoffListeners.forEach(listener => listener({ detail })),
+    finishHandoff: () => { for (const timer of [...timers]) { timers.delete(timer); timer(); } },
+  };
 }
 
 test("an outdated Windows build offers a direct, versioned installer after hydration", async () => {
@@ -36,6 +60,63 @@ test("the control stays absent in web and on current desktop builds", async () =
     assert.deepEqual(h.render(), []);
     h.dispose();
   }
+});
+
+test("opening a desktop installer displays the ring and blocks duplicate browser handoffs", async () => {
+  const h = setup("Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.1.0");
+  const render = () => h.render().find(node => node.props["data-testid"] === "desktop-update")!;
+  render();
+  await new Promise(setImmediate);
+  const action = render();
+  let prevented = 0;
+  const click = action.props.onClick as (event: { preventDefault: () => void }) => void;
+  const event = { preventDefault: () => { prevented++; } };
+  click(event);
+  click(event);
+  assert.equal(prevented, 2);
+  assert.deepEqual(h.opened.map(href => href.split("#")[0]), [action.props.href]);
+  assert.equal(render().props["aria-label"], "Opening download");
+  assert.equal(render().props["aria-busy"], true);
+  assert.ok(h.render().some(node => node.props.className === "updateRing"));
+  h.finishHandoff();
+  assert.equal(render().props["aria-busy"], undefined);
+  assert.equal(render().props["aria-label"], action.props["aria-label"]);
+  h.dispose();
+});
+
+test("a browser launch error is announced and the Russian control can retry", async () => {
+  const h = setup("Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.1.0", "ru");
+  const render = () => h.render().find(node => node.props["data-testid"] === "desktop-update")!;
+  render();
+  await new Promise(setImmediate);
+  const open = h.window.open;
+  h.window.open = () => { throw new Error("Browser unavailable"); };
+  const event = { preventDefault() {} };
+  (render().props.onClick as (event: unknown) => void)(event);
+  assert.equal(render().props["aria-busy"], undefined);
+  assert.match(String(h.render().find(node => node.props.role === "alert")?.props.children), /Не удалось открыть загрузку/);
+  h.window.open = open;
+  (render().props.onClick as (event: unknown) => void)(event);
+  assert.equal(h.opened.length, 1);
+  assert.equal(render().props["aria-label"], "Открываем загрузку");
+  h.dispose();
+});
+
+test("an acknowledgement-capable shell reports the matching native launch failure", async () => {
+  const h = setup("Mozilla/5.0 (Windows NT 10.0; Win64; x64) FalconDesktop/0.1.0 FalconUpdateHandoff/1");
+  const render = () => h.render().find(node => node.props["data-testid"] === "desktop-update")!;
+  render();
+  await new Promise(setImmediate);
+  (render().props.onClick as (event: unknown) => void)({ preventDefault() {} });
+  const requestId = new URLSearchParams(new URL(h.opened[0]).hash.slice(1)).get("falcon-update");
+  assert.ok(requestId);
+  h.acknowledge({ requestId: "previous-attempt", opened: true });
+  assert.equal(render().props["aria-busy"], true);
+  h.acknowledge({ requestId, opened: false });
+  h.finishHandoff();
+  assert.equal(render().props["aria-busy"], undefined);
+  assert.equal(h.render().find(node => node.props.role === "alert")?.props.children, "Could not open the download. Try again.");
+  h.dispose();
 });
 
 test("the Russian update control opens the Mac-only chooser when the CPU is unknown", async () => {
