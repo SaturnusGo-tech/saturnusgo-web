@@ -1,4 +1,6 @@
 "use client";
+
+import { ExternalLink, Globe2, Mail } from "lucide-react";
 import type { Company } from "../../domain/administration";
 import { useTmsLocale } from "../../../localization/context/useTmsLocale";
 import { administrationCopy } from "../copy/administration-copy";
@@ -13,20 +15,32 @@ export function CompanyOverview({ resource }: { readonly resource: {
   const copy = administrationCopy(locale);
   const company = resource.value;
   if (resource.loading || !company) return <ResourceState loading={resource.loading} error={resource.error} retry={resource.refresh} />;
+  const hostname = company.domain?.hostname;
+  const legalFields = (["legalName", "countryCode", "legalForm", "taxId", "registrationId", "taxBranchId", "legalAddress"] as const)
+    .filter((key) => company.legal[key]);
   return <article className={styles.company}>
-    <header className={styles.header}><span>{copy.companyDetails}</span><StatusBadge status={company.status} /></header>
-    <h1>{company.name}</h1>
+    <header className={styles.header}>
+      <h1>{copy.companyDetails}</h1>
+      <StatusBadge status={company.status} />
+    </header>
     {resource.error && <ResourceState loading={false} error={resource.error} retry={resource.refresh} />}
-    <dl className={styles.properties}>
-      <dt>{copy.address}</dt><dd>{company.domain?.hostname ? <a href={`https://${company.domain.hostname}`}>{company.domain.hostname}</a> : "—"}</dd>
-      <dt>{copy.contact}</dt><dd><a href={`mailto:${company.accessContactEmail}`}>{company.accessContactEmail}</a></dd>
-    </dl>
-    <h2>{copy.legalDetails}</h2>
-    <dl className={styles.properties}>
-      <dt>{copy.legalName}</dt><dd>{company.legal.legalName}</dd>
-      <dt>{copy.countryCode}</dt><dd>{company.legal.countryCode}</dd>
-      {(["legalForm", "taxId", "registrationId", "taxBranchId", "legalAddress"] as const).filter((key) => company.legal[key]).map((key) =>
-        <div className={styles.pair} key={key}><dt>{copy[key]}</dt><dd>{company.legal[key]}</dd></div>)}
-    </dl>
+    <section>
+      <h2>{locale === "ru" ? "Рабочее пространство" : "Workspace"}</h2>
+      <dl className={styles.properties}>
+        <div><dt>{locale === "ru" ? "Название" : "Name"}</dt><dd>{company.name}</dd></div>
+        <div><dt>{copy.address}</dt><dd>{hostname ? <a href={`https://${hostname}`}>
+          <Globe2 size={15} aria-hidden="true" /><span>{hostname}</span><ExternalLink size={13} aria-hidden="true" />
+        </a> : <span className={styles.empty}>{locale === "ru" ? "Не указан" : "Not set"}</span>}</dd></div>
+        <div><dt>{copy.contact}</dt><dd><a href={`mailto:${company.accessContactEmail}`}>
+          <Mail size={15} aria-hidden="true" /><span>{company.accessContactEmail}</span>
+        </a></dd></div>
+      </dl>
+    </section>
+    <section>
+      <h2>{copy.legalDetails}</h2>
+      {legalFields.length > 0 ? <dl className={styles.properties}>{legalFields.map((key) =>
+        <div key={key}><dt>{copy[key]}</dt><dd>{company.legal[key]}</dd></div>)}</dl> :
+        <p className={styles.empty}>{locale === "ru" ? "Реквизиты не добавлены." : "No legal details on file."}</p>}
+    </section>
   </article>;
 }

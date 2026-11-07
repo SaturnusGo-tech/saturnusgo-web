@@ -5,6 +5,7 @@ import { useOptionalTmsSession } from "../../auth/presentation/session/TmsSessio
 import { companyViewAvailable } from "../../auth/managed/domain/features/company-features";
 import { navigateWorkspace } from "../../state/navigation/browser/workspace-history";
 import { useTmsLocale } from "../../localization/context/useTmsLocale";
+import { DesktopUpdateControl } from "../../desktop-downloads/presentation/update/DesktopUpdateControl";
 import type { View } from "../../state/types/workspace";
 import shellStyles from "../workspace/tms-shell.module.css";
 import { NavigationUtilityMenu } from "./NavigationUtilityMenu";
@@ -60,6 +61,7 @@ export function Navigation({ view, onChange, disabled, connected, collapsed, onC
         disabled={disabled} allowManagedHooks={codexAvailable} onNavigate={navigate} onTogglePinned={state.togglePinned}/>
     </div>
     <div className={css.footer}>
+      <DesktopUpdateControl/>
       <SidebarSectionsMenu sidebar={root} availableIds={navigation.availableIds} activeId={navigation.activeId}
         preferences={state.preferences} onTogglePinned={state.togglePinned} onNavigate={navigate} disabled={disabled} allowManagedHooks={codexAvailable}/>
       <NavigationUtilityMenu connected={connected} subject={session?.subject ?? ""} workspaceId={workspaceId}/>

@@ -12,8 +12,10 @@ function ActivityEntry({ event, locale, subjectName }: { event: AdministrationEv
     <div className={styles.content}><div className={styles.line}><strong>{view.title}</strong>
       <time dateTime={event.occurredAt} title={new Date(event.occurredAt).toLocaleString(locale)}>
         {new Date(event.occurredAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}</time></div>
-      {view.target && view.target !== subjectName && <p className={styles.target}>{view.target}</p>}
-      {event.actorName !== subjectName && <p className={styles.actor}>{event.actorName}</p>}
+      <div className={styles.context}>
+        {view.target && view.target !== subjectName && <span className={styles.target}>{view.target}</span>}
+        {event.actorName !== subjectName && <span className={styles.actor}>{event.actorName}</span>}
+      </div>
       <details className={styles.details}><summary aria-label={`${ru ? "Подробности" : "Details"}: ${view.title}`}><ChevronDown size={12} />{ru ? "Подробности" : "Details"}</summary>
         <dl><dt>{ru ? "Событие" : "Event"}</dt><dd>{event.action}</dd>
           {event.initiatedBy && <><dt>{ru ? "Инициатор" : "Initiated by"}</dt><dd>{event.initiatedBy.name}</dd></>}

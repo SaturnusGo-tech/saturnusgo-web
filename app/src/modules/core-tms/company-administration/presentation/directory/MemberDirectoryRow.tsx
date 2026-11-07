@@ -22,7 +22,11 @@ export function MemberDirectoryRow({ member, client, selected, disabled, canEdit
   return <div className={styles.person} data-selected={selected || undefined}>
     <button className={styles.personLink} aria-current={selected ? "true" : undefined} disabled={disabled} onClick={() => onOpen(member.identityId)}>
     <ManagedAvatarImage className={styles.avatar} name={member.name} hasAvatar={avatars && member.hasAvatar} version={member.version} load={load} />
-    <span className={styles.identity}><strong>{member.name}</strong><small>{member.email}</small><small>{memberRoleLabel(member.role, locale)} · {status}</small></span>
+    <span className={styles.identity}>
+      <strong>{member.name}</strong>
+      <small>{member.email}</small>
+      <span className={styles.role}>{memberRoleLabel(member.role, locale)}<span className={styles.status} data-status={member.status}>{status}</span></span>
+    </span>
     </button><MemberActions member={member} disabled={disabled || !canEdit} canManage={canManage}
       onEdit={() => onAction(member.identityId, "edit")} onChange={(change) => onAction(member.identityId, change)} />
   </div>;

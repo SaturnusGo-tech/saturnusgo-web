@@ -18,3 +18,17 @@
 .journal[data-member="true"] .header h1 { font-size:18px; letter-spacing:-.3px; }
 .journal[data-member="true"] .toolbar { flex-wrap:wrap; gap:12px; }
 .journal[data-member="true"] .search { flex:1; min-width:170px; }
+
+:global([data-company-admin]) .journal:not([data-member="true"]) .header { margin-bottom:20px; }
+:global([data-company-admin]) .journal:not([data-member="true"]) .header h1 { font-size:28px; font-weight:560; }
+:global([data-company-admin]) .toolbar { justify-content:flex-start; gap:8px; margin-bottom:22px; }
+:global([data-company-admin]) .search { gap:8px; min-height:36px; padding:6px 11px; border-radius:9px; background:var(--falcon-control); }
+:global([data-company-admin]) .search svg { width:15px; height:15px; flex:none; }
+:global([data-company-admin]) .toolbar button[aria-haspopup] { min-height:36px; padding:6px 10px; background:var(--falcon-control); border:1px solid var(--admin-line); border-radius:9px; }
+:global([data-company-admin]) .toolbar [role="listbox"] { left:0; right:auto; max-width:calc(100vw - 52px); }
+:global([data-company-admin]) .empty { border-top:1px solid var(--falcon-border-subtle); text-align:center; padding:34px 8px; }
+:global([data-company-admin]) .more { color:var(--admin-text); border:1px solid var(--admin-line); border-radius:999px; padding:7px 14px; }
+:global([data-company-admin]) .more:hover:not(:disabled) { background:var(--admin-hover); }
+@media (max-width:760px) {
+  :global([data-company-admin]) .toolbar { align-items:flex-start; }
+}

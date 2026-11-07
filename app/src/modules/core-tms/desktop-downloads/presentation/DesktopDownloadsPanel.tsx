@@ -12,9 +12,10 @@ type Props = {
   readonly open: boolean;
   readonly anchor: RefObject<HTMLButtonElement | null>;
   readonly onClose: () => void;
+  readonly installerFiles?: readonly string[];
 };
 
-export function DesktopDownloadsPanel({ open, anchor, onClose }: Props) {
+export function DesktopDownloadsPanel({ open, anchor, onClose, installerFiles }: Props) {
   const { locale } = useTmsLocale(), ru = locale === "ru", id = useId();
   const panel = useRef<HTMLDivElement>(null), closeCallback = useRef(onClose);
   const [position, setPosition] = useState<ReturnType<typeof desktopDownloadsPosition> | null>(null);
@@ -64,7 +65,7 @@ export function DesktopDownloadsPanel({ open, anchor, onClose }: Props) {
       <button type="button" className={css.close} onClick={close} aria-label={ru ? "Закрыть" : "Close"}><X size={18} strokeWidth={1.7} aria-hidden="true" /></button>
     </header>
     <div className={css.builds}>
-      {release.artifacts.map(build => {
+      {release.artifacts.filter(build => !installerFiles || installerFiles.includes(build.file)).map(build => {
         const Platform = build.platform === "mac" ? Laptop : Monitor;
         return <a key={build.id} className={css.build} href={`${release.baseUrl}${build.file}`} download={build.file}>
           <Platform className={css.platform} size={22} strokeWidth={1.6} aria-hidden="true" />

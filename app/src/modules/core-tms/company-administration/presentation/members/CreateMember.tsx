@@ -1,6 +1,6 @@
 "use client";
 
-import { UserRoundPlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MemberDraft, MemberMutation } from "../../domain/administration";
 import type { AdministrationPort } from "../../application/ports/administration-port";
@@ -37,10 +37,10 @@ export function CreateMember({ client, owner, onBack, onCreated, onBusy }: {
       <div><button type="button" aria-label={copy.cancel} disabled={command.pending} onClick={onBack}><X size={20} /></button>
         <button className={styles.primary} type="submit" disabled={command.pending}>{command.pending ? (locale === "ru" ? "Создаём…" : "Creating…") : copy.create}</button></div>
     </header>
-    <div className={`${styles.body} ${styles.createBody}`}><UserRoundPlus className={styles.createAvatar} size={64} strokeWidth={1.3} />
-      <input className={styles.name} aria-label={locale === "ru" ? "Имя и фамилия" : "Full name"} placeholder={locale === "ru" ? "Имя и фамилия" : "Full name"}
-        autoComplete="off" maxLength={200} required value={draft.name} disabled={command.pending}
-        onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
+    <div className={styles.body}>
+      <label className={styles.field}><span>{locale === "ru" ? "Имя и фамилия" : "Full name"}</span>
+        <input autoComplete="off" maxLength={200} required value={draft.name} disabled={command.pending}
+          onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
       <label className={styles.field}><span>{locale === "ru" ? "Рабочая почта" : "Work email"}</span>
         <input type="email" autoComplete="off" required maxLength={254} value={draft.email} disabled={command.pending}
           onChange={(event) => setDraft({ ...draft, email: event.target.value })} /></label>

@@ -2,7 +2,7 @@
 
 import type { AdministrationActor } from "../../domain/administration-actor";
 import type { MemberChange } from "../../domain/administration";
-import { Plus, Search, UserRoundPlus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import type { AdministrationPort } from "../../application/ports/administration-port";
 import { useAdministrationList } from "../../application/list/useAdministrationList";
@@ -23,7 +23,7 @@ export function MemberList({ client, actor, onAction, onOpen, onCreate, selected
   const directory = useRef<HTMLElement | null>(null);
   const covered = creating || !!selectedId;
   useEffect(() => {
-    const narrow = window.matchMedia("(max-width: 1050px)");
+    const narrow = window.matchMedia("(max-width: 900px)");
     const update = () => { if (directory.current) directory.current.inert = covered && narrow.matches; };
     const frame = requestAnimationFrame(update);
     narrow.addEventListener("change", update);
@@ -31,8 +31,7 @@ export function MemberList({ client, actor, onAction, onOpen, onCreate, selected
   }, [covered]);
   useEffect(() => { if (version) list.refresh(); }, [version, list.refresh]);
   return <section ref={directory} className={styles.directory} aria-label={copy.employees}>
-    <header className={styles.heading}><h1>{copy.employees}</h1><button onClick={onCreate} disabled={disabled}
-      aria-label={copy.newMember} title={copy.newMember}><Plus size={23} strokeWidth={1.5} /></button></header>
+    <header className={styles.heading}><h1>{copy.employees}</h1><button onClick={onCreate} disabled={disabled}><Plus size={16} aria-hidden="true" />{copy.newMember}</button></header>
     <label className={styles.search}><Search size={19} strokeWidth={1.6} /><input type="search" aria-label={copy.memberSearch}
       placeholder={copy.memberSearch} value={list.search} maxLength={200} onChange={(event) => list.setSearch(event.target.value)} /></label>
     <div className={styles.people} aria-busy={list.loading}>
@@ -44,8 +43,6 @@ export function MemberList({ client, actor, onAction, onOpen, onCreate, selected
         selected={selectedId === member.identityId && !creating} disabled={disabled} onOpen={onOpen} />)}
       {!list.loading && !list.error && !list.items.length && <p className={styles.empty}>{copy.noMembers}</p>}
       {list.error && <ResourceState loading={false} error={list.error} retry={list.refresh} />}
-      {creating && <div className={styles.newPerson} aria-current="true"><UserRoundPlus size={26} strokeWidth={1.4} />
-        {locale === "ru" ? "Новый сотрудник" : "New person"}</div>}
       {list.cursor && <button className={styles.more} disabled={list.pending} onClick={() => void list.more()}>{copy.more}</button>}
     </div>
   </section>;

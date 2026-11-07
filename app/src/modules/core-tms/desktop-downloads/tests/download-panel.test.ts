@@ -33,3 +33,16 @@ test("download panel exposes the verified beta platforms and signing facts witho
   assert.equal(guide.props.rel, "noopener noreferrer");
   assert.equal(guide.props.download, undefined);
 });
+
+test("the Mac update chooser offers only Mac installers", () => {
+  const h = componentHarness(undefined, { document: { body: {} } });
+  const { DesktopDownloadsPanel: render } = h.load<{ DesktopDownloadsPanel: typeof DesktopDownloadsPanel }>(new URL("../presentation/DesktopDownloadsPanel.tsx", import.meta.url), name => {
+    if (name === "react-dom") return { createPortal: (value: unknown) => value };
+    if (name.endsWith("useTmsLocale")) return { useTmsLocale: () => ({ locale: "en" }) };
+    if (name.endsWith("release.json")) return { default: release };
+  });
+  const macFiles = release.artifacts.filter(build => build.platform === "mac").map(build => build.file);
+  const all = nodes(render({ open: true, anchor: { current: null }, onClose() {}, installerFiles: macFiles }));
+  const downloads = all.filter(node => node.type === "a" && typeof node.props.download === "string" && node.props.download !== release.checksums);
+  assert.deepEqual(downloads.map(node => node.props.download), macFiles);
+});

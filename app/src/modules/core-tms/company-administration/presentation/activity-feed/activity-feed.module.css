@@ -26,3 +26,21 @@
 .service > summary span { font-variant-numeric:tabular-nums; opacity:.8; }
 .service ol { margin-top:16px; }
 @media(max-width:600px) { .line { gap:10px; } .details dl { grid-template-columns:1fr; } }
+
+.context > span { display:block; }
+:global([data-company-admin]) .day + .day { margin-top:22px; }
+:global([data-company-admin]) .day h2 { margin:0; padding:6px 0 10px; border-bottom:1px solid var(--falcon-border-subtle); }
+:global([data-company-admin]) .entry { gap:10px; padding:12px 0; border-bottom:1px solid var(--falcon-border-subtle); }
+:global([data-company-admin]) .entry::before { content:none; }
+:global([data-company-admin]) .icon { border-radius:8px; }
+:global([data-company-admin]) .content { padding-top:0; }
+:global([data-company-admin]) .context { display:flex; flex-wrap:wrap; gap:2px 8px; }
+:global([data-company-admin]) .context > span { margin:4px 0 0; font-size:12px; line-height:1.4; }
+:global([data-company-admin]) .actor:not(:first-child)::before { content:"·"; margin-inline-end:8px; }
+:global([data-company-admin]) .details { margin-top:4px; font-size:12px; }
+:global([data-company-admin]) .details summary { min-height:26px; padding:4px 8px; margin-inline-start:-8px; border-radius:6px; }
+:global([data-company-admin]) .service { margin:8px 0 0; }
+:global([data-company-admin]) .service > summary { min-height:32px; padding:5px 8px; }
+:global([data-company-admin]) :is(.details, .service) > summary:hover { background:var(--admin-hover); }
+:global([data-company-admin]) :is(.details, .service) > summary:focus-visible { outline:2px solid var(--falcon-focus); outline-offset:2px; }
+:global([data-company-admin]) .service ol { margin-top:4px; }

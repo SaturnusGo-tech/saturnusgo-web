@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isFalconDesktop } from "../../auth/sign-in/domain/desktop-mode";
+import { installedDesktopVersion } from "../model/update";
+
+const MOBILE_USER_AGENT = /\b(?:Android|iPhone|iPad|iPod|IEMobile|Opera Mini|BlackBerry|Windows Phone|webOS|Mobile)\b/i;
 
 export function useDesktopDownloadsAvailable(): boolean {
-  // Keep server and initial client output aligned without flashing downloads in the desktop app.
+  // Keep downloads hidden until the browser environment is known.
   const [available, setAvailable] = useState(false);
-  useEffect(() => { setAvailable(!isFalconDesktop()); }, []);
+  useEffect(() => {
+    const { userAgent, maxTouchPoints } = navigator;
+    // Safari on iPad can send the same user agent as macOS Safari.
+    const isAppleMobileInDesktopMode = /\bMacintosh\b/i.test(userAgent) && maxTouchPoints > 1;
+    setAvailable(!installedDesktopVersion(userAgent) && !MOBILE_USER_AGENT.test(userAgent) && !isAppleMobileInDesktopMode);
+  }, []);
   return available;
 }

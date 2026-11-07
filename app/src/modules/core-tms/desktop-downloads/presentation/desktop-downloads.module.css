@@ -1,3 +1,22 @@
+.update {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  margin: 0 var(--nav-inset) 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--falcon-info-solid);
+  color: var(--falcon-media-text);
+  cursor: pointer;
+}
+.update:hover { background: color-mix(in srgb, var(--falcon-info-solid) 88%, black); }
+.update:focus-visible { outline: 2px solid var(--falcon-focus); outline-offset: 3px; }
+@media (max-width: 760px) { .update { margin: 0 4px; } }
+
 .panel {
   position: fixed;
   z-index: 190;

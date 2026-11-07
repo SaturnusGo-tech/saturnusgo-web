@@ -138,3 +138,104 @@
 .page[data-directory="true"] .main { min-height:0; overflow:hidden; }
 .page[data-directory="true"] .canvas { height:100%; }
 @media(max-width:600px) { .page[data-directory="true"] .canvas > div { height:100%; } }
+
+.page[data-company-admin] {
+  --admin-nav-width: 222px;
+  --admin-gutter: clamp(24px, 4vw, 52px);
+  --admin-frame-gap: 8px;
+  background: var(--falcon-chrome);
+  display: grid;
+  grid-template-columns: var(--admin-nav-width) minmax(0, 1fr);
+  grid-template-rows: 52px minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.topBar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 16px;
+}
+
+.topBar .brand { padding: 0; gap: 8px; font-size: 17px; letter-spacing: -.3px; flex-shrink: 0; }
+.topBar .brand img { width: 25px; height: 25px; }
+.workspaceName { min-width: 0; color: var(--admin-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workspaceName:not(:empty) { border-inline-start: 1px solid var(--admin-line); padding-inline-start: 12px; }
+.topBar .returnLink { gap: 7px; margin: 0 0 0 auto; padding: 6px 10px; border-radius: 8px; white-space: nowrap; color: var(--admin-text); font-size: 13px; }
+.topBar .returnLink:hover { background: var(--admin-hover); }
+
+.page[data-company-admin] .sidebar {
+  position: relative;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  padding: 19px 12px 10px;
+  gap: 9px;
+  background: transparent;
+  border: 0;
+}
+
+.navTitle { margin: 0 9px 2px; font-size: 13px; font-weight: 550; color: var(--admin-text); }
+.page[data-company-admin] .nav { display: grid; gap: 3px; }
+.page[data-company-admin] .nav a { gap: 10px; padding: 9px 10px; min-height: 38px; font-size: 13px; }
+.page[data-company-admin] .nav svg { flex: none; }
+.page[data-company-admin] .sidebarBottom { position: static; max-width: none; display: block; margin-top: auto; }
+
+.page[data-company-admin] .main {
+  min-height: 0;
+  padding: 0;
+  margin: 0 var(--admin-frame-gap) var(--admin-frame-gap) 0;
+  border: 1px solid var(--falcon-border-subtle);
+  border-radius: 15px;
+  background: var(--admin-bg);
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.page[data-company-admin] .canvas { max-width: 1244px; padding: clamp(26px, 3.5vw, 48px) var(--admin-gutter) 56px; animation: none; }
+.page[data-company-admin][data-directory="true"] .main { overflow: hidden; }
+.page[data-company-admin][data-directory="true"] .canvas { max-width: none; height: 100%; padding: 0; }
+.page[data-company-admin][data-directory="true"] .canvas > div { height: 100%; }
+
+.page[data-company-admin] :is(button, a).primary {
+  color: var(--falcon-on-action);
+  background: var(--falcon-action);
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
+.page[data-company-admin] :is(button, a).primary:hover { background: var(--falcon-action-hover); }
+.page[data-company-admin] .badge { padding: 3px 8px; border-radius: 999px; background: var(--falcon-selected); }
+.page[data-company-admin] .badge[data-state="active"] { color: var(--falcon-success); background: var(--falcon-success-bg); }
+.page[data-company-admin] .badge[data-state="pending"] { color: var(--falcon-warning); background: var(--falcon-warning-bg); }
+.page[data-company-admin] .badge[data-state="blocked"] { color: var(--falcon-danger); background: var(--falcon-danger-bg); }
+.page[data-company-admin] .confirmation {
+  margin-inline: 20px;
+  width: auto;
+  background: var(--falcon-elevated);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+@media (max-width: 1020px) {
+  .page[data-company-admin] { --admin-nav-width: 178px; }
+}
+
+@media (max-width: 760px) {
+  .page[data-company-admin] { grid-template-columns: minmax(0, 1fr); grid-template-rows: 48px auto minmax(0, 1fr); --admin-gutter: 18px; }
+  .page[data-company-admin] .sidebar { flex-direction: row; align-items: center; padding: 3px 8px 8px; gap: 6px; }
+  .page[data-company-admin] .navTitle { display: none; }
+  .page[data-company-admin] .nav { display: flex; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: thin; padding: 3px; }
+  .page[data-company-admin] .nav a { flex: none; padding: 7px 9px; }
+  .page[data-company-admin] .nav a:focus-visible { outline-offset: -2px; }
+  .page[data-company-admin] .sidebarBottom { flex: none; width: 38px; margin: 0; }
+  .page[data-company-admin] .main { margin-inline: var(--admin-frame-gap); }
+  .topBar { padding-inline: 12px; gap: 8px; }
+  .topBar .returnLink { font-size: 12px; }
+}

@@ -1,12 +1,18 @@
- .company { max-width:980px; }
-.header { display:flex; align-items:center; justify-content:space-between; margin:0 0 60px; color:var(--admin-muted); }
-.company h1 { font-weight:450; font-size:38px; letter-spacing:-1px; line-height:1.3; margin:0 0 35px; }
-.company h2 { font-weight:500; font-size:16px; margin:48px 0 16px; }
-.properties { display:grid; grid-template-columns:230px minmax(0,1fr); margin:0; }
-.properties dt,.properties dd { padding:22px 0; border-bottom:1px solid var(--admin-line); margin:0; }
-.properties dt { color:var(--admin-muted); padding-right:28px; }
-.properties dd { overflow-wrap:anywhere; }
-.properties a { color:inherit; text-decoration:none; }
-.properties a:hover { color:var(--admin-blue); }
-.pair { display:contents; }
-@media(max-width:760px) { .properties { grid-template-columns:1fr; } .properties dt { border:0; padding:20px 0 4px; } .properties dd { padding:4px 0 18px; } .header { margin-bottom:35px; } .company h1 { font-size:30px; } }
+.company { min-width: 0; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 32px; }
+.header h1 { margin: 0; font-weight: 550; font-size: 28px; letter-spacing: -.65px; line-height: 1.25; }
+.company section + section { margin-top: 32px; }
+.company h2 { font-weight: 550; font-size: 15px; margin: 0 0 10px; }
+.properties { margin: 0; font-size: 14px; }
+.properties > div { display: grid; grid-template-columns: minmax(150px, 28%) minmax(0, 1fr); align-items: baseline; gap: 16px; padding: 13px 0; border-top: 1px solid var(--admin-line); }
+.properties dt, .empty { color: var(--admin-muted); }
+.properties dd { margin: 0; overflow-wrap: anywhere; }
+.properties a { display: inline-flex; gap: 7px; align-items: center; color: inherit; text-decoration: none; }
+.properties a svg { flex: none; color: var(--falcon-icon); }
+.properties a:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.empty { font-size: 13px; margin: 0; }
+
+@media (max-width: 540px) {
+  .properties > div { grid-template-columns: minmax(0, 1fr); gap: 4px; padding-block: 10px; }
+  .header h1 { font-size: 24px; }
+}

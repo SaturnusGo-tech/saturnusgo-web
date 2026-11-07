@@ -39,6 +39,10 @@ void test("SSO requires a tested enabled configuration and explicit recovery ack
   assert.equal(button("Require SSO").props.disabled, true);
   await act(async () => renderer.root.findByProps({ type: "checkbox" }).props.onChange({ target: { checked: true } }));
   assert.equal(button("Require SSO").props.disabled, false);
+  config.version = 3;
+  await act(async () => renderer.update(view()));
+  assert.equal(button("Require SSO").props.disabled, true, "a new configuration requires its own acknowledgement");
+  await act(async () => renderer.root.findByProps({ type: "checkbox" }).props.onChange({ target: { checked: true } }));
   await act(async () => button("Require SSO").props.onClick());
   assert.equal(enforced, 1);
   assert.equal(renderer.root.findAllByType("input").some(input => input.props.value === config.entityId), false, "SP values are immutable");

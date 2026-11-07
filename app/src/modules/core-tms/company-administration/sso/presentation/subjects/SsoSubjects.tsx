@@ -14,10 +14,10 @@ export function SsoSubjects({ client, value, copy, pending, bind }: { readonly c
   const [identityId, setIdentity] = useState("");
   const activeMembers = members.items.filter(member => member.status === "active");
   const selected = activeMembers.some(member => member.identityId === identityId);
-  return <section className={styles.section}><h2>{copy.subjects}</h2><p className={styles.hint}>{copy.mappingHint}</p>
+  return <>
     {value.subjects.length ? <ul className={styles.mappings}>{value.subjects.map(mapping => <li key={mapping.subject}>
       <span>{mapping.subject}</span><span><strong>{mapping.identityName}</strong><small>{mapping.email}</small></span>
-    </li>)}</ul> : <p className={styles.hint}>{copy.empty}</p>}
+    </li>)}</ul> : <p className={styles.empty}>{copy.empty}</p>}
     <form className={styles.form} onSubmit={event => { event.preventDefault(); if (selected) void bind({ subject: subject.trim(), identityId }); }}>
       <label>{copy.subject}<input value={subject} onChange={event => setSubject(event.target.value)} required maxLength={512} disabled={pending} /></label>
       <label>{copy.search}<input type="search" value={members.search} onChange={event => members.setSearch(event.target.value)} disabled={pending} /></label>
@@ -25,9 +25,14 @@ export function SsoSubjects({ client, value, copy, pending, bind }: { readonly c
         onChange={event => setIdentity(event.target.value)}><option value="">{copy.choose}</option>
         {activeMembers.map(member => <option key={member.identityId} value={member.identityId}>{member.name} · {member.email || member.login}</option>)}
       </select></label>
-      {members.error && <p className={styles.error} role="alert">{copy.error}<button type="button" onClick={members.refresh}>{copy.refresh}</button></p>}
-      {members.cursor && <button type="button" disabled={members.pending} onClick={() => void members.more()}>{copy.more}</button>}
-      <button className={styles.primary} disabled={pending || members.loading || members.pending || !selected} type="submit">{copy.bind}</button>
+      {members.error && <div className={styles.formFooter}>
+        <p className={styles.error} role="alert">{copy.error}</p>
+        <button className={styles.button} type="button" onClick={members.refresh}>{copy.refresh}</button>
+      </div>}
+      <div className={styles.formFooter}>
+        {members.cursor && <button className={styles.button} type="button" disabled={pending || members.pending} onClick={() => void members.more()}>{copy.more}</button>}
+        <button className={styles.primary} disabled={pending || members.loading || members.pending || !selected} type="submit">{copy.bind}</button>
+      </div>
     </form>
-  </section>;
+  </>;
 }
